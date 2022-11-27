@@ -7,5 +7,23 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  daisyui: {
+    themes: [
+      {
+        ictsc: {
+          "primary": "#f43f5e",
+          // "primary-focus": "#f43f5e",
+          "primary-content": "#FFFFFF",
+          "accent": "#37CDBE",
+          // "neutral": "#f43f5e",
+          "base-100": "#FFFFFF",
+          "info": "#3ABFF8",
+          "success": "#36D399",
+          "warning": "#FBBD23",
+          "error": "#F87272",
+        },
+      },
+    ],
+  },
+  plugins: [require("daisyui")],
 }
