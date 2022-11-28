@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.ictsc-container {
+    @apply max-w-[1024px];
+    @apply mx-auto;
+    @apply px-4;
+    @apply pb-8;
+}
