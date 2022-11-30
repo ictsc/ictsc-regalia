@@ -18,7 +18,10 @@
     "next": "13.0.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "typescript": "4.9.3"
+    "typescript": "4.9.3",
+    "zenn-content-css": "^0.1.132",
+    "zenn-embed-elements": "^0.1.132",
+    "zenn-markdown-html": "^0.1.132"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.13",

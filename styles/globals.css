@@ -2,9 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-.ictsc-container {
+.container-ictsc {
     @apply max-w-[1024px];
     @apply mx-auto;
     @apply px-4;
     @apply pb-8;
+}
+
+.title-ictsc {
+    @apply text-2xl;
+    @apply font-bold;
 }
