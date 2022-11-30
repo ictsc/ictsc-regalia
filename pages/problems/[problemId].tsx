@@ -1,6 +1,7 @@
 import ICTSCNavBar from "../../components/Navbar";
 import MarkdownPreview from "../../components/MarkdownPreview";
 import 'zenn-content-css';
+import ICTSCCard from "../../components/Card";
 
 const Problem = () => {
   // TODO(k-shir0): problemId を取得するコード
@@ -32,9 +33,9 @@ const Problem = () => {
             100 pt 採点基準
             100 pt
           </div>
-          <div className={'border px-8 pt-12 pb-8  rounded-md shadow-sm'}>
+          <ICTSCCard>
             <MarkdownPreview content={content}/>
-          </div>
+          </ICTSCCard>
         </div>
       </>
   )

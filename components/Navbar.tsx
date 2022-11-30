@@ -8,7 +8,12 @@ const ICTSCNavBar = () => {
         </div>
         <div className={'flex-none'}>
           <ul className="menu menu-horizontal p-0">
-            <li><Link href={'/problems'}>問題</Link></li>
+            <li>
+              <Link href={'/'}>ルール</Link>
+            </li>
+            <li>
+              <Link href={'/problems'}>問題</Link>
+            </li>
           </ul>
         </div>
       </div>
