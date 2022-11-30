@@ -1,14 +1,14 @@
-import React from "react";
+import Link from "next/link";
 
-const ICTSCNavBar: React.FC = () => {
+const ICTSCNavBar = () => {
   return (
       <div className={"navbar bg-primary text-primary-content"}>
         <div className={'flex-1'}>
-          <a className="btn btn-ghost normal-case text-xl">ICTSC</a>
+          <Link href={'/'} className="btn btn-ghost normal-case text-xl">ICTSC</Link>
         </div>
         <div className={'flex-none'}>
           <ul className="menu menu-horizontal p-0">
-            <li><a>問題</a></li>
+            <li><Link href={'/problems'}>問題</Link></li>
           </ul>
         </div>
       </div>

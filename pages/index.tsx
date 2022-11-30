@@ -1,4 +1,4 @@
-import ICTSCNavBar from "../components/navbar";
+import ICTSCNavBar from "../components/Navbar";
 
 const Home = () => {
   return (
