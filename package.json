@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "buf:generate": "buf generate proto/scoreserver.proto"
   },
   "dependencies": {
     "@types/node": "18.11.9",
@@ -15,6 +16,7 @@
     "daisyui": "^2.42.0",
     "eslint": "8.28.0",
     "eslint-config-next": "13.0.4",
+    "markdown-yaml-metadata-parser": "^3.0.0",
     "next": "13.0.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
