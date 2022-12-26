@@ -43,9 +43,8 @@ const Login = () => {
         <h1 className={'title-ictsc text-center py-12'}>ログイン</h1>
         <form onSubmit={handleSubmit(onSubmit)}
               className={'form-control flex flex-col container-ictsc items-center'}>
-          {status === 200
-              ? <LoginSuccessAlert/>
-              : <LoginFailedAlert/>}
+          {status === 200 && <LoginSuccessAlert/>}
+          {(status != null && status !== 200) && <LoginFailedAlert/>}
           <input {...register('name', {required: true})}
                  type="text" placeholder="ユーザー名"
                  className="input input-bordered max-w-xs min-w-[312px]"/>
