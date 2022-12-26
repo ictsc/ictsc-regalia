@@ -1,11 +1,7 @@
 import useSWR from 'swr'
-import {useApi} from "./api";
-import {AuthSelfResult} from "../types/_api";
 
-type Result<T> = {
-  code: number;
-  data: T | null;
-}
+import {useApi} from "./api";
+import {AuthSelfResult, Result} from "../types/_api";
 
 export const useAuth = () => {
   const {apiClient} = useApi();
