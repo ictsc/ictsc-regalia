@@ -1,7 +1,12 @@
-import ICTSCNavBar from "../components/Navbar";
-import {useApi} from "../hooks/api";
-import {SubmitHandler, useForm} from "react-hook-form";
 import {useState} from "react";
+import {useRouter} from "next/router";
+
+import {SubmitHandler, useForm} from "react-hook-form";
+
+import ICTSCNavBar from "../components/Navbar";
+import {useAuth} from "../hooks/auth";
+import {useApi} from "../hooks/api";
+
 
 type Inputs = {
   name: string;
@@ -9,8 +14,12 @@ type Inputs = {
 }
 
 const Login = () => {
-  const {apiClient} = useApi();
+  const router = useRouter();
+
   const {register, handleSubmit, formState: {errors}} = useForm<Inputs>()
+
+  const {apiClient} = useApi();
+  const {mutate} = useAuth()
 
   // ステータスコード
   const [status, setStatus] = useState<number | null>(null)
@@ -21,6 +30,11 @@ const Login = () => {
     })
 
     setStatus(response.status)
+
+    if (response.status === 200) {
+      await mutate()
+      await router.push("/")
+    }
   }
 
   return (
