@@ -4,7 +4,7 @@ import {GetServerSideProps} from "next";
 import {Problem} from "../../types/Problem";
 
 interface Props {
-    problems: Problem[];
+  problems: Problem[];
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
