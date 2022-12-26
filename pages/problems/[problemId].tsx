@@ -3,10 +3,10 @@ import {useRouter} from "next/router";
 import Error from "next/error";
 
 import ICTSCNavBar from "../../components/Navbar";
-import MarkdownPreview from "../../components/MarkdownPreview";
 import ICTSCCard from "../../components/Card";
+import MarkdownPreview from "../../components/MarkdownPreview";
+import LoadingPage from "../../components/LoadingPage";
 import {useProblems} from "../../hooks/problem";
-import {LoadingPage} from "../../components/LoadingPage";
 
 const ProblemPage = () => {
   const router = useRouter();
