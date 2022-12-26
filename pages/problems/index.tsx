@@ -1,10 +1,20 @@
 import ICTSCNavBar from "../../components/Navbar";
 import ProblemCard from "../../components/ProblemCard";
 import {useProblems} from "../../hooks/problem";
+import {LoadingPage} from "../../components/LoadingPage";
 
 
 const Problems = () => {
-  const {problems} = useProblems()
+  const {problems, loading} = useProblems()
+
+  if (loading) {
+    return (
+        <>
+          <ICTSCNavBar/>
+          <LoadingPage/>
+        </>
+    );
+  }
 
   return (
       <>
