@@ -4,7 +4,7 @@ import {AuthSelfResult} from "../types/_api";
 
 type Result<T> = {
   code: number;
-  data: T;
+  data: T | null;
 }
 
 export const useAuth = () => {
@@ -15,7 +15,7 @@ export const useAuth = () => {
   const {data, mutate} = useSWR('auth/self', fetcher)
 
   return {
-    user: data?.data.user ?? null,
+    user: data?.data?.user ?? null,
     mutate
   }
 }
