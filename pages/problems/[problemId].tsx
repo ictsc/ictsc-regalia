@@ -1,54 +1,47 @@
-import ICTSCNavBar from "../../components/Navbar";
-import MarkdownPreview from "../../components/MarkdownPreview";
 import 'zenn-content-css';
-import ICTSCCard from "../../components/Card";
+import {useRouter} from "next/router";
+import Error from "next/error";
 
-// @ts-ignore
-import metadataParser from 'markdown-yaml-metadata-parser';
+import ICTSCNavBar from "../../components/Navbar";
+import ICTSCCard from "../../components/Card";
+import MarkdownPreview from "../../components/MarkdownPreview";
+import LoadingPage from "../../components/LoadingPage";
+import {useProblems} from "../../hooks/problem";
 
 const ProblemPage = () => {
-  // TODO(k-shir0): problemId を取得するコード
-  // const router = useRouter();
-  // const {problemId} = router.query;
+  const router = useRouter();
 
-  // TODO(k-shir0): あとで消す
-  const source = `---
-id: 1
-title: 問題タイトル
-point:
-  max: 100
-  solvedCriterion: 100
----
-  
-  # 問題タイトル
-  
-  ## サブタイトル
-  
-  ### サブサブタイトル
-  
-  これは本文です。
-  
-  \`\`\`
-  sudo hogehoge
-  \`\`\`
-  `;
+  const {getProblem, loading} = useProblems();
 
-  const result = metadataParser(source);
-  const {title, point} = result.metadata;
+  const {problemId} = router.query;
+  const problem = getProblem(problemId as string);
+
+  if (problem === null) {
+    return <Error statusCode={404}/>;
+  }
+
+  if (loading) {
+    return (
+        <>
+          <ICTSCNavBar/>
+          <LoadingPage/>
+        </>
+    );
+  }
 
   return (
       <>
         <ICTSCNavBar/>
         <div className={'container-ictsc'}>
           <div className={'flex flex-row items-end py-12'}>
-            <h1 className={'title-ictsc pr-4'}>{title}</h1>
+            <h1 className={'title-ictsc pr-4'}>{problem?.title}</h1>
             満点
-            {point.max} pt
+            {problem?.point} pt
             採点基準
-            {point.solvedCriterion} pt
+            {problem?.solved_criterion} pt
           </div>
           <ICTSCCard>
-            <MarkdownPreview content={result.content}/>
+            <MarkdownPreview content={problem?.body}/>
           </ICTSCCard>
         </div>
       </>
