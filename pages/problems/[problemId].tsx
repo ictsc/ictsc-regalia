@@ -49,10 +49,6 @@ const ProblemPage = () => {
   }
 
 
-  if (problem === null) {
-    return <Error statusCode={404}/>;
-  }
-
   if (loading) {
     return (
         <>
@@ -60,6 +56,10 @@ const ProblemPage = () => {
           <LoadingPage/>
         </>
     );
+  }
+
+  if (problem === null) {
+    return <Error statusCode={404}/>;
   }
 
 
