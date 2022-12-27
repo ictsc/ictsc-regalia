@@ -13,3 +13,8 @@
     @apply text-2xl;
     @apply font-bold;
 }
+
+.subtitle-ictsc {
+    @apply text-xl;
+    @apply font-bold;
+}

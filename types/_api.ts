@@ -1,5 +1,6 @@
 import {User} from "./User";
 import {Problem} from "./Problem";
+import {Answer} from "./Answer";
 
 export type Result<T> = {
   code: number;
@@ -14,4 +15,9 @@ export type AuthSelfResult = {
 // /api/problems
 export type ProblemResult = {
   problems: Problem[];
+}
+
+// /api/problems/:id/answers
+export type AnswerResult = {
+  answer: Answer
 }
