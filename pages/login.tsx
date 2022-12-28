@@ -4,6 +4,7 @@ import {useRouter} from "next/router";
 import {SubmitHandler, useForm} from "react-hook-form";
 
 import ICTSCNavBar from "../components/Navbar";
+import {ICTSCErrorAlert, ICTSCSuccessAlert} from "../components/Alerts";
 import {useAuth} from "../hooks/auth";
 import {useApi} from "../hooks/api";
 
@@ -43,8 +44,10 @@ const Login = () => {
         <h1 className={'title-ictsc text-center py-12'}>ログイン</h1>
         <form onSubmit={handleSubmit(onSubmit)}
               className={'form-control flex flex-col container-ictsc items-center'}>
-          {status === 200 && <LoginSuccessAlert/>}
-          {(status != null && status !== 200) && <LoginFailedAlert/>}
+          {status === 200 &&
+            <ICTSCSuccessAlert className={'mb-8'} message={'ログインに成功しました'}/>}
+          {(status != null && status !== 200) &&
+            <ICTSCErrorAlert className={'mb-8'} message={'ログインに失敗しました'}/>}
           <input {...register('name', {required: true})}
                  type="text" placeholder="ユーザー名"
                  className="input input-bordered max-w-xs min-w-[312px]"/>
@@ -62,38 +65,6 @@ const Login = () => {
         </form>
       </>
   );
-}
-
-// ログインが成功した時に表示するアラート
-const LoginSuccessAlert = () => {
-  return (
-      <div className="alert alert-success shadow-lg max-w-xs min-w-[312ppx] mb-8">
-        <div>
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none"
-               viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          <span>ログインに成功しました！</span>
-        </div>
-      </div>
-  )
-}
-
-// ログインが失敗した時に表示するアラート
-const LoginFailedAlert = () => {
-  return (
-      <div className='alert alert-error shadow-lg max-w-xs min-w-[312ppx] mb-8'>
-        <div>
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none"
-               viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          <span>ログインに失敗しました</span>
-        </div>
-      </div>
-  )
 }
 
 export default Login
