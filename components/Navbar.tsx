@@ -24,7 +24,7 @@ const ICTSCNavBar = () => {
                     <Link href={'/ranking'}>順位</Link>
                   </li>
                   <li>
-                    <Link href={'/problems'}>参加者</Link>
+                    <Link href={'/users'}>参加者</Link>
                   </li>
                   {user.user_group.is_full_access && (
                       <li>

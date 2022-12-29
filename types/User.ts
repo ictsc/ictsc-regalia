@@ -9,4 +9,15 @@ export type User = {
   updated_at: Date;
   user_group: UserGroup;
   user_group_id: string;
+  profile: Profile | null;
+}
+
+export type Profile = {
+  id: string;
+  twitter_id: string;
+  github_id: string;
+  facebook_id: string;
+  self_introduction: string;
+  created_at: Date;
+  updated_at: Date;
 }
