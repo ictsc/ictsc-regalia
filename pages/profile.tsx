@@ -21,7 +21,7 @@ type Inputs = {
 
 const Profile = () => {
   const {apiClient} = useApi()
-  const {user, loading, mutate} = useAuth()
+  const {user, isLoading, mutate} = useAuth()
 
   // ステータスコード
   const [status, setStatus] = useState<number | null>(null)
@@ -37,6 +37,7 @@ const Profile = () => {
   const {register, control, reset, handleSubmit, formState: {errors}} = useForm<Inputs>({
     defaultValues: useMemo(() => ({
       ...getCurrentValue()
+      // eslint-disable-next-line
     }), [user])
   })
 
@@ -47,6 +48,7 @@ const Profile = () => {
         ...getCurrentValue()
       })
     }
+    // eslint-disable-next-line
   }, [user])
 
   const onSubmit = async (data: Inputs) => {
@@ -63,7 +65,7 @@ const Profile = () => {
   }
 
 
-  if (loading) {
+  if (isLoading) {
     return (
         <>
           <ICTSCNavBar/>

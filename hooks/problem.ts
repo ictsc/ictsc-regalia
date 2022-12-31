@@ -9,9 +9,8 @@ export const useProblems = () => {
 
   const fetcher = (url: string) => apiClient.get(url).json<Result<ProblemResult>>();
 
-  const {data, mutate, error} = useSWR('problems', fetcher);
+  const {data, mutate, isLoading} = useSWR('problems', fetcher);
 
-  const loading = !data && !error;
 
   const getProblem = (code: string): Problem | null => {
     return data?.data?.problems.find(problem => problem.code === code) ?? null;
@@ -20,7 +19,7 @@ export const useProblems = () => {
   return {
     problems: data?.data?.problems ?? [],
     mutate,
-    loading,
+    isLoading,
     getProblem
   };
 }

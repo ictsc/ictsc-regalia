@@ -5,9 +5,9 @@ import LoadingPage from "../components/LoadingPage";
 import {useUserGroups} from "../hooks/userGroups";
 
 const Users = () => {
-  const {userGroups, loading} = useUserGroups()
+  const {userGroups, isLoading} = useUserGroups()
 
-  if (loading) {
+  if (isLoading) {
     return (
         <>
           <ICTSCNavBar/>

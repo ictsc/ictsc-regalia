@@ -30,7 +30,7 @@ const ScoringProblem = () => {
 
   const answerFilter = watch('answerFilter')
 
-  const {getProblem, loading} = useProblems();
+  const {getProblem, isLoading} = useProblems();
 
   const {code} = router.query
   const problem = getProblem(code as string)
@@ -38,7 +38,7 @@ const ScoringProblem = () => {
   const [showProblem, setShowProblem] = useState(true)
 
 
-  if (loading) {
+  if (isLoading) {
     return (
         <>
           <ICTSCNavBar/>

@@ -8,13 +8,12 @@ export const useAuth = () => {
 
   const fetcher = (url: string) => apiClient.get(url).json<Result<AuthSelfResult>>()
 
-  const {data, mutate, error} = useSWR('auth/self', fetcher)
+  const {data, mutate, isLoading} = useSWR('auth/self', fetcher)
 
-  const loading = !data && !error
 
   return {
     user: data?.data?.user ?? null,
-    loading,
+    isLoading,
     mutate
   }
 }

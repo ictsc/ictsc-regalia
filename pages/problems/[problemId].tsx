@@ -28,7 +28,7 @@ const ProblemPage = () => {
   const {apiClient} = useApi()
   const [isPreview, setIsPreview] = useState(false);
   const {user} = useAuth()
-  const {getProblem, loading} = useProblems();
+  const {getProblem, isLoading} = useProblems();
 
 
   const {problemId} = router.query;
@@ -54,7 +54,7 @@ const ProblemPage = () => {
   }
 
 
-  if (loading) {
+  if (isLoading) {
     return (
         <>
           <ICTSCNavBar/>

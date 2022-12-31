@@ -9,12 +9,10 @@ export const useUserGroups = () => {
 
   const fetcher = (url: string) => apiClient.get(url).json<Result<UserGroup[]>>();
 
-  const {data, error} = useSWR('usergroups', fetcher)
-
-  const loading = !data && !error;
+  const {data, isLoading} = useSWR('usergroups', fetcher)
 
   return {
     userGroups: data?.data ?? null,
-    loading,
+    isLoading,
   }
 }

@@ -11,12 +11,12 @@ import Error from "next/error";
 
 const Index = () => {
   const {user} = useAuth()
-  const {problems, loading, getProblem} = useProblems();
+  const {problems, isLoading, getProblem} = useProblems();
   const [selectedProblemId, setSelectedProblemId] = useState<string | null>(null);
 
   const problem = selectedProblemId == null ? null : getProblem(selectedProblemId);
 
-  if (loading) {
+  if (isLoading) {
     return (
         <>
           <ICTSCNavBar/>

@@ -4,9 +4,9 @@ import LoadingPage from "../../components/LoadingPage";
 import {useProblems} from "../../hooks/problem";
 
 const Problems = () => {
-  const {problems, loading} = useProblems()
+  const {problems, isLoading} = useProblems()
 
-  if (loading) {
+  if (isLoading) {
     return (
         <>
           <ICTSCNavBar/>

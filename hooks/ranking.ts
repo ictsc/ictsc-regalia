@@ -13,12 +13,10 @@ export const useRanking = () => {
 
   const fetcher = (url: string) => apiClient.get(url).json<Result<AnswerResult>>()
 
-  const {data, error} = useSWR(`ranking`, fetcher)
-
-  const loading = !data && !error
+  const {data,isLoading} = useSWR(`ranking`, fetcher)
 
   return {
     ranking: data?.data?.ranking ?? null,
-    loading,
+    loading: isLoading,
   }
 }
