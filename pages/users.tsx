@@ -35,17 +35,20 @@ const Users = () => {
                         {member.display_name}
                         <div className={'flex flex-row'}>
                           {(member.profile?.github_id ?? '') != '' &&
-                            <button className={'btn btn-circle btn-ghost btn-xs'}>
+                            <a href={`https://github.com/${member.profile?.github_id}`}
+                               className={'btn btn-circle btn-ghost btn-xs'}>
                               <GithubIcon/>
-                            </button>}
+                            </a>}
                           {(member.profile?.github_id ?? '') != '' &&
-                            <button className={'btn btn-circle btn-ghost btn-xs'}>
+                            <a href={`https://twitter.com/${member.profile?.twitter_id}`}
+                               className={'btn btn-circle btn-ghost btn-xs'}>
                               <TwitterIcon/>
-                            </button>}
+                            </a>}
                           {(member.profile?.facebook_id ?? '') != '' &&
-                            <button className={'btn btn-circle btn-ghost btn-xs'}>
+                            <a href={`https://www.facebook.com/${member.profile?.facebook_id}`}
+                               className={'btn btn-circle btn-ghost btn-xs'}>
                               <FacebookIcon/>
-                            </button>}
+                            </a>}
                         </div>
                       </td>
                       <td className={'whitespace-normal lg:min-w-[196px]'}>{userGroup.name}</td>
