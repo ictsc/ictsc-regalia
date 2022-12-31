@@ -15,8 +15,20 @@ import {Answer} from "../../types/Answer";
 import {Problem} from "../../types/Problem";
 import {Result} from "../../types/_api";
 
+type Input = {
+  answerFilter: number;
+}
+
 const ScoringProblem = () => {
   const router = useRouter()
+
+  const {register, watch} = useForm<Input>({
+    defaultValues: {
+      answerFilter: 0,
+    }
+  })
+
+  const answerFilter = watch('answerFilter')
 
   const {getProblem, loading} = useProblems();
 
@@ -60,7 +72,37 @@ const ScoringProblem = () => {
             </div>
           </div>
           <div className={'divider'}/>
-          {answers.map((answer) => (
+          <div className={'form-control w-full max-w-[200px] mb-8'}>
+            <label className="label">
+              <span className="label-text">採点状況フィルタ</span>
+            </label>
+            <select {...register('answerFilter')} className="select select-sm select-bordered ">
+              <option value={0}>すべて</option>
+              <option value={1}>採点済みのみ</option>
+              <option value={2}>未済点のみ</option>
+            </select>
+          </div>
+          {answers.filter((answer) => {
+            if (answerFilter == 0) {
+              console.log('true')
+              return true
+            } else if (answerFilter == 1) {
+              return true
+            } else {
+              return answer.point === null;
+            }
+          }).sort(
+              (a, b) => {
+                // date
+                if (a.updated_at > b.updated_at) {
+                  return 1;
+                }
+                if (a.updated_at < b.updated_at) {
+                  return -1;
+                }
+                return 0;
+              }
+          ).map((answer) => (
               <AnswerForm key={answer.id} problem={problem} answer={answer}/>
           ))}
         </div>
@@ -77,7 +119,9 @@ type AnswerFormInputs = {
   point: number
 }
 
-const AnswerForm = ({problem, answer}: AnswerFormProps) => {
+const AnswerForm = ({
+                      problem, answer
+                    }: AnswerFormProps) => {
   const {apiClient} = useApi();
   const {mutate} = useAnswers(problem.id)
 
@@ -88,8 +132,6 @@ const AnswerForm = ({problem, answer}: AnswerFormProps) => {
   })
 
   const onSubmit = async (data: AnswerFormInputs) => {
-
-
     await apiClient.patch(`problems/${problem.id}/answers/${answer.id}`, {
       json: {
         problem_id: problem.id,
@@ -102,6 +144,16 @@ const AnswerForm = ({problem, answer}: AnswerFormProps) => {
     await mutate()
   }
 
+  // yyyy/mm/dd hh:mm:ss
+  const createdAt = new Date(Date.parse(answer.created_at))
+      .toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      })
 
   return (
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -119,7 +171,7 @@ const AnswerForm = ({problem, answer}: AnswerFormProps) => {
               チーム: {answer.user_group.name}({answer.user_group.organization})
             </div>
             <div>
-              {answer.created_at.toString()}
+              {createdAt}
             </div>
           </div>
           <MarkdownPreview content={problem.body}/>
