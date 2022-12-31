@@ -48,7 +48,7 @@ const ICTSCNavBar = () => {
                           <a>チーム: {user.user_group.name}</a>
                         </li>
                         <li>
-                          <a>マイページ</a>
+                          <Link href={'/profile'}>プロフィール</Link>
                         </li>
                         <div className="divider my-0"/>
                         <li>
