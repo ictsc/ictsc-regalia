@@ -1,9 +1,24 @@
 import Link from "next/link";
+import {useRouter} from "next/router";
 
+import {useApi} from "../hooks/api";
 import {useAuth} from "../hooks/auth";
 
 const ICTSCNavBar = () => {
-  const {user} = useAuth();
+  const router = useRouter();
+
+  const {apiClient} = useApi()
+  const {user, mutate} = useAuth();
+
+  const logout = async () => {
+    const response = await apiClient.delete("auth/signout")
+
+    if (response.ok) {
+      await mutate()
+      await router.push("/")
+    }
+  }
+
 
   return (
       <div className={"navbar bg-primary text-primary-content"}>
@@ -52,7 +67,7 @@ const ICTSCNavBar = () => {
                         </li>
                         <div className="divider my-0"/>
                         <li>
-                          <a>ログアウト</a>
+                          <a onClick={logout}>ログアウト</a>
                         </li>
                       </ul>
                     </li>
