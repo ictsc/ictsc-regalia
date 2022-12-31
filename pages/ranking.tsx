@@ -34,16 +34,16 @@ const Ranking = () => {
               <th>#</th>
               <th>チーム名</th>
               <th>所属</th>
-              <th>得点</th>
+              <th className={'text-right'}>得点</th>
             </tr>
             </thead>
             <tbody>
             {ranking?.map((rank) => (
                 <tr key={rank.user_group.id}>
-                  <th>{rank.rank}</th>
+                  <td className={'w-[64px]'}>{rank.rank}</td>
                   <td>{rank.user_group.name}</td>
                   <td>{rank.user_group.organization}</td>
-                  <td className={'text-right'}>{rank.point}pt</td>
+                  <td className={'w-[124px] text-right'}>{rank.point}pt</td>
                 </tr>
             ))}
             </tbody>
