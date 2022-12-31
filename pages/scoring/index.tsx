@@ -6,13 +6,28 @@ import ICTSCCard from "../../components/Card";
 import MarkdownPreview from "../../components/MarkdownPreview"
 import {useAuth} from "../../hooks/auth";
 import {useProblems} from "../../hooks/problem";
+import LoadingPage from "../../components/LoadingPage";
+import Error from "next/error";
 
 const Index = () => {
   const {user} = useAuth()
-  const {problems, getProblem} = useProblems();
+  const {problems, loading, getProblem} = useProblems();
   const [selectedProblemId, setSelectedProblemId] = useState<string | null>(null);
 
   const problem = selectedProblemId == null ? null : getProblem(selectedProblemId);
+
+  if (loading) {
+    return (
+        <>
+          <ICTSCNavBar/>
+          <LoadingPage/>
+        </>
+    );
+  }
+
+  if (problems === null) {
+    return <Error statusCode={404}/>;
+  }
 
   return (
       <>
