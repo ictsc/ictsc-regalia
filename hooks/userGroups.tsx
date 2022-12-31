@@ -14,7 +14,7 @@ export const useUserGroups = () => {
   const loading = !data && !error;
 
   return {
-    userGroups: data?.data ?? [],
+    userGroups: data?.data ?? null,
     loading,
   }
 }

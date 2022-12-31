@@ -1,3 +1,5 @@
+import Error from "next/error";
+
 import ICTSCNavBar from "../components/Navbar";
 import LoadingPage from "../components/LoadingPage";
 import {useUserGroups} from "../hooks/userGroups";
@@ -14,6 +16,10 @@ const Users = () => {
     );
   }
 
+  if (userGroups === null) {
+    return <Error statusCode={404}/>;
+  }
+
   return (
       <>
         <ICTSCNavBar/>
@@ -28,7 +34,7 @@ const Users = () => {
             </tr>
             </thead>
             <tbody className={'text-sm'}>
-            {userGroups.map((userGroup) =>
+            {userGroups?.map((userGroup) =>
                 userGroup.members?.map((member) => (
                     <tr key={member.id}>
                       <td className={'whitespace-normal max-w-[300px]'}>
