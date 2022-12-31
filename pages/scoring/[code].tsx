@@ -72,22 +72,45 @@ const ScoringProblem = () => {
             </div>
           </div>
           <div className={'divider'}/>
-          <div className={'form-control w-full max-w-[200px] mb-8'}>
-            <label className="label">
-              <span className="label-text">採点状況フィルタ</span>
-            </label>
-            <select {...register('answerFilter')} className="select select-sm select-bordered ">
-              <option value={0}>すべて</option>
-              <option value={1}>採点済みのみ</option>
-              <option value={2}>未済点のみ</option>
-            </select>
+          <div className={'flex flex-row justify-between mb-8'}>
+            <table className="table border table-compact">
+              <thead>
+              <tr>
+                <th>未済点 ~15分</th>
+                <th>15~19分</th>
+                <th>20分~</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>{problem.unchecked}</td>
+                <td> {problem.unchecked_near_overdue != null && problem.unchecked_near_overdue > 0
+                    ? <div className={'inline-block text-warning'}>{problem.unchecked_near_overdue}</div>
+                    : <div className={'inline-block'}>-</div>}
+                </td>
+                <td>{problem.unchecked_overdue != null && problem.unchecked_overdue > 0
+                    ? <div className={'inline-block text-error'}>{problem.unchecked_overdue}</div>
+                    : <div className={'inline-block'}>-</div>}
+                </td>
+              </tr>
+              </tbody>
+            </table>
+            <div className={'form-control w-full max-w-[200px]'}>
+              <label className="label">
+                <span className="label-text">採点状況フィルタ</span>
+              </label>
+              <select {...register('answerFilter')} className="select select-sm select-bordered ">
+                <option value={0}>すべて</option>
+                <option value={1}>採点済みのみ</option>
+                <option value={2}>未済点のみ</option>
+              </select>
+            </div>
           </div>
           {answers.filter((answer) => {
             if (answerFilter == 0) {
-              console.log('true')
               return true
             } else if (answerFilter == 1) {
-              return true
+              return answer.point !== null
             } else {
               return answer.point === null;
             }
@@ -124,6 +147,7 @@ const AnswerForm = ({
                     }: AnswerFormProps) => {
   const {apiClient} = useApi();
   const {mutate} = useAnswers(problem.id)
+  const {mutate: mutateProblem} = useProblems()
 
   const {register, handleSubmit, formState: {errors}} = useForm<AnswerFormInputs>({
     defaultValues: {
@@ -142,6 +166,7 @@ const AnswerForm = ({
     }).json<Result<Answer>>()
 
     await mutate()
+    await mutateProblem()
   }
 
   // yyyy/mm/dd hh:mm:ss
