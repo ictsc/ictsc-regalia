@@ -7,12 +7,12 @@ import {useForm, Controller, SubmitHandler} from "react-hook-form";
 
 import ICTSCNavBar from "../../components/Navbar";
 import ICTSCCard from "../../components/Card";
+import {ICTSCErrorAlert, ICTSCSuccessAlert} from "../../components/Alerts";
 import MarkdownPreview from "../../components/MarkdownPreview";
 import LoadingPage from "../../components/LoadingPage";
 import {useApi} from "../../hooks/api";
 import {useAuth} from "../../hooks/auth";
 import {useProblems} from "../../hooks/problem";
-import {AnswerResult, Result} from "../../types/_api";
 
 type Inputs = {
   answer: string;
@@ -27,6 +27,8 @@ const ProblemPage = () => {
 
   const {apiClient} = useApi()
   const [isPreview, setIsPreview] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [status, setStatus] = useState<number | null>(null);
   const {user} = useAuth()
   const {getProblem, isLoading} = useProblems();
 
@@ -41,11 +43,9 @@ const ProblemPage = () => {
         problem_id: problem?.id,
         body: answer,
       }
-    }).json<Result<AnswerResult>>()
+    })
 
-    // TODO(k-shir0): 投稿に成功しましたアラートを表示
-    // TODO(k-shir0): 投稿に失敗しましたアラートを表示
-    console.log(response)
+    setStatus(response.status)
   }
 
 
@@ -66,16 +66,38 @@ const ProblemPage = () => {
 
   return (
       <>
+        <input type="checkbox" id="my-modal-5" className="modal-toggle"/>
+        <div className={`modal ${isModalOpen && 'modal-open'}`}>
+          <div className="modal-box container-ictsc">
+            <h3 className="title-ictsc pt-4 pb-8">回答内容確認</h3>
+            <ICTSCCard>
+              <MarkdownPreview content={watchField[0]}/>
+            </ICTSCCard>
+            <div className={'text-sm pt-2'}>※ 回答は20分に1度のみです</div>
+            <div className="modal-action">
+              <label onClick={() => setIsModalOpen(false)} className="btn btn-link">閉じる</label>
+              <label onClick={() => {
+                handleSubmit(onSubmit)()
+                setIsModalOpen(false)
+              }} className="btn btn-primary">この内容で提出</label>
+            </div>
+          </div>
+        </div>
+
         <ICTSCNavBar/>
         <div className={'container-ictsc'}>
-          <div className={'flex flex-row items-end py-12'}>
+          <div className={'flex flex-row items-end pt-12 pb-4'}>
             <h1 className={'title-ictsc pr-4'}>{problem.title}</h1>
             満点
             {problem.point} pt
             採点基準
             {problem.solved_criterion} pt
           </div>
-          <ICTSCCard>
+          {status === 201 && (
+              <ICTSCSuccessAlert className={'mt-2'} message={'投稿に成功しました'}/>)}
+          {status != null && status !== 201 && (
+              <ICTSCErrorAlert className={'mt-2'} message={'投稿に失敗しました'}/>)}
+          <ICTSCCard className={'mt-8'}>
             <MarkdownPreview content={problem.body}/>
           </ICTSCCard>
           <ICTSCCard className={'mt-8 pt-4'}>
@@ -105,11 +127,11 @@ const ProblemPage = () => {
                       }}/>
                   )}
               <div className={'flex justify-end'}>
-                <input type={"submit"} className={'btn btn-primary max-w-[312px]'} value={"提出"}/>
+                <label onClick={() => setIsModalOpen(true)} className="btn btn-primary max-w-[312px]">提出確認</label>
               </div>
             </form>
           </ICTSCCard>
-          <div className={'text-sm pt-2'}>※ 回答は15分に1度のみです</div>
+          <div className={'text-sm pt-2'}>※ 回答は20分に1度のみです</div>
         </div>
       </>
   )
