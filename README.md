@@ -13,6 +13,11 @@ with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/
 First, run the development server:
 
 ```bash
+# フォントのインストール
+npm run font
+#or
+yarn font
+
 cp .env .env.local
 # 適切にコンフィグを変更して下さい
 npm run dev
