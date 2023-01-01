@@ -11,6 +11,10 @@ RUN yarn install --frozen-lockfile
 ### Next.js のビルド
 FROM node:16-alpine AS builder
 
+ARG next_public_api_url
+
+ENV NEXT_PUBLIC_API_URL=$next_public_api_url
+
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules

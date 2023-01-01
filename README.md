@@ -23,7 +23,12 @@ yarn dev
 ### Docker build
 
 1. Docker をインストール
-2. コンテナをビルド: `docker build -t nextjs-docker .`
+2. コンテナをビルド:
+```
+docker build \
+  --build-arg=next_public_api_url=http://localhost:8080/api \
+  -t sachiko .
+```
 3. コンテナを起動: `docker run -p 3000:3000 nextjs-docker`
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
