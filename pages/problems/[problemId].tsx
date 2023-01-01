@@ -21,20 +21,25 @@ type Inputs = {
 const ProblemPage = () => {
   const router = useRouter();
 
-  const {handleSubmit, control, watch} = useForm<Inputs>()
+  const {handleSubmit, control, watch, formState: {errors}} = useForm<Inputs>()
   // answer のフォームを監視
   const watchField = watch(['answer'])
 
   const {apiClient} = useApi()
+  const {user} = useAuth()
+  const {getProblem, isLoading} = useProblems();
   const [isPreview, setIsPreview] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [status, setStatus] = useState<number | null>(null);
-  const {user} = useAuth()
-  const {getProblem, isLoading} = useProblems();
 
 
   const {problemId} = router.query;
   const problem = getProblem(problemId as string);
+
+  // モーダルを表示しバリデーションを行う
+  const onModal: SubmitHandler<Inputs> = async () => {
+    setIsModalOpen(true)
+  }
 
   const onSubmit: SubmitHandler<Inputs> = async ({answer}) => {
     const response = await apiClient.post(`problems/${problem?.id}/answers`, {
@@ -101,7 +106,7 @@ const ProblemPage = () => {
             <MarkdownPreview content={problem.body}/>
           </ICTSCCard>
           <ICTSCCard className={'mt-8 pt-4'}>
-            <form onSubmit={handleSubmit(onSubmit)} className={'flex flex-col'}>
+            <form onSubmit={handleSubmit(onModal)} className={'flex flex-col'}>
               <div className="tabs">
                 <a onClick={() => setIsPreview(false)}
                    className={`tab tab-lifted ${!isPreview && 'tab-active'}`}>Write</a>
@@ -116,18 +121,25 @@ const ProblemPage = () => {
                       </>
                   )
                   : (
-                      <Controller name={'answer'} control={control} render={({field}) => {
-                        return (<textarea {...field} className="textarea textarea-bordered my-4 px-2 min-h-[300px]"
-                                          placeholder={`お世話になっております。チーム○○です。
+                      <Controller name={'answer'} control={control}
+                                  rules={{required: true}}
+                                  render={({field}) => {
+                                    return (<textarea {...field}
+                                                      className="textarea textarea-bordered mt-4 px-2 min-h-[300px]"
+                                                      placeholder={`お世話になっております。チーム○○です。
 この問題ではxxxxxが原因でトラブルが発生したと考えられました。
 そのため、以下のように設定を変更し、○○が正しく動くことを確認いたしました。
 確認のほどよろしくお願いします。
+
 ### 手順
 1. /etc/hoge/hoo.bar の編集`}/>)
-                      }}/>
+                                  }}/>
                   )}
-              <div className={'flex justify-end'}>
-                <label onClick={() => setIsModalOpen(true)} className="btn btn-primary max-w-[312px]">提出確認</label>
+              <label className="label max-w-xs min-w-[312px]">
+                {errors.answer && <span className="label-text-alt text-error">回答を入力して下さい</span>}
+              </label>
+              <div className={'flex justify-end mt-4'}>
+                <label onClick={handleSubmit(onModal)} className="btn btn-primary max-w-[312px]">提出確認</label>
               </div>
             </form>
           </ICTSCCard>
