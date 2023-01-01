@@ -23,10 +23,13 @@ const SignUp = () => {
 
   // ステータスコード
   const [status, setStatus] = useState<number | null>(null)
+  // 送信中
+  const [submitting, setSubmitting] = useState(false)
   // エラーメッセージ
   const [message, setMessage] = useState<string | null>(null)
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    setSubmitting(true)
     const response = await apiClient.post("users", {
       json: {
         ...data,
@@ -35,6 +38,7 @@ const SignUp = () => {
       },
     })
 
+    setSubmitting(false)
     setStatus(response.status)
 
     if (!response.ok) {
@@ -87,8 +91,9 @@ const SignUp = () => {
             {errors.password?.type == "minLength" &&
               <span className="label-text-alt text-error">パスワードは8文字以上である必要があります</span>}
           </label>
-          <input type={"submit"} value={'登録'}
-                 className="btn btn-primary mt-4 max-w-xs min-w-[312px]"/>
+          <button type={"submit"}
+                  className={`btn btn-primary mt-4 max-w-xs min-w-[312px] ${submitting && 'loading'}`}>登録
+          </button>
         </form>
       </>
   );

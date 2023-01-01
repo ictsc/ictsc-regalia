@@ -24,12 +24,16 @@ const Login = () => {
 
   // ステータスコード
   const [status, setStatus] = useState<number | null>(null)
+  // 送信中
+  const [submitting, setSubmitting] = useState(false)
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    setSubmitting(true)
     const response = await apiClient.post("auth/signin", {
       json: data,
     })
 
+    setSubmitting(false)
     setStatus(response.status)
 
     if (response.status === 200) {
@@ -60,8 +64,10 @@ const Login = () => {
           <label className="label max-w-xs min-w-[312px]">
             {errors.password && <span className="label-text-alt text-error">パスワードを入力して下さい</span>}
           </label>
-          <input type={"submit"} value={'ログイン'}
-                 className="btn btn-primary mt-4 max-w-xs min-w-[312px]"/>
+          <button type={"submit"}
+                  className={`btn btn-primary mt-4 max-w-xs min-w-[312px] ${submitting && 'loading'}`}>
+            ログイン
+          </button>
         </form>
       </>
   );
