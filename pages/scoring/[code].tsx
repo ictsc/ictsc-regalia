@@ -117,10 +117,10 @@ const ScoringProblem = () => {
           }).sort(
               (a, b) => {
                 // date
-                if (a.updated_at > b.updated_at) {
+                if (a.created_at > b.created_at) {
                   return 1;
                 }
-                if (a.updated_at < b.updated_at) {
+                if (a.created_at < b.created_at) {
                   return -1;
                 }
                 return 0;
@@ -181,44 +181,42 @@ const AnswerForm = ({
       })
 
   return (
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <ICTSCCard key={answer.id} className={'pt-4 mb-4'}>
-          <div className={'flex flex-row justify-between pb-4'}>
-            <div className={'flex flex-row items-center'}>
-              {answer.point !== null && (
-                  <div className={'pr-2'}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3}
-                         stroke="green" className="w-6 h-6">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-                    </svg>
-                  </div>
-              )}
-              チーム: {answer.user_group.name}({answer.user_group.organization})
-            </div>
-            <div>
-              {createdAt}
-            </div>
+      <ICTSCCard key={answer.id} className={'pt-4 mb-4'}>
+        <div className={'flex flex-row justify-between pb-4'}>
+          <div className={'flex flex-row items-center'}>
+            {answer.point !== null && (
+                <div className={'pr-2'}>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3}
+                       stroke="green" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                  </svg>
+                </div>
+            )}
+            チーム: {answer.user_group.name}({answer.user_group.organization})
           </div>
-          <MarkdownPreview content={problem.body}/>
-          <div className={"divider"}/>
-          <div className={'flex flex-row'}>
-            <input {...register("point", {
-              required: true,
-              min: 0,
-              max: problem.point,
-            })} type={"text"} className={"input input-bordered input-sm"}/>
-            <input type={"submit"} className={"btn btn-primary btn-sm ml-2"} value={"採点"}/>
+          <div>
+            {createdAt}
           </div>
-          <label className="label">
-            {errors.point?.type === 'required' &&
-              <span className="label-text-alt text-error">点数を入力して下さい</span>}
-            {errors.point?.type === 'min' &&
-              <span className="label-text-alt text-error">点数が低すぎます0以上の値を指定して下さい</span>}
-            {errors.point?.type === 'max' &&
-              <span className="label-text-alt text-error">点数が高すぎます{problem.point}以下の値を指定して下さい</span>}
-          </label>
-        </ICTSCCard>
-      </form>
+        </div>
+        <MarkdownPreview content={answer.body}/>
+        <div className={"divider"}/>
+        <form onSubmit={handleSubmit(onSubmit)} className={'flex flex-row'}>
+          <input {...register("point", {
+            required: true,
+            min: 0,
+            max: problem.point,
+          })} type={"text"} className={"input input-bordered input-sm"}/>
+          <input type={"submit"} className={"btn btn-primary btn-sm ml-2"} value={"採点"}/>
+        </form>
+        <label className="label">
+          {errors.point?.type === 'required' &&
+            <span className="label-text-alt text-error">点数を入力して下さい</span>}
+          {errors.point?.type === 'min' &&
+            <span className="label-text-alt text-error">点数が低すぎます0以上の値を指定して下さい</span>}
+          {errors.point?.type === 'max' &&
+            <span className="label-text-alt text-error">点数が高すぎます{problem.point}以下の値を指定して下さい</span>}
+        </label>
+      </ICTSCCard>
   )
 }
 
