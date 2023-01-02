@@ -15,8 +15,13 @@ export const useAnswers = (id: string) => {
 
   const {data, mutate} = useSWR(`problems/${id}/answers`, fetcher)
 
+  const getAnswer = (id: string): Answer | null => {
+    return data?.data?.answers.find((answer) => answer.id === id) ?? null
+  }
+
   return {
     answers: data?.data?.answers ?? [],
+    getAnswer,
     mutate
   }
 }
