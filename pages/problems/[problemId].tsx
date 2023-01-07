@@ -41,6 +41,8 @@ const ProblemPage = () => {
   const {answers, getAnswer, mutate} = useAnswers(problem?.id as string);
   const selectedAnswer = getAnswer(selectedAnswerId as string);
 
+  const answerLimit = process.env.NEXT_PUBLIC_ANSWER_LIMIT;
+
   // モーダルを表示しバリデーションを行う
   const onModal: SubmitHandler<Inputs> = async () => {
     setIsModalOpen(true)
@@ -77,8 +79,6 @@ const ProblemPage = () => {
     );
   }
 
-  console.log(answers)
-
 
   return (
       <>
@@ -89,7 +89,7 @@ const ProblemPage = () => {
             <ICTSCCard>
               <MarkdownPreview content={watchField[0]}/>
             </ICTSCCard>
-            <div className={'text-sm pt-2'}>※ 回答は20分に1度のみです</div>
+            {answerLimit && <div className={'text-sm pt-2'}>※ 回答は{answerLimit}分に1度のみです</div>}
             <div className="modal-action">
               <label onClick={() => setIsModalOpen(false)} className="btn btn-link">閉じる</label>
               <label onClick={() => {
@@ -112,7 +112,8 @@ const ProblemPage = () => {
           {status === 201 && (
               <ICTSCSuccessAlert className={'mt-2'} message={'投稿に成功しました'}/>)}
           {status != null && status !== 201 && (
-              <ICTSCErrorAlert className={'mt-2'} message={'投稿に失敗しました'}/>)}
+              <ICTSCErrorAlert className={'mt-2'} message={'投稿に失敗しました'}
+                               subMessage={answerLimit == undefined ? undefined : `回答は${answerLimit}分に1度のみです`}/>)}
           <ICTSCCard className={'mt-8'}>
             <MarkdownPreview content={problem.body}/>
           </ICTSCCard>
@@ -154,9 +155,9 @@ const ProblemPage = () => {
               </div>
             </form>
           </ICTSCCard>
-          <div className={'text-sm pt-2'}>※ 回答は20分に1度のみです</div>
+          {answerLimit && <div className={'text-sm pt-2'}>※ 回答は{answerLimit}分に1度のみです</div>}
           <div className={'divider'}/>
-          <div className={'pb-2'}>
+          <div className={'text-sm pb-2'}>
             定期的に自動更新されます
           </div>
           <div className={'overflow-x-auto'}>
