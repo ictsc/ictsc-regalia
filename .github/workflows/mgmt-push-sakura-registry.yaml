@@ -46,7 +46,7 @@ jobs:
           context: ./
           build-args: |
             next_public_api_url=https://contest.mgmt.ictsc.net/api
-          #   next_public_answer_limit=
+            next_public_answer_limit=20
           push: true
           tags: ${{ steps.image-tag.outputs.tags }}
           cache-from: type=gha
