@@ -45,7 +45,7 @@ jobs:
         with:
           context: ./
           build-args: |
-            next_public_api_url=https://scoreserver.ictsc.net
+            next_public_api_url=https://contest.ictsc.net/api
           #   next_public_answer_limit=
           push: true
           tags: ${{ steps.image-tag.outputs.tags }}
