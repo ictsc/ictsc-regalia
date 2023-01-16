@@ -71,8 +71,8 @@ const Index = () => {
                   <td>{problem.code}</td>
                   <td>{problem.title}</td>
                   {/* 文は 20文字まで */}
-                  <td>{problem.body.length > 20
-                      ? problem.body.slice(0, 20) + "..."
+                  <td>{problem.body?.length ?? 0 > 20
+                      ? problem.body?.slice(0, 20) + "..."
                       : problem.body}</td>
                   <td>{problem.point}</td>
                   <td>{problem.solved_criterion}</td>
@@ -95,7 +95,7 @@ const Index = () => {
                 <Link href={`/scoring/${problem.code}`} className={'link link-primary pl-2'}>採点する</Link>
               </div>
               <ICTSCCard>
-                <MarkdownPreview content={problem.body}/>
+                <MarkdownPreview content={problem.body ?? ""}/>
               </ICTSCCard>
             </div>
         )}

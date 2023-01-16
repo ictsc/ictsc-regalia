@@ -15,6 +15,7 @@ import {useApi} from "../../hooks/api";
 import {useAuth} from "../../hooks/auth";
 import {useProblems} from "../../hooks/problem";
 import {useAnswers} from "../../hooks/answer";
+import {Problem} from "../../types/Problem";
 
 type Inputs = {
   answer: string;
@@ -33,15 +34,11 @@ const ProblemPage = () => {
   const {getProblem, isLoading} = useProblems();
   const [isPreview, setIsPreview] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
   const [status, setStatus] = useState<number | null>(null);
 
   const problem = getProblem(problemId as string);
 
-  const {answers, getAnswer, mutate} = useAnswers(problem?.id as string);
-  const selectedAnswer = getAnswer(selectedAnswerId as string);
-
-  const answerLimit = process.env.NEXT_PUBLIC_ANSWER_LIMIT;
+  const {mutate} = useAnswers(problem?.id as string);
 
   // モーダルを表示しバリデーションを行う
   const onModal: SubmitHandler<Inputs> = async () => {
@@ -80,6 +77,8 @@ const ProblemPage = () => {
   }
 
 
+  const answerLimit = process.env.NEXT_PUBLIC_ANSWER_LIMIT;
+
   return (
       <>
         <input type="checkbox" id="my-modal-5" className="modal-toggle"/>
@@ -115,7 +114,7 @@ const ProblemPage = () => {
               <ICTSCErrorAlert className={'mt-2'} message={'投稿に失敗しました'}
                                subMessage={answerLimit == undefined ? undefined : `回答は${answerLimit}分に1度のみです`}/>)}
           <ICTSCCard className={'mt-8'}>
-            <MarkdownPreview content={problem.body}/>
+            <MarkdownPreview content={problem.body ?? ""}/>
           </ICTSCCard>
           <ICTSCCard className={'mt-8 pt-4'}>
             <form onSubmit={handleSubmit(onModal)} className={'flex flex-col'}>
@@ -157,78 +156,94 @@ const ProblemPage = () => {
           </ICTSCCard>
           {answerLimit && <div className={'text-sm pt-2'}>※ 回答は{answerLimit}分に1度のみです</div>}
           <div className={'divider'}/>
-          <div className={'text-sm pb-2'}>
-            定期的に自動更新されます
-          </div>
-          <div className={'overflow-x-auto'}>
-            <table className="table border table-compact w-full">
-              <thead>
-              <tr>
-                <th className={'w-[196px]'}>提出日時</th>
-                <th className={'w-[100px]'}>問題コード</th>
-                <th>問題</th>
-                <th className={'w-[100px]'}>得点</th>
-                <th className={'w-[100px]'}>チェック済み</th>
-                <th className={'w-[50px]'}></th>
-              </tr>
-              </thead>
-              <tbody>
-              {answers
-                  .sort((a, b) => {
-                    if (a.created_at < b.created_at) {
-                      return 1;
-                    }
-                    if (a.created_at > b.created_at) {
-                      return -1;
-                    }
-                    return 0;
-                  })
-                  .map((answer) => {
-                    const createdAt = DateTime.fromISO(answer.created_at)
-
-                    return (
-                        <tr key={answer.id}>
-                          <td>{createdAt.toFormat('yyyy-MM-dd HH:mm:ss')}</td>
-                          <td>{problem?.code}</td>
-                          <td>{problem?.title}</td>
-                          <td className={'text-right'}>{answer?.point ?? '--'} pt</td>
-                          <td className={'text-center'}>{answer.point != null ? '○' : '採点中'}</td>
-                          <td>
-                            <a href={'#preview'} className={'link'}
-                               onClick={() => setSelectedAnswerId(answer.id)}>投稿内容</a>
-                          </td>
-                        </tr>
-                    );
-                  })}
-              <tr>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-          {selectedAnswer != null && (
-              <div className={'pt-8'} id={'preview'}>
-                <ICTSCCard>
-                  <div className={'flex flex-row justify-between pb-4'}>
-                    <div className={'flex flex-row items-center'}>
-                      {selectedAnswer.point !== null && (
-                          <div className={'pr-2'}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3}
-                                 stroke="green" className="w-6 h-6">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-                            </svg>
-                          </div>
-                      )}
-                      チーム: {selectedAnswer.user_group.name}({selectedAnswer.user_group.organization})
-                    </div>
-                    <div>
-                      {DateTime.fromISO(selectedAnswer.created_at).toFormat('yyyy-MM-dd HH:mm:ss')}
-                    </div>
-                  </div>
-                  <MarkdownPreview content={selectedAnswer.body}/>
-                </ICTSCCard>
-              </div>
-          )}
+          <AnswerListSection problem={problem}/>
         </div>
+      </>
+  )
+}
+
+type AnswerSectionProps = {
+  problem: Problem
+}
+
+const AnswerListSection = ({problem}: AnswerSectionProps) => {
+  const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
+  const {answers, getAnswer, mutate} = useAnswers(problem?.id as string);
+  const selectedAnswer = getAnswer(selectedAnswerId as string);
+
+  return (
+      <>
+        <div className={'text-sm pb-2'}>
+          定期的に自動更新されます
+        </div>
+        <div className={'overflow-x-auto'}>
+          <table className="table border table-compact w-full">
+            <thead>
+            <tr>
+              <th className={'w-[196px]'}>提出日時</th>
+              <th className={'w-[100px]'}>問題コード</th>
+              <th>問題</th>
+              <th className={'w-[100px]'}>得点</th>
+              <th className={'w-[100px]'}>チェック済み</th>
+              <th className={'w-[50px]'}></th>
+            </tr>
+            </thead>
+            <tbody>
+            {answers
+                .sort((a, b) => {
+                  if (a.created_at < b.created_at) {
+                    return 1;
+                  }
+                  if (a.created_at > b.created_at) {
+                    return -1;
+                  }
+                  return 0;
+                })
+                .map((answer) => {
+                  const createdAt = DateTime.fromISO(answer.created_at)
+
+                  return (
+                      <tr key={answer.id}>
+                        <td>{createdAt.toFormat('yyyy-MM-dd HH:mm:ss')}</td>
+                        <td>{problem?.code}</td>
+                        <td>{problem?.title}</td>
+                        <td className={'text-right'}>{answer?.point ?? '--'} pt</td>
+                        <td className={'text-center'}>{answer.point != null ? '○' : '採点中'}</td>
+                        <td>
+                          <a href={'#preview'} className={'link'}
+                             onClick={() => setSelectedAnswerId(answer.id)}>投稿内容</a>
+                        </td>
+                      </tr>
+                  );
+                })}
+            <tr>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        {selectedAnswer != null && (
+            <div className={'pt-8'} id={'preview'}>
+              <ICTSCCard>
+                <div className={'flex flex-row justify-between pb-4'}>
+                  <div className={'flex flex-row items-center'}>
+                    {selectedAnswer.point !== null && (
+                        <div className={'pr-2'}>
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3}
+                               stroke="green" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                          </svg>
+                        </div>
+                    )}
+                    チーム: {selectedAnswer.user_group.name}({selectedAnswer.user_group.organization})
+                  </div>
+                  <div>
+                    {DateTime.fromISO(selectedAnswer.created_at).toFormat('yyyy-MM-dd HH:mm:ss')}
+                  </div>
+                </div>
+                <MarkdownPreview content={selectedAnswer.body}/>
+              </ICTSCCard>
+            </div>
+        )}
       </>
   )
 }
