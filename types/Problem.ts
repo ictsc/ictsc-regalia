@@ -10,6 +10,8 @@ export interface Problem {
   unchecked: number | null;
   unchecked_near_overdue: number | null;
   unchecked_overdue: number | null;
+  current_point: number;
+  is_solved: boolean;
 }
 
 export interface Matter {
