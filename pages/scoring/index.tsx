@@ -14,7 +14,8 @@ const Index = () => {
   const {problems, isLoading, getProblem} = useProblems();
   const [selectedProblemId, setSelectedProblemId] = useState<string | null>(null);
 
-  const problem = selectedProblemId == null ? null : getProblem(selectedProblemId);
+  const result = selectedProblemId == null ? null : getProblem(selectedProblemId);
+  const [matter, problem] = result == null ? [null, null] : result;
 
   if (isLoading) {
     return (

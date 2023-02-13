@@ -17,6 +17,7 @@
     "daisyui": "^2.42.0",
     "eslint": "8.28.0",
     "eslint-config-next": "^13.1.1",
+    "gray-matter": "^4.0.3",
     "ky": "^0.33.0",
     "luxon": "^3.2.0",
     "next": "^13.1.1",

@@ -33,7 +33,7 @@ const ScoringProblem = () => {
   const {getProblem, isLoading} = useProblems();
 
   const {code} = router.query
-  const problem = getProblem(code as string)
+  const [_, problem] = getProblem(code as string)
   const {answers} = useAnswers(problem?.id ?? "")
   const [showProblem, setShowProblem] = useState(true)
 
@@ -67,7 +67,7 @@ const ScoringProblem = () => {
             </div>
             <div className={'collapse-content px-0'}>
               <ICTSCCard className={'ml-0'}>
-                <MarkdownPreview content={problem.body}/>
+                <MarkdownPreview content={problem.body ?? ""}/>
               </ICTSCCard>
             </div>
           </div>

@@ -21,6 +21,7 @@ type Inputs = {
   answer: string;
 }
 
+
 const ProblemPage = () => {
   const router = useRouter();
   const {problemId} = router.query;
@@ -31,12 +32,12 @@ const ProblemPage = () => {
 
   const {apiClient} = useApi()
   const {user} = useAuth()
-  const {getProblem, isLoading} = useProblems();
+  const {getProblem, isLoading,} = useProblems();
   const [isPreview, setIsPreview] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [status, setStatus] = useState<number | null>(null);
 
-  const problem = getProblem(problemId as string);
+  const [matter, problem] = getProblem(problemId as string);
 
   const {mutate} = useAnswers(problem?.id as string);
 
@@ -101,12 +102,48 @@ const ProblemPage = () => {
 
         <ICTSCNavBar/>
         <div className={'container-ictsc'}>
-          <div className={'flex flex-row items-end pt-12 pb-4'}>
-            <h1 className={'title-ictsc pr-4'}>{problem.title}</h1>
-            満点
-            {problem.point} pt
-            採点基準
-            {problem.solved_criterion} pt
+          <div
+              className={`collapse collapse-problem collapse-arrow pt-12 px-0`}>
+            <input type="checkbox" defaultChecked={true}/>
+            <div className={'collapse-title flex flex-row justify-between pl-0 pr-9'}>
+              <div className={'flex flex-row items-end'}>
+                <h1 className={'title-ictsc pr-2'}>{problem.title}</h1>
+                満点
+                {problem.point} pt
+                採点基準
+                {problem.solved_criterion} pt
+              </div>
+              <div className={'text-sm flex flex-row items-end'}>接続情報表示/非表示
+              </div>
+            </div>
+            <div className={'collapse-content pt-2 px-0'}>
+              <div className="overflow-x-auto">
+                <table className="table table-compact w-full">
+                  <thead>
+                  <tr>
+                    <th>ホスト名</th>
+                    <th></th>
+                    <th>ユーザ</th>
+                    <th>パスワード</th>
+                    <th>ポート</th>
+                    <th>種類</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {matter?.connectInfo?.map((info, index) => (
+                      <tr key={index}>
+                        <th>{info.hostname}</th>
+                        <td><MarkdownPreview content={`\`${info.command}\``}/></td>
+                        <td><MarkdownPreview content={`\`${info.user}\``}/></td>
+                        <td><MarkdownPreview content={`\`${info.password}\``}/></td>
+                        <td>{info.port}</td>
+                        <td>{info.type}</td>
+                      </tr>
+                  ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
           {status === 201 && (
               <ICTSCSuccessAlert className={'mt-2'} message={'投稿に成功しました'}/>)}
