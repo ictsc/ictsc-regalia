@@ -1,6 +1,5 @@
 import ky from "ky";
 
-
 export const useApi = () => {
   let headers: HeadersInit = {
     Accept: "application/json, */*",
@@ -12,7 +11,7 @@ export const useApi = () => {
     headers: headers,
     credentials: "include",
     throwHttpErrors: false,
-  })
+  });
 
-  return {apiClient};
+  return { apiClient };
 };

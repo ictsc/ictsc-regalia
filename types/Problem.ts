@@ -23,7 +23,6 @@ export interface Matter {
   connectInfo?: ConnectionInfo[];
 }
 
-
 interface ConnectionInfo {
   type?: string;
   hostname?: string;

@@ -1,4 +1,4 @@
-import {UserGroup} from "./UserGroup";
+import { UserGroup } from "./UserGroup";
 
 export type User = {
   id: string;
@@ -12,7 +12,7 @@ export type User = {
   // ユーザーグループ経由で取得した時のみ使われる
   profile: Profile | null;
   user_profile: Profile | null;
-}
+};
 
 export type Profile = {
   id: string;
@@ -22,4 +22,4 @@ export type Profile = {
   self_introduction: string;
   created_at: Date;
   updated_at: Date;
-}
+};

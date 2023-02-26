@@ -23,17 +23,16 @@ const Home = () => {
   `;
 
   return (
-      <>
-        <ICTSCNavBar/>
-        <h1 className={'title-ictsc text-center py-12'}>ルール</h1>
-        <div className={'container-ictsc'}>
-          <ICTSCCard>
-            <MarkdownPreview content={content}/>
-          </ICTSCCard>
-        </div>
-      </>
-  )
-}
+    <>
+      <ICTSCNavBar />
+      <h1 className={"title-ictsc text-center py-12"}>ルール</h1>
+      <div className={"container-ictsc"}>
+        <ICTSCCard>
+          <MarkdownPreview content={content} />
+        </ICTSCCard>
+      </div>
+    </>
+  );
+};
 
-
-export default Home
+export default Home;

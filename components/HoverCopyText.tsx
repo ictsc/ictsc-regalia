@@ -1,36 +1,36 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 
 import MarkdownPreview from "./MarkdownPreview";
 
 interface Props {
-    text: string;
+  text: string;
 }
 
-const HoverCopyText = ({text}: Props) => {
-    const [isHover, setIsHover] = useState(false);
+const HoverCopyText = ({ text }: Props) => {
+  const [isHover, setIsHover] = useState(false);
 
-    return (
-        <td
-            onMouseEnter={() => {
-                setIsHover(true)
-            }}
-            onMouseLeave={() => {
-                setIsHover(false)
-            }}
+  return (
+    <td
+      onMouseEnter={() => {
+        setIsHover(true);
+      }}
+      onMouseLeave={() => {
+        setIsHover(false);
+      }}
+    >
+      <div className={"flex items-center"}>
+        <MarkdownPreview content={`\`${text}\``} />
+        <button
+          className={`link link-hover pl-2 ${!isHover && "invisible"}`}
+          onClick={() => {
+            navigator.clipboard.writeText(text);
+          }}
         >
-            <div className={'flex items-center'}>
-                <MarkdownPreview content={`\`${text}\``}/>
-                <button
-                    className={`link link-hover pl-2 ${!isHover && 'invisible'}`}
-                    onClick={() => {
-                        navigator.clipboard.writeText(text)
-                    }}
-                >Copy
-                </button>
-            </div>
+          Copy
+        </button>
+      </div>
+    </td>
+  );
+};
 
-        </td>
-    )
-}
-
-export default HoverCopyText
+export default HoverCopyText;

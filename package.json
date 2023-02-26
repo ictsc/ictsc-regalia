@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "format": "prettier --check --ignore-path .gitignore .",
+    "format:fix": "prettier --write --ignore-path .gitignore .",
     "font": "docker build -f Dockerfile.font -t font-builder . && docker run -v $(pwd):/host -it font-builder sh -c \"cp /font/Variable/OTF/Subset/NotoSansJP-VF.woff2 /host/pages/NotoSansJP-VF.woff2 && exit\""
   },
   "dependencies": {
@@ -33,7 +35,9 @@
   "devDependencies": {
     "@types/luxon": "^3.2.0",
     "autoprefixer": "^10.4.13",
+    "eslint-config-prettier": "^8.6.0",
     "postcss": "^8.4.19",
+    "prettier": "^2.8.4",
     "tailwindcss": "^3.2.4"
   }
 }
