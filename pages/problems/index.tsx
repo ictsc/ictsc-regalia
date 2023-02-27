@@ -2,6 +2,8 @@ import ICTSCNavBar from "../../components/Navbar";
 import ProblemCard from "../../components/ProblemCard";
 import LoadingPage from "../../components/LoadingPage";
 import { useProblems } from "../../hooks/problem";
+import Head from "next/head";
+import { site } from "../../components/_const";
 
 const Problems = () => {
   const { problems, isLoading } = useProblems();
@@ -17,6 +19,9 @@ const Problems = () => {
 
   return (
     <>
+      <Head>
+        <title>問題一覧 - {site}</title>
+      </Head>
       <ICTSCNavBar />
       <h1 className={"title-ictsc text-center py-12"}>問題一覧</h1>
       <ul className={"grid grid-cols-4 gap-8 container-ictsc"}>

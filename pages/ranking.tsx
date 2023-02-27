@@ -4,6 +4,8 @@ import ICTSCNavBar from "../components/Navbar";
 import LoadingPage from "../components/LoadingPage";
 
 import { useRanking } from "../hooks/ranking";
+import Head from "next/head";
+import { site } from "../components/_const";
 
 const Ranking = () => {
   const { ranking, loading } = useRanking();
@@ -23,6 +25,9 @@ const Ranking = () => {
 
   return (
     <>
+      <Head>
+        <title>ランキング - {site}</title>
+      </Head>
       <ICTSCNavBar />
       <h1 className={"title-ictsc text-center py-12"}>スコアボード</h1>
       <div className={"container-ictsc"}>

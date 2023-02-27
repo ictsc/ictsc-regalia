@@ -7,6 +7,8 @@ import ICTSCNavBar from "../components/Navbar";
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "../components/Alerts";
 import { useAuth } from "../hooks/auth";
 import { useApi } from "../hooks/api";
+import Head from "next/head";
+import { site } from "../components/_const";
 
 type Inputs = {
   name: string;
@@ -47,6 +49,9 @@ const Login = () => {
 
   return (
     <>
+      <Head>
+        <title>ログイン - {site}</title>
+      </Head>
       <ICTSCNavBar />
       <h1 className={"title-ictsc text-center py-12"}>ログイン</h1>
       <form

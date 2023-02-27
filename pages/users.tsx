@@ -3,6 +3,8 @@ import Error from "next/error";
 import ICTSCNavBar from "../components/Navbar";
 import LoadingPage from "../components/LoadingPage";
 import { useUserGroups } from "../hooks/userGroups";
+import Head from "next/head";
+import { site } from "../components/_const";
 
 const Users = () => {
   const { userGroups, isLoading } = useUserGroups();
@@ -22,6 +24,9 @@ const Users = () => {
 
   return (
     <>
+      <Head>
+        <title>参加者一覧 - {site}</title>
+      </Head>
       <ICTSCNavBar />
       <h1 className={"title-ictsc text-center py-12"}>参加者一覧</h1>
       <div className={"container-ictsc"}>

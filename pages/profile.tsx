@@ -9,6 +9,8 @@ import { ICTSCErrorAlert, ICTSCSuccessAlert } from "../components/Alerts";
 import LoadingPage from "../components/LoadingPage";
 import { useApi } from "../hooks/api";
 import { useAuth } from "../hooks/auth";
+import Head from "next/head";
+import { site } from "../components/_const";
 
 type Inputs = {
   display_name: string;
@@ -87,6 +89,9 @@ const Profile = () => {
 
   return (
     <>
+      <Head>
+        <title>プロフィール - {site}</title>
+      </Head>
       <ICTSCNavBar />
       <div className={"container-ictsc pt-8"}>
         <ICTSCCard>

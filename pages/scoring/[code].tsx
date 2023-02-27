@@ -14,6 +14,8 @@ import { useAnswers } from "../../hooks/answer";
 import { Answer } from "../../types/Answer";
 import { Problem } from "../../types/Problem";
 import { Result } from "../../types/_api";
+import Head from "next/head";
+import { site } from "../../components/_const";
 
 type Input = {
   answerFilter: number;
@@ -52,6 +54,11 @@ const ScoringProblem = () => {
 
   return (
     <>
+      <Head>
+        <title>
+          採点({problem.title}) - {site}
+        </title>
+      </Head>
       <ICTSCNavBar />
       <div className="container-ictsc">
         <div

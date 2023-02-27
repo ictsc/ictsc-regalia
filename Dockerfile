@@ -32,9 +32,11 @@ RUN wget https://github.com/googlefonts/noto-cjk/releases/download/Sans2.004/01_
 FROM node:16-alpine AS builder
 
 ARG next_public_api_url
+ARG next_public_site_name
 ARG next_public_answer_limit
 
 ENV NEXT_PUBLIC_API_URL=$next_public_api_url
+ENV NEXT_PUBLIC_SITE_NAME=$next_public_site_name
 ENV NEXT_PUBLIC_ANSWER_LIMIT=$next_public_answer_limit
 
 WORKDIR /app

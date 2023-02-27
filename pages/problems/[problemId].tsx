@@ -17,6 +17,8 @@ import { useAuth } from "../../hooks/auth";
 import { useProblems } from "../../hooks/problem";
 import { useAnswers } from "../../hooks/answer";
 import { Problem } from "../../types/Problem";
+import Head from "next/head";
+import { site } from "../../components/_const";
 
 type Inputs = {
   answer: string;
@@ -116,6 +118,11 @@ const ProblemPage = () => {
         </div>
       </div>
 
+      <Head>
+        <title>
+          {problem.title} 問題 - {site}
+        </title>
+      </Head>
       <ICTSCNavBar />
       <div className={"container-ictsc"}>
         <div className={`collapse collapse-problem collapse-arrow pt-12 px-0`}>

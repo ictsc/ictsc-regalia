@@ -8,6 +8,8 @@ import { useAuth } from "../../hooks/auth";
 import { useProblems } from "../../hooks/problem";
 import LoadingPage from "../../components/LoadingPage";
 import Error from "next/error";
+import Head from "next/head";
+import { site } from "../../components/_const";
 
 const Index = () => {
   const { user } = useAuth();
@@ -35,6 +37,9 @@ const Index = () => {
 
   return (
     <>
+      <Head>
+        <title>採点 - {site}</title>
+      </Head>
       <ICTSCNavBar />
       <div className="overflow-x-auto">
         <table className="table table-compact w-full">
