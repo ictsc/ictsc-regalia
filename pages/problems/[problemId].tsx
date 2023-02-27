@@ -19,6 +19,7 @@ import { useAnswers } from "../../hooks/answer";
 import { Problem } from "../../types/Problem";
 import Head from "next/head";
 import { site } from "../../components/_const";
+import ConnectionInfo from "../../components/connection_info";
 
 type Inputs = {
   answer: string;
@@ -69,10 +70,6 @@ const ProblemPage = () => {
     }
   };
 
-  if (problem === null) {
-    return <Error statusCode={404} />;
-  }
-
   if (isLoading) {
     return (
       <>
@@ -80,6 +77,10 @@ const ProblemPage = () => {
         <LoadingPage />
       </>
     );
+  }
+
+  if (problem === null) {
+    return <Error statusCode={404} />;
   }
 
   const answerLimit = process.env.NEXT_PUBLIC_ANSWER_LIMIT;
