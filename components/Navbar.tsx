@@ -61,7 +61,7 @@ const ICTSCNavBar = () => {
               <div>{user.display_name}</div>
               <ul
                 tabIndex={0}
-                className="menu menu-compact dropdown-content mt-3 p-2 shadow rounded-box w-52 text-base-content"
+                className="menu menu-compact dropdown-content bg-base-100 mt-3 p-2 shadow rounded-box w-52 text-base-content"
               >
                 <li>
                   <a>チーム: {user.user_group.name}</a>
