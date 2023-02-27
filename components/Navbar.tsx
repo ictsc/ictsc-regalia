@@ -34,6 +34,9 @@ const ICTSCNavBar = () => {
           {user !== null && (
             <>
               <li>
+                <Link href={"/team_info"}>チーム情報</Link>
+              </li>
+              <li>
                 <Link href={"/problems"}>問題</Link>
               </li>
               <li>
