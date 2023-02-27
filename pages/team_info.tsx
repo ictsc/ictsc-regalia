@@ -76,7 +76,7 @@ const TeamInfo = () => {
             </>
           )}
           <label className={"label pt-12"}>
-            <span className={"label-text"}>接続情報</span>
+            <span className={"label-text"}>踏み台サーバへの接続情報</span>
           </label>
           <div
             className={
