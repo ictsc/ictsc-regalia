@@ -11,7 +11,6 @@ import ICTSCCard from "../../components/Card";
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "../../components/Alerts";
 import MarkdownPreview from "../../components/MarkdownPreview";
 import LoadingPage from "../../components/LoadingPage";
-import HoverCopyText from "../../components/HoverCopyText";
 import { useApi } from "../../hooks/api";
 import { useAuth } from "../../hooks/auth";
 import { useProblems } from "../../hooks/problem";
@@ -142,32 +141,7 @@ const ProblemPage = () => {
             </div>
           </div>
           <div className={"collapse-content pt-2 px-0"}>
-            <div className="overflow-x-auto">
-              <table className="table table-compact w-full">
-                <thead>
-                  <tr>
-                    <th>ホスト名</th>
-                    <th></th>
-                    <th>ユーザ</th>
-                    <th>パスワード</th>
-                    <th>ポート</th>
-                    <th>種類</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {matter?.connectInfo?.map((info, index) => (
-                    <tr key={index}>
-                      <th>{info.hostname}</th>
-                      <HoverCopyText text={info.command ?? ""} />
-                      <HoverCopyText text={info.user ?? ""} />
-                      <HoverCopyText text={info.password ?? ""} />
-                      <td>{info.port}</td>
-                      <td>{info.type}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <ConnectionInfo matter={matter} />
           </div>
         </div>
         {status === 201 && (
