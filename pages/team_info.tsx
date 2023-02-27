@@ -89,7 +89,8 @@ const TeamInfo = () => {
             <p className={`${!isHidden && "invisible"}`}>{ssh}</p>
             <button
               className={`link link-hover`}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 navigator.clipboard.writeText(ssh);
               }}
             >
