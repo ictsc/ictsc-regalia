@@ -80,26 +80,25 @@ const TeamInfo = () => {
             <span className={"label-text"}>踏み台サーバへの接続情報</span>
           </label>
           <div className={"flex flex-row"}>
-            <div
-              className={
-                "flex justify-between input input-bordered items-center max-w-[360px] grow"
-              }
-            >
-              <p
-                className={`pr-2 ${isSSHHidden ? "select-none" : "select-all"}`}
-              >
-                {isSSHHidden ? "********" : ssh}
-              </p>
-              <button
-                onClick={() => {
-                  setIsSSHHidden(!isSSHHidden);
-                }}
-              >
-                {isSSHHidden ? <Eye /> : <EyeSlash />}
-              </button>
-            </div>
+            <input
+              type={isSSHHidden ? "password" : "readonly"}
+              className={"input input-bordered max-w-[440px] grow select-none"}
+              value={ssh}
+              onClick={(e) => {
+                // @ts-ignore
+                e.target.select();
+              }}
+            />
             <button
-              className={`link link-hover pl-2`}
+              className={"ml-[-36px]"}
+              onClick={() => {
+                setIsSSHHidden(!isSSHHidden);
+              }}
+            >
+              {isSSHHidden ? <Eye /> : <EyeSlash />}
+            </button>
+            <button
+              className={`link link-hover pl-6`}
               onClick={(e) => {
                 e.stopPropagation();
                 navigator.clipboard.writeText(ssh);
@@ -112,24 +111,27 @@ const TeamInfo = () => {
             <span className={"label-text"}>パスワード</span>
           </label>
           <div className={"flex flex-row"}>
-            {" "}
-            <div
-              className={`flex justify-between input input-bordered items-center max-w-[360px] grow ${
-                isPasswordHidden ? "select-none" : "select-all"
-              }`}
-            >
-              {isPasswordHidden ? "********" : bastionPassword}
-              <button
-                onClick={() => {
-                  setIsPasswordHidden(!isPasswordHidden);
-                }}
-              >
-                {isPasswordHidden ? <Eye /> : <EyeSlash />}
-              </button>
-            </div>
+            <input
+              type={isPasswordHidden ? "password" : "readonly"}
+              className={"input input-bordered max-w-[440px] grow select-none"}
+              value={bastionPassword}
+              onClick={(e) => {
+                // @ts-ignore
+                e.target.select();
+              }}
+            />
             <button
-              className={`link link-hover pl-2`}
+              className={"ml-[-36px]"}
               onClick={() => {
+                setIsPasswordHidden(!isPasswordHidden);
+              }}
+            >
+              {isPasswordHidden ? <Eye /> : <EyeSlash />}
+            </button>
+            <button
+              className={`link link-hover pl-6`}
+              onClick={(e) => {
+                e.stopPropagation();
                 navigator.clipboard.writeText(bastionPassword);
               }}
             >
