@@ -63,16 +63,6 @@ const TeamInfo = () => {
                     <span className={"text-lg pl-2"}>pt</span>
                   </p>
                 </div>
-                <div className={"border rounded-md p-4"}>
-                  <p className={"text-sm"}>メンバー</p>
-                  <ul className={"pt-1 "}>
-                    {rank.user_group.members?.map((user) => (
-                      <div key={user.id} className={"badge text-black"}>
-                        {user.display_name}
-                      </div>
-                    ))}
-                  </ul>
-                </div>
               </ul>
             </>
           )}
