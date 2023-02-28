@@ -3,7 +3,9 @@ import ProblemCard from "../../components/ProblemCard";
 import LoadingPage from "../../components/LoadingPage";
 import { useProblems } from "../../hooks/problem";
 import Head from "next/head";
-import { site } from "../../components/_const";
+import { rule, shortRule, site } from "../../components/_const";
+import ICTSCCard from "../../components/Card";
+import MarkdownPreview from "../../components/MarkdownPreview";
 
 const Problems = () => {
   const { problems, isLoading } = useProblems();
@@ -24,6 +26,13 @@ const Problems = () => {
       </Head>
       <ICTSCNavBar />
       <h1 className={"title-ictsc text-center py-12"}>問題一覧</h1>
+      {shortRule != "" && (
+        <div className={"container-ictsc"}>
+          <ICTSCCard>
+            <MarkdownPreview content={shortRule?.replace(/\\n/g, "\n") ?? ""} />
+          </ICTSCCard>
+        </div>
+      )}
       <ul
         className={
           "grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8 container-ictsc"
