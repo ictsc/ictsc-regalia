@@ -34,7 +34,7 @@ const ScoringProblem = () => {
 
   const { getProblem, isLoading } = useProblems();
 
-  const { code } = router.query;
+  const { code, answer_id } = router.query;
   const [_, problem] = getProblem(code as string);
   const { answers } = useAnswers(problem?.id ?? "");
   const [showProblem, setShowProblem] = useState(true);
@@ -142,12 +142,18 @@ const ScoringProblem = () => {
           .sort((a, b) => {
             // date
             if (a.created_at > b.created_at) {
-              return 1;
-            }
-            if (a.created_at < b.created_at) {
               return -1;
             }
+            if (a.created_at < b.created_at) {
+              return 1;
+            }
             return 0;
+          })
+          .filter((answer) => {
+            if (answer_id == null) {
+              return true;
+            }
+            return answer.id == answer_id;
           })
           .map((answer) => (
             <AnswerForm key={answer.id} problem={problem} answer={answer} />
