@@ -34,10 +34,14 @@ FROM node:16-alpine AS builder
 ARG next_public_api_url
 ARG next_public_site_name
 ARG next_public_answer_limit
+ARG next_public_rule
+ARG next_public_short_rule
 
 ENV NEXT_PUBLIC_API_URL=$next_public_api_url
 ENV NEXT_PUBLIC_SITE_NAME=$next_public_site_name
 ENV NEXT_PUBLIC_ANSWER_LIMIT=$next_public_answer_limit
+ENV NEXT_PUBLIC_RULE=$next_public_rule
+ENV NEXT_PUBLIC_SHORT_RULE=$next_public_short_rule
 
 WORKDIR /app
 
