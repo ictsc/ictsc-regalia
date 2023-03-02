@@ -46,6 +46,7 @@ const ProblemPage = () => {
 
   const [matter, problem] = getProblem(problemId as string);
 
+  const isReadOnly = user?.is_read_only ?? false;
   const { mutate } = useAnswers(problem?.id as string);
 
   // モーダルを表示しバリデーションを行う
@@ -164,73 +165,76 @@ const ProblemPage = () => {
         <ICTSCCard className={"mt-8"}>
           <MarkdownPreview content={problem.body ?? ""} />
         </ICTSCCard>
-        <ICTSCCard className={"mt-8 pt-4"}>
-          <form onSubmit={handleSubmit(onModal)} className={"flex flex-col"}>
-            <div className="tabs">
-              <a
-                onClick={() => setIsPreview(false)}
-                className={`tab tab-lifted ${!isPreview && "tab-active"}`}
-              >
-                Write
-              </a>
-              <a
-                onClick={() => setIsPreview(true)}
-                className={`tab tab-lifted ${isPreview && "tab-active"}`}
-              >
-                Preview
-              </a>
-            </div>
-            {isPreview ? (
-              <>
-                <MarkdownPreview className={"pt-4"} content={watchField[0]} />
-                <div className="divider mt-0" />
-              </>
-            ) : (
-              <Controller
-                name={"answer"}
-                control={control}
-                rules={{ required: true }}
-                render={({ field }) => {
-                  return (
-                    <textarea
-                      {...field}
-                      className="textarea textarea-bordered mt-4 px-2 min-h-[300px]"
-                      placeholder={`お世話になっております。チーム○○です。
+
+        {!isReadOnly && (
+          <ICTSCCard className={"mt-8 pt-4"}>
+            <form onSubmit={handleSubmit(onModal)} className={"flex flex-col"}>
+              <div className="tabs">
+                <a
+                  onClick={() => setIsPreview(false)}
+                  className={`tab tab-lifted ${!isPreview && "tab-active"}`}
+                >
+                  Write
+                </a>
+                <a
+                  onClick={() => setIsPreview(true)}
+                  className={`tab tab-lifted ${isPreview && "tab-active"}`}
+                >
+                  Preview
+                </a>
+              </div>
+              {isPreview ? (
+                <>
+                  <MarkdownPreview className={"pt-4"} content={watchField[0]} />
+                  <div className="divider mt-0" />
+                </>
+              ) : (
+                <Controller
+                  name={"answer"}
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => {
+                    return (
+                      <textarea
+                        {...field}
+                        className="textarea textarea-bordered mt-4 px-2 min-h-[300px]"
+                        placeholder={`お世話になっております。チーム○○です。
 この問題ではxxxxxが原因でトラブルが発生したと考えられました。
 そのため、以下のように設定を変更し、○○が正しく動くことを確認いたしました。
 確認のほどよろしくお願いします。
 
 ### 手順
 1. /etc/hoge/hoo.bar の編集`}
-                    />
-                  );
-                }}
-              />
-            )}
-            <label className="label max-w-xs min-w-[312px]">
-              {errors.answer && (
-                <span className="label-text-alt text-error">
-                  回答を入力して下さい
-                </span>
+                      />
+                    );
+                  }}
+                />
               )}
-            </label>
-            <div className={"flex justify-end mt-4"}>
-              <label
-                onClick={handleSubmit(onModal)}
-                className="btn btn-primary max-w-[312px]"
-              >
-                提出確認
+              <label className="label max-w-xs min-w-[312px]">
+                {errors.answer && (
+                  <span className="label-text-alt text-error">
+                    回答を入力して下さい
+                  </span>
+                )}
               </label>
-            </div>
-          </form>
-        </ICTSCCard>
+              <div className={"flex justify-end mt-4"}>
+                <label
+                  onClick={handleSubmit(onModal)}
+                  className="btn btn-primary max-w-[312px]"
+                >
+                  提出確認
+                </label>
+              </div>
+            </form>
+          </ICTSCCard>
+        )}
         {answerLimit && (
           <div className={"text-sm pt-2"}>
             ※ 回答は{answerLimit}分に1度のみです
           </div>
         )}
-        <div className={"divider"} />
-        <AnswerListSection problem={problem} />
+        {!isReadOnly && <div className={"divider"} />}
+        {!isReadOnly && <AnswerListSection problem={problem} />}
       </div>
     </>
   );

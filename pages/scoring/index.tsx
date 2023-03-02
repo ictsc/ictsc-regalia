@@ -22,6 +22,9 @@ const Index = () => {
     selectedProblemId == null ? null : getProblem(selectedProblemId);
   const [matter, problem] = result == null ? [null, null] : result;
 
+  const isFullAccess = user?.user_group.is_full_access ?? false;
+  const isReadOnly = user?.is_read_only ?? false;
+
   if (isLoading) {
     return (
       <>
@@ -31,7 +34,7 @@ const Index = () => {
     );
   }
 
-  if (problems === null) {
+  if (!isFullAccess || isReadOnly || problems === null) {
     return <Error statusCode={404} />;
   }
 

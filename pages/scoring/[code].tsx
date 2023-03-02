@@ -16,6 +16,7 @@ import { Problem } from "../../types/Problem";
 import { Result } from "../../types/_api";
 import Head from "next/head";
 import { site } from "../../components/_const";
+import { useAuth } from "../../hooks/auth";
 
 type Input = {
   answerFilter: number;
@@ -32,12 +33,16 @@ const ScoringProblem = () => {
 
   const answerFilter = watch("answerFilter");
 
+  const { user } = useAuth();
   const { getProblem, isLoading } = useProblems();
 
   const { code, answer_id } = router.query;
   const [_, problem] = getProblem(code as string);
   const { answers } = useAnswers(problem?.id ?? "");
   const [showProblem, setShowProblem] = useState(true);
+
+  const isFullAccess = user?.user_group.is_full_access ?? false;
+  const isReadOnly = user?.is_read_only ?? false;
 
   if (isLoading) {
     return (
@@ -48,7 +53,7 @@ const ScoringProblem = () => {
     );
   }
 
-  if (problem === null) {
+  if (!isFullAccess || isReadOnly || problem === null) {
     return <Error statusCode={404} />;
   }
 

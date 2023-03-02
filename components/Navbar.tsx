@@ -45,7 +45,7 @@ const ICTSCNavBar = () => {
               <li>
                 <Link href={"/users"}>参加者</Link>
               </li>
-              {user.user_group.is_full_access && (
+              {user.user_group.is_full_access && !user.is_read_only && (
                 <li>
                   <Link href={"/scoring"}>採点</Link>
                 </li>
