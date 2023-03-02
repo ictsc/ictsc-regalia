@@ -13,7 +13,7 @@ export const useReCreateInfo = (problemCode: string) => {
     `recreate/${problemCode}`,
     fetcher,
     {
-      refreshInterval: 15000,
+      refreshInterval: 30000,
     }
   );
 
