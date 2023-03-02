@@ -1,5 +1,6 @@
 import "zenn-content-css";
 import { useState } from "react";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import Error from "next/error";
 
@@ -16,9 +17,9 @@ import { useAuth } from "../../hooks/auth";
 import { useProblems } from "../../hooks/problem";
 import { useAnswers } from "../../hooks/answer";
 import { Problem } from "../../types/Problem";
-import Head from "next/head";
 import { site } from "../../components/_const";
 import ConnectionInfo from "../../components/connection_info";
+import { useReCreateInfo } from "../../hooks/reCreateInfo";
 
 type Inputs = {
   answer: string;
@@ -45,6 +46,12 @@ const ProblemPage = () => {
   const [status, setStatus] = useState<number | null>(null);
 
   const [matter, problem] = getProblem(problemId as string);
+  const { recreateInfo, mutate: recreateMutate } = useReCreateInfo(
+    problem?.code as string
+  );
+
+  // TODO: あとで消す
+  console.log(recreateInfo);
 
   const isReadOnly = user?.is_read_only ?? false;
   const { mutate } = useAnswers(problem?.id as string);
@@ -67,6 +74,17 @@ const ProblemPage = () => {
 
     if (response.ok) {
       await mutate();
+    }
+  };
+
+  const onReCreateSubmit = async () => {
+    const response = await apiClient.post(`recreate/${problem?.code}`);
+
+    // TODO(k-shir0): ログなどをユーザに表示
+    console.log(response);
+
+    if (response.ok) {
+      await recreateMutate();
     }
   };
 
@@ -126,13 +144,26 @@ const ProblemPage = () => {
       </Head>
       <ICTSCNavBar />
       <div className={"container-ictsc"}>
-        <div className={`collapse collapse-problem collapse-arrow pt-12 px-0`}>
+        <div
+          className={"flex flex-row justify-between pt-12 justify-items-center"}
+        >
+          <h1 className={"title-ictsc pr-2"}>{problem.title}</h1>
+          <button
+            className="btn text-red-500 btn-sm"
+            onClick={() => {
+              onReCreateSubmit();
+            }}
+            disabled={!(recreateInfo?.available ?? false)}
+          >
+            再展開を行う
+          </button>
+        </div>
+        <div className={`collapse collapse-problem collapse-arrow px-0`}>
           <input type="checkbox" defaultChecked={true} />
           <div
             className={"collapse-title flex flex-row justify-between pl-0 pr-9"}
           >
             <div className={"flex flex-row items-end"}>
-              <h1 className={"title-ictsc pr-2"}>{problem.title}</h1>
               満点
               {problem.point} pt 採点基準
               {problem.solved_criterion} pt
@@ -145,6 +176,32 @@ const ProblemPage = () => {
             <ConnectionInfo matter={matter} />
           </div>
         </div>
+
+        {!(recreateInfo?.available ?? false) && (
+          <div className={`alert alert-info shadow-lg grow`}>
+            <div>
+              <div className={"animate-spin"}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+                  />
+                </svg>
+              </div>
+              <div className={"flex flex-col"}>
+                <span>問題を再展開中です</span>
+              </div>
+            </div>
+          </div>
+        )}
         {status === 201 && (
           <ICTSCSuccessAlert
             className={"mt-2"}
