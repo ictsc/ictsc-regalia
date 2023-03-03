@@ -54,7 +54,9 @@ const MarkdownPreview = ({ className, content }: Props) => {
     <div
       className={`znc ${className}`}
       ref={ref}
-      dangerouslySetInnerHTML={{ __html: markdownToHtml(content) }}
+      dangerouslySetInnerHTML={{
+        __html: markdownToHtml(content),
+      }}
     />
   );
 };

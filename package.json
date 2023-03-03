@@ -32,9 +32,9 @@
     "recoil-persist": "^4.2.0",
     "swr": "^2.0.0",
     "typescript": "4.9.3",
-    "zenn-content-css": "^0.1.132",
-    "zenn-embed-elements": "^0.1.134",
-    "zenn-markdown-html": "^0.1.132"
+    "zenn-content-css": "^0.1.81",
+    "zenn-embed-elements": "^0.1.81",
+    "zenn-markdown-html": "^0.1.81"
   },
   "devDependencies": {
     "@types/luxon": "^3.2.0",
