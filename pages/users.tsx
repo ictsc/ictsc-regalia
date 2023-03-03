@@ -34,7 +34,7 @@ const Users = () => {
           <thead>
             <tr>
               <th>名前</th>
-              <th>学校名</th>
+              <th>チーム名</th>
               <th>自己紹介</th>
             </tr>
           </thead>
