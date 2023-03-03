@@ -17,6 +17,7 @@ import { Result } from "../../types/_api";
 import Head from "next/head";
 import { site } from "../../components/_const";
 import { useAuth } from "../../hooks/auth";
+import ConnectionInfo from "../../components/connection_info";
 
 type Input = {
   answerFilter: number;
@@ -37,7 +38,7 @@ const ScoringProblem = () => {
   const { getProblem, isLoading } = useProblems();
 
   const { code, answer_id } = router.query;
-  const [_, problem] = getProblem(code as string);
+  const [matter, problem] = getProblem(code as string);
   const { answers } = useAnswers(problem?.id ?? "");
   const [showProblem, setShowProblem] = useState(true);
 
@@ -73,12 +74,11 @@ const ScoringProblem = () => {
           <input type="checkbox" checked={showProblem} />
           <div className={"collapse-title flex flex-row items-end px-0 mt-8"}>
             <h1 className={"title-ictsc pr-4"}>{problem.title}</h1>
-              満点
-              <span className={"sm:text-2xl"}> {problem.point} </span>pt
-              採点基準
-              <span className={"sm:text-2xl"}> {problem.solved_criterion} </span>pt
-              問題コード
-              <span className={"sm:text-2xl"}> {problem.code}</span>
+            満点
+            <span className={"sm:text-2xl"}> {problem.point} </span>pt 採点基準
+            <span className={"sm:text-2xl"}> {problem.solved_criterion} </span>
+            pt 問題コード
+            <span className={"sm:text-2xl"}> {problem.code}</span>
           </div>
           <div className={"collapse-content px-0"}>
             <ICTSCCard className={"ml-0"}>
@@ -87,7 +87,8 @@ const ScoringProblem = () => {
           </div>
         </div>
         <div className={"divider"} />
-        <div className={"flex flex-row justify-between mb-8"}>
+        <ConnectionInfo matter={matter} />
+        <div className={"flex flex-row justify-between mb-8 pt-2"}>
           <table className="table border table-compact">
             <thead>
               <tr>
