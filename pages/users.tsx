@@ -48,14 +48,18 @@ const Users = () => {
                       {(member.profile?.github_id ?? "") != "" && (
                         <a
                           href={`https://github.com/${member.profile?.github_id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className={"btn btn-circle btn-ghost btn-xs"}
                         >
                           <GithubIcon />
                         </a>
                       )}
-                      {(member.profile?.github_id ?? "") != "" && (
+                      {(member.profile?.twitter_id ?? "") != "" && (
                         <a
                           href={`https://twitter.com/${member.profile?.twitter_id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className={"btn btn-circle btn-ghost btn-xs"}
                         >
                           <TwitterIcon />
@@ -64,6 +68,8 @@ const Users = () => {
                       {(member.profile?.facebook_id ?? "") != "" && (
                         <a
                           href={`https://www.facebook.com/${member.profile?.facebook_id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className={"btn btn-circle btn-ghost btn-xs"}
                         >
                           <FacebookIcon />
