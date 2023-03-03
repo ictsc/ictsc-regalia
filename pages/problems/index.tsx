@@ -118,7 +118,7 @@ const Problems = () => {
         {problems &&
           problems.map((problem, index) => (
             <li key={problem.id}>
-              <ProblemCard index={index + 1} problem={problem} />
+              <ProblemCard key={index + 1} problem={problem} />
             </li>
           ))}
       </ul>
