@@ -61,7 +61,7 @@ const ScoringProblem = () => {
     <>
       <Head>
         <title>
-          採点({problem.title}) - {site}
+          採点({problem.code} {problem.title}) - {site}
         </title>
       </Head>
       <ICTSCNavBar />
@@ -73,9 +73,12 @@ const ScoringProblem = () => {
           <input type="checkbox" checked={showProblem} />
           <div className={"collapse-title flex flex-row items-end px-0 mt-8"}>
             <h1 className={"title-ictsc pr-4"}>{problem.title}</h1>
-            満点
-            {problem.point} pt 採点基準
-            {problem.solved_criterion} pt
+              満点
+              <span className={"sm:text-2xl"}> {problem.point} </span>pt
+              採点基準
+              <span className={"sm:text-2xl"}> {problem.solved_criterion} </span>pt
+              問題コード
+              <span className={"sm:text-2xl"}> {problem.code}</span>
           </div>
           <div className={"collapse-content px-0"}>
             <ICTSCCard className={"ml-0"}>

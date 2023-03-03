@@ -139,7 +139,7 @@ const ProblemPage = () => {
 
       <Head>
         <title>
-          {problem.title} 問題 - {site}
+	  {problem.code} {problem.title} 問題 - {site}
         </title>
       </Head>
       <ICTSCNavBar />
