@@ -147,7 +147,7 @@ const ProblemPage = () => {
         <div
           className={"flex flex-row justify-between pt-12 justify-items-center"}
         >
-          <h1 className={"title-ictsc pr-2"}>{problem.title}</h1>
+          <h1 className={"title-ictsc pr-2 sm:text-3xl"}>{problem.title}</h1>
           <button
             className="btn text-red-500 btn-sm"
             onClick={() => {
@@ -168,8 +168,11 @@ const ProblemPage = () => {
           >
             <div className={"flex flex-row items-end"}>
               満点
-              {problem.point} pt 採点基準
-              {problem.solved_criterion} pt
+              <span className={"sm:text-2xl"}> {problem.point} </span>pt
+              採点基準
+              <span className={"sm:text-2xl"}> {problem.solved_criterion} </span>pt
+              問題コード
+              <span className={"sm:text-2xl"}> {problem.code}</span>
             </div>
             <div className={"text-sm flex flex-row items-end"}>
               接続情報表示/非表示
