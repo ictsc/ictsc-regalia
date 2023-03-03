@@ -50,6 +50,7 @@ jobs:
             next_public_site_name=${{ secrets.SITE_NAME }}
             next_public_rule=${{ secrets.RULE }}
             next_public_short_rule=${{ secrets.SHORT_RULE }}
+            next_public_recreate_rule=${{ secrets.RECREATE_RULE }}
           push: true
           tags: ${{ steps.image-tag.outputs.tags }}
           cache-from: type=gha

@@ -17,7 +17,7 @@ import { useAuth } from "../../hooks/auth";
 import { useProblems } from "../../hooks/problem";
 import { useAnswers } from "../../hooks/answer";
 import { Problem } from "../../types/Problem";
-import { site } from "../../components/_const";
+import { recreateRule, site } from "../../components/_const";
 import ConnectionInfo from "../../components/connection_info";
 import { useReCreateInfo } from "../../hooks/reCreateInfo";
 import toast, { Toaster } from "react-hot-toast";
@@ -44,6 +44,7 @@ const ProblemPage = () => {
   const { getProblem, isLoading } = useProblems();
   const [isPreview, setIsPreview] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReCreateModalOpen, setIsReCreateModalOpen] = useState(false);
   const [status, setStatus] = useState<number | null>(null);
 
   const [matter, problem] = getProblem(problemId as string);
@@ -163,6 +164,33 @@ const ProblemPage = () => {
           </div>
         </div>
       </div>
+      <div className={`modal ${isReCreateModalOpen && "modal-open"}`}>
+        <div className="modal-box container-ictsc">
+          <h3 className="title-ictsc pt-4 pb-8">
+            問題の再展開を行います。よろしいですか？
+          </h3>
+          <MarkdownPreview
+            content={recreateRule?.replace(/\\n/g, "\n") ?? ""}
+          />
+          <div className="modal-action">
+            <label
+              onClick={() => setIsReCreateModalOpen(false)}
+              className="btn btn-link"
+            >
+              閉じる
+            </label>
+            <label
+              onClick={() => {
+                onReCreateSubmit();
+                setIsReCreateModalOpen(false);
+              }}
+              className="btn btn-primary"
+            >
+              問題の再展開を行う
+            </label>
+          </div>
+        </div>
+      </div>
 
       <Head>
         <title>
@@ -178,7 +206,8 @@ const ProblemPage = () => {
           <button
             className="btn text-red-500 btn-sm"
             onClick={() => {
-              onReCreateSubmit();
+              // onReCreateSubmit();
+              setIsReCreateModalOpen(true);
             }}
             disabled={
               recreateInfo?.available != null &&
