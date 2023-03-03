@@ -20,6 +20,7 @@ import { Problem } from "../../types/Problem";
 import { site } from "../../components/_const";
 import ConnectionInfo from "../../components/connection_info";
 import { useReCreateInfo } from "../../hooks/reCreateInfo";
+import toast, { Toaster } from "react-hot-toast";
 
 type Inputs = {
   answer: string;
@@ -61,6 +62,27 @@ const ProblemPage = () => {
     setIsModalOpen(true);
   };
 
+  const successNotify = () =>
+    toast.custom((t) => (
+      <ICTSCSuccessAlert
+        className={`mt-2 ${t.visible ? "animate-enter" : "animate-leave"}`}
+        message={"投稿に成功しました"}
+      />
+    ));
+
+  const errorNotify = () =>
+    toast.custom((t) => (
+      <ICTSCErrorAlert
+        className={`mt-2 ${t.visible ? "animate-enter" : "animate-leave"}`}
+        message={"投稿に失敗しました"}
+        subMessage={
+          answerLimit == undefined
+            ? undefined
+            : `回答は${answerLimit}分に1度のみです`
+        }
+      />
+    ));
+
   const onSubmit: SubmitHandler<Inputs> = async ({ answer }) => {
     const response = await apiClient.post(`problems/${problem?.id}/answers`, {
       json: {
@@ -73,7 +95,11 @@ const ProblemPage = () => {
     setStatus(response.status);
 
     if (response.ok) {
+      successNotify();
+
       await mutate();
+    } else {
+      errorNotify();
     }
   };
 
@@ -105,6 +131,7 @@ const ProblemPage = () => {
 
   return (
     <>
+      <Toaster />
       <input type="checkbox" id="my-modal-5" className="modal-toggle" />
       <div className={`modal ${isModalOpen && "modal-open"}`}>
         <div className="modal-box container-ictsc">
@@ -139,7 +166,7 @@ const ProblemPage = () => {
 
       <Head>
         <title>
-	  {problem.code} {problem.title} 問題 - {site}
+          {problem.code} {problem.title} 問題 - {site}
         </title>
       </Head>
       <ICTSCNavBar />
@@ -170,8 +197,11 @@ const ProblemPage = () => {
               満点
               <span className={"sm:text-2xl"}> {problem.point} </span>pt
               採点基準
-              <span className={"sm:text-2xl"}> {problem.solved_criterion} </span>pt
-              問題コード
+              <span className={"sm:text-2xl"}>
+                {" "}
+                {problem.solved_criterion}{" "}
+              </span>
+              pt 問題コード
               <span className={"sm:text-2xl"}> {problem.code}</span>
             </div>
             <div className={"text-sm flex flex-row items-end"}>
@@ -209,23 +239,6 @@ const ProblemPage = () => {
               </div>
             </div>
           )}
-        {status === 201 && (
-          <ICTSCSuccessAlert
-            className={"mt-2"}
-            message={"投稿に成功しました"}
-          />
-        )}
-        {status != null && status !== 201 && (
-          <ICTSCErrorAlert
-            className={"mt-2"}
-            message={"投稿に失敗しました"}
-            subMessage={
-              answerLimit == undefined
-                ? undefined
-                : `回答は${answerLimit}分に1度のみです`
-            }
-          />
-        )}
         <ICTSCCard className={"mt-8"}>
           <MarkdownPreview content={problem.body ?? ""} />
         </ICTSCCard>
