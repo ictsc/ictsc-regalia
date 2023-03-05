@@ -39,9 +39,13 @@ const ICTSCNavBar = () => {
               <li>
                 <Link href={"/problems"}>問題</Link>
               </li>
-              <li>
-                <Link href={"/ranking"}>順位</Link>
-              </li>
+            </>
+          )}
+          <li>
+            <Link href={"/ranking"}>順位</Link>
+          </li>
+          {user !== null && (
+            <>
               <li>
                 <Link href={"/users"}>参加者</Link>
               </li>
