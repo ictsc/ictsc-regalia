@@ -28,7 +28,7 @@ const ScoringProblem = () => {
 
   const { register, watch } = useForm<Input>({
     defaultValues: {
-      answerFilter: 0,
+      answerFilter: 2,
     },
   });
 
