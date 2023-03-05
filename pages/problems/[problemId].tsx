@@ -203,19 +203,21 @@ const ProblemPage = () => {
           className={"flex flex-row justify-between pt-12 justify-items-center"}
         >
           <h1 className={"title-ictsc pr-2 sm:text-3xl"}>{problem.title}</h1>
-          <button
-            className="btn text-red-500 btn-sm"
-            onClick={() => {
-              // onReCreateSubmit();
-              setIsReCreateModalOpen(true);
-            }}
-            disabled={
-              recreateInfo?.available != null &&
-              !(recreateInfo?.available ?? false)
-            }
-          >
-            再展開を行う
-          </button>
+          {!isReadOnly && (
+            <button
+              className="btn text-red-500 btn-sm"
+              onClick={() => {
+                // onReCreateSubmit();
+                setIsReCreateModalOpen(true);
+              }}
+              disabled={
+                recreateInfo?.available != null &&
+                !(recreateInfo?.available ?? false)
+              }
+            >
+              再展開を行う
+            </button>
+          )}
         </div>
         <div className={`collapse collapse-problem collapse-arrow px-0`}>
           <input type="checkbox" defaultChecked={true} />
