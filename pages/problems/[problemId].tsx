@@ -339,8 +339,8 @@ const ProblemPage = () => {
             ※ 回答は{answerLimit}分に1度のみです
           </div>
         )}
-        {!isReadOnly && <div className={"divider"} />}
-        {!isReadOnly && <AnswerListSection problem={problem} />}
+        <div className={"divider"} />
+        <AnswerListSection problem={problem} />
       </div>
     </>
   );
