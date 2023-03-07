@@ -371,6 +371,7 @@ const AnswerListSection = ({ problem }: AnswerSectionProps) => {
               <th className={"w-[100px]"}>得点</th>
               <th className={"w-[100px]"}>チェック済み</th>
               <th className={"w-[50px]"}></th>
+              <th className={"w-[50px]"}></th>
             </tr>
           </thead>
           <tbody>
@@ -386,6 +387,7 @@ const AnswerListSection = ({ problem }: AnswerSectionProps) => {
               })
               .map((answer) => {
                 const createdAt = DateTime.fromISO(answer.created_at);
+                let blob = new Blob(["" + getAnswer(answer.id)?.body], { type: 'text/markdown' });
 
                 return (
                   <tr key={answer.id}>
@@ -403,6 +405,14 @@ const AnswerListSection = ({ problem }: AnswerSectionProps) => {
                         onClick={() => setSelectedAnswerId(answer.id)}
                       >
                         投稿内容
+                      </a>
+                    </td>
+                    <td>
+                      <a download={`ictsc-${problem?.code}-${createdAt.toUnixInteger()}.md`}
+                        className={"link"}
+                        href={URL.createObjectURL(blob)}
+                      >
+                        ダウンロード
                       </a>
                     </td>
                   </tr>
