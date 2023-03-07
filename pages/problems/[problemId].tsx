@@ -11,6 +11,7 @@ import ICTSCNavBar from "../../components/Navbar";
 import ICTSCCard from "../../components/Card";
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "../../components/Alerts";
 import MarkdownPreview from "../../components/MarkdownPreview";
+import MarkdownRawPreview from "../../components/MarkdownRawPreview";
 import LoadingPage from "../../components/LoadingPage";
 import { useApi } from "../../hooks/api";
 import { useAuth } from "../../hooks/auth";
@@ -282,7 +283,7 @@ const ProblemPage = () => {
                   onClick={() => setIsPreview(false)}
                   className={`tab tab-lifted ${!isPreview && "tab-active"}`}
                 >
-                  Write
+                  Markdown
                 </a>
                 <a
                   onClick={() => setIsPreview(true)}
@@ -356,6 +357,7 @@ const AnswerListSection = ({ problem }: AnswerSectionProps) => {
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
   const { answers, getAnswer, mutate } = useAnswers(problem?.id as string);
   const selectedAnswer = getAnswer(selectedAnswerId as string);
+  const [isPreviewAnswer, setIsPreviewAnswer] = useState(true);
 
   return (
     <>
@@ -443,7 +445,19 @@ const AnswerListSection = ({ problem }: AnswerSectionProps) => {
                 )}
               </div>
             </div>
-            <MarkdownPreview content={selectedAnswer.body} />
+            <div className="flex flex-col">
+              <div className="tabs">
+                <a onClick={() => setIsPreviewAnswer(false)} className={`tab tab-lifted ${!isPreviewAnswer && "tab-active"}`}>Markdown</a>
+                <a onClick={() => setIsPreviewAnswer(true)} className={`tab tab-lifted ${isPreviewAnswer && "tab-active"}`}>Preview</a>
+              </div>
+              {isPreviewAnswer ? (
+                <MarkdownPreview content={selectedAnswer.body} />
+              ) : (
+                <textarea readOnly className="textarea textarea-bordered mt-4 px-2 min-h-[300px]">
+                  {selectedAnswer.body}
+                </textarea>
+              )}
+            </div>
           </ICTSCCard>
         </div>
       )}
