@@ -14,7 +14,7 @@ import MarkdownPreview from "../../components/MarkdownPreview";
 import LoadingPage from "../../components/LoadingPage";
 import { useApi } from "../../hooks/api";
 import { useAuth } from "../../hooks/auth";
-import { useProblems } from "../../hooks/problem";
+import { useProblem } from "../../hooks/problem";
 import { useAnswers } from "../../hooks/answer";
 import { Problem } from "../../types/Problem";
 import { recreateRule, site } from "../../components/_const";
@@ -41,19 +41,15 @@ const ProblemPage = () => {
 
   const { apiClient } = useApi();
   const { user } = useAuth();
-  const { getProblem, isLoading } = useProblems();
+  const { matter, problem, isLoading } = useProblem(problemId as string);
   const [isPreview, setIsPreview] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReCreateModalOpen, setIsReCreateModalOpen] = useState(false);
-  const [status, setStatus] = useState<number | null>(null);
+  const [_, setStatus] = useState<number | null>(null);
 
-  const [matter, problem] = getProblem(problemId as string);
   const { recreateInfo, mutate: recreateMutate } = useReCreateInfo(
     problem?.code as string
   );
-
-  // TODO: あとで消す
-  console.log(recreateInfo);
 
   const isReadOnly = user?.is_read_only ?? false;
   const { mutate } = useAnswers(problem?.id as string);
@@ -354,7 +350,7 @@ type AnswerSectionProps = {
 
 const AnswerListSection = ({ problem }: AnswerSectionProps) => {
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
-  const { answers, getAnswer, mutate } = useAnswers(problem?.id as string);
+  const { answers, getAnswer } = useAnswers(problem?.id as string);
   const selectedAnswer = getAnswer(selectedAnswerId as string);
   const [isPreviewAnswer, setIsPreviewAnswer] = useState(true);
 
@@ -387,7 +383,9 @@ const AnswerListSection = ({ problem }: AnswerSectionProps) => {
               })
               .map((answer) => {
                 const createdAt = DateTime.fromISO(answer.created_at);
-                let blob = new Blob(["" + getAnswer(answer.id)?.body], { type: 'text/markdown' });
+                let blob = new Blob(["" + getAnswer(answer.id)?.body], {
+                  type: "text/markdown",
+                });
 
                 return (
                   <tr key={answer.id}>
@@ -408,7 +406,10 @@ const AnswerListSection = ({ problem }: AnswerSectionProps) => {
                       </a>
                     </td>
                     <td>
-                      <a download={`ictsc-${problem?.code}-${createdAt.toUnixInteger()}.md`}
+                      <a
+                        download={`ictsc-${
+                          problem?.code
+                        }-${createdAt.toUnixInteger()}.md`}
                         className={"link"}
                         href={URL.createObjectURL(blob)}
                       >
@@ -456,13 +457,30 @@ const AnswerListSection = ({ problem }: AnswerSectionProps) => {
             </div>
             <div className="flex flex-col">
               <div className="tabs">
-                <a onClick={() => setIsPreviewAnswer(false)} className={`tab tab-lifted ${!isPreviewAnswer && "tab-active"}`}>Markdown</a>
-                <a onClick={() => setIsPreviewAnswer(true)} className={`tab tab-lifted ${isPreviewAnswer && "tab-active"}`}>Preview</a>
+                <a
+                  onClick={() => setIsPreviewAnswer(false)}
+                  className={`tab tab-lifted ${
+                    !isPreviewAnswer && "tab-active"
+                  }`}
+                >
+                  Markdown
+                </a>
+                <a
+                  onClick={() => setIsPreviewAnswer(true)}
+                  className={`tab tab-lifted ${
+                    isPreviewAnswer && "tab-active"
+                  }`}
+                >
+                  Preview
+                </a>
               </div>
               {isPreviewAnswer ? (
                 <MarkdownPreview content={selectedAnswer.body} />
               ) : (
-                <textarea readOnly className="textarea textarea-bordered mt-4 px-2 min-h-[300px]">
+                <textarea
+                  readOnly
+                  className="textarea textarea-bordered mt-4 px-2 min-h-[300px]"
+                >
                   {selectedAnswer.body}
                 </textarea>
               )}

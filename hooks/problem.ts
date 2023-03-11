@@ -4,7 +4,7 @@ import matter from "gray-matter";
 
 import { useApi } from "./api";
 import { ProblemResult, Result } from "../types/_api";
-import { Matter, Problem } from "../types/Problem";
+import { Matter } from "../types/Problem";
 
 export const useProblems = () => {
   const { apiClient } = useApi();
@@ -14,29 +14,33 @@ export const useProblems = () => {
 
   const { data, mutate, isLoading } = useSWR("problems", fetcher);
 
-  const getProblem = (code: string): [Matter | null, Problem | null] => {
-    const problem =
-      data?.data?.problems.find((problem) => problem.code === code) ?? null;
-
-    if (problem === null) {
-      return [null, null];
-    }
-
-    const matterResult = matter(problem.body ?? "");
-
-    const matterData = matterResult.data as Matter;
-    const newProblem = { ...problem, body: matterResult.content };
-
-    console.log(problem);
-    console.log(matterData);
-
-    return [matterData, newProblem];
-  };
-
   return {
     problems: data?.data?.problems ?? [],
     mutate,
     isLoading,
-    getProblem,
+  };
+};
+
+export const useProblem = (code: string) => {
+  const { problems } = useProblems();
+
+  const problem = problems.find((problem) => problem.code === code) ?? null;
+
+  if (problem === null) {
+    return {
+      matter: null,
+      problem: null,
+      isLoading: false,
+    };
+  }
+
+  const matterResult = matter(problem.body ?? "");
+  const matterData = matterResult.data as Matter;
+  const newProblem = { ...problem, body: matterResult.content };
+
+  return {
+    matter: matterData,
+    problem: newProblem,
+    isLoading: false,
   };
 };

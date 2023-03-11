@@ -9,7 +9,7 @@ import ICTSCCard from "../../components/Card";
 import LoadingPage from "../../components/LoadingPage";
 import MarkdownPreview from "../../components/MarkdownPreview";
 import { useApi } from "../../hooks/api";
-import { useProblems } from "../../hooks/problem";
+import { useProblem, useProblems } from "../../hooks/problem";
 import { useAnswers } from "../../hooks/answer";
 import { Answer } from "../../types/Answer";
 import { Problem } from "../../types/Problem";
@@ -25,6 +25,7 @@ type Input = {
 
 const ScoringProblem = () => {
   const router = useRouter();
+  const { code, answer_id } = router.query;
 
   const { register, watch } = useForm<Input>({
     defaultValues: {
@@ -35,10 +36,7 @@ const ScoringProblem = () => {
   const answerFilter = watch("answerFilter");
 
   const { user } = useAuth();
-  const { getProblem, isLoading } = useProblems();
-
-  const { code, answer_id } = router.query;
-  const [matter, problem] = getProblem(code as string);
+  const { problem, matter, isLoading } = useProblem(code as string);
   const { answers } = useAnswers(problem?.id ?? "");
   const [showProblem, setShowProblem] = useState(true);
 
