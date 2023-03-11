@@ -21,7 +21,7 @@ export const useProblems = () => {
   };
 };
 
-export const useProblem = (code: string) => {
+export const useProblem = (code: string | null) => {
   const { problems } = useProblems();
 
   const problem = problems.find((problem) => problem.code === code) ?? null;

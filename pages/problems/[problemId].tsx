@@ -1,4 +1,5 @@
 import "zenn-content-css";
+
 import { useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -6,30 +7,28 @@ import Error from "next/error";
 
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { DateTime } from "luxon";
+import toast, { Toaster } from "react-hot-toast";
 
+import { answerLimit, recreateRule, site } from "../../components/_const";
 import ICTSCNavBar from "../../components/Navbar";
 import ICTSCCard from "../../components/Card";
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "../../components/Alerts";
+import ConnectionInfo from "../../components/connection_info";
 import MarkdownPreview from "../../components/MarkdownPreview";
 import LoadingPage from "../../components/LoadingPage";
 import { useApi } from "../../hooks/api";
 import { useAuth } from "../../hooks/auth";
 import { useProblem } from "../../hooks/problem";
 import { useAnswers } from "../../hooks/answer";
-import { Problem } from "../../types/Problem";
-import { recreateRule, site } from "../../components/_const";
-import ConnectionInfo from "../../components/connection_info";
 import { useReCreateInfo } from "../../hooks/reCreateInfo";
-import toast, { Toaster } from "react-hot-toast";
+
+import { Problem } from "../../types/Problem";
 
 type Inputs = {
   answer: string;
 };
 
-const ProblemPage = () => {
-  const router = useRouter();
-  const { problemId } = router.query;
-
+const AnswerForm = ({ code }: { code: string | null }) => {
   const {
     handleSubmit,
     control,
@@ -39,20 +38,31 @@ const ProblemPage = () => {
   // answer のフォームを監視
   const watchField = watch(["answer"]);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPreview, setIsPreview] = useState(false);
+
   const { apiClient } = useApi();
   const { user } = useAuth();
-  const { matter, problem, isLoading } = useProblem(problemId as string);
-  const [isPreview, setIsPreview] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isReCreateModalOpen, setIsReCreateModalOpen] = useState(false);
-  const [_, setStatus] = useState<number | null>(null);
+  const { problem } = useProblem(code);
+  const { mutate } = useAnswers(problem?.id ?? null);
 
-  const { recreateInfo, mutate: recreateMutate } = useReCreateInfo(
-    problem?.code as string
-  );
+  const onSubmit: SubmitHandler<Inputs> = async ({ answer }) => {
+    const response = await apiClient.post(`problems/${problem?.id}/answers`, {
+      json: {
+        user_group_id: user?.user_group_id,
+        problem_id: problem?.id,
+        body: answer,
+      },
+    });
 
-  const isReadOnly = user?.is_read_only ?? false;
-  const { mutate } = useAnswers(problem?.id as string);
+    if (response.ok) {
+      successNotify();
+
+      await mutate();
+    } else {
+      errorNotify();
+    }
+  };
 
   // モーダルを表示しバリデーションを行う
   const onModal: SubmitHandler<Inputs> = async () => {
@@ -80,56 +90,8 @@ const ProblemPage = () => {
       />
     ));
 
-  const onSubmit: SubmitHandler<Inputs> = async ({ answer }) => {
-    const response = await apiClient.post(`problems/${problem?.id}/answers`, {
-      json: {
-        user_group_id: user?.user_group_id,
-        problem_id: problem?.id,
-        body: answer,
-      },
-    });
-
-    setStatus(response.status);
-
-    if (response.ok) {
-      successNotify();
-
-      await mutate();
-    } else {
-      errorNotify();
-    }
-  };
-
-  const onReCreateSubmit = async () => {
-    const response = await apiClient.post(`recreate/${problem?.code}`);
-
-    // TODO(k-shir0): ログなどをユーザに表示
-    console.log(response);
-
-    if (response.ok) {
-      await recreateMutate();
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <>
-        <ICTSCNavBar />
-        <LoadingPage />
-      </>
-    );
-  }
-
-  if (problem === null) {
-    return <Error statusCode={404} />;
-  }
-
-  const answerLimit = process.env.NEXT_PUBLIC_ANSWER_LIMIT;
-
   return (
-    <>
-      <Toaster />
-      <input type="checkbox" id="my-modal-5" className="modal-toggle" />
+    <ICTSCCard className={"mt-8 pt-4"}>
       <div className={`modal ${isModalOpen && "modal-open"}`}>
         <div className="modal-box container-ictsc">
           <h3 className="title-ictsc pt-4 pb-8">回答内容確認</h3>
@@ -160,187 +122,65 @@ const ProblemPage = () => {
           </div>
         </div>
       </div>
-      <div className={`modal ${isReCreateModalOpen && "modal-open"}`}>
-        <div className="modal-box container-ictsc">
-          <h3 className="title-ictsc pt-4 pb-8">
-            問題の再展開を行います。よろしいですか？
-          </h3>
-          <MarkdownPreview
-            content={recreateRule?.replace(/\\n/g, "\n") ?? ""}
-          />
-          <div className="modal-action">
-            <label
-              onClick={() => setIsReCreateModalOpen(false)}
-              className="btn btn-link"
-            >
-              閉じる
-            </label>
-            <label
-              onClick={() => {
-                onReCreateSubmit();
-                setIsReCreateModalOpen(false);
-              }}
-              className="btn btn-primary"
-            >
-              問題の再展開を行う
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <Head>
-        <title>
-          {problem.code} {problem.title} 問題 - {site}
-        </title>
-      </Head>
-      <ICTSCNavBar />
-      <div className={"container-ictsc"}>
-        <div
-          className={"flex flex-row justify-between pt-12 justify-items-center"}
-        >
-          <h1 className={"title-ictsc pr-2 sm:text-3xl"}>{problem.title}</h1>
-          {!isReadOnly && (
-            <button
-              className="btn text-red-500 btn-sm"
-              onClick={() => {
-                // onReCreateSubmit();
-                setIsReCreateModalOpen(true);
-              }}
-              disabled={
-                recreateInfo?.available != null &&
-                !(recreateInfo?.available ?? false)
-              }
-            >
-              再展開を行う
-            </button>
-          )}
-        </div>
-        <div className={`collapse collapse-problem collapse-arrow px-0`}>
-          <input type="checkbox" defaultChecked={true} />
-          <div
-            className={"collapse-title flex flex-row justify-between pl-0 pr-9"}
+      <form onSubmit={handleSubmit(onModal)} className={"flex flex-col"}>
+        <div className="tabs">
+          <a
+            onClick={() => setIsPreview(false)}
+            className={`tab tab-lifted ${!isPreview && "tab-active"}`}
           >
-            <div className={"flex flex-row items-end"}>
-              満点
-              <span className={"sm:text-2xl"}> {problem.point} </span>pt
-              採点基準
-              <span className={"sm:text-2xl"}>
-                {" "}
-                {problem.solved_criterion}{" "}
-              </span>
-              pt 問題コード
-              <span className={"sm:text-2xl"}> {problem.code}</span>
-            </div>
-            <div className={"text-sm flex flex-row items-end"}>
-              接続情報表示/非表示
-            </div>
-          </div>
-          <div className={"collapse-content pt-2 px-0"}>
-            <ConnectionInfo matter={matter} />
-          </div>
+            Markdown
+          </a>
+          <a
+            onClick={() => setIsPreview(true)}
+            className={`tab tab-lifted ${isPreview && "tab-active"}`}
+          >
+            Preview
+          </a>
         </div>
-
-        {recreateInfo?.available != null &&
-          !(recreateInfo?.available ?? false) && (
-            <div className={`alert alert-info shadow-lg grow`}>
-              <div>
-                <div className={"animate-spin"}>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-                    />
-                  </svg>
-                </div>
-                <div className={"flex flex-col"}>
-                  <span>問題を再展開中です</span>
-                </div>
-              </div>
-            </div>
-          )}
-        <ICTSCCard className={"mt-8"}>
-          <MarkdownPreview content={problem.body ?? ""} />
-        </ICTSCCard>
-
-        {!isReadOnly && (
-          <ICTSCCard className={"mt-8 pt-4"}>
-            <form onSubmit={handleSubmit(onModal)} className={"flex flex-col"}>
-              <div className="tabs">
-                <a
-                  onClick={() => setIsPreview(false)}
-                  className={`tab tab-lifted ${!isPreview && "tab-active"}`}
-                >
-                  Markdown
-                </a>
-                <a
-                  onClick={() => setIsPreview(true)}
-                  className={`tab tab-lifted ${isPreview && "tab-active"}`}
-                >
-                  Preview
-                </a>
-              </div>
-              {isPreview ? (
-                <>
-                  <MarkdownPreview className={"pt-4"} content={watchField[0]} />
-                  <div className="divider mt-0" />
-                </>
-              ) : (
-                <Controller
-                  name={"answer"}
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field }) => {
-                    return (
-                      <textarea
-                        {...field}
-                        className="textarea textarea-bordered mt-4 px-2 min-h-[300px]"
-                        placeholder={`お世話になっております。チーム○○です。
+        {isPreview ? (
+          <>
+            <MarkdownPreview className={"pt-4"} content={watchField[0]} />
+            <div className="divider mt-0" />
+          </>
+        ) : (
+          <Controller
+            name={"answer"}
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => {
+              return (
+                <textarea
+                  {...field}
+                  className="textarea textarea-bordered mt-4 px-2 min-h-[300px]"
+                  placeholder={`お世話になっております。チーム○○です。
 この問題ではxxxxxが原因でトラブルが発生したと考えられました。
 そのため、以下のように設定を変更し、○○が正しく動くことを確認いたしました。
 確認のほどよろしくお願いします。
 
 ### 手順
 1. /etc/hoge/hoo.bar の編集`}
-                      />
-                    );
-                  }}
                 />
-              )}
-              <label className="label max-w-xs min-w-[312px]">
-                {errors.answer && (
-                  <span className="label-text-alt text-error">
-                    回答を入力して下さい
-                  </span>
-                )}
-              </label>
-              <div className={"flex justify-end mt-4"}>
-                <label
-                  onClick={handleSubmit(onModal)}
-                  className="btn btn-primary max-w-[312px]"
-                >
-                  提出確認
-                </label>
-              </div>
-            </form>
-          </ICTSCCard>
+              );
+            }}
+          />
         )}
-        {answerLimit && (
-          <div className={"text-sm pt-2"}>
-            ※ 回答は{answerLimit}分に1度のみです
-          </div>
-        )}
-        <div className={"divider"} />
-        <AnswerListSection problem={problem} />
-      </div>
-    </>
+        <label className="label max-w-xs min-w-[312px]">
+          {errors.answer && (
+            <span className="label-text-alt text-error">
+              回答を入力して下さい
+            </span>
+          )}
+        </label>
+        <div className={"flex justify-end mt-4"}>
+          <label
+            onClick={handleSubmit(onModal)}
+            className="btn btn-primary max-w-[312px]"
+          >
+            提出確認
+          </label>
+        </div>
+      </form>
+    </ICTSCCard>
   );
 };
 
@@ -488,6 +328,168 @@ const AnswerListSection = ({ problem }: AnswerSectionProps) => {
           </ICTSCCard>
         </div>
       )}
+    </>
+  );
+};
+
+const ProblemPage = () => {
+  const router = useRouter();
+  const { problemId } = router.query;
+
+  const { apiClient } = useApi();
+  const { user } = useAuth();
+  const { matter, problem, isLoading } = useProblem(problemId as string | null);
+  const [isReCreateModalOpen, setIsReCreateModalOpen] = useState(false);
+
+  const { recreateInfo, mutate: recreateMutate } = useReCreateInfo(
+    problem?.code ?? null
+  );
+
+  const isReadOnly = user?.is_read_only ?? false;
+  const onReCreateSubmit = async () => {
+    const response = await apiClient.post(`recreate/${problem?.code}`);
+
+    if (response.ok) {
+      await recreateMutate();
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <>
+        <ICTSCNavBar />
+        <LoadingPage />
+      </>
+    );
+  }
+
+  if (problem === null) {
+    return <Error statusCode={404} />;
+  }
+
+  return (
+    <>
+      <Toaster />
+      <input type="checkbox" id="my-modal-5" className="modal-toggle" />
+      <div className={`modal ${isReCreateModalOpen && "modal-open"}`}>
+        <div className="modal-box container-ictsc">
+          <h3 className="title-ictsc pt-4 pb-8">
+            問題の再展開を行います。よろしいですか？
+          </h3>
+          <MarkdownPreview
+            content={recreateRule?.replace(/\\n/g, "\n") ?? ""}
+          />
+          <div className="modal-action">
+            <label
+              onClick={() => setIsReCreateModalOpen(false)}
+              className="btn btn-link"
+            >
+              閉じる
+            </label>
+            <label
+              onClick={() => {
+                onReCreateSubmit();
+                setIsReCreateModalOpen(false);
+              }}
+              className="btn btn-primary"
+            >
+              問題の再展開を行う
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <Head>
+        <title>
+          {problem.code} {problem.title} 問題 - {site}
+        </title>
+      </Head>
+      <ICTSCNavBar />
+      <div className={"container-ictsc"}>
+        <div
+          className={"flex flex-row justify-between pt-12 justify-items-center"}
+        >
+          <h1 className={"title-ictsc pr-2 sm:text-3xl"}>{problem.title}</h1>
+          {!isReadOnly && (
+            <button
+              className="btn text-red-500 btn-sm"
+              onClick={() => {
+                // onReCreateSubmit();
+                setIsReCreateModalOpen(true);
+              }}
+              disabled={
+                recreateInfo?.available != null &&
+                !(recreateInfo?.available ?? false)
+              }
+            >
+              再展開を行う
+            </button>
+          )}
+        </div>
+        <div className={`collapse collapse-problem collapse-arrow px-0`}>
+          <input type="checkbox" defaultChecked={true} />
+          <div
+            className={"collapse-title flex flex-row justify-between pl-0 pr-9"}
+          >
+            <div className={"flex flex-row items-end"}>
+              満点
+              <span className={"sm:text-2xl"}> {problem.point} </span>pt
+              採点基準
+              <span className={"sm:text-2xl"}>
+                {" "}
+                {problem.solved_criterion}{" "}
+              </span>
+              pt 問題コード
+              <span className={"sm:text-2xl"}> {problem.code}</span>
+            </div>
+            <div className={"text-sm flex flex-row items-end"}>
+              接続情報表示/非表示
+            </div>
+          </div>
+          <div className={"collapse-content pt-2 px-0"}>
+            <ConnectionInfo matter={matter} />
+          </div>
+        </div>
+
+        {recreateInfo?.available != null &&
+          !(recreateInfo?.available ?? false) && (
+            <div className={`alert alert-info shadow-lg grow`}>
+              <div>
+                <div className={"animate-spin"}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+                    />
+                  </svg>
+                </div>
+                <div className={"flex flex-col"}>
+                  <span>問題を再展開中です</span>
+                </div>
+              </div>
+            </div>
+          )}
+        <ICTSCCard className={"mt-8"}>
+          <MarkdownPreview content={problem.body ?? ""} />
+        </ICTSCCard>
+
+        {!isReadOnly && <AnswerForm code={problemId as string | null} />}
+        {answerLimit && (
+          <div className={"text-sm pt-2"}>
+            ※ 回答は{answerLimit}分に1度のみです
+          </div>
+        )}
+        <div className={"divider"} />
+        <AnswerListSection problem={problem} />
+      </div>
     </>
   );
 };
