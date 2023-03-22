@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import BaseLayout from "@/layouts/BaseLayout";
+import CommonLayout from "@/layouts/CommonLayout";
 import ICTSCCard from "@/components/Card";
 import LoadingPage from "@/components/LoadingPage";
 import { useAuth } from "@/hooks/auth";
@@ -14,9 +14,9 @@ const TeamInfo = () => {
 
   if (isLoading || isRankingLoading) {
     return (
-      <BaseLayout title={"チーム情報"}>
+      <CommonLayout title={"チーム情報"}>
         <LoadingPage />
-      </BaseLayout>
+      </CommonLayout>
     );
   }
 
@@ -28,8 +28,7 @@ const TeamInfo = () => {
   const ssh = `ssh ${bastionUser}@${bastionIp} -p ${bastionPort}`;
 
   return (
-    <BaseLayout title={"チーム情報"}>
-      <h1 className={"title-ictsc text-center py-12"}>チーム情報</h1>
+    <CommonLayout title={"チーム情報"}>
       <div className={"container-ictsc"}>
         <ICTSCCard>
           <p className={"font-extrabold text-4xl"}>
@@ -123,7 +122,7 @@ const TeamInfo = () => {
           </div>
         </ICTSCCard>
       </div>
-    </BaseLayout>
+    </CommonLayout>
   );
 };
 

@@ -1,4 +1,4 @@
-import BaseLayout from "@/layouts/BaseLayout";
+import CommonLayout from "@/layouts/CommonLayout";
 import MarkdownPreview from "@/components/MarkdownPreview";
 import LoadingPage from "@/components/LoadingPage";
 import { useNotice } from "@/hooks/notice";
@@ -8,15 +8,14 @@ const Notices = () => {
 
   if (isLoading) {
     return (
-      <BaseLayout title={"通知一覧"}>
+      <CommonLayout title={"通知一覧"}>
         <LoadingPage />
-      </BaseLayout>
+      </CommonLayout>
     );
   }
 
   return (
-    <BaseLayout title={"通知一覧"}>
-      <h1 className={"title-ictsc text-center py-12"}>通知一覧</h1>
+    <CommonLayout title={"通知一覧"}>
       {notices?.map((notice) => (
         <div key={notice.source_id} className={"container-ictsc"}>
           <div className="bg-gray-200 p-4 rounded rounded-lg  shadow-lg grow">
@@ -50,7 +49,7 @@ const Notices = () => {
           </div>
         </div>
       ))}
-    </BaseLayout>
+    </CommonLayout>
   );
 };
 

@@ -1,6 +1,6 @@
 import Error from "next/error";
 
-import BaseLayout from "@/layouts/BaseLayout";
+import CommonLayout from "@/layouts/CommonLayout";
 import LoadingPage from "@/components/LoadingPage";
 import { useUserGroups } from "@/hooks/userGroups";
 
@@ -9,9 +9,9 @@ const Users = () => {
 
   if (isLoading) {
     return (
-      <BaseLayout title={"参加者一覧"}>
+      <CommonLayout title={"参加者一覧"}>
         <LoadingPage />
-      </BaseLayout>
+      </CommonLayout>
     );
   }
 
@@ -20,8 +20,7 @@ const Users = () => {
   }
 
   return (
-    <BaseLayout title={"参加者一覧"}>
-      <h1 className={"title-ictsc text-center py-12"}>参加者一覧</h1>
+    <CommonLayout title={"参加者一覧"}>
       <div className={"container-ictsc"}>
         <table className={"table border rounded-md w-full"}>
           <thead>
@@ -82,7 +81,7 @@ const Users = () => {
           </tbody>
         </table>
       </div>
-    </BaseLayout>
+    </CommonLayout>
   );
 };
 

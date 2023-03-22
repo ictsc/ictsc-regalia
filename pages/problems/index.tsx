@@ -1,7 +1,7 @@
 import { useRecoilState } from "recoil";
 import Link from "next/link";
 
-import BaseLayout from "@/layouts/BaseLayout";
+import CommonLayout from "@/layouts/CommonLayout";
 import ProblemCard from "@/components/ProblemCard";
 import LoadingPage from "@/components/LoadingPage";
 import { useProblems } from "@/hooks/problem";
@@ -21,15 +21,14 @@ const Problems = () => {
 
   if (isLoading || isNoticeLoading) {
     return (
-      <BaseLayout title={`問題一覧`}>
+      <CommonLayout title={`問題一覧`}>
         <LoadingPage />
-      </BaseLayout>
+      </CommonLayout>
     );
   }
 
   return (
-    <BaseLayout title={`問題一覧`}>
-      <h1 className={"title-ictsc text-center py-12"}>問題一覧</h1>
+    <CommonLayout title={`問題一覧`}>
       {shortRule != "" && (
         <div className={"container-ictsc"}>
           <ICTSCCard className={"pt-4 pb-8"}>
@@ -116,7 +115,7 @@ const Problems = () => {
             </li>
           ))}
       </ul>
-    </BaseLayout>
+    </CommonLayout>
   );
 };
 

@@ -3,7 +3,7 @@ import Error from "next/error";
 
 import { useForm, Controller } from "react-hook-form";
 
-import BaseLayout from "@/layouts/BaseLayout";
+import CommonLayout from "@/layouts/CommonLayout";
 import ICTSCCard from "@/components/Card";
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
 import LoadingPage from "../components/LoadingPage";
@@ -74,9 +74,9 @@ const Profile = () => {
 
   if (isLoading) {
     return (
-      <BaseLayout title={"プロフィール"}>
+      <CommonLayout title={"プロフィール"}>
         <LoadingPage />
-      </BaseLayout>
+      </CommonLayout>
     );
   }
 
@@ -85,11 +85,9 @@ const Profile = () => {
   }
 
   return (
-    <BaseLayout title={"プロフィール"}>
-      <div className={"container-ictsc pt-8"}>
+    <CommonLayout title={"プロフィール"}>
+      <div className={"container-ictsc"}>
         <ICTSCCard>
-          <h1 className={"title-ictsc"}>プロフィール</h1>
-          <div className={"divider"} />
           {status === 202 && (
             <ICTSCSuccessAlert
               message={"プロフィールを更新しました"}
@@ -182,7 +180,7 @@ const Profile = () => {
           </form>
         </ICTSCCard>
       </div>
-    </BaseLayout>
+    </CommonLayout>
   );
 };
 

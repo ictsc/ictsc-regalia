@@ -1,6 +1,6 @@
 import Error from "next/error";
 
-import BaseLayout from "@/layouts/BaseLayout";
+import CommonLayout from "@/layouts/CommonLayout";
 import LoadingPage from "@/components/LoadingPage";
 import { useRanking } from "@/hooks/ranking";
 
@@ -9,9 +9,9 @@ const Ranking = () => {
 
   if (loading) {
     return (
-      <BaseLayout title={"ランキング"}>
+      <CommonLayout title={"ランキング"}>
         <LoadingPage />
-      </BaseLayout>
+      </CommonLayout>
     );
   }
 
@@ -20,8 +20,7 @@ const Ranking = () => {
   }
 
   return (
-    <BaseLayout title={"ランキング"}>
-      <h1 className={"title-ictsc text-center py-12"}>スコアボード</h1>
+    <CommonLayout title={"ランキング"}>
       <div className={"container-ictsc"}>
         <table className="table border w-full">
           <thead>
@@ -44,7 +43,7 @@ const Ranking = () => {
           </tbody>
         </table>
       </div>
-    </BaseLayout>
+    </CommonLayout>
   );
 };
 
