@@ -1,16 +1,15 @@
-import Head from "next/head";
-
-import ICTSCNavBar from "../../components/Navbar";
-import ProblemCard from "../../components/ProblemCard";
-import LoadingPage from "../../components/LoadingPage";
-import { useProblems } from "../../hooks/problem";
-import { useNotice } from "../../hooks/notice";
-import { shortRule, site } from "../../components/_const";
-import ICTSCCard from "../../components/Card";
-import MarkdownPreview from "../../components/MarkdownPreview";
-import { dismissNoticeIdsState } from "../../hooks/state/recoil";
 import { useRecoilState } from "recoil";
 import Link from "next/link";
+
+import BaseLayout from "@/layouts/BaseLayout";
+import ProblemCard from "@/components/ProblemCard";
+import LoadingPage from "@/components/LoadingPage";
+import { useProblems } from "@/hooks/problem";
+import { useNotice } from "@/hooks/notice";
+import { shortRule } from "@/components/_const";
+import ICTSCCard from "@/components/Card";
+import MarkdownPreview from "@/components/MarkdownPreview";
+import { dismissNoticeIdsState } from "@/hooks/state/recoil";
 
 const Problems = () => {
   const [dismissNoticeIds, setDismissNoticeIds] = useRecoilState(
@@ -22,19 +21,14 @@ const Problems = () => {
 
   if (isLoading || isNoticeLoading) {
     return (
-      <>
-        <ICTSCNavBar />
+      <BaseLayout title={`問題一覧`}>
         <LoadingPage />
-      </>
+      </BaseLayout>
     );
   }
 
   return (
-    <>
-      <Head>
-        <title>問題一覧 - {site}</title>
-      </Head>
-      <ICTSCNavBar />
+    <BaseLayout title={`問題一覧`}>
       <h1 className={"title-ictsc text-center py-12"}>問題一覧</h1>
       {shortRule != "" && (
         <div className={"container-ictsc"}>
@@ -122,7 +116,7 @@ const Problems = () => {
             </li>
           ))}
       </ul>
-    </>
+    </BaseLayout>
   );
 };
 

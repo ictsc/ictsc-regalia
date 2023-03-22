@@ -3,14 +3,12 @@ import Error from "next/error";
 
 import { useForm, Controller } from "react-hook-form";
 
-import ICTSCNavBar from "../components/Navbar";
-import ICTSCCard from "../components/Card";
-import { ICTSCErrorAlert, ICTSCSuccessAlert } from "../components/Alerts";
+import BaseLayout from "@/layouts/BaseLayout";
+import ICTSCCard from "@/components/Card";
+import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
 import LoadingPage from "../components/LoadingPage";
-import { useApi } from "../hooks/api";
-import { useAuth } from "../hooks/auth";
-import Head from "next/head";
-import { site } from "../components/_const";
+import { useApi } from "@/hooks/api";
+import { useAuth } from "@/hooks/auth";
 
 type Inputs = {
   display_name: string;
@@ -76,10 +74,9 @@ const Profile = () => {
 
   if (isLoading) {
     return (
-      <>
-        <ICTSCNavBar />
+      <BaseLayout title={"プロフィール"}>
         <LoadingPage />
-      </>
+      </BaseLayout>
     );
   }
 
@@ -88,11 +85,7 @@ const Profile = () => {
   }
 
   return (
-    <>
-      <Head>
-        <title>プロフィール - {site}</title>
-      </Head>
-      <ICTSCNavBar />
+    <BaseLayout title={"プロフィール"}>
       <div className={"container-ictsc pt-8"}>
         <ICTSCCard>
           <h1 className={"title-ictsc"}>プロフィール</h1>
@@ -189,7 +182,7 @@ const Profile = () => {
           </form>
         </ICTSCCard>
       </div>
-    </>
+    </BaseLayout>
   );
 };
 

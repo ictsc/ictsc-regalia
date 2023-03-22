@@ -1,20 +1,17 @@
 import Error from "next/error";
 
-import ICTSCNavBar from "../components/Navbar";
-import LoadingPage from "../components/LoadingPage";
-import { useUserGroups } from "../hooks/userGroups";
-import Head from "next/head";
-import { site } from "../components/_const";
+import BaseLayout from "@/layouts/BaseLayout";
+import LoadingPage from "@/components/LoadingPage";
+import { useUserGroups } from "@/hooks/userGroups";
 
 const Users = () => {
   const { userGroups, isLoading } = useUserGroups();
 
   if (isLoading) {
     return (
-      <>
-        <ICTSCNavBar />
+      <BaseLayout title={"参加者一覧"}>
         <LoadingPage />
-      </>
+      </BaseLayout>
     );
   }
 
@@ -23,11 +20,7 @@ const Users = () => {
   }
 
   return (
-    <>
-      <Head>
-        <title>参加者一覧 - {site}</title>
-      </Head>
-      <ICTSCNavBar />
+    <BaseLayout title={"参加者一覧"}>
       <h1 className={"title-ictsc text-center py-12"}>参加者一覧</h1>
       <div className={"container-ictsc"}>
         <table className={"table border rounded-md w-full"}>
@@ -89,7 +82,7 @@ const Users = () => {
           </tbody>
         </table>
       </div>
-    </>
+    </BaseLayout>
   );
 };
 

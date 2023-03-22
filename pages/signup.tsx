@@ -3,11 +3,9 @@ import { useRouter } from "next/router";
 
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import ICTSCNavBar from "../components/Navbar";
-import { ICTSCSuccessAlert, ICTSCErrorAlert } from "../components/Alerts";
-import { useApi } from "../hooks/api";
-import Head from "next/head";
-import { site } from "../components/_const";
+import BaseLayout from "@/layouts/BaseLayout";
+import { ICTSCSuccessAlert, ICTSCErrorAlert } from "@/components/Alerts";
+import { useApi } from "@/hooks/api";
 
 type Inputs = {
   name: string;
@@ -80,11 +78,7 @@ const Signup = () => {
   };
 
   return (
-    <>
-      <Head>
-        <title>ユーザー登録 - {site}</title>
-      </Head>
-      <ICTSCNavBar />
+    <BaseLayout title={"ユーザー登録"}>
       <h1 className={"title-ictsc text-center py-12"}>ユーザー登録</h1>
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -146,7 +140,7 @@ const Signup = () => {
           登録
         </button>
       </form>
-    </>
+    </BaseLayout>
   );
 };
 

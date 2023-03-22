@@ -1,21 +1,17 @@
 import Error from "next/error";
 
-import ICTSCNavBar from "../components/Navbar";
-import LoadingPage from "../components/LoadingPage";
-
-import { useRanking } from "../hooks/ranking";
-import Head from "next/head";
-import { site } from "../components/_const";
+import BaseLayout from "@/layouts/BaseLayout";
+import LoadingPage from "@/components/LoadingPage";
+import { useRanking } from "@/hooks/ranking";
 
 const Ranking = () => {
   const { ranking, loading } = useRanking();
 
   if (loading) {
     return (
-      <>
-        <ICTSCNavBar />
+      <BaseLayout title={"ランキング"}>
         <LoadingPage />
-      </>
+      </BaseLayout>
     );
   }
 
@@ -24,11 +20,7 @@ const Ranking = () => {
   }
 
   return (
-    <>
-      <Head>
-        <title>ランキング - {site}</title>
-      </Head>
-      <ICTSCNavBar />
+    <BaseLayout title={"ランキング"}>
       <h1 className={"title-ictsc text-center py-12"}>スコアボード</h1>
       <div className={"container-ictsc"}>
         <table className="table border w-full">
@@ -52,7 +44,7 @@ const Ranking = () => {
           </tbody>
         </table>
       </div>
-    </>
+    </BaseLayout>
   );
 };
 

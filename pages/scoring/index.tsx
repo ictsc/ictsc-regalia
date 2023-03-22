@@ -1,36 +1,32 @@
 import { useState } from "react";
-import Link from "next/link";
 
-import ICTSCNavBar from "../../components/Navbar";
-import ICTSCCard from "../../components/Card";
-import MarkdownPreview from "../../components/MarkdownPreview";
-import { useAuth } from "../../hooks/auth";
-import { useProblems } from "../../hooks/problem";
-import LoadingPage from "../../components/LoadingPage";
+import Link from "next/link";
 import Error from "next/error";
-import Head from "next/head";
-import { site } from "../../components/_const";
+
+import BaseLayout from "@/layouts/BaseLayout";
+import ICTSCCard from "@/components/Card";
+import MarkdownPreview from "@/components/MarkdownPreview";
+import LoadingPage from "@/components/LoadingPage";
+import { useAuth } from "@/hooks/auth";
+import { useProblem, useProblems } from "@/hooks/problem";
 
 const Index = () => {
   const { user } = useAuth();
-  const { problems, isLoading, getProblem } = useProblems();
+  const { problems, isLoading } = useProblems();
   const [selectedProblemId, setSelectedProblemId] = useState<string | null>(
     null
   );
 
-  const result =
-    selectedProblemId == null ? null : getProblem(selectedProblemId);
-  const [matter, problem] = result == null ? [null, null] : result;
+  const { problem } = useProblem(selectedProblemId);
 
   const isFullAccess = user?.user_group.is_full_access ?? false;
   const isReadOnly = user?.is_read_only ?? false;
 
   if (isLoading) {
     return (
-      <>
-        <ICTSCNavBar />
+      <BaseLayout title={"採点"}>
         <LoadingPage />
-      </>
+      </BaseLayout>
     );
   }
 
@@ -39,11 +35,7 @@ const Index = () => {
   }
 
   return (
-    <>
-      <Head>
-        <title>採点 - {site}</title>
-      </Head>
-      <ICTSCNavBar />
+    <BaseLayout title={"採点"}>
       <div className="overflow-x-auto">
         <table className="table table-compact w-full">
           <thead>
@@ -145,7 +137,7 @@ const Index = () => {
           </ICTSCCard>
         </div>
       )}
-    </>
+    </BaseLayout>
   );
 };
 

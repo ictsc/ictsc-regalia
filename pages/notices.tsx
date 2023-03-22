@@ -1,31 +1,21 @@
-import Head from "next/head";
-
-import { useRecoilState } from "recoil";
-
-import { site } from "../components/_const";
-import ICTSCNavBar from "../components/Navbar";
-import MarkdownPreview from "../components/MarkdownPreview";
-import { useNotice } from "../hooks/notice";
-import LoadingPage from "../components/LoadingPage";
+import BaseLayout from "@/layouts/BaseLayout";
+import MarkdownPreview from "@/components/MarkdownPreview";
+import LoadingPage from "@/components/LoadingPage";
+import { useNotice } from "@/hooks/notice";
 
 const Notices = () => {
-  const { notices, isLoading: isNoticeLoading } = useNotice();
+  const { notices, isLoading } = useNotice();
 
-  if (isNoticeLoading) {
+  if (isLoading) {
     return (
-      <>
-        <ICTSCNavBar />
+      <BaseLayout title={"通知一覧"}>
         <LoadingPage />
-      </>
+      </BaseLayout>
     );
   }
 
   return (
-    <>
-      <Head>
-        <title>通知一覧 - {site}</title>
-      </Head>
-      <ICTSCNavBar />
+    <BaseLayout title={"通知一覧"}>
       <h1 className={"title-ictsc text-center py-12"}>通知一覧</h1>
       {notices?.map((notice) => (
         <div key={notice.source_id} className={"container-ictsc"}>
@@ -60,7 +50,7 @@ const Notices = () => {
           </div>
         </div>
       ))}
-    </>
+    </BaseLayout>
   );
 };
 

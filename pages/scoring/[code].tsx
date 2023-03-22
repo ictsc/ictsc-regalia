@@ -4,20 +4,18 @@ import Error from "next/error";
 
 import { useForm } from "react-hook-form";
 
-import ICTSCNavBar from "../../components/Navbar";
-import ICTSCCard from "../../components/Card";
-import LoadingPage from "../../components/LoadingPage";
-import MarkdownPreview from "../../components/MarkdownPreview";
-import { useApi } from "../../hooks/api";
-import { useProblem, useProblems } from "../../hooks/problem";
-import { useAnswers } from "../../hooks/answer";
-import { Answer } from "../../types/Answer";
-import { Problem } from "../../types/Problem";
-import { Result } from "../../types/_api";
-import Head from "next/head";
-import { site } from "../../components/_const";
-import { useAuth } from "../../hooks/auth";
-import ConnectionInfo from "../../components/connection_info";
+import BaseLayout from "@/layouts/BaseLayout";
+import ICTSCCard from "@/components/Card";
+import LoadingPage from "@/components/LoadingPage";
+import MarkdownPreview from "@/components/MarkdownPreview";
+import ConnectionInfo from "@/components/connection_info";
+import { useApi } from "@/hooks/api";
+import { useProblem, useProblems } from "@/hooks/problem";
+import { useAnswers } from "@/hooks/answer";
+import { useAuth } from "@/hooks/auth";
+import { Answer } from "@/types/Answer";
+import { Problem } from "@/types/Problem";
+import { Result } from "@/types/_api";
 
 type Input = {
   answerFilter: number;
@@ -45,10 +43,9 @@ const ScoringProblem = () => {
 
   if (isLoading) {
     return (
-      <>
-        <ICTSCNavBar />
+      <BaseLayout title={`採点`}>
         <LoadingPage />
-      </>
+      </BaseLayout>
     );
   }
 
@@ -57,13 +54,7 @@ const ScoringProblem = () => {
   }
 
   return (
-    <>
-      <Head>
-        <title>
-          採点({problem.code} {problem.title}) - {site}
-        </title>
-      </Head>
-      <ICTSCNavBar />
+    <BaseLayout title={`採点(${problem.code} ${problem.title})`}>
       <div className="container-ictsc">
         <div
           className="collapse collapse-arrow"
@@ -166,7 +157,7 @@ const ScoringProblem = () => {
             <AnswerForm key={answer.id} problem={problem} answer={answer} />
           ))}
       </div>
-    </>
+    </BaseLayout>
   );
 };
 

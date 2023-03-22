@@ -1,24 +1,17 @@
-import ICTSCNavBar from "../components/Navbar";
-import MarkdownPreview from "../components/MarkdownPreview";
-import ICTSCCard from "../components/Card";
-import Head from "next/head";
-import { rule, site } from "../components/_const";
+import BaseLayout from "@/layouts/BaseLayout";
+import { rule } from "@/components/_const";
+import MarkdownPreview from "@/components/MarkdownPreview";
+import ICTSCCard from "@/components/Card";
 
-const Home = () => {
-  return (
-    <>
-      <Head>
-        <title>ルール - {site}</title>
-      </Head>
-      <ICTSCNavBar />
-      <h1 className={"title-ictsc text-center py-12"}>ルール</h1>
-      <div className={"container-ictsc"}>
-        <ICTSCCard>
-          <MarkdownPreview content={rule?.replace(/\\n/g, "\n") ?? ""} />
-        </ICTSCCard>
-      </div>
-    </>
-  );
-};
+const Home = () => (
+  <BaseLayout title={"ルール"}>
+    <h1 className={"title-ictsc text-center py-12"}>ルール</h1>
+    <div className={"container-ictsc"}>
+      <ICTSCCard>
+        <MarkdownPreview content={rule?.replace(/\\n/g, "\n") ?? ""} />
+      </ICTSCCard>
+    </div>
+  </BaseLayout>
+);
 
 export default Home;

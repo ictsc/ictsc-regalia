@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 
-import ICTSCNavBar from "../components/Navbar";
-import ICTSCCard from "../components/Card";
-import LoadingPage from "../components/LoadingPage";
-import { useAuth } from "../hooks/auth";
-import { useRanking } from "../hooks/ranking";
-import Head from "next/head";
-import { site } from "../components/_const";
+import BaseLayout from "@/layouts/BaseLayout";
+import ICTSCCard from "@/components/Card";
+import LoadingPage from "@/components/LoadingPage";
+import { useAuth } from "@/hooks/auth";
+import { useRanking } from "@/hooks/ranking";
 
 const TeamInfo = () => {
   const { user, isLoading } = useAuth();
@@ -16,10 +14,9 @@ const TeamInfo = () => {
 
   if (isLoading || isRankingLoading) {
     return (
-      <>
-        <ICTSCNavBar />
+      <BaseLayout title={"チーム情報"}>
         <LoadingPage />
-      </>
+      </BaseLayout>
     );
   }
 
@@ -31,11 +28,7 @@ const TeamInfo = () => {
   const ssh = `ssh ${bastionUser}@${bastionIp} -p ${bastionPort}`;
 
   return (
-    <>
-      <Head>
-        <title>チーム情報 - {site}</title>
-      </Head>
-      <ICTSCNavBar />
+    <BaseLayout title={"チーム情報"}>
       <h1 className={"title-ictsc text-center py-12"}>チーム情報</h1>
       <div className={"container-ictsc"}>
         <ICTSCCard>
@@ -130,7 +123,7 @@ const TeamInfo = () => {
           </div>
         </ICTSCCard>
       </div>
-    </>
+    </BaseLayout>
   );
 };
 
