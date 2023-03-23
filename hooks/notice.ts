@@ -1,8 +1,8 @@
 import useSWR from "swr";
 
-import { useApi } from "./api";
-import { Notice } from "../types/Notice";
-import { Result } from "../types/_api";
+import { useApi } from "@/hooks/api";
+import { Notice } from "@/types/Notice";
+import { Result } from "@/types/_api";
 
 export const useNotice = () => {
   const { apiClient } = useApi();

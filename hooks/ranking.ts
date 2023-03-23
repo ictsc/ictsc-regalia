@@ -1,8 +1,8 @@
 import useSWR from "swr";
 
-import { useApi } from "./api";
-import { Result } from "../types/_api";
-import { Rank } from "../types/Rank";
+import { useApi } from "@/hooks/api";
+import { Rank } from "@/types/Rank";
+import { Result } from "@/types/_api";
 
 type AnswerResult = {
   ranking: Rank[];

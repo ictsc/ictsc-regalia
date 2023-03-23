@@ -1,8 +1,8 @@
 import Error from "next/error";
 
-import CommonLayout from "@/layouts/CommonLayout";
 import LoadingPage from "@/components/LoadingPage";
 import { useRanking } from "@/hooks/ranking";
+import CommonLayout from "@/layouts/CommonLayout";
 
 const Ranking = () => {
   const { ranking, loading } = useRanking();

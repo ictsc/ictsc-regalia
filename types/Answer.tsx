@@ -1,4 +1,4 @@
-import { UserGroup } from "./UserGroup";
+import { UserGroup } from "@/types/UserGroup";
 
 export type Answer = {
   id: string;

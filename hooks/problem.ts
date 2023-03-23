@@ -1,10 +1,9 @@
+import matter from "gray-matter";
 import useSWR from "swr";
 
-import matter from "gray-matter";
-
-import { useApi } from "./api";
-import { ProblemResult, Result } from "../types/_api";
-import { Matter } from "../types/Problem";
+import { useApi } from "@/hooks/api";
+import { Matter } from "@/types/Problem";
+import { ProblemResult, Result } from "@/types/_api";
 
 export const useProblems = () => {
   const { apiClient } = useApi();

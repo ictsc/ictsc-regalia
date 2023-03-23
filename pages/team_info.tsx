@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
-import CommonLayout from "@/layouts/CommonLayout";
 import ICTSCCard from "@/components/Card";
 import LoadingPage from "@/components/LoadingPage";
 import { useAuth } from "@/hooks/auth";
 import { useRanking } from "@/hooks/ranking";
+import CommonLayout from "@/layouts/CommonLayout";
 
 const TeamInfo = () => {
   const { user, isLoading } = useAuth();

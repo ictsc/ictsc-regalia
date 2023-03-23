@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
+
 import Error from "next/error";
 
 import { useForm, Controller } from "react-hook-form";
 
-import CommonLayout from "@/layouts/CommonLayout";
-import ICTSCCard from "@/components/Card";
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
-import LoadingPage from "../components/LoadingPage";
+import ICTSCCard from "@/components/Card";
+import LoadingPage from "@/components/LoadingPage";
 import { useApi } from "@/hooks/api";
 import { useAuth } from "@/hooks/auth";
+import CommonLayout from "@/layouts/CommonLayout";
 
 type Inputs = {
   display_name: string;
@@ -44,8 +45,8 @@ const Profile = () => {
     defaultValues: useMemo(
       () => ({
         ...getCurrentValue(),
-        // eslint-disable-next-line
       }),
+      // eslint-disable-next-line
       [user]
     ),
   });

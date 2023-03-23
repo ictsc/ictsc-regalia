@@ -1,6 +1,7 @@
-import { atom, useRecoilValue, useSetRecoilState } from "recoil";
-import { setCookie, parseCookies } from "nookies";
 import { useEffect } from "react";
+
+import { setCookie, parseCookies } from "nookies";
+import { atom, useRecoilValue, useSetRecoilState } from "recoil";
 
 export const dismissNoticeIdsState = atom<string[]>({
   key: "dismiss-notice-id",

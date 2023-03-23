@@ -1,7 +1,7 @@
 import useSWR from "swr";
 
-import { useApi } from "./api";
-import { AuthSelfResult, Result } from "../types/_api";
+import { useApi } from "@/hooks/api";
+import { AuthSelfResult, Result } from "@/types/_api";
 
 export const useAuth = () => {
   const { apiClient } = useApi();

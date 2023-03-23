@@ -1,11 +1,12 @@
 import React, { useState } from "react";
+
 import { useRouter } from "next/router";
 
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import BaseLayout from "@/layouts/BaseLayout";
 import { ICTSCSuccessAlert, ICTSCErrorAlert } from "@/components/Alerts";
 import { useApi } from "@/hooks/api";
+import BaseLayout from "@/layouts/BaseLayout";
 
 type Inputs = {
   name: string;

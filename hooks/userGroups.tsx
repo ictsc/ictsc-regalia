@@ -1,8 +1,8 @@
 import useSWR from "swr";
 
-import { useApi } from "./api";
-import { Result } from "../types/_api";
-import { UserGroup } from "../types/UserGroup";
+import { useApi } from "@/hooks/api";
+import { UserGroup } from "@/types/UserGroup";
+import { Result } from "@/types/_api";
 
 export const useUserGroups = () => {
   const { apiClient } = useApi();

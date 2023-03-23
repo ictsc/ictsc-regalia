@@ -1,8 +1,8 @@
 import Error from "next/error";
 
-import CommonLayout from "@/layouts/CommonLayout";
 import LoadingPage from "@/components/LoadingPage";
 import { useUserGroups } from "@/hooks/userGroups";
+import CommonLayout from "@/layouts/CommonLayout";
 
 const Users = () => {
   const { userGroups, isLoading } = useUserGroups();

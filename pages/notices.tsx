@@ -1,7 +1,7 @@
-import CommonLayout from "@/layouts/CommonLayout";
 import LoadingPage from "@/components/LoadingPage";
 import NotificationCard from "@/components/NotificationCard";
 import { useNotice } from "@/hooks/notice";
+import CommonLayout from "@/layouts/CommonLayout";
 
 const Notices = () => {
   const { notices, isLoading } = useNotice();

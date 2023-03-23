@@ -1,6 +1,6 @@
-import { User } from "./User";
-import { Problem } from "./Problem";
-import { Answer } from "./Answer";
+import { Answer } from "@/types/Answer";
+import { Problem } from "@/types/Problem";
+import { User } from "@/types/User";
 
 export type Result<T> = {
   code: number;

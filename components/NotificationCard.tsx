@@ -1,6 +1,7 @@
+import Image from "next/image";
+
 import MarkdownPreview from "@/components/MarkdownPreview";
 import { Notice } from "@/types/Notice";
-import Image from "next/image";
 
 interface Props {
   notice: Notice;

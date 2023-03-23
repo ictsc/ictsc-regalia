@@ -1,15 +1,15 @@
 import { useState } from "react";
 
+import Error from "next/error";
 import Image from "next/image";
 import Link from "next/link";
-import Error from "next/error";
 
-import BaseLayout from "@/layouts/BaseLayout";
 import ICTSCCard from "@/components/Card";
-import MarkdownPreview from "@/components/MarkdownPreview";
 import LoadingPage from "@/components/LoadingPage";
+import MarkdownPreview from "@/components/MarkdownPreview";
 import { useAuth } from "@/hooks/auth";
 import { useProblem, useProblems } from "@/hooks/problem";
+import BaseLayout from "@/layouts/BaseLayout";
 
 const Index = () => {
   const { user } = useAuth();
