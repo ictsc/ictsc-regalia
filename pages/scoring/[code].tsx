@@ -1,19 +1,20 @@
-import { useRouter } from "next/router";
 import Error from "next/error";
+import Image from "next/image";
+import { useRouter } from "next/router";
 
 import { useForm } from "react-hook-form";
 
-import BaseLayout from "@/layouts/BaseLayout";
 import ICTSCCard from "@/components/Card";
 import LoadingPage from "@/components/LoadingPage";
 import MarkdownPreview from "@/components/MarkdownPreview";
-import ProblemTitle from "@/components/ProblemTitle";
-import ProblemMeta from "@/components/ProblemMeta";
 import ProblemConnectionInfo from "@/components/ProblemConnectionInfo";
-import { useApi } from "@/hooks/api";
-import { useProblem, useProblems } from "@/hooks/problem";
+import ProblemMeta from "@/components/ProblemMeta";
+import ProblemTitle from "@/components/ProblemTitle";
 import { useAnswers } from "@/hooks/answer";
+import { useApi } from "@/hooks/api";
 import { useAuth } from "@/hooks/auth";
+import { useProblem, useProblems } from "@/hooks/problem";
+import BaseLayout from "@/layouts/BaseLayout";
 import { Answer } from "@/types/Answer";
 import { Problem } from "@/types/Problem";
 import { Result } from "@/types/_api";
@@ -208,20 +209,12 @@ const AnswerForm = ({ problem, answer }: AnswerFormProps) => {
         <div className={"flex flex-row items-center"}>
           {answer.point !== null && (
             <div className={"pr-2"}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={3}
-                stroke="green"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4.5 12.75l6 6 9-13.5"
-                />
-              </svg>
+              <Image
+                src={"/assets/svg/check-green.svg"}
+                height={24}
+                width={24}
+                alt={"checked"}
+              />
             </div>
           )}
           チーム: {answer.user_group.name}({answer.user_group.organization})
