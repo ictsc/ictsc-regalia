@@ -11,7 +11,6 @@
 
 .title-ictsc {
   @apply text-2xl;
-  @apply sm:text-3xl;
   @apply font-bold;
 }
 
