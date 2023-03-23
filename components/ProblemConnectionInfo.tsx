@@ -1,11 +1,11 @@
-import HoverCopyText from "./HoverCopyText";
-import { Matter } from "../types/Problem";
+import HoverCopyText from "@/components/HoverCopyText";
+import { Matter } from "@/types/Problem";
 
 interface Props {
   matter: Matter | null;
 }
 
-const ConnectionInfo = ({ matter }: Props) => {
+const ProblemConnectionInfo = ({ matter }: Props) => {
   return (
     <div className="overflow-x-auto">
       <table className="table table-compact w-full">
@@ -36,4 +36,4 @@ const ConnectionInfo = ({ matter }: Props) => {
   );
 };
 
-export default ConnectionInfo;
+export default ProblemConnectionInfo;

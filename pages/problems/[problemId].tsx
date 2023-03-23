@@ -12,9 +12,11 @@ import BaseLayout from "@/layouts/BaseLayout";
 import { answerLimit, recreateRule } from "@/components/_const";
 import ICTSCCard from "@/components/Card";
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
-import ConnectionInfo from "@/components/connection_info";
 import MarkdownPreview from "@/components/MarkdownPreview";
 import LoadingPage from "@/components/LoadingPage";
+import ProblemTitle from "@/components/ProblemTitle";
+import ProblemMeta from "@/components/ProblemMeta";
+import ProblemConnectionInfo from "@/components/ProblemConnectionInfo";
 import { useApi } from "@/hooks/api";
 import { useAuth } from "@/hooks/auth";
 import { useProblem } from "@/hooks/problem";
@@ -395,7 +397,6 @@ const ProblemPage = () => {
           </div>
         </div>
       </div>
-
       <BaseLayout title={`${problem.code} ${problem.title} 問題`}>
         <div className={"container-ictsc"}>
           <div
@@ -403,12 +404,11 @@ const ProblemPage = () => {
               "flex flex-row justify-between pt-12 justify-items-center"
             }
           >
-            <h1 className={"title-ictsc pr-2 sm:text-3xl"}>{problem.title}</h1>
+            <ProblemTitle title={problem.title} />
             {!isReadOnly && (
               <button
                 className="btn text-red-500 btn-sm"
                 onClick={() => {
-                  // onReCreateSubmit();
                   setIsReCreateModalOpen(true);
                 }}
                 disabled={
@@ -420,33 +420,8 @@ const ProblemPage = () => {
               </button>
             )}
           </div>
-          <div className={`collapse collapse-problem collapse-arrow px-0`}>
-            <input type="checkbox" defaultChecked={true} />
-            <div
-              className={
-                "collapse-title flex flex-row justify-between pl-0 pr-9"
-              }
-            >
-              <div className={"flex flex-row items-end"}>
-                満点
-                <span className={"sm:text-2xl"}> {problem.point} </span>pt
-                採点基準
-                <span className={"sm:text-2xl"}>
-                  {" "}
-                  {problem.solved_criterion}{" "}
-                </span>
-                pt 問題コード
-                <span className={"sm:text-2xl"}> {problem.code}</span>
-              </div>
-              <div className={"text-sm flex flex-row items-end"}>
-                接続情報表示/非表示
-              </div>
-            </div>
-            <div className={"collapse-content pt-2 px-0"}>
-              <ConnectionInfo matter={matter} />
-            </div>
-          </div>
-
+          <ProblemMeta problem={problem} />
+          <ProblemConnectionInfo matter={matter} />
           {recreateInfo?.available != null &&
             !(recreateInfo?.available ?? false) && (
               <div className={`alert alert-info shadow-lg grow`}>

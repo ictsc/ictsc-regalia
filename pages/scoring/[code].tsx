@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useRouter } from "next/router";
 import Error from "next/error";
 
@@ -8,7 +7,9 @@ import BaseLayout from "@/layouts/BaseLayout";
 import ICTSCCard from "@/components/Card";
 import LoadingPage from "@/components/LoadingPage";
 import MarkdownPreview from "@/components/MarkdownPreview";
-import ConnectionInfo from "@/components/connection_info";
+import ProblemTitle from "@/components/ProblemTitle";
+import ProblemMeta from "@/components/ProblemMeta";
+import ProblemConnectionInfo from "@/components/ProblemConnectionInfo";
 import { useApi } from "@/hooks/api";
 import { useProblem, useProblems } from "@/hooks/problem";
 import { useAnswers } from "@/hooks/answer";
@@ -36,7 +37,6 @@ const ScoringProblem = () => {
   const { user } = useAuth();
   const { problem, matter, isLoading } = useProblem(code as string);
   const { answers } = useAnswers(problem?.id ?? "");
-  const [showProblem, setShowProblem] = useState(true);
 
   const isFullAccess = user?.user_group.is_full_access ?? false;
   const isReadOnly = user?.is_read_only ?? false;
@@ -56,27 +56,15 @@ const ScoringProblem = () => {
   return (
     <BaseLayout title={`採点(${problem.code} ${problem.title})`}>
       <div className="container-ictsc">
-        <div
-          className="collapse collapse-arrow"
-          onClick={() => setShowProblem(!showProblem)}
-        >
-          <input type="checkbox" checked={showProblem} />
-          <div className={"collapse-title flex flex-row items-end px-0 mt-8"}>
-            <h1 className={"title-ictsc pr-4"}>{problem.title}</h1>
-            満点
-            <span className={"sm:text-2xl"}> {problem.point} </span>pt 採点基準
-            <span className={"sm:text-2xl"}> {problem.solved_criterion} </span>
-            pt 問題コード
-            <span className={"sm:text-2xl"}> {problem.code}</span>
-          </div>
-          <div className={"collapse-content px-0"}>
-            <ICTSCCard className={"ml-0"}>
-              <MarkdownPreview content={problem.body ?? ""} />
-            </ICTSCCard>
-          </div>
+        <div className={"flex flex-col mt-12"}>
+          <ProblemTitle title={problem.title} />
+          <ProblemMeta problem={problem} />
         </div>
+        <ICTSCCard className={"ml-0"}>
+          <MarkdownPreview content={problem.body ?? ""} />
+        </ICTSCCard>
         <div className={"divider"} />
-        <ConnectionInfo matter={matter} />
+        <ProblemConnectionInfo matter={matter} />
         <div className={"flex flex-row justify-between mb-8 pt-2"}>
           <table className="table border table-compact">
             <thead>
