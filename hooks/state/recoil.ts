@@ -17,8 +17,6 @@ export function DismissNoticeStateInit() {
     if (cookies.dismissNoticeIds !== undefined) {
       const ids: string[] = JSON.parse(cookies.dismissNoticeIds);
 
-      console.log("ids", ids);
-
       if (ids.length > 0) {
         setDismissNoticeIds(ids);
       }
