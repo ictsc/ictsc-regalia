@@ -5,14 +5,14 @@ interface Props {
   matter: Matter | null;
 }
 
-const ProblemConnectionInfo = ({ matter }: Props) => {
+function ProblemConnectionInfo({ matter }: Props) {
   return (
     <div className="overflow-x-auto">
       <table className="table table-compact w-full">
         <thead>
           <tr>
             <th>ホスト名</th>
-            <th></th>
+            <th>コマンド</th>
             <th>ユーザ</th>
             <th>パスワード</th>
             <th>ポート</th>
@@ -21,6 +21,7 @@ const ProblemConnectionInfo = ({ matter }: Props) => {
         </thead>
         <tbody>
           {matter?.connectInfo?.map((info, index) => (
+            // eslint-disable-next-line react/no-array-index-key
             <tr key={index}>
               <th>{info.hostname}</th>
               <HoverCopyText text={info.command ?? ""} />
@@ -34,6 +35,6 @@ const ProblemConnectionInfo = ({ matter }: Props) => {
       </table>
     </div>
   );
-};
+}
 
 export default ProblemConnectionInfo;

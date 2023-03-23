@@ -1,6 +1,22 @@
 {
-  "extends": ["next", "prettier", "next/core-web-vitals"],
+  "extends": [
+    "airbnb",
+    "next",
+    "prettier",
+    "next/core-web-vitals"
+  ],
   "rules": {
+    "import/extensions": "off",
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [
+          ".jsx",
+          ".tsx"
+        ]
+      }
+    ],
+    "react/jsx-props-no-spreading": "off",
     "import/order": [
       "error",
       {
@@ -30,7 +46,9 @@
             "position": "before"
           }
         ],
-        "pathGroupsExcludedImportTypes": ["builtin"],
+        "pathGroupsExcludedImportTypes": [
+          "builtin"
+        ],
         "alphabetize": {
           "order": "asc"
         },

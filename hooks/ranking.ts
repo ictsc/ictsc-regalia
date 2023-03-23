@@ -1,6 +1,6 @@
 import useSWR from "swr";
 
-import { useApi } from "@/hooks/api";
+import useApi from "@/hooks/api";
 import { Rank } from "@/types/Rank";
 import { Result } from "@/types/_api";
 
@@ -8,7 +8,7 @@ type AnswerResult = {
   ranking: Rank[];
 };
 
-export const useRanking = () => {
+const useRanking = () => {
   const { apiClient } = useApi();
 
   const fetcher = (url: string) =>
@@ -21,3 +21,5 @@ export const useRanking = () => {
     loading: isLoading,
   };
 };
+
+export default useRanking;

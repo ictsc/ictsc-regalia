@@ -5,21 +5,18 @@ type Props = {
   message: string;
   subMessage?: string;
 };
-export const ICTSCSuccessAlert = ({
-  className,
-  message,
-  subMessage,
-}: Props) => {
+
+export function ICTSCSuccessAlert({ className, message, subMessage }: Props) {
   return (
     <div
       className={`alert alert-success shadow-lg max-w-xs min-w-[312ppx] ${className}`}
     >
       <div>
         <Image
-          src={"/assets/svg/check-circle.svg"}
+          src="/assets/svg/check-circle.svg"
           width={24}
           height={24}
-          alt={"success"}
+          alt="success"
         />
         <div>
           <h3>{message}</h3>
@@ -28,19 +25,19 @@ export const ICTSCSuccessAlert = ({
       </div>
     </div>
   );
-};
+}
 
-export const ICTSCErrorAlert = ({ className, message, subMessage }: Props) => {
+export function ICTSCErrorAlert({ className, message, subMessage }: Props) {
   return (
     <div
       className={`alert alert-error shadow-lg max-w-xs min-w-[312ppx] ${className}`}
     >
       <div>
         <Image
-          src={"/assets/svg/x-circle.svg"}
+          src="/assets/svg/x-circle.svg"
           width={24}
           height={24}
-          alt={"success"}
+          alt="success"
         />
         <div>
           <h3>{message}</h3>
@@ -49,4 +46,14 @@ export const ICTSCErrorAlert = ({ className, message, subMessage }: Props) => {
       </div>
     </div>
   );
+}
+
+ICTSCSuccessAlert.defaultProps = {
+  className: "",
+  subMessage: "",
+};
+
+ICTSCErrorAlert.defaultProps = {
+  className: "",
+  subMessage: "",
 };

@@ -5,7 +5,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-const ICTSCCard = ({ className, children }: Props) => {
+function ICTSCCard({ className, children }: Props) {
   return (
     <div
       className={`border px-8 pt-12 pb-8  rounded-md shadow-sm ${className}`}
@@ -13,6 +13,10 @@ const ICTSCCard = ({ className, children }: Props) => {
       {children}
     </div>
   );
+}
+
+ICTSCCard.defaultProps = {
+  className: "",
 };
 
 export default ICTSCCard;

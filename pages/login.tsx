@@ -5,8 +5,8 @@ import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
-import { useApi } from "@/hooks/api";
-import { useAuth } from "@/hooks/auth";
+import useApi from "@/hooks/api";
+import useAuth from "@/hooks/auth";
 import CommonLayout from "@/layouts/CommonLayout";
 
 type Inputs = {
@@ -14,7 +14,7 @@ type Inputs = {
   password: string;
 };
 
-const Login = () => {
+function Login() {
   const router = useRouter();
 
   const {
@@ -47,22 +47,19 @@ const Login = () => {
   };
 
   return (
-    <CommonLayout title={"ログイン"}>
+    <CommonLayout title="ログイン">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className={"form-control flex flex-col container-ictsc items-center"}
+        className="form-control flex flex-col container-ictsc items-center"
       >
         {status === 200 && (
           <ICTSCSuccessAlert
-            className={"mb-8"}
-            message={"ログインに成功しました"}
+            className="mb-8"
+            message="ログインに成功しました"
           />
         )}
         {status != null && status !== 200 && (
-          <ICTSCErrorAlert
-            className={"mb-8"}
-            message={"ログインに失敗しました"}
-          />
+          <ICTSCErrorAlert className="mb-8" message="ログインに失敗しました" />
         )}
         <input
           {...register("name", { required: true })}
@@ -70,28 +67,28 @@ const Login = () => {
           placeholder="ユーザー名"
           className="input input-bordered max-w-xs min-w-[312px]"
         />
-        <label className="label max-w-xs min-w-[312px]">
+        <div className="label max-w-xs min-w-[312px]">
           {errors.name && (
             <span className="label-text-alt text-error">
               ユーザー名を入力してください
             </span>
           )}
-        </label>
+        </div>
         <input
           {...register("password", { required: true })}
           type="password"
           placeholder="パスワード"
           className="input input-bordered max-w-xs min-w-[312px] mt-4"
         />
-        <label className="label max-w-xs min-w-[312px]">
+        <div className="label max-w-xs min-w-[312px]">
           {errors.password && (
             <span className="label-text-alt text-error">
               パスワードを入力して下さい
             </span>
           )}
-        </label>
+        </div>
         <button
-          type={"submit"}
+          type="submit"
           className={`btn btn-primary mt-4 max-w-xs min-w-[312px] ${
             submitting && "loading"
           }`}
@@ -101,6 +98,6 @@ const Login = () => {
       </form>
     </CommonLayout>
   );
-};
+}
 
 export default Login;

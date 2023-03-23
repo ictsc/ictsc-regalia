@@ -1,17 +1,19 @@
 import ky from "ky";
 
-export const useApi = () => {
-  let headers: HeadersInit = {
+const useApi = () => {
+  const headers = {
     Accept: "application/json, */*",
     "Content-type": "application/json",
   };
 
   const apiClient = ky.create({
     prefixUrl: process.env.NEXT_PUBLIC_API_URL,
-    headers: headers,
+    headers,
     credentials: "include",
     throwHttpErrors: false,
   });
 
   return { apiClient };
 };
+
+export default useApi;

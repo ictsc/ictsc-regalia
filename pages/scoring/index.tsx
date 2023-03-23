@@ -7,11 +7,11 @@ import Link from "next/link";
 import ICTSCCard from "@/components/Card";
 import LoadingPage from "@/components/LoadingPage";
 import MarkdownPreview from "@/components/MarkdownPreview";
-import { useAuth } from "@/hooks/auth";
+import useAuth from "@/hooks/auth";
 import { useProblem, useProblems } from "@/hooks/problem";
 import BaseLayout from "@/layouts/BaseLayout";
 
-const Index = () => {
+function Index() {
   const { user } = useAuth();
   const { problems, isLoading } = useProblems();
   const [selectedProblemId, setSelectedProblemId] = useState<string | null>(
@@ -25,7 +25,7 @@ const Index = () => {
 
   if (isLoading) {
     return (
-      <BaseLayout title={"採点"}>
+      <BaseLayout title="採点">
         <LoadingPage />
       </BaseLayout>
     );
@@ -36,7 +36,7 @@ const Index = () => {
   }
 
   return (
-    <BaseLayout title={"採点"}>
+    <BaseLayout title="採点">
       <div className="overflow-x-auto">
         <table className="table table-compact w-full">
           <thead>
@@ -53,74 +53,71 @@ const Index = () => {
               <th>著者</th>
             </tr>
           </thead>
-          <tbody className={"cursor-pointer"}>
-            {problems.map((problem) => (
-              <tr
-                key={problem.id}
-                onClick={() => setSelectedProblemId(problem.code)}
-              >
+          <tbody className="cursor-pointer">
+            {problems.map((prob) => (
+              <tr key={prob.id} onClick={() => setSelectedProblemId(prob.code)}>
                 <td>
                   <Link
-                    href={`/scoring/${problem.code}`}
-                    className={"flex justify-center"}
+                    href={`/scoring/${prob.code}`}
+                    className="flex justify-center"
                   >
                     <Image
-                      src={"/assets/svg/check.svg"}
+                      src="/assets/svg/check.svg"
                       width={20}
                       height={20}
-                      alt={"採点へ"}
+                      alt="採点へ"
                     />
                   </Link>
                 </td>
                 <td>
-                  {problem.unchecked}/
-                  {problem.unchecked_near_overdue != null &&
-                  problem.unchecked_near_overdue > 0 ? (
-                    <div className={"inline-block text-warning"}>
-                      {problem.unchecked_near_overdue}
+                  {prob.unchecked}/
+                  {prob.unchecked_near_overdue != null &&
+                  prob.unchecked_near_overdue > 0 ? (
+                    <div className="inline-block text-warning">
+                      {prob.unchecked_near_overdue}
                     </div>
                   ) : (
-                    <div className={"inline-block"}>-</div>
+                    <div className="inline-block">-</div>
                   )}
                   /
-                  {problem.unchecked_overdue != null &&
-                  problem.unchecked_overdue > 0 ? (
-                    <div className={"inline-block text-error"}>
-                      {problem.unchecked_overdue}
+                  {prob.unchecked_overdue != null &&
+                  prob.unchecked_overdue > 0 ? (
+                    <div className="inline-block text-error">
+                      {prob.unchecked_overdue}
                     </div>
                   ) : (
-                    <div className={"inline-block"}>-</div>
+                    <div className="inline-block">-</div>
                   )}
                 </td>
-                <td>{problem.id}</td>
-                <td>{problem.code}</td>
-                <td>{problem.title}</td>
+                <td>{prob.id}</td>
+                <td>{prob.code}</td>
+                <td>{prob.title}</td>
                 {/* 文は 20文字まで */}
                 <td>
-                  {problem.body?.length ?? 0 > 20
-                    ? problem.body?.slice(0, 20) + "..."
-                    : problem.body}
+                  {prob.body?.length ?? 0 > 20
+                    ? `${prob.body?.slice(0, 20)}...`
+                    : prob.body}
                 </td>
-                <td>{problem.point}</td>
-                <td>{problem.solved_criterion}</td>
-                <td>{problem.previous_problem_id}</td>
-                <td>{problem.author_id === user?.id ? "自分" : ""}</td>
+                <td>{prob.point}</td>
+                <td>{prob.solved_criterion}</td>
+                <td>{prob.previous_problem_id}</td>
+                <td>{prob.author_id === user?.id ? "自分" : ""}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <div className={"divider my-0"} />
+      <div className="divider my-0" />
       {problem != null && (
-        <div className={"container-ictsc"}>
-          <div className={"flex flex-row items-end py-12"}>
-            <h1 className={"title-ictsc pr-4"}>{problem.title}</h1>
+        <div className="container-ictsc">
+          <div className="flex flex-row items-end py-12">
+            <h1 className="title-ictsc pr-4">{problem.title}</h1>
             満点
             {problem.point} pt 採点基準
             {problem.solved_criterion} pt
             <Link
               href={`/scoring/${problem.code}`}
-              className={"link link-primary pl-2"}
+              className="link link-primary pl-2"
             >
               採点する
             </Link>
@@ -132,6 +129,6 @@ const Index = () => {
       )}
     </BaseLayout>
   );
-};
+}
 
 export default Index;

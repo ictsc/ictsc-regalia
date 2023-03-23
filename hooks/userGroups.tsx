@@ -1,10 +1,10 @@
 import useSWR from "swr";
 
-import { useApi } from "@/hooks/api";
+import useApi from "@/hooks/api";
 import { UserGroup } from "@/types/UserGroup";
 import { Result } from "@/types/_api";
 
-export const useUserGroups = () => {
+const useUserGroups = () => {
   const { apiClient } = useApi();
 
   const fetcher = (url: string) =>
@@ -17,3 +17,5 @@ export const useUserGroups = () => {
     isLoading,
   };
 };
+
+export default useUserGroups;

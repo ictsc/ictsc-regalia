@@ -1,7 +1,7 @@
 import matter from "gray-matter";
 import useSWR from "swr";
 
-import { useApi } from "@/hooks/api";
+import useApi from "@/hooks/api";
 import { Matter } from "@/types/Problem";
 import { ProblemResult, Result } from "@/types/_api";
 
@@ -23,7 +23,7 @@ export const useProblems = () => {
 export const useProblem = (code: string | null) => {
   const { problems } = useProblems();
 
-  const problem = problems.find((problem) => problem.code === code) ?? null;
+  const problem = problems.find((prob) => prob.code === code) ?? null;
 
   if (problem === null) {
     return {

@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import { useApi } from "../hooks/api";
-import { useAuth } from "../hooks/auth";
+import useApi from "@/hooks/api";
+import useAuth from "@/hooks/auth";
 
-const ICTSCNavBar = () => {
+function ICTSCNavBar() {
   const router = useRouter();
 
   const { apiClient } = useApi();
@@ -20,62 +20,66 @@ const ICTSCNavBar = () => {
   };
 
   return (
-    <div className={"navbar bg-primary text-primary-content"}>
-      <div className={"flex-1"}>
-        <Link href={"/"} className="btn btn-ghost normal-case text-xl">
+    <div className="navbar bg-primary text-primary-content">
+      <div className="flex-1">
+        <Link href="/" className="btn btn-ghost normal-case text-xl">
           ICTSC
         </Link>
       </div>
-      <div className={"flex-none"}>
+      <div className="flex-none">
         <ul className="menu menu-horizontal p-0">
           <li>
-            <Link href={"/"}>ルール</Link>
+            <Link href="/">ルール</Link>
           </li>
           {user !== null && (
             <>
               <li>
-                <Link href={"/team_info"}>チーム情報</Link>
+                <Link href="/team_info">チーム情報</Link>
               </li>
               <li>
-                <Link href={"/problems"}>問題</Link>
+                <Link href="/problems">問題</Link>
               </li>
             </>
           )}
           <li>
-            <Link href={"/ranking"}>順位</Link>
+            <Link href="/ranking">順位</Link>
           </li>
           {user !== null && (
             <>
               <li>
-                <Link href={"/users"}>参加者</Link>
+                <Link href="/users">参加者</Link>
               </li>
               {user.user_group.is_full_access && !user.is_read_only && (
                 <li>
-                  <Link href={"/scoring"}>採点</Link>
+                  <Link href="/scoring">採点</Link>
                 </li>
               )}
             </>
           )}
           {user === null ? (
-            <li className={"ml-4"}>
-              <Link href={"/login"}>ログイン</Link>
+            <li className="ml-4">
+              <Link href="/login">ログイン</Link>
             </li>
           ) : (
-            <li tabIndex={0} className={"ml-4 dropdown dropdown-end"}>
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+            <li tabIndex={0} className="ml-4 dropdown dropdown-end">
               <div>{user.display_name}</div>
               <ul
+                /* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */
                 tabIndex={0}
                 className="menu menu-compact dropdown-content bg-base-100 mt-3 p-2 shadow rounded-box w-52 text-base-content"
               >
                 <li>
-                  <a>チーム: {user.user_group.name}</a>
+                  <div>チーム: {user.user_group.name}</div>
                 </li>
                 <li>
-                  <Link href={"/profile"}>プロフィール</Link>
+                  <Link href="/profile">プロフィール</Link>
                 </li>
                 <div className="divider my-0" />
                 <li>
-                  <a onClick={logout}>ログアウト</a>
+                  <button type="button" onClick={logout}>
+                    ログアウト
+                  </button>
                 </li>
               </ul>
             </li>
@@ -84,6 +88,6 @@ const ICTSCNavBar = () => {
       </div>
     </div>
   );
-};
+}
 
 export default ICTSCNavBar;

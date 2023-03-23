@@ -12,7 +12,7 @@ export function DismissNoticeStateInit() {
   const setDismissNoticeIds = useSetRecoilState(dismissNoticeIdsState);
 
   useEffect(() => {
-    //dismissNoticeIds を cookie から取得
+    // dismissNoticeIds を cookie から取得
     const cookies = parseCookies();
 
     if (cookies.dismissNoticeIds !== undefined) {

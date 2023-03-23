@@ -8,25 +8,23 @@ interface Props {
   onDismiss?: () => void;
 }
 
-const NotificationCard = ({ notice, onDismiss }: Props) => {
+function NotificationCard({ notice, onDismiss }: Props) {
   return (
-    <div className={"container-ictsc"}>
+    <div className="container-ictsc">
       <div className="bg-gray-200 p-4 rounded rounded-lg  shadow-lg grow">
         <div>
-          <div className={"flex flex-col"}>
-            <div
-              className={"flex flex-row justify-between justify-items-center"}
-            >
-              <div className={"flex flex-row"}>
-                <span className={"pl-2 font-bold"}>{notice.title}</span>
+          <div className="flex flex-col">
+            <div className="flex flex-row justify-between justify-items-center">
+              <div className="flex flex-row">
+                <span className="font-bold">{notice.title}</span>
               </div>
               {onDismiss && (
-                <button onClick={onDismiss}>
+                <button type="button" onClick={onDismiss}>
                   <Image
-                    src={"assets/svg/x-mark.svg"}
+                    src="assets/svg/x-mark.svg"
                     width={24}
                     height={24}
-                    alt={"dismiss"}
+                    alt="dismiss"
                   />
                 </button>
               )}
@@ -37,6 +35,10 @@ const NotificationCard = ({ notice, onDismiss }: Props) => {
       </div>
     </div>
   );
+}
+
+NotificationCard.defaultProps = {
+  onDismiss: undefined,
 };
 
 export default NotificationCard;
