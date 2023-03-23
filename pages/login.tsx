@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import BaseLayout from "@/layouts/BaseLayout";
+import CommonLayout from "@/layouts/CommonLayout";
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
 import { useAuth } from "@/hooks/auth";
 import { useApi } from "@/hooks/api";
@@ -46,8 +46,7 @@ const Login = () => {
   };
 
   return (
-    <BaseLayout title={"ログイン"}>
-      <h1 className={"title-ictsc text-center py-12"}>ログイン</h1>
+    <CommonLayout title={"ログイン"}>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className={"form-control flex flex-col container-ictsc items-center"}
@@ -99,7 +98,7 @@ const Login = () => {
           ログイン
         </button>
       </form>
-    </BaseLayout>
+    </CommonLayout>
   );
 };
 
