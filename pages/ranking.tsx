@@ -21,7 +21,7 @@ function Ranking() {
 
   return (
     <CommonLayout title="ランキング">
-      <div className="container-ictsc">
+      <div className="container-ictsc overflow-x-auto">
         <table className="table border w-full">
           <thead>
             <tr>
