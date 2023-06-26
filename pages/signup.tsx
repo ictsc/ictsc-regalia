@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 
-import { SubmitHandler, useForm } from "react-hook-form";
+import {SubmitHandler, useForm} from "react-hook-form";
 
-import { ICTSCSuccessAlert, ICTSCErrorAlert } from "@/components/Alerts";
+import {ICTSCErrorAlert, ICTSCSuccessAlert} from "@/components/Alerts";
 import useApi from "@/hooks/api";
 import BaseLayout from "@/layouts/BaseLayout";
 
@@ -46,15 +46,15 @@ function Signup() {
     setSubmitting(false);
     setStatus(response.status);
 
-    if (!response.ok) {
-      const msg = await response.text();
+    if (!(response.status === 200)) {
+      const msg = await response.data();
       if (msg.match(/Error 1062: Duplicate entry '\w+' for key 'name'/)) {
         setMessage("ユーザー名が重複しています。");
       }
       if (
-        msg.match(
-          /Error:Field validation for 'UserGroupID' failed on the 'required' tag/
-        )
+          msg.match(
+              /Error:Field validation for 'UserGroupID' failed on the 'required' tag/
+          )
       ) {
         setMessage("無効なユーザーグループです。");
       }

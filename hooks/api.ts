@@ -1,4 +1,6 @@
-import ky from "ky";
+import axios from "axios";
+
+import {Result} from "@/types/_api";
 
 const useApi = () => {
   const headers = {
@@ -6,14 +8,17 @@ const useApi = () => {
     "Content-type": "application/json",
   };
 
-  const apiClient = ky.create({
-    prefixUrl: process.env.NEXT_PUBLIC_API_URL,
+  const apiClient = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_URL,
     headers,
-    credentials: "include",
-    throwHttpErrors: false,
+    withCredentials: true,
   });
 
-  return { apiClient };
+  const client = {
+    get: <T>(url: string) => apiClient.get<Result<T>>(url).then(response => response.data),
+  }
+
+  return {apiClient, client};
 };
 
 export default useApi;
