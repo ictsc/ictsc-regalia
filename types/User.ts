@@ -1,4 +1,4 @@
-import {UserGroup} from "@/types/UserGroup";
+import { UserGroup } from "@/types/UserGroup";
 
 export type User = {
   id: string;
