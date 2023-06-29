@@ -62,9 +62,7 @@ function Profile() {
   }, [user]);
 
   const onSubmit = async (data: Inputs) => {
-    const response = await apiClient.put(`users/${user?.id}`, {
-      json: data,
-    });
+    const response = await apiClient.put(`users/${user?.id}`, data);
 
     setStatus(response.status);
 

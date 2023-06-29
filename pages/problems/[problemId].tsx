@@ -71,11 +71,9 @@ function AnswerForm({code}: { code: string | null }) {
 
   const onSubmit: SubmitHandler<Inputs> = async ({answer}) => {
     const response = await apiClient.post(`problems/${problem?.id}/answers`, {
-      json: {
-        user_group_id: user?.user_group_id,
-        problem_id: problem?.id,
-        body: answer,
-      },
+      user_group_id: user?.user_group_id,
+      problem_id: problem?.id,
+      body: answer,
     });
 
     if (response.status === 200) {
