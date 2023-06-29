@@ -6,16 +6,16 @@ import useAuth from "@/hooks/auth";
 import {testUser} from "@/types/User";
 import {AuthSelfResult, Result} from "@/types/_api";
 
-jest.mock('swr')
+jest.mock("swr");
 
-describe('useAuth', () => {
-  it('ユーザーが取得できる', () => {
+describe("useAuth", () => {
+  it("ユーザーが取得できる", () => {
     // setup
     const mockAuthResult: Result<AuthSelfResult> = {
       code: 200,
       data: {
         user: testUser,
-      }
+      },
     };
 
     (useSWR as jest.Mock).mockReturnValue({
@@ -34,9 +34,9 @@ describe('useAuth', () => {
 
     // verify
     expect(useSWR).toBeCalledTimes(1);
-  })
+  });
 
-  it('ユーザーが取得できない', () => {
+  it("ユーザーが取得できない", () => {
     // setup
     const mockAuthResult: Result<AuthSelfResult> = {
       code: 200,
@@ -59,5 +59,5 @@ describe('useAuth', () => {
 
     // verify
     expect(useSWR).toBeCalledTimes(2);
-  })
-})
+  });
+});

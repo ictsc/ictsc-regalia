@@ -59,5 +59,5 @@ export const testUser: User = {
     self_introduction: "test",
     created_at: new Date(),
     updated_at: new Date(),
-  }
+  },
 };

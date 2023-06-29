@@ -15,8 +15,9 @@ const useApi = () => {
   });
 
   const client = {
-    get: <T>(url: string) => apiClient.get<Result<T>>(url).then(response => response.data),
-  }
+    get: <T>(url: string) =>
+        apiClient.get<Result<T>>(url).then((response) => response.data),
+  };
 
   // TODO(k-shir0): apiClient は廃止し client に統一する
   return {apiClient, client};

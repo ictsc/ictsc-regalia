@@ -44,13 +44,15 @@ function AnswerForm({problem, answer}: AnswerFormProps) {
   });
 
   const onSubmit = async (data: AnswerFormInputs) => {
-    await apiClient
-        .patch<Result<Answer>>(`problems/${problem.id}/answers/${answer.id}`, {
+    await apiClient.patch<Result<Answer>>(
+        `problems/${problem.id}/answers/${answer.id}`,
+        {
           problem_id: problem.id,
           answer_id: answer.id,
           // parseInt するとダブルクォートが取り除かれる
           point: parseInt(data.point.toString(), 10),
-        });
+        }
+    );
 
     await mutate();
     await mutateProblem();
