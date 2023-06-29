@@ -1,16 +1,14 @@
 import useSWR from "swr";
 
 import useApi from "@/hooks/api";
-import { UserGroup } from "@/types/UserGroup";
-import { Result } from "@/types/_api";
+import {UserGroup} from "@/types/UserGroup";
 
 const useUserGroups = () => {
-  const { apiClient } = useApi();
+  const {client} = useApi();
 
-  const fetcher = (url: string) =>
-    apiClient.get(url).json<Result<UserGroup[]>>();
+  const fetcher = (url: string) => client.get<UserGroup[]>(url);
 
-  const { data, isLoading } = useSWR("usergroups", fetcher);
+  const {data, isLoading} = useSWR("usergroups", fetcher);
 
   return {
     userGroups: data?.data ?? null,

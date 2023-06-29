@@ -54,6 +54,17 @@
         },
         "newlines-between": "always"
       }
+    ],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": false,
+        // devDependenciesのimportを禁止
+        "optionalDependencies": false
+      }
     ]
+  },
+  "env": {
+    "jest": true
   }
 }

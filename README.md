@@ -25,6 +25,12 @@ npm run dev
 yarn dev
 ```
 
+#### テスト実行
+
+```bash
+yarn test
+```
+
 ### Docker build
 
 1. Docker をインストール

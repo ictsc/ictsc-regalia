@@ -1,4 +1,4 @@
-import { UserGroup } from "@/types/UserGroup";
+import {UserGroup} from "@/types/UserGroup";
 
 export type User = {
   id: string;
@@ -22,4 +22,42 @@ export type Profile = {
   self_introduction: string;
   created_at: Date;
   updated_at: Date;
+};
+
+export const testUser: User = {
+  id: "1",
+  name: "Test User",
+  display_name: "Test User",
+  is_read_only: false,
+  created_at: new Date(),
+  updated_at: new Date(),
+  user_group: {
+    id: "1",
+    name: "Test User Group",
+    organization: "Test Organization",
+    created_at: new Date(),
+    updated_at: new Date(),
+    is_full_access: false,
+    members: [],
+    bastion: null,
+  },
+  user_group_id: "1",
+  profile: {
+    id: "1",
+    twitter_id: "test",
+    github_id: "test",
+    facebook_id: "test",
+    self_introduction: "test",
+    created_at: new Date(),
+    updated_at: new Date(),
+  },
+  user_profile: {
+    id: "1",
+    twitter_id: "test",
+    github_id: "test",
+    facebook_id: "test",
+    self_introduction: "test",
+    created_at: new Date(),
+    updated_at: new Date(),
+  },
 };

@@ -1,15 +1,14 @@
 import useSWR from "swr";
 
 import useApi from "@/hooks/api";
-import { Notice } from "@/types/Notice";
-import { Result } from "@/types/_api";
+import {Notice} from "@/types/Notice";
 
 const useNotice = () => {
-  const { apiClient } = useApi();
+  const {client} = useApi();
 
-  const fetcher = (url: string) => apiClient.get(url).json<Result<Notice[]>>();
+  const fetcher = (url: string) => client.get<Notice[]>(url);
 
-  const { data, mutate, isLoading } = useSWR("notices", fetcher);
+  const {data, mutate, isLoading} = useSWR("notices", fetcher);
 
   return {
     notices: data?.data ?? null,
