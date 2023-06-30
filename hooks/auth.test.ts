@@ -1,10 +1,10 @@
-import {renderHook} from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 import expect from "expect";
 import useSWR from "swr";
 
 import useAuth from "@/hooks/auth";
-import {testUser} from "@/types/User";
-import {AuthSelfResult, Result} from "@/types/_api";
+import { testUser } from "@/types/User";
+import { AuthSelfResult, Result } from "@/types/_api";
 
 jest.mock("swr");
 
@@ -25,7 +25,7 @@ describe("useAuth", () => {
     });
 
     // when
-    const {result} = renderHook(() => useAuth());
+    const { result } = renderHook(() => useAuth());
 
     // then
     expect(result.current.user).toEqual(mockAuthResult.data?.user);
@@ -50,7 +50,7 @@ describe("useAuth", () => {
     });
 
     // when
-    const {result} = renderHook(() => useAuth());
+    const { result } = renderHook(() => useAuth());
 
     // then
     expect(result.current.user).toBeNull();

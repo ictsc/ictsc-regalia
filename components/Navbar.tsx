@@ -1,5 +1,5 @@
 import Link from "next/link";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
 
 import useApi from "@/hooks/api";
 import useAuth from "@/hooks/auth";
@@ -7,11 +7,11 @@ import useAuth from "@/hooks/auth";
 function ICTSCNavBar() {
   const router = useRouter();
 
-  const { apiClient } = useApi();
+  const { client } = useApi();
   const { user, mutate } = useAuth();
 
   const logout = async () => {
-    const response = await apiClient.delete("auth/signout");
+    const response = await client.delete("auth/signout");
 
     if (response.status === 200) {
       await mutate();
