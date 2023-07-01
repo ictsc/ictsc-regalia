@@ -58,7 +58,7 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": false,
+        "devDependencies": true,
         // devDependenciesのimportを禁止
         "optionalDependencies": false
       }

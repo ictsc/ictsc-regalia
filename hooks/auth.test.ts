@@ -1,12 +1,12 @@
 import { renderHook } from "@testing-library/react";
-import expect from "expect";
 import useSWR from "swr";
+import { MockInstance } from "vitest";
 
 import useAuth from "@/hooks/auth";
 import { testUser } from "@/types/User";
 import { AuthSelfResult, Result } from "@/types/_api";
 
-jest.mock("swr");
+vi.mock("swr");
 
 describe("useAuth", () => {
   it("ユーザーが取得できる", () => {
@@ -18,9 +18,9 @@ describe("useAuth", () => {
       },
     };
 
-    (useSWR as jest.Mock).mockReturnValue({
+    (useSWR as unknown as MockInstance).mockReturnValue({
       data: mockAuthResult,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
       isLoading: false,
     });
 
@@ -45,7 +45,7 @@ describe("useAuth", () => {
 
     (useSWR as jest.Mock).mockReturnValue({
       data: mockAuthResult,
-      mutate: jest.fn(),
+      mutate: vi.fn(),
       isLoading: false,
     });
 
