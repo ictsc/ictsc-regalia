@@ -1,19 +1,14 @@
 import "@testing-library/jest-dom";
-import { render, screen } from "@testing-library/react";
+
+import { act, render, screen } from "@testing-library/react";
+import mockRouter from "next-router-mock";
 import { Mock, MockInstance, vi } from "vitest";
 
 import ICTSCNavbar from "@/components/Navbar";
 import useAuth from "@/hooks/auth";
 import { testAdminUser, testUser } from "@/types/User";
 
-vi.mock("next/router", () => ({
-  useRouter() {
-    return {
-      route: "/",
-      push: () => {},
-    };
-  },
-}));
+vi.mock("next/router", () => require("next-router-mock"));
 vi.mock("@/hooks/auth");
 
 beforeEach(() => {
@@ -70,8 +65,28 @@ describe("参加者ログイン状態 ICTSCNavBar", () => {
     expect(useAuth).toHaveBeenCalledTimes(1);
   });
 
-  test("ログアウトボタンを押した時にログアウト処理が実行されることを確認する", () => {
+  test("チーム名が正しく表示されている", () => {
     // setup
+    (useAuth as unknown as MockInstance).mockReturnValue({
+      user: testUser,
+      mutate: () => {},
+    });
+
+    // when
+    render(<ICTSCNavbar />);
+
+    // then
+    expect(
+      screen.queryByText(`チーム: ${testUser.user_group.name}`)
+    ).toBeInTheDocument();
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(1);
+  });
+
+  test("ログアウトボタンを押した時にログアウト処理が実行されることを確認する", async () => {
+    // setup
+    mockRouter.push("/");
     const logout = vi.fn().mockResolvedValue({ status: 200 });
     (useAuth as unknown as MockInstance).mockReturnValue({
       user: testUser,
@@ -81,13 +96,18 @@ describe("参加者ログイン状態 ICTSCNavBar", () => {
     render(<ICTSCNavbar />);
 
     // when
-    screen.getByText("ログアウト").click();
+    await act(async () => {
+      screen.getByText("ログアウト").click();
+    });
 
     // then
-    expect(logout).toHaveBeenCalledTimes(1);
+    expect(mockRouter).toMatchObject({
+      pathname: "/",
+    });
 
     // verify
-    expect(useAuth).toHaveBeenCalledTimes(1);
+    expect(useAuth).toHaveBeenCalledTimes(2);
+    expect(logout).toHaveBeenCalledTimes(1);
   });
 });
 

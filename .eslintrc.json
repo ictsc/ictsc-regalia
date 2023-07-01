@@ -66,5 +66,19 @@
   },
   "env": {
     "jest": true
-  }
+  },
+  // テストファイルのみ global-require を許可
+  "overrides": [
+    {
+      "files": [
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/*.spec.ts",
+        "**/*.spec.tsx"
+      ],
+      "rules": {
+        "global-require": "off"
+      }
+    }
+  ]
 }
