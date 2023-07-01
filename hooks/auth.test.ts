@@ -1,12 +1,17 @@
 import { renderHook } from "@testing-library/react";
 import useSWR from "swr";
-import { MockInstance } from "vitest";
+import { MockInstance, vi } from "vitest";
 
 import useAuth from "@/hooks/auth";
 import { testUser } from "@/types/User";
 import { AuthSelfResult, Result } from "@/types/_api";
 
 vi.mock("swr");
+
+beforeEach(() => {
+  // toHaveBeenCalledTimes がテストごとにリセットされるようにする
+  vi.clearAllMocks();
+});
 
 describe("useAuth", () => {
   it("ユーザーが取得できる", () => {
@@ -43,7 +48,7 @@ describe("useAuth", () => {
       data: null,
     };
 
-    (useSWR as jest.Mock).mockReturnValue({
+    (useSWR as unknown as MockInstance).mockReturnValue({
       data: mockAuthResult,
       mutate: vi.fn(),
       isLoading: false,
@@ -58,6 +63,6 @@ describe("useAuth", () => {
     expect(result.current.mutate).toBeDefined();
 
     // verify
-    expect(useSWR).toBeCalledTimes(2);
+    expect(useSWR).toBeCalledTimes(1);
   });
 });

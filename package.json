@@ -46,6 +46,8 @@
   },
   "devDependencies": {
     "@types/luxon": "^3.2.0",
+    "@vitest/coverage-v8": "^0.32.2",
+    "@vitest/ui": "^0.32.2",
     "autoprefixer": "^10.4.13",
     "babel-jest": "^29.5.0",
     "eslint-config-prettier": "^8.6.0",

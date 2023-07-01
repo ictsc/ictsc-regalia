@@ -14,8 +14,12 @@ vi.mock("next/router", () => ({
     };
   },
 }));
-
 vi.mock("@/hooks/auth");
+
+beforeEach(() => {
+  // toHaveBeenCalledTimes がテストごとにリセットされるようにする
+  vi.clearAllMocks();
+});
 
 describe("未ログイン状態 ICTSCNavBar", () => {
   test("正常に表示され未ログイン時の項目が表示されることを確認する", () => {
@@ -63,12 +67,11 @@ describe("参加者ログイン状態 ICTSCNavBar", () => {
     expect(screen.queryByText("ログイン")).not.toBeInTheDocument();
 
     // verify
-    expect(useAuth).toHaveBeenCalledTimes(2);
+    expect(useAuth).toHaveBeenCalledTimes(1);
   });
 
   test("ログアウトボタンを押した時にログアウト処理が実行されることを確認する", () => {
     // setup
-    // TODO(k-shir0): push のテストがない
     const logout = vi.fn().mockResolvedValue({ status: 200 });
     (useAuth as unknown as MockInstance).mockReturnValue({
       user: testUser,
@@ -84,7 +87,7 @@ describe("参加者ログイン状態 ICTSCNavBar", () => {
     expect(logout).toHaveBeenCalledTimes(1);
 
     // verify
-    expect(useAuth).toHaveBeenCalledTimes(3);
+    expect(useAuth).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -109,6 +112,6 @@ describe("管理者ログイン状態 ICTSCNavBar", () => {
     expect(screen.queryByText("ログイン")).not.toBeInTheDocument();
 
     // verify
-    // expect(useAuth).toHaveBeenCalledTimes(0);
+    expect(useAuth).toHaveBeenCalledTimes(1);
   });
 });
