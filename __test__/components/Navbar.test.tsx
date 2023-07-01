@@ -1,25 +1,25 @@
-import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
+
+import { act, render, screen } from "@testing-library/react";
+import mockRouter from "next-router-mock";
+import { Mock, MockInstance, vi } from "vitest";
 
 import ICTSCNavbar from "@/components/Navbar";
 import useAuth from "@/hooks/auth";
 import { testAdminUser, testUser } from "@/types/User";
 
-jest.mock("next/router", () => ({
-  useRouter() {
-    return {
-      route: "/",
-      push: () => {},
-    };
-  },
-}));
+vi.mock("next/router", () => require("next-router-mock"));
+vi.mock("@/hooks/auth");
 
-jest.mock("@/hooks/auth");
+beforeEach(() => {
+  // toHaveBeenCalledTimes がテストごとにリセットされるようにする
+  vi.clearAllMocks();
+});
 
 describe("未ログイン状態 ICTSCNavBar", () => {
   test("正常に表示され未ログイン時の項目が表示されることを確認する", () => {
     // setup
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as unknown as MockInstance).mockReturnValue({
       user: null,
       mutate: () => {},
     });
@@ -62,14 +62,33 @@ describe("参加者ログイン状態 ICTSCNavBar", () => {
     expect(screen.queryByText("ログイン")).not.toBeInTheDocument();
 
     // verify
-    expect(useAuth).toHaveBeenCalledTimes(2);
+    expect(useAuth).toHaveBeenCalledTimes(1);
   });
 
-  test("ログアウトボタンを押した時にログアウト処理が実行されることを確認する", () => {
+  test("チーム名が正しく表示されている", () => {
     // setup
-    // TODO(k-shir0): push のテストがない
-    const logout = jest.fn().mockResolvedValue({ status: 200 });
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as unknown as MockInstance).mockReturnValue({
+      user: testUser,
+      mutate: () => {},
+    });
+
+    // when
+    render(<ICTSCNavbar />);
+
+    // then
+    expect(
+      screen.queryByText(`チーム: ${testUser.user_group.name}`)
+    ).toBeInTheDocument();
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(1);
+  });
+
+  test("ログアウトボタンを押した時にログアウト処理が実行されることを確認する", async () => {
+    // setup
+    mockRouter.push("/");
+    const logout = vi.fn().mockResolvedValue({ status: 200 });
+    (useAuth as unknown as MockInstance).mockReturnValue({
       user: testUser,
       mutate: () => {},
       logout,
@@ -77,20 +96,25 @@ describe("参加者ログイン状態 ICTSCNavBar", () => {
     render(<ICTSCNavbar />);
 
     // when
-    screen.getByText("ログアウト").click();
+    await act(async () => {
+      screen.getByText("ログアウト").click();
+    });
 
     // then
-    expect(logout).toHaveBeenCalledTimes(1);
+    expect(mockRouter).toMatchObject({
+      pathname: "/",
+    });
 
     // verify
-    expect(useAuth).toHaveBeenCalledTimes(3);
+    expect(useAuth).toHaveBeenCalledTimes(2);
+    expect(logout).toHaveBeenCalledTimes(1);
   });
 });
 
 describe("管理者ログイン状態 ICTSCNavBar", () => {
   test("正常に表示され管理者ログイン時の項目が表示されることを確認する", () => {
     // setup
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as Mock).mockReturnValue({
       user: testAdminUser,
       mutate: () => {},
     });
@@ -108,6 +132,6 @@ describe("管理者ログイン状態 ICTSCNavBar", () => {
     expect(screen.queryByText("ログイン")).not.toBeInTheDocument();
 
     // verify
-    expect(useAuth).toHaveBeenCalledTimes(4);
+    expect(useAuth).toHaveBeenCalledTimes(1);
   });
 });
