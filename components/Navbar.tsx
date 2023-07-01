@@ -1,17 +1,15 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import useApi from "@/hooks/api";
 import useAuth from "@/hooks/auth";
 
 function ICTSCNavBar() {
   const router = useRouter();
 
-  const { client } = useApi();
-  const { user, mutate } = useAuth();
+  const { user, logout, mutate } = useAuth();
 
-  const logout = async () => {
-    const response = await client.delete("auth/signout");
+  const handleLogout = async () => {
+    const response = await logout();
 
     if (response.status === 200) {
       await mutate();
@@ -77,7 +75,7 @@ function ICTSCNavBar() {
                 </li>
                 <div className="divider my-0" />
                 <li>
-                  <button type="button" onClick={logout}>
+                  <button type="button" onClick={handleLogout}>
                     ログアウト
                   </button>
                 </li>

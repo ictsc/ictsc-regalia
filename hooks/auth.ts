@@ -9,9 +9,11 @@ const useAuth = () => {
   const fetcher = (url: string) => client.get<AuthSelfResult>(url);
 
   const { data, mutate, isLoading } = useSWR("auth/self", fetcher);
+  const logout = () => client.delete("auth/logout");
 
   return {
     user: data?.data?.user ?? null,
+    logout,
     isLoading,
     mutate,
   };
