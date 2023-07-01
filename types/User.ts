@@ -61,3 +61,41 @@ export const testUser: User = {
     updated_at: new Date(),
   },
 };
+
+export const testAdminUser: User = {
+  id: "1",
+  name: "Test Admin User",
+  display_name: "Test Admin User",
+  is_read_only: false,
+  created_at: new Date(),
+  updated_at: new Date(),
+  user_group: {
+    id: "1",
+    name: "Test User Group",
+    organization: "Test Organization",
+    created_at: new Date(),
+    updated_at: new Date(),
+    is_full_access: true,
+    members: [],
+    bastion: null,
+  },
+  user_group_id: "1",
+  profile: {
+    id: "1",
+    twitter_id: "test",
+    github_id: "test",
+    facebook_id: "test",
+    self_introduction: "test",
+    created_at: new Date(),
+    updated_at: new Date(),
+  },
+  user_profile: {
+    id: "1",
+    twitter_id: "test",
+    github_id: "test",
+    facebook_id: "test",
+    self_introduction: "test",
+    created_at: new Date(),
+    updated_at: new Date(),
+  },
+};

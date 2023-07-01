@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@next/font": "^13.1.1",
+    "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@types/node": "18.11.9",
     "@types/react": "18.0.25",
@@ -30,6 +31,7 @@
     "ky-universal": "^0.11.0",
     "luxon": "^3.2.1",
     "next": "^13.1.1",
+    "next-router-mock": "^0.9.7",
     "nookies": "^2.5.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -44,7 +46,6 @@
     "zenn-markdown-html": "^0.1.81"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
     "@types/luxon": "^3.2.0",
     "autoprefixer": "^10.4.13",
     "babel-jest": "^29.5.0",
