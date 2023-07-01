@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -20,29 +16,13 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/components/*": [
-        "components/*"
-      ],
-      "@/hooks/*": [
-        "hooks/*"
-      ],
-      "@/layouts/*": [
-        "layouts/*"
-      ],
-      "@/types/*": [
-        "types/*"
-      ]
+      "@/components/*": ["components/*"],
+      "@/hooks/*": ["hooks/*"],
+      "@/layouts/*": ["layouts/*"],
+      "@/types/*": ["types/*"]
     },
-    "types": [
-      "vitest/globals"
-    ]
+    "types": ["vitest/globals"]
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }
