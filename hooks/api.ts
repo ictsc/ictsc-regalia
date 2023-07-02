@@ -18,13 +18,13 @@ const useApi = () => {
     get: <T>(url: string) =>
       apiClient.get<Result<T>>(url).then((response) => response.data),
     post: (url: string, data?: any) =>
-      apiClient.post(url, data).then((response) => response.data),
+      apiClient.post<Result<any>>(url, data).then((response) => response.data),
     put: (url: string, data?: any) =>
-      apiClient.put(url, data).then((response) => response.data),
+      apiClient.put<Result<any>>(url, data).then((response) => response.data),
     patch: <T>(url: string, data?: any) =>
       apiClient.patch<Result<T>>(url, data).then((response) => response.data),
     delete: (url: string) =>
-      apiClient.delete(url).then((response) => response.data),
+      apiClient.delete<Result<any>>(url).then((response) => response.data),
   };
 
   return { client };

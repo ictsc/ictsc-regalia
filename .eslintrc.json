@@ -62,7 +62,8 @@
         // devDependenciesのimportを禁止
         "optionalDependencies": false
       }
-    ]
+    ],
+    "no-unused-vars": "off"
   },
   "env": {
     "jest": true

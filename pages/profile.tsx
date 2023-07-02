@@ -64,9 +64,9 @@ function Profile() {
   const onSubmit = async (data: Inputs) => {
     const response = await client.put(`users/${user?.id}`, data);
 
-    setStatus(response.status);
+    setStatus(response.code);
 
-    if (response.status === 200) {
+    if (response.code === 200) {
       await mutate();
     }
   };

@@ -42,9 +42,9 @@ function Signup() {
     });
 
     setSubmitting(false);
-    setStatus(response.status);
+    setStatus(response.code);
 
-    if (!(response.status === 200)) {
+    if (!(response.code === 200)) {
       const msg = await response.data();
       if (msg.match(/Error 1062: Duplicate entry '\w+' for key 'name'/)) {
         setMessage("ユーザー名が重複しています。");
@@ -72,8 +72,8 @@ function Signup() {
       }
     }
 
-    if (response.status === 201) {
-      await router.push("/login");
+    if (response.code === 201) {
+      await router.push("/login.ts");
     }
   };
 
