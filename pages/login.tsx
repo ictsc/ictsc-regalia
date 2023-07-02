@@ -36,9 +36,9 @@ function Login() {
     const response = await client.post("auth/signin", data);
 
     setSubmitting(false);
-    setStatus(response.status);
+    setStatus(response.code);
 
-    if (response.status === 200) {
+    if (response.code === 200) {
       await mutate();
       await router.push("/");
     }
@@ -63,6 +63,7 @@ function Login() {
           {...register("name", { required: true })}
           type="text"
           placeholder="ユーザー名"
+          id="username"
           className="input input-bordered max-w-xs min-w-[312px]"
         />
         <div className="label max-w-xs min-w-[312px]">
@@ -76,6 +77,7 @@ function Login() {
           {...register("password", { required: true })}
           type="password"
           placeholder="パスワード"
+          id="password"
           className="input input-bordered max-w-xs min-w-[312px] mt-4"
         />
         <div className="label max-w-xs min-w-[312px]">
@@ -87,6 +89,7 @@ function Login() {
         </div>
         <button
           type="submit"
+          id="loginBtn"
           className={`btn btn-primary mt-4 max-w-xs min-w-[312px] ${
             submitting && "loading"
           }`}

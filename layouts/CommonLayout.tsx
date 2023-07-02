@@ -7,13 +7,15 @@ interface Props {
   children: React.ReactNode;
 }
 
-const CommonLayout = ({ title, children }: Props) => {
+function CommonLayout({ title, children }: Props) {
   return (
     <BaseLayout title={title}>
-      <h1 className={"title-ictsc text-center py-12"}>{title}</h1>
+      <h1 id="page-title" className="title-ictsc text-center py-12">
+        {title}
+      </h1>
       {children}
     </BaseLayout>
   );
-};
+}
 
 export default CommonLayout;

@@ -76,7 +76,7 @@ function AnswerForm({ code }: { code: string | null }) {
       body: answer,
     });
 
-    if (response.status === 200) {
+    if (response.code === 200) {
       successNotify();
 
       await mutate();
@@ -346,7 +346,7 @@ function ProblemPage() {
   const onReCreateSubmit = async () => {
     const response = await client.post(`recreate/${problem?.code}`);
 
-    if (response.status === 200) {
+    if (response.code === 200) {
       await recreateMutate();
     }
   };

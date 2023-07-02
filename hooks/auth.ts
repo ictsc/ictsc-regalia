@@ -9,7 +9,7 @@ const useAuth = () => {
   const fetcher = (url: string) => client.get<AuthSelfResult>(url);
 
   const { data, mutate, isLoading } = useSWR("auth/self", fetcher);
-  const logout = () => client.delete("auth/logout");
+  const logout = async () => client.delete("auth/signout");
 
   return {
     user: data?.data?.user ?? null,

@@ -1,18 +1,20 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
+import { mutate } from "swr";
+
 import useAuth from "@/hooks/auth";
 
 function ICTSCNavBar() {
   const router = useRouter();
 
-  const { user, logout, mutate } = useAuth();
+  const { user, logout } = useAuth();
 
   const handleLogout = async () => {
     const response = await logout();
 
-    if (response.status === 200) {
-      await mutate();
+    if (response.code === 200) {
+      await mutate(() => true, undefined, { revalidate: true });
       await router.push("/");
     }
   };

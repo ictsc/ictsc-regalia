@@ -106,7 +106,7 @@ describe("参加者ログイン状態 ICTSCNavBar", () => {
     });
 
     // verify
-    expect(useAuth).toHaveBeenCalledTimes(2);
+    expect(useAuth).toHaveBeenCalledTimes(1);
     expect(logout).toHaveBeenCalledTimes(1);
   });
 });
