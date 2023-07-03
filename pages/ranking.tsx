@@ -1,5 +1,3 @@
-import Error from "next/error";
-
 import LoadingPage from "@/components/LoadingPage";
 import useRanking from "@/hooks/ranking";
 import CommonLayout from "@/layouts/CommonLayout";
@@ -13,10 +11,6 @@ function Ranking() {
         <LoadingPage />
       </CommonLayout>
     );
-  }
-
-  if (ranking === null) {
-    return <Error statusCode={404} />;
   }
 
   return (
