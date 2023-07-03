@@ -9,4 +9,5 @@ dictionaries:
 ignorePaths:
   - "cspell.config.yaml"
   - "dictionary.txt"
-  - ".vscode/**"
+  - ".vscode"
+  - "**.svg"
