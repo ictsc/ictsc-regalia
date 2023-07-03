@@ -1,0 +1,11 @@
+{
+  "cSpell.customDictionaries": {
+    "words": {
+      "name": "dictionary",
+      "path": "${workspaceRoot}/dev/cspell/dictionary.txt",
+      "addWords": true
+    },
+    "custom": true,
+    "internal-terms": false
+  }
+}

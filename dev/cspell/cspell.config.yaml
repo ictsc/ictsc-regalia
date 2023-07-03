@@ -1,0 +1,11 @@
+$schema: https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json
+version: '0.2'
+dictionaryDefinitions:
+  - name: dictionary
+    path: './dictionary.txt'
+    addWords: true
+dictionaries:
+  - dictionary
+ignorePaths:
+  - 'cspell.config.yaml'
+  - 'dictionary.txt'
