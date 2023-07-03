@@ -2,6 +2,8 @@ name: Spell Check
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 jobs:
@@ -14,5 +16,5 @@ jobs:
         uses: streetsidesoftware/cspell-action@v2
         with:
           incremental_files_only: false
-          config: './dev/cspell/cspell.config.yaml'
+          config: ./dev/cspell/cspell.config.yaml
           verbose: true
