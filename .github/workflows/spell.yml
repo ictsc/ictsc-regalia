@@ -1,0 +1,20 @@
+name: Spell Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  spell-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run Spell Check
+        uses: streetsidesoftware/cspell-action@v2
+        with:
+          incremental_files_only: false
+          config: ./dev/cspell/cspell.config.yaml
+          verbose: true
