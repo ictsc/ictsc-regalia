@@ -1,8 +1,6 @@
 import { expect, Page } from "@playwright/test";
 
-import BasePage from "./page";
-
-const IndexPage: BasePage = {
+const IndexPage = {
   goto: async (page: Page) => {
     await page.goto("/");
   },

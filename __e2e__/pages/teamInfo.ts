@@ -1,15 +1,13 @@
-import { expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 
-import BasePage from "./page";
-
-const TeamInfoPage: BasePage = {
-  goto: async (page) => {
+const TeamInfoPage = {
+  goto: async (page: Page) => {
     await page.goto("/team_info");
   },
-  validate: async (page) => {
+  validate: async (page: Page) => {
     await expect(page.locator(".title-ictsc")).toHaveText("チーム情報");
   },
-  waitFormSelector: async (page) => {
+  waitFormSelector: async (page: Page) => {
     await page.waitForSelector(".title-ictsc >> text=チーム情報");
   },
 };

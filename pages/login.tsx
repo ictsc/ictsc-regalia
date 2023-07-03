@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
-import useApi from "@/hooks/api";
 import useAuth from "@/hooks/auth";
 import CommonLayout from "@/layouts/CommonLayout";
 
@@ -23,8 +22,7 @@ function Login() {
     formState: { errors },
   } = useForm<Inputs>();
 
-  const { client } = useApi();
-  const { mutate } = useAuth();
+  const { signIn, mutate } = useAuth();
 
   // ステータスコード
   const [status, setStatus] = useState<number | null>(null);
@@ -33,7 +31,10 @@ function Login() {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setSubmitting(true);
-    const response = await client.post("auth/signin", data);
+    const response = await signIn({
+      name: data.name,
+      password: data.password,
+    });
 
     setSubmitting(false);
     setStatus(response.code);
@@ -65,6 +66,7 @@ function Login() {
           placeholder="ユーザー名"
           id="username"
           className="input input-bordered max-w-xs min-w-[312px]"
+          data-testid="username"
         />
         <div className="label max-w-xs min-w-[312px]">
           {errors.name && (
@@ -79,6 +81,7 @@ function Login() {
           placeholder="パスワード"
           id="password"
           className="input input-bordered max-w-xs min-w-[312px] mt-4"
+          data-testid="password"
         />
         <div className="label max-w-xs min-w-[312px]">
           {errors.password && (
