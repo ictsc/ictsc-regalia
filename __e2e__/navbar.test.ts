@@ -28,15 +28,7 @@ test.describe("未ログイン状態", () => {
 
 test.describe("ログイン状態", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/login");
-
-    await page.fill("#username", "admin");
-    await page.fill("#password", "password");
-    await page.click("#loginBtn");
-
-    // ログインに成功しましたというアラートが出るまで待つ
-    await page.waitForURL("/");
-    // await page.waitForSelector(".alert-success");
+    await LoginPage.login(page);
   });
 
   test("ルールページに遷移できる", async ({ page }) => {

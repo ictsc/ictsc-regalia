@@ -16,10 +16,21 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/components/*": ["components/*"],
-      "@/hooks/*": ["hooks/*"],
-      "@/layouts/*": ["layouts/*"],
-      "@/types/*": ["types/*"]
+      "@/components/*": [
+        "components/*"
+      ],
+      "@/hooks/*": [
+        "hooks/*"
+      ],
+      "@/layouts/*": [
+        "layouts/*"
+      ],
+      "@/pages/*": [
+        "pages/*"
+      ],
+      "@/types/*": [
+        "types/*"
+      ]
     },
     "types": ["vitest/globals"]
   },
