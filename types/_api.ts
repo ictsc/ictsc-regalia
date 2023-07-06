@@ -19,5 +19,5 @@ export type ProblemResult = {
 
 // /api/problems/:id/answers
 export type AnswerResult = {
-  answer: Answer;
+  answers: Answer[];
 };
