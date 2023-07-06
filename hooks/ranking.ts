@@ -1,16 +1,13 @@
 import useSWR from "swr";
 
 import useApi from "@/hooks/api";
-import { Rank } from "@/types/Rank";
-
-type AnswerResult = {
-  ranking: Rank[];
-};
+import { RankingResult } from "@/types/_api";
 
 const useRanking = () => {
   const { client } = useApi();
 
-  const fetcher = (url: string) => client.get<AnswerResult>(url);
+  /* c8 ignore next */
+  const fetcher = (url: string) => client.get<RankingResult>(url);
 
   const { data, isLoading } = useSWR(`ranking`, fetcher);
 
