@@ -31,3 +31,19 @@ interface ConnectionInfo {
   password?: string;
   command?: string;
 }
+
+export const testProblem: Problem = {
+  id: "id",
+  code: "test",
+  title: "テスト",
+  body: "---\ntitle: テスト\n---\n# テスト本文",
+  point: 100,
+  solved_criterion: 100,
+  previous_problem_id: null,
+  author_id: "author_id",
+  unchecked: null,
+  unchecked_near_overdue: null,
+  unchecked_overdue: null,
+  current_point: 100,
+  is_solved: false,
+};

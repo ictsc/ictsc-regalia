@@ -1,25 +1,9 @@
 import matter from "gray-matter";
-import useSWR from "swr";
 
-import useApi from "@/hooks/api";
+import useProblems from "@/hooks/problems";
 import { Matter } from "@/types/Problem";
-import { ProblemResult } from "@/types/_api";
 
-export const useProblems = () => {
-  const { client } = useApi();
-
-  const fetcher = (url: string) => client.get<ProblemResult>(url);
-
-  const { data, mutate, isLoading } = useSWR("problems", fetcher);
-
-  return {
-    problems: data?.data?.problems ?? [],
-    mutate,
-    isLoading,
-  };
-};
-
-export const useProblem = (code: string | null) => {
+const useProblem = (code: string | null) => {
   const { problems } = useProblems();
 
   const problem = problems.find((prob) => prob.code === code) ?? null;
@@ -34,7 +18,7 @@ export const useProblem = (code: string | null) => {
 
   const matterResult = matter(problem.body ?? "");
   const matterData = matterResult.data as Matter;
-  const newProblem = { ...problem, body: matterResult.content };
+  const newProblem = { ...problem, body: matterResult.content ?? "" };
 
   return {
     matter: matterData,
@@ -42,3 +26,5 @@ export const useProblem = (code: string | null) => {
     isLoading: false,
   };
 };
+
+export default useProblem;
