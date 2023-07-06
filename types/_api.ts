@@ -1,5 +1,6 @@
 import { Answer } from "@/types/Answer";
 import { Problem } from "@/types/Problem";
+import { Rank } from "@/types/Rank";
 import { User } from "@/types/User";
 
 export type Result<T> = {
@@ -15,6 +16,11 @@ export type AuthSelfResult = {
 // /api/problems
 export type ProblemResult = {
   problems: Problem[];
+};
+
+// /api/ranking
+export type RankingResult = {
+  ranking: Rank[];
 };
 
 // /api/problems/:id/answers
