@@ -2,10 +2,8 @@ import useSWR from "swr";
 
 import useApi from "@/hooks/api";
 import { Answer } from "@/types/Answer";
+import { AnswerResult } from "@/types/_api";
 
-type AnswerResult = {
-  answers: Answer[];
-};
 const useAnswers = (problemId: string | null) => {
   const { client } = useApi();
 

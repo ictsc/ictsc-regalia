@@ -15,3 +15,14 @@ export type UserGroup = {
     bastion_port: number;
   } | null;
 };
+
+export const testUserGroup: UserGroup = {
+  id: "1",
+  name: "Test User Group",
+  organization: "Test Organization",
+  created_at: new Date(),
+  updated_at: new Date(),
+  is_full_access: true,
+  members: [],
+  bastion: null,
+};
