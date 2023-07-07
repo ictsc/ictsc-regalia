@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
-import useApi from "@/hooks/api";
+import useAuth from "@/hooks/auth";
 import BaseLayout from "@/layouts/BaseLayout";
 
 type Inputs = {
@@ -24,7 +24,7 @@ function Signup() {
     formState: { errors },
   } = useForm<Inputs>();
 
-  const { client } = useApi();
+  const { signUp } = useAuth();
 
   // ステータスコード
   const [status, setStatus] = useState<number | null>(null);
@@ -35,17 +35,18 @@ function Signup() {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setSubmitting(true);
-    const response = await client.post("users", {
-      ...data,
-      user_group_id: userGroupId,
-      invitation_code: invitationCode,
+    const response = await signUp({
+      name: data.name,
+      password: data.password,
+      user_group_id: userGroupId as string,
+      invitation_code: invitationCode as string,
     });
 
     setSubmitting(false);
     setStatus(response.code);
 
-    if (!(response.code === 200)) {
-      const msg = await response.data();
+    if (!(response.code === 201)) {
+      const msg = response.data ?? "";
       if (msg.match(/Error 1062: Duplicate entry '\w+' for key 'name'/)) {
         setMessage("ユーザー名が重複しています。");
       }
@@ -73,7 +74,7 @@ function Signup() {
     }
 
     if (response.code === 201) {
-      await router.push("/login.ts");
+      await router.push("/login");
     }
   };
 
