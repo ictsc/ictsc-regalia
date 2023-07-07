@@ -27,3 +27,11 @@ export type RankingResult = {
 export type AnswerResult = {
   answers: Answer[];
 };
+
+// /api/auth/signup
+export type SignUpRequest = {
+  name: string;
+  password: string;
+  user_group_id: string;
+  invitation_code: string;
+};
