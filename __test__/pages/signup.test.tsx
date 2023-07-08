@@ -174,8 +174,6 @@ describe("Signup", () => {
       screen.getByRole("button").click();
     });
 
-    screen.debug();
-
     // then
     expect(
       screen.queryByText("ユーザー名が重複しています。")
@@ -203,8 +201,6 @@ describe("Signup", () => {
     await act(async () => {
       screen.getByRole("button").click();
     });
-
-    screen.debug();
 
     // then
     expect(
@@ -234,8 +230,6 @@ describe("Signup", () => {
       screen.getByRole("button").click();
     });
 
-    screen.debug();
-
     // then
     expect(
       screen.queryByText("無効なユーザーグループです。")
@@ -263,8 +257,6 @@ describe("Signup", () => {
     await act(async () => {
       screen.getByRole("button").click();
     });
-
-    screen.debug();
 
     // then
     expect(screen.queryByText("無効な招待コードです。")).toBeInTheDocument();

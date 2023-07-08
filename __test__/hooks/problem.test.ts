@@ -31,7 +31,7 @@ describe("useProblem", () => {
     });
 
     // when
-    renderHook(() => useProblem("test"));
+    renderHook(() => useProblem("XYZ"));
 
     // then
     expect(matter).toBeCalledWith(testProblem.body);
@@ -83,7 +83,7 @@ describe("useProblem", () => {
     });
 
     // when
-    const { result } = renderHook(() => useProblem("test"));
+    const { result } = renderHook(() => useProblem("XYZ"));
 
     // then
     expect(matter).toBeCalledWith("");

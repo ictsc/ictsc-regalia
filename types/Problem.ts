@@ -14,15 +14,6 @@ export interface Problem {
   is_solved: boolean;
 }
 
-export interface Matter {
-  code: string;
-  title: string;
-  point: number;
-  solvedCriterion: number;
-  authorId: string;
-  connectInfo?: ConnectionInfo[];
-}
-
 interface ConnectionInfo {
   type?: string;
   hostname?: string;
@@ -32,10 +23,19 @@ interface ConnectionInfo {
   command?: string;
 }
 
+export interface Matter {
+  code: string;
+  title: string;
+  point: number;
+  solvedCriterion: number;
+  authorId: string;
+  connectInfo?: ConnectionInfo[];
+}
+
 export const testProblem: Problem = {
   id: "id",
-  code: "test",
-  title: "テスト",
+  code: "XYZ",
+  title: "テスト問題タイトル",
   body: "---\ntitle: テスト\n---\n# テスト本文",
   point: 100,
   solved_criterion: 100,
