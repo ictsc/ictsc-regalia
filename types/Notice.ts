@@ -7,7 +7,7 @@ export type Notice = {
 
 export const testNotice: Notice = {
   source_id: "1",
-  title: "Test Notice",
-  body: "Test Notice Body",
+  title: "テスト通知タイトル",
+  body: "テスト通知本文",
   draft: false,
 };

@@ -9,7 +9,7 @@ import NotificationCard from "@/components/NotificationCard";
 import ProblemCard from "@/components/ProblemCard";
 import { shortRule } from "@/components/_const";
 import useNotice from "@/hooks/notice";
-import { useProblems } from "@/hooks/problem";
+import useProblems from "@/hooks/problems";
 import { dismissNoticeIdsState } from "@/hooks/state/recoil";
 import CommonLayout from "@/layouts/CommonLayout";
 
@@ -34,7 +34,7 @@ function Problems() {
       {shortRule !== "" && (
         <div className="container-ictsc">
           <ICTSCCard className="pt-4 pb-8">
-            <MarkdownPreview content={shortRule?.replace(/\\n/g, "\n") ?? ""} />
+            <MarkdownPreview content={shortRule.replace(/\\n/g, "\n")} />
           </ICTSCCard>
         </div>
       )}
