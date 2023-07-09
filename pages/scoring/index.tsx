@@ -8,7 +8,8 @@ import ICTSCCard from "@/components/Card";
 import LoadingPage from "@/components/LoadingPage";
 import MarkdownPreview from "@/components/MarkdownPreview";
 import useAuth from "@/hooks/auth";
-import { useProblem, useProblems } from "@/hooks/problem";
+import useProblem from "@/hooks/problem";
+import useProblems from "@/hooks/problems";
 import BaseLayout from "@/layouts/BaseLayout";
 
 function Index() {
@@ -31,7 +32,7 @@ function Index() {
     );
   }
 
-  if (!isFullAccess || isReadOnly || problems === null) {
+  if (!isFullAccess || isReadOnly || problems.length === 0) {
     return <Error statusCode={404} />;
   }
 
