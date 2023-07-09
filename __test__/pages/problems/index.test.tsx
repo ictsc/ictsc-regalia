@@ -21,6 +21,7 @@ beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
   vi.clearAllMocks();
 });
+
 describe("Problems", () => {
   test("画面が表示されることを確認する", async () => {
     // setup

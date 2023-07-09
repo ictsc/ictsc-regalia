@@ -17,10 +17,13 @@ const useReCreateInfo = (problemCode: string | null) => {
     }
   );
 
+  const reCreate = async (code: string) => client.post(`recreate/${code}`);
+
   return {
     recreateInfo: data?.data ?? null,
     isLoading,
     mutate,
+    reCreate,
   };
 };
 
