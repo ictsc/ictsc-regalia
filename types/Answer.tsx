@@ -12,8 +12,8 @@ export type Answer = {
 
 export const testAnswer: Answer = {
   id: "1",
-  body: "test",
-  point: 100,
+  body: "テスト解答本文",
+  point: null,
   problem_id: "1",
   user_group: testUserGroup,
   created_at: "2021-01-01",

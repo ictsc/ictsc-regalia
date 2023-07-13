@@ -20,6 +20,7 @@ vi.mock("@/components/LoadingPage", () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
 }));
+
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
   vi.clearAllMocks();
@@ -292,7 +293,7 @@ describe("Scoring", () => {
       user: testAdminUser,
     });
     (useProblems as Mock).mockReturnValue({
-      problems: [{ ...testProblem, author_id: "other" }],
+      problems: [{ ...testProblem }],
       isLoading: false,
     });
     render(<Index />);
