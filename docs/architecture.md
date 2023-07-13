@@ -4,7 +4,7 @@
 
 ![構成図](./architecture.dio.svg)
 
-## Client
+## Frontend
 
 - Octavio
   - 競技者用ダッシュボード
@@ -18,7 +18,7 @@
 - Torres
   - 運営用ダッシュボードのBFF
 
-## Server
+## Backend
 
 - Jackson
   - 競技者用セッションマネージャー
