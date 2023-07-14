@@ -11,7 +11,6 @@ ignorePaths:
   - "**/coverage/**"
   - "dictionary.txt"
   - "**/Dockerfile"
-  - "**/Dockerfile.font"
   - ".vscode"
   - "**.svg"
   - "**/package.json"

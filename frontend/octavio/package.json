@@ -12,7 +12,7 @@
     "lint": "next lint",
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
-    "font": "docker build -f Dockerfile.font -t font-builder . && docker run -v $(pwd):/host -it font-builder sh -c \"cp /font/Variable/OTF/Subset/NotoSansJP-VF.woff2 /host/pages/NotoSansJP-VF.woff2 && exit\""
+    "font": "docker build -f Dockerfile --target font-builder -t font-builder . && docker run -v $(pwd):/host -it font-builder sh -c \"cp /font/Variable/OTF/Subset/NotoSansJP-VF.woff2 /host/pages/NotoSansJP-VF.woff2 && exit\""
   },
   "dependencies": {
     "@next/font": "^13.1.1",
