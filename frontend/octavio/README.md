@@ -1,4 +1,4 @@
-# ictsc_sachiko_v3
+# Octavio
 
 ## 構成
 
@@ -39,9 +39,9 @@ yarn test
 ```
 docker build \
   --build-arg=next_public_api_url=http://localhost:8080/api \
-  -t sachiko .
+  -t octavio .
 ```
 
-3. コンテナを起動: `docker run -p 3000:3000 nextjs-docker`
+3. コンテナを起動: `docker run -p 3000:3000 octavio`
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
