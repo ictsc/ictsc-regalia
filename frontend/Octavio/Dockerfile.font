@@ -1,0 +1,18 @@
+FROM alpine:3.14 AS font-builder
+
+WORKDIR /font
+
+RUN apk add --no-cache git make g++
+
+RUN git clone --recursive https://github.com/google/woff2.git
+
+WORKDIR /font/woff2
+
+RUN make clean all
+
+WORKDIR /font
+
+RUN wget https://github.com/googlefonts/noto-cjk/releases/download/Sans2.004/01_NotoSansCJK-OTF-VF.zip && \
+    unzip 01_NotoSansCJK-OTF-VF.zip && \
+    rm 01_NotoSansCJK-OTF-VF.zip && \
+    ./woff2/woff2_compress Variable/OTF/Subset/NotoSansJP-VF.otf
