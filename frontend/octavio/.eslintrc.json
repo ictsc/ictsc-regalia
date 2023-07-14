@@ -59,7 +59,6 @@
       "error",
       {
         "devDependencies": true,
-        // devDependenciesのimportを禁止
         "optionalDependencies": false
       }
     ],
@@ -68,7 +67,6 @@
   "env": {
     "jest": true
   },
-  // テストファイルのみ global-require を許可
   "overrides": [
     {
       "files": [
