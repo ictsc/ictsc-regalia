@@ -8,7 +8,7 @@ import mockRouter from "next-router-mock";
 import { Mock, vi } from "vitest";
 
 import useAuth from "@/hooks/auth";
-import Signup from "@/pages/signup";
+import SignUp from "@/pages/signUp";
 
 vi.mock("@/hooks/auth");
 
@@ -19,13 +19,13 @@ beforeEach(() => {
 
 vi.mock("next/router", () => require("next-router-mock"));
 
-describe("Signup", () => {
+describe("SignUp", () => {
   test("画面が表示されることを確認する", async () => {
     // setup
     (useAuth as Mock).mockReturnValue({
       user: null,
     });
-    render(<Signup />);
+    render(<SignUp />);
 
     // verify
     expect(screen.queryByPlaceholderText("ユーザー名")).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe("Signup", () => {
     (useAuth as Mock).mockReturnValue({
       user: null,
     });
-    render(<Signup />);
+    render(<SignUp />);
 
     // when
     await act(async () => {
@@ -60,7 +60,7 @@ describe("Signup", () => {
     (useAuth as Mock).mockReturnValue({
       user: null,
     });
-    render(<Signup />);
+    render(<SignUp />);
 
     await userEvent.type(screen.getByPlaceholderText("パスワード"), "password");
 
@@ -83,7 +83,7 @@ describe("Signup", () => {
     (useAuth as Mock).mockReturnValue({
       user: null,
     });
-    render(<Signup />);
+    render(<SignUp />);
 
     await userEvent.type(screen.getByPlaceholderText("ユーザー名"), "user");
 
@@ -106,10 +106,10 @@ describe("Signup", () => {
     (useAuth as Mock).mockReturnValue({
       user: null,
     });
-    render(<Signup />);
+    render(<SignUp />);
 
     await userEvent.type(screen.getByPlaceholderText("ユーザー名"), "user");
-    await userEvent.type(screen.getByPlaceholderText("パスワード"), "testtes");
+    await userEvent.type(screen.getByPlaceholderText("パスワード"), "aaaaaaa");
 
     // when
     await act(async () => {
@@ -129,7 +129,7 @@ describe("Signup", () => {
       user: null,
       signUp,
     });
-    render(<Signup />);
+    render(<SignUp />);
 
     await userEvent.type(screen.getByPlaceholderText("ユーザー名"), "user");
     await userEvent.type(screen.getByPlaceholderText("パスワード"), "password");
@@ -164,7 +164,7 @@ describe("Signup", () => {
       signUp,
     });
 
-    render(<Signup />);
+    render(<SignUp />);
 
     await userEvent.type(screen.getByPlaceholderText("ユーザー名"), "user");
     await userEvent.type(screen.getByPlaceholderText("パスワード"), "password");
@@ -192,7 +192,7 @@ describe("Signup", () => {
       signUp,
     });
 
-    render(<Signup />);
+    render(<SignUp />);
 
     await userEvent.type(screen.getByPlaceholderText("ユーザー名"), "user");
     await userEvent.type(screen.getByPlaceholderText("パスワード"), "password");
@@ -220,7 +220,7 @@ describe("Signup", () => {
       signUp,
     });
 
-    render(<Signup />);
+    render(<SignUp />);
 
     await userEvent.type(screen.getByPlaceholderText("ユーザー名"), "user");
     await userEvent.type(screen.getByPlaceholderText("パスワード"), "password");
@@ -248,7 +248,7 @@ describe("Signup", () => {
       signUp,
     });
 
-    render(<Signup />);
+    render(<SignUp />);
 
     await userEvent.type(screen.getByPlaceholderText("ユーザー名"), "user");
     await userEvent.type(screen.getByPlaceholderText("パスワード"), "password");
@@ -274,7 +274,7 @@ describe("Signup", () => {
       signUp,
     });
 
-    render(<Signup />);
+    render(<SignUp />);
 
     await userEvent.type(screen.getByPlaceholderText("ユーザー名"), "user");
     await userEvent.type(screen.getByPlaceholderText("パスワード"), "password");
@@ -302,7 +302,7 @@ describe("Signup", () => {
       user: null,
       signUp,
     });
-    render(<Signup />);
+    render(<SignUp />);
 
     await userEvent.type(screen.getByPlaceholderText("ユーザー名"), "user");
     await userEvent.type(screen.getByPlaceholderText("パスワード"), "password");

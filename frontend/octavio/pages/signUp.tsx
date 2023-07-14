@@ -13,7 +13,7 @@ type Inputs = {
   password: string;
 };
 
-function Signup() {
+function SignUp() {
   const router = useRouter();
   const { user_group_id: userGroupId, invitation_code: invitationCode } =
     router.query;
@@ -145,4 +145,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default SignUp;

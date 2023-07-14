@@ -153,7 +153,7 @@ function AnswerForm() {
 確認のほどよろしくお願いします。
 
 ### 手順
-1. /etc/hoge/hoo.bar の編集`}
+1. /etc/ictsc/hoo.bar の編集`}
               />
             )}
           />
