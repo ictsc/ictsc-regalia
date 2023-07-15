@@ -8,9 +8,11 @@ dictionaries:
   - dictionary
 ignorePaths:
   - "cspell.config.yaml"
+  - "**/coverage/**"
   - "dictionary.txt"
+  - "**/Dockerfile"
   - ".vscode"
   - "**.svg"
-  - "package.json"
-  - "package-lock.json"
-  - "node_modules"
+  - "**/package.json"
+  - "**/package-lock.json"
+  - "**/node_modules"
