@@ -27,7 +27,7 @@ export type Profile = {
 export const testUser: User = {
   id: "1",
   name: "Test User",
-  display_name: "Test User",
+  display_name: "Test User Display Name",
   is_read_only: false,
   created_at: new Date(),
   updated_at: new Date(),
@@ -44,10 +44,10 @@ export const testUser: User = {
   user_group_id: "1",
   profile: {
     id: "1",
-    twitter_id: "test",
-    github_id: "test",
-    facebook_id: "test",
-    self_introduction: "test",
+    twitter_id: "test twitter id",
+    github_id: "test github id",
+    facebook_id: "test facebook id",
+    self_introduction: "test self introduction",
     created_at: new Date(),
     updated_at: new Date(),
   },

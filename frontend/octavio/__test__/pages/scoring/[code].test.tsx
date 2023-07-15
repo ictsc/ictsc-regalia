@@ -445,8 +445,6 @@ describe("ScoringProblem", () => {
     // when
     render(<ScoringProblem />);
 
-    screen.debug();
-
     // then
     expect(screen.queryByTestId("scoring-answer-form")).toHaveAttribute(
       "data-key",
