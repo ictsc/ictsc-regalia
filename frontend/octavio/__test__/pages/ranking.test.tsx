@@ -1,21 +1,20 @@
 import "@testing-library/jest-dom";
 
-import {render, screen} from "@testing-library/react";
-import {Mock, vi} from "vitest";
+import { render, screen } from "@testing-library/react";
+import { Mock, vi } from "vitest";
 
 import useRanking from "@/hooks/ranking";
 import Ranking from "@/pages/ranking";
-import {testRank} from "@/types/Rank";
-
+import { testRank } from "@/types/Rank";
 
 vi.mock("@/hooks/ranking");
 vi.mock("@/components/Navbar", () => ({
   __esModule: true,
-  default: () => <div data-testid="navbar"/>,
+  default: () => <div data-testid="navbar" />,
 }));
 vi.mock("@/components/LoadingPage", () => ({
   __esModule: true,
-  default: () => <div data-testid="loading"/>,
+  default: () => <div data-testid="loading" />,
 }));
 
 beforeEach(() => {
@@ -32,7 +31,7 @@ describe("Ranking", () => {
     });
 
     // when
-    render(<Ranking/>);
+    render(<Ranking />);
 
     // then
     expect(screen.getByTestId("navbar")).toBeInTheDocument();
@@ -46,7 +45,7 @@ describe("Ranking", () => {
     expect(useRanking).toHaveBeenCalledTimes(1);
   });
 
-  test("通知が取得中の場合、ローディング画面が表示されることを確認する", async () => {
+  test("ランキングが取得中の場合、ローディング画面が表示されることを確認する", async () => {
     // setup
     (useRanking as Mock).mockReturnValue({
       ranking: [testRank],
@@ -54,7 +53,7 @@ describe("Ranking", () => {
     });
 
     // when
-    render(<Ranking/>);
+    render(<Ranking />);
 
     // then
     expect(screen.getByTestId("navbar")).toBeInTheDocument();

@@ -8,7 +8,7 @@ export type Rank = {
 };
 
 export const testRank: Rank = {
-  rank: 1,
+  rank: 256,
   point: 100,
   user_group: testUserGroup,
   user_group_id: "1",

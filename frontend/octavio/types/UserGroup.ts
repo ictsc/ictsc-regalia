@@ -22,7 +22,12 @@ export const testUserGroup: UserGroup = {
   organization: "Test Organization",
   created_at: new Date(),
   updated_at: new Date(),
-  is_full_access: true,
+  is_full_access: false,
   members: [],
-  bastion: null,
+  bastion: {
+    bastion_user: "test_bastion_user",
+    bastion_password: "test_bastion_password",
+    bastion_host: "test_bastion_host",
+    bastion_port: 22,
+  },
 };
