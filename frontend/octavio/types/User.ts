@@ -31,16 +31,7 @@ export const testUser: User = {
   is_read_only: false,
   created_at: new Date(),
   updated_at: new Date(),
-  user_group: {
-    id: "1",
-    name: "Test User Group",
-    organization: "Test Organization",
-    created_at: new Date(),
-    updated_at: new Date(),
-    is_full_access: false,
-    members: [],
-    bastion: null,
-  },
+  user_group: testUserGroup,
   user_group_id: "1",
   profile: {
     id: "1",
@@ -69,7 +60,7 @@ export const testAdminUser: User = {
   is_read_only: false,
   created_at: new Date(),
   updated_at: new Date(),
-  user_group: testUserGroup,
+  user_group: { ...testUserGroup, is_full_access: true },
   user_group_id: "1",
   profile: {
     id: "1",
