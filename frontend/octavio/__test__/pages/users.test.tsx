@@ -9,7 +9,9 @@ import { testUserGroup } from "@/types/UserGroup";
 
 vi.mock("next/error", () => ({
   __esModule: true,
-  default: () => <div data-testid="error" />,
+  default: ({ statusCode }: { statusCode: number }) => (
+    <div data-testid="error" data-status-code={statusCode} />
+  ),
 }));
 vi.mock("@/hooks/userGroups");
 vi.mock("@/components/Navbar", () => ({
@@ -79,7 +81,7 @@ describe("Users", () => {
     expect(useUserGroups).toHaveBeenCalledTimes(1);
   });
 
-  test("UserGroup が取得できなかった場合、エラーメッセージが表示されることを確認する", async () => {
+  test("UserGroup が取得できなかった場合、エラーページが表示されることを確認する", async () => {
     // setup
     (useUserGroups as Mock).mockReturnValue({
       userGroups: null,
@@ -91,6 +93,10 @@ describe("Users", () => {
 
     // then
     expect(screen.getByTestId("error")).toBeInTheDocument();
+    expect(screen.getByTestId("error")).toHaveAttribute(
+      "data-status-code",
+      "404"
+    );
 
     // verify
     expect(useUserGroups).toHaveBeenCalledTimes(1);

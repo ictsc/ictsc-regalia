@@ -8,7 +8,6 @@ import useAuth from "@/hooks/auth";
 import Profile from "@/pages/profile";
 import { testUser } from "@/types/User";
 
-// TODO(k-shir0): こっちに統一する
 vi.mock("next/error", () => ({
   __esModule: true,
   default: ({ statusCode }: { statusCode: number }) => (
@@ -100,7 +99,7 @@ describe("Profile", () => {
     expect(useAuth).toHaveBeenCalledTimes(2);
   });
 
-  test("ユーザーが取得できなかった場合、エラー画面が表示されることを確認する", async () => {
+  test("ユーザーが取得できなかった場合、エラーページが表示されることを確認する", async () => {
     // setup
     (useAuth as Mock).mockReturnValue({
       user: null,

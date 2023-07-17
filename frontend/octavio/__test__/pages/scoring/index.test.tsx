@@ -9,6 +9,12 @@ import Index from "@/pages/scoring";
 import { testProblem } from "@/types/Problem";
 import { testAdminUser, testUser } from "@/types/User";
 
+vi.mock("next/error", () => ({
+  __esModule: true,
+  default: ({ statusCode }: { statusCode: number }) => (
+    <div data-testid="error" data-status-code={statusCode} />
+  ),
+}));
 vi.mock("next/router", () => require("next-router-mock"));
 vi.mock("@/hooks/auth");
 vi.mock("@/hooks/problems");
@@ -27,7 +33,7 @@ beforeEach(() => {
 });
 
 describe("Scoring", () => {
-  test("未ログインで、NotFound が表示される", async () => {
+  test("未ログインで、エラーページが表示される", async () => {
     // setup
     (useAuth as Mock).mockReturnValue({
       user: null,
@@ -39,9 +45,11 @@ describe("Scoring", () => {
     render(<Index />);
 
     // when
-    expect(
-      screen.queryByText("This page could not be found.")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("error")).toBeInTheDocument();
+    expect(screen.getByTestId("error")).toHaveAttribute(
+      "data-status-code",
+      "404"
+    );
 
     // then
     expect(screen.queryByTestId("navbar")).not.toBeInTheDocument();
@@ -49,7 +57,7 @@ describe("Scoring", () => {
     expect(useProblems).toHaveBeenCalledTimes(2);
   });
 
-  test("ログイン済みで問題が取得できない場合、NotFound が表示される", async () => {
+  test("ログイン済みで問題が取得できない場合、エラーページが表示される", async () => {
     // setup
     (useAuth as Mock).mockReturnValue({
       user: testAdminUser,
@@ -61,9 +69,11 @@ describe("Scoring", () => {
     render(<Index />);
 
     // when
-    expect(
-      screen.queryByText("This page could not be found.")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("error")).toBeInTheDocument();
+    expect(screen.getByTestId("error")).toHaveAttribute(
+      "data-status-code",
+      "404"
+    );
 
     // then
     expect(screen.queryByTestId("navbar")).not.toBeInTheDocument();
@@ -71,7 +81,7 @@ describe("Scoring", () => {
     expect(useProblems).toHaveBeenCalledTimes(2);
   });
 
-  test("参加者でアクセスした場合、NotFound が表示される", async () => {
+  test("参加者でアクセスした場合、エラーページが表示される", async () => {
     // setup
     (useAuth as Mock).mockReturnValue({
       user: testUser,
@@ -83,9 +93,11 @@ describe("Scoring", () => {
     render(<Index />);
 
     // when
-    expect(
-      screen.queryByText("This page could not be found.")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("error")).toBeInTheDocument();
+    expect(screen.getByTestId("error")).toHaveAttribute(
+      "data-status-code",
+      "404"
+    );
 
     // then
     expect(screen.queryByTestId("navbar")).not.toBeInTheDocument();
