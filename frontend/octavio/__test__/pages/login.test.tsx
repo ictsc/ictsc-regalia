@@ -9,6 +9,34 @@ import useAuth from "@/hooks/auth";
 import Login from "@/pages/login";
 
 vi.mock("@/hooks/auth");
+vi.mock("@/components/Alerts", () => ({
+  ICTSCSuccessAlert: ({
+    message,
+    subMessage,
+  }: {
+    message: string;
+    subMessage: string | undefined;
+  }) => (
+    <div
+      data-testid="success-alert"
+      data-message={message}
+      data-sub-message={subMessage}
+    />
+  ),
+  ICTSCErrorAlert: ({
+    message,
+    subMessage,
+  }: {
+    message: string;
+    subMessage: string | undefined;
+  }) => (
+    <div
+      data-testid="error-alert"
+      data-message={message}
+      data-sub-message={subMessage}
+    />
+  ),
+}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
@@ -124,7 +152,10 @@ describe("Login", () => {
     expect(mockRouter).toMatchObject({
       pathname: "/",
     });
-    expect(screen.queryByText("ログインに成功しました")).toBeInTheDocument();
+    const alert = screen.getByTestId("success-alert");
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute("data-message", "ログインに成功しました");
+    expect(alert).not.toHaveAttribute("data-sub-message");
 
     // verify
     expect(useAuth).toHaveBeenCalledTimes(4);
@@ -151,7 +182,10 @@ describe("Login", () => {
     });
 
     // then
-    expect(screen.queryByText("ログインに失敗しました")).toBeInTheDocument();
+    const alert = screen.getByTestId("error-alert");
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute("data-message", "ログインに失敗しました");
+    expect(alert).not.toHaveAttribute("data-sub-message");
 
     // verify
     expect(useAuth).toHaveBeenCalledTimes(4);

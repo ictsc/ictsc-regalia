@@ -19,7 +19,6 @@ vi.mock("@/components/Navbar", () => ({
   __esModule: true,
   default: () => <div data-testid="navbar" />,
 }));
-// TODO(k-shir0): こっちに統一する
 vi.mock("@/components/Alerts", () => ({
   ICTSCSuccessAlert: ({
     message,

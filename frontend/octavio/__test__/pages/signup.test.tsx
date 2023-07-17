@@ -11,6 +11,34 @@ import useAuth from "@/hooks/auth";
 import SignUp from "@/pages/signUp";
 
 vi.mock("@/hooks/auth");
+vi.mock("@/components/Alerts", () => ({
+  ICTSCSuccessAlert: ({
+    message,
+    subMessage,
+  }: {
+    message: string;
+    subMessage: string | undefined;
+  }) => (
+    <div
+      data-testid="success-alert"
+      data-message={message}
+      data-sub-message={subMessage}
+    />
+  ),
+  ICTSCErrorAlert: ({
+    message,
+    subMessage,
+  }: {
+    message: string;
+    subMessage: string | undefined;
+  }) => (
+    <div
+      data-testid="error-alert"
+      data-message={message}
+      data-sub-message={subMessage}
+    />
+  ),
+}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
@@ -143,9 +171,13 @@ describe("SignUp", () => {
     expect(mockRouter).toMatchObject({
       pathname: "/login",
     });
-    expect(
-      screen.queryByText("ユーザー登録に成功しました！")
-    ).toBeInTheDocument();
+    const alert = screen.getByTestId("success-alert");
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute(
+      "data-message",
+      "ユーザー登録に成功しました！"
+    );
+    expect(alert).not.toHaveAttribute("data-sub-message");
 
     // verify
     expect(useAuth).toHaveBeenCalledTimes(4);
@@ -175,9 +207,13 @@ describe("SignUp", () => {
     });
 
     // then
-    expect(
-      screen.queryByText("ユーザー名が重複しています。")
-    ).toBeInTheDocument();
+    const alert = screen.getByTestId("error-alert");
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute("data-message", "エラーが発生しました");
+    expect(alert).toHaveAttribute(
+      "data-sub-message",
+      "ユーザー名が重複しています。"
+    );
   });
 
   test("UserGroupID が無効な場合にエラーが表示されることを確認する", async () => {
@@ -203,9 +239,13 @@ describe("SignUp", () => {
     });
 
     // then
-    expect(
-      screen.queryByText("無効なユーザーグループです。")
-    ).toBeInTheDocument();
+    const alert = screen.getByTestId("error-alert");
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute("data-message", "エラーが発生しました");
+    expect(alert).toHaveAttribute(
+      "data-sub-message",
+      "無効なユーザーグループです。"
+    );
   });
 
   test("UserGroupID の uuid 形式が無効な場合にエラーが表示されることを確認する", async () => {
@@ -231,9 +271,13 @@ describe("SignUp", () => {
     });
 
     // then
-    expect(
-      screen.queryByText("無効なユーザーグループです。")
-    ).toBeInTheDocument();
+    const alert = screen.getByTestId("error-alert");
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute("data-message", "エラーが発生しました");
+    expect(alert).toHaveAttribute(
+      "data-sub-message",
+      "無効なユーザーグループです。"
+    );
   });
 
   test("InvitationCode が無効の場合", async () => {
@@ -259,7 +303,10 @@ describe("SignUp", () => {
     });
 
     // then
-    expect(screen.queryByText("無効な招待コードです。")).toBeInTheDocument();
+    const alert = screen.getByTestId("error-alert");
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute("data-message", "エラーが発生しました");
+    expect(alert).toHaveAttribute("data-sub-message", "無効な招待コードです。");
   });
 
   test("不明のエラーの場合にエラーが表示されることを確認する", async () => {
@@ -285,7 +332,10 @@ describe("SignUp", () => {
     });
 
     // then
-    expect(screen.queryByText("エラーが発生しました")).toBeInTheDocument();
+    const alert = screen.getByTestId("error-alert");
+    expect(alert).toBeInTheDocument();
+    expect(alert).toHaveAttribute("data-message", "エラーが発生しました");
+    expect(alert).toHaveAttribute("data-sub-message", "");
   });
 
   test("フォームが送信中の場合にボタンが無効になることを確認する", async () => {
