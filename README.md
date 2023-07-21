@@ -15,7 +15,6 @@ ictsc-outlands/
 ├── docs/ (ドキュメント)
 │
 ├── frontend/ (フロントエンド)
-├── bff/ (Backend for Frontend)
 ├── backend/ (バックエンド)
 │
 ├── proto/ (protocol buffersスキーマ定義)
