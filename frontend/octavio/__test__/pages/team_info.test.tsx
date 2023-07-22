@@ -75,8 +75,6 @@ describe("TeamInfo", () => {
     // when
     render(<TeamInfo />);
 
-    screen.debug();
-
     // then
     expect(screen.getByTestId("navbar")).toBeInTheDocument();
     expect(
