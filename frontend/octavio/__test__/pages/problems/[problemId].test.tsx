@@ -14,6 +14,12 @@ import { testReCreateInfo } from "@/types/ReCreate";
 import { testUser } from "@/types/User";
 
 vi.mock("react");
+vi.mock("next/error", () => ({
+  __esModule: true,
+  default: ({ statusCode }: { statusCode: number }) => (
+    <div data-testid="error" data-status-code={statusCode} />
+  ),
+}));
 vi.mock("@/components/_const", () => ({
   title: "title",
   site: "site",
@@ -102,7 +108,7 @@ describe("[problemId]", () => {
     expect(useReCreateInfo).toHaveBeenCalledTimes(1);
   });
 
-  test("問題が取得できなかった場合、エラーメッセージが表示されることを確認する", async () => {
+  test("問題が取得できなかった場合、エラーページが表示されることを確認する", async () => {
     // setup
     (useState as Mock).mockReturnValue([false, vi.fn()]);
     (useAuth as Mock).mockReturnValue({
@@ -118,9 +124,11 @@ describe("[problemId]", () => {
     render(<ProblemPage />);
 
     // then
-    expect(
-      screen.queryByText("This page could not be found.")
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("error")).toBeInTheDocument();
+    expect(screen.getByTestId("error")).toHaveAttribute(
+      "data-status-code",
+      "404"
+    );
 
     // verify
     expect(useAuth).toHaveBeenCalledTimes(1);

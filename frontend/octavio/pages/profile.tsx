@@ -7,21 +7,19 @@ import { Controller, useForm } from "react-hook-form";
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
 import ICTSCCard from "@/components/Card";
 import LoadingPage from "@/components/LoadingPage";
-import useApi from "@/hooks/api";
 import useAuth from "@/hooks/auth";
 import CommonLayout from "@/layouts/CommonLayout";
 
 type Inputs = {
   display_name: string;
   self_introduction: string;
-  twitter_id: string;
   github_id: string;
+  twitter_id: string;
   facebook_id: string;
 };
 
 function Profile() {
-  const { client } = useApi();
-  const { user, isLoading, mutate } = useAuth();
+  const { user, isLoading, mutate, putProfile } = useAuth();
 
   // ステータスコード
   const [status, setStatus] = useState<number | null>(null);
@@ -62,11 +60,15 @@ function Profile() {
   }, [user]);
 
   const onSubmit = async (data: Inputs) => {
-    const response = await client.put(`users/${user?.id}`, data);
+    /* c8 ignore next 404 のところでチェックしているため必ず false になる */
+    if (user == null) {
+      return;
+    }
+    const response = await putProfile(user.id, data);
 
     setStatus(response.code);
 
-    if (response.code === 200) {
+    if (response.code === 202) {
       await mutate();
     }
   };
