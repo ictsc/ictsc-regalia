@@ -8,7 +8,7 @@ function Home() {
     <CommonLayout title="ルール">
       <div className="container-ictsc">
         <ICTSCCard>
-          <MarkdownPreview content={rule?.replace(/\\n/g, "\n") ?? ""} />
+          <MarkdownPreview content={rule} />
         </ICTSCCard>
       </div>
     </CommonLayout>

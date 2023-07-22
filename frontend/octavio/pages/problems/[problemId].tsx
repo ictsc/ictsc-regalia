@@ -69,7 +69,7 @@ function ProblemPage() {
           <h3 className="title-ictsc pt-4 pb-8">
             問題の再展開を行います。よろしいですか？
           </h3>
-          <MarkdownPreview content={recreateRule.replace(/\\n/g, "\n")} />
+          <MarkdownPreview content={recreateRule} />
           <div className="modal-action">
             <button
               type="button"

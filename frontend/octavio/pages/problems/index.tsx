@@ -34,7 +34,7 @@ function Problems() {
       {shortRule !== "" && (
         <div className="container-ictsc">
           <ICTSCCard className="pt-4 pb-8">
-            <MarkdownPreview content={shortRule.replace(/\\n/g, "\n")} />
+            <MarkdownPreview content={shortRule} />
           </ICTSCCard>
         </div>
       )}
