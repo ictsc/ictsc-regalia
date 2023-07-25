@@ -86,7 +86,6 @@ describe("ScoringProblem", () => {
     );
 
     // then
-    // baselayout が表示される
     expect(screen.queryByTestId("base-layout")).not.toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblem).toHaveBeenCalledTimes(1);
