@@ -55,11 +55,14 @@ describe("SignUp", () => {
     });
     render(<SignUp />);
 
-    // verify
+    // then
     expect(screen.queryByPlaceholderText("ユーザー名")).toBeInTheDocument();
     expect(screen.queryByPlaceholderText("パスワード")).toBeInTheDocument();
     expect(screen.queryByRole("button")).toBeInTheDocument();
     expect(screen.queryByRole("button")).not.toHaveAttribute("loading");
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(2);
   });
 
   test("未入力で送信した時にエラーメッセージが表示されることを確認する", async () => {
@@ -81,6 +84,9 @@ describe("SignUp", () => {
     expect(
       screen.queryByText("パスワードを入力して下さい")
     ).toBeInTheDocument();
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(4);
   });
 
   test("ユーザー名が未入力で送信した時にエラーメッセージが表示されることを確認する", async () => {
@@ -104,6 +110,9 @@ describe("SignUp", () => {
     expect(
       screen.queryByText("パスワードを入力して下さい")
     ).not.toBeInTheDocument();
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(4);
   });
 
   test("パスワード名が未入力で送信した時にエラーメッセージが表示されることを確認する", async () => {
@@ -127,6 +136,9 @@ describe("SignUp", () => {
     expect(
       screen.queryByText("パスワードを入力して下さい")
     ).toBeInTheDocument();
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(4);
   });
 
   test("パスワードが8文字未満で入力した場合にエラーが表示される", async () => {
@@ -148,6 +160,9 @@ describe("SignUp", () => {
     expect(
       screen.queryByText("パスワードは8文字以上である必要があります")
     ).toBeInTheDocument();
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(4);
   });
 
   test("登録が成功した場合にホーム画面に遷移することを確認する", async () => {
@@ -214,6 +229,9 @@ describe("SignUp", () => {
       "data-sub-message",
       "ユーザー名が重複しています。"
     );
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(4);
   });
 
   test("UserGroupID が無効な場合にエラーが表示されることを確認する", async () => {
@@ -246,6 +264,9 @@ describe("SignUp", () => {
       "data-sub-message",
       "無効なユーザーグループです。"
     );
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(4);
   });
 
   test("UserGroupID の uuid 形式が無効な場合にエラーが表示されることを確認する", async () => {
@@ -278,6 +299,9 @@ describe("SignUp", () => {
       "data-sub-message",
       "無効なユーザーグループです。"
     );
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(4);
   });
 
   test("InvitationCode が無効の場合", async () => {
@@ -307,6 +331,9 @@ describe("SignUp", () => {
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveAttribute("data-message", "エラーが発生しました");
     expect(alert).toHaveAttribute("data-sub-message", "無効な招待コードです。");
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(4);
   });
 
   test("不明のエラーの場合にエラーが表示されることを確認する", async () => {
@@ -336,6 +363,9 @@ describe("SignUp", () => {
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveAttribute("data-message", "エラーが発生しました");
     expect(alert).toHaveAttribute("data-sub-message", "");
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(4);
   });
 
   test("フォームが送信中の場合にボタンが無効になることを確認する", async () => {

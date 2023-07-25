@@ -1,5 +1,7 @@
 import "@testing-library/jest-dom";
 
+import React from "react";
+
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Mock, vi } from "vitest";
@@ -15,10 +17,6 @@ vi.mock("next/error", () => ({
   ),
 }));
 vi.mock("@/hooks/auth");
-vi.mock("@/components/Navbar", () => ({
-  __esModule: true,
-  default: () => <div data-testid="navbar" />,
-}));
 vi.mock("@/components/Alerts", () => ({
   ICTSCSuccessAlert: ({
     message,
@@ -51,6 +49,20 @@ vi.mock("@/components/LoadingPage", () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
 }));
+vi.mock("@/layouts/CommonLayout", () => ({
+  __esModule: true,
+  default: ({
+    children,
+    title,
+  }: {
+    children: React.ReactNode;
+    title: string;
+  }) => (
+    <div data-testid="common-layout" data-title={title}>
+      {children}
+    </div>
+  ),
+}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
@@ -69,7 +81,11 @@ describe("Profile", () => {
     render(<Profile />);
 
     // then
-    expect(screen.getByTestId("navbar")).toBeInTheDocument();
+    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
+    expect(screen.getByTestId("common-layout")).toHaveAttribute(
+      "data-title",
+      "プロフィール"
+    );
     expect(screen.getByText(testUser.user_group.name)).toBeInTheDocument();
     const inputs = screen.getAllByRole("textbox");
     expect(inputs).toHaveLength(5);
@@ -78,6 +94,9 @@ describe("Profile", () => {
     expect(inputs[2]).toHaveValue(testUser.profile?.github_id);
     expect(inputs[3]).toHaveValue(testUser.profile?.twitter_id);
     expect(inputs[4]).toHaveValue(testUser.profile?.facebook_id);
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(2);
   });
 
   test("ユーザーが取得中の場合、ローディング画面が表示されることを確認する", async () => {
@@ -91,7 +110,7 @@ describe("Profile", () => {
     render(<Profile />);
 
     // then
-    expect(screen.getByTestId("navbar")).toBeInTheDocument();
+    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.getByTestId("loading")).toBeInTheDocument();
 
     // verify
@@ -109,7 +128,7 @@ describe("Profile", () => {
     render(<Profile />);
 
     // then
-    expect(screen.queryByTestId("navbar")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("common-layout")).not.toBeInTheDocument();
     expect(screen.getByTestId("error")).toBeInTheDocument();
     expect(screen.getByTestId("error")).toHaveAttribute(
       "data-status-code",

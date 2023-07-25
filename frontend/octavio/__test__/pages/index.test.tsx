@@ -18,8 +18,16 @@ vi.mock("@/components/MarkdownPreview", () => ({
 }));
 vi.mock("@/layouts/CommonLayout", () => ({
   __esModule: true,
-  default: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="common-layout">{children}</div>
+  default: ({
+    children,
+    title,
+  }: {
+    children: React.ReactNode;
+    title: string;
+  }) => (
+    <div data-testid="common-layout" data-title={title}>
+      {children}
+    </div>
   ),
 }));
 
@@ -35,6 +43,10 @@ describe("Home", () => {
 
     // verify
     expect(screen.queryByTestId("common-layout")).toBeInTheDocument();
+    expect(screen.queryByTestId("common-layout")).toHaveAttribute(
+      "data-title",
+      "ルール"
+    );
     expect(screen.queryByTestId("markdown-preview")).toBeInTheDocument();
     expect(screen.queryByTestId("markdown-preview")).toHaveAttribute(
       "data-content",
