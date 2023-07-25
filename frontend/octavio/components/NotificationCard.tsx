@@ -29,7 +29,7 @@ function NotificationCard({ notice, onDismiss }: Props) {
                 </button>
               )}
             </div>
-            <MarkdownPreview content={notice.body ?? ""} />
+            <MarkdownPreview content={notice.body} />
           </div>
         </div>
       </div>
