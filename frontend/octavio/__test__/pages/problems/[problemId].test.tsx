@@ -39,10 +39,6 @@ vi.mock("next/router", () => ({
 vi.mock("@/hooks/auth");
 vi.mock("@/hooks/problem");
 vi.mock("@/hooks/reCreateInfo");
-vi.mock("@/components/Navbar", () => ({
-  __esModule: true,
-  default: () => <div data-testid="navbar" />,
-}));
 vi.mock("@/components/AnswerForm", () => ({
   __esModule: true,
   default: () => <div data-testid="answerForm" />,
@@ -50,6 +46,20 @@ vi.mock("@/components/AnswerForm", () => ({
 vi.mock("@/components/AnswerListSection", () => ({
   __esModule: true,
   default: () => <div data-testid="answerListSection" />,
+}));
+vi.mock("@/layouts/BaseLayout", () => ({
+  __esModule: true,
+  default: ({
+    children,
+    title,
+  }: {
+    children: React.ReactNode;
+    title: string;
+  }) => (
+    <div data-testid="base-layout" data-title={title}>
+      {children}
+    </div>
+  ),
 }));
 
 beforeEach(() => {
@@ -73,8 +83,14 @@ describe("[problemId]", () => {
     });
     render(<ProblemPage />);
 
+    screen.debug();
+
     // then
-    expect(screen.queryByTestId("navbar")).toBeInTheDocument();
+    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
+    expect(screen.queryByTestId("base-layout")).toHaveAttribute(
+      "data-title",
+      `${testProblem.code} ${testProblem.title} 問題`
+    );
     expect(
       screen.queryByRole("button", { name: "再展開を行う" })
     ).not.toBeInTheDocument();
@@ -100,6 +116,11 @@ describe("[problemId]", () => {
     render(<ProblemPage />);
 
     // then
+    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
+    expect(screen.queryByTestId("base-layout")).toHaveAttribute(
+      "data-title",
+      "Loading..."
+    );
     expect(screen.queryByTestId("loading")).toBeInTheDocument();
 
     // verify
@@ -247,7 +268,7 @@ describe("[problemId]", () => {
     render(<ProblemPage />);
 
     // then
-    expect(screen.queryByTestId("navbar")).toBeInTheDocument();
+    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "再展開を行う" })
     ).toBeInTheDocument();
@@ -276,7 +297,7 @@ describe("[problemId]", () => {
     render(<ProblemPage />);
 
     // then
-    expect(screen.queryByTestId("navbar")).toBeInTheDocument();
+    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "再展開を行う" })
     ).not.toBeInTheDocument();
