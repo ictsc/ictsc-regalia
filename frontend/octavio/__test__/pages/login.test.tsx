@@ -1,5 +1,7 @@
 import "@testing-library/jest-dom";
 
+import React from "react";
+
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import mockRouter from "next-router-mock";
@@ -37,6 +39,20 @@ vi.mock("@/components/Alerts", () => ({
     />
   ),
 }));
+vi.mock("@/layouts/CommonLayout", () => ({
+  __esModule: true,
+  default: ({
+    children,
+    title,
+  }: {
+    children: React.ReactNode;
+    title: string;
+  }) => (
+    <div data-testid="common-layout" data-title={title}>
+      {children}
+    </div>
+  ),
+}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
@@ -55,11 +71,19 @@ describe("Login", () => {
 
     const loginButton = screen.getByRole("button");
 
-    // verify
+    // then
+    expect(screen.queryByTestId("common-layout")).toBeInTheDocument();
+    expect(screen.queryByTestId("common-layout")).toHaveAttribute(
+      "data-title",
+      "ログイン"
+    );
     expect(screen.queryByPlaceholderText("ユーザー名")).toBeInTheDocument();
     expect(screen.queryByPlaceholderText("パスワード")).toBeInTheDocument();
     expect(loginButton).toBeInTheDocument();
     expect(loginButton).not.toHaveAttribute("loading");
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(1);
   });
 
   test("未入力で送信した時にエラーメッセージが表示されることを確認する", async () => {
@@ -81,6 +105,9 @@ describe("Login", () => {
     expect(
       screen.queryByText("パスワードを入力して下さい")
     ).toBeInTheDocument();
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(2);
   });
 
   test("ユーザー名が未入力で送信した時にエラーメッセージが表示されることを確認する", async () => {
@@ -127,6 +154,9 @@ describe("Login", () => {
     expect(
       screen.queryByText("パスワードを入力して下さい")
     ).toBeInTheDocument();
+
+    // verify
+    expect(useAuth).toHaveBeenCalledTimes(2);
   });
 
   test("ログインが成功することを確認する", async () => {
@@ -158,7 +188,7 @@ describe("Login", () => {
     expect(alert).not.toHaveAttribute("data-sub-message");
 
     // verify
-    expect(useAuth).toHaveBeenCalledTimes(4);
+    expect(useAuth).toHaveBeenCalledTimes(2);
     expect(signIn).toHaveBeenCalledTimes(1);
   });
 
@@ -188,7 +218,7 @@ describe("Login", () => {
     expect(alert).not.toHaveAttribute("data-sub-message");
 
     // verify
-    expect(useAuth).toHaveBeenCalledTimes(4);
+    expect(useAuth).toHaveBeenCalledTimes(2);
     expect(signIn).toHaveBeenCalledTimes(1);
   });
 
@@ -223,7 +253,7 @@ describe("Login", () => {
     expect(loginButton).toHaveClass("loading");
 
     // verify
-    expect(useAuth).toHaveBeenCalledTimes(4);
+    expect(useAuth).toHaveBeenCalledTimes(2);
     expect(signIn).toHaveBeenCalledTimes(1);
   });
 });

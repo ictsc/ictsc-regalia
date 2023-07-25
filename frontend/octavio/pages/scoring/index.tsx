@@ -124,7 +124,7 @@ function Index() {
             </Link>
           </div>
           <ICTSCCard>
-            <MarkdownPreview content={problem.body ?? ""} />
+            <MarkdownPreview content={problem.body} />
           </ICTSCCard>
         </div>
       )}

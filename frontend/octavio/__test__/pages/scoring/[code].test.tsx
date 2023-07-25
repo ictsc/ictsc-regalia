@@ -1,5 +1,7 @@
 import "@testing-library/jest-dom";
 
+import React from "react";
+
 import { render, screen } from "@testing-library/react";
 import mockRouter from "next-router-mock";
 import { useForm } from "react-hook-form";
@@ -26,10 +28,6 @@ vi.mock("react-hook-form", () => ({
 vi.mock("@/hooks/auth");
 vi.mock("@/hooks/problem");
 vi.mock("@/hooks/answer");
-vi.mock("@/components/Navbar", () => ({
-  __esModule: true,
-  default: () => <div data-testid="navbar" />,
-}));
 vi.mock("@/components/LoadingPage", () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
@@ -38,6 +36,20 @@ vi.mock("@/components/ScoringAnswerForm", () => ({
   __esModule: true,
   default: ({ answer }: { answer: Answer }) => (
     <div data-testid="scoring-answer-form" data-key={answer.id} />
+  ),
+}));
+vi.mock("@/layouts/BaseLayout", () => ({
+  __esModule: true,
+  default: ({
+    children,
+    title,
+  }: {
+    children: React.ReactNode;
+    title: string;
+  }) => (
+    <div data-testid="base-layout" data-title={title}>
+      {children}
+    </div>
   ),
 }));
 
@@ -74,7 +86,8 @@ describe("ScoringProblem", () => {
     );
 
     // then
-    expect(screen.queryByTestId("navbar")).not.toBeInTheDocument();
+    // baselayout が表示される
+    expect(screen.queryByTestId("base-layout")).not.toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblem).toHaveBeenCalledTimes(1);
     expect(useAnswers).toHaveBeenCalledTimes(1);
@@ -102,7 +115,7 @@ describe("ScoringProblem", () => {
     );
 
     // then
-    expect(screen.queryByTestId("navbar")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("base-layout")).not.toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblem).toHaveBeenCalledTimes(1);
     expect(useAnswers).toHaveBeenCalledTimes(1);
@@ -130,7 +143,7 @@ describe("ScoringProblem", () => {
     );
 
     // then
-    expect(screen.queryByTestId("navbar")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("base-layout")).not.toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblem).toHaveBeenCalledTimes(1);
     expect(useAnswers).toHaveBeenCalledTimes(1);
@@ -158,7 +171,7 @@ describe("ScoringProblem", () => {
     );
 
     // then
-    expect(screen.queryByTestId("navbar")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("base-layout")).not.toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblem).toHaveBeenCalledTimes(1);
     expect(useAnswers).toHaveBeenCalledTimes(1);
@@ -186,7 +199,11 @@ describe("ScoringProblem", () => {
     expect(screen.queryByTestId("loading")).toBeInTheDocument();
 
     // then
-    expect(screen.queryByTestId("navbar")).toBeInTheDocument();
+    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
+    expect(screen.queryByTestId("base-layout")).toHaveAttribute(
+      "data-title",
+      "採点"
+    );
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblem).toHaveBeenCalledTimes(1);
     expect(useAnswers).toHaveBeenCalledTimes(1);

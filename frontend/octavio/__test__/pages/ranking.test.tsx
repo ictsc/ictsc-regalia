@@ -1,5 +1,7 @@
 import "@testing-library/jest-dom";
 
+import React from "react";
+
 import { render, screen } from "@testing-library/react";
 import { Mock, vi } from "vitest";
 
@@ -8,13 +10,23 @@ import Ranking from "@/pages/ranking";
 import { testRank } from "@/types/Rank";
 
 vi.mock("@/hooks/ranking");
-vi.mock("@/components/Navbar", () => ({
-  __esModule: true,
-  default: () => <div data-testid="navbar" />,
-}));
 vi.mock("@/components/LoadingPage", () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
+}));
+vi.mock("@/layouts/CommonLayout", () => ({
+  __esModule: true,
+  default: ({
+    children,
+    title,
+  }: {
+    children: React.ReactNode;
+    title: string;
+  }) => (
+    <div data-testid="common-layout" data-title={title}>
+      {children}
+    </div>
+  ),
 }));
 
 beforeEach(() => {
@@ -34,7 +46,11 @@ describe("Ranking", () => {
     render(<Ranking />);
 
     // then
-    expect(screen.getByTestId("navbar")).toBeInTheDocument();
+    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
+    expect(screen.getByTestId("common-layout")).toHaveAttribute(
+      "data-title",
+      "ランキング"
+    );
     const cells = screen.getAllByRole("cell");
     expect(cells[0]).toHaveTextContent(testRank.rank.toString());
     expect(cells[1]).toHaveTextContent(testRank.user_group.name);
@@ -56,7 +72,7 @@ describe("Ranking", () => {
     render(<Ranking />);
 
     // then
-    expect(screen.getByTestId("navbar")).toBeInTheDocument();
+    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.getByTestId("loading")).toBeInTheDocument();
 
     // verify
