@@ -10,6 +10,7 @@ const RankingPage = {
   waitFormSelector: async (page: Page) => {
     await page.waitForSelector(".title-ictsc >> text=ランキング");
   },
+  // tr
+  Cells: (page: Page) => page.locator("tbody >> tr"),
 };
-
 export default RankingPage;

@@ -28,7 +28,7 @@ test.describe("未ログイン状態", () => {
 
 test.describe("ログイン状態", () => {
   test.beforeEach(async ({ page }) => {
-    await LoginPage.login(page);
+    await LoginPage.adminLogin(page);
   });
 
   test("ルールページに遷移できる", async ({ page }) => {
