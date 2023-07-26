@@ -102,6 +102,7 @@ function SignUp() {
           {...register("name", { required: true })}
           type="text"
           placeholder="ユーザー名"
+          id="username"
           className="input input-bordered max-w-xs min-w-[312px]"
         />
         <div className="label max-w-xs min-w-[312px]">
@@ -118,6 +119,7 @@ function SignUp() {
           })}
           type="password"
           placeholder="パスワード"
+          id="password"
           className="input input-bordered max-w-xs min-w-[312px] mt-4"
         />
         <div className="label max-w-xs min-w-[312px]">
@@ -134,6 +136,7 @@ function SignUp() {
         </div>
         <button
           type="submit"
+          id="signUpBtn"
           className={`btn btn-primary mt-4 max-w-xs min-w-[312px] ${
             submitting && "loading"
           }`}
