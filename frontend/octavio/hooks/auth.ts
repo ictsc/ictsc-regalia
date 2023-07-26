@@ -13,7 +13,7 @@ const useAuth = () => {
   const { data, mutate, isLoading } = useSWR("auth/self", fetcher);
 
   const signUp = async (request: SignUpRequest) =>
-    client.post("auth/signup", request);
+    client.post("users", request);
   const signIn = async (request: SignInRequest) =>
     client.post("auth/signin", request);
   const logout = async () => client.delete("auth/signout");
