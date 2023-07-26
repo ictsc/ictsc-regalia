@@ -53,7 +53,7 @@ function Problems() {
           />
         ))}
       <div className="container-ictsc flex flex-row justify-end text-primary font-bold">
-        <Link href="/notices" className="link link-hover">
+        <Link href="/notices" className="notice-link link link-hover">
           おしらせ一覧へ→
         </Link>
       </div>

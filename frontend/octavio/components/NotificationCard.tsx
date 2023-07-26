@@ -19,7 +19,11 @@ function NotificationCard({ notice, onDismiss }: Props) {
                 <span className="font-bold notice-title">{notice.title}</span>
               </div>
               {onDismiss && (
-                <button type="button" onClick={onDismiss}>
+                <button
+                  className="dismiss-btn"
+                  type="button"
+                  onClick={onDismiss}
+                >
                   <Image
                     src="assets/svg/x-mark.svg"
                     width={24}

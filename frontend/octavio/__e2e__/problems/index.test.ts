@@ -1,12 +1,13 @@
 import { expect, test } from "@playwright/test";
 
 import LoginPage from "../pages/login";
+import NoticesPage from "../pages/notice";
 import ProblemsPage from "../pages/problems";
 import ProblemPage from "../pages/problems/[problemId]";
 
 test("画面項目が表示されること", async ({ page }) => {
   // setup
-  await LoginPage.login(page, "user1", "password");
+  await LoginPage.user1Login(page);
   await ProblemsPage.goto(page);
   await ProblemsPage.validate(page);
 
@@ -56,9 +57,24 @@ test("画面項目が表示されること", async ({ page }) => {
   );
 });
 
+test("通知ページに遷移できる", async ({ page }) => {
+  // setup
+  await LoginPage.user1Login(page);
+  await ProblemsPage.goto(page);
+  await ProblemsPage.validate(page);
+
+  // when
+  await ProblemsPage.FirstNoticeLink(page).click();
+
+  // then
+  await NoticesPage.waitFormSelector(page);
+  expect(page.url().split("/").pop()).toBe("notices");
+  await NoticesPage.validate(page);
+});
+
 test("問題ページに遷移できる", async ({ page }) => {
   // setup
-  await LoginPage.login(page, "user1", "password");
+  await LoginPage.user1Login(page);
   await ProblemsPage.goto(page);
   await ProblemsPage.validate(page);
 
@@ -69,4 +85,24 @@ test("問題ページに遷移できる", async ({ page }) => {
   await ProblemPage.waitFormSelector(page, "問題タイトル1");
   expect(page.url().split("/").pop()).toBe("abc");
   await ProblemPage.validate(page, "問題タイトル1");
+});
+
+test("通知を既読にできる", async ({ page }) => {
+  // setup
+  await LoginPage.user1Login(page);
+  await ProblemsPage.goto(page);
+  await ProblemsPage.validate(page);
+
+  // when
+  await ProblemsPage.FirstDismissButton(page).click();
+
+  // then
+  const notices = await ProblemsPage.Notices(page);
+  await expect(notices).toHaveCount(2);
+  await expect(notices.nth(0).locator(".notice-title")).toHaveText(
+    "通知タイトル2"
+  );
+  await expect(notices.nth(0).locator(".notice-body")).toHaveText(
+    "通知メッセージ2"
+  );
 });
