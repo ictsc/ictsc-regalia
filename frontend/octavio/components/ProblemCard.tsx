@@ -20,16 +20,16 @@ function ProblemCard({ problem }: Props) {
   return (
     <Link
       href={`/problems/${problem.code}`}
-      className="border p-4 hover:bg-base-200 hover:cursor-pointer rounded-md shadow-sm min-h-[212px] justify-between flex flex-col"
+      className="problem-card border p-4 hover:bg-base-200 hover:cursor-pointer rounded-md shadow-sm min-h-[212px] justify-between flex flex-col"
     >
       <div>
-        <span className="font-bold text-2xl text-primary pr-2">
+        <span className="problem-code font-bold text-2xl text-primary pr-2">
           {problem.code}
         </span>
-        <span className="text-xl font-bold">{problem.title}</span>
+        <span className="problem-title text-xl font-bold">{problem.title}</span>
       </div>
       <div>
-        <div className={`text-right ${problemText}`}>
+        <div className={`problem-point text-right ${problemText}`}>
           {problem.current_point}/{problem.point}pt
         </div>
         <div className="font-bold text-primary">問題文へ→</div>

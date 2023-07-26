@@ -21,6 +21,9 @@ const LoginPage = {
   adminLogin: async (page: Page) => {
     await LoginPage.login(page, "admin", "password");
   },
+  user1Login: async (page: Page) => {
+    await LoginPage.login(page, "user1", "password");
+  },
   UsernameInput: (page: Page) => page.locator("#username"),
   PasswordInput: (page: Page) => page.locator("#password"),
   LoginButton: (page: Page) => page.locator("#loginBtn"),

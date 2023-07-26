@@ -10,16 +10,20 @@ interface Props {
 
 function NotificationCard({ notice, onDismiss }: Props) {
   return (
-    <div className="container-ictsc">
+    <div className="container-ictsc notice-card">
       <div className="bg-gray-200 p-4 rounded rounded-lg  shadow-lg grow">
         <div>
           <div className="flex flex-col">
             <div className="flex flex-row justify-between justify-items-center">
               <div className="flex flex-row">
-                <span className="font-bold">{notice.title}</span>
+                <span className="font-bold notice-title">{notice.title}</span>
               </div>
               {onDismiss && (
-                <button type="button" onClick={onDismiss}>
+                <button
+                  className="dismiss-btn"
+                  type="button"
+                  onClick={onDismiss}
+                >
                   <Image
                     src="assets/svg/x-mark.svg"
                     width={24}
@@ -29,7 +33,7 @@ function NotificationCard({ notice, onDismiss }: Props) {
                 </button>
               )}
             </div>
-            <MarkdownPreview content={notice.body} />
+            <MarkdownPreview className="notice-body" content={notice.body} />
           </div>
         </div>
       </div>
