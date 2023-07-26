@@ -5,7 +5,8 @@ import markdownToHtml from "zenn-markdown-html";
 
 interface Props {
   className?: string;
-  content: string;
+  /* eslint-disable-next-line react/require-default-props */
+  content?: string;
 }
 
 const CopyOutlineIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="fill-white" scale="1.2">
