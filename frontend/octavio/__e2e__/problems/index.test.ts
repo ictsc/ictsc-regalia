@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import LoginPage from "../pages/login";
 import ProblemsPage from "../pages/problems";
-import ProblemPage from "../pages/problems/[problemid]";
+import ProblemPage from "../pages/problems/[problemId]";
 
 test("画面項目が表示されること", async ({ page }) => {
   // setup
