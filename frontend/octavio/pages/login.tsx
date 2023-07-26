@@ -66,7 +66,6 @@ function Login() {
           placeholder="ユーザー名"
           id="username"
           className="input input-bordered max-w-xs min-w-[312px]"
-          data-testid="username"
         />
         <div className="label max-w-xs min-w-[312px]">
           {errors.name && (
@@ -81,7 +80,6 @@ function Login() {
           placeholder="パスワード"
           id="password"
           className="input input-bordered max-w-xs min-w-[312px] mt-4"
-          data-testid="password"
         />
         <div className="label max-w-xs min-w-[312px]">
           {errors.password && (
