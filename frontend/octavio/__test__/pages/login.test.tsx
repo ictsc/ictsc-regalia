@@ -117,7 +117,7 @@ describe("Login", () => {
     });
     render(<Login />);
 
-    await userEvent.type(screen.getByTestId("password"), "password");
+    await userEvent.type(screen.getByPlaceholderText("パスワード"), "password");
 
     // when
     await act(async () => {
@@ -140,7 +140,7 @@ describe("Login", () => {
     });
     render(<Login />);
 
-    await userEvent.type(screen.getByTestId("username"), "admin");
+    await userEvent.type(screen.getByPlaceholderText("ユーザー名"), "admin");
 
     // when
     await act(async () => {
@@ -170,8 +170,8 @@ describe("Login", () => {
     });
     render(<Login />);
 
-    await userEvent.type(screen.getByTestId("username"), "admin");
-    await userEvent.type(screen.getByTestId("password"), "password");
+    await userEvent.type(screen.getByPlaceholderText("ユーザー名"), "admin");
+    await userEvent.type(screen.getByPlaceholderText("パスワード"), "password");
 
     // when
     await act(async () => {
@@ -203,8 +203,8 @@ describe("Login", () => {
     });
     render(<Login />);
 
-    await userEvent.type(screen.getByTestId("username"), "admin");
-    await userEvent.type(screen.getByTestId("password"), "password");
+    await userEvent.type(screen.getByPlaceholderText("ユーザー名"), "admin");
+    await userEvent.type(screen.getByPlaceholderText("パスワード"), "password");
 
     // when
     await act(async () => {
@@ -240,8 +240,8 @@ describe("Login", () => {
     });
     render(<Login />);
 
-    await userEvent.type(screen.getByTestId("username"), "admin");
-    await userEvent.type(screen.getByTestId("password"), "password");
+    await userEvent.type(screen.getByPlaceholderText("ユーザー名"), "admin");
+    await userEvent.type(screen.getByPlaceholderText("パスワード"), "password");
     const loginButton = screen.getByRole("button");
 
     // when
