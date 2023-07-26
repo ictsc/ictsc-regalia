@@ -10,6 +10,8 @@ const ProblemsPage = {
   waitFormSelector: async (page: Page) => {
     await page.waitForSelector(".title-ictsc >> text=問題");
   },
+  Notices: (page: Page) => page.locator(".notice-card"),
+  Problems: (page: Page) => page.locator(".problem-card"),
 };
 
 export default ProblemsPage;
