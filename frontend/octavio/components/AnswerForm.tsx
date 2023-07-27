@@ -68,7 +68,7 @@ function AnswerForm() {
       body: answer,
     });
 
-    if (response.code === 200) {
+    if (response.code === 201) {
       successNotify();
 
       await mutate();
@@ -135,7 +135,10 @@ function AnswerForm() {
         </div>
         {isPreview ? (
           <>
-            <MarkdownPreview className="pt-4" content={watchField[0]} />
+            <MarkdownPreview
+              className="answer-form-preview pt-4"
+              content={watchField[0]}
+            />
             <div className="divider mt-0" />
           </>
         ) : (
