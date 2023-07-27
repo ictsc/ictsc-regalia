@@ -133,7 +133,7 @@ function ProblemPage() {
               </div>
             )}
           <ICTSCCard className="mt-8">
-            <MarkdownPreview content={problem.body} />
+            <MarkdownPreview className="problem-body" content={problem.body} />
           </ICTSCCard>
 
           {!isReadOnly && <AnswerForm />}

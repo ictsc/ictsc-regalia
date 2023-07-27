@@ -92,7 +92,7 @@ function AnswerListSection({ problem }: AnswerSectionProps) {
         <div className="pt-8" id="preview">
           <ICTSCCard>
             <div className="flex flex-row justify-between pb-4">
-              <div className="flex flex-row items-center">
+              <div className="answer-preview-team-info flex flex-row items-center">
                 {selectedAnswer.point !== null && (
                   <div className="pr-2">
                     <Image
@@ -106,7 +106,7 @@ function AnswerListSection({ problem }: AnswerSectionProps) {
                 チーム: {selectedAnswer.user_group.name}(
                 {selectedAnswer.user_group.organization})
               </div>
-              <div>
+              <div className="answer-preview-created-at">
                 {DateTime.fromISO(selectedAnswer.created_at).toFormat(
                   "yyyy-MM-dd HH:mm:ss"
                 )}
@@ -134,7 +134,10 @@ function AnswerListSection({ problem }: AnswerSectionProps) {
                 </button>
               </div>
               {isPreviewAnswer ? (
-                <MarkdownPreview content={selectedAnswer.body} />
+                <MarkdownPreview
+                  className="answer-preview"
+                  content={selectedAnswer.body}
+                />
               ) : (
                 <textarea
                   readOnly
