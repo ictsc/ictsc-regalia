@@ -44,7 +44,7 @@ test("画面項目が表示されること", async ({ page }) => {
   await expect(answer3.nth(4)).toHaveText("採点中");
 });
 
-// TODO(k-shir0): 再展開ができること, 再展開はバックエンドが他のシステムと連携しているため失敗する.
+// TODO: 再展開ができること, 再展開はバックエンドが他のシステムと連携しているため失敗する.
 // test("再展開ができること", async ({ page }) => {
 //   // setup
 //   await LoginPage.user1Login(page);
