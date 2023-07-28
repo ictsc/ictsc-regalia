@@ -111,7 +111,7 @@ function Index() {
       <div className="divider my-0" />
       {problem != null && (
         <div className="container-ictsc">
-          <div className="flex flex-row items-end py-12">
+          <div className="problem-info flex flex-row items-end py-12">
             <h1 className="title-ictsc pr-4">{problem.title}</h1>
             満点
             {problem.point} pt 採点基準
@@ -124,7 +124,10 @@ function Index() {
             </Link>
           </div>
           <ICTSCCard>
-            <MarkdownPreview content={problem.body} />
+            <MarkdownPreview
+              className="problem-preview"
+              content={problem.body}
+            />
           </ICTSCCard>
         </div>
       )}
