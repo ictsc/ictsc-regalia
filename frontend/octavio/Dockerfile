@@ -49,7 +49,7 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-COPY --from=font-builder /font/Variable/OTF/Subset/NotoSansJP-VF.woff2 ./pages/NotoSansJP-VF.woff2
+COPY --from=font-builder /font/Variable/OTF/Subset/NotoSansJP-VF.woff2 ./pages/dist/fonts/NotoSansJP-VF.woff2
 
 RUN yarn build
 
