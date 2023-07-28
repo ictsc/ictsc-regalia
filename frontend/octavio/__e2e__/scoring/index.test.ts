@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 import LoginPage from "../pages/login";
+import ScoringPage from "../pages/scoring";
 import ScoringProblemPage from "../pages/scoring/[code]";
-import ScoringPage from "../pages/scoring/scoring";
 
 test("画面項目が表示されること", async ({ page }) => {
   // setup
