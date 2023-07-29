@@ -254,4 +254,4 @@ jobs:
 
       - name: Run tests
         working-directory: frontend/octavio
-        run: npx playwright test --workers 2 __e2e__/${{ matrix.name }}
+        run: npx playwright test __e2e__/${{ matrix.name }}
