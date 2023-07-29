@@ -230,6 +230,10 @@ jobs:
             useSSL: false
           EOF
 
+      - name: Cache Docker Layer
+        if: contains(matrix.dependencies, 'ictsc-rikka')
+        uses: jpribyl/action-docker-layer-caching@v0.1.0
+
       # Docker コンテナが起動してから、レスポンスが返ってくるまで待機する
       # リトライは10回まで `/` にアクセスしてレスポンスのステータスコードをチェック
       # - ステータスコードが `404` の場合は正常終了します
