@@ -62,7 +62,7 @@ function ScoringAnswerForm({ problem, answer }: AnswerFormProps) {
   return (
     <ICTSCCard key={answer.id} className="pt-4 mb-4">
       <div className="flex flex-row justify-between pb-4">
-        <div className="flex flex-row items-center">
+        <div className="answer-preview-team-info flex flex-row items-center">
           {answer.point !== null && (
             <div className="pr-2">
               <Image
@@ -75,9 +75,9 @@ function ScoringAnswerForm({ problem, answer }: AnswerFormProps) {
           )}
           チーム: {answer.user_group.name}({answer.user_group.organization})
         </div>
-        <div>{createdAt}</div>
+        <div className="answer-preview-created-at">{createdAt}</div>
       </div>
-      <MarkdownPreview content={answer.body} />
+      <MarkdownPreview className="answer-preview" content={answer.body} />
       <div className="divider" />
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-row">
         <input
