@@ -122,7 +122,7 @@ function Profile() {
               <div className="label">
                 <span className="label-text">所属チーム</span>
               </div>
-              <div className="pl-1">{user?.user_group.name}</div>
+              <div className="teams pl-1">{user?.user_group.name}</div>
             </div>
             <div className="form-control pt-6">
               <div className="label">

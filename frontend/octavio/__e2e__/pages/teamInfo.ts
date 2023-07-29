@@ -10,6 +10,12 @@ const TeamInfoPage = {
   waitFormSelector: async (page: Page) => {
     await page.waitForSelector(".title-ictsc >> text=チーム情報");
   },
+  GroupNameAndOrganization: (page: Page) =>
+    page.locator(".group-name-and-organization"),
+  Ranking: (page: Page) => page.locator(".ranking"),
+  Score: (page: Page) => page.locator(".score"),
+  SSHInfo: (page: Page) => page.locator(".ssh-info"),
+  PasswordInfo: (page: Page) => page.locator(".password-info"),
 };
 
 export default TeamInfoPage;

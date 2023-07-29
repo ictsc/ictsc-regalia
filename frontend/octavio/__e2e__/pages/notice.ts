@@ -10,6 +10,7 @@ const NoticesPage = {
   waitFormSelector: async (page: Page) => {
     await page.waitForSelector(".title-ictsc >> text=通知一覧");
   },
+  Notices: (page: Page) => page.locator(".notice-card"),
 };
 
 export default NoticesPage;

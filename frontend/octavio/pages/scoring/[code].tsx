@@ -58,7 +58,7 @@ function ScoringProblem() {
           <ProblemMeta problem={problem} />
         </div>
         <ICTSCCard className="ml-0">
-          <MarkdownPreview content={problem.body} />
+          <MarkdownPreview className="problem-body" content={problem.body} />
         </ICTSCCard>
         <div className="divider" />
         <ProblemConnectionInfo matter={matter} />

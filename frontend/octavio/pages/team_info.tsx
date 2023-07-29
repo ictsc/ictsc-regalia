@@ -34,21 +34,21 @@ function TeamInfo() {
     <CommonLayout title="チーム情報">
       <div className="container-ictsc">
         <ICTSCCard>
-          <p className="font-extrabold text-4xl">
+          <p className="group-name-and-organization font-extrabold text-4xl">
             {user?.user_group.name}@{user?.user_group.organization}
           </p>
           {rank && (
             <ul className="grid grid-cols-3 gap-8 pt-4">
               <div className="border rounded-md p-4">
                 <p className="text-sm">ランキング</p>
-                <p className="pt-1">
+                <p className="ranking pt-1">
                   <span className="font-extrabold text-3xl">{rank.rank}</span>
                   <span className="text-lg">/{ranking?.length} teams</span>
                 </p>
               </div>
               <div className="border rounded-md p-4">
                 <p className="text-sm">得点</p>
-                <p className="pt-1">
+                <p className="score pt-1">
                   <span className="font-extrabold text-3xl">{rank.point}</span>
                   <span className="text-lg pl-2">pt</span>
                 </p>
@@ -60,6 +60,7 @@ function TeamInfo() {
           </div>
           <div className="flex flex-row">
             <HiddenInput
+              className="ssh-info"
               value={ssh}
               isHidden={isSSHHidden}
               onClick={(e) => {
@@ -92,6 +93,7 @@ function TeamInfo() {
           </div>
           <div className="flex flex-row">
             <HiddenInput
+              className="password-info"
               value={bastionPassword}
               isHidden={isPasswordHidden}
               onClick={(e) => {
