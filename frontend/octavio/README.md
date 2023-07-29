@@ -16,19 +16,19 @@ First, run the development server:
 # フォントのインストール
 npm run font
 #or
-yarn font
+pnpm font
 
 cp .env .env.local
 # 適切にコンフィグを変更して下さい
 npm run dev
 # or
-yarn dev
+pnpm dev
 ```
 
 #### テスト実行
 
 ```bash
-yarn test
+pnpm test
 ```
 
 ### Docker build

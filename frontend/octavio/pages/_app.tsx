@@ -11,13 +11,13 @@ import {
 
 const notoSansJP = localFont({
   variable: "--font-noto-sans-jp",
-  src: "./NotoSansJP-VF.woff2",
+  src: "./dist/fonts/NotoSansJP-VF.woff2",
 });
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <RecoilRoot>
-      <div data-theme="ictsc" className={`${notoSansJP.className}`}>
+      <div data-theme="ictsc" className={notoSansJP.className}>
         <Component {...pageProps} />
       </div>
       {/* 通知の永続化まわり */}

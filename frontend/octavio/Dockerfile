@@ -1,11 +1,13 @@
 ### 依存関係のインストール
-FROM node:16 AS deps
+FROM node:18 AS deps
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+RUN npm i -g pnpm
 
-RUN yarn install --frozen-lockfile
+COPY package.json pnpm-lock.yaml ./
+
+RUN pnpm i --frozen-lockfile --prod
 
 
 ## Font のビルド
@@ -29,7 +31,7 @@ RUN wget https://github.com/googlefonts/noto-cjk/releases/download/Sans2.004/01_
 
 
 ### Next.js のビルド
-FROM node:16-alpine AS builder
+FROM node:18-alpine AS builder
 
 ARG next_public_api_url
 ARG next_public_site_name
@@ -49,9 +51,9 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-COPY --from=font-builder /font/Variable/OTF/Subset/NotoSansJP-VF.woff2 ./pages/NotoSansJP-VF.woff2
+COPY --from=font-builder /font/Variable/OTF/Subset/NotoSansJP-VF.woff2 ./pages/dist/fonts/NotoSansJP-VF.woff2
 
-RUN yarn build
+RUN pnpm build
 
 
 ### Next.js の実行

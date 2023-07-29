@@ -14,7 +14,7 @@ ignorePaths:
   - ".vscode"
   - "**.svg"
   - "**/package.json"
-  - "**/package-lock.json"
+  - "**/pnpm-lock.yaml"
   - "**/node_modules"
   - "**/__e2e__"
   - "**/__test__"

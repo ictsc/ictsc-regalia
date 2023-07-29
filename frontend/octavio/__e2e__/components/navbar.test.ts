@@ -1,14 +1,14 @@
 import { expect, test } from "@playwright/test";
 
-import IndexPage from "./pages/Index";
-import LoginPage from "./pages/login";
-import ICTSCNavbar from "./pages/navbar";
-import ProblemsPage from "./pages/problems";
-import ProfilePage from "./pages/profile";
-import RankingPage from "./pages/ranking";
-import ScoringPage from "./pages/scoring";
-import TeamInfoPage from "./pages/teamInfo";
-import UsersPage from "./pages/users";
+import IndexPage from "../pages/Index";
+import LoginPage from "../pages/login";
+import ICTSCNavbar from "../pages/navbar";
+import ProblemsPage from "../pages/problems";
+import ProfilePage from "../pages/profile";
+import RankingPage from "../pages/ranking";
+import ScoringPage from "../pages/scoring";
+import TeamInfoPage from "../pages/teamInfo";
+import UsersPage from "../pages/users";
 
 test.describe("未ログイン状態", () => {
   test("ログインページに遷移できる", async ({ page }) => {

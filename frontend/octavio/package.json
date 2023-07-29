@@ -12,7 +12,7 @@
     "lint": "next lint",
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
-    "font": "docker build -f Dockerfile --target font-builder -t font-builder . && docker run -v $(pwd):/host -it font-builder sh -c \"cp /font/Variable/OTF/Subset/NotoSansJP-VF.woff2 /host/pages/NotoSansJP-VF.woff2 && exit\""
+    "font": "docker build -f Dockerfile --target font-builder -t font-builder . && docker run -v $(pwd):/host --detach font-builder sh -c \"mkdir -p /host/pages/dist/fonts; cp /font/Variable/OTF/Subset/NotoSansJP-VF.woff2 /host/pages/dist/fonts/NotoSansJP-VF.woff2\""
   },
   "dependencies": {
     "@next/font": "^13.1.1",
@@ -38,7 +38,7 @@
     "typescript": "4.9.3",
     "zenn-content-css": "^0.1.81",
     "zenn-embed-elements": "^0.1.81",
-    "zenn-markdown-html": "^0.1.81"
+    "zenn-markdown-html": "^0.1.144"
   },
   "devDependencies": {
     "@playwright/test": "^1.35.1",
