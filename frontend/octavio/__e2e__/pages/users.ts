@@ -10,6 +10,7 @@ const UsersPage = {
   waitFormSelector: async (page: Page) => {
     await page.waitForSelector(".title-ictsc >> text=参加者");
   },
+  Users: (page: Page) => page.locator("tbody >> tr"),
 };
 
 export default UsersPage;
