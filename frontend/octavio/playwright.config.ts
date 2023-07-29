@@ -40,5 +40,6 @@ export default defineConfig({
     command: "pnpm build && pnpm start",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
+    timeout: 2 * 60 * 1000,
   },
 });
