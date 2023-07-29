@@ -5,9 +5,9 @@ import React, { useState } from "react";
 import { act, render, screen } from "@testing-library/react";
 import { Mock, vi } from "vitest";
 
+import TeamInfo from "@/app/team_info/page";
 import useAuth from "@/hooks/auth";
 import useRanking from "@/hooks/ranking";
-import TeamInfo from "@/pages/team_info";
 import { testRank } from "@/types/Rank";
 import { testUser } from "@/types/User";
 import { testUserGroup } from "@/types/UserGroup";

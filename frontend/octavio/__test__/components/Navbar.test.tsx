@@ -10,7 +10,9 @@ import { testAdminUser, testUser } from "@/types/User";
 
 vi.mock("next/router", () => require("next-router-mock"));
 vi.mock("@/hooks/auth");
-
+vi.mock("next/navigation", () => ({
+  ...require("next-router-mock"),
+}));
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
   vi.clearAllMocks();
@@ -44,7 +46,7 @@ describe("未ログイン状態 ICTSCNavBar", () => {
 describe("参加者ログイン状態 ICTSCNavBar", () => {
   test("正常に表示され参加者ログイン時の項目が表示されることを確認する", () => {
     // setup
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as Mock).mockReturnValue({
       user: testUser,
       mutate: () => {},
     });

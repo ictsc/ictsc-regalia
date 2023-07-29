@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 
 import ICTSCCard from "@/components/Card";

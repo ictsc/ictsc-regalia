@@ -1,11 +1,12 @@
 import "@testing-library/jest-dom";
+import "@testing-library/jest-dom/extend-expect";
 
 import React from "react";
 
 import { render, screen } from "@testing-library/react";
 import { vi } from "vitest";
 
-import Home from "@/pages/index";
+import Home from "@/app/page";
 
 vi.mock("@/components/_const", () => ({
   rule: "rule",
