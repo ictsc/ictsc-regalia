@@ -23,13 +23,23 @@ jobs:
             dependencies: [ ictsc-rikka ]
           - name: navbar
             dependencies: [ ictsc-rikka ]
+          - name: notices
+            dependencies: [ ictsc-rikka ]
+          - name: profile
+            dependencies: [ ictsc-rikka ]
           - name: ranking
             dependencies: [ ictsc-rikka ]
           - name: signUp
             dependencies: [ ictsc-rikka ]
+          - name: team_info
+            dependencies: [ ictsc-rikka ]
+          - name: users
+            dependencies: [ ictsc-rikka ]
           - name: problems/\[problemId\]
             dependencies: [ ictsc-rikka ]
           - name: problems/index
+            dependencies: [ ictsc-rikka ]
+          - name: scoring/\[code\]
             dependencies: [ ictsc-rikka ]
           - name: scoring/index
             dependencies: [ ictsc-rikka ]
