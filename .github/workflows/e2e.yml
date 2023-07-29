@@ -42,16 +42,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.10
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
-          cache: 'yarn'
-          cache-dependency-path: frontend/octavio/yarn.lock
+          node-version: '18'
+          cache: 'pnpm'
+          cache-dependency-path: frontend/octavio/pnpm-lock.yaml
 
       - name: Install dependencies
         working-directory: frontend/octavio
-        run: yarn install
+        run: pnpm i --frozen-lockfile
 
       - name: Cache font build
         id: cache-font
@@ -63,7 +68,7 @@ jobs:
       - name: Build Font
         if: steps.cache-font.outputs.cache-hit != 'true'
         working-directory: frontend/octavio
-        run: yarn font
+        run: pnpm font
 
       - name: Get installed Playwright version
         id: playwright-version

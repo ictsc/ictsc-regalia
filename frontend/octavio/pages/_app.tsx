@@ -17,7 +17,7 @@ const notoSansJP = localFont({
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <RecoilRoot>
-      <div data-theme="ictsc" className={`${notoSansJP.className}`}>
+      <div data-theme="ictsc" className={notoSansJP.className}>
         <Component {...pageProps} />
       </div>
       {/* 通知の永続化まわり */}

@@ -3,9 +3,9 @@ FROM node:16 AS deps
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+COPY package.json pnpm.lock ./
 
-RUN yarn install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 
 ## Font のビルド
@@ -51,7 +51,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 COPY --from=font-builder /font/Variable/OTF/Subset/NotoSansJP-VF.woff2 ./pages/dist/fonts/NotoSansJP-VF.woff2
 
-RUN yarn build
+RUN pnpm build
 
 
 ### Next.js の実行
