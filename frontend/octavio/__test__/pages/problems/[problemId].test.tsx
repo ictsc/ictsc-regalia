@@ -5,10 +5,10 @@ import React, { useState } from "react";
 import { act, render, screen } from "@testing-library/react";
 import { Mock, vi } from "vitest";
 
+import ProblemPage from "@/app/problems/[problemId]/page";
 import useAuth from "@/hooks/auth";
 import useProblem from "@/hooks/problem";
 import useReCreateInfo from "@/hooks/reCreateInfo";
-import ProblemPage from "@/pages/problems/[problemId]";
 import { testProblem } from "@/types/Problem";
 import { testReCreateInfo } from "@/types/ReCreate";
 import { testUser } from "@/types/User";

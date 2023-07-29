@@ -1,3 +1,5 @@
+"use client";
+
 import "zenn-content-css";
 
 import { useState } from "react";

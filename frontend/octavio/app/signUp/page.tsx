@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 
 import { useRouter } from "next/router";
@@ -13,7 +15,7 @@ type Inputs = {
   password: string;
 };
 
-function SignUp() {
+function Page() {
   const router = useRouter();
   const { user_group_id: userGroupId, invitation_code: invitationCode } =
     router.query;
@@ -148,4 +150,4 @@ function SignUp() {
   );
 }
 
-export default SignUp;
+export default Page;

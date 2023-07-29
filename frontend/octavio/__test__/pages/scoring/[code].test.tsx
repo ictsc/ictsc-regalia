@@ -1,3 +1,5 @@
+"use client";
+
 import "@testing-library/jest-dom";
 
 import React from "react";
@@ -7,10 +9,10 @@ import mockRouter from "next-router-mock";
 import { useForm } from "react-hook-form";
 import { Mock, vi } from "vitest";
 
+import ScoringProblem from "@/app/scoring/[code]/page";
 import useAnswers from "@/hooks/answer";
 import useAuth from "@/hooks/auth";
 import useProblem from "@/hooks/problem";
-import ScoringProblem from "@/pages/scoring/[code]";
 import { Answer, testAnswer } from "@/types/Answer";
 import { testProblem } from "@/types/Problem";
 import { testAdminUser, testUser } from "@/types/User";

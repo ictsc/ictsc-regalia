@@ -4,8 +4,8 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { Mock, vi } from "vitest";
 
+import Users from "@/app/users/page";
 import useUserGroups from "@/hooks/userGroups";
-import Users from "@/pages/users";
 import { testUser } from "@/types/User";
 import { testUserGroup } from "@/types/UserGroup";
 

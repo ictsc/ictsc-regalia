@@ -5,8 +5,8 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { Mock, vi } from "vitest";
 
+import Notices from "@/app/notice/page";
 import useNotice from "@/hooks/notice";
-import Notices from "@/pages/notices";
 import { testNotice } from "@/types/Notice";
 
 vi.mock("@/hooks/notice");

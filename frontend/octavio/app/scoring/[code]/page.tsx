@@ -1,3 +1,5 @@
+"use client";
+
 import Error from "next/error";
 import { useRouter } from "next/router";
 

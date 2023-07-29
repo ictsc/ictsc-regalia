@@ -1,9 +1,11 @@
+"use client";
+
 import LoadingPage from "@/components/LoadingPage";
 import NotificationCard from "@/components/NotificationCard";
 import useNotice from "@/hooks/notice";
 import CommonLayout from "@/layouts/CommonLayout";
 
-function Notices() {
+function Page() {
   const { notices, isLoading } = useNotice();
 
   if (isLoading) {
@@ -23,4 +25,4 @@ function Notices() {
   );
 }
 
-export default Notices;
+export default Page;

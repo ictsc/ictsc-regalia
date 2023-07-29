@@ -1,3 +1,5 @@
+"use client";
+
 import Error from "next/error";
 
 import LoadingPage from "@/components/LoadingPage";
@@ -67,7 +69,7 @@ function FacebookIcon() {
   );
 }
 
-function Users() {
+function Page() {
   const { userGroups, isLoading } = useUserGroups();
 
   if (isLoading) {
@@ -148,4 +150,4 @@ function Users() {
   );
 }
 
-export default Users;
+export default Page;

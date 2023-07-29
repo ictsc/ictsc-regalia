@@ -6,9 +6,9 @@ import { render, screen } from "@testing-library/react";
 import { useRecoilState } from "recoil";
 import { Mock, vi } from "vitest";
 
+import Problems from "@/app/problems/page";
 import useNotice from "@/hooks/notice";
 import useProblems from "@/hooks/problems";
-import Problems from "@/pages/problems";
 import { testNotice } from "@/types/Notice";
 import { testProblem } from "@/types/Problem";
 
@@ -16,6 +16,9 @@ vi.mock("recoil");
 vi.mock("@/hooks/problems");
 vi.mock("@/hooks/notice");
 vi.mock("next/router", () => require("next-router-mock"));
+vi.mock("next/navigation", () => ({
+  ...require("next-router-mock"),
+}));
 vi.mock("@/layouts/CommonLayout", () => ({
   __esModule: true,
   default: ({

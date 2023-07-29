@@ -1,8 +1,10 @@
+"use client";
+
 import LoadingPage from "@/components/LoadingPage";
 import useRanking from "@/hooks/ranking";
 import CommonLayout from "@/layouts/CommonLayout";
 
-function Ranking() {
+function Page() {
   const { ranking, loading } = useRanking();
 
   if (loading) {
@@ -41,4 +43,4 @@ function Ranking() {
   );
 }
 
-export default Ranking;
+export default Page;
