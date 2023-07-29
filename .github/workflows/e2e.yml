@@ -33,11 +33,11 @@ jobs:
             dependencies: [ ictsc-rikka ]
           - name: users
             dependencies: [ ictsc-rikka ]
-          - name: problems/\[problemId\]
+          - name: problems/problemId
             dependencies: [ ictsc-rikka ]
           - name: problems/index
             dependencies: [ ictsc-rikka ]
-          - name: scoring/\[code\]
+          - name: scoring/code
             dependencies: [ ictsc-rikka ]
           - name: scoring/index
             dependencies: [ ictsc-rikka ]
