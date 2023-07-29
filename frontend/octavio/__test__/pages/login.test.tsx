@@ -60,7 +60,9 @@ beforeEach(() => {
 });
 
 vi.mock("next/router", () => require("next-router-mock"));
-
+vi.mock("next/navigation", () => ({
+  ...require("next-router-mock"),
+}));
 describe("Login", () => {
   test("画面が表示されることを確認する", async () => {
     // setup
