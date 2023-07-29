@@ -21,8 +21,6 @@ jobs:
           - name: index
           - name: login
             dependencies: [ ictsc-rikka ]
-          - name: navbar
-            dependencies: [ ictsc-rikka ]
           - name: notices
             dependencies: [ ictsc-rikka ]
           - name: profile
@@ -42,6 +40,8 @@ jobs:
           - name: scoring/\[code\]
             dependencies: [ ictsc-rikka ]
           - name: scoring/index
+            dependencies: [ ictsc-rikka ]
+          - name: components/navbar
             dependencies: [ ictsc-rikka ]
 
     steps:
