@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 import ICTSCCard from "@/components/Card";
+import ConditionalText from "@/components/ConditionalText";
 import LoadingPage from "@/components/LoadingPage";
 import MarkdownPreview from "@/components/MarkdownPreview";
 import ProblemConnectionInfo from "@/components/ProblemConnectionInfo";
@@ -75,27 +76,20 @@ function ScoringProblem({ params }: { params: { code: string } }) {
             </thead>
             <tbody>
               <tr>
-                <td>{problem.unchecked}</td>
                 <td>
-                  {" "}
-                  {problem.unchecked_near_overdue != null &&
-                  problem.unchecked_near_overdue > 0 ? (
-                    <div className="inline-block text-warning">
-                      {problem.unchecked_near_overdue}
-                    </div>
-                  ) : (
-                    <div className="inline-block">-</div>
-                  )}
+                  <ConditionalText value={problem.unchecked ?? 0} />
                 </td>
                 <td>
-                  {problem.unchecked_overdue != null &&
-                  problem.unchecked_overdue > 0 ? (
-                    <div className="inline-block text-error">
-                      {problem.unchecked_overdue}
-                    </div>
-                  ) : (
-                    <div className="inline-block">-</div>
-                  )}
+                  <ConditionalText
+                    value={problem.unchecked_near_overdue ?? 0}
+                    className="text-warning"
+                  />
+                </td>
+                <td>
+                  <ConditionalText
+                    value={problem.unchecked_overdue ?? 0}
+                    className="text-error"
+                  />
                 </td>
               </tr>
             </tbody>
