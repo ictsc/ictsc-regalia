@@ -1,7 +1,7 @@
 "use client";
 
 import Error from "next/error";
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 
@@ -21,9 +21,9 @@ type Input = {
   answerFilter: string;
 };
 
-function ScoringProblem() {
-  const router = useRouter();
-  const { code, answer_id: answerId } = router.query;
+function ScoringProblem({ params }: { params: { code: string } }) {
+  const searchParams = useSearchParams();
+  const answerId = searchParams?.get("answer_id");
 
   const { register, watch } = useForm<Input>({
     defaultValues: {
@@ -34,7 +34,7 @@ function ScoringProblem() {
   const answerFilter = watch("answerFilter");
 
   const { user } = useAuth();
-  const { problem, matter, isLoading } = useProblem(code as string);
+  const { problem, matter, isLoading } = useProblem(params.code);
   const { answers } = useAnswers(problem?.id ?? "");
 
   const isFullAccess = user?.user_group.is_full_access ?? false;

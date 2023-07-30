@@ -1,7 +1,5 @@
 import { useState } from "react";
 
-import { useRouter } from "next/router";
-
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -18,11 +16,7 @@ type Inputs = {
   answer: string;
 };
 
-function AnswerForm() {
-  const router = useRouter();
-  const { problemId: tmpProblemId } = router.query;
-  const code = tmpProblemId as string | null;
-
+function AnswerForm({ code }: { code: string }) {
   const {
     handleSubmit,
     control,

@@ -81,7 +81,7 @@ describe("[problemId]", () => {
     (useReCreateInfo as Mock).mockReturnValue({
       reCreateInfo: null,
     });
-    render(<ProblemPage />);
+    render(<ProblemPage params={{ problemId: "abc" }} />);
 
     screen.debug();
 
@@ -113,7 +113,7 @@ describe("[problemId]", () => {
     (useReCreateInfo as Mock).mockReturnValue({
       reCreateInfo: null,
     });
-    render(<ProblemPage />);
+    render(<ProblemPage params={{ problemId: "abc" }} />);
 
     // then
     expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
@@ -142,7 +142,7 @@ describe("[problemId]", () => {
     (useReCreateInfo as Mock).mockReturnValue({
       reCreateInfo: null,
     });
-    render(<ProblemPage />);
+    render(<ProblemPage params={{ problemId: "abc" }} />);
 
     // then
     expect(screen.getByTestId("error")).toBeInTheDocument();
@@ -170,7 +170,7 @@ describe("[problemId]", () => {
     (useReCreateInfo as Mock).mockReturnValue({
       reCreateInfo: testReCreateInfo,
     });
-    render(<ProblemPage />);
+    render(<ProblemPage params={{ problemId: "abc" }} />);
 
     // when
     await act(async () => {
@@ -200,7 +200,7 @@ describe("[problemId]", () => {
     (useReCreateInfo as Mock).mockReturnValue({
       reCreateInfo: null,
     });
-    render(<ProblemPage />);
+    render(<ProblemPage params={{ problemId: "abc" }} />);
 
     // when
     await act(async () => {
@@ -232,7 +232,7 @@ describe("[problemId]", () => {
       mutate: mockMutate,
       reCreate: mockReCreate,
     });
-    render(<ProblemPage />);
+    render(<ProblemPage params={{ problemId: "abc" }} />);
 
     // when
     await act(async () => {
@@ -265,7 +265,7 @@ describe("[problemId]", () => {
     (useReCreateInfo as Mock).mockReturnValue({
       reCreateInfo: null,
     });
-    render(<ProblemPage />);
+    render(<ProblemPage params={{ problemId: "abc" }} />);
 
     // then
     expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
@@ -294,7 +294,7 @@ describe("[problemId]", () => {
     (useReCreateInfo as Mock).mockReturnValue({
       reCreateInfo: null,
     });
-    render(<ProblemPage />);
+    render(<ProblemPage params={{ problemId: "abc" }} />);
 
     // then
     expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
