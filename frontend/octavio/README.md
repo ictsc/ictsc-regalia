@@ -31,6 +31,18 @@ pnpm dev
 pnpm test
 ```
 
+### Storybook の起動
+
+#### 1. Storybook の起動
+
+```bash
+pnpm storybook
+```
+
+#### 2. アクセス
+
+[http://localhost:6006](http://localhost:6006)
+
 ### Docker build
 
 1. Docker をインストール

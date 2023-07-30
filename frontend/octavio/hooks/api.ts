@@ -1,5 +1,6 @@
 import axios from "axios";
 
+import { apiUrl } from "@/components/_const";
 import { Result } from "@/types/_api";
 
 const useApi = () => {
@@ -9,7 +10,7 @@ const useApi = () => {
   };
 
   const apiClient = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
+    baseURL: apiUrl,
     headers,
     withCredentials: true,
   });

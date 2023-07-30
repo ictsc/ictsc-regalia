@@ -13,7 +13,7 @@
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "font": "docker build -f Dockerfile --target font-builder -t font-builder . && docker run -v $(pwd):/host --detach font-builder sh -c \"mkdir -p /host/app/dist/fonts; cp /font/Variable/OTF/Subset/NotoSansJP-VF.woff2 /host/app/dist/fonts/NotoSansJP-VF.woff2\"",
-    "storybook": "storybook dev -p 6006",
+    "storybook": "NEXT_PUBLIC_API_URL=http://localhost:3000/api storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "dependencies": {
@@ -64,11 +64,16 @@
     "eslint-plugin-storybook": "^0.6.13",
     "identity-obj-proxy": "^3.0.0",
     "jest-environment-jsdom": "^29.6.2",
+    "msw": "^1.2.3",
+    "msw-storybook-addon": "^1.8.0",
     "next-router-mock": "^0.9.7",
     "postcss": "^8.4.27",
     "prettier": "^2.8.8",
     "storybook": "^7.1.1",
     "tailwindcss": "^3.3.3",
     "vitest": "^0.32.2"
+  },
+  "msw": {
+    "workerDirectory": "public"
   }
 }
