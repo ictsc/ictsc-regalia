@@ -1,5 +1,6 @@
 Ajay
 Ashleigh
+autodocs
 daisyui
 Duardo
 ictsc
@@ -7,6 +8,7 @@ Kairi
 Kaleb
 Loba
 luxon
+nextjs
 noninteractive
 noto
 proto

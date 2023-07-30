@@ -8,7 +8,6 @@ import { testAdminUser, testUser } from "@/types/User";
 const meta = {
   title: "Components/NavBar",
   component: ICTSCNavBar,
-  tags: ["autodocs"],
   parameters: {
     nextjs: {
       appDirectory: true,
