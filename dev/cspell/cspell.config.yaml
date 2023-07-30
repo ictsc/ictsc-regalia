@@ -18,4 +18,4 @@ ignorePaths:
   - "**/node_modules"
   - "**/__e2e__"
   - "**/__test__"
-  - "**/*.stories.tsx"
+  - "**/*.stories.ts"
