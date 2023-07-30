@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import clsx from "clsx";
+
 import MarkdownPreview from "./MarkdownPreview";
 
 interface Props {
@@ -22,7 +24,7 @@ function HoverCopyText({ text }: Props) {
         <MarkdownPreview content={`\`${text}\``} />
         <button
           type="button"
-          className={`link link-hover pl-2 ${!isHover && "invisible"}`}
+          className={clsx("link link-hover pl-2", !isHover && "invisible")}
           onClick={() => {
             navigator.clipboard.writeText(text);
           }}

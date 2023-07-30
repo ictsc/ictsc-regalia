@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import clsx from "clsx";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
@@ -93,9 +94,10 @@ function Page() {
         <button
           type="submit"
           id="loginBtn"
-          className={`btn btn-primary mt-4 max-w-xs min-w-[312px] ${
+          className={clsx(
+            "btn btn-primary mt-4 max-w-xs min-w-[312px]",
             submitting && "loading"
-          }`}
+          )}
         >
           ログイン
         </button>

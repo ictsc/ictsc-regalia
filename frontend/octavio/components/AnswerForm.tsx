@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import clsx from "clsx";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -37,7 +38,7 @@ function AnswerForm({ code }: { code: string }) {
   const successNotify = () =>
     toast.custom((t) => (
       <ICTSCSuccessAlert
-        className={`mt-2 ${t.visible ? "animate-enter" : "animate-leave"}`}
+        className={clsx("mt-2", t.visible ? "animate-enter" : "animate-leave")}
         message="投稿に成功しました"
       />
     ));
@@ -45,7 +46,7 @@ function AnswerForm({ code }: { code: string }) {
   const errorNotify = () =>
     toast.custom((t) => (
       <ICTSCErrorAlert
-        className={`mt-2 ${t.visible ? "animate-enter" : "animate-leave"}`}
+        className={clsx("mt-2", t.visible ? "animate-enter" : "animate-leave")}
         message="投稿に失敗しました"
         subMessage={
           answerLimit === undefined
@@ -78,7 +79,7 @@ function AnswerForm({ code }: { code: string }) {
 
   return (
     <ICTSCCard className="mt-8 pt-4">
-      <div className={`modal ${isModalOpen && "modal-open"}`}>
+      <div className={clsx(`modal`, isModalOpen && "modal-open")}>
         <div className="modal-box container-ictsc">
           <h3 className="title-ictsc pt-4 pb-8">回答内容確認</h3>
           <ICTSCCard>
@@ -115,14 +116,14 @@ function AnswerForm({ code }: { code: string }) {
           <button
             type="button"
             onClick={() => setIsPreview(false)}
-            className={`tab tab-lifted ${!isPreview && "tab-active"}`}
+            className={clsx(`tab tab-lifted`, !isPreview && "tab-active")}
           >
             Markdown
           </button>
           <button
             type="button"
             onClick={() => setIsPreview(true)}
-            className={`tab tab-lifted ${isPreview && "tab-active"}`}
+            className={clsx(`tab tab-lifted`, isPreview && "tab-active")}
           >
             Preview
           </button>

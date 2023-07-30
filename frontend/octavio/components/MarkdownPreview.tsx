@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 
 import "zenn-content-css";
+import clsx from "clsx";
 import markdownToHtml from "zenn-markdown-html";
 
 interface Props {
@@ -68,7 +69,7 @@ function MarkdownPreview({ className, content }: Props) {
 
   return (
     <div
-      className={`znc ${className}`}
+      className={clsx("znc", className)}
       ref={ref}
       /* eslint-disable-next-line react/no-danger */
       dangerouslySetInnerHTML={{
