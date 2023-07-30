@@ -1,10 +1,11 @@
+"use client";
+
 import "zenn-content-css";
 
 import { useState } from "react";
 
 import Error from "next/error";
 import Image from "next/image";
-import { useRouter } from "next/router";
 
 import { Toaster } from "react-hot-toast";
 
@@ -22,12 +23,9 @@ import useProblem from "@/hooks/problem";
 import useReCreateInfo from "@/hooks/reCreateInfo";
 import BaseLayout from "@/layouts/BaseLayout";
 
-function ProblemPage() {
-  const router = useRouter();
-  const { problemId } = router.query;
-
+function ProblemPage({ params }: { params: { problemId: string } }) {
   const { user } = useAuth();
-  const { matter, problem, isLoading } = useProblem(problemId as string | null);
+  const { matter, problem, isLoading } = useProblem(params.problemId);
   const [isReCreateModalOpen, setIsReCreateModalOpen] = useState(false);
 
   const { recreateInfo, mutate, reCreate } = useReCreateInfo(
@@ -136,7 +134,7 @@ function ProblemPage() {
             <MarkdownPreview className="problem-body" content={problem.body} />
           </ICTSCCard>
 
-          {!isReadOnly && <AnswerForm />}
+          {!isReadOnly && <AnswerForm code={params.problemId} />}
           {answerLimit && (
             <div className="text-sm pt-2">
               ※ 回答は{answerLimit}分に1度のみです

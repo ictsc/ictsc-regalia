@@ -7,8 +7,8 @@ import userEvent from "@testing-library/user-event";
 import mockRouter from "next-router-mock";
 import { Mock, vi } from "vitest";
 
+import SignUp from "@/app/signUp/page";
 import useAuth from "@/hooks/auth";
-import SignUp from "@/pages/signUp";
 
 vi.mock("@/hooks/auth");
 vi.mock("@/components/Alerts", () => ({
@@ -60,6 +60,20 @@ beforeEach(() => {
 });
 
 vi.mock("next/router", () => require("next-router-mock"));
+vi.mock("next/navigation", () => ({
+  ...require("next-router-mock"),
+  useSearchParams: () => ({
+    get: (key: string) => {
+      if (key === "user_group_id") {
+        return "00000000-0000-0000-0000-000000000000";
+      }
+      if (key === "invitation_code") {
+        return "test_invitation_code";
+      }
+      return "";
+    },
+  }),
+}));
 
 describe("SignUp", () => {
   test("画面が表示されることを確認する", async () => {

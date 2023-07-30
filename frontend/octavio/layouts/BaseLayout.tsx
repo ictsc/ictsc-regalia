@@ -1,16 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import Head from "next/head";
 
-import { site } from "@/components/_const";
 import ICTSCNavBar from "@/components/Navbar";
+import { site } from "@/components/_const";
 
 interface Props {
   title: string;
   children: React.ReactNode;
 }
 
-const BaseLayout = ({ title, children }: Props) => {
+function BaseLayout({ title, children }: Props) {
+  useEffect(() => {
+    // title
+    document.title = `${title} - ${site}`;
+  }, [title]);
+
   return (
     <>
       <Head>
@@ -22,6 +27,6 @@ const BaseLayout = ({ title, children }: Props) => {
       {children}
     </>
   );
-};
+}
 
 export default BaseLayout;

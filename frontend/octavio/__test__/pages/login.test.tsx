@@ -7,8 +7,8 @@ import userEvent from "@testing-library/user-event";
 import mockRouter from "next-router-mock";
 import { Mock, vi } from "vitest";
 
+import Login from "@/app/login/page";
 import useAuth from "@/hooks/auth";
-import Login from "@/pages/login";
 
 vi.mock("@/hooks/auth");
 vi.mock("@/components/Alerts", () => ({
@@ -60,7 +60,9 @@ beforeEach(() => {
 });
 
 vi.mock("next/router", () => require("next-router-mock"));
-
+vi.mock("next/navigation", () => ({
+  ...require("next-router-mock"),
+}));
 describe("Login", () => {
   test("画面が表示されることを確認する", async () => {
     // setup

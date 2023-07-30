@@ -1,6 +1,8 @@
+"use client";
+
 import React, { useState } from "react";
 
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { SubmitHandler, useForm } from "react-hook-form";
 
@@ -13,10 +15,11 @@ type Inputs = {
   password: string;
 };
 
-function SignUp() {
+function Page() {
   const router = useRouter();
-  const { user_group_id: userGroupId, invitation_code: invitationCode } =
-    router.query;
+  const searchParams = useSearchParams();
+  const userGroupId = searchParams?.get("user_group_id");
+  const invitationCode = searchParams?.get("invitation_code");
 
   const {
     register,
@@ -148,4 +151,4 @@ function SignUp() {
   );
 }
 
-export default SignUp;
+export default Page;

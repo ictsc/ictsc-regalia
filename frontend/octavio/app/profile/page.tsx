@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useMemo, useState } from "react";
 
 import Error from "next/error";
@@ -18,7 +20,7 @@ type Inputs = {
   facebook_id: string;
 };
 
-function Profile() {
+function Page() {
   const { user, isLoading, mutate, putProfile } = useAuth();
 
   // ステータスコード
@@ -185,4 +187,4 @@ function Profile() {
   );
 }
 
-export default Profile;
+export default Page;

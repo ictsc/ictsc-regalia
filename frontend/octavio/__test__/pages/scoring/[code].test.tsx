@@ -1,16 +1,19 @@
+"use client";
+
 import "@testing-library/jest-dom";
 
 import React from "react";
 
+import { useSearchParams } from "next/navigation";
+
 import { render, screen } from "@testing-library/react";
-import mockRouter from "next-router-mock";
 import { useForm } from "react-hook-form";
 import { Mock, vi } from "vitest";
 
+import ScoringProblem from "@/app/scoring/[code]/page";
 import useAnswers from "@/hooks/answer";
 import useAuth from "@/hooks/auth";
 import useProblem from "@/hooks/problem";
-import ScoringProblem from "@/pages/scoring/[code]";
 import { Answer, testAnswer } from "@/types/Answer";
 import { testProblem } from "@/types/Problem";
 import { testAdminUser, testUser } from "@/types/User";
@@ -21,7 +24,12 @@ vi.mock("next/error", () => ({
     <div data-testid="error" data-status-code={statusCode} />
   ),
 }));
-vi.mock("next/router", () => require("next-router-mock"));
+vi.mock("next/navigation", () => ({
+  ...require("next-router-mock"),
+  useSearchParams: vi.fn().mockReturnValue({
+    get: vi.fn().mockReturnValue(null),
+  }),
+}));
 vi.mock("react-hook-form", () => ({
   useForm: vi.fn(),
 }));
@@ -76,7 +84,7 @@ describe("ScoringProblem", () => {
     (useAnswers as Mock).mockReturnValue({
       answers: [],
     });
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // when
     expect(screen.getByTestId("error")).toBeInTheDocument();
@@ -104,7 +112,7 @@ describe("ScoringProblem", () => {
     (useAnswers as Mock).mockReturnValue({
       answers: [],
     });
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // when
     expect(screen.getByTestId("error")).toBeInTheDocument();
@@ -132,7 +140,7 @@ describe("ScoringProblem", () => {
     (useAnswers as Mock).mockReturnValue({
       answers: [],
     });
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // when
     expect(screen.getByTestId("error")).toBeInTheDocument();
@@ -160,7 +168,7 @@ describe("ScoringProblem", () => {
     (useAnswers as Mock).mockReturnValue({
       answers: [],
     });
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // when
     expect(screen.getByTestId("error")).toBeInTheDocument();
@@ -192,7 +200,7 @@ describe("ScoringProblem", () => {
     (useAnswers as Mock).mockReturnValue({
       answers: [],
     });
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // when
     expect(screen.queryByTestId("loading")).toBeInTheDocument();
@@ -225,7 +233,7 @@ describe("ScoringProblem", () => {
     });
 
     // when
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // then
     const cells = screen.queryAllByRole("cell");
@@ -251,7 +259,7 @@ describe("ScoringProblem", () => {
     });
 
     // when
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // then
     const cells = screen.queryAllByRole("cell");
@@ -277,7 +285,7 @@ describe("ScoringProblem", () => {
     });
 
     // when
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // then
     const cells = screen.queryAllByRole("cell");
@@ -303,7 +311,7 @@ describe("ScoringProblem", () => {
     });
 
     // when
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // then
     const cells = screen.queryAllByRole("cell");
@@ -329,7 +337,7 @@ describe("ScoringProblem", () => {
     });
 
     // when
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // then
     expect(screen.queryByTestId("scoring-answer-form")).toBeInTheDocument();
@@ -352,7 +360,7 @@ describe("ScoringProblem", () => {
     });
 
     // when
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // then
     expect(screen.queryByTestId("scoring-answer-form")).toBeInTheDocument();
@@ -375,7 +383,7 @@ describe("ScoringProblem", () => {
     });
 
     // when
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // then
     expect(screen.queryByTestId("scoring-answer-form")).not.toBeInTheDocument();
@@ -398,7 +406,7 @@ describe("ScoringProblem", () => {
     });
 
     // when
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // then
     expect(screen.queryByTestId("scoring-answer-form")).toBeInTheDocument();
@@ -421,7 +429,7 @@ describe("ScoringProblem", () => {
     });
 
     // when
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // then
     expect(screen.queryByTestId("scoring-answer-form")).toBeInTheDocument();
@@ -444,47 +452,14 @@ describe("ScoringProblem", () => {
     });
 
     // when
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // then
     expect(screen.queryByTestId("scoring-answer-form")).not.toBeInTheDocument();
   });
 
-  test("answerId を指定した場合指定の回答が表示される", async () => {
-    // setup
-    mockRouter.query = { code: "abc", answer_id: "1" };
-    (useForm as Mock).mockReturnValue({
-      register: vi.fn(),
-      watch: vi.fn().mockReturnValue(null),
-    });
-    (useAuth as Mock).mockReturnValue({
-      user: testAdminUser,
-    });
-    (useProblem as Mock).mockReturnValue({
-      problem: testProblem,
-    });
-    (useAnswers as Mock).mockReturnValue({
-      answers: [
-        { ...testAnswer, id: "1" },
-        { ...testAnswer, id: "2" },
-        { ...testAnswer, id: "3" },
-        { ...testAnswer, id: "4" },
-      ],
-    });
-
-    // when
-    render(<ScoringProblem />);
-
-    // then
-    expect(screen.queryByTestId("scoring-answer-form")).toHaveAttribute(
-      "data-key",
-      "1"
-    );
-  });
-
   test("解答フォームが正しい順番で表示される", async () => {
     // setup
-    mockRouter.query = { answer_id: undefined };
     (useForm as Mock).mockReturnValue({
       register: vi.fn(),
       watch: vi.fn().mockReturnValue(null),
@@ -505,7 +480,7 @@ describe("ScoringProblem", () => {
     });
 
     // when
-    render(<ScoringProblem />);
+    render(<ScoringProblem params={{ code: "abc" }} />);
 
     // then
     const forms = screen.queryAllByTestId("scoring-answer-form");
@@ -513,5 +488,40 @@ describe("ScoringProblem", () => {
     expect(forms[1]).toHaveAttribute("data-key", "2");
     expect(forms[2]).toHaveAttribute("data-key", "1");
     expect(forms[3]).toHaveAttribute("data-key", "4");
+  });
+
+  test("answerId を指定した場合指定の回答が表示される", async () => {
+    // setup
+    (useSearchParams as Mock).mockReturnValue({
+      get: vi.fn().mockReturnValue("1"),
+    });
+
+    (useForm as Mock).mockReturnValue({
+      register: vi.fn(),
+      watch: vi.fn().mockReturnValue(null),
+    });
+    (useAuth as Mock).mockReturnValue({
+      user: testAdminUser,
+    });
+    (useProblem as Mock).mockReturnValue({
+      problem: testProblem,
+    });
+    (useAnswers as Mock).mockReturnValue({
+      answers: [
+        { ...testAnswer, id: "1" },
+        { ...testAnswer, id: "2" },
+        { ...testAnswer, id: "3" },
+        { ...testAnswer, id: "4" },
+      ],
+    });
+
+    // when
+    render(<ScoringProblem params={{ code: "abc" }} />);
+
+    // then
+    expect(screen.queryByTestId("scoring-answer-form")).toHaveAttribute(
+      "data-key",
+      "1"
+    );
   });
 });

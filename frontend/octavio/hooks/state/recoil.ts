@@ -1,6 +1,8 @@
+"use client";
+
 import { useEffect } from "react";
 
-import { setCookie, parseCookies } from "nookies";
+import { parseCookies, setCookie } from "nookies";
 import { atom, useRecoilValue, useSetRecoilState } from "recoil";
 
 export const dismissNoticeIdsState = atom<string[]>({

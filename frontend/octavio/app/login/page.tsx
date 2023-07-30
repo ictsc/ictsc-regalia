@@ -1,6 +1,8 @@
+"use client";
+
 import { useState } from "react";
 
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 import { SubmitHandler, useForm } from "react-hook-form";
 
@@ -13,7 +15,7 @@ type Inputs = {
   password: string;
 };
 
-function Login() {
+function Page() {
   const router = useRouter();
 
   const {
@@ -102,4 +104,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Page;
