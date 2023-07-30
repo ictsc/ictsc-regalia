@@ -15,7 +15,7 @@ import {
 
 const notoSansJP = localFont({
   variable: "--font-noto-sans-jp",
-  src: "../pages/dist/fonts/NotoSansJP-VF.woff2",
+  src: "dist/fonts/NotoSansJP-VF.woff2",
 });
 
 export default function RootLayout({
