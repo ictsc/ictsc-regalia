@@ -7,7 +7,6 @@ import markdownToHtml from "zenn-markdown-html";
 
 interface Props {
   className?: string;
-  /* eslint-disable-next-line react/require-default-props */
   content?: string;
 }
 
@@ -24,7 +23,7 @@ const CopyOutlineIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24
       </g>
     </svg>`;
 
-function MarkdownPreview({ className, content = "" }: Props) {
+function MarkdownPreview({ className, content }: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -73,7 +72,7 @@ function MarkdownPreview({ className, content = "" }: Props) {
       ref={ref}
       /* eslint-disable-next-line react/no-danger */
       dangerouslySetInnerHTML={{
-        __html: markdownToHtml(content),
+        __html: markdownToHtml(content ?? ""),
       }}
     />
   );
@@ -81,6 +80,7 @@ function MarkdownPreview({ className, content = "" }: Props) {
 
 MarkdownPreview.defaultProps = {
   className: "",
+  content: "",
 };
 
 export default MarkdownPreview;
