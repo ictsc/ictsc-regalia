@@ -7,6 +7,7 @@ import { useState } from "react";
 import Error from "next/error";
 import Image from "next/image";
 
+import clsx from "clsx";
 import { Toaster } from "react-hot-toast";
 
 import AnswerForm from "@/components/AnswerForm";
@@ -62,7 +63,7 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
     <>
       <Toaster />
       <input type="checkbox" id="my-modal-5" className="modal-toggle" />
-      <div className={`modal ${isReCreateModalOpen && "modal-open"}`}>
+      <div className={clsx("modal", isReCreateModalOpen && "modal-open")}>
         <div className="modal-box container-ictsc">
           <h3 className="title-ictsc pt-4 pb-8">
             問題の再展開を行います。よろしいですか？

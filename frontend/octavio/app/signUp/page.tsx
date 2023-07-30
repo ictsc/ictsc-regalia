@@ -4,6 +4,7 @@ import React, { useState } from "react";
 
 import { useRouter, useSearchParams } from "next/navigation";
 
+import clsx from "clsx";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
@@ -140,9 +141,10 @@ function Page() {
         <button
           type="submit"
           id="signUpBtn"
-          className={`btn btn-primary mt-4 max-w-xs min-w-[312px] ${
+          className={clsx(
+            "btn btn-primary mt-4 max-w-xs min-w-[312px]",
             submitting && "loading"
-          }`}
+          )}
         >
           登録
         </button>

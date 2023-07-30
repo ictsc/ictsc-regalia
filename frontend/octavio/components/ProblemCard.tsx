@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import clsx from "clsx";
+
 import { Problem } from "@/types/Problem";
 
 type Props = {
@@ -29,7 +31,7 @@ function ProblemCard({ problem }: Props) {
         <span className="problem-title text-xl font-bold">{problem.title}</span>
       </div>
       <div>
-        <div className={`problem-point text-right ${problemText}`}>
+        <div className={clsx("problem-point text-right", problemText)}>
           {problem.current_point}/{problem.point}pt
         </div>
         <div className="font-bold text-primary">問題文へ→</div>

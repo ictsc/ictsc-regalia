@@ -1,6 +1,7 @@
 Ajay
 Ashleigh
 autodocs
+clsx
 daisyui
 Duardo
 ictsc

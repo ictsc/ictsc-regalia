@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import Image from "next/image";
 
+import clsx from "clsx";
 import { DateTime } from "luxon";
 
 import ICTSCCard from "@/components/Card";
@@ -117,18 +118,20 @@ function AnswerListSection({ problem }: AnswerSectionProps) {
                 <button
                   type="button"
                   onClick={() => setIsPreviewAnswer(false)}
-                  className={`tab tab-lifted ${
+                  className={clsx(
+                    `tab tab-lifted`,
                     !isPreviewAnswer && "tab-active"
-                  }`}
+                  )}
                 >
                   Markdown
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsPreviewAnswer(true)}
-                  className={`tab tab-lifted ${
+                  className={clsx(
+                    `tab tab-lifted`,
                     isPreviewAnswer && "tab-active"
-                  }`}
+                  )}
                 >
                   Preview
                 </button>

@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import clsx from "clsx";
+
 type Props = {
   className?: string;
   message: string;
@@ -9,7 +11,10 @@ type Props = {
 export function ICTSCSuccessAlert({ className, message, subMessage }: Props) {
   return (
     <div
-      className={`alert alert-success shadow-lg max-w-xs min-w-[312ppx] ${className}`}
+      className={clsx(
+        "alert alert-success shadow-lg max-w-xs min-w-[312ppx]",
+        className
+      )}
     >
       <div>
         <Image
@@ -30,7 +35,10 @@ export function ICTSCSuccessAlert({ className, message, subMessage }: Props) {
 export function ICTSCErrorAlert({ className, message, subMessage }: Props) {
   return (
     <div
-      className={`alert alert-error shadow-lg max-w-xs min-w-[312ppx] ${className}`}
+      className={clsx(
+        "alert alert-error shadow-lg max-w-xs min-w-[312ppx]",
+        className
+      )}
     >
       <div>
         <Image

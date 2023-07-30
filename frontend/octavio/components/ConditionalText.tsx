@@ -1,3 +1,5 @@
+import clsx from "clsx";
+
 interface Props {
   className?: "" | "text-warning" | "text-error";
   value: number;
@@ -5,7 +7,7 @@ interface Props {
 
 function ConditionalText({ className, value }: Props) {
   if (value > 0) {
-    return <div className={`inline-block ${className}`}>{value}</div>;
+    return <div className={clsx("inline-block", className)}>{value}</div>;
   }
 
   return <div className="inline-block">-</div>;
