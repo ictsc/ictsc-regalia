@@ -1,7 +1,6 @@
 import React from "react";
 
 type Props = {
-  // eslint-disable-next-line react/require-default-props
   className?: string;
   value: string;
   isHidden: boolean;
@@ -18,5 +17,9 @@ function HiddenInput({ className, value, isHidden, onClick }: Props) {
     />
   );
 }
+
+HiddenInput.defaultProps = {
+  className: "",
+};
 
 export default HiddenInput;
