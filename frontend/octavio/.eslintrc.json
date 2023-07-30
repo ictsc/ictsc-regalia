@@ -3,7 +3,8 @@
     "airbnb",
     "next",
     "prettier",
-    "next/core-web-vitals"
+    "next/core-web-vitals",
+    "plugin:storybook/recommended"
   ],
   "rules": {
     "import/extensions": "off",
@@ -73,7 +74,8 @@
         "**/*.test.ts",
         "**/*.test.tsx",
         "**/*.spec.ts",
-        "**/*.spec.tsx"
+        "**/*.spec.tsx",
+        "**/*.stories.tsx"
       ],
       "rules": {
         "global-require": "off"

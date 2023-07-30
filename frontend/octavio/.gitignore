@@ -10,6 +10,9 @@
 /playwright-report
 /test-results
 
+# storybook
+/storybook-static
+
 # next.js
 /.next/
 /out/
