@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import ICTSCCard from "@/components/Card";
+import ConditionalText from "@/components/ConditionalText";
 import LoadingPage from "@/components/LoadingPage";
 import MarkdownPreview from "@/components/MarkdownPreview";
 import useAuth from "@/hooks/auth";
@@ -73,24 +74,17 @@ function Index() {
                   </Link>
                 </td>
                 <td>
-                  {prob.unchecked}/
-                  {prob.unchecked_near_overdue != null &&
-                  prob.unchecked_near_overdue > 0 ? (
-                    <div className="inline-block text-warning">
-                      {prob.unchecked_near_overdue}
-                    </div>
-                  ) : (
-                    <div className="inline-block">-</div>
-                  )}
+                  <ConditionalText value={prob.unchecked ?? 0} />
                   /
-                  {prob.unchecked_overdue != null &&
-                  prob.unchecked_overdue > 0 ? (
-                    <div className="inline-block text-error">
-                      {prob.unchecked_overdue}
-                    </div>
-                  ) : (
-                    <div className="inline-block">-</div>
-                  )}
+                  <ConditionalText
+                    value={prob.unchecked_near_overdue ?? 0}
+                    className="text-warning"
+                  />
+                  /
+                  <ConditionalText
+                    value={prob.unchecked_overdue ?? 0}
+                    className="text-error"
+                  />
                 </td>
                 <td>{prob.id}</td>
                 <td>{prob.code}</td>

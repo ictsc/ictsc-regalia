@@ -237,7 +237,7 @@ describe("ScoringProblem", () => {
 
     // then
     const cells = screen.queryAllByRole("cell");
-    expect(cells[0]).toHaveTextContent("");
+    expect(cells[0]).toHaveTextContent("-");
     expect(cells[1]).toHaveTextContent("-");
     expect(cells[2]).toHaveTextContent("-");
   });
@@ -289,7 +289,7 @@ describe("ScoringProblem", () => {
 
     // then
     const cells = screen.queryAllByRole("cell");
-    expect(cells[0]).toHaveTextContent("");
+    expect(cells[0]).toHaveTextContent("-");
     expect(cells[1]).toHaveTextContent("1");
     expect(cells[2]).toHaveTextContent("-");
   });
@@ -315,7 +315,7 @@ describe("ScoringProblem", () => {
 
     // then
     const cells = screen.queryAllByRole("cell");
-    expect(cells[0]).toHaveTextContent("");
+    expect(cells[0]).toHaveTextContent("-");
     expect(cells[1]).toHaveTextContent("-");
     expect(cells[2]).toHaveTextContent("1");
   });

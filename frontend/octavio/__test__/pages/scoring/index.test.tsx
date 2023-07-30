@@ -161,7 +161,7 @@ describe("Scoring", () => {
       "採点"
     );
     expect(screen.queryByText("採点")).toBeInTheDocument();
-    expect(tds[1]).toHaveTextContent("/-/-");
+    expect(tds[1]).toHaveTextContent("-/-/-");
     expect(tds[2]).toHaveTextContent("id");
     expect(tds[3]).toHaveTextContent("XYZ");
     expect(tds[4]).toHaveTextContent("テスト問題タイトル");
