@@ -14,7 +14,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <ICTSCTitle title={title} />
-      <main>{children}</main>
+      {children}
     </>
   );
 }

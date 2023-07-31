@@ -11,9 +11,13 @@ function Page() {
     return <LoadingPage />;
   }
 
-  return notices?.map((notice) => (
-    <NotificationCard key={notice.source_id} notice={notice} />
-  ));
+  return (
+    <main>
+      {notices?.map((notice) => (
+        <NotificationCard key={notice.source_id} notice={notice} />
+      ))}
+    </main>
+  );
 }
 
 export default Page;
