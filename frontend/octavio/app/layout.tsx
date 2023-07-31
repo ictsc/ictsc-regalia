@@ -27,7 +27,6 @@ export default function RootLayout({
     <html lang="ja">
       <head>
         <title>{site}</title>
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
       </head>
       <body>
         <RecoilRoot>
