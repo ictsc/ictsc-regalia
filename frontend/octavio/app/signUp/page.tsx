@@ -9,7 +9,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
 import useAuth from "@/hooks/auth";
-import BaseLayout from "@/layouts/BaseLayout";
+import CommonLayout from "@/layouts/CommonLayout";
 
 type Inputs = {
   name: string;
@@ -83,8 +83,7 @@ function Page() {
   };
 
   return (
-    <BaseLayout title="ユーザー登録">
-      <h1 className="title-ictsc text-center py-12">ユーザー登録</h1>
+    <CommonLayout title="ユーザー登録">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="form-control flex flex-col container-ictsc items-center"
@@ -149,7 +148,7 @@ function Page() {
           登録
         </button>
       </form>
-    </BaseLayout>
+    </CommonLayout>
   );
 }
 
