@@ -29,7 +29,9 @@ export default function RootLayout({
     <html lang="ja" data-theme="ictsc" className={notoSansJP.className}>
       <body>
         <Providers>
-          <ICTSCNavBar />
+          <header>
+            <ICTSCNavBar />
+          </header>
           {children}
         </Providers>
       </body>
