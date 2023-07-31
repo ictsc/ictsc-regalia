@@ -6,7 +6,7 @@ import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Mock, vi } from "vitest";
 
-import Profile from "@/app/(participant)/profile/page";
+import Profile from "@/app/profile/page";
 import useAuth from "@/hooks/auth";
 import { testUser } from "@/types/User";
 

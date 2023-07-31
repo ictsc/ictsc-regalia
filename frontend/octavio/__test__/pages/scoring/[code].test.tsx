@@ -10,7 +10,7 @@ import { render, screen } from "@testing-library/react";
 import { useForm } from "react-hook-form";
 import { Mock, vi } from "vitest";
 
-import ScoringProblem from "@/app/(operational)/scoring/[code]/page";
+import ScoringProblem from "@/app/scoring/[code]/page";
 import useAnswers from "@/hooks/answer";
 import useAuth from "@/hooks/auth";
 import useProblem from "@/hooks/problem";
@@ -35,15 +35,12 @@ vi.mock("react-hook-form", () => ({
   useForm: vi.fn(),
 }));
 
-vi.mock(
-  "@/app/(operational)/scoring/[code]/_components/ScoringAnswerForm",
-  () => ({
-    __esModule: true,
-    default: ({ answer }: { answer: Answer }) => (
-      <div data-testid="scoring-answer-form" data-key={answer.id} />
-    ),
-  })
-);
+vi.mock("@/app/scoring/[code]/_components/ScoringAnswerForm", () => ({
+  __esModule: true,
+  default: ({ answer }: { answer: Answer }) => (
+    <div data-testid="scoring-answer-form" data-key={answer.id} />
+  ),
+}));
 vi.mock("@/hooks/auth");
 vi.mock("@/hooks/problem");
 vi.mock("@/hooks/answer");

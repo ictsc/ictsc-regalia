@@ -10,8 +10,8 @@ import Image from "next/image";
 import clsx from "clsx";
 import { Toaster } from "react-hot-toast";
 
-import AnswerForm from "@/app/(participant)/problems/[problemId]/_components/AnswerForm";
-import AnswerListSection from "@/app/(participant)/problems/[problemId]/_components/AnswerListSection";
+import AnswerForm from "@/app/problems/[problemId]/_components/AnswerForm";
+import AnswerListSection from "@/app/problems/[problemId]/_components/AnswerListSection";
 import ICTSCCard from "@/components/Card";
 import LoadingPage from "@/components/LoadingPage";
 import MarkdownPreview from "@/components/MarkdownPreview";

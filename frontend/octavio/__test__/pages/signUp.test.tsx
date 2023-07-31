@@ -7,7 +7,7 @@ import userEvent from "@testing-library/user-event";
 import mockRouter from "next-router-mock";
 import { Mock, vi } from "vitest";
 
-import SignUp from "@/app/(participant)/signUp/page";
+import SignUp from "@/app/signUp/page";
 import useAuth from "@/hooks/auth";
 
 vi.mock("@/hooks/auth");

@@ -5,7 +5,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { Mock, vi } from "vitest";
 
-import Ranking from "@/app/(participant)/ranking/page";
+import Ranking from "@/app/ranking/page";
 import useRanking from "@/hooks/ranking";
 import { testRank } from "@/types/Rank";
 

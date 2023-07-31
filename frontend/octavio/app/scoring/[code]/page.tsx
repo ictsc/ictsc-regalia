@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 
-import ScoringAnswerForm from "@/app/(operational)/scoring/[code]/_components/ScoringAnswerForm";
+import ScoringAnswerForm from "@/app/scoring/[code]/_components/ScoringAnswerForm";
 import ICTSCCard from "@/components/Card";
 import ConditionalText from "@/components/ConditionalText";
 import LoadingPage from "@/components/LoadingPage";

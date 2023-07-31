@@ -6,7 +6,7 @@ import { render, screen } from "@testing-library/react";
 import { useRecoilState } from "recoil";
 import { Mock, vi } from "vitest";
 
-import Problems from "@/app/(participant)/problems/page";
+import Problems from "@/app/problems/page";
 import useNotice from "@/hooks/notice";
 import useProblems from "@/hooks/problems";
 import { testNotice } from "@/types/Notice";

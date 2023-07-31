@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { act, render, screen } from "@testing-library/react";
 import { Mock, vi } from "vitest";
 
-import ProblemPage from "@/app/(participant)/problems/[problemId]/page";
+import ProblemPage from "@/app/problems/[problemId]/page";
 import useAuth from "@/hooks/auth";
 import useProblem from "@/hooks/problem";
 import useReCreateInfo from "@/hooks/reCreateInfo";
@@ -37,20 +37,14 @@ vi.mock("next/router", () => ({
   },
 }));
 
-vi.mock(
-  "@/app/(participant)/problems/[problemId]/_components/AnswerForm",
-  () => ({
-    __esModule: true,
-    default: () => <div data-testid="answerForm" />,
-  })
-);
-vi.mock(
-  "@/app/(participant)/problems/[problemId]/_components/AnswerListSection",
-  () => ({
-    __esModule: true,
-    default: () => <div data-testid="answerListSection" />,
-  })
-);
+vi.mock("@/app/problems/[problemId]/_components/AnswerForm", () => ({
+  __esModule: true,
+  default: () => <div data-testid="answerForm" />,
+}));
+vi.mock("@/app/problems/[problemId]/_components/AnswerListSection", () => ({
+  __esModule: true,
+  default: () => <div data-testid="answerListSection" />,
+}));
 
 vi.mock("@/hooks/auth");
 vi.mock("@/hooks/problem");

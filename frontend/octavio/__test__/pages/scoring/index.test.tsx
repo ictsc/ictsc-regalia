@@ -5,7 +5,7 @@ import React from "react";
 import { act, render, screen } from "@testing-library/react";
 import { Mock, vi } from "vitest";
 
-import Index from "@/app/(operational)/scoring/page";
+import Index from "@/app/scoring/page";
 import useAuth from "@/hooks/auth";
 import useProblems from "@/hooks/problems";
 import { testProblem } from "@/types/Problem";
