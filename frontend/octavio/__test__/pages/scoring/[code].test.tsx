@@ -48,6 +48,12 @@ vi.mock("@/components/LoadingPage", () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
 }));
+vi.mock("@/components/MarkdownPreview", () => ({
+  __esModule: true,
+  default: ({ content }: { content: string }) => (
+    <div data-testid="markdown-preview" data-content={content} />
+  ),
+}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする

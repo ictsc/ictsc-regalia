@@ -13,6 +13,13 @@ import { testNotice } from "@/types/Notice";
 import { testProblem } from "@/types/Problem";
 
 vi.mock("recoil");
+
+vi.mock("@/components/MarkdownPreview", () => ({
+  __esModule: true,
+  default: ({ content }: { content: string }) => (
+    <div data-testid="markdown-preview" data-content={content} />
+  ),
+}));
 vi.mock("@/hooks/problems");
 vi.mock("@/hooks/notice");
 vi.mock("next/router", () => require("next-router-mock"));
@@ -42,7 +49,10 @@ describe("Problems", () => {
 
     // verify
     expect(screen.queryByText("テスト通知タイトル")).toBeInTheDocument();
-    expect(screen.queryByText("テスト通知本文")).toBeInTheDocument();
+    expect(screen.getAllByTestId("markdown-preview")[1]).toHaveAttribute(
+      "data-content",
+      "テスト通知本文"
+    );
     expect(screen.queryByText("XYZ")).toBeInTheDocument();
     expect(screen.queryByText("テスト問題タイトル")).toBeInTheDocument();
     expect(screen.queryByText("100/100pt")).toBeInTheDocument();
@@ -206,7 +216,10 @@ describe("Problems", () => {
     render(<Problems />);
 
     // then
-    expect(screen.queryByText("ルール本文")).toBeInTheDocument();
+    expect(screen.getAllByTestId("markdown-preview")[0]).toHaveAttribute(
+      "data-content",
+      "# ルール本文"
+    );
 
     // verify
     expect(useProblems).toHaveBeenCalledTimes(1);
