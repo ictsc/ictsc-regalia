@@ -14,20 +14,6 @@ vi.mock("@/components/NotificationCard", () => ({
   __esModule: true,
   default: () => <div data-testid="notification-card" />,
 }));
-vi.mock("@/layouts/CommonLayout", () => ({
-  __esModule: true,
-  default: ({
-    children,
-    title,
-  }: {
-    children: React.ReactNode;
-    title: string;
-  }) => (
-    <div data-testid="common-layout" data-title={title}>
-      {children}
-    </div>
-  ),
-}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
@@ -46,11 +32,6 @@ describe("Notices", () => {
     render(<Notices />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
-    expect(screen.getByTestId("common-layout")).toHaveAttribute(
-      "data-title",
-      "通知一覧"
-    );
     expect(screen.getByTestId("notification-card")).toBeInTheDocument();
 
     // verify
@@ -68,7 +49,6 @@ describe("Notices", () => {
     render(<Notices />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.queryByTestId("notification-card")).not.toBeInTheDocument();
 
     // verify

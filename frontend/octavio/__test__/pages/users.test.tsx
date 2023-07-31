@@ -20,20 +20,6 @@ vi.mock("@/components/LoadingPage", () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
 }));
-vi.mock("@/layouts/CommonLayout", () => ({
-  __esModule: true,
-  default: ({
-    children,
-    title,
-  }: {
-    children: React.ReactNode;
-    title: string;
-  }) => (
-    <div data-testid="common-layout" data-title={title}>
-      {children}
-    </div>
-  ),
-}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
@@ -52,11 +38,6 @@ describe("Users", () => {
     render(<Users />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
-    expect(screen.getByTestId("common-layout")).toHaveAttribute(
-      "data-title",
-      "参加者一覧"
-    );
     const cells = screen.getAllByRole("cell");
     expect(cells[0]).toHaveTextContent(testUser.display_name);
     expect(cells[1]).toHaveTextContent(testUserGroup.name);
@@ -90,7 +71,6 @@ describe("Users", () => {
     render(<Users />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.getByTestId("loading")).toBeInTheDocument();
 
     // verify
@@ -129,7 +109,6 @@ describe("Users", () => {
     render(<Users />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.queryByRole("cell")).toBeNull();
 
     // verify
@@ -147,7 +126,6 @@ describe("Users", () => {
     render(<Users />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.queryByRole("cell")).toBeNull();
   });
 
@@ -166,7 +144,6 @@ describe("Users", () => {
     render(<Users />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     const links = screen.getAllByRole("link");
     expect(links[0]).toHaveAttribute(
       "href",
@@ -196,7 +173,6 @@ describe("Users", () => {
     render(<Users />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     const links = screen.getAllByRole("link");
     expect(links[0]).toHaveAttribute(
       "href",
@@ -222,7 +198,6 @@ describe("Users", () => {
     render(<Users />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     const links = screen.getAllByRole("link");
     expect(links[0]).toHaveAttribute(
       "href",
@@ -249,7 +224,6 @@ describe("Users", () => {
     render(<Users />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
   });
 });

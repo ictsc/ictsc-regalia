@@ -4,7 +4,6 @@ import Error from "next/error";
 
 import LoadingPage from "@/components/LoadingPage";
 import useUserGroups from "@/hooks/userGroups";
-import CommonLayout from "@/layouts/CommonLayout";
 
 function GithubIcon() {
   return (
@@ -73,11 +72,7 @@ function Page() {
   const { userGroups, isLoading } = useUserGroups();
 
   if (isLoading) {
-    return (
-      <CommonLayout title="参加者一覧">
-        <LoadingPage />
-      </CommonLayout>
-    );
+    return <LoadingPage />;
   }
 
   if (userGroups === null) {
@@ -85,68 +80,64 @@ function Page() {
   }
 
   return (
-    <CommonLayout title="参加者一覧">
-      <div className="container-ictsc">
-        <table className="table border rounded-md w-full">
-          <thead>
-            <tr>
-              <th>名前</th>
-              <th>チーム名</th>
-              <th>自己紹介</th>
+    <table className="table border rounded-md w-full">
+      <thead>
+        <tr>
+          <th>名前</th>
+          <th>チーム名</th>
+          <th>自己紹介</th>
+        </tr>
+      </thead>
+      <tbody className="text-sm">
+        {userGroups?.map((userGroup) =>
+          userGroup.members?.map((member) => (
+            <tr key={member.id}>
+              <td className="whitespace-normal max-w-[300px]">
+                {member.display_name}
+                <div className="flex flex-row">
+                  {(member.profile?.github_id ?? "") !== "" && (
+                    <a
+                      href={`https://github.com/${member.profile?.github_id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-circle btn-ghost btn-xs"
+                    >
+                      <GithubIcon />
+                    </a>
+                  )}
+                  {(member.profile?.twitter_id ?? "") !== "" && (
+                    <a
+                      href={`https://twitter.com/${member.profile?.twitter_id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-circle btn-ghost btn-xs"
+                    >
+                      <TwitterIcon />
+                    </a>
+                  )}
+                  {(member.profile?.facebook_id ?? "") !== "" && (
+                    <a
+                      href={`https://www.facebook.com/${member.profile?.facebook_id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-circle btn-ghost btn-xs"
+                    >
+                      <FacebookIcon />
+                    </a>
+                  )}
+                </div>
+              </td>
+              <td className="whitespace-normal lg:min-w-[196px]">
+                {userGroup.name}
+              </td>
+              <td className="whitespace-normal">
+                {member.profile?.self_introduction}
+              </td>
             </tr>
-          </thead>
-          <tbody className="text-sm">
-            {userGroups?.map((userGroup) =>
-              userGroup.members?.map((member) => (
-                <tr key={member.id}>
-                  <td className="whitespace-normal max-w-[300px]">
-                    {member.display_name}
-                    <div className="flex flex-row">
-                      {(member.profile?.github_id ?? "") !== "" && (
-                        <a
-                          href={`https://github.com/${member.profile?.github_id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-circle btn-ghost btn-xs"
-                        >
-                          <GithubIcon />
-                        </a>
-                      )}
-                      {(member.profile?.twitter_id ?? "") !== "" && (
-                        <a
-                          href={`https://twitter.com/${member.profile?.twitter_id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-circle btn-ghost btn-xs"
-                        >
-                          <TwitterIcon />
-                        </a>
-                      )}
-                      {(member.profile?.facebook_id ?? "") !== "" && (
-                        <a
-                          href={`https://www.facebook.com/${member.profile?.facebook_id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-circle btn-ghost btn-xs"
-                        >
-                          <FacebookIcon />
-                        </a>
-                      )}
-                    </div>
-                  </td>
-                  <td className="whitespace-normal lg:min-w-[196px]">
-                    {userGroup.name}
-                  </td>
-                  <td className="whitespace-normal">
-                    {member.profile?.self_introduction}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-    </CommonLayout>
+          ))
+        )}
+      </tbody>
+    </table>
   );
 }
 

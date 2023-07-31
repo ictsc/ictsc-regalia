@@ -19,20 +19,6 @@ vi.mock("next/router", () => require("next-router-mock"));
 vi.mock("next/navigation", () => ({
   ...require("next-router-mock"),
 }));
-vi.mock("@/layouts/CommonLayout", () => ({
-  __esModule: true,
-  default: ({
-    children,
-    title,
-  }: {
-    children: React.ReactNode;
-    title: string;
-  }) => (
-    <div data-testid="common-layout" data-title={title}>
-      {children}
-    </div>
-  ),
-}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
@@ -55,11 +41,6 @@ describe("Problems", () => {
     render(<Problems />);
 
     // verify
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
-    expect(screen.getByTestId("common-layout")).toHaveAttribute(
-      "data-title",
-      "問題一覧"
-    );
     expect(screen.queryByText("テスト通知タイトル")).toBeInTheDocument();
     expect(screen.queryByText("テスト通知本文")).toBeInTheDocument();
     expect(screen.queryByText("XYZ")).toBeInTheDocument();
@@ -83,7 +64,6 @@ describe("Problems", () => {
     render(<Problems />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.queryByTestId("loading")).toBeInTheDocument();
 
     // verify
@@ -105,7 +85,6 @@ describe("Problems", () => {
     render(<Problems />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.queryByTestId("loading")).toBeInTheDocument();
 
     // verify
@@ -127,7 +106,6 @@ describe("Problems", () => {
     render(<Problems />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.queryByTestId("loading")).toBeInTheDocument();
 
     // verify
@@ -149,7 +127,6 @@ describe("Problems", () => {
     render(<Problems />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.queryByText("テスト通知タイトル")).not.toBeInTheDocument();
     expect(screen.queryByText("テスト通知本文")).not.toBeInTheDocument();
 
@@ -176,7 +153,6 @@ describe("Problems", () => {
     screen.getByRole("button").click();
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(onDismiss).toHaveBeenCalledWith([testNotice.source_id]);
 
     // verify
@@ -203,7 +179,6 @@ describe("Problems", () => {
     screen.getByRole("button").click();
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(onDismiss).toHaveBeenCalledWith(["TEST", testNotice.source_id]);
 
     // verify
@@ -231,7 +206,6 @@ describe("Problems", () => {
     render(<Problems />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.queryByText("ルール本文")).toBeInTheDocument();
 
     // verify

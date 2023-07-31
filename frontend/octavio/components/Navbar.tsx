@@ -28,7 +28,7 @@ function ICTSCNavBar() {
           ICTSC
         </Link>
       </div>
-      <div className="flex-none">
+      <nav className="flex-none">
         <ul className="menu menu-horizontal p-0">
           <li>
             <Link href="/">ルール</Link>
@@ -87,7 +87,7 @@ function ICTSCNavBar() {
             </li>
           )}
         </ul>
-      </div>
+      </nav>
     </div>
   );
 }

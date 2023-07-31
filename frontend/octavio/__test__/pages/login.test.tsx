@@ -39,20 +39,6 @@ vi.mock("@/components/Alerts", () => ({
     />
   ),
 }));
-vi.mock("@/layouts/CommonLayout", () => ({
-  __esModule: true,
-  default: ({
-    children,
-    title,
-  }: {
-    children: React.ReactNode;
-    title: string;
-  }) => (
-    <div data-testid="common-layout" data-title={title}>
-      {children}
-    </div>
-  ),
-}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
@@ -74,11 +60,6 @@ describe("Login", () => {
     const loginButton = screen.getByRole("button");
 
     // then
-    expect(screen.queryByTestId("common-layout")).toBeInTheDocument();
-    expect(screen.queryByTestId("common-layout")).toHaveAttribute(
-      "data-title",
-      "ログイン"
-    );
     expect(screen.queryByPlaceholderText("ユーザー名")).toBeInTheDocument();
     expect(screen.queryByPlaceholderText("パスワード")).toBeInTheDocument();
     expect(loginButton).toBeInTheDocument();
