@@ -36,17 +36,19 @@ vi.mock("next/router", () => ({
     };
   },
 }));
-vi.mock("@/hooks/auth");
-vi.mock("@/hooks/problem");
-vi.mock("@/hooks/reCreateInfo");
-vi.mock("@/components/AnswerForm", () => ({
+
+vi.mock("@/app/problems/[problemId]/_components/AnswerForm", () => ({
   __esModule: true,
   default: () => <div data-testid="answerForm" />,
 }));
-vi.mock("@/components/AnswerListSection", () => ({
+vi.mock("@/app/problems/[problemId]/_components/AnswerListSection", () => ({
   __esModule: true,
   default: () => <div data-testid="answerListSection" />,
 }));
+
+vi.mock("@/hooks/auth");
+vi.mock("@/hooks/problem");
+vi.mock("@/hooks/reCreateInfo");
 vi.mock("@/layouts/BaseLayout", () => ({
   __esModule: true,
   default: ({
@@ -81,9 +83,9 @@ describe("[problemId]", () => {
     (useReCreateInfo as Mock).mockReturnValue({
       reCreateInfo: null,
     });
-    render(<ProblemPage params={{ problemId: "abc" }} />);
 
-    screen.debug();
+    // when
+    render(<ProblemPage params={{ problemId: "abc" }} />);
 
     // then
     expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
@@ -113,6 +115,8 @@ describe("[problemId]", () => {
     (useReCreateInfo as Mock).mockReturnValue({
       reCreateInfo: null,
     });
+
+    // when
     render(<ProblemPage params={{ problemId: "abc" }} />);
 
     // then
