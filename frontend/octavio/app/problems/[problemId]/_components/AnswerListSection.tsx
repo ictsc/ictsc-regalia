@@ -64,7 +64,7 @@ function AnswerListSection({ problem }: AnswerSectionProps) {
                     </td>
                     <td>
                       <a
-                        href="app/problems/[problemId]/_components#preview"
+                        href="#preview"
                         className="link"
                         onClick={() => setSelectedAnswerId(answer.id)}
                       >
