@@ -51,20 +51,6 @@ vi.mock("@/components/LoadingPage", () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
 }));
-vi.mock("@/layouts/BaseLayout", () => ({
-  __esModule: true,
-  default: ({
-    children,
-    title,
-  }: {
-    children: React.ReactNode;
-    title: string;
-  }) => (
-    <div data-testid="base-layout" data-title={title}>
-      {children}
-    </div>
-  ),
-}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
@@ -99,7 +85,6 @@ describe("ScoringProblem", () => {
     );
 
     // then
-    expect(screen.queryByTestId("base-layout")).not.toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblem).toHaveBeenCalledTimes(1);
     expect(useAnswers).toHaveBeenCalledTimes(1);
@@ -127,7 +112,6 @@ describe("ScoringProblem", () => {
     );
 
     // then
-    expect(screen.queryByTestId("base-layout")).not.toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblem).toHaveBeenCalledTimes(1);
     expect(useAnswers).toHaveBeenCalledTimes(1);
@@ -155,7 +139,6 @@ describe("ScoringProblem", () => {
     );
 
     // then
-    expect(screen.queryByTestId("base-layout")).not.toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblem).toHaveBeenCalledTimes(1);
     expect(useAnswers).toHaveBeenCalledTimes(1);
@@ -183,7 +166,6 @@ describe("ScoringProblem", () => {
     );
 
     // then
-    expect(screen.queryByTestId("base-layout")).not.toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblem).toHaveBeenCalledTimes(1);
     expect(useAnswers).toHaveBeenCalledTimes(1);
@@ -211,11 +193,6 @@ describe("ScoringProblem", () => {
     expect(screen.queryByTestId("loading")).toBeInTheDocument();
 
     // then
-    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
-    expect(screen.queryByTestId("base-layout")).toHaveAttribute(
-      "data-title",
-      "採点"
-    );
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblem).toHaveBeenCalledTimes(1);
     expect(useAnswers).toHaveBeenCalledTimes(1);

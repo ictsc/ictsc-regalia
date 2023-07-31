@@ -22,7 +22,6 @@ import { answerLimit, recreateRule } from "@/components/_const";
 import useAuth from "@/hooks/auth";
 import useProblem from "@/hooks/problem";
 import useReCreateInfo from "@/hooks/reCreateInfo";
-import BaseLayout from "@/layouts/BaseLayout";
 
 function ProblemPage({ params }: { params: { problemId: string } }) {
   const { user } = useAuth();
@@ -48,11 +47,7 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
   };
 
   if (isLoading) {
-    return (
-      <BaseLayout title="Loading...">
-        <LoadingPage />
-      </BaseLayout>
-    );
+    return <LoadingPage />;
   }
 
   if (problem === null) {
@@ -91,60 +86,58 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
           </div>
         </div>
       </div>
-      <BaseLayout title={`${problem.code} ${problem.title} 問題`}>
-        <div className="container-ictsc">
-          <div className="flex flex-row justify-between pt-12 justify-items-center">
-            <ProblemTitle title={problem.title} />
-            {!isReadOnly && (
-              <button
-                type="button"
-                className="btn text-red-500 btn-sm"
-                onClick={() => {
-                  setIsReCreateModalOpen(true);
-                }}
-                disabled={
-                  recreateInfo?.available != null &&
-                  !(recreateInfo?.available ?? false)
-                }
-              >
-                再展開を行う
-              </button>
-            )}
-          </div>
-          <ProblemMeta problem={problem} />
-          <ProblemConnectionInfo matter={matter} />
-          {recreateInfo?.available != null &&
-            !(recreateInfo?.available ?? false) && (
-              <div className="alert alert-info shadow-lg grow">
-                <div>
-                  <div className="animate-spin">
-                    <Image
-                      src="/assets/svg/arrow-path.svg"
-                      height={24}
-                      width={24}
-                      alt="recreate"
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <span>問題を再展開中です</span>
-                  </div>
+      <div className="container-ictsc">
+        <div className="flex flex-row justify-between pt-12 justify-items-center">
+          <ProblemTitle title={problem.title} />
+          {!isReadOnly && (
+            <button
+              type="button"
+              className="btn text-red-500 btn-sm"
+              onClick={() => {
+                setIsReCreateModalOpen(true);
+              }}
+              disabled={
+                recreateInfo?.available != null &&
+                !(recreateInfo?.available ?? false)
+              }
+            >
+              再展開を行う
+            </button>
+          )}
+        </div>
+        <ProblemMeta problem={problem} />
+        <ProblemConnectionInfo matter={matter} />
+        {recreateInfo?.available != null &&
+          !(recreateInfo?.available ?? false) && (
+            <div className="alert alert-info shadow-lg grow">
+              <div>
+                <div className="animate-spin">
+                  <Image
+                    src="/assets/svg/arrow-path.svg"
+                    height={24}
+                    width={24}
+                    alt="recreate"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <span>問題を再展開中です</span>
                 </div>
               </div>
-            )}
-          <ICTSCCard className="mt-8">
-            <MarkdownPreview className="problem-body" content={problem.body} />
-          </ICTSCCard>
-
-          {!isReadOnly && <AnswerForm code={params.problemId} />}
-          {answerLimit && (
-            <div className="text-sm pt-2">
-              ※ 回答は{answerLimit}分に1度のみです
             </div>
           )}
-          <div className="divider" />
-          <AnswerListSection problem={problem} />
-        </div>
-      </BaseLayout>
+        <ICTSCCard className="mt-8">
+          <MarkdownPreview className="problem-body" content={problem.body} />
+        </ICTSCCard>
+
+        {!isReadOnly && <AnswerForm code={params.problemId} />}
+        {answerLimit && (
+          <div className="text-sm pt-2">
+            ※ 回答は{answerLimit}分に1度のみです
+          </div>
+        )}
+        <div className="divider" />
+        <AnswerListSection problem={problem} />
+      </div>
     </>
   );
 }

@@ -5,6 +5,7 @@ import localFont from "@next/font/local";
 import { Metadata } from "next";
 
 import Providers from "@/app/providers";
+import ICTSCNavBar from "@/components/Navbar";
 import { site } from "@/components/_const";
 
 const notoSansJP = localFont({
@@ -27,7 +28,10 @@ export default function RootLayout({
   return (
     <html lang="ja" data-theme="ictsc" className={notoSansJP.className}>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <ICTSCNavBar />
+          {children}
+        </Providers>
       </body>
     </html>
   );

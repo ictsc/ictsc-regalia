@@ -24,20 +24,6 @@ vi.mock("@/components/LoadingPage", () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
 }));
-vi.mock("@/layouts/BaseLayout", () => ({
-  __esModule: true,
-  default: ({
-    children,
-    title,
-  }: {
-    children: React.ReactNode;
-    title: string;
-  }) => (
-    <div data-testid="base-layout" data-title={title}>
-      {children}
-    </div>
-  ),
-}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
@@ -64,7 +50,6 @@ describe("Scoring", () => {
     );
 
     // then
-    expect(screen.queryByTestId("base-layout")).not.toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblems).toHaveBeenCalledTimes(2);
   });
@@ -88,7 +73,6 @@ describe("Scoring", () => {
     );
 
     // then
-    expect(screen.queryByTestId("base-layout")).not.toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblems).toHaveBeenCalledTimes(2);
   });
@@ -112,7 +96,6 @@ describe("Scoring", () => {
     );
 
     // then
-    expect(screen.queryByTestId("base-layout")).not.toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblems).toHaveBeenCalledTimes(2);
   });
@@ -129,15 +112,9 @@ describe("Scoring", () => {
     render(<Index />);
 
     // when
-    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
-    expect(screen.queryByTestId("base-layout")).toHaveAttribute(
-      "data-title",
-      "採点"
-    );
     expect(screen.queryByTestId("loading")).toBeInTheDocument();
 
     // then
-    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblems).toHaveBeenCalledTimes(2);
   });
@@ -155,11 +132,6 @@ describe("Scoring", () => {
     const tds = screen.queryAllByRole("cell");
 
     // when
-    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
-    expect(screen.queryByTestId("base-layout")).toHaveAttribute(
-      "data-title",
-      "採点"
-    );
     expect(screen.queryByText("採点")).toBeInTheDocument();
     expect(tds[1]).toHaveTextContent("-/-/-");
     expect(tds[2]).toHaveTextContent("id");
@@ -172,7 +144,6 @@ describe("Scoring", () => {
     expect(tds[9]).toHaveTextContent("自分");
 
     // then
-    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblems).toHaveBeenCalledTimes(2);
   });
@@ -193,7 +164,6 @@ describe("Scoring", () => {
     expect(tds[1]).toHaveTextContent("1/-/-");
 
     // then
-    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblems).toHaveBeenCalledTimes(2);
   });
@@ -214,7 +184,6 @@ describe("Scoring", () => {
     expect(tds[1]).toHaveTextContent("/1/-");
 
     // then
-    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblems).toHaveBeenCalledTimes(2);
   });
@@ -235,7 +204,6 @@ describe("Scoring", () => {
     expect(tds[1]).toHaveTextContent("/-/1");
 
     // then
-    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblems).toHaveBeenCalledTimes(2);
   });
@@ -273,7 +241,6 @@ describe("Scoring", () => {
     expect(tds[5]).toHaveTextContent(`${"a".repeat(20)}...`);
 
     // then
-    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblems).toHaveBeenCalledTimes(2);
   });
@@ -295,7 +262,6 @@ describe("Scoring", () => {
     expect(tds[5]).toHaveTextContent("");
 
     // then
-    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblems).toHaveBeenCalledTimes(2);
   });
@@ -316,7 +282,6 @@ describe("Scoring", () => {
     expect(tds[9]).toHaveTextContent("");
 
     // then
-    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(1);
     expect(useProblems).toHaveBeenCalledTimes(2);
   });
@@ -339,7 +304,6 @@ describe("Scoring", () => {
     expect(screen.queryByText("採点する")).toBeInTheDocument();
 
     // then
-    expect(screen.queryByTestId("base-layout")).toBeInTheDocument();
     expect(useAuth).toHaveBeenCalledTimes(2);
     expect(useProblems).toHaveBeenCalledTimes(4);
   });

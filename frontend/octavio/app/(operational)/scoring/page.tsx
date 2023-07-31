@@ -13,7 +13,6 @@ import MarkdownPreview from "@/components/MarkdownPreview";
 import useAuth from "@/hooks/auth";
 import useProblem from "@/hooks/problem";
 import useProblems from "@/hooks/problems";
-import BaseLayout from "@/layouts/BaseLayout";
 
 function Index() {
   const { user } = useAuth();
@@ -28,11 +27,7 @@ function Index() {
   const isReadOnly = user?.is_read_only ?? false;
 
   if (isLoading) {
-    return (
-      <BaseLayout title="採点">
-        <LoadingPage />
-      </BaseLayout>
-    );
+    return <LoadingPage />;
   }
 
   if (!isFullAccess || isReadOnly || problems.length === 0) {
@@ -40,7 +35,7 @@ function Index() {
   }
 
   return (
-    <BaseLayout title="採点">
+    <>
       <div className="overflow-x-auto">
         <table className="table table-compact w-full">
           <thead>
@@ -127,7 +122,7 @@ function Index() {
           </ICTSCCard>
         </div>
       )}
-    </BaseLayout>
+    </>
   );
 }
 

@@ -39,20 +39,6 @@ vi.mock("@/components/Alerts", () => ({
     />
   ),
 }));
-vi.mock("@/layouts/BaseLayout", () => ({
-  __esModule: true,
-  default: ({
-    children,
-    title,
-  }: {
-    children: React.ReactNode;
-    title: string;
-  }) => (
-    <div data-testid="base-layout" data-title={title}>
-      {children}
-    </div>
-  ),
-}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
@@ -84,11 +70,6 @@ describe("SignUp", () => {
     render(<SignUp />);
 
     // then
-    expect(screen.getByTestId("base-layout")).toBeInTheDocument();
-    expect(screen.getByTestId("base-layout")).toHaveAttribute(
-      "data-title",
-      "ユーザー登録"
-    );
     expect(screen.queryByPlaceholderText("ユーザー名")).toBeInTheDocument();
     expect(screen.queryByPlaceholderText("パスワード")).toBeInTheDocument();
     expect(screen.queryByRole("button")).toBeInTheDocument();
