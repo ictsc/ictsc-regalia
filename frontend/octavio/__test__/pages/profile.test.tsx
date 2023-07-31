@@ -49,20 +49,6 @@ vi.mock("@/components/LoadingPage", () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
 }));
-vi.mock("@/layouts/CommonLayout", () => ({
-  __esModule: true,
-  default: ({
-    children,
-    title,
-  }: {
-    children: React.ReactNode;
-    title: string;
-  }) => (
-    <div data-testid="common-layout" data-title={title}>
-      {children}
-    </div>
-  ),
-}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
@@ -81,11 +67,6 @@ describe("Profile", () => {
     render(<Profile />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
-    expect(screen.getByTestId("common-layout")).toHaveAttribute(
-      "data-title",
-      "プロフィール"
-    );
     expect(screen.getByText(testUser.user_group.name)).toBeInTheDocument();
     const inputs = screen.getAllByRole("textbox");
     expect(inputs).toHaveLength(5);
@@ -110,7 +91,6 @@ describe("Profile", () => {
     render(<Profile />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.getByTestId("loading")).toBeInTheDocument();
 
     // verify
@@ -128,7 +108,6 @@ describe("Profile", () => {
     render(<Profile />);
 
     // then
-    expect(screen.queryByTestId("common-layout")).not.toBeInTheDocument();
     expect(screen.getByTestId("error")).toBeInTheDocument();
     expect(screen.getByTestId("error")).toHaveAttribute(
       "data-status-code",

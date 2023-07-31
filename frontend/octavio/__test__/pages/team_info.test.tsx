@@ -47,20 +47,6 @@ vi.mock("@/components/icons/EyeSlash", () => ({
   __esModule: true,
   default: () => <div data-testid="eye-slash" />,
 }));
-vi.mock("@/layouts/CommonLayout", () => ({
-  __esModule: true,
-  default: ({
-    children,
-    title,
-  }: {
-    children: React.ReactNode;
-    title: string;
-  }) => (
-    <div data-testid="common-layout" data-title={title}>
-      {children}
-    </div>
-  ),
-}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
@@ -86,11 +72,6 @@ describe("TeamInfo", () => {
     render(<TeamInfo />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
-    expect(screen.getByTestId("common-layout")).toHaveAttribute(
-      "data-title",
-      "チーム情報"
-    );
     expect(
       screen.getByText(`${testUserGroup.name}@${testUserGroup.organization}`)
     ).toBeInTheDocument();
@@ -130,7 +111,6 @@ describe("TeamInfo", () => {
     render(<TeamInfo />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.getByTestId("loading")).toBeInTheDocument();
 
     // verify
@@ -157,7 +137,6 @@ describe("TeamInfo", () => {
     render(<TeamInfo />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.getByTestId("loading")).toBeInTheDocument();
 
     // verify
@@ -184,7 +163,6 @@ describe("TeamInfo", () => {
     render(<TeamInfo />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     expect(screen.getByTestId("loading")).toBeInTheDocument();
 
     // verify
@@ -210,7 +188,6 @@ describe("TeamInfo", () => {
     render(<TeamInfo />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     const hiddenInputs = screen.getAllByTestId("hidden-input");
     expect(hiddenInputs[0]).toHaveAttribute("data-value", "ssh @ -p ");
     expect(hiddenInputs[1]).toHaveAttribute("data-value", "");
@@ -245,7 +222,6 @@ describe("TeamInfo", () => {
     render(<TeamInfo />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     const hiddenInputs = screen.getAllByTestId("hidden-input");
     expect(hiddenInputs[0]).toHaveAttribute(
       "data-value",
@@ -286,7 +262,6 @@ describe("TeamInfo", () => {
     render(<TeamInfo />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     const hiddenInputs = screen.getAllByTestId("hidden-input");
     expect(hiddenInputs[0]).toHaveAttribute(
       "data-value",
@@ -327,7 +302,6 @@ describe("TeamInfo", () => {
     render(<TeamInfo />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     const hiddenInputs = screen.getAllByTestId("hidden-input");
     expect(hiddenInputs[0]).toHaveAttribute(
       "data-value",
@@ -367,7 +341,6 @@ describe("TeamInfo", () => {
     render(<TeamInfo />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     const hiddenInputs = screen.getAllByTestId("hidden-input");
     expect(hiddenInputs[0]).toHaveAttribute(
       "data-value",
@@ -399,7 +372,6 @@ describe("TeamInfo", () => {
     render(<TeamInfo />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     const hiddenInputs = screen.getAllByTestId("hidden-input");
     expect(hiddenInputs[0]).toHaveAttribute("data-is-hidden", "true");
     expect(screen.queryAllByTestId("eye")).toHaveLength(2);
@@ -429,7 +401,6 @@ describe("TeamInfo", () => {
     render(<TeamInfo />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     const hiddenInputs = screen.getAllByTestId("hidden-input");
     expect(hiddenInputs[0]).toHaveAttribute("data-is-hidden", "false");
     expect(screen.queryAllByTestId("eye")).toHaveLength(1);
@@ -459,7 +430,6 @@ describe("TeamInfo", () => {
     render(<TeamInfo />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     const hiddenInputs = screen.getAllByTestId("hidden-input");
     expect(hiddenInputs[1]).toHaveAttribute("data-is-hidden", "true");
     expect(screen.queryAllByTestId("eye")).toHaveLength(1);
@@ -489,7 +459,6 @@ describe("TeamInfo", () => {
     render(<TeamInfo />);
 
     // then
-    expect(screen.getByTestId("common-layout")).toBeInTheDocument();
     const hiddenInputs = screen.getAllByTestId("hidden-input");
     expect(hiddenInputs[1]).toHaveAttribute("data-is-hidden", "false");
     expect(screen.queryAllByTestId("eye")).toHaveLength(0);
