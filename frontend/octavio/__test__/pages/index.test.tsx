@@ -24,10 +24,10 @@ beforeEach(() => {
 
 describe("Home", () => {
   test("画面が表示されることを確認する", async () => {
-    // setup
+    // when
     render(<Home />);
 
-    // verify
+    // then
     expect(screen.queryByTestId("markdown-preview")).toBeInTheDocument();
     expect(screen.queryByTestId("markdown-preview")).toHaveAttribute(
       "data-content",

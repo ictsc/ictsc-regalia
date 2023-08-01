@@ -45,7 +45,12 @@ vi.mock("@/app/problems/[problemId]/_components/AnswerListSection", () => ({
   __esModule: true,
   default: () => <div data-testid="answerListSection" />,
 }));
-
+vi.mock("@/components/MarkdownPreview", () => ({
+  __esModule: true,
+  default: ({ content }: { content: string }) => (
+    <div data-testid="markdown-preview" data-content={content} />
+  ),
+}));
 vi.mock("@/hooks/auth");
 vi.mock("@/hooks/problem");
 vi.mock("@/hooks/reCreateInfo");
@@ -161,7 +166,10 @@ describe("[problemId]", () => {
     expect(
       screen.queryByText("問題の再展開を行います。よろしいですか？")
     ).toBeInTheDocument();
-    expect(screen.queryByText("テスト再展開ルール")).toBeInTheDocument();
+    expect(screen.getAllByTestId("markdown-preview")[0]).toHaveAttribute(
+      "data-content",
+      "テスト再展開ルール"
+    );
 
     // verify
     expect(useAuth).toHaveBeenCalledTimes(1);

@@ -24,6 +24,12 @@ vi.mock("@/components/LoadingPage", () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
 }));
+vi.mock("@/components/MarkdownPreview", () => ({
+  __esModule: true,
+  default: ({ content }: { content: string }) => (
+    <div data-testid="markdown-preview" data-content={content} />
+  ),
+}));
 
 beforeEach(() => {
   // toHaveBeenCalledTimes がテストごとにリセットされるようにする
@@ -304,6 +310,12 @@ describe("Scoring", () => {
     expect(screen.queryByText("採点する")).toBeInTheDocument();
 
     // then
+    expect(screen.getByTestId("markdown-preview")).toHaveAttribute(
+      "data-content",
+      "# テスト本文"
+    );
+
+    // verify
     expect(useAuth).toHaveBeenCalledTimes(2);
     expect(useProblems).toHaveBeenCalledTimes(4);
   });
