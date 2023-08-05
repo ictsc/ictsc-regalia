@@ -4,7 +4,7 @@ import { act, render, screen } from "@testing-library/react";
 import mockRouter from "next-router-mock";
 import { Mock, MockInstance, vi } from "vitest";
 
-import ICTSCNavbar from "@/components/Navbar";
+import ICTSCNavbar from "@/components/navbar";
 import useAuth from "@/hooks/auth";
 import { testAdminUser, testUser } from "@/types/User";
 

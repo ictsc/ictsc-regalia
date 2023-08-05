@@ -1,7 +1,7 @@
 "use client";
 
-import LoadingPage from "@/components/LoadingPage";
-import NotificationCard from "@/components/NotificationCard";
+import LoadingPage from "@/components/loading-page";
+import NotificationCard from "@/components/notification-card";
 import useNotice from "@/hooks/notice";
 
 function Page() {

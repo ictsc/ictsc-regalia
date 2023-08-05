@@ -1,7 +1,7 @@
-import ICTSCCard from "@/components/Card";
-import MarkdownPreview from "@/components/MarkdownPreview";
-import ICTSCTitle from "@/components/Title";
 import { rule } from "@/components/_const";
+import ICTSCCard from "@/components/card";
+import MarkdownPreview from "@/components/markdown-preview";
+import ICTSCTitle from "@/components/title";
 
 function Home() {
   return (

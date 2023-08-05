@@ -6,9 +6,9 @@ import Error from "next/error";
 
 import { Controller, useForm } from "react-hook-form";
 
-import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
-import ICTSCCard from "@/components/Card";
-import LoadingPage from "@/components/LoadingPage";
+import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/alerts";
+import ICTSCCard from "@/components/card";
+import LoadingPage from "@/components/loading-page";
 import useAuth from "@/hooks/auth";
 
 type Inputs = {

@@ -10,7 +10,7 @@ import Home from "@/app/page";
 vi.mock("@/components/_const", () => ({
   rule: "rule",
 }));
-vi.mock("@/components/MarkdownPreview", () => ({
+vi.mock("@/components/markdown-preview", () => ({
   __esModule: true,
   default: ({ content }: { content: string }) => (
     <div data-testid="markdown-preview" data-content={content} />

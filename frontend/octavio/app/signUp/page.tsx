@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import clsx from "clsx";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
+import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/alerts";
 import useAuth from "@/hooks/auth";
 
 type Inputs = {

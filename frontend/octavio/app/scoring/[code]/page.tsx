@@ -5,14 +5,14 @@ import { useSearchParams } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 
-import ScoringAnswerForm from "@/app/scoring/[code]/_components/ScoringAnswerForm";
-import ICTSCCard from "@/components/Card";
-import ConditionalText from "@/components/ConditionalText";
-import LoadingPage from "@/components/LoadingPage";
-import MarkdownPreview from "@/components/MarkdownPreview";
-import ProblemConnectionInfo from "@/components/ProblemConnectionInfo";
-import ProblemMeta from "@/components/ProblemMeta";
-import ProblemTitle from "@/components/ProblemTitle";
+import ScoringAnswerForm from "@/app/scoring/[code]/_components/scoring-answer-form";
+import ICTSCCard from "@/components/card";
+import ConditionalText from "@/components/conditional-text";
+import LoadingPage from "@/components/loading-page";
+import MarkdownPreview from "@/components/markdown-preview";
+import ProblemConnectionInfo from "@/components/problem-connection-info";
+import ProblemMeta from "@/components/problem-meta";
+import ProblemTitle from "@/components/problem-title";
 import useAnswers from "@/hooks/answer";
 import useAuth from "@/hooks/auth";
 import useProblem from "@/hooks/problem";

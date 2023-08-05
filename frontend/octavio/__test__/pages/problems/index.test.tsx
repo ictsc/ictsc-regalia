@@ -14,7 +14,7 @@ import { testProblem } from "@/types/Problem";
 
 vi.mock("recoil");
 
-vi.mock("@/components/MarkdownPreview", () => ({
+vi.mock("@/components/markdown-preview", () => ({
   __esModule: true,
   default: ({ content }: { content: string }) => (
     <div data-testid="markdown-preview" data-content={content} />

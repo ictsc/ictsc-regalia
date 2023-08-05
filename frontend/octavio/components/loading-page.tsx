@@ -1,4 +1,4 @@
-import LoadingSpinner from "./LoadingSpinner";
+import LoadingSpinner from "./loading-spinner";
 
 function LoadingPage() {
   return (

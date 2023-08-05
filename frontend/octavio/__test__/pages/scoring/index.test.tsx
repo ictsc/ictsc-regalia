@@ -20,11 +20,11 @@ vi.mock("next/error", () => ({
 vi.mock("next/router", () => require("next-router-mock"));
 vi.mock("@/hooks/auth");
 vi.mock("@/hooks/problems");
-vi.mock("@/components/LoadingPage", () => ({
+vi.mock("@/components/loading-page", () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
 }));
-vi.mock("@/components/MarkdownPreview", () => ({
+vi.mock("@/components/markdown-preview", () => ({
   __esModule: true,
   default: ({ content }: { content: string }) => (
     <div data-testid="markdown-preview" data-content={content} />

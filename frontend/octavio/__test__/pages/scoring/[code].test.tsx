@@ -35,7 +35,7 @@ vi.mock("react-hook-form", () => ({
   useForm: vi.fn(),
 }));
 
-vi.mock("@/app/scoring/[code]/_components/ScoringAnswerForm", () => ({
+vi.mock("@/app/scoring/[code]/_components/scoring-answer-form", () => ({
   __esModule: true,
   default: ({ answer }: { answer: Answer }) => (
     <div data-testid="scoring-answer-form" data-key={answer.id} />
@@ -44,11 +44,11 @@ vi.mock("@/app/scoring/[code]/_components/ScoringAnswerForm", () => ({
 vi.mock("@/hooks/auth");
 vi.mock("@/hooks/problem");
 vi.mock("@/hooks/answer");
-vi.mock("@/components/LoadingPage", () => ({
+vi.mock("@/components/loading-page", () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
 }));
-vi.mock("@/components/MarkdownPreview", () => ({
+vi.mock("@/components/markdown-preview", () => ({
   __esModule: true,
   default: ({ content }: { content: string }) => (
     <div data-testid="markdown-preview" data-content={content} />

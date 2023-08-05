@@ -4,10 +4,10 @@ import clsx from "clsx";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/Alerts";
-import ICTSCCard from "@/components/Card";
-import MarkdownPreview from "@/components/MarkdownPreview";
 import { answerLimit } from "@/components/_const";
+import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/alerts";
+import ICTSCCard from "@/components/card";
+import MarkdownPreview from "@/components/markdown-preview";
 import useAnswers from "@/hooks/answer";
 import useApi from "@/hooks/api";
 import useAuth from "@/hooks/auth";
