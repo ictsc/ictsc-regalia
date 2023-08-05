@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import clsx from "clsx";
 
-import MarkdownPreview from "./MarkdownPreview";
+import MarkdownPreview from "./markdown-preview";
 
 interface Props {
   text: string;

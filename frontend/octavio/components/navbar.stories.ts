@@ -1,8 +1,8 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { rest } from "msw";
 
-import ICTSCNavBar from "@/components/Navbar";
 import { apiUrl } from "@/components/_const";
+import ICTSCNavBar from "@/components/navbar";
 import { testAdminUser, testUser } from "@/types/User";
 
 const meta = {

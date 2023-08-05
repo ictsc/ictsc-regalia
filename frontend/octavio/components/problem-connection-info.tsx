@@ -1,4 +1,4 @@
-import HoverCopyText from "@/components/HoverCopyText";
+import HoverCopyText from "@/components/hover-copyText";
 import { Matter } from "@/types/Problem";
 
 interface Props {

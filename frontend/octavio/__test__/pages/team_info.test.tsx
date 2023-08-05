@@ -16,7 +16,7 @@ vi.mock("react");
 vi.mock("@/hooks/auth");
 vi.mock("@/hooks/ranking");
 
-vi.mock("@/components/HiddenInput", () => ({
+vi.mock("@/components/hidden-input", () => ({
   __esModule: true,
   default: ({
     value,
@@ -35,15 +35,15 @@ vi.mock("@/components/HiddenInput", () => ({
     />
   ),
 }));
-vi.mock("@/components/LoadingPage", () => ({
+vi.mock("@/components/loading-page", () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
 }));
-vi.mock("@/components/icons/Eye", () => ({
+vi.mock("@/components/icons/eye", () => ({
   __esModule: true,
   default: () => <div data-testid="eye" />,
 }));
-vi.mock("@/components/icons/EyeSlash", () => ({
+vi.mock("@/components/icons/eye-slash", () => ({
   __esModule: true,
   default: () => <div data-testid="eye-slash" />,
 }));

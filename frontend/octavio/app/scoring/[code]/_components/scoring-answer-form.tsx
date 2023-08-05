@@ -2,8 +2,8 @@ import Image from "next/image";
 
 import { useForm } from "react-hook-form";
 
-import ICTSCCard from "@/components/Card";
-import MarkdownPreview from "@/components/MarkdownPreview";
+import ICTSCCard from "@/components/card";
+import MarkdownPreview from "@/components/markdown-preview";
 import useAnswers from "@/hooks/answer";
 import useApi from "@/hooks/api";
 import useProblems from "@/hooks/problems";

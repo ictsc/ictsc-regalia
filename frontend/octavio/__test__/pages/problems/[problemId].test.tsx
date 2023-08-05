@@ -37,15 +37,15 @@ vi.mock("next/router", () => ({
   },
 }));
 
-vi.mock("@/app/problems/[problemId]/_components/AnswerForm", () => ({
+vi.mock("@/app/problems/[problemId]/_components/answer-form", () => ({
   __esModule: true,
   default: () => <div data-testid="answerForm" />,
 }));
-vi.mock("@/app/problems/[problemId]/_components/AnswerListSection", () => ({
+vi.mock("@/app/problems/[problemId]/_components/answer-list-section", () => ({
   __esModule: true,
   default: () => <div data-testid="answerListSection" />,
 }));
-vi.mock("@/components/MarkdownPreview", () => ({
+vi.mock("@/components/markdown-preview", () => ({
   __esModule: true,
   default: ({ content }: { content: string }) => (
     <div data-testid="markdown-preview" data-content={content} />

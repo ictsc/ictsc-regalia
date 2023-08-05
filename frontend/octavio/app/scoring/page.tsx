@@ -6,10 +6,10 @@ import Error from "next/error";
 import Image from "next/image";
 import Link from "next/link";
 
-import ICTSCCard from "@/components/Card";
-import ConditionalText from "@/components/ConditionalText";
-import LoadingPage from "@/components/LoadingPage";
-import MarkdownPreview from "@/components/MarkdownPreview";
+import ICTSCCard from "@/components/card";
+import ConditionalText from "@/components/conditional-text";
+import LoadingPage from "@/components/loading-page";
+import MarkdownPreview from "@/components/markdown-preview";
 import useAuth from "@/hooks/auth";
 import useProblem from "@/hooks/problem";
 import useProblems from "@/hooks/problems";

@@ -10,7 +10,7 @@ import useNotice from "@/hooks/notice";
 import { testNotice } from "@/types/Notice";
 
 vi.mock("@/hooks/notice");
-vi.mock("@/components/NotificationCard", () => ({
+vi.mock("@/components/notification-card", () => ({
   __esModule: true,
   default: () => <div data-testid="notification-card" />,
 }));

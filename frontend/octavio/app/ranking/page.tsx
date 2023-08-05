@@ -1,6 +1,6 @@
 "use client";
 
-import LoadingPage from "@/components/LoadingPage";
+import LoadingPage from "@/components/loading-page";
 import useRanking from "@/hooks/ranking";
 
 function Page() {

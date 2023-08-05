@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 
-import ICTSCCard from "@/components/Card";
-import HiddenInput from "@/components/HiddenInput";
-import LoadingPage from "@/components/LoadingPage";
-import Eye from "@/components/icons/Eye";
-import EyeSlash from "@/components/icons/EyeSlash";
+import ICTSCCard from "@/components/card";
+import HiddenInput from "@/components/hidden-input";
+import Eye from "@/components/icons/eye";
+import EyeSlash from "@/components/icons/eye-slash";
+import LoadingPage from "@/components/loading-page";
 import useAuth from "@/hooks/auth";
 import useRanking from "@/hooks/ranking";
 

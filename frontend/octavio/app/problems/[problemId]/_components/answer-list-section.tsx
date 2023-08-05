@@ -5,8 +5,8 @@ import Image from "next/image";
 import clsx from "clsx";
 import { DateTime } from "luxon";
 
-import ICTSCCard from "@/components/Card";
-import MarkdownPreview from "@/components/MarkdownPreview";
+import ICTSCCard from "@/components/card";
+import MarkdownPreview from "@/components/markdown-preview";
 import useAnswers from "@/hooks/answer";
 import { Problem } from "@/types/Problem";
 

@@ -6,13 +6,13 @@ import Link from "next/link";
 
 import { useRecoilState } from "recoil";
 
-import ICTSCCard from "@/components/Card";
-import LoadingPage from "@/components/LoadingPage";
-import MarkdownPreview from "@/components/MarkdownPreview";
-import NotificationCard from "@/components/NotificationCard";
-import ProblemCard from "@/components/ProblemCard";
-import ICTSCTitle from "@/components/Title";
 import { shortRule } from "@/components/_const";
+import ICTSCCard from "@/components/card";
+import LoadingPage from "@/components/loading-page";
+import MarkdownPreview from "@/components/markdown-preview";
+import NotificationCard from "@/components/notification-card";
+import ProblemCard from "@/components/problem-card";
+import ICTSCTitle from "@/components/title";
 import useNotice from "@/hooks/notice";
 import useProblems from "@/hooks/problems";
 import { dismissNoticeIdsState } from "@/hooks/state/recoil";

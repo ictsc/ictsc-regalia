@@ -2,7 +2,7 @@ import React from "react";
 
 import { Metadata } from "next";
 
-import ICTSCTitle from "@/components/Title";
+import ICTSCTitle from "@/components/title";
 
 const title = "ユーザー登録";
 

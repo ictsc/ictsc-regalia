@@ -5,8 +5,8 @@ import localFont from "@next/font/local";
 import { Metadata } from "next";
 
 import Providers from "@/app/providers";
-import ICTSCNavBar from "@/components/Navbar";
 import { site } from "@/components/_const";
+import ICTSCNavBar from "@/components/navbar";
 
 const notoSansJP = localFont({
   variable: "--font-noto-sans-jp",

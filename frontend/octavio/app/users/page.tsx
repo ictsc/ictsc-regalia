@@ -2,7 +2,7 @@
 
 import Error from "next/error";
 
-import LoadingPage from "@/components/LoadingPage";
+import LoadingPage from "@/components/loading-page";
 import useUserGroups from "@/hooks/userGroups";
 
 function GithubIcon() {
