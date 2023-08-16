@@ -86,7 +86,7 @@ describe("Login", () => {
       screen.queryByText("ユーザー名を入力してください")
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("パスワードを入力して下さい")
+      screen.queryByText("パスワードを入力してください")
     ).toBeInTheDocument();
 
     // verify
@@ -135,7 +135,7 @@ describe("Login", () => {
       screen.queryByText("ユーザー名を入力してください")
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByText("パスワードを入力して下さい")
+      screen.queryByText("パスワードを入力してください")
     ).toBeInTheDocument();
 
     // verify

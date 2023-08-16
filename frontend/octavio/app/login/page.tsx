@@ -4,16 +4,13 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import clsx from "clsx";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/alerts";
 import useAuth from "@/hooks/auth";
-
-type Inputs = {
-  name: string;
-  password: string;
-};
+import { LoginSchema, LoginType } from "@/types/schema/login";
 
 function Page() {
   const router = useRouter();
@@ -22,7 +19,9 @@ function Page() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Inputs>();
+  } = useForm<LoginType>({
+    resolver: valibotResolver(LoginSchema),
+  });
 
   const { signIn, mutate } = useAuth();
 
@@ -31,7 +30,7 @@ function Page() {
   // 送信中
   const [submitting, setSubmitting] = useState(false);
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+  const onSubmit: SubmitHandler<LoginType> = async (data) => {
     setSubmitting(true);
     const response = await signIn({
       name: data.name,
@@ -68,7 +67,7 @@ function Page() {
       <div className="label max-w-xs min-w-[312px]">
         {errors.name && (
           <span className="label-text-alt text-error">
-            ユーザー名を入力してください
+            {errors.name.message}
           </span>
         )}
       </div>
@@ -82,7 +81,7 @@ function Page() {
       <div className="label max-w-xs min-w-[312px]">
         {errors.password && (
           <span className="label-text-alt text-error">
-            パスワードを入力して下さい
+            {errors.password.message}
           </span>
         )}
       </div>
