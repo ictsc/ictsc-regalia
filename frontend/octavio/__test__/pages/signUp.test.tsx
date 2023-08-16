@@ -96,7 +96,7 @@ describe("SignUp", () => {
       screen.queryByText("ユーザー名を入力してください")
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("パスワードを入力して下さい")
+      screen.queryByText("パスワードは8文字以上である必要があります")
     ).toBeInTheDocument();
 
     // verify
@@ -122,7 +122,7 @@ describe("SignUp", () => {
       screen.queryByText("ユーザー名を入力してください")
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("パスワードを入力して下さい")
+      screen.queryByText("パスワードは8文字以上である必要があります")
     ).not.toBeInTheDocument();
 
     // verify
@@ -148,7 +148,7 @@ describe("SignUp", () => {
       screen.queryByText("ユーザー名を入力してください")
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByText("パスワードを入力して下さい")
+      screen.queryByText("パスワードは8文字以上である必要があります")
     ).toBeInTheDocument();
 
     // verify

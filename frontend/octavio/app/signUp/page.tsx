@@ -4,16 +4,13 @@ import React, { useState } from "react";
 
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import clsx from "clsx";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/alerts";
 import useAuth from "@/hooks/auth";
-
-type Inputs = {
-  name: string;
-  password: string;
-};
+import { SignUpSchema, SignUpType } from "@/types/schema/signUp";
 
 function Page() {
   const router = useRouter();
@@ -25,7 +22,9 @@ function Page() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Inputs>();
+  } = useForm<SignUpType>({
+    resolver: valibotResolver(SignUpSchema),
+  });
 
   const { signUp } = useAuth();
 
@@ -36,7 +35,7 @@ function Page() {
   // エラーメッセージ
   const [message, setMessage] = useState<string | null>(null);
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+  const onSubmit: SubmitHandler<SignUpType> = async (data) => {
     setSubmitting(true);
     const response = await signUp({
       name: data.name,
@@ -100,7 +99,7 @@ function Page() {
         />
       )}
       <input
-        {...register("name", { required: true })}
+        {...register("name")}
         type="text"
         placeholder="ユーザー名"
         id="username"
@@ -109,29 +108,21 @@ function Page() {
       <div className="label max-w-xs min-w-[312px]">
         {errors.name && (
           <span className="label-text-alt text-error">
-            ユーザー名を入力してください
+            {errors.name.message}
           </span>
         )}
       </div>
       <input
-        {...register("password", {
-          required: true,
-          minLength: 8,
-        })}
+        {...register("password")}
         type="password"
         placeholder="パスワード"
         id="password"
         className="input input-bordered max-w-xs min-w-[312px] mt-4"
       />
       <div className="label max-w-xs min-w-[312px]">
-        {errors.password?.type === "required" && (
+        {errors.password && (
           <span className="label-text-alt text-error">
-            パスワードを入力して下さい
-          </span>
-        )}
-        {errors.password?.type === "minLength" && (
-          <span className="label-text-alt text-error">
-            パスワードは8文字以上である必要があります
+            {errors.password.message}
           </span>
         )}
       </div>
