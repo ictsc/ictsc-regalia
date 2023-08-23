@@ -1,11 +1,14 @@
 Ajay
 Ashleigh
 autodocs
+bytedance
 clsx
 cockroachdb
 daisyui
 Duardo
+exhaustruct
 ictsc
+ireturn
 Kairi
 Kaleb
 Loba
@@ -13,6 +16,7 @@ luxon
 Newf
 nextjs
 nofilter
+nolint
 noninteractive
 noto
 proto

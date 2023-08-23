@@ -25,7 +25,7 @@ func Is(err, reference error) bool {
 }
 
 // As errors.As()のラッパー
-func As(err error, target interface{}) bool {
+func As(err error, target any) bool {
 	return errors.As(err, target)
 }
 
