@@ -14,16 +14,17 @@ First, run the development server:
 
 ```bash
 # フォントのインストール
-npm run font
-#or
 pnpm font
 
 cp .env .env.local
 # 適切にコンフィグを変更して下さい
-npm run dev
-# or
+pnpm install
 pnpm dev
 ```
+
+### アクセス
+
+[http://localhost:3000](http://localhost:3000)
 
 #### テスト実行
 
