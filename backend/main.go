@@ -1,7 +1,8 @@
+// Package main プログラムのエントリーポイント
 package main
 
-import "fmt"
+import "log"
 
 func main() {
-	fmt.Println("Hello ictsc-outlands!")
+	log.Print("Hello ictsc-outlands!")
 }

@@ -1,0 +1,26 @@
+linters:
+  enable-all: true
+  disable:
+    - deadcode # deprecated
+    - exhaustivestruct # deprecated
+    - golint # deprecated
+    - ifshort # deprecated
+    - interfacer # deprecated
+    - maligned # deprecated
+    - nosnakecase # deprecated
+    - scopelint # deprecated
+    - structcheck # deprecated
+    - varcheck # deprecated
+    - depguard
+    - godot
+    - nolintlint
+
+linters-settings:
+  lll:
+    line-length: 150
+  varnamelen:
+    ignore-names:
+      - tt
+
+issues:
+  exclude-use-default: false
