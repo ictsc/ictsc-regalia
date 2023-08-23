@@ -17,3 +17,5 @@ jobs:
           fetch-depth: 0
       - name: Lint Actions
         uses: reviewdog/action-actionlint@v1
+        with:
+          fail_on_error: true
