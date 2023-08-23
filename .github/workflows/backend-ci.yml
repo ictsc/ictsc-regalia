@@ -24,7 +24,6 @@ jobs:
         with:
           go_version_file: 'backend/go.mod'
           workdir: backend
-          level: info
           fail_on_error: true
   build:
     name: Build
