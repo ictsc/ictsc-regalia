@@ -7,5 +7,7 @@
     },
     "custom": true,
     "internal-terms": false
-  }
+  },
+  "go.lintOnSave": "package",
+  "go.lintTool": "golangci-lint"
 }
