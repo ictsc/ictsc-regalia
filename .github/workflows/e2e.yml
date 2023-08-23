@@ -20,29 +20,29 @@ jobs:
         include:
           - name: index
           - name: login
-            dependencies: [ ictsc-rikka ]
+            dependencies: [ictsc-rikka]
           - name: notices
-            dependencies: [ ictsc-rikka ]
+            dependencies: [ictsc-rikka]
           - name: profile
-            dependencies: [ ictsc-rikka ]
+            dependencies: [ictsc-rikka]
           - name: ranking
-            dependencies: [ ictsc-rikka ]
+            dependencies: [ictsc-rikka]
           - name: signUp
-            dependencies: [ ictsc-rikka ]
+            dependencies: [ictsc-rikka]
           - name: team_info
-            dependencies: [ ictsc-rikka ]
+            dependencies: [ictsc-rikka]
           - name: users
-            dependencies: [ ictsc-rikka ]
+            dependencies: [ictsc-rikka]
           - name: problems/problemId
-            dependencies: [ ictsc-rikka ]
+            dependencies: [ictsc-rikka]
           - name: problems/index
-            dependencies: [ ictsc-rikka ]
+            dependencies: [ictsc-rikka]
           - name: scoring/code
-            dependencies: [ ictsc-rikka ]
+            dependencies: [ictsc-rikka]
           - name: scoring/index
-            dependencies: [ ictsc-rikka ]
+            dependencies: [ictsc-rikka]
           - name: components/navbar
-            dependencies: [ ictsc-rikka ]
+            dependencies: [ictsc-rikka]
 
     steps:
       - name: Set Timezone
@@ -232,11 +232,11 @@ jobs:
           set +e # curlのエラーを無視する
           cp scripts/docker-compose.override.yml docker-compose.override.yml
           make up
-          
+
           url="http://localhost:8080"
           max_attempts=15
           sleep_interval=5
-          
+
           for i in $(seq 1 $max_attempts); do
             status=$(curl -o /dev/null -s -w '%{http_code}\n' $url)
             if [ $status -eq 404 ]; then
