@@ -19,3 +19,5 @@ ignorePaths:
   - "**/__e2e__"
   - "**/__test__"
   - "**/.golangci.yaml"
+  - "**/go.mod"
+  - "**/go.sum"
