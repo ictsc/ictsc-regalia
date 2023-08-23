@@ -22,7 +22,7 @@ jobs:
       - name: Run golangci-lint
         uses: reviewdog/action-golangci-lint@v2
         with:
-          go_version_file: 'backend/go.mod'
+          go_version_file: backend/go.mod
           workdir: backend
           fail_on_error: true
           filter_mode: nofilter
@@ -35,7 +35,8 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
-          go-version-file: 'backend/go.mod'
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
       - name: Mod Download
         run: go mod download
       - name: Build
@@ -50,6 +51,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
-          go-version-file: 'backend/go.mod'
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
       - name: Run Test
         run: go test ./... -v
