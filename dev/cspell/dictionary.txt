@@ -1,6 +1,7 @@
 Ajay
 Ashleigh
 autodocs
+bytedance
 clsx
 cockroachdb
 daisyui
@@ -15,6 +16,7 @@ luxon
 Newf
 nextjs
 nofilter
+nolint
 noninteractive
 noto
 proto
