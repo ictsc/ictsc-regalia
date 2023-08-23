@@ -2,6 +2,7 @@ Ajay
 Ashleigh
 autodocs
 clsx
+cockroachdb
 daisyui
 Duardo
 ictsc
@@ -9,6 +10,7 @@ Kairi
 Kaleb
 Loba
 luxon
+Newf
 nextjs
 nofilter
 noninteractive

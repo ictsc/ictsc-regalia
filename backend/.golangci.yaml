@@ -12,6 +12,7 @@ linters:
     - structcheck # deprecated
     - varcheck # deprecated
     - depguard
+    - dogsled
     - godot
     - nolintlint
 
@@ -21,6 +22,15 @@ linters-settings:
   varnamelen:
     ignore-names:
       - tt
+  wrapcheck:
+    ignoreSigs:
+      - .Wrap(
+      - .Wrapf(
+      - .WithMessage(
+      - .WithMessagef(
+      - .WithStack(
+      - github.com/cockroachdb/errors.Newf(
+      - github.com/ictsc/ictsc-outlands/backend/pkg/errors.New(
 
 issues:
   exclude-use-default: false
