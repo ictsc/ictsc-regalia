@@ -25,6 +25,7 @@ jobs:
           go_version_file: 'backend/go.mod'
           workdir: backend
           fail_on_error: true
+          filter_mode: nofilter
   build:
     name: Build
     runs-on: ubuntu-latest
