@@ -5,7 +5,9 @@ clsx
 cockroachdb
 daisyui
 Duardo
+exhaustruct
 ictsc
+ireturn
 Kairi
 Kaleb
 Loba
