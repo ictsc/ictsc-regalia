@@ -26,7 +26,7 @@
     "daisyui": "^2.52.0",
     "eslint": "8.28.0",
     "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-next": "^13.4.12",
+    "eslint-config-next": "^13.4.19",
     "gray-matter": "^4.0.3",
     "luxon": "^3.3.0",
     "next": "^13.4.12",
