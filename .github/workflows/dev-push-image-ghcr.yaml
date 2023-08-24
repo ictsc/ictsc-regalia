@@ -1,4 +1,4 @@
-name: build_mgmt_image
+name: build_dev_image
 
 on:
   push:
@@ -24,8 +24,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,prefix=mgmt-,value=latest
-            type=sha,prefix=mgmt-,format=short
+            type=raw,prefix=dev-,value=latest
+            type=sha,prefix=dev-,format=short
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -43,9 +43,9 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: ./
+          context: ./frontend/octavio
           build-args: |
-            next_public_api_url=https://contest.mgmt.ictsc.net/api
+            next_public_api_url=https://contest.dev.ictsc.net/api
             next_public_answer_limit=20
             next_public_site_name=${{ secrets.SITE_NAME }}
             next_public_rule=${{ secrets.RULE }}
