@@ -1,12 +1,15 @@
 // Package oauth2 OAuth2認証プロバイダーインターフェース定義
 package oauth2
 
-import "context"
+import (
+	"context"
+	"net/url"
+)
 
 // Provider OAuth2認証プロバイダーインターフェース
 type Provider interface {
 	// AuthorizationURL フロントエンドをリダイレクトさせる認可URLを発行する
-	AuthorizationURL() (reqID, url string)
+	AuthorizationURL() (reqID string, url url.URL)
 
 	// GetToken OAuthプロバイダーが発行したcodeをアクセストークンに変換する
 	GetToken(ctx context.Context, reqID, code string) (token string, err error)
