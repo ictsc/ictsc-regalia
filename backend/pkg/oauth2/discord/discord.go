@@ -20,5 +20,5 @@ type Provider interface {
 }
 
 func Hello() {
-	fmt.Println("hello from discord")
+	fmt.Println("hello with discord!")
 }
