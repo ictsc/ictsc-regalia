@@ -3,6 +3,7 @@ package discord
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 )
 
@@ -16,4 +17,8 @@ type Provider interface {
 
 	// GetIdentity アクセストークンを使用して、プロバイダー上のIdentityを取得する
 	GetIdentity(ctx context.Context, token string) (identity string, err error)
+}
+
+func Hello() {
+	fmt.Println("hello from discord")
 }
