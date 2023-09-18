@@ -72,8 +72,8 @@ dependencies:
     specifier: 4.9.3
     version: 4.9.3
   zenn-content-css:
-    specifier: ^0.1.144
-    version: 0.1.144
+    specifier: ^0.1.146
+    version: 0.1.146
   zenn-embed-elements:
     specifier: ^0.1.144
     version: 0.1.144
@@ -13139,8 +13139,8 @@ packages:
     engines: {node: '>=12.20'}
     dev: true
 
-  /zenn-content-css@0.1.144:
-    resolution: {integrity: sha512-HTO7UlbAmj5uvNhbiUb/YvNe3etl+jCBkuIlpBOVgW6+szv7B/q3yjqEpV1n68aus+WYbkjqDKc62bJww/5mwA==}
+  /zenn-content-css@0.1.146:
+    resolution: {integrity: sha512-fVdvx/QKmDwhc4Qp1KJvKvacVyUE5kPJ/M3zG6jVb9nyyfM0liFWqcRXEDtLrL2sQIcSjr6NaeJ0kC4+bSnREw==}
     dev: false
 
   /zenn-embed-elements@0.1.144:
