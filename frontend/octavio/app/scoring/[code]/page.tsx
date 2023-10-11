@@ -63,7 +63,7 @@ function ScoringProblem({ params }: { params: { code: string } }) {
         <table className="table border table-compact">
           <thead>
             <tr>
-              <th>未済点 ~15分</th>
+              <th>未採点 ~15分</th>
               <th>15~19分</th>
               <th>20分~</th>
             </tr>
@@ -98,7 +98,7 @@ function ScoringProblem({ params }: { params: { code: string } }) {
           >
             <option value={0}>すべて</option>
             <option value={1}>採点済みのみ</option>
-            <option value={2}>未済点のみ</option>
+            <option value={2}>未採点のみ</option>
           </select>
         </div>
       </div>
