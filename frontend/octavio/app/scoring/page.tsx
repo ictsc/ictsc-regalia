@@ -41,7 +41,7 @@ function Index() {
           <thead>
             <tr>
               <th>採点</th>
-              <th>未済点 ~15分/15~19分/20分~</th>
+              <th>未採点 ~15分/15~19分/20分~</th>
               <th>ID</th>
               <th>問題コード</th>
               <th>タイトル</th>
