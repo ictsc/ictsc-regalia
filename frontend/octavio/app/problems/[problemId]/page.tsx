@@ -2,7 +2,7 @@
 
 import "zenn-content-css";
 
-import { useState } from "react";
+import React, { useState } from "react";
 
 import Error from "next/error";
 import Image from "next/image";
@@ -12,6 +12,7 @@ import { Toaster } from "react-hot-toast";
 
 import AnswerForm from "@/app/problems/[problemId]/_components/answer-form";
 import AnswerListSection from "@/app/problems/[problemId]/_components/answer-list-section";
+import MultipleAnswerForm from "@/app/problems/[problemId]/_components/multiple-answer-form";
 import { answerLimit, recreateRule } from "@/components/_const";
 import ICTSCCard from "@/components/card";
 import LoadingPage from "@/components/loading-page";
@@ -29,10 +30,11 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
   const [isReCreateModalOpen, setIsReCreateModalOpen] = useState(false);
 
   const { recreateInfo, mutate, reCreate } = useReCreateInfo(
-    problem?.code ?? null
+    problem?.code ?? null,
   );
-
+  const matterType = matter?.type ?? "normal";
   const isReadOnly = user?.is_read_only ?? true;
+
   const onReCreateSubmit = async () => {
     /* c8 ignore next 404 のところでチェックしているため必ず false になる */
     if (problem === null) {
@@ -89,7 +91,7 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
       <div className="container-ictsc">
         <div className="flex flex-row justify-between pt-12 justify-items-center">
           <ProblemTitle title={problem.title} />
-          {!isReadOnly && (
+          {!isReadOnly && matterType === "normal" && (
             <button
               type="button"
               className="btn text-red-500 btn-sm"
@@ -106,8 +108,9 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
           )}
         </div>
         <ProblemMeta problem={problem} />
-        <ProblemConnectionInfo matter={matter} />
-        {recreateInfo?.available != null &&
+        {matterType === "normal" && <ProblemConnectionInfo matter={matter} />}
+        {matterType === "normal" &&
+          recreateInfo?.available != null &&
           !(recreateInfo?.available ?? false) && (
             <div className="alert alert-info shadow-lg grow">
               <div>
@@ -125,18 +128,31 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
               </div>
             </div>
           )}
-        <ICTSCCard className="mt-8">
+        <ICTSCCard
+          className={clsx(
+            matterType === "normal" && "mt-8",
+            matterType === "multiple" && "mt-4",
+          )}
+        >
           <MarkdownPreview className="problem-body" content={problem.body} />
         </ICTSCCard>
-
-        {!isReadOnly && <AnswerForm code={params.problemId} />}
+        {!isReadOnly && matterType === "normal" && (
+          <AnswerForm code={params.problemId} />
+        )}
+        {!isReadOnly && matterType === "multiple" && (
+          <MultipleAnswerForm code={params.problemId} />
+        )}
         {answerLimit && (
           <div className="text-sm pt-2">
             ※ 回答は{answerLimit}分に1度のみです
           </div>
         )}
-        <div className="divider" />
-        <AnswerListSection problem={problem} />
+        {matterType !== "multiple" && (
+          <>
+            <div className="divider" />
+            <AnswerListSection problem={problem} />
+          </>
+        )}
       </div>
     </>
   );

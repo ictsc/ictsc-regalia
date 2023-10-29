@@ -23,6 +23,8 @@ interface ConnectionInfo {
   command?: string;
 }
 
+export type formType = "normal" | "multiple";
+
 export interface Matter {
   code: string;
   title: string;
@@ -30,6 +32,7 @@ export interface Matter {
   solvedCriterion: number;
   authorId: string;
   connectInfo?: ConnectionInfo[];
+  type: formType;
 }
 
 export const testProblem: Problem = {
