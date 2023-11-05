@@ -41,7 +41,7 @@
     "typescript": "5.0.4",
     "zenn-content-css": "^0.1.146",
     "zenn-embed-elements": "^0.1.144",
-    "zenn-markdown-html": "link:../../../zenn-editor/packages/zenn-markdown-html"
+    "zenn-markdown-html": "link:local-modules/zenn-editor/packages/zenn-markdown-html"
   },
   "devDependencies": {
     "@playwright/test": "^1.36.2",

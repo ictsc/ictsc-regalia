@@ -78,8 +78,8 @@ dependencies:
     specifier: ^0.1.144
     version: 0.1.144
   zenn-markdown-html:
-    specifier: link:../../../zenn-editor/packages/zenn-markdown-html
-    version: link:../../../zenn-editor/packages/zenn-markdown-html
+    specifier: link:local-modules/zenn-editor/packages/zenn-markdown-html
+    version: link:local-modules/zenn-editor/packages/zenn-markdown-html
 
 devDependencies:
   '@playwright/test':
