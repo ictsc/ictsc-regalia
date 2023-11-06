@@ -20,7 +20,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run golangci-lint
-        uses: reviewdog/action-golangci-lint@v2
+        uses: reviewdog/action-golangci-lint@v3
         with:
           go_version_file: backend/go.mod
           workdir: backend
