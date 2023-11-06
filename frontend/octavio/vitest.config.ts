@@ -9,7 +9,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "jsdom",
-    exclude: ["**/node_modules/**", "**/__e2e__/**"],
+    exclude: ["**/node_modules/**", "**/__e2e__/**", "**/local-modules/**"],
   },
   resolve: {
     alias: {
