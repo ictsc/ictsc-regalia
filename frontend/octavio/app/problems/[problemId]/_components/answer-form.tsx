@@ -2,17 +2,18 @@ import { useState } from "react";
 
 import clsx from "clsx";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 
+import {
+  errorNotify,
+  successNotify,
+} from "@/app/problems/[problemId]/_components/notify";
 import { answerLimit } from "@/components/_const";
-import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/alerts";
 import ICTSCCard from "@/components/card";
 import MarkdownPreview from "@/components/markdown-preview";
 import useAnswers from "@/hooks/answer";
 import useApi from "@/hooks/api";
 import useAuth from "@/hooks/auth";
 import useProblem from "@/hooks/problem";
-import {errorNotify, successNotify} from "@/app/problems/[problemId]/_components/notify";
 
 type Inputs = {
   answer: string;
