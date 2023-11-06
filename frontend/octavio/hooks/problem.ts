@@ -4,7 +4,15 @@ import useProblems from "@/hooks/problems";
 import { Matter } from "@/types/Problem";
 
 const useProblem = (code: string | null) => {
-  const { problems } = useProblems();
+  const { problems, isLoading } = useProblems();
+
+  if (isLoading) {
+    return {
+      matter: null,
+      problem: null,
+      isLoading,
+    };
+  }
 
   const problem = problems.find((prob) => prob.code === code) ?? null;
 
