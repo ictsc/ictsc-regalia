@@ -4,8 +4,8 @@ import "zenn-content-css";
 
 import React, { useState } from "react";
 
-import Error from "next/error";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 
 import clsx from "clsx";
 import { Toaster } from "react-hot-toast";
@@ -53,7 +53,7 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
   }
 
   if (problem === null) {
-    return <Error statusCode={404} />;
+    return notFound();
   }
 
   return (

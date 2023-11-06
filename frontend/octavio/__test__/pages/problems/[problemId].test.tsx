@@ -14,11 +14,8 @@ import { testReCreateInfo } from "@/types/ReCreate";
 import { testUser } from "@/types/User";
 
 vi.mock("react");
-vi.mock("next/error", () => ({
-  __esModule: true,
-  default: ({ statusCode }: { statusCode: number }) => (
-    <div data-testid="error" data-status-code={statusCode} />
-  ),
+vi.mock("next/navigation", () => ({
+  notFound: () => <div data-testid="error" />,
 }));
 vi.mock("@/components/_const", () => ({
   title: "title",
@@ -80,7 +77,7 @@ describe("[problemId]", () => {
 
     // then
     expect(
-      screen.queryByRole("button", { name: "再展開を行う" })
+      screen.queryByRole("button", { name: "再展開を行う" }),
     ).not.toBeInTheDocument();
     expect(screen.queryByTestId("answerForm")).not.toBeInTheDocument();
     expect(screen.queryByTestId("answerListSection")).toBeInTheDocument();
@@ -131,10 +128,6 @@ describe("[problemId]", () => {
 
     // then
     expect(screen.getByTestId("error")).toBeInTheDocument();
-    expect(screen.getByTestId("error")).toHaveAttribute(
-      "data-status-code",
-      "404"
-    );
 
     // verify
     expect(useAuth).toHaveBeenCalledTimes(1);
@@ -164,11 +157,11 @@ describe("[problemId]", () => {
 
     // then
     expect(
-      screen.queryByText("問題の再展開を行います。よろしいですか？")
+      screen.queryByText("問題の再展開を行います。よろしいですか？"),
     ).toBeInTheDocument();
     expect(screen.getAllByTestId("markdown-preview")[0]).toHaveAttribute(
       "data-content",
-      "テスト再展開ルール"
+      "テスト再展開ルール",
     );
 
     // verify
@@ -257,7 +250,7 @@ describe("[problemId]", () => {
 
     // then
     expect(
-      screen.queryByRole("button", { name: "再展開を行う" })
+      screen.queryByRole("button", { name: "再展開を行う" }),
     ).toBeInTheDocument();
     expect(screen.queryByTestId("answerForm")).toBeInTheDocument();
     expect(screen.queryByTestId("answerListSection")).toBeInTheDocument();
@@ -285,7 +278,7 @@ describe("[problemId]", () => {
 
     // then
     expect(
-      screen.queryByRole("button", { name: "再展開を行う" })
+      screen.queryByRole("button", { name: "再展開を行う" }),
     ).not.toBeInTheDocument();
     expect(screen.queryByTestId("answerForm")).not.toBeInTheDocument();
     expect(screen.queryByTestId("answerListSection")).toBeInTheDocument();

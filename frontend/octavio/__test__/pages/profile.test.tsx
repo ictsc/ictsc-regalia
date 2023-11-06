@@ -10,11 +10,8 @@ import Profile from "@/app/profile/page";
 import useAuth from "@/hooks/auth";
 import { testUser } from "@/types/User";
 
-vi.mock("next/error", () => ({
-  __esModule: true,
-  default: ({ statusCode }: { statusCode: number }) => (
-    <div data-testid="error" data-status-code={statusCode} />
-  ),
+vi.mock("next/navigation", () => ({
+  notFound: () => <div data-testid="error" />,
 }));
 vi.mock("@/hooks/auth");
 vi.mock("@/components/Alerts", () => ({
@@ -109,10 +106,6 @@ describe("Profile", () => {
 
     // then
     expect(screen.getByTestId("error")).toBeInTheDocument();
-    expect(screen.getByTestId("error")).toHaveAttribute(
-      "data-status-code",
-      "404"
-    );
 
     // verify
     expect(useAuth).toHaveBeenCalledTimes(1);
@@ -327,7 +320,7 @@ describe("Profile", () => {
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveAttribute(
       "data-message",
-      "プロフィールの更新に失敗しました"
+      "プロフィールの更新に失敗しました",
     );
     expect(alert).not.toHaveAttribute("data-sub-message");
 

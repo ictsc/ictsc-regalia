@@ -9,11 +9,8 @@ import useUserGroups from "@/hooks/userGroups";
 import { testUser } from "@/types/User";
 import { testUserGroup } from "@/types/UserGroup";
 
-vi.mock("next/error", () => ({
-  __esModule: true,
-  default: ({ statusCode }: { statusCode: number }) => (
-    <div data-testid="error" data-status-code={statusCode} />
-  ),
+vi.mock("next/navigation", () => ({
+  notFound: () => <div data-testid="error" />,
 }));
 vi.mock("@/hooks/userGroups");
 vi.mock("@/components/LoadingPage", () => ({
@@ -45,15 +42,15 @@ describe("Users", () => {
     const links = screen.getAllByRole("link");
     expect(links[0]).toHaveAttribute(
       "href",
-      `https://github.com/${testUser.profile?.github_id}`
+      `https://github.com/${testUser.profile?.github_id}`,
     );
     expect(links[1]).toHaveAttribute(
       "href",
-      `https://twitter.com/${testUser.profile?.twitter_id}`
+      `https://twitter.com/${testUser.profile?.twitter_id}`,
     );
     expect(links[2]).toHaveAttribute(
       "href",
-      `https://www.facebook.com/${testUser.profile?.facebook_id}`
+      `https://www.facebook.com/${testUser.profile?.facebook_id}`,
     );
 
     // verify
@@ -89,10 +86,6 @@ describe("Users", () => {
 
     // then
     expect(screen.getByTestId("error")).toBeInTheDocument();
-    expect(screen.getByTestId("error")).toHaveAttribute(
-      "data-status-code",
-      "404"
-    );
 
     // verify
     expect(useUserGroups).toHaveBeenCalledTimes(1);
@@ -147,11 +140,11 @@ describe("Users", () => {
     const links = screen.getAllByRole("link");
     expect(links[0]).toHaveAttribute(
       "href",
-      `https://twitter.com/${testUser.profile?.twitter_id}`
+      `https://twitter.com/${testUser.profile?.twitter_id}`,
     );
     expect(links[1]).toHaveAttribute(
       "href",
-      `https://www.facebook.com/${testUser.profile?.facebook_id}`
+      `https://www.facebook.com/${testUser.profile?.facebook_id}`,
     );
 
     // verify
@@ -176,7 +169,7 @@ describe("Users", () => {
     const links = screen.getAllByRole("link");
     expect(links[0]).toHaveAttribute(
       "href",
-      `https://github.com/${testUser.profile?.github_id}`
+      `https://github.com/${testUser.profile?.github_id}`,
     );
 
     // verify
@@ -201,11 +194,11 @@ describe("Users", () => {
     const links = screen.getAllByRole("link");
     expect(links[0]).toHaveAttribute(
       "href",
-      `https://github.com/${testUser.profile?.github_id}`
+      `https://github.com/${testUser.profile?.github_id}`,
     );
     expect(links[1]).toHaveAttribute(
       "href",
-      `https://twitter.com/${testUser.profile?.twitter_id}`
+      `https://twitter.com/${testUser.profile?.twitter_id}`,
     );
 
     // verify

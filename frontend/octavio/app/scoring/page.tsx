@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 
-import Error from "next/error";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import ICTSCCard from "@/components/card";
 import ConditionalText from "@/components/conditional-text";
@@ -18,7 +18,7 @@ function Index() {
   const { user } = useAuth();
   const { problems, isLoading } = useProblems();
   const [selectedProblemId, setSelectedProblemId] = useState<string | null>(
-    null
+    null,
   );
 
   const { problem } = useProblem(selectedProblemId);
@@ -31,7 +31,7 @@ function Index() {
   }
 
   if (!isFullAccess || isReadOnly || problems.length === 0) {
-    return <Error statusCode={404} />;
+    return notFound();
   }
 
   return (

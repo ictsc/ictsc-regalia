@@ -1,6 +1,6 @@
 "use client";
 
-import Error from "next/error";
+import { notFound } from "next/navigation";
 
 import LoadingPage from "@/components/loading-page";
 import useUserGroups from "@/hooks/userGroups";
@@ -76,7 +76,7 @@ function Page() {
   }
 
   if (userGroups === null) {
-    return <Error statusCode={404} />;
+    return notFound();
   }
 
   return (
@@ -89,52 +89,53 @@ function Page() {
         </tr>
       </thead>
       <tbody className="text-sm">
-        {userGroups?.map((userGroup) =>
-          userGroup.members?.map((member) => (
-            <tr key={member.id}>
-              <td className="whitespace-normal max-w-[300px]">
-                {member.display_name}
-                <div className="flex flex-row">
-                  {(member.profile?.github_id ?? "") !== "" && (
-                    <a
-                      href={`https://github.com/${member.profile?.github_id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-circle btn-ghost btn-xs"
-                    >
-                      <GithubIcon />
-                    </a>
-                  )}
-                  {(member.profile?.twitter_id ?? "") !== "" && (
-                    <a
-                      href={`https://twitter.com/${member.profile?.twitter_id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-circle btn-ghost btn-xs"
-                    >
-                      <TwitterIcon />
-                    </a>
-                  )}
-                  {(member.profile?.facebook_id ?? "") !== "" && (
-                    <a
-                      href={`https://www.facebook.com/${member.profile?.facebook_id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-circle btn-ghost btn-xs"
-                    >
-                      <FacebookIcon />
-                    </a>
-                  )}
-                </div>
-              </td>
-              <td className="whitespace-normal lg:min-w-[196px]">
-                {userGroup.name}
-              </td>
-              <td className="whitespace-normal">
-                {member.profile?.self_introduction}
-              </td>
-            </tr>
-          ))
+        {userGroups?.map(
+          (userGroup) =>
+            userGroup.members?.map((member) => (
+              <tr key={member.id}>
+                <td className="whitespace-normal max-w-[300px]">
+                  {member.display_name}
+                  <div className="flex flex-row">
+                    {(member.profile?.github_id ?? "") !== "" && (
+                      <a
+                        href={`https://github.com/${member.profile?.github_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-circle btn-ghost btn-xs"
+                      >
+                        <GithubIcon />
+                      </a>
+                    )}
+                    {(member.profile?.twitter_id ?? "") !== "" && (
+                      <a
+                        href={`https://twitter.com/${member.profile?.twitter_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-circle btn-ghost btn-xs"
+                      >
+                        <TwitterIcon />
+                      </a>
+                    )}
+                    {(member.profile?.facebook_id ?? "") !== "" && (
+                      <a
+                        href={`https://www.facebook.com/${member.profile?.facebook_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-circle btn-ghost btn-xs"
+                      >
+                        <FacebookIcon />
+                      </a>
+                    )}
+                  </div>
+                </td>
+                <td className="whitespace-normal lg:min-w-[196px]">
+                  {userGroup.name}
+                </td>
+                <td className="whitespace-normal">
+                  {member.profile?.self_introduction}
+                </td>
+              </tr>
+            )),
         )}
       </tbody>
     </table>

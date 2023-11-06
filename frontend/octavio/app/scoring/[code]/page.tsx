@@ -1,7 +1,8 @@
 "use client";
 
-import Error from "next/error";
-import { useSearchParams } from "next/navigation";
+import React from "react";
+
+import { notFound, useSearchParams } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 
@@ -45,7 +46,7 @@ function ScoringProblem({ params }: { params: { code: string } }) {
   }
 
   if (!isFullAccess || isReadOnly || problem === null) {
-    return <Error statusCode={404} />;
+    return notFound();
   }
 
   return (
