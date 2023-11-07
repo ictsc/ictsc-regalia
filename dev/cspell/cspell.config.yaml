@@ -21,3 +21,4 @@ ignorePaths:
   - "**/.golangci.yaml"
   - "**/go.mod"
   - "**/go.sum"
+  - "**/local-modules"

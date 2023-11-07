@@ -51,6 +51,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Checkout zenn-editor repository
+        uses: actions/checkout@v3
+        with:
+          repository: ictsc/zenn-editor
+          ref: feature/add-checkbox-and-radio
+          path: frontend/octavio/local-modules/zenn-editor
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
@@ -62,6 +69,20 @@ jobs:
           node-version: '18'
           cache: 'pnpm'
           cache-dependency-path: frontend/octavio/pnpm-lock.yaml
+
+      - name: Cache zenn-editor dependencies
+        uses: actions/cache@v3
+        with:
+          path: frontend/octavio/local-modules/zenn-editor/node_modules
+          key: zenn-editor-deps-${{ hashFiles('frontend/octavio/local-modules/zenn-editor/pnpm-lock.yaml') }}
+
+      - name: Install zenn-editor dependencies
+        working-directory: frontend/octavio/local-modules/zenn-editor
+        run: pnpm i --frozen-lockfile
+
+      - name: Build zenn-editor
+        working-directory: frontend/octavio/local-modules/zenn-editor
+        run: pnpm build --filter zenn-markdown-html
 
       - name: Install dependencies
         working-directory: frontend/octavio

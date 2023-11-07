@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import Error from "next/error";
+import { notFound } from "next/navigation";
 
 import { Controller, useForm } from "react-hook-form";
 
@@ -46,7 +46,7 @@ function Page() {
         ...getCurrentValue(),
       }),
       // eslint-disable-next-line
-      [user]
+      [user],
     ),
   });
 
@@ -79,7 +79,7 @@ function Page() {
   }
 
   if (user === null) {
-    return <Error statusCode={404} />;
+    return notFound();
   }
 
   return (

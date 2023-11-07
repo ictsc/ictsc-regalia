@@ -18,19 +18,13 @@ import { Answer, testAnswer } from "@/types/Answer";
 import { testProblem } from "@/types/Problem";
 import { testAdminUser, testUser } from "@/types/User";
 
-vi.mock("next/error", () => ({
-  __esModule: true,
-  default: ({ statusCode }: { statusCode: number }) => (
-    <div data-testid="error" data-status-code={statusCode} />
-  ),
-}));
 vi.mock("next/navigation", () => ({
   ...require("next-router-mock"),
   useSearchParams: vi.fn().mockReturnValue({
     get: vi.fn().mockReturnValue(null),
   }),
+  notFound: () => <div data-testid="error" />,
 }));
-
 vi.mock("react-hook-form", () => ({
   useForm: vi.fn(),
 }));
@@ -82,10 +76,6 @@ describe("ScoringProblem", () => {
 
     // when
     expect(screen.getByTestId("error")).toBeInTheDocument();
-    expect(screen.getByTestId("error")).toHaveAttribute(
-      "data-status-code",
-      "404"
-    );
 
     // then
     expect(useAuth).toHaveBeenCalledTimes(1);
@@ -109,10 +99,6 @@ describe("ScoringProblem", () => {
 
     // when
     expect(screen.getByTestId("error")).toBeInTheDocument();
-    expect(screen.getByTestId("error")).toHaveAttribute(
-      "data-status-code",
-      "404"
-    );
 
     // then
     expect(useAuth).toHaveBeenCalledTimes(1);
@@ -136,10 +122,6 @@ describe("ScoringProblem", () => {
 
     // when
     expect(screen.getByTestId("error")).toBeInTheDocument();
-    expect(screen.getByTestId("error")).toHaveAttribute(
-      "data-status-code",
-      "404"
-    );
 
     // then
     expect(useAuth).toHaveBeenCalledTimes(1);
@@ -163,10 +145,6 @@ describe("ScoringProblem", () => {
 
     // when
     expect(screen.getByTestId("error")).toBeInTheDocument();
-    expect(screen.getByTestId("error")).toHaveAttribute(
-      "data-status-code",
-      "404"
-    );
 
     // then
     expect(useAuth).toHaveBeenCalledTimes(1);
@@ -506,7 +484,7 @@ describe("ScoringProblem", () => {
     // then
     expect(screen.queryByTestId("scoring-answer-form")).toHaveAttribute(
       "data-key",
-      "1"
+      "1",
     );
   });
 });

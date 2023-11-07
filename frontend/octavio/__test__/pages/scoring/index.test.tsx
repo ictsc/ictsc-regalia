@@ -1,7 +1,5 @@
 import "@testing-library/jest-dom";
 
-import React from "react";
-
 import { act, render, screen } from "@testing-library/react";
 import { Mock, vi } from "vitest";
 
@@ -11,11 +9,8 @@ import useProblems from "@/hooks/problems";
 import { testProblem } from "@/types/Problem";
 import { testAdminUser, testUser } from "@/types/User";
 
-vi.mock("next/error", () => ({
-  __esModule: true,
-  default: ({ statusCode }: { statusCode: number }) => (
-    <div data-testid="error" data-status-code={statusCode} />
-  ),
+vi.mock("next/navigation", () => ({
+  notFound: () => <div data-testid="error" />,
 }));
 vi.mock("next/router", () => require("next-router-mock"));
 vi.mock("@/hooks/auth");
@@ -50,10 +45,6 @@ describe("Scoring", () => {
 
     // when
     expect(screen.getByTestId("error")).toBeInTheDocument();
-    expect(screen.getByTestId("error")).toHaveAttribute(
-      "data-status-code",
-      "404"
-    );
 
     // then
     expect(useAuth).toHaveBeenCalledTimes(1);
@@ -73,10 +64,6 @@ describe("Scoring", () => {
 
     // when
     expect(screen.getByTestId("error")).toBeInTheDocument();
-    expect(screen.getByTestId("error")).toHaveAttribute(
-      "data-status-code",
-      "404"
-    );
 
     // then
     expect(useAuth).toHaveBeenCalledTimes(1);
@@ -96,10 +83,6 @@ describe("Scoring", () => {
 
     // when
     expect(screen.getByTestId("error")).toBeInTheDocument();
-    expect(screen.getByTestId("error")).toHaveAttribute(
-      "data-status-code",
-      "404"
-    );
 
     // then
     expect(useAuth).toHaveBeenCalledTimes(1);
@@ -312,7 +295,7 @@ describe("Scoring", () => {
     // then
     expect(screen.getByTestId("markdown-preview")).toHaveAttribute(
       "data-content",
-      "# テスト本文"
+      "# テスト本文",
     );
 
     // verify

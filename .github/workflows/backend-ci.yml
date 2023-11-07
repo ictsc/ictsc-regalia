@@ -26,6 +26,7 @@ jobs:
           workdir: backend
           fail_on_error: true
           filter_mode: nofilter
+          args: --timeout=10m
   build:
     name: Build
     runs-on: ubuntu-latest

@@ -2,10 +2,12 @@ import { useState } from "react";
 
 import clsx from "clsx";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 
+import {
+  errorNotify,
+  successNotify,
+} from "@/app/problems/[problemId]/_components/notify";
 import { answerLimit } from "@/components/_const";
-import { ICTSCErrorAlert, ICTSCSuccessAlert } from "@/components/alerts";
 import ICTSCCard from "@/components/card";
 import MarkdownPreview from "@/components/markdown-preview";
 import useAnswers from "@/hooks/answer";
@@ -34,27 +36,6 @@ function AnswerForm({ code }: { code: string }) {
   const { user } = useAuth();
   const { problem } = useProblem(code);
   const { mutate } = useAnswers(problem?.id ?? null);
-
-  const successNotify = () =>
-    toast.custom((t) => (
-      <ICTSCSuccessAlert
-        className={clsx("mt-2", t.visible ? "animate-enter" : "animate-leave")}
-        message="投稿に成功しました"
-      />
-    ));
-
-  const errorNotify = () =>
-    toast.custom((t) => (
-      <ICTSCErrorAlert
-        className={clsx("mt-2", t.visible ? "animate-enter" : "animate-leave")}
-        message="投稿に失敗しました"
-        subMessage={
-          answerLimit === undefined
-            ? undefined
-            : `回答は${answerLimit}分に1度のみです`
-        }
-      />
-    ));
 
   const onSubmit: SubmitHandler<Inputs> = async ({ answer }) => {
     const response = await client.post(`problems/${problem?.id}/answers`, {

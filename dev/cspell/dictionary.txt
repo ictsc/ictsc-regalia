@@ -8,6 +8,8 @@ daisyui
 Duardo
 exhaustruct
 ictsc
+ictscr
+ictscc
 ireturn
 Kairi
 Kaleb

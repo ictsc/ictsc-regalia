@@ -2,6 +2,7 @@ import useSWR from "swr";
 
 import useApi from "@/hooks/api";
 import { GetReCreateInfo } from "@/types/ReCreate";
+import useProblem from "@/hooks/problem";
 
 const useReCreateInfo = (problemCode: string | null) => {
   const { client } = useApi();
@@ -14,7 +15,7 @@ const useReCreateInfo = (problemCode: string | null) => {
     fetcher,
     {
       refreshInterval: 30000,
-    }
+    },
   );
 
   const reCreate = async (code: string) => client.post(`recreate/${code}`);

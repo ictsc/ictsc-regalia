@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import "zenn-content-css";
 import clsx from "clsx";
@@ -29,7 +29,7 @@ function MarkdownPreview({ className, content }: Props) {
 
   useEffect(() => {
     const codeBlockContainers = ref.current?.querySelectorAll(
-      "div.code-block-container"
+      "div.code-block-container",
     );
     codeBlockContainers?.forEach((codeBlockContainer) => {
       // eslint-disable-next-line no-param-reassign
@@ -67,16 +67,77 @@ function MarkdownPreview({ className, content }: Props) {
     });
   }, []);
 
-  return (
-    <div
-      className={clsx("znc", className)}
-      ref={ref}
-      /* eslint-disable-next-line react/no-danger */
-      dangerouslySetInnerHTML={{
-        __html: markdownToHtml(content ?? ""),
-      }}
-    />
-  );
+  return useMemo(() => {
+    let count = 0;
+
+    return (
+      <div
+        className={clsx("znc", className)}
+        ref={ref}
+        /* eslint-disable-next-line react/no-danger */
+        dangerouslySetInnerHTML={{
+          __html: markdownToHtml(content ?? "", {
+            customEmbed: {
+              ictscr(str) {
+                const lines = str
+                  .split("\n")
+                  .filter((line) => line.startsWith("- [ ]"));
+
+                const radioButtons = lines.map((line, index) => {
+                  const label = line.replace("- [ ]", "").trim();
+                  return `
+                    <div class="flex items-center mb-4">
+                      <input 
+                        id="radio-${count}-${index}" 
+                        type="radio" 
+                        value=${index} 
+                        name="radio${count}" 
+                        class="w-6 h-4 text-blue-600 bg-gray-100 border-gray-300"
+                      >
+                      <label for="radio-${count}-${index}" class="ml-2 text-sm font-medium text-gray-900">${label}</label>
+                    </div>`;
+                });
+
+                count += 1;
+
+                return `
+                  <div class="radio-buttons pt-2">
+                    <fieldset class="flex flex-col space-y-4">${radioButtons.join(
+                      "",
+                    )}</fieldset>
+                  </div>`;
+              },
+              ictscc(str) {
+                // - [ ] で始まる行を取得
+                const lines = str
+                  .split("\n")
+                  .filter((line) => line.startsWith("- [ ]"));
+
+                // checkbox を追加
+                const checkboxes = lines.map((line, index) => {
+                  const label = line.replace("- [ ]", "").trim();
+                  return `
+                        <div class="flex items-center mb-4">
+                            <input id="checkbox-${count}-${index}" type="checkbox" value=${index} name="checkbox${count}" class="w-6 h-4 text-blue-600 bg-gray-100 border-gray-30">
+                            <label for="checkbox-${count}-${index}" class="ml-2 text-sm font-medium text-gray-900">${label}</label>
+                        </div>`;
+                });
+
+                count += 1;
+
+                return `
+          <div class="checkboxes pt-2">
+              <fieldset class="flex flex-col space-y-4">${checkboxes.join(
+                "",
+              )}</fieldset>
+          </div>`;
+              },
+            },
+          }),
+        }}
+      />
+    );
+  }, [content, className]);
 }
 
 MarkdownPreview.defaultProps = {
