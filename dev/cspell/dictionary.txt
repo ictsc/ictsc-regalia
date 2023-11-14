@@ -1,6 +1,7 @@
 Ajay
 Ashleigh
 autodocs
+bufbuild
 automerge
 bytedance
 clsx
