@@ -17,13 +17,13 @@ type Config struct {
 }
 
 // Redis Redisクライアント
-type Redis[K, V any] struct {
+type Redis[V any] struct {
 	c *redis.Client
 }
 
 // New Redisクライアント生成
-func New[K, V any](conf *Config) *Redis[K, V] {
-	return &Redis[K, V]{
+func New[V any](conf *Config) *Redis[V] {
+	return &Redis[V]{
 		c: redis.NewClient(&redis.Options{ // nolint:exhaustruct
 			Addr:     conf.Hostname + ":" + strconv.Itoa(conf.Port),
 			Username: conf.Username,
