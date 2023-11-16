@@ -56,8 +56,6 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
     return notFound();
   }
 
-  console.log(problem.body);
-
   return (
     <>
       <Toaster />
