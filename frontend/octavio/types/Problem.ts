@@ -1,8 +1,11 @@
+export type formType = "normal" | "multiple";
+
 export interface Problem {
   id: string;
   code: string;
   title: string;
   body?: string;
+  type: formType;
   point: number;
   solved_criterion: number | null;
   previous_problem_id: string | null;
@@ -23,8 +26,6 @@ interface ConnectionInfo {
   command?: string;
 }
 
-export type formType = "normal" | "multiple";
-
 export interface Matter {
   code: string;
   title: string;
@@ -32,7 +33,6 @@ export interface Matter {
   solvedCriterion: number;
   authorId: string;
   connectInfo?: ConnectionInfo[];
-  type: formType;
 }
 
 export const testProblem: Problem = {
@@ -40,6 +40,7 @@ export const testProblem: Problem = {
   code: "XYZ",
   title: "テスト問題タイトル",
   body: "---\ntitle: テスト\n---\n# テスト本文",
+  type: "normal",
   point: 100,
   solved_criterion: 150,
   previous_problem_id: null,
