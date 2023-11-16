@@ -32,7 +32,7 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
   const { recreateInfo, mutate, reCreate } = useReCreateInfo(
     problem?.code ?? null,
   );
-  const matterType = matter?.type ?? "normal";
+  const formType = problem?.type ?? "normal";
   const isReadOnly = user?.is_read_only ?? true;
 
   const onReCreateSubmit = async () => {
@@ -55,6 +55,8 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
   if (problem === null) {
     return notFound();
   }
+
+  console.log(problem.body);
 
   return (
     <>
@@ -91,7 +93,7 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
       <div className="container-ictsc">
         <div className="flex flex-row justify-between pt-12 justify-items-center">
           <ProblemTitle title={problem.title} />
-          {!isReadOnly && matterType === "normal" && (
+          {!isReadOnly && formType === "normal" && (
             <button
               type="button"
               className="btn text-red-500 btn-sm"
@@ -108,8 +110,8 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
           )}
         </div>
         <ProblemMeta problem={problem} />
-        {matterType === "normal" && <ProblemConnectionInfo matter={matter} />}
-        {matterType === "normal" &&
+        {formType === "normal" && <ProblemConnectionInfo matter={matter} />}
+        {formType === "normal" &&
           recreateInfo?.available != null &&
           !(recreateInfo?.available ?? false) && (
             <div className="alert alert-info shadow-lg grow">
@@ -130,16 +132,16 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
           )}
         <ICTSCCard
           className={clsx(
-            matterType === "normal" && "mt-8",
-            matterType === "multiple" && "mt-4",
+            formType === "normal" && "mt-8",
+            formType === "multiple" && "mt-4",
           )}
         >
           <MarkdownPreview className="problem-body" content={problem.body} />
         </ICTSCCard>
-        {!isReadOnly && matterType === "normal" && (
+        {!isReadOnly && formType === "normal" && (
           <AnswerForm code={params.problemId} />
         )}
-        {!isReadOnly && matterType === "multiple" && (
+        {!isReadOnly && formType === "multiple" && (
           <MultipleAnswerForm code={params.problemId} />
         )}
         {answerLimit && (
@@ -147,7 +149,7 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
             ※ 回答は{answerLimit}分に1度のみです
           </div>
         )}
-        {matterType !== "multiple" && (
+        {formType !== "multiple" && (
           <>
             <div className="divider" />
             <AnswerListSection problem={problem} />
