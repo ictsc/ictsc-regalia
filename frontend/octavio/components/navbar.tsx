@@ -43,9 +43,6 @@ function ICTSCNavBar() {
               </li>
             </>
           )}
-          <li>
-            <Link href="/ranking">順位</Link>
-          </li>
           {user !== null && (
             <>
               <li>
