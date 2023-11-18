@@ -13,17 +13,17 @@ export function ICTSCSuccessAlert({ className, message, subMessage }: Props) {
     <div
       className={clsx(
         "alert alert-success shadow-lg max-w-xs min-w-[312ppx]",
-        className
+        className,
       )}
     >
-      <div>
+      <div className="flex flex-row">
         <Image
           src="/assets/svg/check-circle.svg"
           width={24}
           height={24}
           alt="success"
         />
-        <div>
+        <div className="pl-2">
           <h3>{message}</h3>
           {subMessage && <span className="text-xs">{subMessage}</span>}
         </div>
@@ -37,17 +37,17 @@ export function ICTSCErrorAlert({ className, message, subMessage }: Props) {
     <div
       className={clsx(
         "alert alert-error shadow-lg max-w-xs min-w-[312ppx]",
-        className
+        className,
       )}
     >
-      <div>
+      <div className="flex flex-row">
         <Image
           src="/assets/svg/x-circle.svg"
           width={24}
           height={24}
           alt="success"
         />
-        <div>
+        <div className="pl-2">
           <h3>{message}</h3>
           {subMessage && <span className="text-xs">{subMessage}</span>}
         </div>
