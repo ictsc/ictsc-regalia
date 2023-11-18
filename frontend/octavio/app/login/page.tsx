@@ -33,18 +33,24 @@ function Page() {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setSubmitting(true);
-    const response = await signIn({
+    await signIn({
       name: data.name,
       password: data.password,
-    });
+    })
+      .then((res) => {
+        setStatus(res.code);
 
-    setSubmitting(false);
-    setStatus(response.code);
-
-    if (response.code === 200) {
-      await mutate();
-      await router.push("/");
-    }
+        if (res.code === 200) {
+          mutate();
+          router.push("/");
+        }
+      })
+      .catch((e) => {
+        setStatus(e.code);
+      })
+      .finally(() => {
+        setSubmitting(false);
+      });
   };
 
   return (
@@ -90,10 +96,12 @@ function Page() {
         type="submit"
         id="loginBtn"
         className={clsx(
-          "btn btn-primary mt-4 max-w-xs min-w-[312px]",
-          submitting && "loading"
+          "btn mt-4 max-w-xs min-w-[312px]",
+          !submitting ? "btn-primary" : "btn-disabled",
         )}
+        disabled={submitting}
       >
+        {submitting && <span className="loading loading-spinner" />}
         ログイン
       </button>
     </form>
