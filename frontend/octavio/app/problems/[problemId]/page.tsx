@@ -112,19 +112,16 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
         {formType === "normal" &&
           recreateInfo?.available != null &&
           !(recreateInfo?.available ?? false) && (
-            <div className="alert alert-info shadow-lg grow">
-              <div>
-                <div className="animate-spin">
-                  <Image
-                    src="/assets/svg/arrow-path.svg"
-                    height={24}
-                    width={24}
-                    alt="recreate"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <span>問題を再展開中です</span>
-                </div>
+            <div className="alert alert-info shadow-lg grow flex flex-row mb-4">
+              <Image
+                src="/assets/svg/arrow-path.svg"
+                height={24}
+                width={24}
+                alt="recreate"
+                className="animate-spin"
+              />
+              <div className="flex flex-col">
+                <span>問題を再展開中です</span>
               </div>
             </div>
           )}
