@@ -38,47 +38,51 @@ function Page() {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setSubmitting(true);
-    const response = await signUp({
+    signUp({
       name: data.name,
       password: data.password,
       user_group_id: userGroupId as string,
       invitation_code: invitationCode as string,
-    });
+    })
+      .then((res) => {
+        setStatus(res.code);
 
-    setSubmitting(false);
-    setStatus(response.code);
+        if (res.code === 201) {
+          router.push("/login");
+        }
+      })
+      .catch((e) => {
+        setStatus(e.code);
 
-    if (!(response.code === 201)) {
-      const msg = response.data ?? "";
-      if (msg.match(/Error 1062: Duplicate entry '\w+' for key 'name'/)) {
-        setMessage("ユーザー名が重複しています。");
-      }
-      if (
-        msg.match(
-          /Error:Field validation for 'UserGroupID' failed on the 'required' tag/
-        )
-      ) {
-        setMessage("無効なユーザーグループです。");
-      }
-      if (
-        msg.match(
-          /Error:Field validation for 'UserGroupID' failed on the 'uuid' tag/
-        )
-      ) {
-        setMessage("無効なユーザーグループです。");
-      }
-      if (
-        msg.match(
-          /Error:Field validation for 'InvitationCode' failed on the 'required' tag/
-        )
-      ) {
-        setMessage("無効な招待コードです。");
-      }
-    }
-
-    if (response.code === 201) {
-      await router.push("/login");
-    }
+        const msg = e.response.data.error ?? "";
+        if (msg.match(/Error 1062: Duplicate entry '\w+' for key 'name'/)) {
+          setMessage("ユーザー名が重複しています。");
+        }
+        if (
+          msg.match(
+            /Error:Field validation for 'UserGroupID' failed on the 'required' tag/,
+          )
+        ) {
+          setMessage("無効なユーザーグループです。");
+        }
+        if (
+          msg.match(
+            /Error:Field validation for 'UserGroupID' failed on the 'uuid' tag/,
+          )
+        ) {
+          setMessage("無効なユーザーグループです。");
+        }
+        if (
+          msg.match(
+            /Error:Field validation for 'InvitationCode' failed on the 'required' tag/,
+          )
+        ) {
+          setMessage("無効な招待コードです。");
+        }
+      })
+      .finally(() => {
+        setSubmitting(false);
+      });
   };
 
   return (
@@ -100,7 +104,14 @@ function Page() {
         />
       )}
       <input
-        {...register("name", { required: true })}
+        {...register("name", {
+          required: "ユーザー名を入力してください",
+          pattern: {
+            value: /^[A-Za-z0-9_]{3,32}$/,
+            message:
+              "ユーザー名は3〜32文字のアルファベット、数字、アンダースコアのみが使用できます",
+          },
+        })}
         type="text"
         placeholder="ユーザー名"
         id="username"
@@ -109,7 +120,7 @@ function Page() {
       <div className="label max-w-xs min-w-[312px]">
         {errors.name && (
           <span className="label-text-alt text-error">
-            ユーザー名を入力してください
+            {errors.name.message}
           </span>
         )}
       </div>
@@ -139,10 +150,12 @@ function Page() {
         type="submit"
         id="signUpBtn"
         className={clsx(
-          "btn btn-primary mt-4 max-w-xs min-w-[312px]",
-          submitting && "loading"
+          "btn mt-4 max-w-xs min-w-[312px]",
+          !submitting ? "btn-primary" : "btn-disabled",
         )}
+        disabled={submitting}
       >
+        {submitting && <span className="loading loading-spinner" />}
         登録
       </button>
     </form>
