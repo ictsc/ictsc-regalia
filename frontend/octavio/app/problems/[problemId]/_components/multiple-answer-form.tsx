@@ -71,7 +71,8 @@ function MultipleAnswerForm({ code }: { code: string }) {
         }
       });
     });
-  }, [latestAnswerID, sortedAnswers]);
+    // eslint-disable-next-line
+  }, [sortedAnswers]);
 
   const sendButton = async () => {
     const checkedRadioElements = document.querySelectorAll(
