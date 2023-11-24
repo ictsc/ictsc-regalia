@@ -10,7 +10,7 @@ import (
 
 // Get 指定したキーの値を取得する
 func (r *Redis[V]) Get(ctx context.Context, key string) (*V, error) { // nolint:ireturn
-	valueStr, err := r.c.Get(ctx, key).Result()
+	valueStr, err := r.c.Get(ctx, r.srv+key).Result()
 	if err != nil {
 		return nil, errors.Wrap(err)
 	}
@@ -30,7 +30,7 @@ func (r *Redis[V]) Set(ctx context.Context, key string, value V, ttl int) error 
 		return errors.Wrap(err)
 	}
 
-	err = r.c.Set(ctx, key, string(valueStr), time.Millisecond*time.Duration(ttl)).Err()
+	err = r.c.Set(ctx, r.srv+key, string(valueStr), time.Millisecond*time.Duration(ttl)).Err()
 
 	return errors.Wrap(err)
 }
