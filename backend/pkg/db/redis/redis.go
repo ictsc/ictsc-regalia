@@ -14,11 +14,14 @@ type Config struct {
 	Username string
 	Password string
 	Database int
+
+	Service string // Redisを利用しているサービス名
 }
 
 // Redis Redisクライアント
 type Redis[V any] struct {
-	c *redis.Client
+	c   *redis.Client
+	srv string
 }
 
 // New Redisクライアント生成
@@ -30,5 +33,6 @@ func New[V any](conf *Config) *Redis[V] {
 			Password: conf.Password,
 			DB:       conf.Database,
 		}),
+		srv: conf.Service,
 	}
 }
