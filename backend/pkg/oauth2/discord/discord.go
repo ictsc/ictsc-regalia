@@ -17,3 +17,5 @@ type Provider interface {
 	// GetIdentity アクセストークンを使用して、プロバイダー上のIdentityを取得する
 	GetIdentity(ctx context.Context, token string) (identity string, err error)
 }
+
+func 
