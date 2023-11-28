@@ -26,6 +26,7 @@ noninteractive
 noto
 proto
 protobuf
+protovalidate
 signin
 signout
 tailwindcss
