@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import clsx from "clsx";
 
+import { preRoundMode } from "@/components/_const";
 import { Problem } from "@/types/Problem";
 
 type Props = {
@@ -9,15 +10,18 @@ type Props = {
 };
 
 function ProblemCard({ problem }: Props) {
-  // let problemText = "";
-  // if (
-  //   problem.current_point >= (problem.solved_criterion ?? problem.current_point)
-  // ) {
-  const problemText = "font-bold text-gray-500";
-  // }
-  // if (problem.current_point === problem.point) {
-  //  problemText = "font-bold text-amber-500";
-  // }
+  let problemText = "font-bold text-gray-500";
+  if (!preRoundMode) {
+    if (
+      problem.current_point >=
+      (problem.solved_criterion ?? problem.current_point)
+    ) {
+      problemText = "font-bold text-gray-500";
+    }
+    if (problem.current_point === problem.point) {
+      problemText = "font-bold text-amber-500";
+    }
+  }
 
   return (
     <Link
@@ -32,7 +36,9 @@ function ProblemCard({ problem }: Props) {
       </div>
       <div>
         <div className={clsx("problem-point text-right", problemText)}>
-          {problem.point}pt
+          {preRoundMode
+            ? `${problem.point}pt`
+            : `${problem.current_point}/${problem.point}pt`}
         </div>
         <div className="font-bold text-primary">問題文へ→</div>
       </div>

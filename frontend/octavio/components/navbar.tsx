@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { mutate } from "swr";
 
+import { preRoundMode } from "@/components/_const";
 import useAuth from "@/hooks/auth";
 
 function ICTSCNavBar() {
@@ -42,6 +43,11 @@ function ICTSCNavBar() {
                 <Link href="/problems">問題</Link>
               </li>
             </>
+          )}
+          {!preRoundMode && (
+            <li>
+              <Link href="/ranking">順位</Link>
+            </li>
           )}
           {user !== null && (
             <>

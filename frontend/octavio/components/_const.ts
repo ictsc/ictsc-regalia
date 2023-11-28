@@ -5,6 +5,7 @@ export const site = process.env.NEXT_PUBLIC_SITE_NAME ?? "";
 export const rule = replaceN(process.env.RULE ?? "");
 export const shortRule = replaceN(process.env.NEXT_PUBLIC_SHORT_RULE ?? "");
 export const recreateRule = replaceN(
-  process.env.NEXT_PUBLIC_RECREATE_RULE ?? ""
+  process.env.NEXT_PUBLIC_RECREATE_RULE ?? "",
 );
 export const answerLimit = process.env.NEXT_PUBLIC_ANSWER_LIMIT;
+export const preRoundMode = process.env.NEXT_PUBLIC_PRE_ROUND_MODE === "true";
