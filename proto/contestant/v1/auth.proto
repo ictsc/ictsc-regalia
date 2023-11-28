@@ -9,11 +9,11 @@ option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/cont
 message GetCallbackRequest {}
 
 message GetCallbackResponse {
-  string redirect_uri = 1 [ (buf.validate.field).string.uri = true ];
+  string redirect_uri = 1 [(buf.validate.field).string.uri = true];
 }
 
 message PostCodeRequest {
-  string code = 1 [ (buf.validate.field).string.min_len = 1 ];
+  string code = 1 [(buf.validate.field).string.min_len = 1];
 }
 
 message PostCodeResponse {}
