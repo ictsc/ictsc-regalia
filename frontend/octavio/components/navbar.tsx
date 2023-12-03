@@ -54,7 +54,7 @@ function ICTSCNavBar() {
               <li>
                 <Link href="/users">参加者</Link>
               </li>
-              {user.user_group.is_full_access && !user.is_read_only && (
+              {user?.user_group.is_full_access && !user.is_read_only && (
                 <li>
                   <Link href="/scoring">採点</Link>
                 </li>
@@ -68,14 +68,14 @@ function ICTSCNavBar() {
           ) : (
             // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
             <li tabIndex={0} className="ml-4 dropdown dropdown-end">
-              <div>{user.display_name}</div>
+              <div>{user?.display_name}</div>
               <ul
                 /* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */
                 tabIndex={0}
                 className="menu menu-compact dropdown-content bg-base-100 mt-3 p-2 shadow rounded-box w-52 text-base-content"
               >
                 <li>
-                  <div>チーム: {user.user_group.name}</div>
+                  <div>チーム: {user?.user_group.name}</div>
                 </li>
                 <li>
                   <Link href="/profile">プロフィール</Link>
