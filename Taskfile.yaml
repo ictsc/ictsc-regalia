@@ -1,0 +1,7 @@
+version: 3
+
+tasks:
+  init:
+    desc: Initialize the Workspace
+    cmds:
+      - cp .vscode/settings-sample.json .vscode/settings.json
