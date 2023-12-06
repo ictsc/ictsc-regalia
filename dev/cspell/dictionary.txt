@@ -3,6 +3,7 @@ Ashleigh
 autodocs
 bytedance
 clsx
+cmds
 cockroachdb
 daisyui
 Duardo
