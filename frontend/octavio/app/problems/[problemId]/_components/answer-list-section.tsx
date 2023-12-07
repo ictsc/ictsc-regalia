@@ -30,8 +30,8 @@ function AnswerListSection({ problem }: AnswerSectionProps) {
               <th className="w-[196px]">提出日時</th>
               <th className="w-[100px]">問題コード</th>
               <th>問題</th>
-              <th className="w-[100px]">得点</th>
-              <th className="w-[100px]">チェック済み</th>
+              {/* <th className="w-[100px]">得点</th> */}
+              {/* <th className="w-[100px]">チェック済み</th> */}
               <th className="w-[50px]" aria-label="投稿内容" />
               <th className="w-[50px]" aria-label="ダウンロード" />
             </tr>
@@ -58,10 +58,10 @@ function AnswerListSection({ problem }: AnswerSectionProps) {
                     <td>{createdAt.toFormat("yyyy-MM-dd HH:mm:ss")}</td>
                     <td>{problem?.code}</td>
                     <td>{problem?.title}</td>
-                    <td className="text-right">{answer?.point ?? "--"} pt</td>
-                    <td className="text-center">
-                      {answer.point != null ? "○" : "採点中"}
-                    </td>
+                    {/* <td className="text-right">{answer?.point ?? "--"} pt</td> */}
+                    {/* <td className="text-center"> */}
+                    {/*  {answer.point != null ? "○" : "採点中"} */}
+                    {/* </td> */}
                     <td>
                       <a
                         href="#preview"
@@ -73,9 +73,7 @@ function AnswerListSection({ problem }: AnswerSectionProps) {
                     </td>
                     <td>
                       <a
-                        download={`ictsc-${
-                          problem?.code
-                        }-${createdAt.toUnixInteger()}.md`}
+                        download={`ictsc-${problem?.code}-${createdAt.toUnixInteger()}.md`}
                         className="link"
                         href={URL.createObjectURL(blob)}
                       >
@@ -109,7 +107,7 @@ function AnswerListSection({ problem }: AnswerSectionProps) {
               </div>
               <div className="answer-preview-created-at">
                 {DateTime.fromISO(selectedAnswer.created_at).toFormat(
-                  "yyyy-MM-dd HH:mm:ss"
+                  "yyyy-MM-dd HH:mm:ss",
                 )}
               </div>
             </div>
@@ -120,7 +118,7 @@ function AnswerListSection({ problem }: AnswerSectionProps) {
                   onClick={() => setIsPreviewAnswer(false)}
                   className={clsx(
                     `tab tab-lifted`,
-                    !isPreviewAnswer && "tab-active"
+                    !isPreviewAnswer && "tab-active",
                   )}
                 >
                   Markdown
@@ -130,7 +128,7 @@ function AnswerListSection({ problem }: AnswerSectionProps) {
                   onClick={() => setIsPreviewAnswer(true)}
                   className={clsx(
                     `tab tab-lifted`,
-                    isPreviewAnswer && "tab-active"
+                    isPreviewAnswer && "tab-active",
                   )}
                 >
                   Preview
