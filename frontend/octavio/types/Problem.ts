@@ -14,6 +14,7 @@ export interface Problem {
   unchecked_near_overdue: number | null;
   unchecked_overdue: number | null;
   current_point: number;
+  is_answered: boolean;
   is_solved: boolean;
 }
 
@@ -49,5 +50,6 @@ export const testProblem: Problem = {
   unchecked_near_overdue: null,
   unchecked_overdue: null,
   current_point: 100,
+  is_answered: false,
   is_solved: false,
 };

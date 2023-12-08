@@ -10,8 +10,13 @@ type Props = {
 };
 
 function ProblemCard({ problem }: Props) {
-  let problemText = "font-bold text-gray-500";
-  if (!preRoundMode) {
+  let problemText = "";
+
+  if (preRoundMode) {
+    if (problem.is_answered) {
+      problemText = "font-bold text-amber-500";
+    }
+  } else {
     if (
       problem.current_point >=
       (problem.solved_criterion ?? problem.current_point)
