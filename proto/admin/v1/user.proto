@@ -12,7 +12,7 @@ message User {
     min_len: 1,
     max_len: 20
   }];
-  string group_id = 3 [(buf.validate.field).string.len = 26];
+  string team_id = 3 [(buf.validate.field).string.len = 26];
 }
 
 message GetUserRequest {
@@ -24,7 +24,7 @@ message GetUserResponse {
 }
 
 message GetUsersRequest {
-  string group_id = 1 [(buf.validate.field).string.len = 26];
+  string team_id = 1 [(buf.validate.field).string.len = 26];
 }
 
 message GetUsersResponse {
