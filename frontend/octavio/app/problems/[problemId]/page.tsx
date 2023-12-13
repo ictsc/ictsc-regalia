@@ -30,7 +30,7 @@ function ProblemPage({ params }: { params: { problemId: string } }) {
   const [isReCreateModalOpen, setIsReCreateModalOpen] = useState(false);
 
   const { recreateInfo, mutate, reCreate } = useReCreateInfo(
-    problem?.code ?? null,
+    problem?.type === "normal" ? problem?.code ?? null : null,
   );
   const formType = problem?.type ?? "normal";
   const isReadOnly = user?.is_read_only ?? true;
