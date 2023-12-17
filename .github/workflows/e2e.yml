@@ -252,7 +252,7 @@ jobs:
         working-directory: ictsc-rikka
         run: |
           set +e # curlのエラーを無視する
-          cp scripts/compose.ci.yml docker-compose.override.yml
+          cp scripts/compose.ci.yml compose.override.yml
           make up
 
           url="http://localhost:8080"
