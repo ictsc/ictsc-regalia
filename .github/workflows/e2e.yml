@@ -138,7 +138,7 @@ jobs:
         with:
           repository: ictsc/ictsc-rikka
           path: ictsc-rikka
-          ref: c9fb8c2731f6bd2d1eeb3c3083732e296162fa01
+          ref: 6118e0a1be791b1397d0b0dbae0dd275525e8181
 
       #  MariaDB cache
       - name: Cache a MariaDB Docker image
