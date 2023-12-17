@@ -93,10 +93,10 @@ describe("SignUp", () => {
 
     // then
     expect(
-      screen.queryByText("ユーザー名を入力してください")
+      screen.queryByText("ユーザー名を入力してください"),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("パスワードを入力して下さい")
+      screen.queryByText("パスワードを入力して下さい"),
     ).toBeInTheDocument();
 
     // verify
@@ -119,10 +119,10 @@ describe("SignUp", () => {
 
     // then
     expect(
-      screen.queryByText("ユーザー名を入力してください")
+      screen.queryByText("ユーザー名を入力してください"),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("パスワードを入力して下さい")
+      screen.queryByText("パスワードを入力して下さい"),
     ).not.toBeInTheDocument();
 
     // verify
@@ -145,10 +145,10 @@ describe("SignUp", () => {
 
     // then
     expect(
-      screen.queryByText("ユーザー名を入力してください")
+      screen.queryByText("ユーザー名を入力してください"),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByText("パスワードを入力して下さい")
+      screen.queryByText("パスワードを入力して下さい"),
     ).toBeInTheDocument();
 
     // verify
@@ -172,7 +172,7 @@ describe("SignUp", () => {
 
     // then
     expect(
-      screen.queryByText("パスワードは8文字以上である必要があります")
+      screen.queryByText("パスワードは8文字以上である必要があります"),
     ).toBeInTheDocument();
 
     // verify
@@ -204,7 +204,7 @@ describe("SignUp", () => {
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveAttribute(
       "data-message",
-      "ユーザー登録に成功しました！"
+      "ユーザー登録に成功しました！",
     );
     expect(alert).not.toHaveAttribute("data-sub-message");
 
@@ -241,7 +241,7 @@ describe("SignUp", () => {
     expect(alert).toHaveAttribute("data-message", "エラーが発生しました");
     expect(alert).toHaveAttribute(
       "data-sub-message",
-      "ユーザー名が重複しています。"
+      "ユーザー名が重複しています。",
     );
 
     // verify
@@ -276,7 +276,7 @@ describe("SignUp", () => {
     expect(alert).toHaveAttribute("data-message", "エラーが発生しました");
     expect(alert).toHaveAttribute(
       "data-sub-message",
-      "無効なユーザーグループです。"
+      "無効なユーザーグループです。",
     );
 
     // verify
@@ -311,7 +311,7 @@ describe("SignUp", () => {
     expect(alert).toHaveAttribute("data-message", "エラーが発生しました");
     expect(alert).toHaveAttribute(
       "data-sub-message",
-      "無効なユーザーグループです。"
+      "無効なユーザーグループです。",
     );
 
     // verify
@@ -390,7 +390,7 @@ describe("SignUp", () => {
         setTimeout(() => {
           resolve({ code: 200 });
         }, 1000);
-      })
+      }),
     );
     (useAuth as Mock).mockReturnValue({
       user: null,
@@ -408,7 +408,7 @@ describe("SignUp", () => {
     });
 
     // then
-    expect(button).toHaveClass("loading");
+    expect(button).toHaveClass("btn-disabled");
 
     // verify
     expect(useAuth).toHaveBeenCalledTimes(2);
