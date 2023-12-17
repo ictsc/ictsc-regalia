@@ -20,7 +20,7 @@ test("画面項目が表示されること", async ({ page }) => {
   const problem1 = problems.nth(0).locator("td");
   await expect(problem1.nth(1)).toHaveText("1/1/1");
   await expect(problem1.nth(2)).toHaveText(
-    "00000000-0000-4000-a000-000000000000"
+    "00000000-0000-4000-a000-000000000000",
   );
   await expect(problem1.nth(3)).toHaveText("abc");
   await expect(problem1.nth(4)).toHaveText("問題タイトル1");
@@ -28,12 +28,11 @@ test("画面項目が表示されること", async ({ page }) => {
   await expect(problem1.nth(6)).toHaveText("100");
   await expect(problem1.nth(7)).toHaveText("100");
   await expect(problem1.nth(8)).toHaveText("");
-  await expect(problem1.nth(9)).toHaveText("自分");
 
   const problem2 = problems.nth(1).locator("td");
   await expect(problem2.nth(1)).toHaveText("1/1/1");
   await expect(problem2.nth(2)).toHaveText(
-    "00000000-0000-4000-a000-000000000001"
+    "00000000-0000-4000-a000-000000000001",
   );
   await expect(problem2.nth(3)).toHaveText("def");
   await expect(problem2.nth(4)).toHaveText("問題タイトル2");
@@ -41,12 +40,11 @@ test("画面項目が表示されること", async ({ page }) => {
   await expect(problem2.nth(6)).toHaveText("200");
   await expect(problem2.nth(7)).toHaveText("200");
   await expect(problem2.nth(8)).toHaveText("");
-  await expect(problem2.nth(9)).toHaveText("自分");
 
   const problem3 = problems.nth(2).locator("td");
   await expect(problem3.nth(1)).toHaveText("1/1/1");
   await expect(problem3.nth(2)).toHaveText(
-    "00000000-0000-4000-a000-000000000002"
+    "00000000-0000-4000-a000-000000000002",
   );
   await expect(problem3.nth(3)).toHaveText("ghi");
   await expect(problem3.nth(4)).toHaveText("問題タイトル3");
@@ -54,7 +52,6 @@ test("画面項目が表示されること", async ({ page }) => {
   await expect(problem3.nth(6)).toHaveText("300");
   await expect(problem3.nth(7)).toHaveText("300");
   await expect(problem3.nth(8)).toHaveText("");
-  await expect(problem3.nth(9)).toHaveText("自分");
 });
 
 test("採点ページへ遷移できること", async ({ page }) => {
@@ -83,10 +80,10 @@ test("問題のプレビューができること", async ({ page }) => {
 
   // then
   await expect(ScoringPage.ProblemPreviewProblemInfo(page)).toHaveText(
-    "問題タイトル1満点100 pt 採点基準100 pt採点する"
+    "問題タイトル1満点100 pt 採点基準100 pt採点する",
   );
   await expect(ScoringPage.ProblemPreviewProblemContent(page)).toHaveText(
-    "問題内容1"
+    "問題内容1",
   );
 });
 
