@@ -38,7 +38,8 @@ describe("Users", () => {
     const cells = screen.getAllByRole("cell");
     expect(cells[0]).toHaveTextContent(testUser.display_name);
     expect(cells[1]).toHaveTextContent(testUserGroup.name);
-    expect(cells[2]).toHaveTextContent(testUser.profile?.self_introduction!);
+    expect(cells[2]).toHaveTextContent(testUserGroup.organization);
+    expect(cells[3]).toHaveTextContent(testUser.profile?.self_introduction!);
     const links = screen.getAllByRole("link");
     expect(links[0]).toHaveAttribute(
       "href",

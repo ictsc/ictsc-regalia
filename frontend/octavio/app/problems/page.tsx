@@ -19,7 +19,7 @@ import { dismissNoticeIdsState } from "@/hooks/state/recoil";
 
 function Problems() {
   const [dismissNoticeIds, setDismissNoticeIds] = useRecoilState(
-    dismissNoticeIdsState
+    dismissNoticeIdsState,
   );
 
   const { problems, isLoading } = useProblems();
@@ -33,6 +33,13 @@ function Problems() {
       </>
     );
   }
+
+  const normalProblems = problems.filter(
+    (problem) => problem.type === "normal",
+  );
+  const multipleProblems = problems.filter(
+    (problem) => problem.type === "multiple",
+  );
 
   return (
     <>
@@ -64,13 +71,32 @@ function Problems() {
             おしらせ一覧へ→
           </Link>
         </div>
-        <ul className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8 container-ictsc">
-          {problems.map((problem) => (
-            <li key={problem.id}>
-              <ProblemCard problem={problem} />
-            </li>
-          ))}
-        </ul>
+        {normalProblems.length > 0 && (
+          <>
+            <h2 className="container-ictsc text-2xl font-bold">実技問題</h2>
+            <ul className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8 container-ictsc">
+              {normalProblems.map((problem) => (
+                <li key={problem.id}>
+                  <ProblemCard problem={problem} />
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        {multipleProblems.length > 0 && (
+          <>
+            <h2 className="container-ictsc text-2xl font-bold pt-2">
+              選択問題
+            </h2>
+            <ul className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8 container-ictsc">
+              {multipleProblems.map((problem) => (
+                <li key={problem.id}>
+                  <ProblemCard problem={problem} />
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </main>
     </>
   );

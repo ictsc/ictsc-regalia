@@ -51,7 +51,7 @@ describe("Problems", () => {
     expect(screen.queryByText("テスト通知タイトル")).toBeInTheDocument();
     expect(screen.getAllByTestId("markdown-preview")[1]).toHaveAttribute(
       "data-content",
-      "テスト通知本文"
+      "テスト通知本文",
     );
     expect(screen.queryByText("XYZ")).toBeInTheDocument();
     expect(screen.queryByText("テスト問題タイトル")).toBeInTheDocument();
@@ -203,6 +203,7 @@ describe("Problems", () => {
       title: "title",
       site: "site",
       shortRule: "# ルール本文",
+      preRoundMode: false,
     }));
     (useRecoilState as Mock).mockReturnValue([[], vi.fn()]);
     (useProblems as Mock).mockReturnValue({
@@ -218,7 +219,7 @@ describe("Problems", () => {
     // then
     expect(screen.getAllByTestId("markdown-preview")[0]).toHaveAttribute(
       "data-content",
-      "# ルール本文"
+      "# ルール本文",
     );
 
     // verify

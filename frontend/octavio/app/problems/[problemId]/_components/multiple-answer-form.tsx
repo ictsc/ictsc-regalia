@@ -154,7 +154,7 @@ function MultipleAnswerForm({ code }: { code: string }) {
         type="button"
         className="btn btn-primary mt-4"
         onClick={sendButton}
-        value="提出確認"
+        value="提出"
       />
       <input
         type="button"

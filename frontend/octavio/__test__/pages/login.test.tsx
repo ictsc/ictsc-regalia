@@ -63,7 +63,7 @@ describe("Login", () => {
     expect(screen.queryByPlaceholderText("ユーザー名")).toBeInTheDocument();
     expect(screen.queryByPlaceholderText("パスワード")).toBeInTheDocument();
     expect(loginButton).toBeInTheDocument();
-    expect(loginButton).not.toHaveAttribute("loading");
+    expect(loginButton).not.toHaveAttribute("btn-disabled");
 
     // verify
     expect(useAuth).toHaveBeenCalledTimes(1);
@@ -83,10 +83,10 @@ describe("Login", () => {
 
     // then
     expect(
-      screen.queryByText("ユーザー名を入力してください")
+      screen.queryByText("ユーザー名を入力してください"),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("パスワードを入力して下さい")
+      screen.queryByText("パスワードを入力して下さい"),
     ).toBeInTheDocument();
 
     // verify
@@ -109,10 +109,10 @@ describe("Login", () => {
 
     // then
     expect(
-      screen.queryByText("ユーザー名を入力してください")
+      screen.queryByText("ユーザー名を入力してください"),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("パスワードを入力して下さい")
+      screen.queryByText("パスワードを入力して下さい"),
     ).not.toBeInTheDocument();
   });
 
@@ -132,10 +132,10 @@ describe("Login", () => {
 
     // then
     expect(
-      screen.queryByText("ユーザー名を入力してください")
+      screen.queryByText("ユーザー名を入力してください"),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByText("パスワードを入力して下さい")
+      screen.queryByText("パスワードを入力して下さい"),
     ).toBeInTheDocument();
 
     // verify
@@ -214,7 +214,7 @@ describe("Login", () => {
         setTimeout(() => {
           resolve({ code: 200 });
         }, 1000);
-      })
+      }),
     );
     (useAuth as Mock).mockReturnValue({
       user: null,
@@ -233,7 +233,7 @@ describe("Login", () => {
     });
 
     // then
-    expect(loginButton).toHaveClass("loading");
+    expect(loginButton).toHaveClass("btn-disabled");
 
     // verify
     expect(useAuth).toHaveBeenCalledTimes(2);

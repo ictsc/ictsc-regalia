@@ -85,6 +85,7 @@ function Page() {
         <tr>
           <th>名前</th>
           <th>チーム名</th>
+          <th>所属</th>
           <th>自己紹介</th>
         </tr>
       </thead>
@@ -130,6 +131,9 @@ function Page() {
                 </td>
                 <td className="whitespace-normal lg:min-w-[196px]">
                   {userGroup.name}
+                </td>
+                <td className="whitespace-normal lg:min-w-[196px]">
+                  {userGroup.organization}
                 </td>
                 <td className="whitespace-normal">
                   {member.profile?.self_introduction}

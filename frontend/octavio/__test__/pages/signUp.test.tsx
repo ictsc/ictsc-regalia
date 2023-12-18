@@ -10,6 +10,23 @@ import { Mock, vi } from "vitest";
 import SignUp from "@/app/signUp/page";
 import useAuth from "@/hooks/auth";
 
+class CustomError extends Error {
+  code: number;
+
+  response: { data: { error: string } };
+
+  constructor(
+    message: string,
+    code: number,
+    response: { data: { error: string } },
+  ) {
+    super(message);
+    this.code = code;
+    this.response = response;
+    Object.setPrototypeOf(this, CustomError.prototype);
+  }
+}
+
 vi.mock("@/hooks/auth");
 vi.mock("@/components/Alerts", () => ({
   ICTSCSuccessAlert: ({
@@ -93,10 +110,10 @@ describe("SignUp", () => {
 
     // then
     expect(
-      screen.queryByText("ユーザー名を入力してください")
+      screen.queryByText("ユーザー名を入力してください"),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("パスワードを入力して下さい")
+      screen.queryByText("パスワードを入力して下さい"),
     ).toBeInTheDocument();
 
     // verify
@@ -119,10 +136,10 @@ describe("SignUp", () => {
 
     // then
     expect(
-      screen.queryByText("ユーザー名を入力してください")
+      screen.queryByText("ユーザー名を入力してください"),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("パスワードを入力して下さい")
+      screen.queryByText("パスワードを入力して下さい"),
     ).not.toBeInTheDocument();
 
     // verify
@@ -145,10 +162,10 @@ describe("SignUp", () => {
 
     // then
     expect(
-      screen.queryByText("ユーザー名を入力してください")
+      screen.queryByText("ユーザー名を入力してください"),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByText("パスワードを入力して下さい")
+      screen.queryByText("パスワードを入力して下さい"),
     ).toBeInTheDocument();
 
     // verify
@@ -172,7 +189,7 @@ describe("SignUp", () => {
 
     // then
     expect(
-      screen.queryByText("パスワードは8文字以上である必要があります")
+      screen.queryByText("パスワードは8文字以上である必要があります"),
     ).toBeInTheDocument();
 
     // verify
@@ -204,7 +221,7 @@ describe("SignUp", () => {
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveAttribute(
       "data-message",
-      "ユーザー登録に成功しました！"
+      "ユーザー登録に成功しました！",
     );
     expect(alert).not.toHaveAttribute("data-sub-message");
 
@@ -215,9 +232,13 @@ describe("SignUp", () => {
 
   test("ユーザーが既に存在する場合にエラーが表示されることを確認する", async () => {
     // setup
-    const signUp = vi.fn().mockResolvedValue({
+    const signUp = vi.fn().mockRejectedValue({
       code: 400,
-      data: "Error 1062: Duplicate entry 'user' for key 'name'",
+      response: {
+        data: {
+          error: "Error 1062: Duplicate entry 'user' for key 'name'",
+        },
+      },
     });
 
     (useAuth as Mock).mockReturnValue({
@@ -241,7 +262,7 @@ describe("SignUp", () => {
     expect(alert).toHaveAttribute("data-message", "エラーが発生しました");
     expect(alert).toHaveAttribute(
       "data-sub-message",
-      "ユーザー名が重複しています。"
+      "ユーザー名が重複しています。",
     );
 
     // verify
@@ -250,9 +271,14 @@ describe("SignUp", () => {
 
   test("UserGroupID が無効な場合にエラーが表示されることを確認する", async () => {
     // setup
-    const signUp = vi.fn().mockResolvedValue({
+    const signUp = vi.fn().mockRejectedValue({
       code: 400,
-      data: "Error:Field validation for 'UserGroupID' failed on the 'required' tag",
+      response: {
+        data: {
+          error:
+            "Error:Field validation for 'UserGroupID' failed on the 'required' tag",
+        },
+      },
     });
 
     (useAuth as Mock).mockReturnValue({
@@ -276,7 +302,7 @@ describe("SignUp", () => {
     expect(alert).toHaveAttribute("data-message", "エラーが発生しました");
     expect(alert).toHaveAttribute(
       "data-sub-message",
-      "無効なユーザーグループです。"
+      "無効なユーザーグループです。",
     );
 
     // verify
@@ -285,9 +311,14 @@ describe("SignUp", () => {
 
   test("UserGroupID の uuid 形式が無効な場合にエラーが表示されることを確認する", async () => {
     // setup
-    const signUp = vi.fn().mockResolvedValue({
+    const signUp = vi.fn().mockRejectedValue({
       code: 400,
-      data: "Error:Field validation for 'UserGroupID' failed on the 'uuid' tag",
+      response: {
+        data: {
+          error:
+            "Error:Field validation for 'UserGroupID' failed on the 'uuid' tag",
+        },
+      },
     });
 
     (useAuth as Mock).mockReturnValue({
@@ -311,7 +342,7 @@ describe("SignUp", () => {
     expect(alert).toHaveAttribute("data-message", "エラーが発生しました");
     expect(alert).toHaveAttribute(
       "data-sub-message",
-      "無効なユーザーグループです。"
+      "無効なユーザーグループです。",
     );
 
     // verify
@@ -320,9 +351,14 @@ describe("SignUp", () => {
 
   test("InvitationCode が無効の場合", async () => {
     // setup
-    const signUp = vi.fn().mockResolvedValue({
+    const signUp = vi.fn().mockRejectedValue({
       code: 400,
-      data: "Error:Field validation for 'InvitationCode' failed on the 'required' tag",
+      response: {
+        data: {
+          error:
+            "Error:Field validation for 'InvitationCode' failed on the 'required' tag",
+        },
+      },
     });
 
     (useAuth as Mock).mockReturnValue({
@@ -390,7 +426,7 @@ describe("SignUp", () => {
         setTimeout(() => {
           resolve({ code: 200 });
         }, 1000);
-      })
+      }),
     );
     (useAuth as Mock).mockReturnValue({
       user: null,
@@ -408,7 +444,7 @@ describe("SignUp", () => {
     });
 
     // then
-    expect(button).toHaveClass("loading");
+    expect(button).toHaveClass("btn-disabled");
 
     // verify
     expect(useAuth).toHaveBeenCalledTimes(2);

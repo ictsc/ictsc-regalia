@@ -9,11 +9,11 @@ export interface Problem {
   point: number;
   solved_criterion: number | null;
   previous_problem_id: string | null;
-  author_id: string;
   unchecked: number | null;
   unchecked_near_overdue: number | null;
   unchecked_overdue: number | null;
   current_point: number;
+  is_answered: boolean;
   is_solved: boolean;
 }
 
@@ -44,10 +44,10 @@ export const testProblem: Problem = {
   point: 100,
   solved_criterion: 150,
   previous_problem_id: null,
-  author_id: "1",
   unchecked: null,
   unchecked_near_overdue: null,
   unchecked_overdue: null,
   current_point: 100,
+  is_answered: false,
   is_solved: false,
 };

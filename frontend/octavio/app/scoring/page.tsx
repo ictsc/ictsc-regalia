@@ -49,7 +49,6 @@ function Index() {
               <th>ポイント</th>
               <th>採点基準ポイント</th>
               <th>前提問題</th>
-              <th>著者</th>
             </tr>
           </thead>
           <tbody className="cursor-pointer">
@@ -93,7 +92,6 @@ function Index() {
                 <td>{prob.point}</td>
                 <td>{prob.solved_criterion}</td>
                 <td>{prob.previous_problem_id}</td>
-                <td>{prob.author_id === user?.id ? "自分" : ""}</td>
               </tr>
             ))}
           </tbody>

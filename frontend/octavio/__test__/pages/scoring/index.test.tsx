@@ -130,7 +130,6 @@ describe("Scoring", () => {
     expect(tds[6]).toHaveTextContent("100");
     expect(tds[7]).toHaveTextContent("150");
     expect(tds[8]).toHaveTextContent("");
-    expect(tds[9]).toHaveTextContent("自分");
 
     // then
     expect(useAuth).toHaveBeenCalledTimes(1);
@@ -249,26 +248,6 @@ describe("Scoring", () => {
     // when
     // aaa... となる
     expect(tds[5]).toHaveTextContent("");
-
-    // then
-    expect(useAuth).toHaveBeenCalledTimes(1);
-    expect(useProblems).toHaveBeenCalledTimes(2);
-  });
-
-  test("問題作成者id が自分でない場合空文字が表示される", () => {
-    // setup
-    (useAuth as Mock).mockReturnValue({
-      user: testAdminUser,
-    });
-    (useProblems as Mock).mockReturnValue({
-      problems: [{ ...testProblem, author_id: "other" }],
-      isLoading: false,
-    });
-    render(<Index />);
-    const tds = screen.queryAllByRole("cell");
-
-    // when
-    expect(tds[9]).toHaveTextContent("");
 
     // then
     expect(useAuth).toHaveBeenCalledTimes(1);

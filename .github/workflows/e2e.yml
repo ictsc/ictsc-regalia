@@ -138,7 +138,7 @@ jobs:
         with:
           repository: ictsc/ictsc-rikka
           path: ictsc-rikka
-          ref: c9fb8c2731f6bd2d1eeb3c3083732e296162fa01
+          ref: 023061a63b1a2fb425939c36bcb7dd8bd2235b7c
 
       #  MariaDB cache
       - name: Cache a MariaDB Docker image
@@ -252,7 +252,7 @@ jobs:
         working-directory: ictsc-rikka
         run: |
           set +e # curlのエラーを無視する
-          cp scripts/docker-compose.override.yml docker-compose.override.yml
+          cp scripts/compose.ci.yml compose.override.yml
           make up
 
           url="http://localhost:8080"

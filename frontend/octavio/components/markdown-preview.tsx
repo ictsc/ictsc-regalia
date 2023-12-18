@@ -101,7 +101,7 @@ function MarkdownPreview({ className, content }: Props) {
                 count += 1;
 
                 return `
-                  <div class="radio-buttons pt-2">
+                  <div class="radio-buttons pt-2 mt-4">
                     <fieldset class="flex flex-col space-y-4">${radioButtons.join(
                       "",
                     )}</fieldset>
@@ -126,7 +126,7 @@ function MarkdownPreview({ className, content }: Props) {
                 count += 1;
 
                 return `
-          <div class="checkboxes pt-2">
+          <div class="checkboxes pt-2 mt-4">
               <fieldset class="flex flex-col space-y-4">${checkboxes.join(
                 "",
               )}</fieldset>
