@@ -34,8 +34,6 @@ function Problems() {
     );
   }
 
-  console.log(problems);
-
   const normalProblems = problems.filter(
     (problem) => problem.type === "normal",
   );
