@@ -10,6 +10,23 @@ import { Mock, vi } from "vitest";
 import SignUp from "@/app/signUp/page";
 import useAuth from "@/hooks/auth";
 
+class CustomError extends Error {
+  code: number;
+
+  response: { data: { error: string } };
+
+  constructor(
+    message: string,
+    code: number,
+    response: { data: { error: string } },
+  ) {
+    super(message);
+    this.code = code;
+    this.response = response;
+    Object.setPrototypeOf(this, CustomError.prototype);
+  }
+}
+
 vi.mock("@/hooks/auth");
 vi.mock("@/components/Alerts", () => ({
   ICTSCSuccessAlert: ({
@@ -215,9 +232,13 @@ describe("SignUp", () => {
 
   test("ユーザーが既に存在する場合にエラーが表示されることを確認する", async () => {
     // setup
-    const signUp = vi.fn().mockResolvedValue({
+    const signUp = vi.fn().mockRejectedValue({
       code: 400,
-      data: "Error 1062: Duplicate entry 'user' for key 'name'",
+      response: {
+        data: {
+          error: "Error 1062: Duplicate entry 'user' for key 'name'",
+        },
+      },
     });
 
     (useAuth as Mock).mockReturnValue({
@@ -250,9 +271,14 @@ describe("SignUp", () => {
 
   test("UserGroupID が無効な場合にエラーが表示されることを確認する", async () => {
     // setup
-    const signUp = vi.fn().mockResolvedValue({
+    const signUp = vi.fn().mockRejectedValue({
       code: 400,
-      data: "Error:Field validation for 'UserGroupID' failed on the 'required' tag",
+      response: {
+        data: {
+          error:
+            "Error:Field validation for 'UserGroupID' failed on the 'required' tag",
+        },
+      },
     });
 
     (useAuth as Mock).mockReturnValue({
@@ -285,9 +311,14 @@ describe("SignUp", () => {
 
   test("UserGroupID の uuid 形式が無効な場合にエラーが表示されることを確認する", async () => {
     // setup
-    const signUp = vi.fn().mockResolvedValue({
+    const signUp = vi.fn().mockRejectedValue({
       code: 400,
-      data: "Error:Field validation for 'UserGroupID' failed on the 'uuid' tag",
+      response: {
+        data: {
+          error:
+            "Error:Field validation for 'UserGroupID' failed on the 'uuid' tag",
+        },
+      },
     });
 
     (useAuth as Mock).mockReturnValue({
@@ -320,9 +351,14 @@ describe("SignUp", () => {
 
   test("InvitationCode が無効の場合", async () => {
     // setup
-    const signUp = vi.fn().mockResolvedValue({
+    const signUp = vi.fn().mockRejectedValue({
       code: 400,
-      data: "Error:Field validation for 'InvitationCode' failed on the 'required' tag",
+      response: {
+        data: {
+          error:
+            "Error:Field validation for 'InvitationCode' failed on the 'required' tag",
+        },
+      },
     });
 
     (useAuth as Mock).mockReturnValue({
