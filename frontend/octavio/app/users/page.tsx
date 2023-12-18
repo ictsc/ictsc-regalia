@@ -103,6 +103,7 @@ function Page() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-circle btn-ghost btn-xs"
+                        aria-label={`GitHub: ${member.profile?.github_id}`}
                       >
                         <GithubIcon />
                       </a>
@@ -113,6 +114,7 @@ function Page() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-circle btn-ghost btn-xs"
+                        aria-label={`Twitter: ${member.profile?.twitter_id}`}
                       >
                         <TwitterIcon />
                       </a>
@@ -123,6 +125,7 @@ function Page() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-circle btn-ghost btn-xs"
+                        aria-label={`Facebook: ${member.profile?.facebook_id}`}
                       >
                         <FacebookIcon />
                       </a>

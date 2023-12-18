@@ -63,7 +63,34 @@
         "optionalDependencies": false
       }
     ],
-    "no-unused-vars": "off"
+    "no-unused-vars": "off",
+    "jsx-a11y/control-has-associated-label": [ 2, {
+      "labelAttributes": ["label"],
+      "controlComponents": ["CustomComponent"],
+      "ignoreElements": [
+        "audio",
+        "canvas",
+        "embed",
+        "input",
+        "textarea",
+        "tr",
+        "td",
+        "video"
+      ],
+      "ignoreRoles": [
+        "grid",
+        "listbox",
+        "menu",
+        "menubar",
+        "radiogroup",
+        "row",
+        "tablist",
+        "toolbar",
+        "tree",
+        "treegrid"
+      ],
+      "depth": 3
+    }]
   },
   "env": {
     "jest": true
