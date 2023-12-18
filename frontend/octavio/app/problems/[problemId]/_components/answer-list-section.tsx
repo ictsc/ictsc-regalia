@@ -5,6 +5,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import { DateTime } from "luxon";
 
+import { preRoundMode } from "@/components/_const";
 import ICTSCCard from "@/components/card";
 import MarkdownPreview from "@/components/markdown-preview";
 import useAnswers from "@/hooks/answer";
@@ -30,8 +31,12 @@ function AnswerListSection({ problem }: AnswerSectionProps) {
               <th className="w-[196px]">提出日時</th>
               <th className="w-[100px]">問題コード</th>
               <th>問題</th>
-              {/* <th className="w-[100px]">得点</th> */}
-              {/* <th className="w-[100px]">チェック済み</th> */}
+              {preRoundMode && (
+                <>
+                  <th className="w-[100px]">得点</th>
+                  <th className="w-[100px]">チェック済み</th>
+                </>
+              )}
               <th className="w-[50px]" aria-label="投稿内容" />
               <th className="w-[50px]" aria-label="ダウンロード" />
             </tr>
@@ -58,10 +63,16 @@ function AnswerListSection({ problem }: AnswerSectionProps) {
                     <td>{createdAt.toFormat("yyyy-MM-dd HH:mm:ss")}</td>
                     <td>{problem?.code}</td>
                     <td>{problem?.title}</td>
-                    {/* <td className="text-right">{answer?.point ?? "--"} pt</td> */}
-                    {/* <td className="text-center"> */}
-                    {/*  {answer.point != null ? "○" : "採点中"} */}
-                    {/* </td> */}
+                    {!preRoundMode && (
+                      <>
+                        <td className="text-right">
+                          {answer?.point ?? "--"} pt
+                        </td>
+                        <td className="text-center">
+                          {answer.point != null ? "○" : "採点中"}
+                        </td>{" "}
+                      </>
+                    )}
                     <td>
                       <a
                         href="#preview"
