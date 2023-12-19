@@ -7,6 +7,7 @@ bytedance
 clsx
 cmds
 cockroachdb
+connectrpc
 daisyui
 Duardo
 exhaustruct
