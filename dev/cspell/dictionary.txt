@@ -40,4 +40,5 @@ tailwindcss
 testid
 Tressa
 usergroups
+wrapcheck
 zenn
