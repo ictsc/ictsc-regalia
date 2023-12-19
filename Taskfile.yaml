@@ -41,6 +41,7 @@ tasks:
       - task: generate-buf
 
   generate-buf:
+    internal: true
     desc: Protobuf & Connectの自動生成ファイルを生成
     dir: proto
     deps:
