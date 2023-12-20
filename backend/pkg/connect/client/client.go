@@ -44,7 +44,7 @@ func NewRetry[C any](
 	}
 
 	return &Retry[C]{
-		client: newFunc(client, baseURL, connect.WithGRPC(), connect.WithSendGzip()),
+		client: newFunc(client, baseURL, connect.WithSendGzip()),
 		retry:  retry,
 	}
 }
