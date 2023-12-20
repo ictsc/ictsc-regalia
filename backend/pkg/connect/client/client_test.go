@@ -89,6 +89,23 @@ func TestRetry_Do(t *testing.T) {
 			assertion: assert.Error,
 		},
 		{
+			name: "retry 15 times",
+			r:    client.NewRetry(prodNewFunc, "http://example.com", 15, false),
+			args: args{
+				ctx:      context.Background(),
+				callback: nil,
+			},
+			setup: func(args *args, counter *int) {
+				args.callback = func(ctx context.Context, client struct{}) error {
+					*counter++
+
+					return connect.NewError(connect.CodeUnavailable, nil)
+				}
+			},
+			wantCount: 15,
+			assertion: assert.Error,
+		},
+		{
 			name: "retry 10 times",
 			r:    client.NewRetry(prodNewFunc, "http://example.com", 0, false),
 			args: args{
