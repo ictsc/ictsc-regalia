@@ -1,9 +1,27 @@
 version: 3
 
+# タスク定義の順番
+#
+# 1.
+#   desc
+#
+# 2.
+#   internal
+#   dir
+#   silent
+#
+# 3.
+#   vars
+#   status / sources / generates / methods / preconditions
+#   deps
+#
+# 4.
+#   cmds
+
 tasks:
   check-binary:
-    internal: true
     desc: 指定されたバイナリがインストールされているか確認
+    internal: true
     silent: true
     cmds:
       - |
@@ -20,8 +38,8 @@ tasks:
       - task: init-buf
 
   init-buf:
-    internal: true
     desc: bufの初期化
+    internal: true
     deps:
       - task: check-binary
         vars:
@@ -41,8 +59,8 @@ tasks:
       - task: generate-buf
 
   generate-buf:
-    internal: true
     desc: Protobuf & Connectの自動生成ファイルを生成
+    internal: true
     dir: proto
     deps:
       - init-buf
