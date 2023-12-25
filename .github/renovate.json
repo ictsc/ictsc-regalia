@@ -5,7 +5,11 @@
   "prConcurrentLimit": 0,
   "packageRules": [
     {
-      "matchCategories": ["github-actions"],
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true
+    },
+    {
+      "matchManagers": ["github-actions"],
       "automerge": true
     },
     {
