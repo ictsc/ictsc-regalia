@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Run Spell Check
-        uses: streetsidesoftware/cspell-action@v2
+        uses: streetsidesoftware/cspell-action@v5
         with:
           incremental_files_only: false
           config: ./dev/cspell/cspell.config.yaml
