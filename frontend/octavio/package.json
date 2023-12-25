@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@next/font": "^13.4.12",
-    "@types/node": "18.11.9",
+    "@types/node": "18.19.3",
     "@types/react": "18.2.45",
     "@types/react-dom": "18.2.18",
     "axios": "^1.6.2",
@@ -84,6 +84,6 @@
     "yarn": "please-use-pnpm"
   },
   "volta": {
-    "node": "18.17.1"
+    "node": "18.19.0"
   }
 }
