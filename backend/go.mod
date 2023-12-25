@@ -3,7 +3,7 @@ module github.com/ictsc/ictsc-outlands/backend
 go 1.20
 
 require (
-	github.com/bytedance/sonic v1.10.0
+	github.com/bytedance/sonic v1.10.2
 	github.com/cockroachdb/errors v1.10.0
 	github.com/redis/go-redis/v9 v9.1.0
 )
