@@ -1,6 +1,7 @@
 Ajay
 Ashleigh
 autodocs
+automerge
 bytedance
 clsx
 cmds
@@ -9,8 +10,8 @@ daisyui
 Duardo
 exhaustruct
 ictsc
-ictscr
 ictscc
+ictscr
 ireturn
 Kairi
 Kaleb
