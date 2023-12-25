@@ -241,7 +241,7 @@ jobs:
 
       - name: Cache Docker Layer
         if: contains(matrix.dependencies, 'ictsc-rikka')
-        uses: jpribyl/action-docker-layer-caching@v0.1.0
+        uses: jpribyl/action-docker-layer-caching@v0.1.1
 
       # Docker コンテナが起動してから、レスポンスが返ってくるまで待機する
       # リトライは10回まで `/` にアクセスしてレスポンスのステータスコードをチェック
