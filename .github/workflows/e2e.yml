@@ -49,10 +49,10 @@ jobs:
         run: sudo timedatectl set-timezone Asia/Tokyo
 
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Checkout zenn-editor repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ictsc/zenn-editor
           ref: feature/add-checkbox-and-radio
@@ -134,7 +134,7 @@ jobs:
       #
       - name: Checkout ictsc-rikka repository
         if: contains(matrix.dependencies, 'ictsc-rikka')
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: ictsc/ictsc-rikka
           path: ictsc-rikka
