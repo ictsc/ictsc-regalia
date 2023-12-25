@@ -24,7 +24,7 @@
     "axios": "^1.6.2",
     "clsx": "^2.0.0",
     "daisyui": "^3.7.5",
-    "eslint": "8.28.0",
+    "eslint": "8.56.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-next": "^14.0.4",
     "gray-matter": "^4.0.3",
