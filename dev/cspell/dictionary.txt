@@ -1,8 +1,8 @@
 Ajay
 Ashleigh
 autodocs
-bufbuild
 automerge
+bufbuild
 bytedance
 clsx
 cmds
@@ -27,6 +27,7 @@ noninteractive
 noto
 proto
 protobuf
+protoc
 protovalidate
 signin
 signout
