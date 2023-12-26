@@ -66,6 +66,29 @@ jobs:
           fail_on_error: true
           filter_mode: nofilter
           golangci_lint_flags: --timeout=10m
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+      - name: Install Format Tools
+        run: |
+          go install golang.org/x/tools/cmd/goimports@latest
+          go install mvdan.cc/gofumpt@latest
+      - name: Run Format Tools
+        run: |
+          goimports -l -w .
+          gofumpt -l -w .
+      - name: Push
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Run go format"
+          branch: ${{ github.head_ref }}
   build:
     name: Build
     runs-on: ubuntu-latest

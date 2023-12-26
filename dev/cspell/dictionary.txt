@@ -11,6 +11,8 @@ connectrpc
 daisyui
 Duardo
 exhaustruct
+gofumpt
+goimports
 ictsc
 ictscc
 ictscr
@@ -19,6 +21,7 @@ Kairi
 Kaleb
 Loba
 luxon
+mvdan
 Newf
 nextjs
 nofilter
@@ -31,6 +34,7 @@ protoc
 protovalidate
 signin
 signout
+stefanzweifel
 tailwindcss
 testid
 Tressa
