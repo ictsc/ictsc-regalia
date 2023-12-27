@@ -60,6 +60,7 @@ jobs:
         with:
           path: ./backend/internal/proto
           key: connect-${{ hashFiles('**/*.proto') }}
+          fail-on-cache-miss: true
       - name: Run golangci-lint
         uses: reviewdog/action-golangci-lint@v2
         with:
@@ -94,6 +95,7 @@ jobs:
         with:
           path: ./backend/internal/proto
           key: connect-${{ hashFiles('**/*.proto') }}
+          fail-on-cache-miss: true
       - name: Mod Tidy
         run: go mod tidy
       - name: Install Format Tools
@@ -128,6 +130,7 @@ jobs:
         with:
           path: ./backend/internal/proto
           key: connect-${{ hashFiles('**/*.proto') }}
+          fail-on-cache-miss: true
       - name: Mod Download
         run: go mod download
       - name: Build
@@ -145,6 +148,7 @@ jobs:
         with:
           path: ./backend/internal/proto
           key: connect-${{ hashFiles('**/*.proto') }}
+          fail-on-cache-miss: true
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
