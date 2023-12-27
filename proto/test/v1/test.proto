@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package test.v1;
-
-option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/test/v1";
-
-message Test {}
