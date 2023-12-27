@@ -60,7 +60,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ steps.token.outputs.token }}
-          persist-credentials: false
       - name: Set Connect Cache
         id: connect-cache
         uses: actions/cache@v3
@@ -116,7 +115,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ steps.token.outputs.token }}
-          persist-credentials: false
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
