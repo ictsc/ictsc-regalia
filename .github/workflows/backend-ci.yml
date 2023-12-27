@@ -55,7 +55,7 @@ jobs:
         uses: actions/create-github-app-token@v1
         with:
           app-id: ${{ secrets.PUSHER_APP_ID }}
-          private-key: ${{ secrets.PUSHER_APP_ID }}
+          private-key: ${{ secrets.PUSHER_PRIVATE_KEY }}
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -111,7 +111,7 @@ jobs:
         uses: actions/create-github-app-token@v1
         with:
           app-id: ${{ secrets.PUSHER_APP_ID }}
-          private-key: ${{ secrets.PUSHER_APP_ID }}
+          private-key: ${{ secrets.PUSHER_PRIVATE_KEY }}
       - name: Checkout
         uses: actions/checkout@v4
         with:
