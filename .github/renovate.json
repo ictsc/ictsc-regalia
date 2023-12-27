@@ -21,6 +21,7 @@
   "customManagers": [
     {
       "description": "Go tool dependencies",
+      "fileMatch": [".+\\.ya?ml$", "(^|/)Dockerfile$"],
       "matchStrings": ["go install (?<depName>[^@]+?)@(?<currentValue>.+)\n"],
       "datasourceTemplate": "go"
     }
