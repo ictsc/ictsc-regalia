@@ -45,6 +45,31 @@ jobs:
       - name: Generate Connect Files
         if: steps.connect-cache.outputs.cache-hit != 'true'
         run: buf generate
+  mod-tidy:
+    name: Go Mod Tidy
+    runs-on: ubuntu-latest
+    needs: connect
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set Connect Cache
+        id: connect-cache
+        uses: actions/cache@v3
+        with:
+          path: ./backend/internal/proto
+          key: connect-${{ hashFiles('**/*.proto') }}
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - name: Mod Tidy
+        run: go mod tidy
+      - name: Push
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Run go mod tidy"
+          branch: ${{ github.head_ref }}
   lint:
     name: Lint
     runs-on: ubuntu-latest
