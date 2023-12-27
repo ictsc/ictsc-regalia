@@ -28,7 +28,7 @@
       "description": "Go tool dependencies",
       "fileMatch": [".+\\.ya?ml$", "(^|/)Dockerfile$"],
       "matchStrings": [
-        "go install (?<depName>([^@](?!cmd))+?)@(?<currentValue>.+)\n",
+        "go install (?<depName>((?:[^@c]|c(?:[^m]|m(?:[^d]))))+?)@(?<currentValue>.+)\n",
         "go install (?<depName>[^@]+?)/cmd/[^@]+@(?<currentValue>.+)\n"
       ],
       "datasourceTemplate": "go"
