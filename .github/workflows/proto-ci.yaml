@@ -1,0 +1,21 @@
+name: Protobuf CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install buf
+        uses: bufbuild/buf-setup-action@v1
+      - name: Run buf lint
+        uses: bufbuild/buf-lint-action@v1
+        with:
+          input: proto

@@ -17,5 +17,12 @@
       "matchCurrentVersion": "!/^0/",
       "automerge": true
     }
+  ],
+  "customManagers": [
+    {
+      "description": "Go tool dependencies",
+      "matchStrings": ["go install (?<depName>[^@]+?)@(?<currentValue>.+)\n"],
+      "datasourceTemplate": "go"
+    }
   ]
 }

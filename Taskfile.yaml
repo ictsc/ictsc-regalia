@@ -1,7 +1,69 @@
 version: 3
 
+# タスク定義の順番
+#
+# 1.
+#   desc
+#
+# 2.
+#   internal
+#   dir
+#   silent
+#
+# 3.
+#   vars
+#   status / sources / generates / methods / preconditions
+#   deps
+#
+# 4.
+#   cmds
+
 tasks:
+  check-binary:
+    desc: 指定されたバイナリがインストールされているか確認
+    internal: true
+    silent: true
+    cmds:
+      - |
+        if ! (type {{.BINARY}} >/dev/null 2>&1); then
+          echo "下記公式ドキュメントを参考に、{{.BINARY}}をインストールした後、もう一度実行してください"
+          echo {{.INSTALL_DOC}}
+          exit 1
+        fi
+
   init:
-    desc: Initialize the Workspace
+    desc: ワークスペースを初期化
     cmds:
       - cp .vscode/settings-sample.json .vscode/settings.json
+      - task: init-buf
+
+  init-buf:
+    desc: bufの初期化
+    internal: true
+    deps:
+      - task: check-binary
+        vars:
+          BINARY: go
+          INSTALL_DOC: https://go.dev/doc/install
+      - task: check-binary
+        vars:
+          BINARY: buf
+          INSTALL_DOC: https://buf.build/docs/installation
+    cmds:
+      - go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.0
+      - go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.13.0
+
+  generate:
+    desc: 自動生成ファイルをすべて生成
+    cmds:
+      - task: generate-buf
+
+  generate-buf:
+    desc: Protobuf & Connectの自動生成ファイルを生成
+    internal: true
+    dir: proto
+    deps:
+      - init-buf
+    cmds:
+      - rm -rf ../backend/internal/proto
+      - buf generate

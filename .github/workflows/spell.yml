@@ -8,6 +8,7 @@ on:
 
 jobs:
   spell-check:
+    name: Spell Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
