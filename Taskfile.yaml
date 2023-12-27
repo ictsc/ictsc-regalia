@@ -65,4 +65,5 @@ tasks:
     deps:
       - init-buf
     cmds:
+      - rm -rf ../backend/internal/proto
       - buf generate
