@@ -38,8 +38,8 @@ jobs:
       - name: Install Connect Related Packages
         if: steps.connect-cache.outputs.cache-hit != 'true'
         run: |
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-          go install connectrpc.com/connect/cmd/protoc-gen-connect-go@latest
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.0
+          go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.13.0
       - name: Generate Connect Files
         if: steps.connect-cache.outputs.cache-hit != 'true'
         run: buf generate
@@ -78,8 +78,8 @@ jobs:
           go-version-file: backend/go.mod
       - name: Install Format Tools
         run: |
-          go install golang.org/x/tools/cmd/goimports@latest
-          go install mvdan.cc/gofumpt@latest
+          go install golang.org/x/tools/cmd/goimports@v0.16.0
+          go install mvdan.cc/gofumpt@v0.5.0
       - name: Run Format Tools
         run: |
           goimports -l -w .
