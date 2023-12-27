@@ -35,4 +35,4 @@ jobs:
         uses: bufbuild/buf-breaking-action@v1
         with:
           input: proto
-          against: .git#branch=main
+          against: https://github.com/ictsc/ictsc-outlands.git#branch=main

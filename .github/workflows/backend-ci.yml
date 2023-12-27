@@ -71,13 +71,31 @@ jobs:
   format:
     name: Format
     runs-on: ubuntu-latest
+    needs: connect
     steps:
+      - name: Generate a token
+        id: token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.PUSHER_APP_ID }}
+          private-key: ${{ secrets.PUSHER_PRIVATE_KEY }}
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ steps.token.outputs.token }}
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - name: Set Connect Cache
+        id: connect-cache
+        uses: actions/cache@v3
+        with:
+          path: ./backend/internal/proto
+          key: connect-${{ hashFiles('**/*.proto') }}
+      - name: Mod Tidy
+        run: go mod tidy
       - name: Install Format Tools
         run: |
           go install golang.org/x/tools/cmd/goimports@v0.16.1
@@ -89,8 +107,11 @@ jobs:
       - name: Push
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Run go format"
+          commit_message: "run go mod tidy & format go codes"
           branch: ${{ github.head_ref }}
+          commit_user_name: ictsc-actions-pusher[bot]
+          commit_user_email: ${{ secrets.PUSHER_APP_ID }}+ictsc-actions-pusher[bot]@users.noreply.github.com
+          commit_author: ictsc-actions-pusher[bot] <${{ secrets.PUSHER_APP_ID }}+ictsc-actions-pusher[bot]@users.noreply.github.com>
   build:
     name: Build
     runs-on: ubuntu-latest
