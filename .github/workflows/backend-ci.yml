@@ -38,7 +38,7 @@ jobs:
       - name: Install Connect Related Packages
         if: steps.connect-cache.outputs.cache-hit != 'true'
         run: |
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.0
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.32.0
           go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.13.0
       - name: Generate Connect Files
         if: steps.connect-cache.outputs.cache-hit != 'true'
