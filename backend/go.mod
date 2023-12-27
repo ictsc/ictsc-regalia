@@ -6,6 +6,7 @@ require (
 	github.com/bytedance/sonic v1.10.2
 	github.com/cockroachdb/errors v1.11.1
 	github.com/redis/go-redis/v9 v9.3.1
+	google.golang.org/protobuf v1.29.1
 )
 
 require (
