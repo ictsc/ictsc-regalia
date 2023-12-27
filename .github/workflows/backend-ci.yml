@@ -35,6 +35,8 @@ jobs:
       - name: Install buf
         if: steps.connect-cache.outputs.cache-hit != 'true'
         uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install Connect Related Packages
         if: steps.connect-cache.outputs.cache-hit != 'true'
         run: |

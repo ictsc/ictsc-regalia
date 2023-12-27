@@ -15,7 +15,9 @@ jobs:
         uses: actions/checkout@v4
       - name: Install buf
         uses: bufbuild/buf-setup-action@v1
-      - name: Run buf lint
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run buf-lint
         uses: bufbuild/buf-lint-action@v1
         with:
           input: proto
