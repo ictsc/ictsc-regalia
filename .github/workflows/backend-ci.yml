@@ -77,7 +77,9 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Run go mod tidy"
-          branch: ${{ github.head_ref }}
+          commit_user_name: ictsc-actions-pusher[bot]
+          commit_user_email: ${{ secrets.PUSHER_APP_ID }}+ictsc-actions-pusher[bot]@users.noreply.github.com
+          commit_author: ictsc-actions-pusher[bot] <${{ secrets.PUSHER_APP_ID }}+ictsc-actions-pusher[bot]@users.noreply.github.com>
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -131,7 +133,9 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Run go format"
-          branch: ${{ github.head_ref }}
+          commit_user_name: ictsc-actions-pusher[bot]
+          commit_user_email: ${{ secrets.PUSHER_APP_ID }}+ictsc-actions-pusher[bot]@users.noreply.github.com
+          commit_author: ictsc-actions-pusher[bot] <${{ secrets.PUSHER_APP_ID }}+ictsc-actions-pusher[bot]@users.noreply.github.com>
   build:
     name: Build
     runs-on: ubuntu-latest
