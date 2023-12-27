@@ -1,6 +1,6 @@
 module github.com/ictsc/ictsc-outlands/backend
 
-go 1.21.0
+go 1.21.5
 
 require (
 	github.com/bytedance/sonic v1.10.2
