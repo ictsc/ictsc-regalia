@@ -98,7 +98,7 @@ jobs:
           go install mvdan.cc/gofumpt@v0.5.0
       - name: Run Format Tools
         run: |
-          goimports -l -w .
+          goimports -l -w $(find . -type f -name '*.go' -not -path "*/internal/proto/*")
           gofumpt -l -w .
       - name: Push
         id: push
