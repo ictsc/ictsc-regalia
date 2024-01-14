@@ -1,13 +1,5 @@
 {
-  "cSpell.customDictionaries": {
-    "words": {
-      "name": "dictionary",
-      "path": "${workspaceRoot}/dev/cspell/dictionary.txt",
-      "addWords": true
-    },
-    "custom": true,
-    "internal-terms": false
-  },
+  "cSpell.import": ["dev/cspell/cspell.config.yaml"],
   "go.lintOnSave": "package",
   "go.lintTool": "golangci-lint"
 }
