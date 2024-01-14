@@ -22,3 +22,4 @@ ignorePaths:
   - "**/go.mod"
   - "**/go.sum"
   - "**/local-modules"
+  - "backend/internal/proto"
