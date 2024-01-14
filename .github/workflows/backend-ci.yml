@@ -49,7 +49,9 @@ jobs:
         with:
           commit_message: "generate connect files"
           branch: ${{ github.head_ref }}
-          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          commit_user_name: ictsc-actions[bot]
+          commit_user_email: 154957684+ictsc-actions[bot]@users.noreply.github.com
+          commit_author: ictsc-actions[bot] <154957684+ictsc-actions[bot]@users.noreply.github.com>
       - name: Exit with Error If Files Are Changed
         if: steps.push.outputs.changes_detected == 'true'
         run: exit 1
@@ -106,7 +108,9 @@ jobs:
         with:
           commit_message: "run go mod tidy & format go codes"
           branch: ${{ github.head_ref }}
-          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          commit_user_name: ictsc-actions[bot]
+          commit_user_email: 154957684+ictsc-actions[bot]@users.noreply.github.com
+          commit_author: ictsc-actions[bot] <154957684+ictsc-actions[bot]@users.noreply.github.com>
       - name: Exit with Error If Files Are Changed
         if: steps.push.outputs.changes_detected == 'true'
         run: exit 1
