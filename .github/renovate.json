@@ -3,24 +3,35 @@
   "extends": ["config:recommended"],
   "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
+  "labels": ["dependencies"],
   "postUpdateOptions": ["gomodUpdateImportPaths", "gomodTidy"],
   "packageRules": [
     {
+      "description": "Upgrade go indirect dependencies up to minor",
       "matchManagers": ["gomod"],
       "matchDepTypes": ["indirect"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
       "enabled": true
     },
     {
+      "description": "Auto merge devDependencies",
       "matchDepTypes": ["devDependencies"],
       "automerge": true
     },
     {
+      "description": "Auto merge GitHub Actions",
       "matchManagers": ["github-actions"],
       "automerge": true
     },
     {
+      "description": "Auto merge up to minor",
       "matchUpdateTypes": ["minor", "patch"],
       "matchCurrentVersion": "!/^0/",
+      "automerge": true
+    },
+    {
+      "description": "Auto merge digest & pin",
+      "matchUpdateTypes": ["digest", "pin", "pinDigest"],
       "automerge": true
     }
   ],
