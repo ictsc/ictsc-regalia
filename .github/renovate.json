@@ -7,11 +7,17 @@
   "postUpdateOptions": ["gomodUpdateImportPaths", "gomodTidy"],
   "packageRules": [
     {
-      "description": "Upgrade go indirect dependencies up to minor",
+      "description": "Upgrade go indirect dependencies",
       "matchManagers": ["gomod"],
       "matchDepTypes": ["indirect"],
-      "matchUpdateTypes": ["minor", "patch", "digest"],
       "enabled": true
+    },
+    {
+      "description": "Restrict go indirect dependencies up to minor",
+      "matchManagers": ["gomod"],
+      "matchDepTypes": ["indirect"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
     },
     {
       "description": "Auto merge devDependencies",
