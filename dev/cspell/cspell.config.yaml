@@ -2,14 +2,13 @@ $schema: https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell
 version: "0.2"
 dictionaryDefinitions:
   - name: dictionary
-    path: "./dictionary.txt"
+    path: "dictionary.txt"
     addWords: true
 dictionaries:
   - dictionary
 ignorePaths:
   - "cspell.config.yaml"
   - "**/coverage/**"
-  - "dictionary.txt"
   - "**/Dockerfile"
   - ".vscode"
   - "**.svg"
@@ -22,4 +21,4 @@ ignorePaths:
   - "**/go.mod"
   - "**/go.sum"
   - "**/local-modules"
-  - "backend/internal/proto/**"
+  - "**/backend/internal/proto"
