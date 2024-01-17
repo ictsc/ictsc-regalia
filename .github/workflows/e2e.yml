@@ -71,7 +71,7 @@ jobs:
           cache-dependency-path: frontend/octavio/pnpm-lock.yaml
 
       - name: Cache zenn-editor dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: frontend/octavio/local-modules/zenn-editor/node_modules
           key: zenn-editor-deps-${{ hashFiles('frontend/octavio/local-modules/zenn-editor/pnpm-lock.yaml') }}
@@ -90,7 +90,7 @@ jobs:
 
       - name: Cache font build
         id: cache-font
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: frontend/octavio/app/dist/fonts
           key: font-${{ hashFiles('frontend/octavio/Dockerfile') }}
@@ -107,7 +107,7 @@ jobs:
 
       - name: Cache install Playwright
         id: cache-playwright
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ steps.playwright-version.outputs.PLAYWRIGHT_VERSION }}
@@ -144,7 +144,7 @@ jobs:
       - name: Cache a MariaDB Docker image
         if: contains(matrix.dependencies, 'ictsc-rikka')
         id: cache-mariadb
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: mariadb-image
           key: mariadb-${{ env.MARIADB_VERSION }}
@@ -162,7 +162,7 @@ jobs:
       - name: Cache a Redis Docker image
         if: contains(matrix.dependencies, 'ictsc-rikka')
         id: cache-redis
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: redis-image
           key: redis-${{ env.REDIS_VERSION }}
@@ -180,7 +180,7 @@ jobs:
       - name: Cache a Minio Docker image
         if: contains(matrix.dependencies, 'ictsc-rikka')
         id: cache-minio
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: minio-image
           key: minio-${{ env.MINIO_VERSION }}
