@@ -36,6 +36,7 @@ protovalidate
 signin
 signout
 stefanzweifel
+stretchr
 tailwindcss
 testid
 Tressa
