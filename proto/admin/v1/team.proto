@@ -31,7 +31,7 @@ message Team {
 message GetTeamsRequest {}
 
 message GetTeamsResponse {
-  repeated Team teams = 1;
+  repeated Team teams = 1 [(buf.validate.field).required = true];
 }
 
 message GetTeamRequest {
@@ -39,7 +39,7 @@ message GetTeamRequest {
 }
 
 message GetTeamResponse {
-  Team team = 1;
+  Team team = 1 [(buf.validate.field).required = true];
 }
 
 message BaStation {
@@ -60,7 +60,7 @@ message GetTeamConnectionInfoRequest {
 }
 
 message GetTeamConnectionInfoResponse {
-  BaStation ba_station = 1;
+  BaStation ba_station = 1 [(buf.validate.field).required = true];
 }
 
 message GetTeamMembersRequest {
@@ -76,7 +76,7 @@ message GetTeamMembersResponse {
 
 message PutTeamConnectionInfoRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
-  BaStation ba_station = 2;
+  BaStation ba_station = 2 [(buf.validate.field).required = true];
 }
 
 message PutTeamConnectionInfoResponse {}
@@ -101,7 +101,7 @@ message PostTeamRequest {
 }
 
 message PostTeamResponse {
-  Team team = 1;
+  Team team = 1 [(buf.validate.field).required = true];
 }
 
 service TeamService {

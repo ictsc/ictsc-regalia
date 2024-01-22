@@ -20,7 +20,7 @@ message GetUserRequest {
 }
 
 message GetUserResponse {
-  User user = 1;
+  User user = 1 [(buf.validate.field).required = true];
 }
 
 message GetUsersRequest {
@@ -28,7 +28,7 @@ message GetUsersRequest {
 }
 
 message GetUsersResponse {
-  repeated User users = 1;
+  repeated User users = 1 [(buf.validate.field).required = true];
 }
 
 service UserService {

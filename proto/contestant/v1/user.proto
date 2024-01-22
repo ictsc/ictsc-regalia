@@ -18,7 +18,7 @@ message User {
 message GetMeRequest {}
 
 message GetMeResponse {
-  User user = 1;
+  User user = 1 [(buf.validate.field).required = true];
 }
 
 message BaStation {
@@ -37,7 +37,7 @@ message BaStation {
 message GetMyConnectionInfoRequest {}
 
 message GetMyConnectionInfoResponse {
-  BaStation ba_station = 1;
+  BaStation ba_station = 1 [(buf.validate.field).required = true];
 }
 
 message GetUserRequest {
@@ -45,7 +45,7 @@ message GetUserRequest {
 }
 
 message GetUserResponse {
-  User user = 1;
+  User user = 1 [(buf.validate.field).required = true];
 }
 
 message PostUserRequest {
@@ -57,7 +57,7 @@ message PostUserRequest {
 }
 
 message PostUserResponse {
-  User user = 1;
+  User user = 1 [(buf.validate.field).required = true];
 }
 
 message PatchUserRequest {
@@ -68,7 +68,7 @@ message PatchUserRequest {
 }
 
 message PatchUserResponse {
-  User user = 1;
+  User user = 1 [(buf.validate.field).required = true];
 }
 
 service UserService {

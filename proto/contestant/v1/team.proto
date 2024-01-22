@@ -26,7 +26,7 @@ message Team {
 message GetTeamsRequest {}
 
 message GetTeamsResponse {
-  repeated Team teams = 1;
+  repeated Team teams = 1 [(buf.validate.field).required = true];
 }
 
 message GetTeamRequest {
@@ -34,7 +34,7 @@ message GetTeamRequest {
 }
 
 message GetTeamResponse {
-  Team team = 1;
+  Team team = 1 [(buf.validate.field).required = true];
 }
 
 message GetTeamMembersRequest {

@@ -17,7 +17,7 @@ message Admin {
 message GetMeRequest {}
 
 message GetMeResponse {
-  Admin admin = 1;
+  Admin admin = 1 [(buf.validate.field).required = true];
 }
 
 message GetAdminRequest {
@@ -25,13 +25,13 @@ message GetAdminRequest {
 }
 
 message GetAdminResponse {
-  Admin admin = 1;
+  Admin admin = 1 [(buf.validate.field).required = true];
 }
 
 message GetAdminsRequest {}
 
 message GetAdminsResponse {
-  repeated Admin admins = 1;
+  repeated Admin admins = 1 [(buf.validate.field).required = true];
 }
 
 message PostAdminRequest {
@@ -42,7 +42,7 @@ message PostAdminRequest {
 }
 
 message PostAdminResponse {
-  Admin admin = 1;
+  Admin admin = 1 [(buf.validate.field).required = true];
 }
 
 message PatchAdminRequest {
@@ -53,7 +53,7 @@ message PatchAdminRequest {
 }
 
 message PatchAdminResponse {
-  Admin admin = 1;
+  Admin admin = 1 [(buf.validate.field).required = true];
 }
 
 service AdminService {
