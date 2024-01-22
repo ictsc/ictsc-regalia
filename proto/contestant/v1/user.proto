@@ -21,10 +21,23 @@ message GetMeResponse {
   User user = 1;
 }
 
+message BaStation {
+  string user = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string password = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string host = 3 [(buf.validate.field).string.ip = true];
+  int32 port = 4 [(buf.validate.field).int32.gte = 0];
+}
+
 message GetMyConnectionInfoRequest {}
 
 message GetMyConnectionInfoResponse {
-  string ba_station = 1 [(buf.validate.field).string.ip = true];
+  BaStation ba_station = 1;
 }
 
 message GetUserRequest {
