@@ -74,6 +74,30 @@ message GetTeamMembersResponse {
   }];
 }
 
+message PatchTeamRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  optional int32 code = 2 [(buf.validate.field).int32 = {
+    gt: 1,
+    lt: 100
+  }];
+  optional string name = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  optional string organization = 4 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+  optional int32 member_num = 5 [(buf.validate.field).int32 = {
+    gte: 1,
+    lte: 5
+  }];
+}
+
+message PatchTeamResponse {
+  Team team = 1 [(buf.validate.field).required = true];
+}
+
 message PutTeamConnectionInfoRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
   BaStation ba_station = 2 [(buf.validate.field).required = true];
@@ -109,6 +133,7 @@ service TeamService {
   rpc GetTeam(GetTeamRequest) returns (GetTeamResponse);
   rpc GetTeamConnectionInfo(GetTeamConnectionInfoRequest) returns (GetTeamConnectionInfoResponse);
   rpc GetTeamMembers(GetTeamMembersRequest) returns (GetTeamMembersResponse);
+  rpc PatchTeam(PatchTeamRequest) returns (PatchTeamResponse);
   rpc PutTeamConnectionInfo(PutTeamConnectionInfoRequest) returns (PutTeamConnectionInfoResponse);
   rpc PostTeam(PostTeamRequest) returns (PostTeamResponse);
 }

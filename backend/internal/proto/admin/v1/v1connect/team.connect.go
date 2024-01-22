@@ -43,6 +43,8 @@ const (
 	// TeamServiceGetTeamMembersProcedure is the fully-qualified name of the TeamService's
 	// GetTeamMembers RPC.
 	TeamServiceGetTeamMembersProcedure = "/admin.v1.TeamService/GetTeamMembers"
+	// TeamServicePatchTeamProcedure is the fully-qualified name of the TeamService's PatchTeam RPC.
+	TeamServicePatchTeamProcedure = "/admin.v1.TeamService/PatchTeam"
 	// TeamServicePutTeamConnectionInfoProcedure is the fully-qualified name of the TeamService's
 	// PutTeamConnectionInfo RPC.
 	TeamServicePutTeamConnectionInfoProcedure = "/admin.v1.TeamService/PutTeamConnectionInfo"
@@ -57,6 +59,7 @@ var (
 	teamServiceGetTeamMethodDescriptor               = teamServiceServiceDescriptor.Methods().ByName("GetTeam")
 	teamServiceGetTeamConnectionInfoMethodDescriptor = teamServiceServiceDescriptor.Methods().ByName("GetTeamConnectionInfo")
 	teamServiceGetTeamMembersMethodDescriptor        = teamServiceServiceDescriptor.Methods().ByName("GetTeamMembers")
+	teamServicePatchTeamMethodDescriptor             = teamServiceServiceDescriptor.Methods().ByName("PatchTeam")
 	teamServicePutTeamConnectionInfoMethodDescriptor = teamServiceServiceDescriptor.Methods().ByName("PutTeamConnectionInfo")
 	teamServicePostTeamMethodDescriptor              = teamServiceServiceDescriptor.Methods().ByName("PostTeam")
 )
@@ -67,6 +70,7 @@ type TeamServiceClient interface {
 	GetTeam(context.Context, *connect.Request[v1.GetTeamRequest]) (*connect.Response[v1.GetTeamResponse], error)
 	GetTeamConnectionInfo(context.Context, *connect.Request[v1.GetTeamConnectionInfoRequest]) (*connect.Response[v1.GetTeamConnectionInfoResponse], error)
 	GetTeamMembers(context.Context, *connect.Request[v1.GetTeamMembersRequest]) (*connect.Response[v1.GetTeamMembersResponse], error)
+	PatchTeam(context.Context, *connect.Request[v1.PatchTeamRequest]) (*connect.Response[v1.PatchTeamResponse], error)
 	PutTeamConnectionInfo(context.Context, *connect.Request[v1.PutTeamConnectionInfoRequest]) (*connect.Response[v1.PutTeamConnectionInfoResponse], error)
 	PostTeam(context.Context, *connect.Request[v1.PostTeamRequest]) (*connect.Response[v1.PostTeamResponse], error)
 }
@@ -105,6 +109,12 @@ func NewTeamServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(teamServiceGetTeamMembersMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		patchTeam: connect.NewClient[v1.PatchTeamRequest, v1.PatchTeamResponse](
+			httpClient,
+			baseURL+TeamServicePatchTeamProcedure,
+			connect.WithSchema(teamServicePatchTeamMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		putTeamConnectionInfo: connect.NewClient[v1.PutTeamConnectionInfoRequest, v1.PutTeamConnectionInfoResponse](
 			httpClient,
 			baseURL+TeamServicePutTeamConnectionInfoProcedure,
@@ -126,6 +136,7 @@ type teamServiceClient struct {
 	getTeam               *connect.Client[v1.GetTeamRequest, v1.GetTeamResponse]
 	getTeamConnectionInfo *connect.Client[v1.GetTeamConnectionInfoRequest, v1.GetTeamConnectionInfoResponse]
 	getTeamMembers        *connect.Client[v1.GetTeamMembersRequest, v1.GetTeamMembersResponse]
+	patchTeam             *connect.Client[v1.PatchTeamRequest, v1.PatchTeamResponse]
 	putTeamConnectionInfo *connect.Client[v1.PutTeamConnectionInfoRequest, v1.PutTeamConnectionInfoResponse]
 	postTeam              *connect.Client[v1.PostTeamRequest, v1.PostTeamResponse]
 }
@@ -150,6 +161,11 @@ func (c *teamServiceClient) GetTeamMembers(ctx context.Context, req *connect.Req
 	return c.getTeamMembers.CallUnary(ctx, req)
 }
 
+// PatchTeam calls admin.v1.TeamService.PatchTeam.
+func (c *teamServiceClient) PatchTeam(ctx context.Context, req *connect.Request[v1.PatchTeamRequest]) (*connect.Response[v1.PatchTeamResponse], error) {
+	return c.patchTeam.CallUnary(ctx, req)
+}
+
 // PutTeamConnectionInfo calls admin.v1.TeamService.PutTeamConnectionInfo.
 func (c *teamServiceClient) PutTeamConnectionInfo(ctx context.Context, req *connect.Request[v1.PutTeamConnectionInfoRequest]) (*connect.Response[v1.PutTeamConnectionInfoResponse], error) {
 	return c.putTeamConnectionInfo.CallUnary(ctx, req)
@@ -166,6 +182,7 @@ type TeamServiceHandler interface {
 	GetTeam(context.Context, *connect.Request[v1.GetTeamRequest]) (*connect.Response[v1.GetTeamResponse], error)
 	GetTeamConnectionInfo(context.Context, *connect.Request[v1.GetTeamConnectionInfoRequest]) (*connect.Response[v1.GetTeamConnectionInfoResponse], error)
 	GetTeamMembers(context.Context, *connect.Request[v1.GetTeamMembersRequest]) (*connect.Response[v1.GetTeamMembersResponse], error)
+	PatchTeam(context.Context, *connect.Request[v1.PatchTeamRequest]) (*connect.Response[v1.PatchTeamResponse], error)
 	PutTeamConnectionInfo(context.Context, *connect.Request[v1.PutTeamConnectionInfoRequest]) (*connect.Response[v1.PutTeamConnectionInfoResponse], error)
 	PostTeam(context.Context, *connect.Request[v1.PostTeamRequest]) (*connect.Response[v1.PostTeamResponse], error)
 }
@@ -200,6 +217,12 @@ func NewTeamServiceHandler(svc TeamServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(teamServiceGetTeamMembersMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	teamServicePatchTeamHandler := connect.NewUnaryHandler(
+		TeamServicePatchTeamProcedure,
+		svc.PatchTeam,
+		connect.WithSchema(teamServicePatchTeamMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	teamServicePutTeamConnectionInfoHandler := connect.NewUnaryHandler(
 		TeamServicePutTeamConnectionInfoProcedure,
 		svc.PutTeamConnectionInfo,
@@ -222,6 +245,8 @@ func NewTeamServiceHandler(svc TeamServiceHandler, opts ...connect.HandlerOption
 			teamServiceGetTeamConnectionInfoHandler.ServeHTTP(w, r)
 		case TeamServiceGetTeamMembersProcedure:
 			teamServiceGetTeamMembersHandler.ServeHTTP(w, r)
+		case TeamServicePatchTeamProcedure:
+			teamServicePatchTeamHandler.ServeHTTP(w, r)
 		case TeamServicePutTeamConnectionInfoProcedure:
 			teamServicePutTeamConnectionInfoHandler.ServeHTTP(w, r)
 		case TeamServicePostTeamProcedure:
@@ -249,6 +274,10 @@ func (UnimplementedTeamServiceHandler) GetTeamConnectionInfo(context.Context, *c
 
 func (UnimplementedTeamServiceHandler) GetTeamMembers(context.Context, *connect.Request[v1.GetTeamMembersRequest]) (*connect.Response[v1.GetTeamMembersResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.TeamService.GetTeamMembers is not implemented"))
+}
+
+func (UnimplementedTeamServiceHandler) PatchTeam(context.Context, *connect.Request[v1.PatchTeamRequest]) (*connect.Response[v1.PatchTeamResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.TeamService.PatchTeam is not implemented"))
 }
 
 func (UnimplementedTeamServiceHandler) PutTeamConnectionInfo(context.Context, *connect.Request[v1.PutTeamConnectionInfoRequest]) (*connect.Response[v1.PutTeamConnectionInfoResponse], error) {
