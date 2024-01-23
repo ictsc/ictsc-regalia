@@ -23,15 +23,20 @@ message GetUserResponse {
   User user = 1 [(buf.validate.field).required = true];
 }
 
-message GetUsersRequest {
-  string team_id = 1 [(buf.validate.field).string.len = 26];
-}
+message GetUsersRequest {}
 
 message GetUsersResponse {
   repeated User users = 1 [(buf.validate.field).required = true];
 }
 
+message DeleteUserRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message DeleteUserResponse {}
+
 service UserService {
   rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
   rpc GetUsers(GetUsersRequest) returns (GetUsersResponse) {}
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
 }

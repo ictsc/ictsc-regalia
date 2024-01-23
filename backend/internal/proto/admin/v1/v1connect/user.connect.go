@@ -37,19 +37,23 @@ const (
 	UserServiceGetUserProcedure = "/admin.v1.UserService/GetUser"
 	// UserServiceGetUsersProcedure is the fully-qualified name of the UserService's GetUsers RPC.
 	UserServiceGetUsersProcedure = "/admin.v1.UserService/GetUsers"
+	// UserServiceDeleteUserProcedure is the fully-qualified name of the UserService's DeleteUser RPC.
+	UserServiceDeleteUserProcedure = "/admin.v1.UserService/DeleteUser"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	userServiceServiceDescriptor        = v1.File_admin_v1_user_proto.Services().ByName("UserService")
-	userServiceGetUserMethodDescriptor  = userServiceServiceDescriptor.Methods().ByName("GetUser")
-	userServiceGetUsersMethodDescriptor = userServiceServiceDescriptor.Methods().ByName("GetUsers")
+	userServiceServiceDescriptor          = v1.File_admin_v1_user_proto.Services().ByName("UserService")
+	userServiceGetUserMethodDescriptor    = userServiceServiceDescriptor.Methods().ByName("GetUser")
+	userServiceGetUsersMethodDescriptor   = userServiceServiceDescriptor.Methods().ByName("GetUsers")
+	userServiceDeleteUserMethodDescriptor = userServiceServiceDescriptor.Methods().ByName("DeleteUser")
 )
 
 // UserServiceClient is a client for the admin.v1.UserService service.
 type UserServiceClient interface {
 	GetUser(context.Context, *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error)
 	GetUsers(context.Context, *connect.Request[v1.GetUsersRequest]) (*connect.Response[v1.GetUsersResponse], error)
+	DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error)
 }
 
 // NewUserServiceClient constructs a client for the admin.v1.UserService service. By default, it
@@ -74,13 +78,20 @@ func NewUserServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(userServiceGetUsersMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		deleteUser: connect.NewClient[v1.DeleteUserRequest, v1.DeleteUserResponse](
+			httpClient,
+			baseURL+UserServiceDeleteUserProcedure,
+			connect.WithSchema(userServiceDeleteUserMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // userServiceClient implements UserServiceClient.
 type userServiceClient struct {
-	getUser  *connect.Client[v1.GetUserRequest, v1.GetUserResponse]
-	getUsers *connect.Client[v1.GetUsersRequest, v1.GetUsersResponse]
+	getUser    *connect.Client[v1.GetUserRequest, v1.GetUserResponse]
+	getUsers   *connect.Client[v1.GetUsersRequest, v1.GetUsersResponse]
+	deleteUser *connect.Client[v1.DeleteUserRequest, v1.DeleteUserResponse]
 }
 
 // GetUser calls admin.v1.UserService.GetUser.
@@ -93,10 +104,16 @@ func (c *userServiceClient) GetUsers(ctx context.Context, req *connect.Request[v
 	return c.getUsers.CallUnary(ctx, req)
 }
 
+// DeleteUser calls admin.v1.UserService.DeleteUser.
+func (c *userServiceClient) DeleteUser(ctx context.Context, req *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error) {
+	return c.deleteUser.CallUnary(ctx, req)
+}
+
 // UserServiceHandler is an implementation of the admin.v1.UserService service.
 type UserServiceHandler interface {
 	GetUser(context.Context, *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error)
 	GetUsers(context.Context, *connect.Request[v1.GetUsersRequest]) (*connect.Response[v1.GetUsersResponse], error)
+	DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error)
 }
 
 // NewUserServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -117,12 +134,20 @@ func NewUserServiceHandler(svc UserServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(userServiceGetUsersMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	userServiceDeleteUserHandler := connect.NewUnaryHandler(
+		UserServiceDeleteUserProcedure,
+		svc.DeleteUser,
+		connect.WithSchema(userServiceDeleteUserMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/admin.v1.UserService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case UserServiceGetUserProcedure:
 			userServiceGetUserHandler.ServeHTTP(w, r)
 		case UserServiceGetUsersProcedure:
 			userServiceGetUsersHandler.ServeHTTP(w, r)
+		case UserServiceDeleteUserProcedure:
+			userServiceDeleteUserHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -138,4 +163,8 @@ func (UnimplementedUserServiceHandler) GetUser(context.Context, *connect.Request
 
 func (UnimplementedUserServiceHandler) GetUsers(context.Context, *connect.Request[v1.GetUsersRequest]) (*connect.Response[v1.GetUsersResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.UserService.GetUsers is not implemented"))
+}
+
+func (UnimplementedUserServiceHandler) DeleteUser(context.Context, *connect.Request[v1.DeleteUserRequest]) (*connect.Response[v1.DeleteUserResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.UserService.DeleteUser is not implemented"))
 }
