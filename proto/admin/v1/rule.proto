@@ -35,8 +35,8 @@ message Schedule {
     max_len: 100
   }];
   Rounds round = 3 [(buf.validate.field).enum = {defined_only: true}];
-  google.protobuf.Timestamp start_at = 4 [(buf.validate.field).timestamp.gt_now = true];
-  google.protobuf.Timestamp end_at = 5 [(buf.validate.field).timestamp.gt_now = true];
+  google.protobuf.Timestamp start_at = 4;
+  google.protobuf.Timestamp end_at = 5;
 }
 
 message GetRuleRequest {}
@@ -77,7 +77,7 @@ message PatchScheduleRequest {
     max_len: 100
   }];
   optional Rounds round = 3 [(buf.validate.field).enum = {defined_only: true}];
-  optional google.protobuf.Timestamp start_at = 4 [(buf.validate.field).timestamp.gt_now = true];
+  optional google.protobuf.Timestamp start_at = 4;
   optional google.protobuf.Timestamp end_at = 5 [(buf.validate.field).timestamp.gt_now = true];
 }
 
