@@ -63,11 +63,11 @@ message GetTeamConnectionInfoResponse {
   BaStation ba_station = 1 [(buf.validate.field).required = true];
 }
 
-message GetTeamMembersRequest {
+message GetMembersRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
 }
 
-message GetTeamMembersResponse {
+message GetMembersResponse {
   repeated User members = 1 [(buf.validate.field).repeated = {
     min_items: 1,
     max_items: 5
@@ -88,8 +88,8 @@ message PatchTeamRequest {
     min_len: 1,
     max_len: 50
   }];
-  optional int32 member_num = 5 [(buf.validate.field).int32 = {
-    gte: 1,
+  optional int32 code_remaining = 6 [(buf.validate.field).int32 = {
+    gte: 0,
     lte: 5
   }];
 }
@@ -118,8 +118,8 @@ message PostTeamRequest {
     min_len: 1,
     max_len: 50
   }];
-  int32 member_num = 4 [(buf.validate.field).int32 = {
-    gte: 1,
+  int32 code_remaining = 6 [(buf.validate.field).int32 = {
+    gte: 0,
     lte: 5
   }];
 }
@@ -128,12 +128,35 @@ message PostTeamResponse {
   Team team = 1 [(buf.validate.field).required = true];
 }
 
+message AddMemberRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string user_id = 2 [(buf.validate.field).string.len = 26];
+}
+
+message AddMemberResponse {}
+
+message DeleteTeamRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message DeleteTeamResponse {}
+
+message DeleteMemberRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string user_id = 2 [(buf.validate.field).string.len = 26];
+}
+
+message DeleteMemberResponse {}
+
 service TeamService {
   rpc GetTeams(GetTeamsRequest) returns (GetTeamsResponse);
   rpc GetTeam(GetTeamRequest) returns (GetTeamResponse);
   rpc GetTeamConnectionInfo(GetTeamConnectionInfoRequest) returns (GetTeamConnectionInfoResponse);
-  rpc GetTeamMembers(GetTeamMembersRequest) returns (GetTeamMembersResponse);
+  rpc GetMembers(GetMembersRequest) returns (GetMembersResponse);
   rpc PatchTeam(PatchTeamRequest) returns (PatchTeamResponse);
   rpc PutTeamConnectionInfo(PutTeamConnectionInfoRequest) returns (PutTeamConnectionInfoResponse);
   rpc PostTeam(PostTeamRequest) returns (PostTeamResponse);
+  rpc AddMember(AddMemberRequest) returns (AddMemberResponse);
+  rpc DeleteTeam(DeleteTeamRequest) returns (DeleteTeamResponse);
+  rpc DeleteMember(DeleteMemberRequest) returns (DeleteMemberResponse);
 }

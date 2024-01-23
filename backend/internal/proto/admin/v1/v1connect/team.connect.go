@@ -40,9 +40,8 @@ const (
 	// TeamServiceGetTeamConnectionInfoProcedure is the fully-qualified name of the TeamService's
 	// GetTeamConnectionInfo RPC.
 	TeamServiceGetTeamConnectionInfoProcedure = "/admin.v1.TeamService/GetTeamConnectionInfo"
-	// TeamServiceGetTeamMembersProcedure is the fully-qualified name of the TeamService's
-	// GetTeamMembers RPC.
-	TeamServiceGetTeamMembersProcedure = "/admin.v1.TeamService/GetTeamMembers"
+	// TeamServiceGetMembersProcedure is the fully-qualified name of the TeamService's GetMembers RPC.
+	TeamServiceGetMembersProcedure = "/admin.v1.TeamService/GetMembers"
 	// TeamServicePatchTeamProcedure is the fully-qualified name of the TeamService's PatchTeam RPC.
 	TeamServicePatchTeamProcedure = "/admin.v1.TeamService/PatchTeam"
 	// TeamServicePutTeamConnectionInfoProcedure is the fully-qualified name of the TeamService's
@@ -50,6 +49,13 @@ const (
 	TeamServicePutTeamConnectionInfoProcedure = "/admin.v1.TeamService/PutTeamConnectionInfo"
 	// TeamServicePostTeamProcedure is the fully-qualified name of the TeamService's PostTeam RPC.
 	TeamServicePostTeamProcedure = "/admin.v1.TeamService/PostTeam"
+	// TeamServiceAddMemberProcedure is the fully-qualified name of the TeamService's AddMember RPC.
+	TeamServiceAddMemberProcedure = "/admin.v1.TeamService/AddMember"
+	// TeamServiceDeleteTeamProcedure is the fully-qualified name of the TeamService's DeleteTeam RPC.
+	TeamServiceDeleteTeamProcedure = "/admin.v1.TeamService/DeleteTeam"
+	// TeamServiceDeleteMemberProcedure is the fully-qualified name of the TeamService's DeleteMember
+	// RPC.
+	TeamServiceDeleteMemberProcedure = "/admin.v1.TeamService/DeleteMember"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -58,10 +64,13 @@ var (
 	teamServiceGetTeamsMethodDescriptor              = teamServiceServiceDescriptor.Methods().ByName("GetTeams")
 	teamServiceGetTeamMethodDescriptor               = teamServiceServiceDescriptor.Methods().ByName("GetTeam")
 	teamServiceGetTeamConnectionInfoMethodDescriptor = teamServiceServiceDescriptor.Methods().ByName("GetTeamConnectionInfo")
-	teamServiceGetTeamMembersMethodDescriptor        = teamServiceServiceDescriptor.Methods().ByName("GetTeamMembers")
+	teamServiceGetMembersMethodDescriptor            = teamServiceServiceDescriptor.Methods().ByName("GetMembers")
 	teamServicePatchTeamMethodDescriptor             = teamServiceServiceDescriptor.Methods().ByName("PatchTeam")
 	teamServicePutTeamConnectionInfoMethodDescriptor = teamServiceServiceDescriptor.Methods().ByName("PutTeamConnectionInfo")
 	teamServicePostTeamMethodDescriptor              = teamServiceServiceDescriptor.Methods().ByName("PostTeam")
+	teamServiceAddMemberMethodDescriptor             = teamServiceServiceDescriptor.Methods().ByName("AddMember")
+	teamServiceDeleteTeamMethodDescriptor            = teamServiceServiceDescriptor.Methods().ByName("DeleteTeam")
+	teamServiceDeleteMemberMethodDescriptor          = teamServiceServiceDescriptor.Methods().ByName("DeleteMember")
 )
 
 // TeamServiceClient is a client for the admin.v1.TeamService service.
@@ -69,10 +78,13 @@ type TeamServiceClient interface {
 	GetTeams(context.Context, *connect.Request[v1.GetTeamsRequest]) (*connect.Response[v1.GetTeamsResponse], error)
 	GetTeam(context.Context, *connect.Request[v1.GetTeamRequest]) (*connect.Response[v1.GetTeamResponse], error)
 	GetTeamConnectionInfo(context.Context, *connect.Request[v1.GetTeamConnectionInfoRequest]) (*connect.Response[v1.GetTeamConnectionInfoResponse], error)
-	GetTeamMembers(context.Context, *connect.Request[v1.GetTeamMembersRequest]) (*connect.Response[v1.GetTeamMembersResponse], error)
+	GetMembers(context.Context, *connect.Request[v1.GetMembersRequest]) (*connect.Response[v1.GetMembersResponse], error)
 	PatchTeam(context.Context, *connect.Request[v1.PatchTeamRequest]) (*connect.Response[v1.PatchTeamResponse], error)
 	PutTeamConnectionInfo(context.Context, *connect.Request[v1.PutTeamConnectionInfoRequest]) (*connect.Response[v1.PutTeamConnectionInfoResponse], error)
 	PostTeam(context.Context, *connect.Request[v1.PostTeamRequest]) (*connect.Response[v1.PostTeamResponse], error)
+	AddMember(context.Context, *connect.Request[v1.AddMemberRequest]) (*connect.Response[v1.AddMemberResponse], error)
+	DeleteTeam(context.Context, *connect.Request[v1.DeleteTeamRequest]) (*connect.Response[v1.DeleteTeamResponse], error)
+	DeleteMember(context.Context, *connect.Request[v1.DeleteMemberRequest]) (*connect.Response[v1.DeleteMemberResponse], error)
 }
 
 // NewTeamServiceClient constructs a client for the admin.v1.TeamService service. By default, it
@@ -103,10 +115,10 @@ func NewTeamServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(teamServiceGetTeamConnectionInfoMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		getTeamMembers: connect.NewClient[v1.GetTeamMembersRequest, v1.GetTeamMembersResponse](
+		getMembers: connect.NewClient[v1.GetMembersRequest, v1.GetMembersResponse](
 			httpClient,
-			baseURL+TeamServiceGetTeamMembersProcedure,
-			connect.WithSchema(teamServiceGetTeamMembersMethodDescriptor),
+			baseURL+TeamServiceGetMembersProcedure,
+			connect.WithSchema(teamServiceGetMembersMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		patchTeam: connect.NewClient[v1.PatchTeamRequest, v1.PatchTeamResponse](
@@ -127,6 +139,24 @@ func NewTeamServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(teamServicePostTeamMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		addMember: connect.NewClient[v1.AddMemberRequest, v1.AddMemberResponse](
+			httpClient,
+			baseURL+TeamServiceAddMemberProcedure,
+			connect.WithSchema(teamServiceAddMemberMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		deleteTeam: connect.NewClient[v1.DeleteTeamRequest, v1.DeleteTeamResponse](
+			httpClient,
+			baseURL+TeamServiceDeleteTeamProcedure,
+			connect.WithSchema(teamServiceDeleteTeamMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		deleteMember: connect.NewClient[v1.DeleteMemberRequest, v1.DeleteMemberResponse](
+			httpClient,
+			baseURL+TeamServiceDeleteMemberProcedure,
+			connect.WithSchema(teamServiceDeleteMemberMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -135,10 +165,13 @@ type teamServiceClient struct {
 	getTeams              *connect.Client[v1.GetTeamsRequest, v1.GetTeamsResponse]
 	getTeam               *connect.Client[v1.GetTeamRequest, v1.GetTeamResponse]
 	getTeamConnectionInfo *connect.Client[v1.GetTeamConnectionInfoRequest, v1.GetTeamConnectionInfoResponse]
-	getTeamMembers        *connect.Client[v1.GetTeamMembersRequest, v1.GetTeamMembersResponse]
+	getMembers            *connect.Client[v1.GetMembersRequest, v1.GetMembersResponse]
 	patchTeam             *connect.Client[v1.PatchTeamRequest, v1.PatchTeamResponse]
 	putTeamConnectionInfo *connect.Client[v1.PutTeamConnectionInfoRequest, v1.PutTeamConnectionInfoResponse]
 	postTeam              *connect.Client[v1.PostTeamRequest, v1.PostTeamResponse]
+	addMember             *connect.Client[v1.AddMemberRequest, v1.AddMemberResponse]
+	deleteTeam            *connect.Client[v1.DeleteTeamRequest, v1.DeleteTeamResponse]
+	deleteMember          *connect.Client[v1.DeleteMemberRequest, v1.DeleteMemberResponse]
 }
 
 // GetTeams calls admin.v1.TeamService.GetTeams.
@@ -156,9 +189,9 @@ func (c *teamServiceClient) GetTeamConnectionInfo(ctx context.Context, req *conn
 	return c.getTeamConnectionInfo.CallUnary(ctx, req)
 }
 
-// GetTeamMembers calls admin.v1.TeamService.GetTeamMembers.
-func (c *teamServiceClient) GetTeamMembers(ctx context.Context, req *connect.Request[v1.GetTeamMembersRequest]) (*connect.Response[v1.GetTeamMembersResponse], error) {
-	return c.getTeamMembers.CallUnary(ctx, req)
+// GetMembers calls admin.v1.TeamService.GetMembers.
+func (c *teamServiceClient) GetMembers(ctx context.Context, req *connect.Request[v1.GetMembersRequest]) (*connect.Response[v1.GetMembersResponse], error) {
+	return c.getMembers.CallUnary(ctx, req)
 }
 
 // PatchTeam calls admin.v1.TeamService.PatchTeam.
@@ -176,15 +209,33 @@ func (c *teamServiceClient) PostTeam(ctx context.Context, req *connect.Request[v
 	return c.postTeam.CallUnary(ctx, req)
 }
 
+// AddMember calls admin.v1.TeamService.AddMember.
+func (c *teamServiceClient) AddMember(ctx context.Context, req *connect.Request[v1.AddMemberRequest]) (*connect.Response[v1.AddMemberResponse], error) {
+	return c.addMember.CallUnary(ctx, req)
+}
+
+// DeleteTeam calls admin.v1.TeamService.DeleteTeam.
+func (c *teamServiceClient) DeleteTeam(ctx context.Context, req *connect.Request[v1.DeleteTeamRequest]) (*connect.Response[v1.DeleteTeamResponse], error) {
+	return c.deleteTeam.CallUnary(ctx, req)
+}
+
+// DeleteMember calls admin.v1.TeamService.DeleteMember.
+func (c *teamServiceClient) DeleteMember(ctx context.Context, req *connect.Request[v1.DeleteMemberRequest]) (*connect.Response[v1.DeleteMemberResponse], error) {
+	return c.deleteMember.CallUnary(ctx, req)
+}
+
 // TeamServiceHandler is an implementation of the admin.v1.TeamService service.
 type TeamServiceHandler interface {
 	GetTeams(context.Context, *connect.Request[v1.GetTeamsRequest]) (*connect.Response[v1.GetTeamsResponse], error)
 	GetTeam(context.Context, *connect.Request[v1.GetTeamRequest]) (*connect.Response[v1.GetTeamResponse], error)
 	GetTeamConnectionInfo(context.Context, *connect.Request[v1.GetTeamConnectionInfoRequest]) (*connect.Response[v1.GetTeamConnectionInfoResponse], error)
-	GetTeamMembers(context.Context, *connect.Request[v1.GetTeamMembersRequest]) (*connect.Response[v1.GetTeamMembersResponse], error)
+	GetMembers(context.Context, *connect.Request[v1.GetMembersRequest]) (*connect.Response[v1.GetMembersResponse], error)
 	PatchTeam(context.Context, *connect.Request[v1.PatchTeamRequest]) (*connect.Response[v1.PatchTeamResponse], error)
 	PutTeamConnectionInfo(context.Context, *connect.Request[v1.PutTeamConnectionInfoRequest]) (*connect.Response[v1.PutTeamConnectionInfoResponse], error)
 	PostTeam(context.Context, *connect.Request[v1.PostTeamRequest]) (*connect.Response[v1.PostTeamResponse], error)
+	AddMember(context.Context, *connect.Request[v1.AddMemberRequest]) (*connect.Response[v1.AddMemberResponse], error)
+	DeleteTeam(context.Context, *connect.Request[v1.DeleteTeamRequest]) (*connect.Response[v1.DeleteTeamResponse], error)
+	DeleteMember(context.Context, *connect.Request[v1.DeleteMemberRequest]) (*connect.Response[v1.DeleteMemberResponse], error)
 }
 
 // NewTeamServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -211,10 +262,10 @@ func NewTeamServiceHandler(svc TeamServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(teamServiceGetTeamConnectionInfoMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	teamServiceGetTeamMembersHandler := connect.NewUnaryHandler(
-		TeamServiceGetTeamMembersProcedure,
-		svc.GetTeamMembers,
-		connect.WithSchema(teamServiceGetTeamMembersMethodDescriptor),
+	teamServiceGetMembersHandler := connect.NewUnaryHandler(
+		TeamServiceGetMembersProcedure,
+		svc.GetMembers,
+		connect.WithSchema(teamServiceGetMembersMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	teamServicePatchTeamHandler := connect.NewUnaryHandler(
@@ -235,6 +286,24 @@ func NewTeamServiceHandler(svc TeamServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(teamServicePostTeamMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	teamServiceAddMemberHandler := connect.NewUnaryHandler(
+		TeamServiceAddMemberProcedure,
+		svc.AddMember,
+		connect.WithSchema(teamServiceAddMemberMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	teamServiceDeleteTeamHandler := connect.NewUnaryHandler(
+		TeamServiceDeleteTeamProcedure,
+		svc.DeleteTeam,
+		connect.WithSchema(teamServiceDeleteTeamMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	teamServiceDeleteMemberHandler := connect.NewUnaryHandler(
+		TeamServiceDeleteMemberProcedure,
+		svc.DeleteMember,
+		connect.WithSchema(teamServiceDeleteMemberMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/admin.v1.TeamService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case TeamServiceGetTeamsProcedure:
@@ -243,14 +312,20 @@ func NewTeamServiceHandler(svc TeamServiceHandler, opts ...connect.HandlerOption
 			teamServiceGetTeamHandler.ServeHTTP(w, r)
 		case TeamServiceGetTeamConnectionInfoProcedure:
 			teamServiceGetTeamConnectionInfoHandler.ServeHTTP(w, r)
-		case TeamServiceGetTeamMembersProcedure:
-			teamServiceGetTeamMembersHandler.ServeHTTP(w, r)
+		case TeamServiceGetMembersProcedure:
+			teamServiceGetMembersHandler.ServeHTTP(w, r)
 		case TeamServicePatchTeamProcedure:
 			teamServicePatchTeamHandler.ServeHTTP(w, r)
 		case TeamServicePutTeamConnectionInfoProcedure:
 			teamServicePutTeamConnectionInfoHandler.ServeHTTP(w, r)
 		case TeamServicePostTeamProcedure:
 			teamServicePostTeamHandler.ServeHTTP(w, r)
+		case TeamServiceAddMemberProcedure:
+			teamServiceAddMemberHandler.ServeHTTP(w, r)
+		case TeamServiceDeleteTeamProcedure:
+			teamServiceDeleteTeamHandler.ServeHTTP(w, r)
+		case TeamServiceDeleteMemberProcedure:
+			teamServiceDeleteMemberHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -272,8 +347,8 @@ func (UnimplementedTeamServiceHandler) GetTeamConnectionInfo(context.Context, *c
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.TeamService.GetTeamConnectionInfo is not implemented"))
 }
 
-func (UnimplementedTeamServiceHandler) GetTeamMembers(context.Context, *connect.Request[v1.GetTeamMembersRequest]) (*connect.Response[v1.GetTeamMembersResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.TeamService.GetTeamMembers is not implemented"))
+func (UnimplementedTeamServiceHandler) GetMembers(context.Context, *connect.Request[v1.GetMembersRequest]) (*connect.Response[v1.GetMembersResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.TeamService.GetMembers is not implemented"))
 }
 
 func (UnimplementedTeamServiceHandler) PatchTeam(context.Context, *connect.Request[v1.PatchTeamRequest]) (*connect.Response[v1.PatchTeamResponse], error) {
@@ -286,4 +361,16 @@ func (UnimplementedTeamServiceHandler) PutTeamConnectionInfo(context.Context, *c
 
 func (UnimplementedTeamServiceHandler) PostTeam(context.Context, *connect.Request[v1.PostTeamRequest]) (*connect.Response[v1.PostTeamResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.TeamService.PostTeam is not implemented"))
+}
+
+func (UnimplementedTeamServiceHandler) AddMember(context.Context, *connect.Request[v1.AddMemberRequest]) (*connect.Response[v1.AddMemberResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.TeamService.AddMember is not implemented"))
+}
+
+func (UnimplementedTeamServiceHandler) DeleteTeam(context.Context, *connect.Request[v1.DeleteTeamRequest]) (*connect.Response[v1.DeleteTeamResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.TeamService.DeleteTeam is not implemented"))
+}
+
+func (UnimplementedTeamServiceHandler) DeleteMember(context.Context, *connect.Request[v1.DeleteMemberRequest]) (*connect.Response[v1.DeleteMemberResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.TeamService.DeleteMember is not implemented"))
 }
