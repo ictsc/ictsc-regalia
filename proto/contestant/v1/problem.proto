@@ -50,7 +50,6 @@ message DescriptiveProblem {
     min_len: 1,
     max_len: 1000
   }];
-  int32 point = 2 [(buf.validate.field).int32.gt = 0];
 }
 
 enum ProblemType {
@@ -66,11 +65,12 @@ message Problem {
     max_len: 100
   }];
   string code = 3 [(buf.validate.field).string.len = 3];
-  ProblemType type = 4 [(buf.validate.field).enum.defined_only = true];
+  int32 point = 4 [(buf.validate.field).int32.gt = 0];
+  ProblemType type = 5 [(buf.validate.field).enum.defined_only = true];
   oneof body {
     option (buf.validate.oneof).required = true;
-    DescriptiveProblem descriptive = 5;
-    MultipleChoiceProblem multiple_choice = 6;
+    DescriptiveProblem descriptive = 6;
+    MultipleChoiceProblem multiple_choice = 7;
   }
 }
 
@@ -82,10 +82,21 @@ message GetProblemResponse {
   Problem problem = 1;
 }
 
+message ShortProblem {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string title = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+  string code = 3 [(buf.validate.field).string.len = 3];
+  int32 point = 4 [(buf.validate.field).int32.gt = 0];
+  int32 current_point = 5 [(buf.validate.field).int32.gte = 0];
+}
+
 message GetProblemsRequest {}
 
 message GetProblemsResponse {
-  repeated Problem problems = 1;
+  repeated ShortProblem problems = 1;
 }
 
 service ProblemService {
