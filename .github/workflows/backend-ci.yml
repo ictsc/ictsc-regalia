@@ -44,7 +44,7 @@ jobs:
       - name: Generate Connect Files
         run: |
           rm -rf ../backend/internal/proto
-          buf generate
+          buf generate --template buf.gen-backend.yaml
       - name: Push
         id: push
         uses: stefanzweifel/git-auto-commit-action@v5
