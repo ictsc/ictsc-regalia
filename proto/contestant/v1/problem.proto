@@ -96,7 +96,7 @@ message ShortProblem {
 message GetProblemsRequest {}
 
 message GetProblemsResponse {
-  repeated ShortProblem problems = 1;
+  repeated ShortProblem problems = 1 [(buf.validate.field).required = true];
 }
 
 service ProblemService {

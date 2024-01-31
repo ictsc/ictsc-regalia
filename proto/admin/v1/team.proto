@@ -69,7 +69,7 @@ message GetMembersRequest {
 
 message GetMembersResponse {
   repeated User members = 1 [(buf.validate.field).repeated = {
-    min_items: 1,
+    min_items: 0,
     max_items: 5
   }];
 }

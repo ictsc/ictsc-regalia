@@ -48,7 +48,7 @@ message GetRuleResponse {
 message GetSchedulesRequest {}
 
 message GetSchedulesResponse {
-  repeated Schedule schedules = 1;
+  repeated Schedule schedules = 1 [(buf.validate.field).required = true];
 }
 
 message PatchRuleRequest {
