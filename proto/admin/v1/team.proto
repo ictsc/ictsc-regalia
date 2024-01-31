@@ -51,7 +51,10 @@ message BaStation {
     min_len: 1,
     max_len: 20
   }];
-  string host = 3 [(buf.validate.field).string.ip = true];
+  string host = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100
+  }];
   int32 port = 4 [(buf.validate.field).int32.gte = 0];
 }
 
