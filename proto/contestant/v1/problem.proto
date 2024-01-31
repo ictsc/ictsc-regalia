@@ -45,10 +45,33 @@ message MultipleChoiceProblem {
   }];
 }
 
+message ConnectionInfo {
+  string hostname = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+  string command = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+  string password = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string type = 4 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+}
+
 message DescriptiveProblem {
   string body = 1 [(buf.validate.field).string = {
     min_len: 1,
     max_len: 1000
+  }];
+  repeated ConnectionInfo connection_infos = 2 [(buf.validate.field).repeated = {
+    min_items: 1,
+    max_items: 10
   }];
 }
 
