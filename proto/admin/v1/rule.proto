@@ -22,6 +22,12 @@ message Rule {
   }];
 }
 
+message GetRuleRequest {}
+
+message GetRuleResponse {
+  Rule rule = 1 [(buf.validate.field).required = true];
+}
+
 enum Rounds {
   ROUNDS_UNSPECIFIED = 0;
   ROUNDS_QUALIFYING = 1;
@@ -37,12 +43,6 @@ message Schedule {
   Rounds round = 3 [(buf.validate.field).enum = {defined_only: true}];
   google.protobuf.Timestamp start_at = 4;
   google.protobuf.Timestamp end_at = 5;
-}
-
-message GetRuleRequest {}
-
-message GetRuleResponse {
-  Rule rule = 1 [(buf.validate.field).required = true];
 }
 
 message GetSchedulesRequest {}

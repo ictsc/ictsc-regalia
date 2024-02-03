@@ -134,6 +134,91 @@ func (x *Rule) GetRecreationRule() string {
 	return ""
 }
 
+type GetRuleRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetRuleRequest) Reset() {
+	*x = GetRuleRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_admin_v1_rule_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetRuleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRuleRequest) ProtoMessage() {}
+
+func (x *GetRuleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_rule_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRuleRequest.ProtoReflect.Descriptor instead.
+func (*GetRuleRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_rule_proto_rawDescGZIP(), []int{1}
+}
+
+type GetRuleResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Rule *Rule `protobuf:"bytes,1,opt,name=rule,proto3" json:"rule,omitempty"`
+}
+
+func (x *GetRuleResponse) Reset() {
+	*x = GetRuleResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_admin_v1_rule_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetRuleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRuleResponse) ProtoMessage() {}
+
+func (x *GetRuleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_rule_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRuleResponse.ProtoReflect.Descriptor instead.
+func (*GetRuleResponse) Descriptor() ([]byte, []int) {
+	return file_admin_v1_rule_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetRuleResponse) GetRule() *Rule {
+	if x != nil {
+		return x.Rule
+	}
+	return nil
+}
+
 type Schedule struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -149,7 +234,7 @@ type Schedule struct {
 func (x *Schedule) Reset() {
 	*x = Schedule{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_rule_proto_msgTypes[1]
+		mi := &file_admin_v1_rule_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -162,7 +247,7 @@ func (x *Schedule) String() string {
 func (*Schedule) ProtoMessage() {}
 
 func (x *Schedule) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_rule_proto_msgTypes[1]
+	mi := &file_admin_v1_rule_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -175,7 +260,7 @@ func (x *Schedule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Schedule.ProtoReflect.Descriptor instead.
 func (*Schedule) Descriptor() ([]byte, []int) {
-	return file_admin_v1_rule_proto_rawDescGZIP(), []int{1}
+	return file_admin_v1_rule_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Schedule) GetId() string {
@@ -209,91 +294,6 @@ func (x *Schedule) GetStartAt() *timestamppb.Timestamp {
 func (x *Schedule) GetEndAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.EndAt
-	}
-	return nil
-}
-
-type GetRuleRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *GetRuleRequest) Reset() {
-	*x = GetRuleRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_rule_proto_msgTypes[2]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetRuleRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetRuleRequest) ProtoMessage() {}
-
-func (x *GetRuleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_rule_proto_msgTypes[2]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetRuleRequest.ProtoReflect.Descriptor instead.
-func (*GetRuleRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_rule_proto_rawDescGZIP(), []int{2}
-}
-
-type GetRuleResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Rule *Rule `protobuf:"bytes,1,opt,name=rule,proto3" json:"rule,omitempty"`
-}
-
-func (x *GetRuleResponse) Reset() {
-	*x = GetRuleResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_rule_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetRuleResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetRuleResponse) ProtoMessage() {}
-
-func (x *GetRuleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_rule_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetRuleResponse.ProtoReflect.Descriptor instead.
-func (*GetRuleResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_rule_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *GetRuleResponse) GetRule() *Rule {
-	if x != nil {
-		return x.Rule
 	}
 	return nil
 }
@@ -839,26 +839,26 @@ var file_admin_v1_rule_proto_rawDesc = []byte{
 	0x65, 0x12, 0x33, 0x0a, 0x0f, 0x72, 0x65, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f,
 	0x72, 0x75, 0x6c, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0a, 0xba, 0x48, 0x07, 0x72,
 	0x05, 0x10, 0x01, 0x18, 0xe8, 0x07, 0x52, 0x0e, 0x72, 0x65, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x52, 0x75, 0x6c, 0x65, 0x22, 0xdf, 0x01, 0x0a, 0x08, 0x53, 0x63, 0x68, 0x65, 0x64,
-	0x75, 0x6c, 0x65, 0x12, 0x18, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42,
-	0x08, 0xba, 0x48, 0x05, 0x72, 0x03, 0x98, 0x01, 0x1a, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1d, 0x0a,
-	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x09, 0xba, 0x48, 0x06,
-	0x72, 0x04, 0x10, 0x01, 0x18, 0x64, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x30, 0x0a, 0x05,
-	0x72, 0x6f, 0x75, 0x6e, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x10, 0x2e, 0x61, 0x64,
-	0x6d, 0x69, 0x6e, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x6f, 0x75, 0x6e, 0x64, 0x73, 0x42, 0x08, 0xba,
-	0x48, 0x05, 0x82, 0x01, 0x02, 0x10, 0x01, 0x52, 0x05, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x12, 0x35,
-	0x0a, 0x08, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x61, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
-	0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x07, 0x73, 0x74,
-	0x61, 0x72, 0x74, 0x41, 0x74, 0x12, 0x31, 0x0a, 0x06, 0x65, 0x6e, 0x64, 0x5f, 0x61, 0x74, 0x18,
-	0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d,
-	0x70, 0x52, 0x05, 0x65, 0x6e, 0x64, 0x41, 0x74, 0x22, 0x10, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x52,
-	0x75, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x3d, 0x0a, 0x0f, 0x47, 0x65,
-	0x74, 0x52, 0x75, 0x6c, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2a, 0x0a,
-	0x04, 0x72, 0x75, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x61, 0x64,
-	0x6d, 0x69, 0x6e, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x75, 0x6c, 0x65, 0x42, 0x06, 0xba, 0x48, 0x03,
-	0xc8, 0x01, 0x01, 0x52, 0x04, 0x72, 0x75, 0x6c, 0x65, 0x22, 0x15, 0x0a, 0x13, 0x47, 0x65, 0x74,
+	0x6f, 0x6e, 0x52, 0x75, 0x6c, 0x65, 0x22, 0x10, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x52, 0x75, 0x6c,
+	0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x3d, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x52,
+	0x75, 0x6c, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2a, 0x0a, 0x04, 0x72,
+	0x75, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x61, 0x64, 0x6d, 0x69,
+	0x6e, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x75, 0x6c, 0x65, 0x42, 0x06, 0xba, 0x48, 0x03, 0xc8, 0x01,
+	0x01, 0x52, 0x04, 0x72, 0x75, 0x6c, 0x65, 0x22, 0xdf, 0x01, 0x0a, 0x08, 0x53, 0x63, 0x68, 0x65,
+	0x64, 0x75, 0x6c, 0x65, 0x12, 0x18, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x42, 0x08, 0xba, 0x48, 0x05, 0x72, 0x03, 0x98, 0x01, 0x1a, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1d,
+	0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x09, 0xba, 0x48,
+	0x06, 0x72, 0x04, 0x10, 0x01, 0x18, 0x64, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x30, 0x0a,
+	0x05, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x10, 0x2e, 0x61,
+	0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x6f, 0x75, 0x6e, 0x64, 0x73, 0x42, 0x08,
+	0xba, 0x48, 0x05, 0x82, 0x01, 0x02, 0x10, 0x01, 0x52, 0x05, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x12,
+	0x35, 0x0a, 0x08, 0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x61, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x07, 0x73,
+	0x74, 0x61, 0x72, 0x74, 0x41, 0x74, 0x12, 0x31, 0x0a, 0x06, 0x65, 0x6e, 0x64, 0x5f, 0x61, 0x74,
+	0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61,
+	0x6d, 0x70, 0x52, 0x05, 0x65, 0x6e, 0x64, 0x41, 0x74, 0x22, 0x15, 0x0a, 0x13, 0x47, 0x65, 0x74,
 	0x53, 0x63, 0x68, 0x65, 0x64, 0x75, 0x6c, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
 	0x22, 0x50, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x53, 0x63, 0x68, 0x65, 0x64, 0x75, 0x6c, 0x65, 0x73,
 	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x38, 0x0a, 0x09, 0x73, 0x63, 0x68, 0x65,
@@ -990,9 +990,9 @@ var file_admin_v1_rule_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_admin_v1_rule_proto_goTypes = []interface{}{
 	(Rounds)(0),                    // 0: admin.v1.Rounds
 	(*Rule)(nil),                   // 1: admin.v1.Rule
-	(*Schedule)(nil),               // 2: admin.v1.Schedule
-	(*GetRuleRequest)(nil),         // 3: admin.v1.GetRuleRequest
-	(*GetRuleResponse)(nil),        // 4: admin.v1.GetRuleResponse
+	(*GetRuleRequest)(nil),         // 2: admin.v1.GetRuleRequest
+	(*GetRuleResponse)(nil),        // 3: admin.v1.GetRuleResponse
+	(*Schedule)(nil),               // 4: admin.v1.Schedule
 	(*GetSchedulesRequest)(nil),    // 5: admin.v1.GetSchedulesRequest
 	(*GetSchedulesResponse)(nil),   // 6: admin.v1.GetSchedulesResponse
 	(*PatchRuleRequest)(nil),       // 7: admin.v1.PatchRuleRequest
@@ -1006,27 +1006,27 @@ var file_admin_v1_rule_proto_goTypes = []interface{}{
 	(*timestamppb.Timestamp)(nil),  // 15: google.protobuf.Timestamp
 }
 var file_admin_v1_rule_proto_depIdxs = []int32{
-	0,  // 0: admin.v1.Schedule.round:type_name -> admin.v1.Rounds
-	15, // 1: admin.v1.Schedule.start_at:type_name -> google.protobuf.Timestamp
-	15, // 2: admin.v1.Schedule.end_at:type_name -> google.protobuf.Timestamp
-	1,  // 3: admin.v1.GetRuleResponse.rule:type_name -> admin.v1.Rule
-	2,  // 4: admin.v1.GetSchedulesResponse.schedules:type_name -> admin.v1.Schedule
+	1,  // 0: admin.v1.GetRuleResponse.rule:type_name -> admin.v1.Rule
+	0,  // 1: admin.v1.Schedule.round:type_name -> admin.v1.Rounds
+	15, // 2: admin.v1.Schedule.start_at:type_name -> google.protobuf.Timestamp
+	15, // 3: admin.v1.Schedule.end_at:type_name -> google.protobuf.Timestamp
+	4,  // 4: admin.v1.GetSchedulesResponse.schedules:type_name -> admin.v1.Schedule
 	1,  // 5: admin.v1.PatchRuleResponse.rule:type_name -> admin.v1.Rule
 	0,  // 6: admin.v1.PatchScheduleRequest.round:type_name -> admin.v1.Rounds
 	15, // 7: admin.v1.PatchScheduleRequest.start_at:type_name -> google.protobuf.Timestamp
 	15, // 8: admin.v1.PatchScheduleRequest.end_at:type_name -> google.protobuf.Timestamp
-	2,  // 9: admin.v1.PatchScheduleResponse.schedule:type_name -> admin.v1.Schedule
+	4,  // 9: admin.v1.PatchScheduleResponse.schedule:type_name -> admin.v1.Schedule
 	0,  // 10: admin.v1.PostScheduleRequest.round:type_name -> admin.v1.Rounds
 	15, // 11: admin.v1.PostScheduleRequest.start_at:type_name -> google.protobuf.Timestamp
 	15, // 12: admin.v1.PostScheduleRequest.end_at:type_name -> google.protobuf.Timestamp
-	2,  // 13: admin.v1.PostScheduleResponse.schedule:type_name -> admin.v1.Schedule
-	3,  // 14: admin.v1.RuleService.GetRule:input_type -> admin.v1.GetRuleRequest
+	4,  // 13: admin.v1.PostScheduleResponse.schedule:type_name -> admin.v1.Schedule
+	2,  // 14: admin.v1.RuleService.GetRule:input_type -> admin.v1.GetRuleRequest
 	5,  // 15: admin.v1.RuleService.GetSchedules:input_type -> admin.v1.GetSchedulesRequest
 	7,  // 16: admin.v1.RuleService.PatchRule:input_type -> admin.v1.PatchRuleRequest
 	9,  // 17: admin.v1.RuleService.PatchSchedule:input_type -> admin.v1.PatchScheduleRequest
 	11, // 18: admin.v1.RuleService.PostSchedule:input_type -> admin.v1.PostScheduleRequest
 	13, // 19: admin.v1.RuleService.DeleteSchedule:input_type -> admin.v1.DeleteScheduleRequest
-	4,  // 20: admin.v1.RuleService.GetRule:output_type -> admin.v1.GetRuleResponse
+	3,  // 20: admin.v1.RuleService.GetRule:output_type -> admin.v1.GetRuleResponse
 	6,  // 21: admin.v1.RuleService.GetSchedules:output_type -> admin.v1.GetSchedulesResponse
 	8,  // 22: admin.v1.RuleService.PatchRule:output_type -> admin.v1.PatchRuleResponse
 	10, // 23: admin.v1.RuleService.PatchSchedule:output_type -> admin.v1.PatchScheduleResponse
@@ -1058,18 +1058,6 @@ func file_admin_v1_rule_proto_init() {
 			}
 		}
 		file_admin_v1_rule_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Schedule); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_admin_v1_rule_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetRuleRequest); i {
 			case 0:
 				return &v.state
@@ -1081,8 +1069,20 @@ func file_admin_v1_rule_proto_init() {
 				return nil
 			}
 		}
-		file_admin_v1_rule_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_admin_v1_rule_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetRuleResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_admin_v1_rule_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Schedule); i {
 			case 0:
 				return &v.state
 			case 1:
