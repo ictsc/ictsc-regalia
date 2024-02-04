@@ -29,6 +29,7 @@ nofilter
 nolint
 noninteractive
 noto
+oneof
 proto
 protobuf
 protoc
