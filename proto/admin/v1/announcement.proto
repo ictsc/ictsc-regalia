@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package admin.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/admin/v1";
+
+message Announcement {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  optional string problem_id = 2 [(buf.validate.field).string.len = 26];
+  string title = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+  string body = 4 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 1000
+  }];
+  google.protobuf.Timestamp created_at = 5;
+}
+
+message GetAnnouncementsRequest {
+  optional string problem_id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message GetAnnouncementsResponse {
+  repeated Announcement announcements = 1 [(buf.validate.field).required = true];
+}
+
+message PatchAnnouncementRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  optional string problem_id = 2 [(buf.validate.field).string.len = 26];
+  optional string title = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+  optional string body = 4 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 1000
+  }];
+}
+
+message PatchAnnouncementResponse {
+  Announcement announcement = 1 [(buf.validate.field).required = true];
+}
+
+message PostAnnouncementRequest {
+  optional string problem_id = 1 [(buf.validate.field).string.len = 26];
+  optional string title = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+  optional string body = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 1000
+  }];
+}
+
+message PostAnnouncementResponse {
+  Announcement announcement = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteAnnouncementRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message DeleteAnnouncementResponse {}
+
+service AnnouncementService {
+  rpc GetAnnouncements(GetAnnouncementsRequest) returns (GetAnnouncementsResponse);
+  rpc PatchAnnouncement(PatchAnnouncementRequest) returns (PatchAnnouncementResponse);
+  rpc PostAnnouncement(PostAnnouncementRequest) returns (PostAnnouncementResponse);
+  rpc DeleteAnnouncement(DeleteAnnouncementRequest) returns (DeleteAnnouncementResponse);
+}
