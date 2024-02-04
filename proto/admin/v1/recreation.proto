@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package admin.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/admin/v1";
+
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_IN_PROGRESS = 1;
+  STATUS_COMPLETED = 2;
+}
+
+message Recreation {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string team_id = 2 [(buf.validate.field).string.len = 26];
+  string problem_id = 3 [(buf.validate.field).string.len = 26];
+  Status status = 4 [(buf.validate.field).enum.defined_only = true];
+  google.protobuf.Timestamp created_at = 5 [(buf.validate.field).required = true];
+}
+
+message GetRecreationsRequest {
+  string team_id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message GetRecreationsResponse {
+  repeated Recreation recreations = 1 [(buf.validate.field).required = true];
+}
+
+service RecreationService {
+  rpc GetRecreations(GetRecreationsRequest) returns (GetRecreationsResponse);
+}

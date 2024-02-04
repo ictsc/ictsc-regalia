@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package admin.v1;
+
+import "admin/v1/problem.proto";
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/admin/v1";
+
+message QuestionAnswer {
+  repeated int32 answer = 6 [(buf.validate.field).repeated = {
+    unique: true,
+    min_items: 1,
+    max_items: 10,
+    items: {
+      int32: {gte: 0}
+    }
+  }];
+}
+
+message MultipleChoiceAnswer {
+  repeated QuestionAnswer question_answer = 1 [(buf.validate.field).repeated = {
+    min_items: 1,
+    max_items: 10
+  }];
+}
+
+message DescriptiveAnswer {
+  string body = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 1000
+  }];
+}
+
+message Answer {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string problem_id = 2 [(buf.validate.field).string.len = 26];
+  string team_id = 3 [(buf.validate.field).string.len = 26];
+  ProblemType problem_type = 4 [(buf.validate.field).enum.defined_only = true];
+  oneof body {
+    option (buf.validate.oneof).required = true;
+    MultipleChoiceAnswer multiple_choice = 5;
+    DescriptiveAnswer descriptive = 6;
+  }
+  optional int32 point = 7 [(buf.validate.field).int32.gte = 0];
+  bool mark_published = 8;
+  google.protobuf.Timestamp created_at = 9 [(buf.validate.field).required = true];
+}
+
+message GetAnswerRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message GetAnswerResponse {
+  Answer answer = 1 [(buf.validate.field).required = true];
+}
+
+message Pagination {
+  int32 limit = 1 [(buf.validate.field).int32.gte = 1];
+  google.protobuf.Timestamp last_item_created_at = 2 [(buf.validate.field).required = true];
+}
+
+message GetAnswersRequest {
+  string problem_id = 1 [(buf.validate.field).string.len = 26];
+  optional string team_id = 2 [(buf.validate.field).string.len = 26];
+  optional Pagination pagination = 3 [(buf.validate.field).required = true];
+}
+
+message GetAnswersResponse {
+  repeated Answer answers = 1 [(buf.validate.field).required = true];
+}
+
+message PutPointRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  int32 point = 2 [(buf.validate.field).int32.gte = 0];
+}
+
+message PutPointResponse {}
+
+service AnswerService {
+  rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
+  rpc GetAnswers(GetAnswersRequest) returns (GetAnswersResponse);
+  rpc PutPoint(PutPointRequest) returns (PutPointResponse);
+}

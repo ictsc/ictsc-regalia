@@ -42,7 +42,9 @@ jobs:
           go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.32.0
           go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.14.0
       - name: Generate Connect Files
-        run: buf generate
+        run: |
+          rm -rf ../backend/internal/proto
+          buf generate --template buf.gen-backend.yaml
       - name: Push
         id: push
         uses: stefanzweifel/git-auto-commit-action@v5

@@ -16,6 +16,14 @@ linters:
     - godot
     - nolintlint
 
+issues:
+  exclude-use-default: false
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - containedctx
+        - funlen
+
 linters-settings:
   lll:
     line-length: 150
@@ -31,6 +39,3 @@ linters-settings:
       - .WithStack(
       - github.com/cockroachdb/errors.Newf(
       - github.com/ictsc/ictsc-outlands/backend/pkg/errors.New(
-
-issues:
-  exclude-use-default: false

@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+package admin.v1;
+
+import "admin/v1/user.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/admin/v1";
+
+message Team {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  int32 code = 2 [(buf.validate.field).int32 = {
+    gt: 1,
+    lt: 100
+  }];
+  string name = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string organization = 4 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+  string invitation_code = 5 [(buf.validate.field).string.len = 32];
+  int32 code_remaining = 6 [(buf.validate.field).int32 = {
+    gte: 0,
+    lte: 5
+  }];
+}
+
+message GetTeamsRequest {}
+
+message GetTeamsResponse {
+  repeated Team teams = 1 [(buf.validate.field).required = true];
+}
+
+message GetTeamRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message GetTeamResponse {
+  Team team = 1 [(buf.validate.field).required = true];
+}
+
+message BaStation {
+  string user = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string password = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string host = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+  int32 port = 4 [(buf.validate.field).int32.gte = 0];
+}
+
+message GetTeamConnectionInfoRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message GetTeamConnectionInfoResponse {
+  BaStation ba_station = 1 [(buf.validate.field).required = true];
+}
+
+message GetMembersRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message GetMembersResponse {
+  repeated User members = 1 [(buf.validate.field).repeated = {
+    min_items: 0,
+    max_items: 5
+  }];
+}
+
+message PatchTeamRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  optional int32 code = 2 [(buf.validate.field).int32 = {
+    gt: 1,
+    lt: 100
+  }];
+  optional string name = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  optional string organization = 4 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+  optional int32 code_remaining = 6 [(buf.validate.field).int32 = {
+    gte: 0,
+    lte: 5
+  }];
+}
+
+message PatchTeamResponse {
+  Team team = 1 [(buf.validate.field).required = true];
+}
+
+message PutTeamConnectionInfoRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  BaStation ba_station = 2 [(buf.validate.field).required = true];
+}
+
+message PutTeamConnectionInfoResponse {}
+
+message PostTeamRequest {
+  int32 code = 1 [(buf.validate.field).int32 = {
+    gt: 1,
+    lt: 100
+  }];
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string organization = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+  int32 code_remaining = 6 [(buf.validate.field).int32 = {
+    gte: 0,
+    lte: 5
+  }];
+}
+
+message PostTeamResponse {
+  Team team = 1 [(buf.validate.field).required = true];
+}
+
+message AddMemberRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string user_id = 2 [(buf.validate.field).string.len = 26];
+}
+
+message AddMemberResponse {}
+
+message DeleteTeamRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message DeleteTeamResponse {}
+
+message DeleteMemberRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string user_id = 2 [(buf.validate.field).string.len = 26];
+}
+
+message DeleteMemberResponse {}
+
+service TeamService {
+  rpc GetTeams(GetTeamsRequest) returns (GetTeamsResponse);
+  rpc GetTeam(GetTeamRequest) returns (GetTeamResponse);
+  rpc GetTeamConnectionInfo(GetTeamConnectionInfoRequest) returns (GetTeamConnectionInfoResponse);
+  rpc GetMembers(GetMembersRequest) returns (GetMembersResponse);
+  rpc PatchTeam(PatchTeamRequest) returns (PatchTeamResponse);
+  rpc PutTeamConnectionInfo(PutTeamConnectionInfoRequest) returns (PutTeamConnectionInfoResponse);
+  rpc PostTeam(PostTeamRequest) returns (PostTeamResponse);
+  rpc AddMember(AddMemberRequest) returns (AddMemberResponse);
+  rpc DeleteTeam(DeleteTeamRequest) returns (DeleteTeamResponse);
+  rpc DeleteMember(DeleteMemberRequest) returns (DeleteMemberResponse);
+}

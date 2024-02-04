@@ -29,6 +29,7 @@ nofilter
 nolint
 noninteractive
 noto
+oneof
 proto
 protobuf
 protoc
@@ -36,8 +37,10 @@ protovalidate
 signin
 signout
 stefanzweifel
+stretchr
 tailwindcss
 testid
 Tressa
 usergroups
+wrapcheck
 zenn

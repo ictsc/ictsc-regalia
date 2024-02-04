@@ -66,4 +66,4 @@ tasks:
       - init-buf
     cmds:
       - rm -rf ../backend/internal/proto
-      - buf generate
+      - buf generate --template buf.gen-backend.yaml

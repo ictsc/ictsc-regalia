@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package contestant.v1;
+
+import "buf/validate/validate.proto";
+import "contestant/v1/user.proto";
+
+option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/contestant/v1";
+
+message Team {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  int32 code = 2 [(buf.validate.field).int32 = {
+    gt: 1,
+    lt: 100
+  }];
+  string name = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string organization = 4 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 50
+  }];
+}
+
+message GetTeamsRequest {}
+
+message GetTeamsResponse {
+  repeated Team teams = 1 [(buf.validate.field).required = true];
+}
+
+message GetTeamRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message GetTeamResponse {
+  Team team = 1 [(buf.validate.field).required = true];
+}
+
+message GetTeamMembersRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message GetTeamMembersResponse {
+  repeated User members = 1 [(buf.validate.field).repeated = {
+    min_items: 0,
+    max_items: 5
+  }];
+}
+
+service TeamService {
+  rpc GetTeams(GetTeamsRequest) returns (GetTeamsResponse);
+  rpc GetTeam(GetTeamRequest) returns (GetTeamResponse);
+  rpc GetTeamMembers(GetTeamMembersRequest) returns (GetTeamMembersResponse);
+}

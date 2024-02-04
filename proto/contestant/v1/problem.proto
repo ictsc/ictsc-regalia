@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package contestant.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/contestant/v1";
+
+enum QuestionType {
+  QUESTION_TYPE_UNSPECIFIED = 0;
+  QUESTION_TYPE_RADIO = 1;
+  QUESTION_TYPE_CHECKBOX = 2;
+}
+
+message Choice {
+  int32 index = 1 [(buf.validate.field).int32.gte = 0];
+  string body = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 1000
+  }];
+}
+
+message Question {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string body = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 1000
+  }];
+  QuestionType type = 3 [(buf.validate.field).enum.defined_only = true];
+  repeated Choice choices = 4 [(buf.validate.field).repeated = {
+    min_items: 2,
+    max_items: 10
+  }];
+  int32 point = 5 [(buf.validate.field).int32.gt = 0];
+}
+
+message MultipleChoiceProblem {
+  optional string body = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 1000
+  }];
+  repeated Question questions = 2 [(buf.validate.field).repeated = {
+    min_items: 1,
+    max_items: 10
+  }];
+}
+
+message ConnectionInfo {
+  string hostname = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+  string command = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+  string password = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string type = 4 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+}
+
+message DescriptiveProblem {
+  string body = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 1000
+  }];
+  repeated ConnectionInfo connection_infos = 2 [(buf.validate.field).repeated = {
+    min_items: 0,
+    max_items: 10
+  }];
+}
+
+enum ProblemType {
+  PROBLEM_TYPE_UNSPECIFIED = 0;
+  PROBLEM_TYPE_DESCRIPTIVE = 1;
+  PROBLEM_TYPE_MULTIPLE_CHOICE = 2;
+}
+
+message Problem {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string title = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+  string code = 3 [(buf.validate.field).string.len = 3];
+  int32 point = 4 [(buf.validate.field).int32.gt = 0];
+  ProblemType type = 5 [(buf.validate.field).enum.defined_only = true];
+  oneof body {
+    option (buf.validate.oneof).required = true;
+    DescriptiveProblem descriptive = 6;
+    MultipleChoiceProblem multiple_choice = 7;
+  }
+}
+
+message GetProblemRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message GetProblemResponse {
+  Problem problem = 1 [(buf.validate.field).required = true];
+}
+
+message ShortProblem {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string title = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+  string code = 3 [(buf.validate.field).string.len = 3];
+  int32 point = 4 [(buf.validate.field).int32.gt = 0];
+  int32 current_point = 5 [(buf.validate.field).int32.gte = 0];
+}
+
+message GetProblemsRequest {}
+
+message GetProblemsResponse {
+  repeated ShortProblem problems = 1 [(buf.validate.field).required = true];
+}
+
+service ProblemService {
+  rpc GetProblem(GetProblemRequest) returns (GetProblemResponse);
+  rpc GetProblems(GetProblemsRequest) returns (GetProblemsResponse);
+}

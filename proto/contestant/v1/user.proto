@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package contestant.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/contestant/v1";
+
+message User {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string team_id = 3 [(buf.validate.field).string.len = 26];
+}
+
+message GetMeRequest {}
+
+message GetMeResponse {
+  User user = 1 [(buf.validate.field).required = true];
+}
+
+message BaStation {
+  string user = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string password = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string host = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+  int32 port = 4 [(buf.validate.field).int32.gte = 0];
+}
+
+message GetMyConnectionInfoRequest {}
+
+message GetMyConnectionInfoResponse {
+  BaStation ba_station = 1 [(buf.validate.field).required = true];
+}
+
+message GetUserRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message GetUserResponse {
+  User user = 1 [(buf.validate.field).required = true];
+}
+
+message PostUserRequest {
+  string name = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string invitation_code = 2 [(buf.validate.field).string.len = 32];
+}
+
+message PostUserResponse {
+  User user = 1 [(buf.validate.field).required = true];
+}
+
+message PatchUserRequest {
+  string name = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+}
+
+message PatchUserResponse {
+  User user = 1 [(buf.validate.field).required = true];
+}
+
+service UserService {
+  rpc GetMe(GetMeRequest) returns (GetMeResponse) {}
+  rpc GetMyConnectionInfo(GetMyConnectionInfoRequest) returns (GetMyConnectionInfoResponse) {}
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
+  rpc PostUser(PostUserRequest) returns (PostUserResponse) {}
+  rpc PatchUser(PatchUserRequest) returns (PatchUserResponse) {}
+}
