@@ -45,7 +45,7 @@ message Answer {
   }
   optional int32 point = 7 [(buf.validate.field).int32.gte = 0];
   bool mark_published = 8;
-  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp created_at = 9 [(buf.validate.field).required = true];
 }
 
 message GetAnswerRequest {

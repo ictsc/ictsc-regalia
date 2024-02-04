@@ -41,8 +41,8 @@ message Schedule {
     max_len: 100
   }];
   Rounds round = 3 [(buf.validate.field).enum = {defined_only: true}];
-  google.protobuf.Timestamp start_at = 4;
-  google.protobuf.Timestamp end_at = 5;
+  google.protobuf.Timestamp start_at = 4 [(buf.validate.field).required = true];
+  google.protobuf.Timestamp end_at = 5 [(buf.validate.field).required = true];
 }
 
 message GetSchedulesRequest {}
@@ -77,8 +77,11 @@ message PatchScheduleRequest {
     max_len: 100
   }];
   optional Rounds round = 3 [(buf.validate.field).enum = {defined_only: true}];
-  optional google.protobuf.Timestamp start_at = 4;
-  optional google.protobuf.Timestamp end_at = 5 [(buf.validate.field).timestamp.gt_now = true];
+  optional google.protobuf.Timestamp start_at = 4 [(buf.validate.field).required = true];
+  optional google.protobuf.Timestamp end_at = 5 [(buf.validate.field) = {
+    required: true,
+    timestamp: {gt_now: true}
+  }];
 }
 
 message PatchScheduleResponse {
@@ -91,8 +94,14 @@ message PostScheduleRequest {
     max_len: 100
   }];
   Rounds round = 2 [(buf.validate.field).enum = {defined_only: true}];
-  google.protobuf.Timestamp start_at = 3 [(buf.validate.field).timestamp.gt_now = true];
-  google.protobuf.Timestamp end_at = 4 [(buf.validate.field).timestamp.gt_now = true];
+  google.protobuf.Timestamp start_at = 3 [(buf.validate.field) = {
+    required: true,
+    timestamp: {gt_now: true}
+  }];
+  google.protobuf.Timestamp end_at = 4 [(buf.validate.field) = {
+    required: true,
+    timestamp: {gt_now: true}
+  }];
 }
 
 message PostScheduleResponse {

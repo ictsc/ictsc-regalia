@@ -18,7 +18,7 @@ message Announcement {
     min_len: 1,
     max_len: 1000
   }];
-  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp created_at = 5 [(buf.validate.field).required = true];
 }
 
 message GetAnnouncementsRequest {

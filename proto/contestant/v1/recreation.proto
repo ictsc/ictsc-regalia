@@ -17,7 +17,7 @@ message Recreation {
   string id = 1 [(buf.validate.field).string.len = 26];
   string problem_id = 2 [(buf.validate.field).string.len = 26];
   Status status = 3 [(buf.validate.field).enum.defined_only = true];
-  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp created_at = 4 [(buf.validate.field).required = true];
 }
 
 message GetRecreationsRequest {
