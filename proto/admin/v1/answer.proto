@@ -56,8 +56,15 @@ message GetAnswerResponse {
   Answer answer = 1 [(buf.validate.field).required = true];
 }
 
+message Pagination {
+  int32 limit = 1 [(buf.validate.field).int32.gte = 1];
+  google.protobuf.Timestamp last_item_created_at = 2 [(buf.validate.field).required = true];
+}
+
 message GetAnswersRequest {
   string problem_id = 1 [(buf.validate.field).string.len = 26];
+  optional string team_id = 2 [(buf.validate.field).string.len = 26];
+  optional Pagination pagination = 3 [(buf.validate.field).required = true];
 }
 
 message GetAnswersResponse {
