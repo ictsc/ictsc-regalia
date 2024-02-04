@@ -1,7 +1,7 @@
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.32.0-20231115204500-e097f827e652.1 h1:u0olL4yf2p7Tl5jfsAK5keaFi+JFJuv1CDHrbiXkxkk=
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.32.0-20231115204500-e097f827e652.1/go.mod h1:tiTMKD8j6Pd/D2WzREoweufjzaJKHZg35f/VGcZ2v3I=
-connectrpc.com/connect v1.13.0 h1:lGs5maZZzWOOD+PFFiOt5OncKmMsk9ZdPwpy5jcmaYg=
-connectrpc.com/connect v1.13.0/go.mod h1:uHAFHtYgeSZJxXrkN1IunDpKghnTXhYbVh0wW4StPW0=
+connectrpc.com/connect v1.14.0 h1:PDS+J7uoz5Oui2VEOMcfz6Qft7opQM9hPiKvtGC01pA=
+connectrpc.com/connect v1.14.0/go.mod h1:uoAq5bmhhn43TwhaKdGKN/bZcGtzPW1v+ngDTn5u+8s=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
 github.com/bsm/ginkgo/v2 v2.12.0/go.mod h1:SwYbGRRDovPVboqFv0tPTcG1sN61LM1Z4ARdbAV9g4c=
 github.com/bsm/gomega v1.27.10 h1:yeMWxP2pV2fG3FgAODIY8EiRE3dy0aeFYt4l7wh6yKA=
