@@ -1,0 +1,14 @@
+{
+  "name": "frontend",
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev"
+  },
+  "devDependencies": {
+    "turbo": "^1.12.2"
+  },
+  "packageManager": "pnpm@8.10.0",
+  "engines": {
+    "node": ">=18"
+  }
+}
