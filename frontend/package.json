@@ -2,6 +2,7 @@
   "name": "frontend",
   "scripts": {
     "build": "turbo build",
+    "test": "turbo test",
     "dev": "turbo dev"
   },
   "devDependencies": {
