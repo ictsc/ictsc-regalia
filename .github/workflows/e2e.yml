@@ -68,7 +68,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'pnpm'
-          cache-dependency-path: frontend/octavio/pnpm-lock.yaml
+          cache-dependency-path: frontend/pnpm-lock.yaml
 
       - name: Cache zenn-editor dependencies
         uses: actions/cache@v4
