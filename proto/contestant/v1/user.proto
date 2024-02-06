@@ -41,14 +41,14 @@ message PostUserResponse {
   User user = 1 [(buf.validate.field).required = true];
 }
 
-message PatchUserRequest {
+message PatchMeRequest {
   string name = 1 [(buf.validate.field).string = {
     min_len: 1,
     max_len: 20
   }];
 }
 
-message PatchUserResponse {
+message PatchMeResponse {
   User user = 1 [(buf.validate.field).required = true];
 }
 
@@ -56,5 +56,5 @@ service UserService {
   rpc GetMe(GetMeRequest) returns (GetMeResponse) {}
   rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
   rpc PostUser(PostUserRequest) returns (PostUserResponse) {}
-  rpc PatchUser(PatchUserRequest) returns (PatchUserResponse) {}
+  rpc PatchMe(PatchMeRequest) returns (PatchMeResponse) {}
 }

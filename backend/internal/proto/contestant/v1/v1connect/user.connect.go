@@ -39,17 +39,17 @@ const (
 	UserServiceGetUserProcedure = "/contestant.v1.UserService/GetUser"
 	// UserServicePostUserProcedure is the fully-qualified name of the UserService's PostUser RPC.
 	UserServicePostUserProcedure = "/contestant.v1.UserService/PostUser"
-	// UserServicePatchUserProcedure is the fully-qualified name of the UserService's PatchUser RPC.
-	UserServicePatchUserProcedure = "/contestant.v1.UserService/PatchUser"
+	// UserServicePatchMeProcedure is the fully-qualified name of the UserService's PatchMe RPC.
+	UserServicePatchMeProcedure = "/contestant.v1.UserService/PatchMe"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	userServiceServiceDescriptor         = v1.File_contestant_v1_user_proto.Services().ByName("UserService")
-	userServiceGetMeMethodDescriptor     = userServiceServiceDescriptor.Methods().ByName("GetMe")
-	userServiceGetUserMethodDescriptor   = userServiceServiceDescriptor.Methods().ByName("GetUser")
-	userServicePostUserMethodDescriptor  = userServiceServiceDescriptor.Methods().ByName("PostUser")
-	userServicePatchUserMethodDescriptor = userServiceServiceDescriptor.Methods().ByName("PatchUser")
+	userServiceServiceDescriptor        = v1.File_contestant_v1_user_proto.Services().ByName("UserService")
+	userServiceGetMeMethodDescriptor    = userServiceServiceDescriptor.Methods().ByName("GetMe")
+	userServiceGetUserMethodDescriptor  = userServiceServiceDescriptor.Methods().ByName("GetUser")
+	userServicePostUserMethodDescriptor = userServiceServiceDescriptor.Methods().ByName("PostUser")
+	userServicePatchMeMethodDescriptor  = userServiceServiceDescriptor.Methods().ByName("PatchMe")
 )
 
 // UserServiceClient is a client for the contestant.v1.UserService service.
@@ -57,7 +57,7 @@ type UserServiceClient interface {
 	GetMe(context.Context, *connect.Request[v1.GetMeRequest]) (*connect.Response[v1.GetMeResponse], error)
 	GetUser(context.Context, *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error)
 	PostUser(context.Context, *connect.Request[v1.PostUserRequest]) (*connect.Response[v1.PostUserResponse], error)
-	PatchUser(context.Context, *connect.Request[v1.PatchUserRequest]) (*connect.Response[v1.PatchUserResponse], error)
+	PatchMe(context.Context, *connect.Request[v1.PatchMeRequest]) (*connect.Response[v1.PatchMeResponse], error)
 }
 
 // NewUserServiceClient constructs a client for the contestant.v1.UserService service. By default,
@@ -88,10 +88,10 @@ func NewUserServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(userServicePostUserMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		patchUser: connect.NewClient[v1.PatchUserRequest, v1.PatchUserResponse](
+		patchMe: connect.NewClient[v1.PatchMeRequest, v1.PatchMeResponse](
 			httpClient,
-			baseURL+UserServicePatchUserProcedure,
-			connect.WithSchema(userServicePatchUserMethodDescriptor),
+			baseURL+UserServicePatchMeProcedure,
+			connect.WithSchema(userServicePatchMeMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -99,10 +99,10 @@ func NewUserServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 
 // userServiceClient implements UserServiceClient.
 type userServiceClient struct {
-	getMe     *connect.Client[v1.GetMeRequest, v1.GetMeResponse]
-	getUser   *connect.Client[v1.GetUserRequest, v1.GetUserResponse]
-	postUser  *connect.Client[v1.PostUserRequest, v1.PostUserResponse]
-	patchUser *connect.Client[v1.PatchUserRequest, v1.PatchUserResponse]
+	getMe    *connect.Client[v1.GetMeRequest, v1.GetMeResponse]
+	getUser  *connect.Client[v1.GetUserRequest, v1.GetUserResponse]
+	postUser *connect.Client[v1.PostUserRequest, v1.PostUserResponse]
+	patchMe  *connect.Client[v1.PatchMeRequest, v1.PatchMeResponse]
 }
 
 // GetMe calls contestant.v1.UserService.GetMe.
@@ -120,9 +120,9 @@ func (c *userServiceClient) PostUser(ctx context.Context, req *connect.Request[v
 	return c.postUser.CallUnary(ctx, req)
 }
 
-// PatchUser calls contestant.v1.UserService.PatchUser.
-func (c *userServiceClient) PatchUser(ctx context.Context, req *connect.Request[v1.PatchUserRequest]) (*connect.Response[v1.PatchUserResponse], error) {
-	return c.patchUser.CallUnary(ctx, req)
+// PatchMe calls contestant.v1.UserService.PatchMe.
+func (c *userServiceClient) PatchMe(ctx context.Context, req *connect.Request[v1.PatchMeRequest]) (*connect.Response[v1.PatchMeResponse], error) {
+	return c.patchMe.CallUnary(ctx, req)
 }
 
 // UserServiceHandler is an implementation of the contestant.v1.UserService service.
@@ -130,7 +130,7 @@ type UserServiceHandler interface {
 	GetMe(context.Context, *connect.Request[v1.GetMeRequest]) (*connect.Response[v1.GetMeResponse], error)
 	GetUser(context.Context, *connect.Request[v1.GetUserRequest]) (*connect.Response[v1.GetUserResponse], error)
 	PostUser(context.Context, *connect.Request[v1.PostUserRequest]) (*connect.Response[v1.PostUserResponse], error)
-	PatchUser(context.Context, *connect.Request[v1.PatchUserRequest]) (*connect.Response[v1.PatchUserResponse], error)
+	PatchMe(context.Context, *connect.Request[v1.PatchMeRequest]) (*connect.Response[v1.PatchMeResponse], error)
 }
 
 // NewUserServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -157,10 +157,10 @@ func NewUserServiceHandler(svc UserServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(userServicePostUserMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	userServicePatchUserHandler := connect.NewUnaryHandler(
-		UserServicePatchUserProcedure,
-		svc.PatchUser,
-		connect.WithSchema(userServicePatchUserMethodDescriptor),
+	userServicePatchMeHandler := connect.NewUnaryHandler(
+		UserServicePatchMeProcedure,
+		svc.PatchMe,
+		connect.WithSchema(userServicePatchMeMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/contestant.v1.UserService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -171,8 +171,8 @@ func NewUserServiceHandler(svc UserServiceHandler, opts ...connect.HandlerOption
 			userServiceGetUserHandler.ServeHTTP(w, r)
 		case UserServicePostUserProcedure:
 			userServicePostUserHandler.ServeHTTP(w, r)
-		case UserServicePatchUserProcedure:
-			userServicePatchUserHandler.ServeHTTP(w, r)
+		case UserServicePatchMeProcedure:
+			userServicePatchMeHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -194,6 +194,6 @@ func (UnimplementedUserServiceHandler) PostUser(context.Context, *connect.Reques
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.UserService.PostUser is not implemented"))
 }
 
-func (UnimplementedUserServiceHandler) PatchUser(context.Context, *connect.Request[v1.PatchUserRequest]) (*connect.Response[v1.PatchUserResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.UserService.PatchUser is not implemented"))
+func (UnimplementedUserServiceHandler) PatchMe(context.Context, *connect.Request[v1.PatchMeRequest]) (*connect.Response[v1.PatchMeResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.UserService.PatchMe is not implemented"))
 }
