@@ -66,6 +66,12 @@ message GetTeamConnectionInfoResponse {
   Bastion bastion = 1 [(buf.validate.field).required = true];
 }
 
+message GetAdminConnectionInfoRequest {}
+
+message GetAdminConnectionInfoResponse {
+  Bastion bastion = 1 [(buf.validate.field).required = true];
+}
+
 message GetMembersRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
 }
@@ -107,6 +113,12 @@ message PutTeamConnectionInfoRequest {
 }
 
 message PutTeamConnectionInfoResponse {}
+
+message PutAdminConnectionInfoRequest {
+  Bastion bastion = 1 [(buf.validate.field).required = true];
+}
+
+message PutAdminConnectionInfoResponse {}
 
 message PostTeamRequest {
   int32 code = 1 [(buf.validate.field).int32 = {
@@ -155,9 +167,11 @@ service TeamService {
   rpc GetTeams(GetTeamsRequest) returns (GetTeamsResponse);
   rpc GetTeam(GetTeamRequest) returns (GetTeamResponse);
   rpc GetTeamConnectionInfo(GetTeamConnectionInfoRequest) returns (GetTeamConnectionInfoResponse);
+  rpc GetAdminConnectionInfo(GetAdminConnectionInfoRequest) returns (GetAdminConnectionInfoResponse);
   rpc GetMembers(GetMembersRequest) returns (GetMembersResponse);
   rpc PatchTeam(PatchTeamRequest) returns (PatchTeamResponse);
   rpc PutTeamConnectionInfo(PutTeamConnectionInfoRequest) returns (PutTeamConnectionInfoResponse);
+  rpc PutAdminConnectionInfo(PutAdminConnectionInfoRequest) returns (PutAdminConnectionInfoResponse);
   rpc PostTeam(PostTeamRequest) returns (PostTeamResponse);
   rpc AddMember(AddMemberRequest) returns (AddMemberResponse);
   rpc DeleteTeam(DeleteTeamRequest) returns (DeleteTeamResponse);

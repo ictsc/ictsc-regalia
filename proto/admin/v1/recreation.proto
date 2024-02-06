@@ -29,6 +29,15 @@ message GetRecreationsResponse {
   repeated Recreation recreations = 1 [(buf.validate.field).required = true];
 }
 
+message PostAdminRecreationRequest {
+  string problem_id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message PostAdminRecreationResponse {
+  Recreation recreation = 1 [(buf.validate.field).required = true];
+}
+
 service RecreationService {
   rpc GetRecreations(GetRecreationsRequest) returns (GetRecreationsResponse);
+  rpc PostAdminRecreation(PostAdminRecreationRequest) returns (PostAdminRecreationResponse);
 }
