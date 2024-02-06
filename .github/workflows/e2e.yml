@@ -56,7 +56,7 @@ jobs:
         with:
           repository: ictsc/zenn-editor
           ref: feature/add-checkbox-and-radio
-          path: frontend/octavio/local-modules/zenn-editor
+          path: frontend/packages/zenn-editor
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
