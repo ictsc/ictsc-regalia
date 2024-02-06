@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package admin.v1;
+
+import "admin/v1/team.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/admin/v1";
+
+message Rank {
+  int32 rank = 1 [(buf.validate.field).int32.gt = 0];
+  Team team = 2 [(buf.validate.field).required = true];
+  int32 point = 3 [(buf.validate.field).int32.gte = 0];
+}
+
+message GetRankingRequest {
+  bool unpublished = 1;
+}
+
+message GetRankingResponse {
+  repeated Rank ranking = 1 [(buf.validate.field).required = true];
+}
+
+service RankingService {
+  rpc GetRanking(GetRankingRequest) returns (GetRankingResponse);
+}
