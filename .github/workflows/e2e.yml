@@ -70,23 +70,19 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: frontend/pnpm-lock.yaml
 
-      - name: Cache zenn-editor dependencies
-        uses: actions/cache@v4
-        with:
-          path: frontend/octavio/local-modules/zenn-editor/node_modules
-          key: zenn-editor-deps-${{ hashFiles('frontend/octavio/local-modules/zenn-editor/pnpm-lock.yaml') }}
-
-      - name: Install zenn-editor dependencies
-        working-directory: frontend/octavio/local-modules/zenn-editor
-        run: pnpm i --frozen-lockfile
-
-      - name: Build zenn-editor
-        working-directory: frontend/octavio/local-modules/zenn-editor
-        run: pnpm build --filter zenn-markdown-html
+#      - name: Cache zenn-editor dependencies
+#        uses: actions/cache@v4
+#        with:
+#          path: frontend/octavio/local-modules/zenn-editor/node_modules
+#          key: zenn-editor-deps-${{ hashFiles('frontend/octavio/local-modules/zenn-editor/pnpm-lock.yaml') }}
 
       - name: Install dependencies
-        working-directory: frontend/octavio
+        working-directory: frontend
         run: pnpm i --frozen-lockfile
+
+      - name: Build
+        working-directory: frontend
+        run: pnpm build
 
       - name: Cache font build
         id: cache-font
