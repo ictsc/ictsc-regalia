@@ -35,7 +35,6 @@ tasks:
     desc: ワークスペースを初期化
     cmds:
       - cp .vscode/settings-sample.json .vscode/settings.json
-      - task: init-buf
 
   init-buf:
     desc: bufの初期化
@@ -53,10 +52,23 @@ tasks:
       - go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.32.0
       - go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.14.0
 
+  init-oapi:
+    desc: OpenAPI Generatorの初期化
+    internal: true
+    deps:
+      - task: check-binary
+        vars:
+          BINARY: go
+          INSTALL_DOC: https://go.dev/doc/install
+    cmds:
+      - go install github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen@v2.1.0
+
   generate:
     desc: 自動生成ファイルをすべて生成
     cmds:
+      - rm -rf backend/internal/proto
       - task: generate-buf
+      - task: generate-oapi
 
   generate-buf:
     desc: Protobuf & Connectの自動生成ファイルを生成
@@ -65,5 +77,19 @@ tasks:
     deps:
       - init-buf
     cmds:
-      - rm -rf ../backend/internal/proto
       - buf generate --template buf.gen-backend.yaml
+
+  generate-oapi:
+    desc: OpenAPIの自動生成ファイルを生成
+    internal: true
+    dir: proto
+    deps:
+      - init-oapi
+    cmds:
+      - for: ["admin", "contestant"]
+        cmd: |-
+          mkdir -p ../backend/internal/proto/{{ .ITEM }}/v1/v1oapi
+          oapi-codegen -package v1oapi -generate chi-server {{ .ITEM }}/v1/file.yaml \
+            > ../backend/internal/proto/{{ .ITEM }}/v1/v1oapi/file-server.oapi.go
+          oapi-codegen -package v1oapi -generate client {{ .ITEM }}/v1/file.yaml \
+            > ../backend/internal/proto/{{ .ITEM }}/v1/v1oapi/file-client.oapi.go
