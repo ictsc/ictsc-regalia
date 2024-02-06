@@ -42,7 +42,7 @@ message GetTeamResponse {
   Team team = 1 [(buf.validate.field).required = true];
 }
 
-message BaStation {
+message Bastion {
   string user = 1 [(buf.validate.field).string = {
     min_len: 1,
     max_len: 20
@@ -63,7 +63,7 @@ message GetTeamConnectionInfoRequest {
 }
 
 message GetTeamConnectionInfoResponse {
-  BaStation ba_station = 1 [(buf.validate.field).required = true];
+  Bastion bastion = 1 [(buf.validate.field).required = true];
 }
 
 message GetMembersRequest {
@@ -103,7 +103,7 @@ message PatchTeamResponse {
 
 message PutTeamConnectionInfoRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
-  BaStation ba_station = 2 [(buf.validate.field).required = true];
+  Bastion bastion = 2 [(buf.validate.field).required = true];
 }
 
 message PutTeamConnectionInfoResponse {}

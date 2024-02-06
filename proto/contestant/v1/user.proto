@@ -21,28 +21,6 @@ message GetMeResponse {
   User user = 1 [(buf.validate.field).required = true];
 }
 
-message BaStation {
-  string user = 1 [(buf.validate.field).string = {
-    min_len: 1,
-    max_len: 20
-  }];
-  string password = 2 [(buf.validate.field).string = {
-    min_len: 1,
-    max_len: 20
-  }];
-  string host = 3 [(buf.validate.field).string = {
-    min_len: 1,
-    max_len: 100
-  }];
-  int32 port = 4 [(buf.validate.field).int32.gte = 0];
-}
-
-message GetMyConnectionInfoRequest {}
-
-message GetMyConnectionInfoResponse {
-  BaStation ba_station = 1 [(buf.validate.field).required = true];
-}
-
 message GetUserRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
 }
@@ -76,7 +54,6 @@ message PatchUserResponse {
 
 service UserService {
   rpc GetMe(GetMeRequest) returns (GetMeResponse) {}
-  rpc GetMyConnectionInfo(GetMyConnectionInfoRequest) returns (GetMyConnectionInfoResponse) {}
   rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
   rpc PostUser(PostUserRequest) returns (PostUserResponse) {}
   rpc PatchUser(PatchUserRequest) returns (PatchUserResponse) {}
