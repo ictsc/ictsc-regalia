@@ -1,4 +1,4 @@
-name: Protobuf CI Pipeline
+name: Proto CI Pipeline
 
 on:
   push:
@@ -10,6 +10,9 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: proto
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,6 +24,12 @@ jobs:
         uses: bufbuild/buf-lint-action@v1
         with:
           input: proto
+      - name: Setup Node
+        uses: actions/setup-node@v3
+      - name: Install spectral
+        run: npm install --location=global @stoplight/spectral-cli
+      - name: Run spectral
+        run: spectral lint **/v1/*.yaml --ruleset .spectral.yaml --fail-severity warn
   breaking:
     name: Check Breaking Changes
     runs-on: ubuntu-latest
@@ -36,3 +45,44 @@ jobs:
         with:
           input: proto
           against: https://github.com/ictsc/ictsc-outlands.git#branch=main
+  generate:
+    name: Generation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate a token
+        id: token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.PUSHER_APP_ID }}
+          private-key: ${{ secrets.PUSHER_PRIVATE_KEY }}
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.token.outputs.token }}
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - name: Install buf
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate
+        run: task generate
+      - name: Push
+        id: push
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "generate & oapi files"
+          branch: ${{ github.head_ref }}
+          commit_user_name: ictsc-actions[bot]
+          commit_user_email: 154957684+ictsc-actions[bot]@users.noreply.github.com
+          commit_author: ictsc-actions[bot] <154957684+ictsc-actions[bot]@users.noreply.github.com>
+      - name: Exit with Error If Files Are Changed
+        if: steps.push.outputs.changes_detected == 'true'
+        run: exit 1
