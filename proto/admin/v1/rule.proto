@@ -28,29 +28,6 @@ message GetRuleResponse {
   Rule rule = 1 [(buf.validate.field).required = true];
 }
 
-enum Rounds {
-  ROUNDS_UNSPECIFIED = 0;
-  ROUNDS_QUALIFYING = 1;
-  ROUNDS_FINALS = 2;
-}
-
-message Schedule {
-  string id = 1 [(buf.validate.field).string.len = 26];
-  string name = 2 [(buf.validate.field).string = {
-    min_len: 1,
-    max_len: 100
-  }];
-  Rounds round = 3 [(buf.validate.field).enum = {defined_only: true}];
-  google.protobuf.Timestamp start_at = 4 [(buf.validate.field).required = true];
-  google.protobuf.Timestamp end_at = 5 [(buf.validate.field).required = true];
-}
-
-message GetSchedulesRequest {}
-
-message GetSchedulesResponse {
-  repeated Schedule schedules = 1 [(buf.validate.field).required = true];
-}
-
 message PatchRuleRequest {
   optional string rule = 1 [(buf.validate.field).string = {
     min_len: 1,
@@ -70,55 +47,7 @@ message PatchRuleResponse {
   Rule rule = 1 [(buf.validate.field).required = true];
 }
 
-message PatchScheduleRequest {
-  string id = 1 [(buf.validate.field).string.len = 26];
-  optional string name = 2 [(buf.validate.field).string = {
-    min_len: 1,
-    max_len: 100
-  }];
-  optional Rounds round = 3 [(buf.validate.field).enum = {defined_only: true}];
-  optional google.protobuf.Timestamp start_at = 4 [(buf.validate.field).required = true];
-  optional google.protobuf.Timestamp end_at = 5 [(buf.validate.field) = {
-    required: true,
-    timestamp: {gt_now: true}
-  }];
-}
-
-message PatchScheduleResponse {
-  Schedule schedule = 1 [(buf.validate.field).required = true];
-}
-
-message PostScheduleRequest {
-  string name = 1 [(buf.validate.field).string = {
-    min_len: 1,
-    max_len: 100
-  }];
-  Rounds round = 2 [(buf.validate.field).enum = {defined_only: true}];
-  google.protobuf.Timestamp start_at = 3 [(buf.validate.field) = {
-    required: true,
-    timestamp: {gt_now: true}
-  }];
-  google.protobuf.Timestamp end_at = 4 [(buf.validate.field) = {
-    required: true,
-    timestamp: {gt_now: true}
-  }];
-}
-
-message PostScheduleResponse {
-  Schedule schedule = 1 [(buf.validate.field).required = true];
-}
-
-message DeleteScheduleRequest {
-  string id = 1 [(buf.validate.field).string.len = 26];
-}
-
-message DeleteScheduleResponse {}
-
 service RuleService {
   rpc GetRule(GetRuleRequest) returns (GetRuleResponse);
-  rpc GetSchedules(GetSchedulesRequest) returns (GetSchedulesResponse);
   rpc PatchRule(PatchRuleRequest) returns (PatchRuleResponse);
-  rpc PatchSchedule(PatchScheduleRequest) returns (PatchScheduleResponse);
-  rpc PostSchedule(PostScheduleRequest) returns (PostScheduleResponse);
-  rpc DeleteSchedule(DeleteScheduleRequest) returns (DeleteScheduleResponse);
 }
