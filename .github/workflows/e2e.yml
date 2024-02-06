@@ -80,10 +80,6 @@ jobs:
         working-directory: frontend
         run: pnpm i --frozen-lockfile
 
-      - name: Build
-        working-directory: frontend
-        run: pnpm build
-
       - name: Cache font build
         id: cache-font
         uses: actions/cache@v4
@@ -95,6 +91,10 @@ jobs:
         if: steps.cache-font.outputs.cache-hit != 'true'
         working-directory: frontend/octavio
         run: pnpm font
+
+      - name: Build
+        working-directory: frontend
+        run: pnpm build
 
       - name: Get installed Playwright version
         id: playwright-version
