@@ -37,9 +37,9 @@
     "recoil": "^0.7.7",
     "recoil-persist": "^5.1.0",
     "swr": "^2.2.4",
-    "zenn-content-css": "^0.1.146",
-    "zenn-embed-elements": "^0.1.144",
-    "zenn-markdown-html": "link:local-modules/zenn-editor/packages/zenn-markdown-html"
+    "zenn-content-css": "workspace:*",
+    "zenn-embed-elements": "workspace:*",
+    "zenn-markdown-html": "workspace:*"
   },
   "devDependencies": {
     "@next/font": "^14.0.4",

@@ -1,4 +1,6 @@
 packages:
   - "duardo"
   - "octavio"
-  - "packages/*"
+  - "packages/zenn-editor/packages/zenn-content-css"
+  - "packages/zenn-editor/packages/zenn-embed-elements"
+  - "packages/zenn-editor/packages/zenn-markdown-html"
