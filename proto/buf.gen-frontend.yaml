@@ -1,0 +1,10 @@
+version: v1
+plugins:
+  - plugin: es
+    out: ../frontend/proto
+    opt:
+      - target=ts
+  - plugin: connect-es
+    out: ../frontend/proto
+    opt:
+      - target=ts
