@@ -42,7 +42,7 @@ message GetTeamResponse {
   Team team = 1 [(buf.validate.field).required = true];
 }
 
-message BaStation {
+message Bastion {
   string user = 1 [(buf.validate.field).string = {
     min_len: 1,
     max_len: 20
@@ -63,7 +63,13 @@ message GetTeamConnectionInfoRequest {
 }
 
 message GetTeamConnectionInfoResponse {
-  BaStation ba_station = 1 [(buf.validate.field).required = true];
+  Bastion bastion = 1 [(buf.validate.field).required = true];
+}
+
+message GetAdminConnectionInfoRequest {}
+
+message GetAdminConnectionInfoResponse {
+  Bastion bastion = 1 [(buf.validate.field).required = true];
 }
 
 message GetMembersRequest {
@@ -91,7 +97,7 @@ message PatchTeamRequest {
     min_len: 1,
     max_len: 50
   }];
-  optional int32 code_remaining = 6 [(buf.validate.field).int32 = {
+  optional int32 code_remaining = 5 [(buf.validate.field).int32 = {
     gte: 0,
     lte: 5
   }];
@@ -103,10 +109,16 @@ message PatchTeamResponse {
 
 message PutTeamConnectionInfoRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
-  BaStation ba_station = 2 [(buf.validate.field).required = true];
+  Bastion bastion = 2 [(buf.validate.field).required = true];
 }
 
 message PutTeamConnectionInfoResponse {}
+
+message PutAdminConnectionInfoRequest {
+  Bastion bastion = 1 [(buf.validate.field).required = true];
+}
+
+message PutAdminConnectionInfoResponse {}
 
 message PostTeamRequest {
   int32 code = 1 [(buf.validate.field).int32 = {
@@ -121,7 +133,7 @@ message PostTeamRequest {
     min_len: 1,
     max_len: 50
   }];
-  int32 code_remaining = 6 [(buf.validate.field).int32 = {
+  int32 code_remaining = 4 [(buf.validate.field).int32 = {
     gte: 0,
     lte: 5
   }];
@@ -155,9 +167,11 @@ service TeamService {
   rpc GetTeams(GetTeamsRequest) returns (GetTeamsResponse);
   rpc GetTeam(GetTeamRequest) returns (GetTeamResponse);
   rpc GetTeamConnectionInfo(GetTeamConnectionInfoRequest) returns (GetTeamConnectionInfoResponse);
+  rpc GetAdminConnectionInfo(GetAdminConnectionInfoRequest) returns (GetAdminConnectionInfoResponse);
   rpc GetMembers(GetMembersRequest) returns (GetMembersResponse);
   rpc PatchTeam(PatchTeamRequest) returns (PatchTeamResponse);
   rpc PutTeamConnectionInfo(PutTeamConnectionInfoRequest) returns (PutTeamConnectionInfoResponse);
+  rpc PutAdminConnectionInfo(PutAdminConnectionInfoRequest) returns (PutAdminConnectionInfoResponse);
   rpc PostTeam(PostTeamRequest) returns (PostTeamResponse);
   rpc AddMember(AddMemberRequest) returns (AddMemberResponse);
   rpc DeleteTeam(DeleteTeamRequest) returns (DeleteTeamResponse);

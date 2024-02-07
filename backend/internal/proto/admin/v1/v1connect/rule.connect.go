@@ -35,41 +35,21 @@ const (
 const (
 	// RuleServiceGetRuleProcedure is the fully-qualified name of the RuleService's GetRule RPC.
 	RuleServiceGetRuleProcedure = "/admin.v1.RuleService/GetRule"
-	// RuleServiceGetSchedulesProcedure is the fully-qualified name of the RuleService's GetSchedules
-	// RPC.
-	RuleServiceGetSchedulesProcedure = "/admin.v1.RuleService/GetSchedules"
 	// RuleServicePatchRuleProcedure is the fully-qualified name of the RuleService's PatchRule RPC.
 	RuleServicePatchRuleProcedure = "/admin.v1.RuleService/PatchRule"
-	// RuleServicePatchScheduleProcedure is the fully-qualified name of the RuleService's PatchSchedule
-	// RPC.
-	RuleServicePatchScheduleProcedure = "/admin.v1.RuleService/PatchSchedule"
-	// RuleServicePostScheduleProcedure is the fully-qualified name of the RuleService's PostSchedule
-	// RPC.
-	RuleServicePostScheduleProcedure = "/admin.v1.RuleService/PostSchedule"
-	// RuleServiceDeleteScheduleProcedure is the fully-qualified name of the RuleService's
-	// DeleteSchedule RPC.
-	RuleServiceDeleteScheduleProcedure = "/admin.v1.RuleService/DeleteSchedule"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	ruleServiceServiceDescriptor              = v1.File_admin_v1_rule_proto.Services().ByName("RuleService")
-	ruleServiceGetRuleMethodDescriptor        = ruleServiceServiceDescriptor.Methods().ByName("GetRule")
-	ruleServiceGetSchedulesMethodDescriptor   = ruleServiceServiceDescriptor.Methods().ByName("GetSchedules")
-	ruleServicePatchRuleMethodDescriptor      = ruleServiceServiceDescriptor.Methods().ByName("PatchRule")
-	ruleServicePatchScheduleMethodDescriptor  = ruleServiceServiceDescriptor.Methods().ByName("PatchSchedule")
-	ruleServicePostScheduleMethodDescriptor   = ruleServiceServiceDescriptor.Methods().ByName("PostSchedule")
-	ruleServiceDeleteScheduleMethodDescriptor = ruleServiceServiceDescriptor.Methods().ByName("DeleteSchedule")
+	ruleServiceServiceDescriptor         = v1.File_admin_v1_rule_proto.Services().ByName("RuleService")
+	ruleServiceGetRuleMethodDescriptor   = ruleServiceServiceDescriptor.Methods().ByName("GetRule")
+	ruleServicePatchRuleMethodDescriptor = ruleServiceServiceDescriptor.Methods().ByName("PatchRule")
 )
 
 // RuleServiceClient is a client for the admin.v1.RuleService service.
 type RuleServiceClient interface {
 	GetRule(context.Context, *connect.Request[v1.GetRuleRequest]) (*connect.Response[v1.GetRuleResponse], error)
-	GetSchedules(context.Context, *connect.Request[v1.GetSchedulesRequest]) (*connect.Response[v1.GetSchedulesResponse], error)
 	PatchRule(context.Context, *connect.Request[v1.PatchRuleRequest]) (*connect.Response[v1.PatchRuleResponse], error)
-	PatchSchedule(context.Context, *connect.Request[v1.PatchScheduleRequest]) (*connect.Response[v1.PatchScheduleResponse], error)
-	PostSchedule(context.Context, *connect.Request[v1.PostScheduleRequest]) (*connect.Response[v1.PostScheduleResponse], error)
-	DeleteSchedule(context.Context, *connect.Request[v1.DeleteScheduleRequest]) (*connect.Response[v1.DeleteScheduleResponse], error)
 }
 
 // NewRuleServiceClient constructs a client for the admin.v1.RuleService service. By default, it
@@ -88,34 +68,10 @@ func NewRuleServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(ruleServiceGetRuleMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		getSchedules: connect.NewClient[v1.GetSchedulesRequest, v1.GetSchedulesResponse](
-			httpClient,
-			baseURL+RuleServiceGetSchedulesProcedure,
-			connect.WithSchema(ruleServiceGetSchedulesMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
 		patchRule: connect.NewClient[v1.PatchRuleRequest, v1.PatchRuleResponse](
 			httpClient,
 			baseURL+RuleServicePatchRuleProcedure,
 			connect.WithSchema(ruleServicePatchRuleMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		patchSchedule: connect.NewClient[v1.PatchScheduleRequest, v1.PatchScheduleResponse](
-			httpClient,
-			baseURL+RuleServicePatchScheduleProcedure,
-			connect.WithSchema(ruleServicePatchScheduleMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		postSchedule: connect.NewClient[v1.PostScheduleRequest, v1.PostScheduleResponse](
-			httpClient,
-			baseURL+RuleServicePostScheduleProcedure,
-			connect.WithSchema(ruleServicePostScheduleMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		deleteSchedule: connect.NewClient[v1.DeleteScheduleRequest, v1.DeleteScheduleResponse](
-			httpClient,
-			baseURL+RuleServiceDeleteScheduleProcedure,
-			connect.WithSchema(ruleServiceDeleteScheduleMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -123,12 +79,8 @@ func NewRuleServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 
 // ruleServiceClient implements RuleServiceClient.
 type ruleServiceClient struct {
-	getRule        *connect.Client[v1.GetRuleRequest, v1.GetRuleResponse]
-	getSchedules   *connect.Client[v1.GetSchedulesRequest, v1.GetSchedulesResponse]
-	patchRule      *connect.Client[v1.PatchRuleRequest, v1.PatchRuleResponse]
-	patchSchedule  *connect.Client[v1.PatchScheduleRequest, v1.PatchScheduleResponse]
-	postSchedule   *connect.Client[v1.PostScheduleRequest, v1.PostScheduleResponse]
-	deleteSchedule *connect.Client[v1.DeleteScheduleRequest, v1.DeleteScheduleResponse]
+	getRule   *connect.Client[v1.GetRuleRequest, v1.GetRuleResponse]
+	patchRule *connect.Client[v1.PatchRuleRequest, v1.PatchRuleResponse]
 }
 
 // GetRule calls admin.v1.RuleService.GetRule.
@@ -136,39 +88,15 @@ func (c *ruleServiceClient) GetRule(ctx context.Context, req *connect.Request[v1
 	return c.getRule.CallUnary(ctx, req)
 }
 
-// GetSchedules calls admin.v1.RuleService.GetSchedules.
-func (c *ruleServiceClient) GetSchedules(ctx context.Context, req *connect.Request[v1.GetSchedulesRequest]) (*connect.Response[v1.GetSchedulesResponse], error) {
-	return c.getSchedules.CallUnary(ctx, req)
-}
-
 // PatchRule calls admin.v1.RuleService.PatchRule.
 func (c *ruleServiceClient) PatchRule(ctx context.Context, req *connect.Request[v1.PatchRuleRequest]) (*connect.Response[v1.PatchRuleResponse], error) {
 	return c.patchRule.CallUnary(ctx, req)
 }
 
-// PatchSchedule calls admin.v1.RuleService.PatchSchedule.
-func (c *ruleServiceClient) PatchSchedule(ctx context.Context, req *connect.Request[v1.PatchScheduleRequest]) (*connect.Response[v1.PatchScheduleResponse], error) {
-	return c.patchSchedule.CallUnary(ctx, req)
-}
-
-// PostSchedule calls admin.v1.RuleService.PostSchedule.
-func (c *ruleServiceClient) PostSchedule(ctx context.Context, req *connect.Request[v1.PostScheduleRequest]) (*connect.Response[v1.PostScheduleResponse], error) {
-	return c.postSchedule.CallUnary(ctx, req)
-}
-
-// DeleteSchedule calls admin.v1.RuleService.DeleteSchedule.
-func (c *ruleServiceClient) DeleteSchedule(ctx context.Context, req *connect.Request[v1.DeleteScheduleRequest]) (*connect.Response[v1.DeleteScheduleResponse], error) {
-	return c.deleteSchedule.CallUnary(ctx, req)
-}
-
 // RuleServiceHandler is an implementation of the admin.v1.RuleService service.
 type RuleServiceHandler interface {
 	GetRule(context.Context, *connect.Request[v1.GetRuleRequest]) (*connect.Response[v1.GetRuleResponse], error)
-	GetSchedules(context.Context, *connect.Request[v1.GetSchedulesRequest]) (*connect.Response[v1.GetSchedulesResponse], error)
 	PatchRule(context.Context, *connect.Request[v1.PatchRuleRequest]) (*connect.Response[v1.PatchRuleResponse], error)
-	PatchSchedule(context.Context, *connect.Request[v1.PatchScheduleRequest]) (*connect.Response[v1.PatchScheduleResponse], error)
-	PostSchedule(context.Context, *connect.Request[v1.PostScheduleRequest]) (*connect.Response[v1.PostScheduleResponse], error)
-	DeleteSchedule(context.Context, *connect.Request[v1.DeleteScheduleRequest]) (*connect.Response[v1.DeleteScheduleResponse], error)
 }
 
 // NewRuleServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -183,50 +111,18 @@ func NewRuleServiceHandler(svc RuleServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(ruleServiceGetRuleMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	ruleServiceGetSchedulesHandler := connect.NewUnaryHandler(
-		RuleServiceGetSchedulesProcedure,
-		svc.GetSchedules,
-		connect.WithSchema(ruleServiceGetSchedulesMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
 	ruleServicePatchRuleHandler := connect.NewUnaryHandler(
 		RuleServicePatchRuleProcedure,
 		svc.PatchRule,
 		connect.WithSchema(ruleServicePatchRuleMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	ruleServicePatchScheduleHandler := connect.NewUnaryHandler(
-		RuleServicePatchScheduleProcedure,
-		svc.PatchSchedule,
-		connect.WithSchema(ruleServicePatchScheduleMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	ruleServicePostScheduleHandler := connect.NewUnaryHandler(
-		RuleServicePostScheduleProcedure,
-		svc.PostSchedule,
-		connect.WithSchema(ruleServicePostScheduleMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	ruleServiceDeleteScheduleHandler := connect.NewUnaryHandler(
-		RuleServiceDeleteScheduleProcedure,
-		svc.DeleteSchedule,
-		connect.WithSchema(ruleServiceDeleteScheduleMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/admin.v1.RuleService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case RuleServiceGetRuleProcedure:
 			ruleServiceGetRuleHandler.ServeHTTP(w, r)
-		case RuleServiceGetSchedulesProcedure:
-			ruleServiceGetSchedulesHandler.ServeHTTP(w, r)
 		case RuleServicePatchRuleProcedure:
 			ruleServicePatchRuleHandler.ServeHTTP(w, r)
-		case RuleServicePatchScheduleProcedure:
-			ruleServicePatchScheduleHandler.ServeHTTP(w, r)
-		case RuleServicePostScheduleProcedure:
-			ruleServicePostScheduleHandler.ServeHTTP(w, r)
-		case RuleServiceDeleteScheduleProcedure:
-			ruleServiceDeleteScheduleHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -240,22 +136,6 @@ func (UnimplementedRuleServiceHandler) GetRule(context.Context, *connect.Request
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.RuleService.GetRule is not implemented"))
 }
 
-func (UnimplementedRuleServiceHandler) GetSchedules(context.Context, *connect.Request[v1.GetSchedulesRequest]) (*connect.Response[v1.GetSchedulesResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.RuleService.GetSchedules is not implemented"))
-}
-
 func (UnimplementedRuleServiceHandler) PatchRule(context.Context, *connect.Request[v1.PatchRuleRequest]) (*connect.Response[v1.PatchRuleResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.RuleService.PatchRule is not implemented"))
-}
-
-func (UnimplementedRuleServiceHandler) PatchSchedule(context.Context, *connect.Request[v1.PatchScheduleRequest]) (*connect.Response[v1.PatchScheduleResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.RuleService.PatchSchedule is not implemented"))
-}
-
-func (UnimplementedRuleServiceHandler) PostSchedule(context.Context, *connect.Request[v1.PostScheduleRequest]) (*connect.Response[v1.PostScheduleResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.RuleService.PostSchedule is not implemented"))
-}
-
-func (UnimplementedRuleServiceHandler) DeleteSchedule(context.Context, *connect.Request[v1.DeleteScheduleRequest]) (*connect.Response[v1.DeleteScheduleResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.RuleService.DeleteSchedule is not implemented"))
 }

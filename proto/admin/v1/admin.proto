@@ -45,14 +45,14 @@ message PostAdminResponse {
   Admin admin = 1 [(buf.validate.field).required = true];
 }
 
-message PatchAdminRequest {
+message PatchMeRequest {
   string name = 1 [(buf.validate.field).string = {
     min_len: 1,
     max_len: 20
   }];
 }
 
-message PatchAdminResponse {
+message PatchMeResponse {
   Admin admin = 1 [(buf.validate.field).required = true];
 }
 
@@ -61,5 +61,5 @@ service AdminService {
   rpc GetAdmin(GetAdminRequest) returns (GetAdminResponse) {}
   rpc GetAdmins(GetAdminsRequest) returns (GetAdminsResponse) {}
   rpc PostAdmin(PostAdminRequest) returns (PostAdminResponse) {}
-  rpc PatchAdmin(PatchAdminRequest) returns (PatchAdminResponse) {}
+  rpc PatchMe(PatchMeRequest) returns (PatchMeResponse) {}
 }

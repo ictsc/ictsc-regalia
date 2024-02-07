@@ -41,18 +41,18 @@ const (
 	AdminServiceGetAdminsProcedure = "/admin.v1.AdminService/GetAdmins"
 	// AdminServicePostAdminProcedure is the fully-qualified name of the AdminService's PostAdmin RPC.
 	AdminServicePostAdminProcedure = "/admin.v1.AdminService/PostAdmin"
-	// AdminServicePatchAdminProcedure is the fully-qualified name of the AdminService's PatchAdmin RPC.
-	AdminServicePatchAdminProcedure = "/admin.v1.AdminService/PatchAdmin"
+	// AdminServicePatchMeProcedure is the fully-qualified name of the AdminService's PatchMe RPC.
+	AdminServicePatchMeProcedure = "/admin.v1.AdminService/PatchMe"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	adminServiceServiceDescriptor          = v1.File_admin_v1_admin_proto.Services().ByName("AdminService")
-	adminServiceGetMeMethodDescriptor      = adminServiceServiceDescriptor.Methods().ByName("GetMe")
-	adminServiceGetAdminMethodDescriptor   = adminServiceServiceDescriptor.Methods().ByName("GetAdmin")
-	adminServiceGetAdminsMethodDescriptor  = adminServiceServiceDescriptor.Methods().ByName("GetAdmins")
-	adminServicePostAdminMethodDescriptor  = adminServiceServiceDescriptor.Methods().ByName("PostAdmin")
-	adminServicePatchAdminMethodDescriptor = adminServiceServiceDescriptor.Methods().ByName("PatchAdmin")
+	adminServiceServiceDescriptor         = v1.File_admin_v1_admin_proto.Services().ByName("AdminService")
+	adminServiceGetMeMethodDescriptor     = adminServiceServiceDescriptor.Methods().ByName("GetMe")
+	adminServiceGetAdminMethodDescriptor  = adminServiceServiceDescriptor.Methods().ByName("GetAdmin")
+	adminServiceGetAdminsMethodDescriptor = adminServiceServiceDescriptor.Methods().ByName("GetAdmins")
+	adminServicePostAdminMethodDescriptor = adminServiceServiceDescriptor.Methods().ByName("PostAdmin")
+	adminServicePatchMeMethodDescriptor   = adminServiceServiceDescriptor.Methods().ByName("PatchMe")
 )
 
 // AdminServiceClient is a client for the admin.v1.AdminService service.
@@ -61,7 +61,7 @@ type AdminServiceClient interface {
 	GetAdmin(context.Context, *connect.Request[v1.GetAdminRequest]) (*connect.Response[v1.GetAdminResponse], error)
 	GetAdmins(context.Context, *connect.Request[v1.GetAdminsRequest]) (*connect.Response[v1.GetAdminsResponse], error)
 	PostAdmin(context.Context, *connect.Request[v1.PostAdminRequest]) (*connect.Response[v1.PostAdminResponse], error)
-	PatchAdmin(context.Context, *connect.Request[v1.PatchAdminRequest]) (*connect.Response[v1.PatchAdminResponse], error)
+	PatchMe(context.Context, *connect.Request[v1.PatchMeRequest]) (*connect.Response[v1.PatchMeResponse], error)
 }
 
 // NewAdminServiceClient constructs a client for the admin.v1.AdminService service. By default, it
@@ -98,10 +98,10 @@ func NewAdminServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(adminServicePostAdminMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
-		patchAdmin: connect.NewClient[v1.PatchAdminRequest, v1.PatchAdminResponse](
+		patchMe: connect.NewClient[v1.PatchMeRequest, v1.PatchMeResponse](
 			httpClient,
-			baseURL+AdminServicePatchAdminProcedure,
-			connect.WithSchema(adminServicePatchAdminMethodDescriptor),
+			baseURL+AdminServicePatchMeProcedure,
+			connect.WithSchema(adminServicePatchMeMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -109,11 +109,11 @@ func NewAdminServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 
 // adminServiceClient implements AdminServiceClient.
 type adminServiceClient struct {
-	getMe      *connect.Client[v1.GetMeRequest, v1.GetMeResponse]
-	getAdmin   *connect.Client[v1.GetAdminRequest, v1.GetAdminResponse]
-	getAdmins  *connect.Client[v1.GetAdminsRequest, v1.GetAdminsResponse]
-	postAdmin  *connect.Client[v1.PostAdminRequest, v1.PostAdminResponse]
-	patchAdmin *connect.Client[v1.PatchAdminRequest, v1.PatchAdminResponse]
+	getMe     *connect.Client[v1.GetMeRequest, v1.GetMeResponse]
+	getAdmin  *connect.Client[v1.GetAdminRequest, v1.GetAdminResponse]
+	getAdmins *connect.Client[v1.GetAdminsRequest, v1.GetAdminsResponse]
+	postAdmin *connect.Client[v1.PostAdminRequest, v1.PostAdminResponse]
+	patchMe   *connect.Client[v1.PatchMeRequest, v1.PatchMeResponse]
 }
 
 // GetMe calls admin.v1.AdminService.GetMe.
@@ -136,9 +136,9 @@ func (c *adminServiceClient) PostAdmin(ctx context.Context, req *connect.Request
 	return c.postAdmin.CallUnary(ctx, req)
 }
 
-// PatchAdmin calls admin.v1.AdminService.PatchAdmin.
-func (c *adminServiceClient) PatchAdmin(ctx context.Context, req *connect.Request[v1.PatchAdminRequest]) (*connect.Response[v1.PatchAdminResponse], error) {
-	return c.patchAdmin.CallUnary(ctx, req)
+// PatchMe calls admin.v1.AdminService.PatchMe.
+func (c *adminServiceClient) PatchMe(ctx context.Context, req *connect.Request[v1.PatchMeRequest]) (*connect.Response[v1.PatchMeResponse], error) {
+	return c.patchMe.CallUnary(ctx, req)
 }
 
 // AdminServiceHandler is an implementation of the admin.v1.AdminService service.
@@ -147,7 +147,7 @@ type AdminServiceHandler interface {
 	GetAdmin(context.Context, *connect.Request[v1.GetAdminRequest]) (*connect.Response[v1.GetAdminResponse], error)
 	GetAdmins(context.Context, *connect.Request[v1.GetAdminsRequest]) (*connect.Response[v1.GetAdminsResponse], error)
 	PostAdmin(context.Context, *connect.Request[v1.PostAdminRequest]) (*connect.Response[v1.PostAdminResponse], error)
-	PatchAdmin(context.Context, *connect.Request[v1.PatchAdminRequest]) (*connect.Response[v1.PatchAdminResponse], error)
+	PatchMe(context.Context, *connect.Request[v1.PatchMeRequest]) (*connect.Response[v1.PatchMeResponse], error)
 }
 
 // NewAdminServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -180,10 +180,10 @@ func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(adminServicePostAdminMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
-	adminServicePatchAdminHandler := connect.NewUnaryHandler(
-		AdminServicePatchAdminProcedure,
-		svc.PatchAdmin,
-		connect.WithSchema(adminServicePatchAdminMethodDescriptor),
+	adminServicePatchMeHandler := connect.NewUnaryHandler(
+		AdminServicePatchMeProcedure,
+		svc.PatchMe,
+		connect.WithSchema(adminServicePatchMeMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/admin.v1.AdminService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -196,8 +196,8 @@ func NewAdminServiceHandler(svc AdminServiceHandler, opts ...connect.HandlerOpti
 			adminServiceGetAdminsHandler.ServeHTTP(w, r)
 		case AdminServicePostAdminProcedure:
 			adminServicePostAdminHandler.ServeHTTP(w, r)
-		case AdminServicePatchAdminProcedure:
-			adminServicePatchAdminHandler.ServeHTTP(w, r)
+		case AdminServicePatchMeProcedure:
+			adminServicePatchMeHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -223,6 +223,6 @@ func (UnimplementedAdminServiceHandler) PostAdmin(context.Context, *connect.Requ
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.AdminService.PostAdmin is not implemented"))
 }
 
-func (UnimplementedAdminServiceHandler) PatchAdmin(context.Context, *connect.Request[v1.PatchAdminRequest]) (*connect.Response[v1.PatchAdminResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.AdminService.PatchAdmin is not implemented"))
+func (UnimplementedAdminServiceHandler) PatchMe(context.Context, *connect.Request[v1.PatchMeRequest]) (*connect.Response[v1.PatchMeResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.AdminService.PatchMe is not implemented"))
 }

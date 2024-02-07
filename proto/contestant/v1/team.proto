@@ -48,8 +48,31 @@ message GetTeamMembersResponse {
   }];
 }
 
+message Bastion {
+  string user = 1 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string password = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string host = 3 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 100
+  }];
+  int32 port = 4 [(buf.validate.field).int32.gte = 0];
+}
+
+message GetConnectionInfoRequest {}
+
+message GetConnectionInfoResponse {
+  Bastion bastion = 1 [(buf.validate.field).required = true];
+}
+
 service TeamService {
   rpc GetTeams(GetTeamsRequest) returns (GetTeamsResponse);
   rpc GetTeam(GetTeamRequest) returns (GetTeamResponse);
   rpc GetTeamMembers(GetTeamMembersRequest) returns (GetTeamMembersResponse);
+  rpc GetConnectionInfo(GetConnectionInfoRequest) returns (GetConnectionInfoResponse);
 }

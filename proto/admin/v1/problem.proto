@@ -124,21 +124,10 @@ message GetProblemResponse {
   Problem problem = 1 [(buf.validate.field).required = true];
 }
 
-message ShortProblem {
-  string id = 1 [(buf.validate.field).string.len = 26];
-  string title = 2 [(buf.validate.field).string = {
-    min_len: 1,
-    max_len: 100
-  }];
-  string code = 3 [(buf.validate.field).string.len = 3];
-  int32 point = 4 [(buf.validate.field).int32.gt = 0];
-  int32 current_point = 5 [(buf.validate.field).int32.gte = 0];
-}
-
 message GetProblemsRequest {}
 
 message GetProblemsResponse {
-  repeated ShortProblem problems = 1 [(buf.validate.field).required = true];
+  repeated Problem problems = 1 [(buf.validate.field).required = true];
 }
 
 message PatchProblemRequest {
@@ -156,7 +145,9 @@ message PatchProblemRequest {
   }
 }
 
-message PatchProblemResponse {}
+message PatchProblemResponse {
+  Problem problem = 1 [(buf.validate.field).required = true];
+}
 
 message PostProblemRequest {
   string title = 1 [(buf.validate.field).string = {
@@ -174,7 +165,7 @@ message PostProblemRequest {
 }
 
 message PostProblemResponse {
-  string id = 1 [(buf.validate.field).string.len = 26];
+  Problem problem = 1 [(buf.validate.field).required = true];
 }
 
 message DeleteProblemRequest {

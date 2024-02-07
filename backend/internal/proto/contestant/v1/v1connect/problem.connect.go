@@ -33,9 +33,6 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// ProblemServiceGetProblemProcedure is the fully-qualified name of the ProblemService's GetProblem
-	// RPC.
-	ProblemServiceGetProblemProcedure = "/contestant.v1.ProblemService/GetProblem"
 	// ProblemServiceGetProblemsProcedure is the fully-qualified name of the ProblemService's
 	// GetProblems RPC.
 	ProblemServiceGetProblemsProcedure = "/contestant.v1.ProblemService/GetProblems"
@@ -44,13 +41,11 @@ const (
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
 	problemServiceServiceDescriptor           = v1.File_contestant_v1_problem_proto.Services().ByName("ProblemService")
-	problemServiceGetProblemMethodDescriptor  = problemServiceServiceDescriptor.Methods().ByName("GetProblem")
 	problemServiceGetProblemsMethodDescriptor = problemServiceServiceDescriptor.Methods().ByName("GetProblems")
 )
 
 // ProblemServiceClient is a client for the contestant.v1.ProblemService service.
 type ProblemServiceClient interface {
-	GetProblem(context.Context, *connect.Request[v1.GetProblemRequest]) (*connect.Response[v1.GetProblemResponse], error)
 	GetProblems(context.Context, *connect.Request[v1.GetProblemsRequest]) (*connect.Response[v1.GetProblemsResponse], error)
 }
 
@@ -64,12 +59,6 @@ type ProblemServiceClient interface {
 func NewProblemServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ProblemServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &problemServiceClient{
-		getProblem: connect.NewClient[v1.GetProblemRequest, v1.GetProblemResponse](
-			httpClient,
-			baseURL+ProblemServiceGetProblemProcedure,
-			connect.WithSchema(problemServiceGetProblemMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
 		getProblems: connect.NewClient[v1.GetProblemsRequest, v1.GetProblemsResponse](
 			httpClient,
 			baseURL+ProblemServiceGetProblemsProcedure,
@@ -81,13 +70,7 @@ func NewProblemServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 
 // problemServiceClient implements ProblemServiceClient.
 type problemServiceClient struct {
-	getProblem  *connect.Client[v1.GetProblemRequest, v1.GetProblemResponse]
 	getProblems *connect.Client[v1.GetProblemsRequest, v1.GetProblemsResponse]
-}
-
-// GetProblem calls contestant.v1.ProblemService.GetProblem.
-func (c *problemServiceClient) GetProblem(ctx context.Context, req *connect.Request[v1.GetProblemRequest]) (*connect.Response[v1.GetProblemResponse], error) {
-	return c.getProblem.CallUnary(ctx, req)
 }
 
 // GetProblems calls contestant.v1.ProblemService.GetProblems.
@@ -97,7 +80,6 @@ func (c *problemServiceClient) GetProblems(ctx context.Context, req *connect.Req
 
 // ProblemServiceHandler is an implementation of the contestant.v1.ProblemService service.
 type ProblemServiceHandler interface {
-	GetProblem(context.Context, *connect.Request[v1.GetProblemRequest]) (*connect.Response[v1.GetProblemResponse], error)
 	GetProblems(context.Context, *connect.Request[v1.GetProblemsRequest]) (*connect.Response[v1.GetProblemsResponse], error)
 }
 
@@ -107,12 +89,6 @@ type ProblemServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewProblemServiceHandler(svc ProblemServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	problemServiceGetProblemHandler := connect.NewUnaryHandler(
-		ProblemServiceGetProblemProcedure,
-		svc.GetProblem,
-		connect.WithSchema(problemServiceGetProblemMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
 	problemServiceGetProblemsHandler := connect.NewUnaryHandler(
 		ProblemServiceGetProblemsProcedure,
 		svc.GetProblems,
@@ -121,8 +97,6 @@ func NewProblemServiceHandler(svc ProblemServiceHandler, opts ...connect.Handler
 	)
 	return "/contestant.v1.ProblemService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case ProblemServiceGetProblemProcedure:
-			problemServiceGetProblemHandler.ServeHTTP(w, r)
 		case ProblemServiceGetProblemsProcedure:
 			problemServiceGetProblemsHandler.ServeHTTP(w, r)
 		default:
@@ -133,10 +107,6 @@ func NewProblemServiceHandler(svc ProblemServiceHandler, opts ...connect.Handler
 
 // UnimplementedProblemServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedProblemServiceHandler struct{}
-
-func (UnimplementedProblemServiceHandler) GetProblem(context.Context, *connect.Request[v1.GetProblemRequest]) (*connect.Response[v1.GetProblemResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.ProblemService.GetProblem is not implemented"))
-}
 
 func (UnimplementedProblemServiceHandler) GetProblems(context.Context, *connect.Request[v1.GetProblemsRequest]) (*connect.Response[v1.GetProblemsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.ProblemService.GetProblems is not implemented"))
