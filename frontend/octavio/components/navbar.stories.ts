@@ -1,5 +1,7 @@
+import { Response } from "next/dist/compiled/@edge-runtime/primitives";
+
 import { Meta, StoryObj } from "@storybook/react";
-import { rest } from "msw";
+import { http } from "msw";
 
 import { apiUrl } from "@/components/_const";
 import ICTSCNavBar from "@/components/navbar";
@@ -26,14 +28,22 @@ export const AdminLoggedIn: Story = {
   parameters: {
     msw: {
       handlers: [
-        rest.get(path, (req, res, ctx) =>
-          res(
-            ctx.json({
-              data: {
-                user: testAdminUser,
-              },
-            })
-          )
+        http.get(
+          path,
+          (info) =>
+            new Response(
+              JSON.stringify({
+                data: {
+                  user: testAdminUser,
+                },
+              }),
+              // {
+              //   status: 200,
+              //   headers: {
+              //     "Content-Type": "application/json",
+              //   },
+              // },
+            ),
         ),
       ],
     },
@@ -45,14 +55,31 @@ export const UserLoggedIn: Story = {
   parameters: {
     msw: {
       handlers: [
-        rest.get(path, (req, res, ctx) =>
-          res(
-            ctx.json({
-              data: {
-                user: testUser,
-              },
-            })
-          )
+        // http.get(path, (req, res, ctx) =>
+        //   res(
+        //     ctx.json({
+        //       data: {
+        //         user: testUser,
+        //       },
+        //     }),
+        //   ),
+        // ),
+        http.get(
+          path,
+          (info) =>
+            new Response(
+              JSON.stringify({
+                data: {
+                  user: testUser,
+                },
+              }),
+              // {
+              //   status: 200,
+              //   headers: {
+              //     "Content-Type": "application/json",
+              //   },
+              // },
+            ),
         ),
       ],
     },
@@ -64,14 +91,31 @@ export const LoggedOut: Story = {
   parameters: {
     msw: {
       handlers: [
-        rest.get(path, (req, res, ctx) =>
-          res(
-            ctx.json({
-              data: {
-                user: null,
-              },
-            })
-          )
+        // rest.get(path, (req, res, ctx) =>
+        //   res(
+        //     ctx.json({
+        //       data: {
+        //         user: null,
+        //       },
+        //     }),
+        //   ),
+        // ),
+        http.get(
+          path,
+          (info) =>
+            new Response(
+              JSON.stringify({
+                data: {
+                  user: null,
+                },
+              }),
+              // {
+              //   status: 200,
+              //   headers: {
+              //     "Content-Type": "application/json",
+              //   },
+              // },
+            ),
         ),
       ],
     },
