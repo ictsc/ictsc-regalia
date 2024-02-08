@@ -25,6 +25,7 @@ luxon
 mvdan
 Newf
 nextjs
+nocheck
 nofilter
 nolint
 noninteractive
