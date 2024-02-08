@@ -7,9 +7,11 @@ bytedance
 clsx
 cmds
 cockroachdb
+codegen
 connectrpc
 daisyui
 datasource
+deepmap
 Duardo
 exhaustruct
 gofumpt
@@ -30,6 +32,7 @@ nofilter
 nolint
 noninteractive
 noto
+oapi
 oneof
 proto
 protobuf

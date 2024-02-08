@@ -36,17 +36,22 @@ const (
 	// RecreationServiceGetRecreationsProcedure is the fully-qualified name of the RecreationService's
 	// GetRecreations RPC.
 	RecreationServiceGetRecreationsProcedure = "/admin.v1.RecreationService/GetRecreations"
+	// RecreationServicePostAdminRecreationProcedure is the fully-qualified name of the
+	// RecreationService's PostAdminRecreation RPC.
+	RecreationServicePostAdminRecreationProcedure = "/admin.v1.RecreationService/PostAdminRecreation"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	recreationServiceServiceDescriptor              = v1.File_admin_v1_recreation_proto.Services().ByName("RecreationService")
-	recreationServiceGetRecreationsMethodDescriptor = recreationServiceServiceDescriptor.Methods().ByName("GetRecreations")
+	recreationServiceServiceDescriptor                   = v1.File_admin_v1_recreation_proto.Services().ByName("RecreationService")
+	recreationServiceGetRecreationsMethodDescriptor      = recreationServiceServiceDescriptor.Methods().ByName("GetRecreations")
+	recreationServicePostAdminRecreationMethodDescriptor = recreationServiceServiceDescriptor.Methods().ByName("PostAdminRecreation")
 )
 
 // RecreationServiceClient is a client for the admin.v1.RecreationService service.
 type RecreationServiceClient interface {
 	GetRecreations(context.Context, *connect.Request[v1.GetRecreationsRequest]) (*connect.Response[v1.GetRecreationsResponse], error)
+	PostAdminRecreation(context.Context, *connect.Request[v1.PostAdminRecreationRequest]) (*connect.Response[v1.PostAdminRecreationResponse], error)
 }
 
 // NewRecreationServiceClient constructs a client for the admin.v1.RecreationService service. By
@@ -65,12 +70,19 @@ func NewRecreationServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithSchema(recreationServiceGetRecreationsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		postAdminRecreation: connect.NewClient[v1.PostAdminRecreationRequest, v1.PostAdminRecreationResponse](
+			httpClient,
+			baseURL+RecreationServicePostAdminRecreationProcedure,
+			connect.WithSchema(recreationServicePostAdminRecreationMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // recreationServiceClient implements RecreationServiceClient.
 type recreationServiceClient struct {
-	getRecreations *connect.Client[v1.GetRecreationsRequest, v1.GetRecreationsResponse]
+	getRecreations      *connect.Client[v1.GetRecreationsRequest, v1.GetRecreationsResponse]
+	postAdminRecreation *connect.Client[v1.PostAdminRecreationRequest, v1.PostAdminRecreationResponse]
 }
 
 // GetRecreations calls admin.v1.RecreationService.GetRecreations.
@@ -78,9 +90,15 @@ func (c *recreationServiceClient) GetRecreations(ctx context.Context, req *conne
 	return c.getRecreations.CallUnary(ctx, req)
 }
 
+// PostAdminRecreation calls admin.v1.RecreationService.PostAdminRecreation.
+func (c *recreationServiceClient) PostAdminRecreation(ctx context.Context, req *connect.Request[v1.PostAdminRecreationRequest]) (*connect.Response[v1.PostAdminRecreationResponse], error) {
+	return c.postAdminRecreation.CallUnary(ctx, req)
+}
+
 // RecreationServiceHandler is an implementation of the admin.v1.RecreationService service.
 type RecreationServiceHandler interface {
 	GetRecreations(context.Context, *connect.Request[v1.GetRecreationsRequest]) (*connect.Response[v1.GetRecreationsResponse], error)
+	PostAdminRecreation(context.Context, *connect.Request[v1.PostAdminRecreationRequest]) (*connect.Response[v1.PostAdminRecreationResponse], error)
 }
 
 // NewRecreationServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -95,10 +113,18 @@ func NewRecreationServiceHandler(svc RecreationServiceHandler, opts ...connect.H
 		connect.WithSchema(recreationServiceGetRecreationsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	recreationServicePostAdminRecreationHandler := connect.NewUnaryHandler(
+		RecreationServicePostAdminRecreationProcedure,
+		svc.PostAdminRecreation,
+		connect.WithSchema(recreationServicePostAdminRecreationMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/admin.v1.RecreationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case RecreationServiceGetRecreationsProcedure:
 			recreationServiceGetRecreationsHandler.ServeHTTP(w, r)
+		case RecreationServicePostAdminRecreationProcedure:
+			recreationServicePostAdminRecreationHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -110,4 +136,8 @@ type UnimplementedRecreationServiceHandler struct{}
 
 func (UnimplementedRecreationServiceHandler) GetRecreations(context.Context, *connect.Request[v1.GetRecreationsRequest]) (*connect.Response[v1.GetRecreationsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.RecreationService.GetRecreations is not implemented"))
+}
+
+func (UnimplementedRecreationServiceHandler) PostAdminRecreation(context.Context, *connect.Request[v1.PostAdminRecreationRequest]) (*connect.Response[v1.PostAdminRecreationResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.RecreationService.PostAdminRecreation is not implemented"))
 }

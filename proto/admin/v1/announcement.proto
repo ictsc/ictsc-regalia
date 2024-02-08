@@ -47,12 +47,12 @@ message PatchAnnouncementResponse {
 }
 
 message PostAnnouncementRequest {
-  optional string problem_id = 1 [(buf.validate.field).string.len = 26];
-  optional string title = 2 [(buf.validate.field).string = {
+  string problem_id = 1 [(buf.validate.field).string.len = 26];
+  string title = 2 [(buf.validate.field).string = {
     min_len: 1,
     max_len: 100
   }];
-  optional string body = 3 [(buf.validate.field).string = {
+  string body = 3 [(buf.validate.field).string = {
     min_len: 1,
     max_len: 1000
   }];

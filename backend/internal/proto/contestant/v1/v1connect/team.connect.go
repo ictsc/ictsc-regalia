@@ -40,14 +40,18 @@ const (
 	// TeamServiceGetTeamMembersProcedure is the fully-qualified name of the TeamService's
 	// GetTeamMembers RPC.
 	TeamServiceGetTeamMembersProcedure = "/contestant.v1.TeamService/GetTeamMembers"
+	// TeamServiceGetConnectionInfoProcedure is the fully-qualified name of the TeamService's
+	// GetConnectionInfo RPC.
+	TeamServiceGetConnectionInfoProcedure = "/contestant.v1.TeamService/GetConnectionInfo"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	teamServiceServiceDescriptor              = v1.File_contestant_v1_team_proto.Services().ByName("TeamService")
-	teamServiceGetTeamsMethodDescriptor       = teamServiceServiceDescriptor.Methods().ByName("GetTeams")
-	teamServiceGetTeamMethodDescriptor        = teamServiceServiceDescriptor.Methods().ByName("GetTeam")
-	teamServiceGetTeamMembersMethodDescriptor = teamServiceServiceDescriptor.Methods().ByName("GetTeamMembers")
+	teamServiceServiceDescriptor                 = v1.File_contestant_v1_team_proto.Services().ByName("TeamService")
+	teamServiceGetTeamsMethodDescriptor          = teamServiceServiceDescriptor.Methods().ByName("GetTeams")
+	teamServiceGetTeamMethodDescriptor           = teamServiceServiceDescriptor.Methods().ByName("GetTeam")
+	teamServiceGetTeamMembersMethodDescriptor    = teamServiceServiceDescriptor.Methods().ByName("GetTeamMembers")
+	teamServiceGetConnectionInfoMethodDescriptor = teamServiceServiceDescriptor.Methods().ByName("GetConnectionInfo")
 )
 
 // TeamServiceClient is a client for the contestant.v1.TeamService service.
@@ -55,6 +59,7 @@ type TeamServiceClient interface {
 	GetTeams(context.Context, *connect.Request[v1.GetTeamsRequest]) (*connect.Response[v1.GetTeamsResponse], error)
 	GetTeam(context.Context, *connect.Request[v1.GetTeamRequest]) (*connect.Response[v1.GetTeamResponse], error)
 	GetTeamMembers(context.Context, *connect.Request[v1.GetTeamMembersRequest]) (*connect.Response[v1.GetTeamMembersResponse], error)
+	GetConnectionInfo(context.Context, *connect.Request[v1.GetConnectionInfoRequest]) (*connect.Response[v1.GetConnectionInfoResponse], error)
 }
 
 // NewTeamServiceClient constructs a client for the contestant.v1.TeamService service. By default,
@@ -85,14 +90,21 @@ func NewTeamServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(teamServiceGetTeamMembersMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getConnectionInfo: connect.NewClient[v1.GetConnectionInfoRequest, v1.GetConnectionInfoResponse](
+			httpClient,
+			baseURL+TeamServiceGetConnectionInfoProcedure,
+			connect.WithSchema(teamServiceGetConnectionInfoMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // teamServiceClient implements TeamServiceClient.
 type teamServiceClient struct {
-	getTeams       *connect.Client[v1.GetTeamsRequest, v1.GetTeamsResponse]
-	getTeam        *connect.Client[v1.GetTeamRequest, v1.GetTeamResponse]
-	getTeamMembers *connect.Client[v1.GetTeamMembersRequest, v1.GetTeamMembersResponse]
+	getTeams          *connect.Client[v1.GetTeamsRequest, v1.GetTeamsResponse]
+	getTeam           *connect.Client[v1.GetTeamRequest, v1.GetTeamResponse]
+	getTeamMembers    *connect.Client[v1.GetTeamMembersRequest, v1.GetTeamMembersResponse]
+	getConnectionInfo *connect.Client[v1.GetConnectionInfoRequest, v1.GetConnectionInfoResponse]
 }
 
 // GetTeams calls contestant.v1.TeamService.GetTeams.
@@ -110,11 +122,17 @@ func (c *teamServiceClient) GetTeamMembers(ctx context.Context, req *connect.Req
 	return c.getTeamMembers.CallUnary(ctx, req)
 }
 
+// GetConnectionInfo calls contestant.v1.TeamService.GetConnectionInfo.
+func (c *teamServiceClient) GetConnectionInfo(ctx context.Context, req *connect.Request[v1.GetConnectionInfoRequest]) (*connect.Response[v1.GetConnectionInfoResponse], error) {
+	return c.getConnectionInfo.CallUnary(ctx, req)
+}
+
 // TeamServiceHandler is an implementation of the contestant.v1.TeamService service.
 type TeamServiceHandler interface {
 	GetTeams(context.Context, *connect.Request[v1.GetTeamsRequest]) (*connect.Response[v1.GetTeamsResponse], error)
 	GetTeam(context.Context, *connect.Request[v1.GetTeamRequest]) (*connect.Response[v1.GetTeamResponse], error)
 	GetTeamMembers(context.Context, *connect.Request[v1.GetTeamMembersRequest]) (*connect.Response[v1.GetTeamMembersResponse], error)
+	GetConnectionInfo(context.Context, *connect.Request[v1.GetConnectionInfoRequest]) (*connect.Response[v1.GetConnectionInfoResponse], error)
 }
 
 // NewTeamServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -141,6 +159,12 @@ func NewTeamServiceHandler(svc TeamServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(teamServiceGetTeamMembersMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	teamServiceGetConnectionInfoHandler := connect.NewUnaryHandler(
+		TeamServiceGetConnectionInfoProcedure,
+		svc.GetConnectionInfo,
+		connect.WithSchema(teamServiceGetConnectionInfoMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/contestant.v1.TeamService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case TeamServiceGetTeamsProcedure:
@@ -149,6 +173,8 @@ func NewTeamServiceHandler(svc TeamServiceHandler, opts ...connect.HandlerOption
 			teamServiceGetTeamHandler.ServeHTTP(w, r)
 		case TeamServiceGetTeamMembersProcedure:
 			teamServiceGetTeamMembersHandler.ServeHTTP(w, r)
+		case TeamServiceGetConnectionInfoProcedure:
+			teamServiceGetConnectionInfoHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -168,4 +194,8 @@ func (UnimplementedTeamServiceHandler) GetTeam(context.Context, *connect.Request
 
 func (UnimplementedTeamServiceHandler) GetTeamMembers(context.Context, *connect.Request[v1.GetTeamMembersRequest]) (*connect.Response[v1.GetTeamMembersResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.TeamService.GetTeamMembers is not implemented"))
+}
+
+func (UnimplementedTeamServiceHandler) GetConnectionInfo(context.Context, *connect.Request[v1.GetConnectionInfoRequest]) (*connect.Response[v1.GetConnectionInfoResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.TeamService.GetConnectionInfo is not implemented"))
 }
