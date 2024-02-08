@@ -1,10 +1,20 @@
 version: v1
 plugins:
+  # Duardo
   - plugin: es
-    out: ../frontend/proto
+    out: ../frontend/duardo/proto
     opt:
       - target=ts
   - plugin: connect-es
-    out: ../frontend/proto
+    out: ../frontend/duardo/proto
+    opt:
+      - target=ts
+  # Octavio
+  - plugin: es
+    out: ../frontend/octavio/proto
+    opt:
+      - target=ts
+  - plugin: connect-es
+    out: ../frontend/octavio/proto
     opt:
       - target=ts
