@@ -16,7 +16,7 @@ type Redis[V any] struct {
 
 var _ cache.DB[struct{}] = (*Redis[struct{}])(nil)
 
-// Config Redis接続用設定
+// Config Redis接続設定
 type Config struct {
 	Hostname string
 	Port     int
