@@ -4,15 +4,16 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/ictsc/ictsc-outlands/backend/pkg/errors"
 	"github.com/uptrace/bun"
 )
 
-type txsKey struct{}
+type txKey bool
 
-var key = txsKey{}
+const key = txKey(false)
 
-// Do is a func to execute db operations in transaction
-func (repo *DB) Do(ctx context.Context, options *sql.TxOptions, callBack func(context.Context) error) error {
+// Do トランザクションの中で処理を実行
+func (d *DB) Do(ctx context.Context, options *sql.TxOptions, callBack func(context.Context) error) error {
 	var (
 		idb bun.IDB
 		ok  bool
@@ -20,15 +21,18 @@ func (repo *DB) Do(ctx context.Context, options *sql.TxOptions, callBack func(co
 
 	idb, ok = ctx.Value(key).(bun.Tx)
 	if !ok {
-		idb = repo.DB
+		idb = d.db
 	}
 
 	tx, err := idb.BeginTx(ctx, options)
 	if err != nil {
-		return err
+		return errors.Wrap(err)
 	}
 
-	defer tx.Rollback()
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
 	ctx = context.WithValue(ctx, key, tx)
 
 	err = callBack(ctx)
@@ -38,16 +42,17 @@ func (repo *DB) Do(ctx context.Context, options *sql.TxOptions, callBack func(co
 
 	err = ctx.Err()
 	if err != nil {
-		return err
+		return errors.Wrap(err)
 	}
 
-	return tx.Commit()
+	return errors.Wrap(tx.Commit())
 }
 
-func (db *DB) getIDB(ctx context.Context) bun.IDB {
+// GetIDB bun.IDBインスタンスを取得
+func (d *DB) GetIDB(ctx context.Context) bun.IDB { // nolint:ireturn
 	tx, ok := ctx.Value(key).(bun.Tx)
 	if !ok {
-		return db.DB
+		return d.db
 	}
 
 	return tx

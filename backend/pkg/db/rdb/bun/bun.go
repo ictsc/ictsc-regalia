@@ -16,12 +16,12 @@ import (
 
 // DB Bun RDBクライアント
 type DB struct {
-	*bun.DB
+	db *bun.DB
 }
 
 var _ rdb.Tx = (*DB)(nil)
 
-// RDB接続設定
+// Config RDB接続設定
 type Config struct {
 	Dev bool
 
@@ -44,8 +44,10 @@ func NewDB(conf *Config) (*DB, error) {
 	mysqlConf.Passwd = conf.Password
 	mysqlConf.Addr = conf.Hostname + ":" + strconv.Itoa(conf.Port)
 	mysqlConf.DBName = conf.Database
-	mysqlConf.ParseTime = true
+	mysqlConf.Collation = "utf8mb4_general_ci"
 	mysqlConf.Loc = jst
+	mysqlConf.InterpolateParams = true
+	mysqlConf.ParseTime = true
 
 	sqlDB, err := sql.Open("mysql", mysqlConf.FormatDSN())
 	if err != nil {
@@ -57,5 +59,5 @@ func NewDB(conf *Config) (*DB, error) {
 		bunDB.AddQueryHook(bundebug.NewQueryHook())
 	}
 
-	return &DB{DB: bunDB}, nil
+	return &DB{db: bunDB}, nil
 }
