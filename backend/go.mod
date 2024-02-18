@@ -7,7 +7,7 @@ require (
 	connectrpc.com/connect v1.14.0
 	github.com/bytedance/sonic v1.10.2
 	github.com/cockroachdb/errors v1.11.1
-	github.com/go-chi/chi/v5 v5.0.11
+	github.com/go-chi/chi/v5 v5.0.12
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/redis/go-redis/v9 v9.4.0
 	golang.org/x/net v0.21.0
