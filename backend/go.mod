@@ -9,7 +9,7 @@ require (
 	github.com/cockroachdb/errors v1.11.1
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/oapi-codegen/runtime v1.1.1
-	github.com/redis/go-redis/v9 v9.5.0
+	github.com/redis/go-redis/v9 v9.5.1
 	golang.org/x/net v0.21.0
 	google.golang.org/protobuf v1.32.0
 )
