@@ -3,6 +3,7 @@ Ashleigh
 autodocs
 automerge
 bufbuild
+bundebug
 bytedance
 clsx
 cmds
@@ -27,6 +28,7 @@ Kaleb
 Loba
 luxon
 mvdan
+mysqldialect
 Newf
 nextjs
 nocheck
@@ -47,6 +49,7 @@ stretchr
 tailwindcss
 testid
 Tressa
+uptrace
 usergroups
 wrapcheck
 zenn
