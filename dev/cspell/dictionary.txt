@@ -15,6 +15,7 @@ deepmap
 defval
 Duardo
 exhaustruct
+gochecknoinits
 gofumpt
 goimports
 ictsc
@@ -49,3 +50,4 @@ Tressa
 usergroups
 wrapcheck
 zenn
+zerolog
