@@ -4,10 +4,19 @@ package redis
 import (
 	"strconv"
 
+	"github.com/ictsc/ictsc-outlands/backend/pkg/db/cache"
 	"github.com/redis/go-redis/v9"
 )
 
-// Config Redis接続用設定
+// Redis Redisクライアント
+type Redis[V any] struct {
+	c   *redis.Client
+	srv string
+}
+
+var _ cache.DB[struct{}] = (*Redis[struct{}])(nil)
+
+// Config Redis接続設定
 type Config struct {
 	Hostname string
 	Port     int
@@ -16,12 +25,6 @@ type Config struct {
 	Database int
 
 	Service string // Redisを利用しているサービス名
-}
-
-// Redis Redisクライアント
-type Redis[V any] struct {
-	c   *redis.Client
-	srv string
 }
 
 // New Redisクライアント生成

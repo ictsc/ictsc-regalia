@@ -33,15 +33,9 @@ func As(err error, target any) bool {
 func Sprint(err error) string {
 	details := errors.GetSafeDetails(err)
 
-	str := err.Error() + "\n"
-
-	for i, v := range details.SafeDetails {
-		if i == 0 {
-			str += strings.Join(strings.Split(v, "\n")[3:], "\n") + "\n"
-		} else {
-			str += v + "\n"
-		}
-	}
+	str := err.Error() + "\n  -- stack trace:\n  | "
+	// 最初の2行は errors.New() もしくは errors.Wrap() の情報なので除外
+	str += strings.Join(strings.Split(details.SafeDetails[0], "\n")[3:], "\n  | ")
 
 	return str
 }

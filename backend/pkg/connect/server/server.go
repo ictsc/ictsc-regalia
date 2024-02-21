@@ -2,10 +2,14 @@
 package server
 
 import (
-	"log"
+	"context"
 	"net/http"
+	"time"
 
 	"connectrpc.com/connect"
+	"github.com/ictsc/ictsc-outlands/backend/pkg/log"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 )
 
 type serverType int
@@ -23,24 +27,40 @@ type registerer struct {
 	authInterceptor connect.HandlerOption
 }
 
-// NewMux Connectサーバールーターを作成する
-func NewMux(
+// New Connectサーバーを作成する
+func New(
 	dev bool,
-	srvType serverType,
+	_ serverType,
+	addr string,
 	register func(reg *registerer),
-) *http.ServeMux {
+) (*http.Server, func()) {
 	mux := http.NewServeMux()
 	reg := &registerer{
-		mux:             mux,
-		commonOpt:       []connect.HandlerOption{},
+		mux: mux,
+		commonOpt: []connect.HandlerOption{
+			connect.WithInterceptors(
+				log.NewLoggerInterceptor(log.NewLogger(dev)),
+			),
+		},
 		authInterceptor: nil,
 	}
 
 	register(reg)
 
-	log.Print(dev, srvType)
+	srv := &http.Server{ // nolint:exhaustruct
+		Addr:        addr,
+		Handler:     mux,
+		ReadTimeout: time.Second,
+	}
 
-	return mux
+	// 開発環境の場合はh2c(TLS無しのHTTP/2)を有効にする
+	if dev {
+		srv.Handler = h2c.NewHandler(mux, &http2.Server{}) // nolint:exhaustruct
+	}
+
+	return srv, func() {
+		_ = srv.Shutdown(context.Background())
+	}
 }
 
 // Register Connectサービスを認証無しで登録する
