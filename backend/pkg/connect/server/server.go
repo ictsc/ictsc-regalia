@@ -3,11 +3,11 @@ package server
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/ictsc/ictsc-outlands/backend/pkg/log"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
@@ -30,20 +30,22 @@ type registerer struct {
 // New Connectサーバーを作成する
 func New(
 	dev bool,
-	srvType serverType,
+	_ serverType,
 	addr string,
 	register func(reg *registerer),
 ) (*http.Server, func()) {
 	mux := http.NewServeMux()
 	reg := &registerer{
-		mux:             mux,
-		commonOpt:       []connect.HandlerOption{},
+		mux: mux,
+		commonOpt: []connect.HandlerOption{
+			connect.WithInterceptors(
+				log.NewLoggerInterceptor(log.NewLogger(dev)),
+			),
+		},
 		authInterceptor: nil,
 	}
 
 	register(reg)
-
-	log.Print(dev, srvType)
 
 	srv := &http.Server{ // nolint:exhaustruct
 		Addr:        addr,

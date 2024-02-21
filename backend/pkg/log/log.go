@@ -14,11 +14,11 @@ type Config struct {
 }
 
 // NewLogger ロガー生成
-func NewLogger(conf *Config) zerolog.Logger {
+func NewLogger(dev bool) zerolog.Logger {
 	zerolog.TimeFieldFormat = time.RFC3339Nano
 	logger := zerolog.New(os.Stderr).With().Timestamp().Logger()
 
-	if conf.Dev {
+	if dev {
 		// nolint:exhaustruct
 		logger = logger.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
