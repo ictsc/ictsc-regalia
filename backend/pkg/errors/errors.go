@@ -19,9 +19,32 @@ func Wrap(err error) error {
 	return errors.Wrap(err, "")
 }
 
+// PutFlag エラーにフラグを追加
+func PutFlag(err error, flag Flag) error {
+	return newAppError(flag, err)
+}
+
 // Is errors.Is()のラッパー
 func Is(err, reference error) bool {
 	return errors.Is(err, reference)
+}
+
+// IsFlag エラーにフラグがあるか判定する
+func IsFlag(err error, flag Flag) bool {
+	for {
+		if err == nil {
+			return false
+		}
+
+		// nolint:errorlint
+		if e, ok := err.(*appError); ok {
+			if e.flag == flag {
+				return true
+			}
+		}
+
+		err = errors.Unwrap(err)
+	}
 }
 
 // As errors.As()のラッパー
