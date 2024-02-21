@@ -16,6 +16,7 @@ datasource
 deepmap
 defval
 Duardo
+errorlint
 exhaustruct
 gochecknoinits
 gofumpt
@@ -51,6 +52,7 @@ tailwindcss
 testid
 Tressa
 uptrace
+usecase
 usergroups
 wrapcheck
 zenn
