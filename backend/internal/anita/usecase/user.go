@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 
-	"github.com/ictsc/ictsc-outlands/backend/internal/domain"
+	"github.com/ictsc/ictsc-outlands/backend/internal/anita/domain"
 	"github.com/oklog/ulid/v2"
 )
 
