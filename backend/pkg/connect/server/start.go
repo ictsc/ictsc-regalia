@@ -34,6 +34,6 @@ func Start(srv []*http.Server, container *di.Container) error {
 	case <-ctx.Done():
 		return nil
 	case err := <-errChan:
-		return errors.Wrap(err)
+		return errors.Wrap(errors.ErrUnknown, err)
 	}
 }

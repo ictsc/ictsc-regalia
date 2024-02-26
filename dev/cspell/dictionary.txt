@@ -18,6 +18,7 @@ defval
 Duardo
 errorlint
 exhaustruct
+gochecknoglobals
 gochecknoinits
 gofumpt
 goimports

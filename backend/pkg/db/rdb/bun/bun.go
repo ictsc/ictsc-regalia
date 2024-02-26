@@ -36,7 +36,7 @@ type Config struct {
 func NewDB(conf *Config) (*DB, error) {
 	jst, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
-		return nil, errors.Wrap(err)
+		return nil, errors.Wrap(errors.ErrUnknown, err)
 	}
 
 	mysqlConf := mysql.NewConfig()
@@ -51,7 +51,7 @@ func NewDB(conf *Config) (*DB, error) {
 
 	sqlDB, err := sql.Open("mysql", mysqlConf.FormatDSN())
 	if err != nil {
-		return nil, errors.Wrap(err)
+		return nil, errors.Wrap(errors.ErrUnknown, err)
 	}
 
 	bunDB := bun.NewDB(sqlDB, mysqldialect.New())
