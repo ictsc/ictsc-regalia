@@ -1,2 +1,2 @@
-// Package domain ドメイン定義
+// Package domain ドメインエンティティー定義
 package domain
