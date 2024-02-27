@@ -52,6 +52,7 @@ stretchr
 tailwindcss
 testid
 Tressa
+Upsert
 uptrace
 usecase
 usergroups
