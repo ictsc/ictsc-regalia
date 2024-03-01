@@ -39,4 +39,4 @@ linters-settings:
       - .WithMessagef(
       - .WithStack(
       - github.com/cockroachdb/errors.Newf(
-      - github.com/ictsc/ictsc-outlands/backend/pkg/errors.New(
+      - github.com/ictsc/ictsc-outlands/backend
