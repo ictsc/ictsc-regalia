@@ -30,8 +30,6 @@ func (id UserID) String() string {
 	return id.value.String()
 }
 
-const maxUserNameLength = 20
-
 // UserName ユーザー名
 type UserName struct {
 	value string
@@ -39,12 +37,8 @@ type UserName struct {
 
 // NewUserName ユーザー名を生成
 func NewUserName(value string) (UserName, error) {
-	if value == "" {
-		return UserName{}, errors.New(errors.ErrBadArgument, "user name is empty")
-	}
-
-	if len(value) > maxUserNameLength {
-		return UserName{}, errors.New(errors.ErrBadArgument, "user name is too long")
+	if len(value) < 1 || len(value) > 20 {
+		return UserName{}, errors.New(errors.ErrBadArgument, "Invalid value")
 	}
 
 	return UserName{value: value}, nil
