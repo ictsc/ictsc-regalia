@@ -2,8 +2,9 @@
 
 import React from "react";
 
-import clsx from "clsx";
+import MarkdownPreview from "@repo/ui/markdown-preview";
 
+import Card from "@/components/card";
 import { Answer } from "@/proto/admin/v1/answer_pb";
 import {
   MultipleChoiceProblem,
@@ -46,7 +47,7 @@ ProblemHeader.defaultProps = {
 function ProblemDescriptiveBody({ body }: { body: string }) {
   return (
     <div className="markdown-body">
-      <p>{body}</p>
+      <MarkdownPreview content={body} />
     </div>
   );
 }
@@ -54,30 +55,6 @@ function ProblemDescriptiveBody({ body }: { body: string }) {
 function ProblemMultipleChoiceBody({ body }: { body: MultipleChoiceProblem }) {
   return <div>Unimplemented</div>;
 }
-
-function Card({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div
-      // className={`border md:border-t px-8 pt-12 pb-8 rounded-md shadow-sm ${className}`}
-      className={clsx(
-        "border md:border-t px-8 pt-12 pb-8 rounded-md shadow-sm",
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
-}
-
-Card.defaultProps = {
-  className: "",
-};
 
 function AnswerListForm() {
   const answer = new Answer({

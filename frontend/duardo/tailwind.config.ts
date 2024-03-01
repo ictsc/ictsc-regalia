@@ -20,6 +20,6 @@ const config: Config = {
   daisyui: {
     darkTheme: false,
   },
-  plugins: [daisyui],
+  plugins: [daisyui, require("tailwindcss-radix")()],
 };
 export default config;
