@@ -319,9 +319,21 @@ importers:
       '@turbo/gen':
         specifier: ^1.12.4
         version: 1.12.4(@types/node@20.11.16)(typescript@5.3.3)
+      '@types/react':
+        specifier: ^18
+        version: 18.2.54
+      '@types/react-dom':
+        specifier: ^18
+        version: 18.2.18
       clsx:
         specifier: ^2.1.0
         version: 2.1.0
+      react:
+        specifier: ^18
+        version: 18.2.0
+      react-dom:
+        specifier: ^18
+        version: 18.2.0(react@18.2.0)
       zenn-content-css:
         specifier: workspace:*
         version: link:../zenn-editor/packages/zenn-content-css

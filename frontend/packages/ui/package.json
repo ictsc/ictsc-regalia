@@ -11,7 +11,11 @@
   },
   "devDependencies": {
     "@turbo/gen": "^1.12.4",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
     "clsx": "^2.1.0",
+    "react": "^18",
+    "react-dom": "^18",
     "zenn-content-css": "workspace:*",
     "zenn-embed-elements": "workspace:*",
     "zenn-markdown-html": "workspace:*"
