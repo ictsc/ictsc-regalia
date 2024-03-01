@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -30,14 +30,14 @@ function DescriptiveProblemEdit({ problem, saveProblemData }: Props) {
 
   const [text, setText] = useState("");
 
-  const timerRef = React.useRef(0);
+  const timerRef = useRef(0);
 
   const [toastText, setToastText] = useState("");
   const [toastType, setToastType] = useState<ToastType>();
   const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState(false);
 
-  React.useEffect(() => () => clearTimeout(timerRef.current), []);
+  useEffect(() => () => clearTimeout(timerRef.current), []);
 
   const defaultValues =
     problem?.body.case === "descriptive"
