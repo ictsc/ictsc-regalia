@@ -17,6 +17,9 @@ const config: Config = {
       },
     },
   },
-  plugins: [daisyui],
+  daisyui: {
+    darkTheme: false,
+  },
+  plugins: [daisyui, require("tailwindcss-radix")()],
 };
 export default config;
