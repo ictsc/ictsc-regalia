@@ -96,21 +96,3 @@ func (t *Team) SetInvitationCode(invitationCode value.TeamInvitationCode) {
 func (t *Team) SetBastion(bastion value.Bastion) {
 	t.bastion = bastion
 }
-
-// AddMember メンバーを追加する
-func (t *Team) AddMember(user *User) {
-	t.members = append(t.members, user)
-	user.teamID = t.id
-}
-
-// DeleteMember メンバーを削除する
-func (t *Team) DeleteMember(user *User) {
-	for i, member := range t.members {
-		if member.Equals(user) {
-			t.members = append(t.members[:i], t.members[i+1:]...)
-			user.teamID = value.TeamID{}
-
-			return
-		}
-	}
-}

@@ -8,4 +8,6 @@ var (
 	ErrUnknown Flag = "Unknown"
 	// ErrBadArgument Bad Argumentエラー
 	ErrBadArgument Flag = "Bad Argument"
+	// ErrAlreadyExists Already Existsエラー
+	ErrAlreadyExists Flag = "Already Exists"
 )

@@ -33,6 +33,7 @@ linters-settings:
       - tx
       - id
       - db
+      - to
   wrapcheck:
     ignoreSigs:
       - .Wrap(
