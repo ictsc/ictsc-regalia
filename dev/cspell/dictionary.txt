@@ -47,6 +47,7 @@ protoc
 protovalidate
 signin
 signout
+smallint
 stefanzweifel
 stretchr
 tailwindcss
