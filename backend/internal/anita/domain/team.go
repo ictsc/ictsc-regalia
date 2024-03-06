@@ -1,6 +1,9 @@
 package domain
 
-import "github.com/ictsc/ictsc-outlands/backend/internal/anita/domain/value"
+import (
+	"github.com/ictsc/ictsc-outlands/backend/internal/anita/domain/value"
+	"github.com/ictsc/ictsc-outlands/backend/pkg/optional"
+)
 
 const maxTeamMembers = 5
 
@@ -12,7 +15,7 @@ type Team struct {
 	organization   value.TeamOrganization
 	invitationCode value.TeamInvitationCode
 
-	bastion value.Bastion
+	bastion optional.Of[value.Bastion]
 
 	members []*User
 }
@@ -24,7 +27,6 @@ func NewTeam(
 	name value.TeamName,
 	organization value.TeamOrganization,
 	invitationCode value.TeamInvitationCode,
-	bastion value.Bastion,
 ) *Team {
 	return &Team{
 		id:             id,
@@ -32,7 +34,7 @@ func NewTeam(
 		name:           name,
 		organization:   organization,
 		invitationCode: invitationCode,
-		bastion:        bastion,
+		bastion:        optional.New(value.Bastion{}, false),
 		members:        make([]*User, 0, maxTeamMembers),
 	}
 }
@@ -63,7 +65,7 @@ func (t *Team) InvitationCode() value.TeamInvitationCode {
 }
 
 // Bastion 踏み台サーバーを取得する
-func (t *Team) Bastion() value.Bastion {
+func (t *Team) Bastion() optional.Of[value.Bastion] {
 	return t.bastion
 }
 
@@ -94,5 +96,5 @@ func (t *Team) SetInvitationCode(invitationCode value.TeamInvitationCode) {
 
 // SetBastion 踏み台サーバーを設定する
 func (t *Team) SetBastion(bastion value.Bastion) {
-	t.bastion = bastion
+	t.bastion = optional.NewValid(bastion)
 }
