@@ -30,10 +30,17 @@ message GetUsersResponse {
 }
 
 message PostUserRequest {
-  User user = 1 [(buf.validate.field).required = true];
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string invitation_code = 3 [(buf.validate.field).string.len = 32];
 }
 
-message PostUserResponse {}
+message PostUserResponse {
+  User user = 1 [(buf.validate.field).required = true];
+}
 
 message PatchUserRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
