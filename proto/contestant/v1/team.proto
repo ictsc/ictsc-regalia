@@ -37,11 +37,11 @@ message GetTeamResponse {
   Team team = 1 [(buf.validate.field).required = true];
 }
 
-message GetTeamMembersRequest {
+message GetMembersRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
 }
 
-message GetTeamMembersResponse {
+message GetMembersResponse {
   repeated Contestant members = 1 [(buf.validate.field).repeated = {
     min_items: 0
     max_items: 5
@@ -73,6 +73,6 @@ message GetConnectionInfoResponse {
 service TeamService {
   rpc GetTeams(GetTeamsRequest) returns (GetTeamsResponse);
   rpc GetTeam(GetTeamRequest) returns (GetTeamResponse);
-  rpc GetTeamMembers(GetTeamMembersRequest) returns (GetTeamMembersResponse);
+  rpc GetMembers(GetMembersRequest) returns (GetMembersResponse);
   rpc GetConnectionInfo(GetConnectionInfoRequest) returns (GetConnectionInfoResponse);
 }
