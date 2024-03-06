@@ -100,6 +100,8 @@ func (t *Team) SetBastion(bastion value.Bastion) {
 }
 
 // SetMembers メンバーを設定する
+//
+//	型変換以外での使用は禁止
 func (t *Team) SetMembers(members []*User) {
 	t.members = members
 }
