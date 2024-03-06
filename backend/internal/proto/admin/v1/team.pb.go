@@ -358,7 +358,7 @@ func (x *Bastion) GetPort() int32 {
 	return 0
 }
 
-type GetTeamConnectionInfoRequest struct {
+type GetConnectionInfoRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -366,8 +366,8 @@ type GetTeamConnectionInfoRequest struct {
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
-func (x *GetTeamConnectionInfoRequest) Reset() {
-	*x = GetTeamConnectionInfoRequest{}
+func (x *GetConnectionInfoRequest) Reset() {
+	*x = GetConnectionInfoRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_admin_v1_team_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -375,13 +375,13 @@ func (x *GetTeamConnectionInfoRequest) Reset() {
 	}
 }
 
-func (x *GetTeamConnectionInfoRequest) String() string {
+func (x *GetConnectionInfoRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetTeamConnectionInfoRequest) ProtoMessage() {}
+func (*GetConnectionInfoRequest) ProtoMessage() {}
 
-func (x *GetTeamConnectionInfoRequest) ProtoReflect() protoreflect.Message {
+func (x *GetConnectionInfoRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_admin_v1_team_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -393,19 +393,19 @@ func (x *GetTeamConnectionInfoRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetTeamConnectionInfoRequest.ProtoReflect.Descriptor instead.
-func (*GetTeamConnectionInfoRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetConnectionInfoRequest.ProtoReflect.Descriptor instead.
+func (*GetConnectionInfoRequest) Descriptor() ([]byte, []int) {
 	return file_admin_v1_team_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *GetTeamConnectionInfoRequest) GetId() string {
+func (x *GetConnectionInfoRequest) GetId() string {
 	if x != nil {
 		return x.Id
 	}
 	return ""
 }
 
-type GetTeamConnectionInfoResponse struct {
+type GetConnectionInfoResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -413,8 +413,8 @@ type GetTeamConnectionInfoResponse struct {
 	Bastion *Bastion `protobuf:"bytes,1,opt,name=bastion,proto3" json:"bastion,omitempty"`
 }
 
-func (x *GetTeamConnectionInfoResponse) Reset() {
-	*x = GetTeamConnectionInfoResponse{}
+func (x *GetConnectionInfoResponse) Reset() {
+	*x = GetConnectionInfoResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_admin_v1_team_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -422,13 +422,13 @@ func (x *GetTeamConnectionInfoResponse) Reset() {
 	}
 }
 
-func (x *GetTeamConnectionInfoResponse) String() string {
+func (x *GetConnectionInfoResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetTeamConnectionInfoResponse) ProtoMessage() {}
+func (*GetConnectionInfoResponse) ProtoMessage() {}
 
-func (x *GetTeamConnectionInfoResponse) ProtoReflect() protoreflect.Message {
+func (x *GetConnectionInfoResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_admin_v1_team_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -440,97 +440,12 @@ func (x *GetTeamConnectionInfoResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetTeamConnectionInfoResponse.ProtoReflect.Descriptor instead.
-func (*GetTeamConnectionInfoResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetConnectionInfoResponse.ProtoReflect.Descriptor instead.
+func (*GetConnectionInfoResponse) Descriptor() ([]byte, []int) {
 	return file_admin_v1_team_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *GetTeamConnectionInfoResponse) GetBastion() *Bastion {
-	if x != nil {
-		return x.Bastion
-	}
-	return nil
-}
-
-type GetAdminConnectionInfoRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *GetAdminConnectionInfoRequest) Reset() {
-	*x = GetAdminConnectionInfoRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[8]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetAdminConnectionInfoRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetAdminConnectionInfoRequest) ProtoMessage() {}
-
-func (x *GetAdminConnectionInfoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[8]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetAdminConnectionInfoRequest.ProtoReflect.Descriptor instead.
-func (*GetAdminConnectionInfoRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{8}
-}
-
-type GetAdminConnectionInfoResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Bastion *Bastion `protobuf:"bytes,1,opt,name=bastion,proto3" json:"bastion,omitempty"`
-}
-
-func (x *GetAdminConnectionInfoResponse) Reset() {
-	*x = GetAdminConnectionInfoResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[9]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetAdminConnectionInfoResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetAdminConnectionInfoResponse) ProtoMessage() {}
-
-func (x *GetAdminConnectionInfoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[9]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetAdminConnectionInfoResponse.ProtoReflect.Descriptor instead.
-func (*GetAdminConnectionInfoResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *GetAdminConnectionInfoResponse) GetBastion() *Bastion {
+func (x *GetConnectionInfoResponse) GetBastion() *Bastion {
 	if x != nil {
 		return x.Bastion
 	}
@@ -548,7 +463,7 @@ type GetMembersRequest struct {
 func (x *GetMembersRequest) Reset() {
 	*x = GetMembersRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[10]
+		mi := &file_admin_v1_team_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -561,7 +476,7 @@ func (x *GetMembersRequest) String() string {
 func (*GetMembersRequest) ProtoMessage() {}
 
 func (x *GetMembersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[10]
+	mi := &file_admin_v1_team_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -574,7 +489,7 @@ func (x *GetMembersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMembersRequest.ProtoReflect.Descriptor instead.
 func (*GetMembersRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{10}
+	return file_admin_v1_team_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetMembersRequest) GetId() string {
@@ -595,7 +510,7 @@ type GetMembersResponse struct {
 func (x *GetMembersResponse) Reset() {
 	*x = GetMembersResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[11]
+		mi := &file_admin_v1_team_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -608,7 +523,7 @@ func (x *GetMembersResponse) String() string {
 func (*GetMembersResponse) ProtoMessage() {}
 
 func (x *GetMembersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[11]
+	mi := &file_admin_v1_team_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -621,7 +536,7 @@ func (x *GetMembersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMembersResponse.ProtoReflect.Descriptor instead.
 func (*GetMembersResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{11}
+	return file_admin_v1_team_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetMembersResponse) GetMembers() []*Contestant {
@@ -646,7 +561,7 @@ type PatchTeamRequest struct {
 func (x *PatchTeamRequest) Reset() {
 	*x = PatchTeamRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[12]
+		mi := &file_admin_v1_team_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -659,7 +574,7 @@ func (x *PatchTeamRequest) String() string {
 func (*PatchTeamRequest) ProtoMessage() {}
 
 func (x *PatchTeamRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[12]
+	mi := &file_admin_v1_team_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -672,7 +587,7 @@ func (x *PatchTeamRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PatchTeamRequest.ProtoReflect.Descriptor instead.
 func (*PatchTeamRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{12}
+	return file_admin_v1_team_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *PatchTeamRequest) GetId() string {
@@ -721,7 +636,7 @@ type PatchTeamResponse struct {
 func (x *PatchTeamResponse) Reset() {
 	*x = PatchTeamResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[13]
+		mi := &file_admin_v1_team_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -734,7 +649,7 @@ func (x *PatchTeamResponse) String() string {
 func (*PatchTeamResponse) ProtoMessage() {}
 
 func (x *PatchTeamResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[13]
+	mi := &file_admin_v1_team_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -747,7 +662,7 @@ func (x *PatchTeamResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PatchTeamResponse.ProtoReflect.Descriptor instead.
 func (*PatchTeamResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{13}
+	return file_admin_v1_team_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *PatchTeamResponse) GetTeam() *Team {
@@ -757,7 +672,7 @@ func (x *PatchTeamResponse) GetTeam() *Team {
 	return nil
 }
 
-type PutTeamConnectionInfoRequest struct {
+type PutConnectionInfoRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -766,23 +681,23 @@ type PutTeamConnectionInfoRequest struct {
 	Bastion *Bastion `protobuf:"bytes,2,opt,name=bastion,proto3" json:"bastion,omitempty"`
 }
 
-func (x *PutTeamConnectionInfoRequest) Reset() {
-	*x = PutTeamConnectionInfoRequest{}
+func (x *PutConnectionInfoRequest) Reset() {
+	*x = PutConnectionInfoRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[14]
+		mi := &file_admin_v1_team_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *PutTeamConnectionInfoRequest) String() string {
+func (x *PutConnectionInfoRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PutTeamConnectionInfoRequest) ProtoMessage() {}
+func (*PutConnectionInfoRequest) ProtoMessage() {}
 
-func (x *PutTeamConnectionInfoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[14]
+func (x *PutConnectionInfoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_team_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -793,48 +708,48 @@ func (x *PutTeamConnectionInfoRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PutTeamConnectionInfoRequest.ProtoReflect.Descriptor instead.
-func (*PutTeamConnectionInfoRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{14}
+// Deprecated: Use PutConnectionInfoRequest.ProtoReflect.Descriptor instead.
+func (*PutConnectionInfoRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_team_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *PutTeamConnectionInfoRequest) GetId() string {
+func (x *PutConnectionInfoRequest) GetId() string {
 	if x != nil {
 		return x.Id
 	}
 	return ""
 }
 
-func (x *PutTeamConnectionInfoRequest) GetBastion() *Bastion {
+func (x *PutConnectionInfoRequest) GetBastion() *Bastion {
 	if x != nil {
 		return x.Bastion
 	}
 	return nil
 }
 
-type PutTeamConnectionInfoResponse struct {
+type PutConnectionInfoResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *PutTeamConnectionInfoResponse) Reset() {
-	*x = PutTeamConnectionInfoResponse{}
+func (x *PutConnectionInfoResponse) Reset() {
+	*x = PutConnectionInfoResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[15]
+		mi := &file_admin_v1_team_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *PutTeamConnectionInfoResponse) String() string {
+func (x *PutConnectionInfoResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PutTeamConnectionInfoResponse) ProtoMessage() {}
+func (*PutConnectionInfoResponse) ProtoMessage() {}
 
-func (x *PutTeamConnectionInfoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[15]
+func (x *PutConnectionInfoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_team_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -845,94 +760,9 @@ func (x *PutTeamConnectionInfoResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PutTeamConnectionInfoResponse.ProtoReflect.Descriptor instead.
-func (*PutTeamConnectionInfoResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{15}
-}
-
-type PutAdminConnectionInfoRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Bastion *Bastion `protobuf:"bytes,1,opt,name=bastion,proto3" json:"bastion,omitempty"`
-}
-
-func (x *PutAdminConnectionInfoRequest) Reset() {
-	*x = PutAdminConnectionInfoRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[16]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *PutAdminConnectionInfoRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PutAdminConnectionInfoRequest) ProtoMessage() {}
-
-func (x *PutAdminConnectionInfoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[16]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PutAdminConnectionInfoRequest.ProtoReflect.Descriptor instead.
-func (*PutAdminConnectionInfoRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{16}
-}
-
-func (x *PutAdminConnectionInfoRequest) GetBastion() *Bastion {
-	if x != nil {
-		return x.Bastion
-	}
-	return nil
-}
-
-type PutAdminConnectionInfoResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *PutAdminConnectionInfoResponse) Reset() {
-	*x = PutAdminConnectionInfoResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[17]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *PutAdminConnectionInfoResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PutAdminConnectionInfoResponse) ProtoMessage() {}
-
-func (x *PutAdminConnectionInfoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[17]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PutAdminConnectionInfoResponse.ProtoReflect.Descriptor instead.
-func (*PutAdminConnectionInfoResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{17}
+// Deprecated: Use PutConnectionInfoResponse.ProtoReflect.Descriptor instead.
+func (*PutConnectionInfoResponse) Descriptor() ([]byte, []int) {
+	return file_admin_v1_team_proto_rawDescGZIP(), []int{13}
 }
 
 type PostTeamRequest struct {
@@ -949,7 +779,7 @@ type PostTeamRequest struct {
 func (x *PostTeamRequest) Reset() {
 	*x = PostTeamRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[18]
+		mi := &file_admin_v1_team_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -962,7 +792,7 @@ func (x *PostTeamRequest) String() string {
 func (*PostTeamRequest) ProtoMessage() {}
 
 func (x *PostTeamRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[18]
+	mi := &file_admin_v1_team_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -975,7 +805,7 @@ func (x *PostTeamRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PostTeamRequest.ProtoReflect.Descriptor instead.
 func (*PostTeamRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{18}
+	return file_admin_v1_team_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *PostTeamRequest) GetCode() int32 {
@@ -1017,7 +847,7 @@ type PostTeamResponse struct {
 func (x *PostTeamResponse) Reset() {
 	*x = PostTeamResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[19]
+		mi := &file_admin_v1_team_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1030,7 +860,7 @@ func (x *PostTeamResponse) String() string {
 func (*PostTeamResponse) ProtoMessage() {}
 
 func (x *PostTeamResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[19]
+	mi := &file_admin_v1_team_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1043,7 +873,7 @@ func (x *PostTeamResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PostTeamResponse.ProtoReflect.Descriptor instead.
 func (*PostTeamResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{19}
+	return file_admin_v1_team_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *PostTeamResponse) GetTeam() *Team {
@@ -1065,7 +895,7 @@ type AddMemberRequest struct {
 func (x *AddMemberRequest) Reset() {
 	*x = AddMemberRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[20]
+		mi := &file_admin_v1_team_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1078,7 +908,7 @@ func (x *AddMemberRequest) String() string {
 func (*AddMemberRequest) ProtoMessage() {}
 
 func (x *AddMemberRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[20]
+	mi := &file_admin_v1_team_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1091,7 +921,7 @@ func (x *AddMemberRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddMemberRequest.ProtoReflect.Descriptor instead.
 func (*AddMemberRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{20}
+	return file_admin_v1_team_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *AddMemberRequest) GetId() string {
@@ -1117,7 +947,7 @@ type AddMemberResponse struct {
 func (x *AddMemberResponse) Reset() {
 	*x = AddMemberResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[21]
+		mi := &file_admin_v1_team_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1130,7 +960,7 @@ func (x *AddMemberResponse) String() string {
 func (*AddMemberResponse) ProtoMessage() {}
 
 func (x *AddMemberResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[21]
+	mi := &file_admin_v1_team_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1143,7 +973,7 @@ func (x *AddMemberResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddMemberResponse.ProtoReflect.Descriptor instead.
 func (*AddMemberResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{21}
+	return file_admin_v1_team_proto_rawDescGZIP(), []int{17}
 }
 
 type DeleteTeamRequest struct {
@@ -1157,7 +987,7 @@ type DeleteTeamRequest struct {
 func (x *DeleteTeamRequest) Reset() {
 	*x = DeleteTeamRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[22]
+		mi := &file_admin_v1_team_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1170,7 +1000,7 @@ func (x *DeleteTeamRequest) String() string {
 func (*DeleteTeamRequest) ProtoMessage() {}
 
 func (x *DeleteTeamRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[22]
+	mi := &file_admin_v1_team_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1183,7 +1013,7 @@ func (x *DeleteTeamRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteTeamRequest.ProtoReflect.Descriptor instead.
 func (*DeleteTeamRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{22}
+	return file_admin_v1_team_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *DeleteTeamRequest) GetId() string {
@@ -1202,7 +1032,7 @@ type DeleteTeamResponse struct {
 func (x *DeleteTeamResponse) Reset() {
 	*x = DeleteTeamResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[23]
+		mi := &file_admin_v1_team_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1215,7 +1045,7 @@ func (x *DeleteTeamResponse) String() string {
 func (*DeleteTeamResponse) ProtoMessage() {}
 
 func (x *DeleteTeamResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[23]
+	mi := &file_admin_v1_team_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1228,35 +1058,35 @@ func (x *DeleteTeamResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteTeamResponse.ProtoReflect.Descriptor instead.
 func (*DeleteTeamResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{23}
+	return file_admin_v1_team_proto_rawDescGZIP(), []int{19}
 }
 
-type DeleteMemberRequest struct {
+type MoveMemberRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id     string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	UserId string `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	ToTeamId string `protobuf:"bytes,1,opt,name=to_team_id,json=toTeamId,proto3" json:"to_team_id,omitempty"`
+	UserId   string `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 }
 
-func (x *DeleteMemberRequest) Reset() {
-	*x = DeleteMemberRequest{}
+func (x *MoveMemberRequest) Reset() {
+	*x = MoveMemberRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[24]
+		mi := &file_admin_v1_team_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *DeleteMemberRequest) String() string {
+func (x *MoveMemberRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*DeleteMemberRequest) ProtoMessage() {}
+func (*MoveMemberRequest) ProtoMessage() {}
 
-func (x *DeleteMemberRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[24]
+func (x *MoveMemberRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_team_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1267,48 +1097,48 @@ func (x *DeleteMemberRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteMemberRequest.ProtoReflect.Descriptor instead.
-func (*DeleteMemberRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{24}
+// Deprecated: Use MoveMemberRequest.ProtoReflect.Descriptor instead.
+func (*MoveMemberRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_team_proto_rawDescGZIP(), []int{20}
 }
 
-func (x *DeleteMemberRequest) GetId() string {
+func (x *MoveMemberRequest) GetToTeamId() string {
 	if x != nil {
-		return x.Id
+		return x.ToTeamId
 	}
 	return ""
 }
 
-func (x *DeleteMemberRequest) GetUserId() string {
+func (x *MoveMemberRequest) GetUserId() string {
 	if x != nil {
 		return x.UserId
 	}
 	return ""
 }
 
-type DeleteMemberResponse struct {
+type MoveMemberResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *DeleteMemberResponse) Reset() {
-	*x = DeleteMemberResponse{}
+func (x *MoveMemberResponse) Reset() {
+	*x = MoveMemberResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_admin_v1_team_proto_msgTypes[25]
+		mi := &file_admin_v1_team_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *DeleteMemberResponse) String() string {
+func (x *MoveMemberResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*DeleteMemberResponse) ProtoMessage() {}
+func (*MoveMemberResponse) ProtoMessage() {}
 
-func (x *DeleteMemberResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_team_proto_msgTypes[25]
+func (x *MoveMemberResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_team_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1319,9 +1149,9 @@ func (x *DeleteMemberResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteMemberResponse.ProtoReflect.Descriptor instead.
-func (*DeleteMemberResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_team_proto_rawDescGZIP(), []int{25}
+// Deprecated: Use MoveMemberResponse.ProtoReflect.Descriptor instead.
+func (*MoveMemberResponse) Descriptor() ([]byte, []int) {
+	return file_admin_v1_team_proto_rawDescGZIP(), []int{21}
 }
 
 var File_admin_v1_team_proto protoreflect.FileDescriptor
@@ -1575,46 +1405,63 @@ var file_admin_v1_team_proto_goTypes = []any{
 	(*DeleteMemberRequest)(nil),            // 24: admin.v1.DeleteMemberRequest
 	(*DeleteMemberResponse)(nil),           // 25: admin.v1.DeleteMemberResponse
 	(*Contestant)(nil),                     // 26: admin.v1.Contestant
+var file_admin_v1_team_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_admin_v1_team_proto_goTypes = []interface{}{
+	(*Team)(nil),                      // 0: admin.v1.Team
+	(*GetTeamsRequest)(nil),           // 1: admin.v1.GetTeamsRequest
+	(*GetTeamsResponse)(nil),          // 2: admin.v1.GetTeamsResponse
+	(*GetTeamRequest)(nil),            // 3: admin.v1.GetTeamRequest
+	(*GetTeamResponse)(nil),           // 4: admin.v1.GetTeamResponse
+	(*Bastion)(nil),                   // 5: admin.v1.Bastion
+	(*GetConnectionInfoRequest)(nil),  // 6: admin.v1.GetConnectionInfoRequest
+	(*GetConnectionInfoResponse)(nil), // 7: admin.v1.GetConnectionInfoResponse
+	(*GetMembersRequest)(nil),         // 8: admin.v1.GetMembersRequest
+	(*GetMembersResponse)(nil),        // 9: admin.v1.GetMembersResponse
+	(*PatchTeamRequest)(nil),          // 10: admin.v1.PatchTeamRequest
+	(*PatchTeamResponse)(nil),         // 11: admin.v1.PatchTeamResponse
+	(*PutConnectionInfoRequest)(nil),  // 12: admin.v1.PutConnectionInfoRequest
+	(*PutConnectionInfoResponse)(nil), // 13: admin.v1.PutConnectionInfoResponse
+	(*PostTeamRequest)(nil),           // 14: admin.v1.PostTeamRequest
+	(*PostTeamResponse)(nil),          // 15: admin.v1.PostTeamResponse
+	(*AddMemberRequest)(nil),          // 16: admin.v1.AddMemberRequest
+	(*AddMemberResponse)(nil),         // 17: admin.v1.AddMemberResponse
+	(*DeleteTeamRequest)(nil),         // 18: admin.v1.DeleteTeamRequest
+	(*DeleteTeamResponse)(nil),        // 19: admin.v1.DeleteTeamResponse
+	(*MoveMemberRequest)(nil),         // 20: admin.v1.MoveMemberRequest
+	(*MoveMemberResponse)(nil),        // 21: admin.v1.MoveMemberResponse
+	(*User)(nil),                      // 22: admin.v1.User
 }
 var file_admin_v1_team_proto_depIdxs = []int32{
 	0,  // 0: admin.v1.GetTeamsResponse.teams:type_name -> admin.v1.Team
 	0,  // 1: admin.v1.GetTeamResponse.team:type_name -> admin.v1.Team
-	5,  // 2: admin.v1.GetTeamConnectionInfoResponse.bastion:type_name -> admin.v1.Bastion
-	5,  // 3: admin.v1.GetAdminConnectionInfoResponse.bastion:type_name -> admin.v1.Bastion
-	26, // 4: admin.v1.GetMembersResponse.members:type_name -> admin.v1.Contestant
-	0,  // 5: admin.v1.PatchTeamResponse.team:type_name -> admin.v1.Team
-	5,  // 6: admin.v1.PutTeamConnectionInfoRequest.bastion:type_name -> admin.v1.Bastion
-	5,  // 7: admin.v1.PutAdminConnectionInfoRequest.bastion:type_name -> admin.v1.Bastion
-	0,  // 8: admin.v1.PostTeamResponse.team:type_name -> admin.v1.Team
-	1,  // 9: admin.v1.TeamService.GetTeams:input_type -> admin.v1.GetTeamsRequest
-	3,  // 10: admin.v1.TeamService.GetTeam:input_type -> admin.v1.GetTeamRequest
-	6,  // 11: admin.v1.TeamService.GetTeamConnectionInfo:input_type -> admin.v1.GetTeamConnectionInfoRequest
-	8,  // 12: admin.v1.TeamService.GetAdminConnectionInfo:input_type -> admin.v1.GetAdminConnectionInfoRequest
-	10, // 13: admin.v1.TeamService.GetMembers:input_type -> admin.v1.GetMembersRequest
-	12, // 14: admin.v1.TeamService.PatchTeam:input_type -> admin.v1.PatchTeamRequest
-	14, // 15: admin.v1.TeamService.PutTeamConnectionInfo:input_type -> admin.v1.PutTeamConnectionInfoRequest
-	16, // 16: admin.v1.TeamService.PutAdminConnectionInfo:input_type -> admin.v1.PutAdminConnectionInfoRequest
-	18, // 17: admin.v1.TeamService.PostTeam:input_type -> admin.v1.PostTeamRequest
-	20, // 18: admin.v1.TeamService.AddMember:input_type -> admin.v1.AddMemberRequest
-	22, // 19: admin.v1.TeamService.DeleteTeam:input_type -> admin.v1.DeleteTeamRequest
-	24, // 20: admin.v1.TeamService.DeleteMember:input_type -> admin.v1.DeleteMemberRequest
-	2,  // 21: admin.v1.TeamService.GetTeams:output_type -> admin.v1.GetTeamsResponse
-	4,  // 22: admin.v1.TeamService.GetTeam:output_type -> admin.v1.GetTeamResponse
-	7,  // 23: admin.v1.TeamService.GetTeamConnectionInfo:output_type -> admin.v1.GetTeamConnectionInfoResponse
-	9,  // 24: admin.v1.TeamService.GetAdminConnectionInfo:output_type -> admin.v1.GetAdminConnectionInfoResponse
-	11, // 25: admin.v1.TeamService.GetMembers:output_type -> admin.v1.GetMembersResponse
-	13, // 26: admin.v1.TeamService.PatchTeam:output_type -> admin.v1.PatchTeamResponse
-	15, // 27: admin.v1.TeamService.PutTeamConnectionInfo:output_type -> admin.v1.PutTeamConnectionInfoResponse
-	17, // 28: admin.v1.TeamService.PutAdminConnectionInfo:output_type -> admin.v1.PutAdminConnectionInfoResponse
-	19, // 29: admin.v1.TeamService.PostTeam:output_type -> admin.v1.PostTeamResponse
-	21, // 30: admin.v1.TeamService.AddMember:output_type -> admin.v1.AddMemberResponse
-	23, // 31: admin.v1.TeamService.DeleteTeam:output_type -> admin.v1.DeleteTeamResponse
-	25, // 32: admin.v1.TeamService.DeleteMember:output_type -> admin.v1.DeleteMemberResponse
-	21, // [21:33] is the sub-list for method output_type
-	9,  // [9:21] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	5,  // 2: admin.v1.GetConnectionInfoResponse.bastion:type_name -> admin.v1.Bastion
+	22, // 3: admin.v1.GetMembersResponse.members:type_name -> admin.v1.Contestant
+	0,  // 4: admin.v1.PatchTeamResponse.team:type_name -> admin.v1.Team
+	5,  // 5: admin.v1.PutConnectionInfoRequest.bastion:type_name -> admin.v1.Bastion
+	0,  // 6: admin.v1.PostTeamResponse.team:type_name -> admin.v1.Team
+	1,  // 7: admin.v1.TeamService.GetTeams:input_type -> admin.v1.GetTeamsRequest
+	3,  // 8: admin.v1.TeamService.GetTeam:input_type -> admin.v1.GetTeamRequest
+	6,  // 9: admin.v1.TeamService.GetConnectionInfo:input_type -> admin.v1.GetConnectionInfoRequest
+	8,  // 10: admin.v1.TeamService.GetMembers:input_type -> admin.v1.GetMembersRequest
+	10, // 11: admin.v1.TeamService.PatchTeam:input_type -> admin.v1.PatchTeamRequest
+	12, // 12: admin.v1.TeamService.PutConnectionInfo:input_type -> admin.v1.PutConnectionInfoRequest
+	14, // 13: admin.v1.TeamService.PostTeam:input_type -> admin.v1.PostTeamRequest
+	18, // 14: admin.v1.TeamService.DeleteTeam:input_type -> admin.v1.DeleteTeamRequest
+	20, // 15: admin.v1.TeamService.MoveMember:input_type -> admin.v1.MoveMemberRequest
+	2,  // 16: admin.v1.TeamService.GetTeams:output_type -> admin.v1.GetTeamsResponse
+	4,  // 17: admin.v1.TeamService.GetTeam:output_type -> admin.v1.GetTeamResponse
+	7,  // 18: admin.v1.TeamService.GetConnectionInfo:output_type -> admin.v1.GetConnectionInfoResponse
+	9,  // 19: admin.v1.TeamService.GetMembers:output_type -> admin.v1.GetMembersResponse
+	11, // 20: admin.v1.TeamService.PatchTeam:output_type -> admin.v1.PatchTeamResponse
+	13, // 21: admin.v1.TeamService.PutConnectionInfo:output_type -> admin.v1.PutConnectionInfoResponse
+	15, // 22: admin.v1.TeamService.PostTeam:output_type -> admin.v1.PostTeamResponse
+	19, // 23: admin.v1.TeamService.DeleteTeam:output_type -> admin.v1.DeleteTeamResponse
+	21, // 24: admin.v1.TeamService.MoveMember:output_type -> admin.v1.MoveMemberResponse
+	16, // [16:25] is the sub-list for method output_type
+	7,  // [7:16] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_admin_v1_team_proto_init() }
@@ -1697,7 +1544,7 @@ func file_admin_v1_team_proto_init() {
 			}
 		}
 		file_admin_v1_team_proto_msgTypes[6].Exporter = func(v any, i int) any {
-			switch v := v.(*GetTeamConnectionInfoRequest); i {
+			switch v := v.(*GetConnectionInfoRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1709,7 +1556,7 @@ func file_admin_v1_team_proto_init() {
 			}
 		}
 		file_admin_v1_team_proto_msgTypes[7].Exporter = func(v any, i int) any {
-			switch v := v.(*GetTeamConnectionInfoResponse); i {
+			switch v := v.(*GetConnectionInfoResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1721,30 +1568,6 @@ func file_admin_v1_team_proto_init() {
 			}
 		}
 		file_admin_v1_team_proto_msgTypes[8].Exporter = func(v any, i int) any {
-			switch v := v.(*GetAdminConnectionInfoRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_admin_v1_team_proto_msgTypes[9].Exporter = func(v any, i int) any {
-			switch v := v.(*GetAdminConnectionInfoResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_admin_v1_team_proto_msgTypes[10].Exporter = func(v any, i int) any {
 			switch v := v.(*GetMembersRequest); i {
 			case 0:
 				return &v.state
@@ -1756,7 +1579,7 @@ func file_admin_v1_team_proto_init() {
 				return nil
 			}
 		}
-		file_admin_v1_team_proto_msgTypes[11].Exporter = func(v any, i int) any {
+		file_admin_v1_team_proto_msgTypes[9].Exporter = func(v any, i int) any {
 			switch v := v.(*GetMembersResponse); i {
 			case 0:
 				return &v.state
@@ -1768,7 +1591,7 @@ func file_admin_v1_team_proto_init() {
 				return nil
 			}
 		}
-		file_admin_v1_team_proto_msgTypes[12].Exporter = func(v any, i int) any {
+		file_admin_v1_team_proto_msgTypes[10].Exporter = func(v any, i int) any {
 			switch v := v.(*PatchTeamRequest); i {
 			case 0:
 				return &v.state
@@ -1780,7 +1603,7 @@ func file_admin_v1_team_proto_init() {
 				return nil
 			}
 		}
-		file_admin_v1_team_proto_msgTypes[13].Exporter = func(v any, i int) any {
+		file_admin_v1_team_proto_msgTypes[11].Exporter = func(v any, i int) any {
 			switch v := v.(*PatchTeamResponse); i {
 			case 0:
 				return &v.state
@@ -1792,55 +1615,31 @@ func file_admin_v1_team_proto_init() {
 				return nil
 			}
 		}
+		file_admin_v1_team_proto_msgTypes[12].Exporter = func(v any, i int) any {
+			switch v := v.(*PutConnectionInfoRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_admin_v1_team_proto_msgTypes[13].Exporter = func(v any, i int) any {
+			switch v := v.(*PutConnectionInfoResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 		file_admin_v1_team_proto_msgTypes[14].Exporter = func(v any, i int) any {
-			switch v := v.(*PutTeamConnectionInfoRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_admin_v1_team_proto_msgTypes[15].Exporter = func(v any, i int) any {
-			switch v := v.(*PutTeamConnectionInfoResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_admin_v1_team_proto_msgTypes[16].Exporter = func(v any, i int) any {
-			switch v := v.(*PutAdminConnectionInfoRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_admin_v1_team_proto_msgTypes[17].Exporter = func(v any, i int) any {
-			switch v := v.(*PutAdminConnectionInfoResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_admin_v1_team_proto_msgTypes[18].Exporter = func(v any, i int) any {
 			switch v := v.(*PostTeamRequest); i {
 			case 0:
 				return &v.state
@@ -1852,7 +1651,7 @@ func file_admin_v1_team_proto_init() {
 				return nil
 			}
 		}
-		file_admin_v1_team_proto_msgTypes[19].Exporter = func(v any, i int) any {
+		file_admin_v1_team_proto_msgTypes[15].Exporter = func(v any, i int) any {
 			switch v := v.(*PostTeamResponse); i {
 			case 0:
 				return &v.state
@@ -1864,7 +1663,7 @@ func file_admin_v1_team_proto_init() {
 				return nil
 			}
 		}
-		file_admin_v1_team_proto_msgTypes[20].Exporter = func(v any, i int) any {
+		file_admin_v1_team_proto_msgTypes[16].Exporter = func(v any, i int) any {
 			switch v := v.(*AddMemberRequest); i {
 			case 0:
 				return &v.state
@@ -1876,7 +1675,7 @@ func file_admin_v1_team_proto_init() {
 				return nil
 			}
 		}
-		file_admin_v1_team_proto_msgTypes[21].Exporter = func(v any, i int) any {
+		file_admin_v1_team_proto_msgTypes[17].Exporter = func(v any, i int) any {
 			switch v := v.(*AddMemberResponse); i {
 			case 0:
 				return &v.state
@@ -1888,7 +1687,7 @@ func file_admin_v1_team_proto_init() {
 				return nil
 			}
 		}
-		file_admin_v1_team_proto_msgTypes[22].Exporter = func(v any, i int) any {
+		file_admin_v1_team_proto_msgTypes[18].Exporter = func(v any, i int) any {
 			switch v := v.(*DeleteTeamRequest); i {
 			case 0:
 				return &v.state
@@ -1900,7 +1699,7 @@ func file_admin_v1_team_proto_init() {
 				return nil
 			}
 		}
-		file_admin_v1_team_proto_msgTypes[23].Exporter = func(v any, i int) any {
+		file_admin_v1_team_proto_msgTypes[19].Exporter = func(v any, i int) any {
 			switch v := v.(*DeleteTeamResponse); i {
 			case 0:
 				return &v.state
@@ -1912,8 +1711,8 @@ func file_admin_v1_team_proto_init() {
 				return nil
 			}
 		}
-		file_admin_v1_team_proto_msgTypes[24].Exporter = func(v any, i int) any {
-			switch v := v.(*DeleteMemberRequest); i {
+		file_admin_v1_team_proto_msgTypes[20].Exporter = func(v any, i int) any {
+			switch v := v.(*MoveMemberRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1924,8 +1723,8 @@ func file_admin_v1_team_proto_init() {
 				return nil
 			}
 		}
-		file_admin_v1_team_proto_msgTypes[25].Exporter = func(v any, i int) any {
-			switch v := v.(*DeleteMemberResponse); i {
+		file_admin_v1_team_proto_msgTypes[21].Exporter = func(v any, i int) any {
+			switch v := v.(*MoveMemberResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1937,14 +1736,14 @@ func file_admin_v1_team_proto_init() {
 			}
 		}
 	}
-	file_admin_v1_team_proto_msgTypes[12].OneofWrappers = []any{}
+	file_admin_v1_team_proto_msgTypes[10].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_admin_v1_team_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   26,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
