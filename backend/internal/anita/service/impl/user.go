@@ -40,11 +40,6 @@ func (s *UserService) ReadUsers(ctx context.Context) ([]*domain.User, error) {
 	return s.repo.SelectUsers(ctx)
 }
 
-// ReadUsersByTeamID チームIDからユーザーを取得する
-func (s *UserService) ReadUsersByTeamID(ctx context.Context, teamID value.TeamID) ([]*domain.User, error) {
-	return s.repo.SelectUsersByTeamID(ctx, teamID)
-}
-
 // CreateUser ユーザーを作成する
 func (s *UserService) CreateUser(ctx context.Context, id value.UserID, name value.UserName, teamID value.TeamID) (*domain.User, error) {
 	user := domain.NewUser(id, name, teamID)
