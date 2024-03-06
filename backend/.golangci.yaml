@@ -24,6 +24,11 @@ issues:
       linters:
         - containedctx
         - funlen
+    - path: cmd/anita/cmd/
+      linters:
+        - exhaustruct
+        - gochecknoglobals
+        - gochecknoinits
 
 linters-settings:
   cyclop:
