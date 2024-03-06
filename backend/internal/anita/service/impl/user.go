@@ -46,19 +46,21 @@ func (s *UserService) ReadUsersByTeamID(ctx context.Context, teamID value.TeamID
 }
 
 // CreateUser ユーザーを作成する
-func (s *UserService) CreateUser(ctx context.Context, user *domain.User) error {
+func (s *UserService) CreateUser(ctx context.Context, id value.UserID, name value.UserName, teamID value.TeamID) (*domain.User, error) {
+	user := domain.NewUser(id, name, teamID)
+
 	err := s.tx.Do(ctx, nil, func(ctx context.Context) error {
-		if s.exists(ctx, user.ID()) {
+		if s.exists(ctx, id) {
 			return errors.New(errors.ErrAlreadyExists, "User already exists")
 		}
 
 		return s.repo.UpsertUser(ctx, user)
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return user, nil
 }
 
 // UpdateUser ユーザーを更新する
