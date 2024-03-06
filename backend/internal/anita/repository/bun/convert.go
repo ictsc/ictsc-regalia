@@ -49,7 +49,6 @@ func convertFromDomainUser(user *domain.User) *User {
 	}
 }
 
-// nolint:cyclop
 func convertToDomainTeam(team *Team) (*domain.Team, error) {
 	id, err := value.NewTeamID(team.ID)
 	if err != nil {

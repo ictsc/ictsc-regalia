@@ -25,6 +25,8 @@ issues:
         - funlen
 
 linters-settings:
+  cyclop:
+    max-complexity: 15
   lll:
     line-length: 150
   varnamelen:

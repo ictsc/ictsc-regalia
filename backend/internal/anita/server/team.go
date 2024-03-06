@@ -77,7 +77,9 @@ func (s *TeamServiceHandler) GetConnectionInfo(
 }
 
 // GetMembers チームのメンバー一覧を取得する
-func (s *TeamServiceHandler) GetMembers(ctx context.Context, req *connect.Request[v1.GetMembersRequest]) (*connect.Response[v1.GetMembersResponse], error) {
+func (s *TeamServiceHandler) GetMembers(
+	ctx context.Context, req *connect.Request[v1.GetMembersRequest],
+) (*connect.Response[v1.GetMembersResponse], error) {
 	id, err := value.NewTeamID(req.Msg.GetId())
 	if err != nil {
 		return nil, err
@@ -233,7 +235,9 @@ func (s *TeamServiceHandler) PostTeam(ctx context.Context, req *connect.Request[
 }
 
 // DeleteTeam チームを削除する
-func (s *TeamServiceHandler) DeleteTeam(ctx context.Context, req *connect.Request[v1.DeleteTeamRequest]) (*connect.Response[v1.DeleteTeamResponse], error) {
+func (s *TeamServiceHandler) DeleteTeam(
+	ctx context.Context, req *connect.Request[v1.DeleteTeamRequest],
+) (*connect.Response[v1.DeleteTeamResponse], error) {
 	id, err := value.NewTeamID(req.Msg.GetId())
 	if err != nil {
 		return nil, err
