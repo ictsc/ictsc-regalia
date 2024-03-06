@@ -9,9 +9,9 @@ clsx
 cmds
 cockroachdb
 codegen
+connectquery
 connectrpc
 cyclop
-connectquery
 daisyui
 datasource
 deepmap
@@ -39,8 +39,10 @@ nocheck
 nofilter
 nolint
 noninteractive
+notnull
 noto
 oapi
+oklog
 oneof
 proto
 protobuf
@@ -53,11 +55,13 @@ stefanzweifel
 stretchr
 tailwindcss
 testid
+tinyint
 Tressa
 Upsert
 uptrace
 usecase
 usergroups
+varchar
 wrapcheck
 zenn
 zerolog
