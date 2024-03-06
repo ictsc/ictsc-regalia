@@ -13,6 +13,7 @@ linters:
     - varcheck # deprecated
     - depguard
     - dogsled
+    - gci
     - godot
     - nolintlint
 

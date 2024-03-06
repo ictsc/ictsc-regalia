@@ -11,7 +11,6 @@ cockroachdb
 codegen
 connectquery
 connectrpc
-cyclop
 daisyui
 datasource
 deepmap
@@ -44,6 +43,7 @@ noto
 oapi
 oklog
 oneof
+paralleltest
 proto
 protobuf
 protoc

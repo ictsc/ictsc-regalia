@@ -11,6 +11,10 @@ import (
 func NewString(digit uint32) (string, error) {
 	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$"
 
+	if digit == 0 {
+		return "", errors.New(errors.ErrBadArgument, "digit must be greater than 0")
+	}
+
 	byteSlice := make([]byte, digit)
 	if _, err := rand.Read(byteSlice); err != nil {
 		return "", errors.Wrap(errors.ErrUnknown, err)
