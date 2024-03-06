@@ -5,6 +5,7 @@ import (
 
 	"github.com/ictsc/ictsc-outlands/backend/internal/anita/domain"
 	"github.com/ictsc/ictsc-outlands/backend/internal/anita/domain/value"
+	"github.com/ictsc/ictsc-outlands/backend/internal/anita/repository"
 	"github.com/ictsc/ictsc-outlands/backend/pkg/db/rdb/bun"
 	"github.com/ictsc/ictsc-outlands/backend/pkg/errors"
 )
@@ -14,7 +15,7 @@ type TeamRepository struct {
 	db *bun.DB
 }
 
-// var _ repository.TeamRepository = (*TeamRepository)(nil)
+var _ repository.TeamRepository = (*TeamRepository)(nil)
 
 // NewTeamRepository チームリポジトリを生成する
 func NewTeamRepository(db *bun.DB) *TeamRepository {
@@ -54,6 +55,28 @@ func (repo *TeamRepository) SelectTeams(ctx context.Context) ([]*domain.Team, er
 	}
 
 	return convertToDomainTeams(teams)
+}
+
+// SelectTeamByInvitationCode 招待コードからチームを取得する
+func (repo *TeamRepository) SelectTeamByInvitationCode(ctx context.Context, code value.TeamInvitationCode) (*domain.Team, error) {
+	db := repo.db.GetIDB(ctx)
+	team := new(Team)
+
+	exists, err := db.NewSelect().Model(team).Where("invitation_code = ?", code.Value()).Exists(ctx)
+	if err != nil {
+		return nil, errors.Wrap(errors.ErrUnknown, err)
+	}
+
+	if !exists {
+		return nil, errors.Wrap(errors.ErrNotFound, nil)
+	}
+
+	err = db.NewSelect().Model(team).Relation("Members").Relation("Bastion").Where("invitation_code = ?", code.Value()).Scan(ctx)
+	if err != nil {
+		return nil, errors.Wrap(errors.ErrUnknown, err)
+	}
+
+	return convertToDomainTeam(team)
 }
 
 // UpsertTeam チームを挿入・更新する
