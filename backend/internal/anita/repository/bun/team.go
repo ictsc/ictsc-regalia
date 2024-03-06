@@ -56,28 +56,6 @@ func (repo *TeamRepository) SelectTeams(ctx context.Context) ([]*domain.Team, er
 	return convertToDomainTeams(teams)
 }
 
-// SelectTeamByMemberID メンバーIDからチームを取得する
-func (repo *TeamRepository) SelectTeamByMemberID(ctx context.Context, memberID value.UserID) (*domain.Team, error) {
-	db := repo.db.GetIDB(ctx)
-	user := new(User)
-
-	exists, err := db.NewSelect().Model(user).Relation("Team").Exists(ctx)
-	if err != nil {
-		return nil, errors.Wrap(errors.ErrUnknown, err)
-	}
-
-	if !exists {
-		return nil, errors.Wrap(errors.ErrNotFound, nil)
-	}
-
-	err = db.NewSelect().Model(user).Relation("Team").Where("id = ?", memberID.String()).Scan(ctx)
-	if err != nil {
-		return nil, errors.Wrap(errors.ErrUnknown, err)
-	}
-
-	return convertToDomainTeam(user.Team)
-}
-
 // UpsertTeam チームを挿入・更新する
 func (repo *TeamRepository) UpsertTeam(ctx context.Context, team *domain.Team) error {
 	db := repo.db.GetIDB(ctx)
