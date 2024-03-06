@@ -25,7 +25,7 @@ func NewUserRepository(db *bun.DB) *UserRepository {
 // SelectUser ユーザーを取得する
 func (repo *UserRepository) SelectUser(ctx context.Context, id value.UserID) (*domain.User, error) {
 	db := repo.db.GetIDB(ctx)
-	user := &domain.User{}
+	user := new(User)
 
 	exists, err := db.NewSelect().Model(user).Where("id = ?", id.String()).Exists(ctx)
 	if err != nil {
@@ -41,40 +41,41 @@ func (repo *UserRepository) SelectUser(ctx context.Context, id value.UserID) (*d
 		return nil, errors.Wrap(errors.ErrUnknown, err)
 	}
 
-	return user, nil
+	return convertToDomainUser(user)
 }
 
 // SelectUsers ユーザーを取得する
 func (repo *UserRepository) SelectUsers(ctx context.Context) ([]*domain.User, error) {
 	db := repo.db.GetIDB(ctx)
-	users := make([]*domain.User, 0)
+	users := make([]*User, 0)
 
 	err := db.NewSelect().Model(&users).Scan(ctx)
 	if err != nil {
 		return nil, errors.Wrap(errors.ErrUnknown, err)
 	}
 
-	return users, nil
+	return convertToDomainUsers(users)
 }
 
 // SelectUsersByTeamID チームIDからユーザーを取得する
 func (repo *UserRepository) SelectUsersByTeamID(ctx context.Context, teamID value.TeamID) ([]*domain.User, error) {
 	db := repo.db.GetIDB(ctx)
-	users := make([]*domain.User, 0)
+	users := make([]*User, 0)
 
 	err := db.NewSelect().Model(&users).Where("team_id = ?", teamID.String()).Scan(ctx)
 	if err != nil {
 		return nil, errors.Wrap(errors.ErrUnknown, err)
 	}
 
-	return users, nil
+	return convertToDomainUsers(users)
 }
 
 // UpsertUser ユーザーを挿入または更新する
 func (repo *UserRepository) UpsertUser(ctx context.Context, user *domain.User) error {
 	db := repo.db.GetIDB(ctx)
+	convUser := convertFromDomainUser(user)
 
-	_, err := db.NewInsert().Model(user).On("DUPLICATE KEY UPDATE").Exec(ctx)
+	_, err := db.NewInsert().Model(convUser).On("DUPLICATE KEY UPDATE").Exec(ctx)
 	if err != nil {
 		return errors.Wrap(errors.ErrUnknown, err)
 	}
@@ -86,7 +87,7 @@ func (repo *UserRepository) UpsertUser(ctx context.Context, user *domain.User) e
 func (repo *UserRepository) DeleteUser(ctx context.Context, id value.UserID) error {
 	db := repo.db.GetIDB(ctx)
 
-	_, err := db.NewDelete().Model(&domain.User{}).Where("id = ?", id.String()).Exec(ctx)
+	_, err := db.NewDelete().Model((*User)(nil)).Where("id = ?", id.String()).Exec(ctx)
 	if err != nil {
 		return errors.Wrap(errors.ErrUnknown, err)
 	}
