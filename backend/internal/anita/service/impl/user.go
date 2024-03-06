@@ -63,7 +63,7 @@ func (s *UserService) CreateUser(ctx context.Context, id value.UserID, name valu
 			return err
 		}
 
-		err = team.DecrementRemaining()
+		err = team.DecrementCodeRemaining()
 		if err != nil {
 			return err
 		}

@@ -53,7 +53,7 @@ func (s *TeamService) CreateTeam(ctx context.Context, args service.CreateTeamArg
 		return nil, err
 	}
 
-	team := domain.NewTeam(value.NewRandTeamID(), args.Code, args.Name, args.Org, invCode, args.Remaining)
+	team := domain.NewTeam(value.NewRandTeamID(), args.Code, args.Name, args.Org, invCode, args.CodeRemaining)
 
 	err = s.tx.Do(ctx, nil, func(ctx context.Context) error {
 		if s.exists(ctx, team.ID()) {
@@ -94,8 +94,8 @@ func (s *TeamService) UpdateTeam(ctx context.Context, args service.UpdateTeamArg
 			team.SetOrganization(args.Org.V)
 		}
 
-		if args.Remaining.Valid {
-			team.SetRemaining(args.Remaining.V)
+		if args.CodeRemaining.Valid {
+			team.SetCodeRemaining(args.CodeRemaining.V)
 		}
 
 		if args.Bastion.Valid {
@@ -125,11 +125,6 @@ func (s *TeamService) DeleteTeam(ctx context.Context, id value.TeamID) error {
 	}
 
 	return nil
-}
-
-// ReadMembers チームのメンバーを取得する
-func (s *TeamService) ReadMembers(ctx context.Context, id value.TeamID) ([]*domain.User, error) {
-	return s.uRepo.SelectUsersByTeamID(ctx, id)
 }
 
 // MoveMember メンバーを移動する

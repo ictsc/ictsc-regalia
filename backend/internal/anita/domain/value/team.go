@@ -144,26 +144,26 @@ func (code TeamInvitationCode) Value() string {
 	return code.value
 }
 
-// TeamRemaining 招待コードの残り回数
-type TeamRemaining struct {
+// TeamCodeRemaining 招待コードの残り回数
+type TeamCodeRemaining struct {
 	value int
 }
 
-// NewTeamRemaining 招待コードの残り回数を生成
-func NewTeamRemaining(value int) (TeamRemaining, error) {
+// NewTeamCodeRemaining 招待コードの残り回数を生成
+func NewTeamCodeRemaining(value int) (TeamCodeRemaining, error) {
 	if value < 0 || value > 5 {
-		return TeamRemaining{}, errors.New(errors.ErrBadArgument, "Invalid value")
+		return TeamCodeRemaining{}, errors.New(errors.ErrBadArgument, "Invalid value")
 	}
 
-	return TeamRemaining{value: value}, nil
+	return TeamCodeRemaining{value: value}, nil
 }
 
 // Equals 招待コードの残り回数が等しいか
-func (remaining TeamRemaining) Equals(other TeamRemaining) bool {
-	return remaining.value == other.value
+func (codeRemaining TeamCodeRemaining) Equals(other TeamCodeRemaining) bool {
+	return codeRemaining.value == other.value
 }
 
 // Value 値を取得
-func (remaining TeamRemaining) Value() int {
-	return remaining.value
+func (codeRemaining TeamCodeRemaining) Value() int {
+	return codeRemaining.value
 }

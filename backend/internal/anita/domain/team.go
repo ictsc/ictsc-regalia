@@ -14,7 +14,7 @@ type Team struct {
 	name           value.TeamName
 	organization   value.TeamOrganization
 	invitationCode value.TeamInvitationCode
-	remaining      value.TeamRemaining
+	codeRemaining  value.TeamCodeRemaining
 
 	bastion optional.Of[value.Bastion]
 
@@ -28,7 +28,7 @@ func NewTeam(
 	name value.TeamName,
 	organization value.TeamOrganization,
 	invitationCode value.TeamInvitationCode,
-	remaining value.TeamRemaining,
+	codeRemaining value.TeamCodeRemaining,
 ) *Team {
 	return &Team{
 		id:             id,
@@ -36,7 +36,7 @@ func NewTeam(
 		name:           name,
 		organization:   organization,
 		invitationCode: invitationCode,
-		remaining:      remaining,
+		codeRemaining:  codeRemaining,
 		bastion:        optional.New(value.Bastion{}, false),
 		members:        make([]*User, 0, maxTeamMembers),
 	}
@@ -67,9 +67,9 @@ func (t *Team) InvitationCode() value.TeamInvitationCode {
 	return t.invitationCode
 }
 
-// Remaining 招待コードの残り回数を取得する
-func (t *Team) Remaining() value.TeamRemaining {
-	return t.remaining
+// CodeRemaining 招待コードの残り回数を取得する
+func (t *Team) CodeRemaining() value.TeamCodeRemaining {
+	return t.codeRemaining
 }
 
 // Bastion 踏み台サーバーを取得する
@@ -97,9 +97,9 @@ func (t *Team) SetOrganization(organization value.TeamOrganization) {
 	t.organization = organization
 }
 
-// SetRemaining 招待コードの残り回数を設定する
-func (t *Team) SetRemaining(remaining value.TeamRemaining) {
-	t.remaining = remaining
+// SetCodeRemaining 招待コードの残り回数を設定する
+func (t *Team) SetCodeRemaining(codeRemaining value.TeamCodeRemaining) {
+	t.codeRemaining = codeRemaining
 }
 
 // SetBastion 踏み台サーバーを設定する
@@ -114,14 +114,14 @@ func (t *Team) SetMembers(members []*User) {
 	t.members = members
 }
 
-// DecrementRemaining 招待コードの残り回数を減らす
-func (t *Team) DecrementRemaining() error {
-	remaining, err := value.NewTeamRemaining(t.remaining.Value() - 1)
+// DecrementCodeRemaining 招待コードの残り回数を減らす
+func (t *Team) DecrementCodeRemaining() error {
+	codeRemaining, err := value.NewTeamCodeRemaining(t.codeRemaining.Value() - 1)
 	if err != nil {
 		return err
 	}
 
-	t.remaining = remaining
+	t.codeRemaining = codeRemaining
 
 	return nil
 }

@@ -29,7 +29,7 @@ type Team struct {
 	Name           string `bun:"name,type:varchar(20),notnull"`
 	Organization   string `bun:"organization,type:varchar(50),notnull"`
 	InvitationCode string `bun:"invitation_code,type:char(32),notnull,unique"`
-	Remaining      int    `bun:"remaining,type:tinyint,notnull"`
+	CodeRemaining  int    `bun:"codeRemaining,type:tinyint,notnull"`
 
 	Bastion sql.Null[Bastion] `bun:"rel:has-one,join:id=team_id"`
 	Members []*User           `bun:"rel:has-many,join:id=team_id"`
