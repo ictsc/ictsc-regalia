@@ -58,17 +58,11 @@ message Bastion {
   int32 port = 4 [(buf.validate.field).int32.gte = 0];
 }
 
-message GetTeamConnectionInfoRequest {
+message GetConnectionInfoRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
 }
 
-message GetTeamConnectionInfoResponse {
-  Bastion bastion = 1 [(buf.validate.field).required = true];
-}
-
-message GetAdminConnectionInfoRequest {}
-
-message GetAdminConnectionInfoResponse {
+message GetConnectionInfoResponse {
   Bastion bastion = 1 [(buf.validate.field).required = true];
 }
 
@@ -107,18 +101,12 @@ message PatchTeamResponse {
   Team team = 1 [(buf.validate.field).required = true];
 }
 
-message PutTeamConnectionInfoRequest {
+message PutConnectionInfoRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
   Bastion bastion = 2 [(buf.validate.field).required = true];
 }
 
-message PutTeamConnectionInfoResponse {}
-
-message PutAdminConnectionInfoRequest {
-  Bastion bastion = 1 [(buf.validate.field).required = true];
-}
-
-message PutAdminConnectionInfoResponse {}
+message PutConnectionInfoResponse {}
 
 message PostTeamRequest {
   int32 code = 1 [(buf.validate.field).int32 = {
@@ -156,24 +144,21 @@ message DeleteTeamRequest {
 
 message DeleteTeamResponse {}
 
-message DeleteMemberRequest {
-  string id = 1 [(buf.validate.field).string.len = 26];
+message MoveMemberRequest {
+  string to_team_id = 1 [(buf.validate.field).string.len = 26];
   string user_id = 2 [(buf.validate.field).string.len = 26];
 }
 
-message DeleteMemberResponse {}
+message MoveMemberResponse {}
 
 service TeamService {
   rpc GetTeams(GetTeamsRequest) returns (GetTeamsResponse);
   rpc GetTeam(GetTeamRequest) returns (GetTeamResponse);
-  rpc GetTeamConnectionInfo(GetTeamConnectionInfoRequest) returns (GetTeamConnectionInfoResponse);
-  rpc GetAdminConnectionInfo(GetAdminConnectionInfoRequest) returns (GetAdminConnectionInfoResponse);
+  rpc GetConnectionInfo(GetConnectionInfoRequest) returns (GetConnectionInfoResponse);
   rpc GetMembers(GetMembersRequest) returns (GetMembersResponse);
   rpc PatchTeam(PatchTeamRequest) returns (PatchTeamResponse);
-  rpc PutTeamConnectionInfo(PutTeamConnectionInfoRequest) returns (PutTeamConnectionInfoResponse);
-  rpc PutAdminConnectionInfo(PutAdminConnectionInfoRequest) returns (PutAdminConnectionInfoResponse);
+  rpc PutConnectionInfo(PutConnectionInfoRequest) returns (PutConnectionInfoResponse);
   rpc PostTeam(PostTeamRequest) returns (PostTeamResponse);
-  rpc AddMember(AddMemberRequest) returns (AddMemberResponse);
   rpc DeleteTeam(DeleteTeamRequest) returns (DeleteTeamResponse);
-  rpc DeleteMember(DeleteMemberRequest) returns (DeleteMemberResponse);
+  rpc MoveMember(MoveMemberRequest) returns (MoveMemberResponse);
 }
