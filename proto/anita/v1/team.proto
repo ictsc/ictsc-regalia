@@ -28,18 +28,18 @@ message Team {
   }];
 }
 
-message GetTeamsRequest {}
-
-message GetTeamsResponse {
-  repeated Team teams = 1 [(buf.validate.field).required = true];
-}
-
 message GetTeamRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
 }
 
 message GetTeamResponse {
   Team team = 1 [(buf.validate.field).required = true];
+}
+
+message GetTeamsRequest {}
+
+message GetTeamsResponse {
+  repeated Team teams = 1 [(buf.validate.field).required = true];
 }
 
 message Bastion {
@@ -63,7 +63,7 @@ message GetConnectionInfoRequest {
 }
 
 message GetConnectionInfoResponse {
-  Bastion bastion = 1 [(buf.validate.field).required = true];
+  Bastion bastion = 1;
 }
 
 message GetMembersRequest {
@@ -152,8 +152,8 @@ message MoveMemberRequest {
 message MoveMemberResponse {}
 
 service TeamService {
-  rpc GetTeams(GetTeamsRequest) returns (GetTeamsResponse);
   rpc GetTeam(GetTeamRequest) returns (GetTeamResponse);
+  rpc GetTeams(GetTeamsRequest) returns (GetTeamsResponse);
   rpc GetConnectionInfo(GetConnectionInfoRequest) returns (GetConnectionInfoResponse);
   rpc GetMembers(GetMembersRequest) returns (GetMembersResponse);
   rpc PatchTeam(PatchTeamRequest) returns (PatchTeamResponse);

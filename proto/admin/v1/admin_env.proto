@@ -14,7 +14,7 @@ message GetAdminConnectionInfoResponse {
 }
 
 message PutAdminConnectionInfoRequest {
-  Bastion bastion = 1 [(buf.validate.field).required = true];
+  Bastion bastion = 1;
 }
 
 message PutAdminConnectionInfoResponse {}

@@ -33,10 +33,10 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// TeamServiceGetTeamsProcedure is the fully-qualified name of the TeamService's GetTeams RPC.
-	TeamServiceGetTeamsProcedure = "/anita.v1.TeamService/GetTeams"
 	// TeamServiceGetTeamProcedure is the fully-qualified name of the TeamService's GetTeam RPC.
 	TeamServiceGetTeamProcedure = "/anita.v1.TeamService/GetTeam"
+	// TeamServiceGetTeamsProcedure is the fully-qualified name of the TeamService's GetTeams RPC.
+	TeamServiceGetTeamsProcedure = "/anita.v1.TeamService/GetTeams"
 	// TeamServiceGetConnectionInfoProcedure is the fully-qualified name of the TeamService's
 	// GetConnectionInfo RPC.
 	TeamServiceGetConnectionInfoProcedure = "/anita.v1.TeamService/GetConnectionInfo"
@@ -58,8 +58,8 @@ const (
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
 	teamServiceServiceDescriptor                 = v1.File_anita_v1_team_proto.Services().ByName("TeamService")
-	teamServiceGetTeamsMethodDescriptor          = teamServiceServiceDescriptor.Methods().ByName("GetTeams")
 	teamServiceGetTeamMethodDescriptor           = teamServiceServiceDescriptor.Methods().ByName("GetTeam")
+	teamServiceGetTeamsMethodDescriptor          = teamServiceServiceDescriptor.Methods().ByName("GetTeams")
 	teamServiceGetConnectionInfoMethodDescriptor = teamServiceServiceDescriptor.Methods().ByName("GetConnectionInfo")
 	teamServiceGetMembersMethodDescriptor        = teamServiceServiceDescriptor.Methods().ByName("GetMembers")
 	teamServicePatchTeamMethodDescriptor         = teamServiceServiceDescriptor.Methods().ByName("PatchTeam")
@@ -71,8 +71,8 @@ var (
 
 // TeamServiceClient is a client for the anita.v1.TeamService service.
 type TeamServiceClient interface {
-	GetTeams(context.Context, *connect.Request[v1.GetTeamsRequest]) (*connect.Response[v1.GetTeamsResponse], error)
 	GetTeam(context.Context, *connect.Request[v1.GetTeamRequest]) (*connect.Response[v1.GetTeamResponse], error)
+	GetTeams(context.Context, *connect.Request[v1.GetTeamsRequest]) (*connect.Response[v1.GetTeamsResponse], error)
 	GetConnectionInfo(context.Context, *connect.Request[v1.GetConnectionInfoRequest]) (*connect.Response[v1.GetConnectionInfoResponse], error)
 	GetMembers(context.Context, *connect.Request[v1.GetMembersRequest]) (*connect.Response[v1.GetMembersResponse], error)
 	PatchTeam(context.Context, *connect.Request[v1.PatchTeamRequest]) (*connect.Response[v1.PatchTeamResponse], error)
@@ -92,16 +92,16 @@ type TeamServiceClient interface {
 func NewTeamServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) TeamServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &teamServiceClient{
-		getTeams: connect.NewClient[v1.GetTeamsRequest, v1.GetTeamsResponse](
-			httpClient,
-			baseURL+TeamServiceGetTeamsProcedure,
-			connect.WithSchema(teamServiceGetTeamsMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
 		getTeam: connect.NewClient[v1.GetTeamRequest, v1.GetTeamResponse](
 			httpClient,
 			baseURL+TeamServiceGetTeamProcedure,
 			connect.WithSchema(teamServiceGetTeamMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
+		getTeams: connect.NewClient[v1.GetTeamsRequest, v1.GetTeamsResponse](
+			httpClient,
+			baseURL+TeamServiceGetTeamsProcedure,
+			connect.WithSchema(teamServiceGetTeamsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 		getConnectionInfo: connect.NewClient[v1.GetConnectionInfoRequest, v1.GetConnectionInfoResponse](
@@ -151,8 +151,8 @@ func NewTeamServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 
 // teamServiceClient implements TeamServiceClient.
 type teamServiceClient struct {
-	getTeams          *connect.Client[v1.GetTeamsRequest, v1.GetTeamsResponse]
 	getTeam           *connect.Client[v1.GetTeamRequest, v1.GetTeamResponse]
+	getTeams          *connect.Client[v1.GetTeamsRequest, v1.GetTeamsResponse]
 	getConnectionInfo *connect.Client[v1.GetConnectionInfoRequest, v1.GetConnectionInfoResponse]
 	getMembers        *connect.Client[v1.GetMembersRequest, v1.GetMembersResponse]
 	patchTeam         *connect.Client[v1.PatchTeamRequest, v1.PatchTeamResponse]
@@ -162,14 +162,14 @@ type teamServiceClient struct {
 	moveMember        *connect.Client[v1.MoveMemberRequest, v1.MoveMemberResponse]
 }
 
-// GetTeams calls anita.v1.TeamService.GetTeams.
-func (c *teamServiceClient) GetTeams(ctx context.Context, req *connect.Request[v1.GetTeamsRequest]) (*connect.Response[v1.GetTeamsResponse], error) {
-	return c.getTeams.CallUnary(ctx, req)
-}
-
 // GetTeam calls anita.v1.TeamService.GetTeam.
 func (c *teamServiceClient) GetTeam(ctx context.Context, req *connect.Request[v1.GetTeamRequest]) (*connect.Response[v1.GetTeamResponse], error) {
 	return c.getTeam.CallUnary(ctx, req)
+}
+
+// GetTeams calls anita.v1.TeamService.GetTeams.
+func (c *teamServiceClient) GetTeams(ctx context.Context, req *connect.Request[v1.GetTeamsRequest]) (*connect.Response[v1.GetTeamsResponse], error) {
+	return c.getTeams.CallUnary(ctx, req)
 }
 
 // GetConnectionInfo calls anita.v1.TeamService.GetConnectionInfo.
@@ -209,8 +209,8 @@ func (c *teamServiceClient) MoveMember(ctx context.Context, req *connect.Request
 
 // TeamServiceHandler is an implementation of the anita.v1.TeamService service.
 type TeamServiceHandler interface {
-	GetTeams(context.Context, *connect.Request[v1.GetTeamsRequest]) (*connect.Response[v1.GetTeamsResponse], error)
 	GetTeam(context.Context, *connect.Request[v1.GetTeamRequest]) (*connect.Response[v1.GetTeamResponse], error)
+	GetTeams(context.Context, *connect.Request[v1.GetTeamsRequest]) (*connect.Response[v1.GetTeamsResponse], error)
 	GetConnectionInfo(context.Context, *connect.Request[v1.GetConnectionInfoRequest]) (*connect.Response[v1.GetConnectionInfoResponse], error)
 	GetMembers(context.Context, *connect.Request[v1.GetMembersRequest]) (*connect.Response[v1.GetMembersResponse], error)
 	PatchTeam(context.Context, *connect.Request[v1.PatchTeamRequest]) (*connect.Response[v1.PatchTeamResponse], error)
@@ -226,16 +226,16 @@ type TeamServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewTeamServiceHandler(svc TeamServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	teamServiceGetTeamsHandler := connect.NewUnaryHandler(
-		TeamServiceGetTeamsProcedure,
-		svc.GetTeams,
-		connect.WithSchema(teamServiceGetTeamsMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
 	teamServiceGetTeamHandler := connect.NewUnaryHandler(
 		TeamServiceGetTeamProcedure,
 		svc.GetTeam,
 		connect.WithSchema(teamServiceGetTeamMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
+	teamServiceGetTeamsHandler := connect.NewUnaryHandler(
+		TeamServiceGetTeamsProcedure,
+		svc.GetTeams,
+		connect.WithSchema(teamServiceGetTeamsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	teamServiceGetConnectionInfoHandler := connect.NewUnaryHandler(
@@ -282,10 +282,10 @@ func NewTeamServiceHandler(svc TeamServiceHandler, opts ...connect.HandlerOption
 	)
 	return "/anita.v1.TeamService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case TeamServiceGetTeamsProcedure:
-			teamServiceGetTeamsHandler.ServeHTTP(w, r)
 		case TeamServiceGetTeamProcedure:
 			teamServiceGetTeamHandler.ServeHTTP(w, r)
+		case TeamServiceGetTeamsProcedure:
+			teamServiceGetTeamsHandler.ServeHTTP(w, r)
 		case TeamServiceGetConnectionInfoProcedure:
 			teamServiceGetConnectionInfoHandler.ServeHTTP(w, r)
 		case TeamServiceGetMembersProcedure:
@@ -309,12 +309,12 @@ func NewTeamServiceHandler(svc TeamServiceHandler, opts ...connect.HandlerOption
 // UnimplementedTeamServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedTeamServiceHandler struct{}
 
-func (UnimplementedTeamServiceHandler) GetTeams(context.Context, *connect.Request[v1.GetTeamsRequest]) (*connect.Response[v1.GetTeamsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("anita.v1.TeamService.GetTeams is not implemented"))
-}
-
 func (UnimplementedTeamServiceHandler) GetTeam(context.Context, *connect.Request[v1.GetTeamRequest]) (*connect.Response[v1.GetTeamResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("anita.v1.TeamService.GetTeam is not implemented"))
+}
+
+func (UnimplementedTeamServiceHandler) GetTeams(context.Context, *connect.Request[v1.GetTeamsRequest]) (*connect.Response[v1.GetTeamsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("anita.v1.TeamService.GetTeams is not implemented"))
 }
 
 func (UnimplementedTeamServiceHandler) GetConnectionInfo(context.Context, *connect.Request[v1.GetConnectionInfoRequest]) (*connect.Response[v1.GetConnectionInfoResponse], error) {

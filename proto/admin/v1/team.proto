@@ -63,7 +63,7 @@ message GetConnectionInfoRequest {
 }
 
 message GetConnectionInfoResponse {
-  Bastion bastion = 1 [(buf.validate.field).required = true];
+  Bastion bastion = 1;
 }
 
 message GetMembersRequest {
