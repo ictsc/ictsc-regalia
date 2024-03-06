@@ -66,9 +66,11 @@ func (repo *TeamRepository) UpsertTeam(ctx context.Context, team *domain.Team) e
 		return errors.Wrap(errors.ErrUnknown, err)
 	}
 
-	_, err = db.NewInsert().Model(bunTeam.Bastion).On("DUPLICATE KEY UPDATE").Exec(ctx)
-	if err != nil {
-		return errors.Wrap(errors.ErrUnknown, err)
+	if bunTeam.Bastion.Valid {
+		_, err = db.NewInsert().Model(bunTeam.Bastion).On("DUPLICATE KEY UPDATE").Exec(ctx)
+		if err != nil {
+			return errors.Wrap(errors.ErrUnknown, err)
+		}
 	}
 
 	return nil
@@ -79,6 +81,11 @@ func (repo *TeamRepository) DeleteTeam(ctx context.Context, id value.TeamID) err
 	db := repo.db.GetIDB(ctx)
 
 	_, err := db.NewDelete().Model((*Team)(nil)).Where("id = ?", id.String()).Exec(ctx)
+	if err != nil {
+		return errors.Wrap(errors.ErrUnknown, err)
+	}
+
+	_, err = db.NewDelete().Model((*Bastion)(nil)).Where("team_id = ?", id.String()).Exec(ctx)
 	if err != nil {
 		return errors.Wrap(errors.ErrUnknown, err)
 	}
