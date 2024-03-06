@@ -113,3 +113,15 @@ func (t *Team) SetBastion(bastion value.Bastion) {
 func (t *Team) SetMembers(members []*User) {
 	t.members = members
 }
+
+// DecrementRemaining 招待コードの残り回数を減らす
+func (t *Team) DecrementRemaining() error {
+	remaining, err := value.NewTeamRemaining(t.remaining.Value() - 1)
+	if err != nil {
+		return err
+	}
+
+	t.remaining = remaining
+
+	return nil
+}
