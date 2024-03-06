@@ -98,3 +98,8 @@ func (t *Team) SetInvitationCode(invitationCode value.TeamInvitationCode) {
 func (t *Team) SetBastion(bastion value.Bastion) {
 	t.bastion = optional.NewValid(bastion)
 }
+
+// SetMembers メンバーを設定する
+func (t *Team) SetMembers(members []*User) {
+	t.members = members
+}

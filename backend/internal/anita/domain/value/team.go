@@ -116,8 +116,8 @@ type TeamInvitationCode struct {
 	remaining int
 }
 
-// NewTeamInvitationCode チームの招待コードを生成
-func NewTeamInvitationCode(remaining int) (TeamInvitationCode, error) {
+// NewRandTeamInvitationCode ランダムなチームの招待コードを生成
+func NewRandTeamInvitationCode(remaining int) (TeamInvitationCode, error) {
 	if remaining < 1 || remaining > 5 {
 		return TeamInvitationCode{}, errors.New(errors.ErrBadArgument, "Invalid remaining")
 	}
@@ -125,6 +125,19 @@ func NewTeamInvitationCode(remaining int) (TeamInvitationCode, error) {
 	code, err := random.NewString(invitationCodeDigit)
 	if err != nil {
 		return TeamInvitationCode{}, err
+	}
+
+	return TeamInvitationCode{code: code, remaining: remaining}, nil
+}
+
+// NewTeamInvitationCode チームの招待コードを生成
+func NewTeamInvitationCode(code string, remaining int) (TeamInvitationCode, error) {
+	if len(code) != invitationCodeDigit {
+		return TeamInvitationCode{}, errors.New(errors.ErrBadArgument, "Invalid code")
+	}
+
+	if remaining < 1 || remaining > 5 {
+		return TeamInvitationCode{}, errors.New(errors.ErrBadArgument, "Invalid remaining")
 	}
 
 	return TeamInvitationCode{code: code, remaining: remaining}, nil

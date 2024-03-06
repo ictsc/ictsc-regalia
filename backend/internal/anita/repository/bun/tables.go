@@ -2,6 +2,8 @@
 package bun
 
 import (
+	"database/sql"
+
 	"github.com/uptrace/bun"
 )
 
@@ -13,7 +15,7 @@ type User struct {
 	Name   string `bun:"name,type:varchar(20),notnull"`
 	TeamID string `bun:"team_id,type:char(26),notnull"`
 
-	Team Team `bun:"rel:belongs-to,join:team_id=id"`
+	Team *Team `bun:"rel:belongs-to,join:team_id=id"`
 }
 
 // Team チームテーブル
@@ -27,8 +29,8 @@ type Team struct {
 	InvitationCode string `bun:"invitation_code,type:char(32),notnull"`
 	Remaining      int    `bun:"remaining,type:tinyint,notnull"`
 
-	Bastion Bastion `bun:"rel:has-one,join:id=team_id"`
-	Members []*User `bun:"rel:has-many,join:id=team_id"`
+	Bastion sql.Null[Bastion] `bun:"rel:has-one,join:id=team_id"`
+	Members []*User           `bun:"rel:has-many,join:id=team_id"`
 }
 
 // Bastion 踏み台サーバー
