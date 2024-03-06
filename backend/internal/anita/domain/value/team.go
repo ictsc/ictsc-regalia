@@ -112,57 +112,58 @@ const invitationCodeDigit = 32
 
 // TeamInvitationCode チームの招待コード
 type TeamInvitationCode struct {
-	code      string
-	remaining int
+	value string
 }
 
 // NewRandTeamInvitationCode ランダムなチームの招待コードを生成
-func NewRandTeamInvitationCode(remaining int) (TeamInvitationCode, error) {
-	if remaining < 1 || remaining > 5 {
-		return TeamInvitationCode{}, errors.New(errors.ErrBadArgument, "Invalid remaining")
-	}
-
+func NewRandTeamInvitationCode() (TeamInvitationCode, error) {
 	code, err := random.NewString(invitationCodeDigit)
 	if err != nil {
 		return TeamInvitationCode{}, err
 	}
 
-	return TeamInvitationCode{code: code, remaining: remaining}, nil
+	return TeamInvitationCode{value: code}, nil
 }
 
 // NewTeamInvitationCode チームの招待コードを生成
-func NewTeamInvitationCode(code string, remaining int) (TeamInvitationCode, error) {
-	if len(code) != invitationCodeDigit {
+func NewTeamInvitationCode(value string) (TeamInvitationCode, error) {
+	if len(value) != invitationCodeDigit {
 		return TeamInvitationCode{}, errors.New(errors.ErrBadArgument, "Invalid code")
 	}
 
-	if remaining < 1 || remaining > 5 {
-		return TeamInvitationCode{}, errors.New(errors.ErrBadArgument, "Invalid remaining")
-	}
-
-	return TeamInvitationCode{code: code, remaining: remaining}, nil
-}
-
-// NewWithExistingCode 既存の招待コードからチームの招待コードを生成
-func (code TeamInvitationCode) NewWithExistingCode(remaining int) (TeamInvitationCode, error) {
-	if remaining < 1 || remaining > 5 {
-		return TeamInvitationCode{}, errors.New(errors.ErrBadArgument, "Invalid remaining")
-	}
-
-	return TeamInvitationCode{code: code.code, remaining: remaining}, nil
+	return TeamInvitationCode{value: value}, nil
 }
 
 // Equals チームの招待コードが等しいか
 func (code TeamInvitationCode) Equals(other TeamInvitationCode) bool {
-	return code.code == other.code && code.remaining == other.remaining
+	return code.value == other.value
 }
 
-// Code チームの招待コードを取得
-func (code TeamInvitationCode) Code() string {
-	return code.code
+// Value 値を取得
+func (code TeamInvitationCode) Value() string {
+	return code.value
 }
 
-// Remaining 招待可能回数を取得
-func (code TeamInvitationCode) Remaining() int {
-	return code.remaining
+// TeamRemaining 招待コードの残り回数
+type TeamRemaining struct {
+	value int
+}
+
+// NewTeamRemaining 招待コードの残り回数を生成
+func NewTeamRemaining(value int) (TeamRemaining, error) {
+	if value < 0 || value > 5 {
+		return TeamRemaining{}, errors.New(errors.ErrBadArgument, "Invalid value")
+	}
+
+	return TeamRemaining{value: value}, nil
+}
+
+// Equals 招待コードの残り回数が等しいか
+func (remaining TeamRemaining) Equals(other TeamRemaining) bool {
+	return remaining.value == other.value
+}
+
+// Value 値を取得
+func (remaining TeamRemaining) Value() int {
+	return remaining.value
 }

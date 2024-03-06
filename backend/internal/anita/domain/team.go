@@ -14,6 +14,7 @@ type Team struct {
 	name           value.TeamName
 	organization   value.TeamOrganization
 	invitationCode value.TeamInvitationCode
+	remaining      value.TeamRemaining
 
 	bastion optional.Of[value.Bastion]
 
@@ -27,6 +28,7 @@ func NewTeam(
 	name value.TeamName,
 	organization value.TeamOrganization,
 	invitationCode value.TeamInvitationCode,
+	remaining value.TeamRemaining,
 ) *Team {
 	return &Team{
 		id:             id,
@@ -34,6 +36,7 @@ func NewTeam(
 		name:           name,
 		organization:   organization,
 		invitationCode: invitationCode,
+		remaining:      remaining,
 		bastion:        optional.New(value.Bastion{}, false),
 		members:        make([]*User, 0, maxTeamMembers),
 	}
@@ -64,6 +67,11 @@ func (t *Team) InvitationCode() value.TeamInvitationCode {
 	return t.invitationCode
 }
 
+// Remaining 招待コードの残り回数を取得する
+func (t *Team) Remaining() value.TeamRemaining {
+	return t.remaining
+}
+
 // Bastion 踏み台サーバーを取得する
 func (t *Team) Bastion() optional.Of[value.Bastion] {
 	return t.bastion
@@ -89,9 +97,9 @@ func (t *Team) SetOrganization(organization value.TeamOrganization) {
 	t.organization = organization
 }
 
-// SetInvitationCode 招待コードを設定する
-func (t *Team) SetInvitationCode(invitationCode value.TeamInvitationCode) {
-	t.invitationCode = invitationCode
+// SetRemaining 招待コードの残り回数を設定する
+func (t *Team) SetRemaining(remaining value.TeamRemaining) {
+	t.remaining = remaining
 }
 
 // SetBastion 踏み台サーバーを設定する

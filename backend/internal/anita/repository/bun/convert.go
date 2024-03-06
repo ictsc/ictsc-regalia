@@ -49,6 +49,7 @@ func convertFromDomainUser(user *domain.User) *User {
 	}
 }
 
+// nolint:cyclop
 func convertToDomainTeam(team *Team) (*domain.Team, error) {
 	id, err := value.NewTeamID(team.ID)
 	if err != nil {
@@ -70,12 +71,17 @@ func convertToDomainTeam(team *Team) (*domain.Team, error) {
 		return nil, err
 	}
 
-	invitationCode, err := value.NewTeamInvitationCode(team.InvitationCode, team.Remaining)
+	invitationCode, err := value.NewTeamInvitationCode(team.InvitationCode)
 	if err != nil {
 		return nil, err
 	}
 
-	domainTeam := domain.NewTeam(id, code, name, organization, invitationCode)
+	remaining, err := value.NewTeamRemaining(team.Remaining)
+	if err != nil {
+		return nil, err
+	}
+
+	domainTeam := domain.NewTeam(id, code, name, organization, invitationCode, remaining)
 
 	if team.Bastion.Valid {
 		bastion, err := value.NewBastion(team.Bastion.V.User, team.Bastion.V.Password, team.Bastion.V.Host, team.Bastion.V.Port)
@@ -128,8 +134,8 @@ func convertFromDomainTeam(team *domain.Team) *Team {
 		Code:           team.Code().Value(),
 		Name:           team.Name().Value(),
 		Organization:   team.Organization().Value(),
-		InvitationCode: team.InvitationCode().Code(),
-		Remaining:      team.InvitationCode().Remaining(),
+		InvitationCode: team.InvitationCode().Value(),
+		Remaining:      team.Remaining().Value(),
 		Bastion:        bastion,
 	}
 }
