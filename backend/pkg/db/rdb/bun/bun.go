@@ -60,3 +60,7 @@ func NewDB(conf *Config) (*DB, error) {
 
 	return &DB{db: bunDB}, nil
 }
+
+func (d *DB) GetBunDB() *bun.DB {
+	return d.db
+}
