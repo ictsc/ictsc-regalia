@@ -1,4 +1,3 @@
-// Package server Connectサーバーユーティリティ
 package server
 
 import (

@@ -24,7 +24,7 @@ issues:
       linters:
         - containedctx
         - funlen
-    - path: cmd/anita/cmd/
+    - path: cmd/(.+)/cmd/
       linters:
         - exhaustruct
         - gochecknoglobals
@@ -35,6 +35,14 @@ linters-settings:
     max-complexity: 15
   lll:
     line-length: 150
+  revive:
+    rules:
+      - name: package-comments
+        disabled: true
+  stylecheck:
+    checks:
+      - all
+      - -ST1000
   varnamelen:
     ignore-names:
       - tt

@@ -1,4 +1,3 @@
-// Package errors エラーユーティリティー
 package errors
 
 import (

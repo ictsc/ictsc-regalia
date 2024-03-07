@@ -1,4 +1,3 @@
-// Package bun bunによるリポジトリ実装
 package bun
 
 import (

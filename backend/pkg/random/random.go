@@ -1,4 +1,3 @@
-// Package random 乱数ユーティリティー
 package random
 
 import (

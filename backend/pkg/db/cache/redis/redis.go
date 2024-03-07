@@ -1,4 +1,3 @@
-// Package redis Redisユーティリティー
 package redis
 
 import (

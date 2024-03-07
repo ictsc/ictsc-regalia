@@ -1,4 +1,3 @@
-// Package cmd コマンド一覧
 package cmd
 
 import (

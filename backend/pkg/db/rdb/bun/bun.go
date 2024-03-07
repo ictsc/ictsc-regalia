@@ -1,4 +1,3 @@
-// Package bun Bunユーティリティー
 package bun
 
 import (

@@ -1,4 +1,3 @@
-// Package main プログラムのエントリーポイント
 package main
 
 import "log"

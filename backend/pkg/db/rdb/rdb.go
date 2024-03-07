@@ -1,4 +1,3 @@
-// Package rdb RDBユーティリティー
 package rdb
 
 import (
