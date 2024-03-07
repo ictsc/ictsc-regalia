@@ -20,7 +20,7 @@ type Config struct {
 
 	// RDB RDB接続設定
 	RDB struct {
-		// Hostname ホスト名 (default: "anita_db")
+		// Hostname ホスト名 (default: "mysql")
 		Hostname string `json:"hostname" mapstructure:"hostname" yaml:"hostname"`
 		// Port ポート番号 (default: 3306)
 		Port int `json:"port" mapstructure:"port" yaml:"port"`
@@ -59,7 +59,7 @@ var (
 func init() {
 	viper.SetDefault("dev", false)
 	viper.SetDefault("addr", ":8080")
-	viper.SetDefault("rdb.hostname", "anita_db")
+	viper.SetDefault("rdb.hostname", "mysql")
 	viper.SetDefault("rdb.port", 3306)
 	viper.SetDefault("rdb.username", "root")
 	viper.SetDefault("rdb.password", "password")
@@ -104,4 +104,5 @@ var configCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(configCmd)
+	rootCmd.Flags().StringVarP(&configFile, "config", "c", "", "config file path")
 }
