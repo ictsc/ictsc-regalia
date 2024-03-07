@@ -93,3 +93,9 @@ tasks:
             > ../backend/internal/proto/{{ .ITEM }}/v1/v1oapi/file-server.oapi.go
           oapi-codegen -package v1oapi -generate client {{ .ITEM }}/v1/file.yaml \
             > ../backend/internal/proto/{{ .ITEM }}/v1/v1oapi/file-client.oapi.go
+
+  up:
+    desc: ローカル開発環境を立ち上げる
+    dir: dev/docker
+    cmds:
+      - docker compose up -d

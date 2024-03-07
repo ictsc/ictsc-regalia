@@ -1,0 +1,44 @@
+services:
+  anita:
+    build:
+      context: ../../backend
+      target: anita
+    restart: always
+    environment:
+      DEV: "true"
+    entrypoint: ./anita migrate && ./anita run
+    expose:
+      - "8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.3.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: anita
+    expose:
+      - "3306"
+    volumes:
+      - mysql:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: mysql --user=root --password=password --execute "SHOW DATABASES;"
+      interval: 1s
+      timeout: 10s
+      retries: 60
+
+  adminer:
+    image: adminer:4.8.1
+    restart: always
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
+    expose:
+      - "8080"
+    ports:
+      - "2401:8080"
+
+volumes:
+  mysql:
