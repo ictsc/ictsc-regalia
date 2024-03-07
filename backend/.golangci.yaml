@@ -27,6 +27,11 @@ issues:
     - path: cmd/(.+)/cmd/
       linters:
         - exhaustruct
+        - gomnd
+        - gochecknoglobals
+        - gochecknoinits
+    - path: internal/(.+)/repository/bun/migration/
+      linters:
         - gochecknoglobals
         - gochecknoinits
 

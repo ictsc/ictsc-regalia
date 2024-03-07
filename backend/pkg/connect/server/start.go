@@ -14,10 +14,10 @@ import (
 // Start サーバーを起動する
 //
 //	"github.com/defval/di" でInvokeするための関数
-func Start(srv []*http.Server, container *di.Container) error {
+func Start(ctx context.Context, srv []*http.Server, container *di.Container) error {
 	defer container.Cleanup()
 
-	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, os.Interrupt, os.Kill)
+	ctx, cancel := signal.NotifyContext(ctx, syscall.SIGTERM, os.Interrupt, os.Kill)
 	defer cancel()
 
 	errChan := make(chan error)

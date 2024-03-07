@@ -19,8 +19,10 @@ import (
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run the Connect server",
-	Run: func(_ *cobra.Command, _ []string) {
+	Run: func(cmd *cobra.Command, args []string) {
 		container, err := di.New(
+			di.ProvideValue(cmd.Context()),
+
 			di.ProvideValue(&config),
 			di.Provide(provideRDBConfig),
 			di.Provide(provideServerConfig),
