@@ -34,6 +34,7 @@ Loba
 luxon
 mvdan
 mysqldialect
+nette
 Newf
 nextjs
 nocheck
