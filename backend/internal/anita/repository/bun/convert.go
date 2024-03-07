@@ -1,8 +1,6 @@
 package bun
 
 import (
-	"database/sql"
-
 	"github.com/ictsc/ictsc-outlands/backend/internal/anita/domain"
 	"github.com/ictsc/ictsc-outlands/backend/internal/anita/domain/value"
 )
@@ -82,8 +80,8 @@ func convertToDomainTeam(team *Team) (*domain.Team, error) {
 
 	domainTeam := domain.NewTeam(id, code, name, organization, invitationCode, codeRemaining)
 
-	if team.Bastion.Valid {
-		bastion, err := value.NewBastion(team.Bastion.V.User, team.Bastion.V.Password, team.Bastion.V.Host, team.Bastion.V.Port)
+	if team.Bastion != nil {
+		bastion, err := value.NewBastion(team.Bastion.User, team.Bastion.Password, team.Bastion.Host, team.Bastion.Port)
 		if err != nil {
 			return nil, err
 		}
@@ -123,10 +121,7 @@ func convertToDomainTeams(teams []*Team) ([]*domain.Team, error) {
 }
 
 func convertFromDomainTeam(team *domain.Team) *Team {
-	bastion := sql.Null[Bastion]{
-		V:     convertFromDomainBastion(team.ID(), team.Bastion().V),
-		Valid: team.Bastion().Valid,
-	}
+	bastion := convertFromDomainBastion(team.ID(), team.Bastion().V)
 
 	return &Team{ // nolint:exhaustruct
 		ID:             team.ID().String(),
@@ -135,7 +130,7 @@ func convertFromDomainTeam(team *domain.Team) *Team {
 		Organization:   team.Organization().Value(),
 		InvitationCode: team.InvitationCode().Value(),
 		CodeRemaining:  team.CodeRemaining().Value(),
-		Bastion:        bastion,
+		Bastion:        &bastion,
 	}
 }
 

@@ -36,7 +36,11 @@ func (repo *TeamRepository) SelectTeam(ctx context.Context, id value.TeamID) (*d
 		return nil, errors.Wrap(errors.ErrNotFound, nil)
 	}
 
-	err = db.NewSelect().Model(team).Relation("Members").Relation("Bastion").Where("id = ?", id.String()).Scan(ctx)
+	err = db.NewSelect().Model(team).
+		Relation("Members").
+		Join("LEFT OUTER JOIN bastion").JoinOn("bastion.team_id=team.id").
+		Where("id = ?", id.String()).
+		Scan(ctx)
 	if err != nil {
 		return nil, errors.Wrap(errors.ErrUnknown, err)
 	}
@@ -89,7 +93,7 @@ func (repo *TeamRepository) UpsertTeam(ctx context.Context, team *domain.Team) e
 		return errors.Wrap(errors.ErrUnknown, err)
 	}
 
-	if bunTeam.Bastion.Valid {
+	if bunTeam.Bastion != nil {
 		_, err = db.NewInsert().Model(bunTeam.Bastion).On("DUPLICATE KEY UPDATE").Exec(ctx)
 		if err != nil {
 			return errors.Wrap(errors.ErrUnknown, err)
