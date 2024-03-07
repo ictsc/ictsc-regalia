@@ -16,7 +16,7 @@ type Config struct {
 // NewServer サーバーを作成する
 func NewServer(conf *Config, user v1connect.UserServiceHandler, team v1connect.TeamServiceHandler) (*http.Server, func()) {
 	return server.New(conf.Dev, server.TypeInternal, conf.Addr, func(reg *server.Registerer) {
-		server.Register(reg, v1connect.NewUserServiceHandler, user, nil)
-		server.Register(reg, v1connect.NewTeamServiceHandler, team, nil)
+		server.Register(reg, v1connect.NewUserServiceHandler, user)
+		server.Register(reg, v1connect.NewTeamServiceHandler, team)
 	})
 }
