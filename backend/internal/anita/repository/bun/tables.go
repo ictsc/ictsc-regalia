@@ -1,10 +1,6 @@
 package bun
 
 import (
-	"context"
-	"database/sql"
-
-	"github.com/ictsc/ictsc-outlands/backend/pkg/errors"
 	"github.com/uptrace/bun"
 )
 
@@ -30,17 +26,8 @@ type Team struct {
 	InvitationCode string `bun:"invitation_code,type:char(32),notnull,unique"`
 	CodeRemaining  int    `bun:"codeRemaining,type:tinyint,notnull"`
 
-	Bastion sql.Null[Bastion] `bun:"rel:has-one,join:id=team_id"`
-	Members []*User           `bun:"rel:has-many,join:id=team_id"`
-}
-
-var _ bun.AfterCreateTableHook = (*Team)(nil)
-
-// AfterCreateTable テーブル作成後の処理
-func (*Team) AfterCreateTable(ctx context.Context, query *bun.CreateTableQuery) error {
-	_, err := query.DB().NewCreateIndex().Model((*Team)(nil)).Index("invitation_code_idx").Column("invitation_code").Exec(ctx)
-
-	return errors.Wrap(errors.ErrUnknown, err)
+	Bastion *Bastion `bun:"rel:has-one,join:id=team_id"`
+	Members []*User  `bun:"rel:has-many,join:id=team_id"`
 }
 
 // Bastion 踏み台サーバー

@@ -2,7 +2,6 @@ package migration
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/ictsc/ictsc-outlands/backend/pkg/errors"
 	"github.com/uptrace/bun"
@@ -11,7 +10,12 @@ import (
 func init() {
 	Migrations.MustRegister(
 		func(ctx context.Context, db *bun.DB) error {
-			_, err := db.NewCreateTable().Model((*v1User)(nil)).Exec(ctx)
+			_, err := db.NewCreateTable().Model((*v1Bastion)(nil)).Exec(ctx)
+			if err != nil {
+				return errors.Wrap(errors.ErrUnknown, err)
+			}
+
+			_, err = db.NewCreateTable().Model((*v1User)(nil)).Exec(ctx)
 			if err != nil {
 				return errors.Wrap(errors.ErrUnknown, err)
 			}
@@ -21,20 +25,15 @@ func init() {
 				return errors.Wrap(errors.ErrUnknown, err)
 			}
 
-			_, err = db.NewCreateTable().Model((*v1Bastion)(nil)).Exec(ctx)
-			if err != nil {
-				return errors.Wrap(errors.ErrUnknown, err)
-			}
-
 			return nil
 		},
 		func(ctx context.Context, db *bun.DB) error {
-			_, err := db.NewDropTable().Model((*v1User)(nil)).IfExists().Exec(ctx)
+			_, err := db.NewDropTable().Model((*v1Team)(nil)).IfExists().Exec(ctx)
 			if err != nil {
 				return errors.Wrap(errors.ErrUnknown, err)
 			}
 
-			_, err = db.NewDropTable().Model((*v1Team)(nil)).IfExists().Exec(ctx)
+			_, err = db.NewDropTable().Model((*v1User)(nil)).IfExists().Exec(ctx)
 			if err != nil {
 				return errors.Wrap(errors.ErrUnknown, err)
 			}
@@ -71,17 +70,8 @@ type v1Team struct {
 	InvitationCode string `bun:"invitation_code,type:char(32),notnull,unique"`
 	CodeRemaining  int    `bun:"codeRemaining,type:tinyint,notnull"`
 
-	Bastion sql.Null[v1Bastion] `bun:"rel:has-one,join:id=team_id"`
-	Members []*v1User           `bun:"rel:has-many,join:id=team_id"`
-}
-
-var _ bun.AfterCreateTableHook = (*v1Team)(nil)
-
-// AfterCreateTable テーブル作成後の処理
-func (*v1Team) AfterCreateTable(ctx context.Context, query *bun.CreateTableQuery) error {
-	_, err := query.DB().NewCreateIndex().Model((*v1Team)(nil)).Index("invitation_code_idx").Column("invitation_code").Exec(ctx)
-
-	return errors.Wrap(errors.ErrUnknown, err)
+	Bastion *v1Bastion `bun:"rel:has-one,join:id=team_id"`
+	Members []*v1User  `bun:"rel:has-many,join:id=team_id"`
 }
 
 // v1Bastion 踏み台サーバー

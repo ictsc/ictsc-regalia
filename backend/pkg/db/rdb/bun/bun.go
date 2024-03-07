@@ -41,6 +41,7 @@ func NewDB(conf *Config) (*DB, error) {
 	mysqlConf := mysql.NewConfig()
 	mysqlConf.User = conf.Username
 	mysqlConf.Passwd = conf.Password
+	mysqlConf.Net = "tcp"
 	mysqlConf.Addr = conf.Hostname + ":" + strconv.Itoa(conf.Port)
 	mysqlConf.DBName = conf.Database
 	mysqlConf.Collation = "utf8mb4_general_ci"

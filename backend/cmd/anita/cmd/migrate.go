@@ -9,7 +9,6 @@ import (
 	"github.com/uptrace/bun/migrate"
 )
 
-// migrateCmd represents the migrate command
 var migrateCmd = &cobra.Command{
 	Use:   "migrate",
 	Short: "Execute bun migration",
@@ -23,11 +22,15 @@ var migrateCmd = &cobra.Command{
 		migrator := migrate.NewMigrator(bunDB, migration.Migrations)
 		ctx := cmd.Context()
 
-		if err := migrator.Lock(ctx); err != nil {
+		if err = migrator.Init(ctx); err != nil {
+			log.Panic(err)
+		}
+
+		if err = migrator.Lock(ctx); err != nil {
 			log.Panic(err)
 		}
 		defer func() {
-			if err := migrator.Unlock(ctx); err != nil {
+			if err = migrator.Unlock(ctx); err != nil {
 				log.Panic(err)
 			}
 		}()
@@ -38,10 +41,10 @@ var migrateCmd = &cobra.Command{
 		}
 
 		if group.IsZero() {
-			log.Println("no changes")
+			log.Println("No changes")
+		} else {
+			log.Printf("Migrated to %s\n", group)
 		}
-
-		log.Printf("migrated to %s\n", group)
 	},
 }
 
