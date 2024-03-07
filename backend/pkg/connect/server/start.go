@@ -24,7 +24,7 @@ func Start(srv []*http.Server, container *di.Container) error {
 
 	for _, s := range srv {
 		go func(s *http.Server) {
-			if err := s.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
+			if err := s.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 				errChan <- err
 			}
 		}(s)
