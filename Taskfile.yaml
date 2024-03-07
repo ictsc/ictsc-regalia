@@ -98,4 +98,10 @@ tasks:
     desc: ローカル開発環境を立ち上げる
     dir: dev/docker
     cmds:
-      - docker compose up -d
+      - docker compose up --build -d
+
+  down:
+    desc: ローカル開発環境を終了する
+    dir: dev/docker
+    cmds:
+      - docker compose down
