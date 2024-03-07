@@ -23,6 +23,8 @@ gochecknoglobals
 gochecknoinits
 gofumpt
 goimports
+GOPROXY
+healthcheck
 ictsc
 ictscc
 ictscr
@@ -32,6 +34,7 @@ Kairi
 Kaleb
 Loba
 luxon
+mapstructure
 mvdan
 mysqldialect
 nette
@@ -47,6 +50,7 @@ oapi
 oklog
 oneof
 paralleltest
+phpmyadmin
 proto
 protobuf
 protoc
@@ -60,6 +64,7 @@ tailwindcss
 testid
 tinyint
 Tressa
+trimpath
 Upsert
 uptrace
 usecase
