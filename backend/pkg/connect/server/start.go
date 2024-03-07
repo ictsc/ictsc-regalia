@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -29,6 +30,8 @@ func Start(srv []*http.Server, container *di.Container) error {
 			}
 		}(s)
 	}
+
+	log.Println("Server started")
 
 	select {
 	case <-ctx.Done():
