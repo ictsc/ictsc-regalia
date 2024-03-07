@@ -49,6 +49,10 @@ func New(
 
 	register(reg)
 
+	mux.Handle("/ping", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte("pong"))
+	}))
+
 	srv := &http.Server{ // nolint:exhaustruct
 		Addr:        addr,
 		Handler:     mux,
