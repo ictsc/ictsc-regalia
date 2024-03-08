@@ -50,6 +50,7 @@ func New(
 
 	register(reg)
 
+	// Healthcheckのため、pingハンドラを追加
 	mux.Handle("/ping", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("pong"))
 	}))
