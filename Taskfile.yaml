@@ -35,6 +35,7 @@ tasks:
     desc: ワークスペースを初期化
     cmds:
       - cp .vscode/settings-sample.json .vscode/settings.json
+      - cp backend/.vscode/settings-sample.json backend/.vscode/settings.json
 
   init-buf:
     desc: bufの初期化
