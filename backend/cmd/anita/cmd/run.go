@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"log"
 
 	"github.com/defval/di"
@@ -21,7 +22,7 @@ var runCmd = &cobra.Command{
 	Short: "Run the Connect server",
 	Run: func(cmd *cobra.Command, args []string) {
 		container, err := di.New(
-			di.ProvideValue(cmd.Context()),
+			di.ProvideValue(cmd.Context(), di.As(new(context.Context))),
 
 			di.ProvideValue(&config),
 			di.Provide(provideRDBConfig),
