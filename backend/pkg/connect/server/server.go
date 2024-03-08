@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"time"
 
 	"connectrpc.com/connect"
@@ -32,7 +33,7 @@ type Registerer struct {
 func New(
 	dev bool,
 	_ serverType,
-	addr string,
+	port int,
 	register func(reg *Registerer),
 ) (*http.Server, func()) {
 	mux := http.NewServeMux()
@@ -54,7 +55,7 @@ func New(
 	}))
 
 	srv := &http.Server{ // nolint:exhaustruct
-		Addr:        addr,
+		Addr:        "0.0.0.0:" + strconv.Itoa(port),
 		Handler:     mux,
 		ReadTimeout: time.Second,
 	}

@@ -15,8 +15,8 @@ import (
 type Config struct {
 	// Dev 開発モード (default: false)
 	Dev bool `json:"dev" mapstructure:"dev" yaml:"dev"`
-	// Addr サーバーがListenするアドレス (default: ":8080")
-	Addr string `json:"addr" mapstructure:"addr" yaml:"addr"`
+	// Port サーバーがリッスンするポート番号 (default: 8080)
+	Port int `json:"port" mapstructure:"port" yaml:"port"`
 
 	// RDB RDB接続設定
 	RDB struct {
@@ -47,7 +47,7 @@ func provideRDBConfig(conf *Config) *bun.Config {
 func provideServerConfig(conf *Config) *server.Config {
 	return &server.Config{
 		Dev:  conf.Dev,
-		Addr: conf.Addr,
+		Port: conf.Port,
 	}
 }
 
@@ -58,7 +58,7 @@ var (
 
 func init() {
 	viper.SetDefault("dev", false)
-	viper.SetDefault("addr", ":8080")
+	viper.SetDefault("port", 8080)
 	viper.SetDefault("rdb.hostname", "mysql")
 	viper.SetDefault("rdb.port", 3306)
 	viper.SetDefault("rdb.username", "root")

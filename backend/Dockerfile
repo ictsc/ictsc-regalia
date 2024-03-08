@@ -31,6 +31,6 @@ EXPOSE 8080
 
 COPY --from=anita-builder --chown=nonroot:nonroot /anita .
 
-HEALTHCHECK CMD ["curl", "localhost:8080/ping"]
+HEALTHCHECK CMD ["./anita", "ping"]
 ENTRYPOINT ["./anita"]
 CMD ["run"]
