@@ -24,12 +24,12 @@ FROM --platform=$BUILDPLATFORM builder AS anita-builder
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/tmp/go/cache \
   go build -o /anita -ldflags "-s -w" -trimpath ./cmd/anita
 
-FROM gcr.io/distroless/base:latest AS anita
+FROM gcr.io/distroless/static:nonroot AS anita
 
 WORKDIR /app
 EXPOSE 8080
 
-COPY --from=anita-builder /anita .
+COPY --from=anita-builder --chown=nonroot:nonroot /anita .
 
 HEALTHCHECK CMD ["curl", "localhost:8080/ping"]
 ENTRYPOINT ["./anita"]
