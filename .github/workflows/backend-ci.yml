@@ -71,6 +71,10 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app:
+          - anita
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -82,7 +86,7 @@ jobs:
       - name: Mod Download
         run: go mod download
       - name: Build
-        run: go build
+        run: go build -o ./${{ matrix.app }} -ldflags "-s -w" -trimpath ./cmd/${{ matrix.app }}
   test:
     name: Test
     runs-on: ubuntu-latest
