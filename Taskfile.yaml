@@ -50,7 +50,7 @@ tasks:
           INSTALL_DOC: https://buf.build/docs/installation
     cmds:
       - go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.33.0
-      - go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.15.0
+      - go install connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.16.1
 
   init-oapi:
     desc: OpenAPI Generatorの初期化
