@@ -12,7 +12,7 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/redis/go-redis/v9 v9.5.1
-	github.com/rs/zerolog v1.32.0
+	github.com/rs/zerolog v1.33.0
 	github.com/uptrace/bun v1.2.1
 	github.com/uptrace/bun/dialect/mysqldialect v1.2.1
 	github.com/uptrace/bun/extra/bundebug v1.2.1
