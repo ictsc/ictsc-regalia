@@ -84,6 +84,6 @@
     "yarn": "please-use-pnpm"
   },
   "volta": {
-    "node": "18.20.2"
+    "node": "18.20.3"
   }
 }
