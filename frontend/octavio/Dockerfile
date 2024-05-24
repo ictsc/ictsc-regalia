@@ -11,7 +11,7 @@ RUN pnpm i --frozen-lockfile --prod
 
 
 ## Font のビルド
-FROM alpine:3.19 AS font-builder
+FROM alpine:3.20 AS font-builder
 
 WORKDIR /font
 
