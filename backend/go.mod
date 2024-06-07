@@ -11,7 +11,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/oapi-codegen/runtime v1.1.1
-	github.com/redis/go-redis/v9 v9.5.2
+	github.com/redis/go-redis/v9 v9.5.3
 	github.com/rs/zerolog v1.33.0
 	github.com/uptrace/bun v1.2.1
 	github.com/uptrace/bun/dialect/mysqldialect v1.2.1
