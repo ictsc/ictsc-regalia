@@ -8,7 +8,7 @@ require (
 	github.com/bytedance/sonic v1.11.9
 	github.com/cockroachdb/errors v1.11.3
 	github.com/defval/di v1.12.0
-	github.com/go-chi/chi/v5 v5.0.14
+	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/redis/go-redis/v9 v9.5.3
