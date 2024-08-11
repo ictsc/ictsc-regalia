@@ -30,7 +30,7 @@
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.2.1",
     "@types/autoprefixer": "~10.2.0",
-    "@types/eslint": "~8.56.4",
+    "@types/eslint": "~9.6.0",
     "@types/eslint-config-prettier": "~6.11.3",
     "@types/jsdom": "~21.1.6",
     "@types/node": "^20",
