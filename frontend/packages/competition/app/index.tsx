@@ -1,5 +1,3 @@
-/// <reference types="react/canary" />
-/// <reference types="react-dom/canary" />
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
