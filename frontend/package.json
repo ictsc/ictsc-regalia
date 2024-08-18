@@ -1,20 +1,8 @@
 {
   "name": "frontend",
-  "scripts": {
-    "build": "turbo build",
-    "lint": "turbo lint",
-    "test": "turbo test",
-    "dev": "turbo dev",
-    "generate": "buf generate --template ../proto/buf.gen-frontend.yaml --path ../proto/admin --path ../proto/contestant ../proto "
-  },
+  "scripts": {},
   "devDependencies": {
-    "@bufbuild/buf": "^1.29.0",
-    "@bufbuild/protobuf": "^2.0.0",
-    "@bufbuild/protoc-gen-es": "^1.7.2",
-    "@connectrpc/protoc-gen-connect-es": "^1.3.0",
-    "@connectrpc/protoc-gen-connect-query": "^1.2.0",
-    "npm-run-all2": "^6.0.0",
-    "turbo": "^1.12.2"
+    "typescript": "^5.5.4"
   },
   "packageManager": "pnpm@9.7.1",
   "engines": {
