@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { IconTypes, MaterialSymbol } from "./components/MaterialSymbol";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 
 function NavBar() {
   return (
@@ -32,17 +32,32 @@ function NavBar() {
   );
 }
 
-function SideBar() {
+function Sidebar({
+  opened = true,
+  onOpenToggleClick: handleOpenToggleClick,
+}: {
+  readonly opened: boolean;
+  readonly onOpenToggleClick: () => void;
+}) {
   return (
     <div className="flex size-full flex-col items-start bg-surface-1 text-text">
-      <SideBarButton icon="list" showTitle={false} title="閉じる" />
-      <SideBarButton icon="developer_guide" title="ルール" />
-      <SideBarButton icon="brand_awareness" title="アナウンス" />
-      <SideBarButton icon="lan" title="接続情報" />
-      <SideBarButton icon="help" title="問題" />
-      <SideBarButton icon="trophy" title="ランキング" />
-      <SideBarButton icon="groups" title="チーム一覧" />
-      <SideBarButton icon="chat" title="お問い合わせ" />
+      <SideBarButton
+        icon="list"
+        showTitle={false}
+        title={opened ? "閉じる" : "開く"}
+        onClick={handleOpenToggleClick}
+      />
+      <SideBarButton showTitle={opened} icon="developer_guide" title="ルール" />
+      <SideBarButton
+        showTitle={opened}
+        icon="brand_awareness"
+        title="アナウンス"
+      />
+      <SideBarButton showTitle={opened} icon="lan" title="接続情報" />
+      <SideBarButton showTitle={opened} icon="help" title="問題" />
+      <SideBarButton showTitle={opened} icon="trophy" title="ランキング" />
+      <SideBarButton showTitle={opened} icon="groups" title="チーム一覧" />
+      <SideBarButton showTitle={opened} icon="chat" title="お問い合わせ" />
     </div>
   );
 }
@@ -51,10 +66,13 @@ function SideBarButton({
   icon,
   showTitle = true,
   title,
+  onClick: handleClick,
 }: {
   icon: IconTypes;
   showTitle?: boolean;
   title: string;
+
+  onClick?: React.MouseEventHandler;
 }) {
   return (
     <button
@@ -64,6 +82,7 @@ function SideBarButton({
           "rounded-[10px] bg-surface-1 hover:bg-surface-2 motion-safe:hover:transition-all",
       )}
       title={title}
+      onClick={handleClick}
     >
       <div
         className={clsx(
@@ -79,28 +98,61 @@ function SideBarButton({
   );
 }
 
-export function App() {
+function Layout({
+  children,
+  navbar,
+  sidebar,
+  sidebarOpened,
+}: {
+  readonly children?: ReactNode;
+  readonly navbar: ReactNode;
+  readonly sidebar: ReactNode;
+  readonly sidebarOpened: boolean;
+}) {
   return (
-    <div className="grid grid-cols-[220px_1fr] grid-rows-[70px_1fr]">
-      <header className="sticky top-0 col-span-full row-span-1">
-        <NavBar />
+    <div
+      className={clsx(
+        "grid grid-rows-[70px_1fr]",
+        sidebarOpened ? "grid-cols-[220px_1fr]" : "grid-cols-[50px_1fr]",
+      )}
+    >
+      <header className="sticky top-0 col-span-full row-start-1 row-end-2">
+        {navbar}
       </header>
-      <aside className="sticky top-[70px] col-span-1 col-start-1 row-span-1 row-start-2 h-[calc(100vh-70px)]">
-        <SideBar />
+      <aside className="sticky top-[70px] col-start-1 col-end-2 row-start-2 row-end-3 h-[calc(100vh-70px)]">
+        {sidebar}
       </aside>
-      <main className="col-span-1 col-start-2 row-span-1 row-start-2">
-        <p>
-          {`Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+      <main className="col-start-2 col-end-3 row-start-2 row-end-3">
+        {children}
+      </main>
+    </div>
+  );
+}
+
+export function App() {
+  const [sidebarOpened, setSidebarOpened] = useState(true);
+  return (
+    <Layout
+      navbar={<NavBar />}
+      sidebar={
+        <Sidebar
+          opened={sidebarOpened}
+          onOpenToggleClick={() => setSidebarOpened((o) => !o)}
+        />
+      }
+      sidebarOpened={sidebarOpened}
+    >
+      <p>
+        {`Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
             eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
             ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
             aliquip ex ea commodo consequat. Duis aute irure dolor in
             reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
             pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
             culpa qui officia deserunt mollit anim id est laborum.`.repeat(
-            1000,
-          )}
-        </p>
-      </main>
-    </div>
+          1000,
+        )}
+      </p>
+    </Layout>
   );
 }
