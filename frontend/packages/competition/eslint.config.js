@@ -2,6 +2,7 @@ import js from "@eslint/js";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import tailwind from "eslint-plugin-tailwindcss"
 import ts from "typescript-eslint";
 
 const tsFileConfig = (conf) => ({
@@ -19,6 +20,7 @@ export default [
   ...[
     js.configs.recommended,
     ...ts.configs.recommended,
+    ...tailwind.configs["flat/recommended"],
     {
       plugins: { "react-hooks": reactHooks },
       rules: reactHooks.configs.recommended.rules,
