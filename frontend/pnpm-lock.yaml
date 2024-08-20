@@ -14,6 +14,15 @@ importers:
 
   packages/competition:
     dependencies:
+      '@material-symbols/metadata':
+        specifier: ^0.22.1
+        version: 0.22.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      material-symbols:
+        specifier: ^0.22.1
+        version: 0.22.1
       react:
         specifier: ^19.0.0-rc
         version: 19.0.0-rc-1eaccd82-20240816
@@ -355,6 +364,9 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
+  '@material-symbols/metadata@0.22.1':
+    resolution: {integrity: sha512-cLquzXpyzxeigpBJU5gG5AKj6vyfYfOvWFnR00Q95UCE6/ZkoFR/Jaw7JKOdrAwvrS8u8L8TKlEYh2ldXHALbg==}
+
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -639,6 +651,10 @@ packages:
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
     engines: {node: '>= 8.10.0'}
+
+  clsx@2.1.1:
+    resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
+    engines: {node: '>=6'}
 
   color-convert@1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
@@ -982,6 +998,9 @@ packages:
 
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
+
+  material-symbols@0.22.1:
+    resolution: {integrity: sha512-MWZB/53EMWzL3RYpr7plQRAWuqW73C/21PhvSwh/dptEGUk7SpG8h45eCqe37wfQoq6YZvuYfwLEYGfK2dgUqQ==}
 
   merge2@1.4.1:
     resolution: {integrity: sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==}
@@ -1641,6 +1660,8 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
+  '@material-symbols/metadata@0.22.1': {}
+
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -1932,6 +1953,8 @@ snapshots:
       readdirp: 3.6.0
     optionalDependencies:
       fsevents: 2.3.3
+
+  clsx@2.1.1: {}
 
   color-convert@1.9.3:
     dependencies:
@@ -2266,6 +2289,8 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
+
+  material-symbols@0.22.1: {}
 
   merge2@1.4.1: {}
 
