@@ -13,13 +13,18 @@ export default {
       },
       text: "#505050"
     },
-    spacing: {
+    width: {
       full: "100%",
       screen: "100vw",
       auto: "auto",
       fit: "fit-content",
       0: "0",
     },
+    fontSize: {
+      "12": ["0.75rem", "1.25rem"],
+      "16": ["1rem", "1.5rem"],
+      "24": ["1.5rem", "2rem"],
+    }
   },
   plugins: [],
 };
