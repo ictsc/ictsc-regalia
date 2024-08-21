@@ -14,9 +14,6 @@ importers:
 
   packages/competition:
     dependencies:
-      '@material-symbols/metadata':
-        specifier: ^0.22.1
-        version: 0.22.1
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -41,7 +38,7 @@ importers:
         version: 18.3.0
       '@vitejs/plugin-react':
         specifier: ^4.3.1
-        version: 4.3.1(vite@5.4.1)
+        version: 4.3.1(vite@5.4.1(@types/node@22.4.2))
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.41)
@@ -74,7 +71,7 @@ importers:
         version: 8.1.0(eslint@9.9.0(jiti@1.21.6))(typescript@5.5.4)
       vite:
         specifier: ^5.4.1
-        version: 5.4.1
+        version: 5.4.1(@types/node@22.4.2)
 
 packages:
 
@@ -367,9 +364,6 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
-  '@material-symbols/metadata@0.22.1':
-    resolution: {integrity: sha512-cLquzXpyzxeigpBJU5gG5AKj6vyfYfOvWFnR00Q95UCE6/ZkoFR/Jaw7JKOdrAwvrS8u8L8TKlEYh2ldXHALbg==}
-
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -480,6 +474,9 @@ packages:
 
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
+
+  '@types/node@22.4.2':
+    resolution: {integrity: sha512-nAvM3Ey230/XzxtyDcJ+VjvlzpzoHwLsF7JaDRfoI0ytO0mVheerNmM45CtA0yOILXwXXxOrcUWH3wltX+7PSw==}
 
   '@types/prop-types@15.7.12':
     resolution: {integrity: sha512-5zvhXYtRNRluoE/jAp4GVsSduVUzNWKkOZrCDBWYtE7biZywwdC2AcEzg+cSMLFRfVgeAFqpfNabiPjxFddV1Q==}
@@ -1332,6 +1329,9 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  undici-types@6.19.8:
+    resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
+
   update-browserslist-db@1.1.0:
     resolution: {integrity: sha512-EdRAaAyk2cUE1wOf2DkEhzxqOQvFOoRJFNS6NeyJ01Gp2beMRpBAINjM2iDXE3KCuKhwnvHIQCJm6ThL2Z+HzQ==}
     hasBin: true
@@ -1669,8 +1669,6 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@material-symbols/metadata@0.22.1': {}
-
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -1756,6 +1754,11 @@ snapshots:
       '@babel/types': 7.25.2
 
   '@types/estree@1.0.5': {}
+
+  '@types/node@22.4.2':
+    dependencies:
+      undici-types: 6.19.8
+    optional: true
 
   '@types/prop-types@15.7.12': {}
 
@@ -1849,14 +1852,14 @@ snapshots:
       '@typescript-eslint/types': 8.1.0
       eslint-visitor-keys: 3.4.3
 
-  '@vitejs/plugin-react@4.3.1(vite@5.4.1)':
+  '@vitejs/plugin-react@4.3.1(vite@5.4.1(@types/node@22.4.2))':
     dependencies:
       '@babel/core': 7.25.2
       '@babel/plugin-transform-react-jsx-self': 7.24.7(@babel/core@7.25.2)
       '@babel/plugin-transform-react-jsx-source': 7.24.7(@babel/core@7.25.2)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 5.4.1
+      vite: 5.4.1(@types/node@22.4.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -2614,6 +2617,9 @@ snapshots:
 
   typescript@5.5.4: {}
 
+  undici-types@6.19.8:
+    optional: true
+
   update-browserslist-db@1.1.0(browserslist@4.23.3):
     dependencies:
       browserslist: 4.23.3
@@ -2626,12 +2632,13 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vite@5.4.1:
+  vite@5.4.1(@types/node@22.4.2):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.41
       rollup: 4.21.0
     optionalDependencies:
+      '@types/node': 22.4.2
       fsevents: 2.3.3
 
   which@2.0.2:

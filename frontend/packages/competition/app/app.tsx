@@ -1,5 +1,8 @@
 import clsx from "clsx";
-import { IconTypes, MaterialSymbol } from "./components/MaterialSymbol";
+import {
+  MaterialSymbol,
+  type MaterialSymbolType,
+} from "./components/MaterialSymbol";
 import { ReactNode, useState } from "react";
 
 function NavBar() {
@@ -68,7 +71,7 @@ function SideBarButton({
   title,
   onClick: handleClick,
 }: {
-  icon: IconTypes;
+  icon: MaterialSymbolType;
   showTitle?: boolean;
   title: string;
 

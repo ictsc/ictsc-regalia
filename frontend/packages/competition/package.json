@@ -23,7 +23,6 @@
     "vite": "^5.4.1"
   },
   "dependencies": {
-    "@material-symbols/metadata": "^0.22.1",
     "clsx": "^2.1.1",
     "material-symbols": "^0.22.1",
     "react": "^19.0.0-rc",
