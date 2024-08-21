@@ -80,23 +80,20 @@ function SideBarButton({
   return (
     <button
       className={clsx(
-        "group flex w-full items-center text-text",
-        showTitle &&
-          "rounded-[10px] bg-surface-1 hover:bg-surface-2 motion-safe:hover:transition-all",
+        "flex flex-row items-center rounded-[10px] bg-surface-1 text-text hover:bg-surface-2 motion-safe:hover:transition-colors",
+        showTitle && "w-full",
       )}
       title={title}
       onClick={handleClick}
     >
-      <div
-        className={clsx(
-          "flex size-[50px] items-center justify-center",
-          !showTitle &&
-            "rounded-[10px] bg-surface-1 group-hover:bg-surface-2 motion-safe:group-hover:transition-all",
-        )}
-      >
+      <div className="flex size-[50px] shrink-0 basis-[50px] items-center justify-center">
         <MaterialSymbol icon={icon} size={24} />
       </div>
-      {showTitle && <span className="text-16">{title}</span>}
+      {showTitle && (
+        <span className="line-clamp-1 overflow-x-hidden text-left text-16">
+          {title}
+        </span>
+      )}
     </button>
   );
 }
@@ -115,7 +112,7 @@ function Layout({
   return (
     <div
       className={clsx(
-        "grid grid-rows-[70px_1fr]",
+        "grid h-screen w-screen grid-rows-[70px_1fr] duration-75 motion-safe:transition-[grid-template-columns]",
         sidebarOpened ? "grid-cols-[220px_1fr]" : "grid-cols-[50px_1fr]",
       )}
     >
@@ -125,7 +122,7 @@ function Layout({
       <aside className="sticky top-[70px] col-start-1 col-end-2 row-start-2 row-end-3 h-[calc(100vh-70px)]">
         {sidebar}
       </aside>
-      <main className="col-start-2 col-end-3 row-start-2 row-end-3">
+      <main className="col-start-2 col-end-3 row-start-2 row-end-3 overflow-y-scroll">
         {children}
       </main>
     </div>
@@ -139,7 +136,7 @@ export function App() {
       navbar={<NavBar />}
       sidebar={
         <Sidebar
-          opened={sidebarOpened}
+          opened={true}
           onOpenToggleClick={() => setSidebarOpened((o) => !o)}
         />
       }
