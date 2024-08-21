@@ -2,7 +2,7 @@ import clsx from "clsx";
 import {
   MaterialSymbol,
   type MaterialSymbolType,
-} from "./components/MaterialSymbol";
+} from "./components/material-symbol";
 import { ReactNode, useState } from "react";
 
 function NavBar() {
