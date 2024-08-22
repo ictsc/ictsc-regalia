@@ -51,7 +51,7 @@ jobs:
       - name: Install Format Tools
         run: |
           go install golang.org/x/tools/cmd/goimports@v0.22.0
-          go install mvdan.cc/gofumpt@v0.6.0
+          go install mvdan.cc/gofumpt@v0.7.0
       - name: Run Format Tools
         run: |
           find . -type f -name '*.go' -not -path "*/internal/proto/*" | while IFS='' read -r file; do goimports -l -w "$file"; done
