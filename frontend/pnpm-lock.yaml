@@ -93,9 +93,6 @@ importers:
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
-      prop-types:
-        specifier: ^15.8.1
-        version: 15.8.1
       storybook:
         specifier: ^8.2.9
         version: 8.2.9(@babel/preset-env@7.25.3(@babel/core@7.25.2))
