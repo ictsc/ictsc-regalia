@@ -7,11 +7,11 @@ export default {
       current: "currentColor",
       primary: "#ff4040",
       surface: {
-        "0": "#ffffff",
-        "1": "#fdf1f1",
-        "2": "#f8dcdc",
+        0: "#ffffff",
+        1: "#fdf1f1",
+        2: "#f8dcdc",
       },
-      text: "#505050"
+      text: "#505050",
     },
     width: {
       full: "100%",
@@ -21,11 +21,11 @@ export default {
       0: "0",
     },
     fontSize: {
-      "12": ["0.75rem", "1.25rem"],
-      "16": ["1rem", "1.5rem"],
-      "24": ["1.5rem", "2rem"],
-    }
+      12: ["0.75rem", "1.25rem"],
+      14: ["0.875rem", "1.375rem"],
+      16: ["1rem", "1.5rem"],
+      24: ["1.5rem", "2rem"],
+    },
   },
   plugins: [],
 };
-
