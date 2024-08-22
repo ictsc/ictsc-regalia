@@ -3,12 +3,19 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { AppShellLayout as Layout } from "./layout";
 import { HeaderView } from "./header";
 import { NavbarView } from "./navbar";
+import { ContestStateView } from "./contest-state";
 
 function AppShell() {
   const [collapsed, toggle] = useReducer((o) => !o, false);
   return (
     <Layout
-      header={<HeaderView />}
+      header={
+        <HeaderView
+          contestState={
+            <ContestStateView state="before" restDurationSeconds={73850} />
+          }
+        />
+      }
       navbar={<NavbarView collapsed={collapsed} onOpenToggleClick={toggle} />}
       navbarCollapsed={collapsed}
     >
