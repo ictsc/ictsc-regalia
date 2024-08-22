@@ -1,6 +1,7 @@
 import { type ReactNode } from "react";
 import { MenuButton } from "@headlessui/react";
 import { MaterialSymbol } from "../material-symbol";
+import { Logo } from "../logo";
 import { AccountMenu } from "./account-menu";
 
 export type HeaderViewProps = {
@@ -10,7 +11,9 @@ export type HeaderViewProps = {
 export function HeaderView({ contestState }: HeaderViewProps) {
   return (
     <div className="flex size-full items-center border-b-[3px] border-primary bg-surface-0">
-      <span className="flex-none">ICTSC</span>
+      <div className="flex-none">
+        <Logo height={60} />
+      </div>
       <div className="ml-auto flex h-full items-center">
         {contestState != null && (
           <div className="mr-[30px]">{contestState}</div>
