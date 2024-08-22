@@ -1,35 +1,28 @@
+import type { CSSProperties } from "react";
 import type { MaterialSymbol } from "material-symbols";
 import clsx from "clsx";
-import { CSSProperties } from "react";
 
 export type { MaterialSymbol as MaterialSymbolType };
 
 export type MaterilaSymbolProps = {
   readonly icon: MaterialSymbol;
   readonly fill?: boolean;
-  readonly size?: number;
+  readonly size?: 20 | 24 | 40 | 48;
   readonly className?: string;
   readonly style?: CSSProperties;
 };
 
 export function MaterialSymbol({
   icon,
-  fill,
-  size,
+  fill = false,
+  size = 24,
   className,
   style: propStyle,
 }: MaterilaSymbolProps) {
-  const fontVariationSettings = [
-    propStyle?.fontVariationSettings,
-    size != null && `"opsz" ${size}`,
-    fill && '"FILL" 1',
-  ]
-    .filter(Boolean)
-    .join(",");
   const style: CSSProperties = {
     ...propStyle,
-    fontVariationSettings,
-    ...(size != null ? { fontSize: size } : {}),
+    fontVariationSettings: `"FILL" ${fill ? "1" : "0"}`,
+    fontSize: size,
   };
   return (
     <span
