@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [
     TanStackRouterVite({
       routesDirectory: "app/routes",
+      routeFilePrefix: "~", // Route Inclusion Style: https://tanstack.com/router/latest/docs/framework/react/guide/file-based-routing#route-inclusion-example
       generatedRouteTree: "app/routes.gen.ts",
       quoteStyle: "double",
       semicolons: true,
