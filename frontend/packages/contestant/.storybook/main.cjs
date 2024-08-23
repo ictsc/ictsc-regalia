@@ -1,4 +1,4 @@
-const { join, dirname} = require("path");
+const { join, dirname } = require("path");
 
 /**
  * This function is used to resolve the absolute path of a package.
@@ -10,10 +10,7 @@ function getAbsolutePath(value) {
 
 /** @type { import('@storybook/react-vite').StorybookConfig } */
 const config = {
-  stories: [
-    "../app/**/*.mdx",
-    "../app/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-  ],
+  stories: ["../app/**/*.mdx", "../app/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
   addons: [
     getAbsolutePath("@storybook/addon-onboarding"),
     getAbsolutePath("@storybook/addon-links"),

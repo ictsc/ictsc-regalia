@@ -10,5 +10,4 @@ type Story = StoryObj<typeof Logo>;
 
 export const Default: Story = {
   render: () => <Logo height={100} />,
-}
-
+};

@@ -8,11 +8,10 @@ export default {
 
 type Story = StoryObj<typeof MaterialSymbol>;
 
-export const Default : Story = {
+export const Default: Story = {
   args: {
     icon: "schedule",
     fill: false,
     size: 24,
-  }
-}
-
+  },
+};

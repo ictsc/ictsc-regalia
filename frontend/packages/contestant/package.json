@@ -3,7 +3,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "lint": "eslint \"**/*.{js,cjs,mjs,jsx,ts,tsx}\"",
+    "lint": "run-s -c lint:*",
+    "lint:tsc": "tsc",
+    "lint:eslint": "eslint --cache --cache-location node_modules/.cache/eslint/ --cache-strategy content .",
+    "lint:prettier": "prettier --cache --check .",
+    "lint-fix": "run-s -c lint-fix:*",
+    "lint-fix:eslint": "eslint --fix .",
+    "lint-fix:prettier": "prettier --write .",
     "story": "storybook dev -p 6006",
     "story:build": "storybook build"
   },
@@ -32,6 +38,7 @@
     "eslint-plugin-storybook": "^0.8.0",
     "eslint-plugin-tailwindcss": "^3.17.4",
     "globals": "^15.9.0",
+    "npm-run-all2": "^6.2.2",
     "postcss": "^8.4.41",
     "prettier": "^3.3.3",
     "storybook": "^8.2.9",
