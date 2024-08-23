@@ -1,4 +1,4 @@
-import { join, dirname } from "path";
+const { join, dirname} = require("path");
 
 /**
  * This function is used to resolve the absolute path of a package.
@@ -26,4 +26,4 @@ const config = {
     options: {},
   },
 };
-export default config;
+module.exports = config;
