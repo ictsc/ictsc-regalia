@@ -7,8 +7,8 @@ export default defineConfig({
     TanStackRouterVite({
       routesDirectory: "app/routes",
       generatedRouteTree: "app/routes.gen.ts",
-      routeFileIgnorePrefix: "-",
       quoteStyle: "double",
+      semicolons: true,
     }),
     react(),
   ],

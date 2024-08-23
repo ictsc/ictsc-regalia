@@ -7,7 +7,7 @@ export function NavbarView({
   onOpenToggleClick: handleOpenToggleClick,
 }: {
   readonly collapsed: boolean;
-  readonly onOpenToggleClick: () => void;
+  readonly onOpenToggleClick?: () => void;
 }) {
   return (
     <div className="flex size-full flex-col items-start bg-surface-1 text-text">
