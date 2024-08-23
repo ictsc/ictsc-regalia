@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
 import { MenuButton } from "@headlessui/react";
+import { Link } from "@tanstack/react-router";
 import { MaterialSymbol } from "../material-symbol";
 import { Logo } from "../logo";
 import { AccountMenu } from "./account-menu";
@@ -12,7 +13,9 @@ export function HeaderView({ contestState }: HeaderViewProps) {
   return (
     <div className="flex size-full items-center border-b-[3px] border-primary bg-surface-0">
       <div className="flex-none">
-        <Logo height={60} />
+        <Link>
+          <Logo height={60} />
+        </Link>
       </div>
       <div className="ml-auto flex h-full items-center">
         {contestState != null && (

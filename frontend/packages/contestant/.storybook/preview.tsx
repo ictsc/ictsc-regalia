@@ -1,7 +1,8 @@
+import type { Preview } from "@storybook/react";
+import { withTanstack } from "./tanstack-decorator";
 import "../app/index.css";
 
-/** @type { import('@storybook/react').Preview } */
-const preview = {
+const preview: Preview = {
   parameters: {
     controls: {
       matchers: {
@@ -10,6 +11,7 @@ const preview = {
       },
     },
   },
+  decorators: [withTanstack],
 };
 
 export default preview;
