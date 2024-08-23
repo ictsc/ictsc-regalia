@@ -1,5 +1,6 @@
 import globals from "globals";
 import jsPlugin from "@eslint/js";
+import prettierConfig from "eslint-config-prettier";
 import tseslint from "typescript-eslint";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import reactRefreshPlugin from "eslint-plugin-react-refresh";
@@ -98,6 +99,13 @@ const config = [
       "storybook/use-storybook-expect": "error",
       "storybook/use-storybook-testing-library": "error",
     },
+  },
+  // フォーマットに関するルールを無効化
+  {
+    plugins: {
+      "@typescript-eslint": tseslint.plugin,
+    },
+    rules: prettierConfig.rules,
   },
 ];
 
