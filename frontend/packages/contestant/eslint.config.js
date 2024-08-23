@@ -1,6 +1,7 @@
 import globals from "globals";
 import jsPlugin from "@eslint/js";
 import prettierConfig from "eslint-config-prettier";
+import importPlugin from "eslint-plugin-import";
 import tseslint from "typescript-eslint";
 import reactPlugin from "eslint-plugin-react";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
@@ -14,6 +15,19 @@ const tsFiles = ["**/*.{ts,tsx,cts,mts}"];
 /** @type {import("eslint").Linter.FlatConfig[]} */
 const config = [
   { ignores: ["dist"] },
+  // プラグイン
+  {
+    name: "@ictsc/eslint-config/plugins",
+    plugins: {
+      import: importPlugin,
+      "@typescript-eslint": tseslint.plugin,
+      react: reactPlugin,
+      "react-hooks": reactHooksPlugin,
+      "react-refresh": reactRefreshPlugin,
+      tailwindcss: tailwindPlugin,
+      storybook: storybookPlugin,
+    },
+  },
   // パーサーの設定
   {
     files: [jsFiles, tsFiles],
@@ -45,6 +59,9 @@ const config = [
       parser: tseslint.parser,
       parserOptions: { projectService: true },
     },
+    settings: {
+      ...importPlugin.configs.typescript.settings,
+    },
   },
   // JS/TS共通ルール設定
   ...[
@@ -61,14 +78,13 @@ const config = [
         ],
       },
     },
-    ...tailwindPlugin.configs["flat/recommended"],
+    { rules: importPlugin.configs.recommended.rules },
     {
-      plugins: {
-        react: reactPlugin,
-        "react-hooks": reactHooksPlugin,
-        "react-refresh": reactRefreshPlugin,
+      rules: {
+        "import/no-unresolved": "off",
       },
     },
+    ...tailwindPlugin.configs["flat/recommended"],
     { rules: reactPlugin.configs.recommended.rules },
     { rules: reactPlugin.configs["jsx-runtime"].rules },
     { rules: reactHooksPlugin.configs.recommended.rules },
@@ -85,16 +101,25 @@ const config = [
     files: [jsFiles, tsFiles],
   })),
   // TS固有のルール設定
-  ...[...tseslint.configs.recommendedTypeChecked].map(
-    ({ languageOptions: _ignore, ...config }) => ({
-      ...config,
-      files: [tsFiles],
-    }),
-  ),
+  ...[
+    ...tseslint.configs.recommendedTypeChecked,
+    { rules: importPlugin.configs.typescript.rules },
+    {
+      rules: {
+        "import/named": "off",
+        "import/namespace": "off",
+        "import/default": "off",
+        "import/no-named-as-default-member": "off",
+        "import/no-unresolved": "off",
+      },
+    },
+  ].map(({ languageOptions: _ignore, ...config }) => ({
+    ...config,
+    files: [tsFiles],
+  })),
   // Storybookルール設定
   {
     files: ["**/*.stories.{ts,tsx}"],
-    plugins: { storybook: storybookPlugin, "react-hooks": reactHooksPlugin },
     rules: {
       "react-hooks/rules-of-hooks": "off",
       "storybook/await-interactions": "error",
@@ -109,12 +134,7 @@ const config = [
     },
   },
   // フォーマットに関するルールを無効化
-  {
-    plugins: {
-      "@typescript-eslint": tseslint.plugin,
-    },
-    rules: prettierConfig.rules,
-  },
+  { rules: prettierConfig.rules },
 ];
 
 export default config;
