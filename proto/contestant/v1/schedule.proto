@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package contestant.v1;
+
+import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/contestant/v1";
+
+enum Phases {
+  ROUNDS_UNSPECIFIED = 0;
+  ROUNDS_QUALIFYING = 1;
+  ROUNDS_FINALS = 2;
+}
+
+message Schedule {
+  Phases current_phase = 1 [(buf.validate.field).enum = {defined_only: true}];
+  google.protobuf.Timestamp end_at = 2 [(buf.validate.field).required = true];
+  Phases next_phase = 3 [(buf.validate.field).enum = {defined_only: true}];
+}
+
+message GetScheduleRequest {}
+
+message GetScheduleResponse {
+  repeated Schedule schedules = 1 [(buf.validate.field).required = true];
+}
+
+service ScheduleService {
+  rpc GetSchedule(GetScheduleRequest) returns (GetScheduleResponse);
+}

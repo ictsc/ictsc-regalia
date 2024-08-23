@@ -3,22 +3,22 @@ syntax = "proto3";
 package contestant.v1;
 
 import "buf/validate/validate.proto";
-import "contestant/v1/user.proto";
+import "contestant/v1/contestant.proto";
 
 option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/contestant/v1";
 
 message Team {
   string id = 1 [(buf.validate.field).string.len = 26];
   int32 code = 2 [(buf.validate.field).int32 = {
-    gt: 1,
+    gt: 1
     lt: 100
   }];
   string name = 3 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 20
   }];
   string organization = 4 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 50
   }];
 }
@@ -42,23 +42,23 @@ message GetTeamMembersRequest {
 }
 
 message GetTeamMembersResponse {
-  repeated User members = 1 [(buf.validate.field).repeated = {
-    min_items: 0,
+  repeated Contestant members = 1 [(buf.validate.field).repeated = {
+    min_items: 0
     max_items: 5
   }];
 }
 
 message Bastion {
   string user = 1 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 20
   }];
   string password = 2 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 20
   }];
   string host = 3 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 100
   }];
   int32 port = 4 [(buf.validate.field).int32.gte = 0];

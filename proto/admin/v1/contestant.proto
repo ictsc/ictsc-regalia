@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package admin.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/admin/v1";
+
+message Contestant {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string team_id = 3 [(buf.validate.field).string.len = 26];
+}
+
+message GetContestantRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message GetContestantResponse {
+  Contestant user = 1 [(buf.validate.field).required = true];
+}
+
+message GetContestantsRequest {}
+
+message GetContestantsResponse {
+  repeated Contestant users = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteContestantRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message DeleteContestantResponse {}
+
+service ContestantService {
+  rpc GetContestant(GetContestantRequest) returns (GetContestantResponse) {}
+  rpc GetContestants(GetContestantsRequest) returns (GetContestantsResponse) {}
+  rpc DeleteContestant(DeleteContestantRequest) returns (DeleteContestantResponse) {}
+}

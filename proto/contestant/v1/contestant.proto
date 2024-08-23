@@ -6,7 +6,7 @@ import "buf/validate/validate.proto";
 
 option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/contestant/v1";
 
-message User {
+message Contestant {
   string id = 1 [(buf.validate.field).string.len = 26];
   string name = 2 [(buf.validate.field).string = {
     min_len: 1,
@@ -18,18 +18,18 @@ message User {
 message GetMeRequest {}
 
 message GetMeResponse {
-  User user = 1 [(buf.validate.field).required = true];
+  Contestant user = 1 [(buf.validate.field).required = true];
 }
 
-message GetUserRequest {
+message GetContestantRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
 }
 
-message GetUserResponse {
-  User user = 1 [(buf.validate.field).required = true];
+message GetContestantResponse {
+  Contestant user = 1 [(buf.validate.field).required = true];
 }
 
-message PostUserRequest {
+message PostContestantRequest {
   string name = 1 [(buf.validate.field).string = {
     min_len: 1,
     max_len: 20
@@ -37,8 +37,8 @@ message PostUserRequest {
   string invitation_code = 2 [(buf.validate.field).string.len = 32];
 }
 
-message PostUserResponse {
-  User user = 1 [(buf.validate.field).required = true];
+message PostContestantResponse {
+  Contestant user = 1 [(buf.validate.field).required = true];
 }
 
 message PatchMeRequest {
@@ -49,12 +49,12 @@ message PatchMeRequest {
 }
 
 message PatchMeResponse {
-  User user = 1 [(buf.validate.field).required = true];
+  Contestant user = 1 [(buf.validate.field).required = true];
 }
 
-service UserService {
+service ContestantService {
   rpc GetMe(GetMeRequest) returns (GetMeResponse) {}
-  rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
-  rpc PostUser(PostUserRequest) returns (PostUserResponse) {}
+  rpc GetContestant(GetContestantRequest) returns (GetContestantResponse) {}
+  rpc PostContestant(PostContestantRequest) returns (PostContestantResponse) {}
   rpc PatchMe(PatchMeRequest) returns (PatchMeResponse) {}
 }
