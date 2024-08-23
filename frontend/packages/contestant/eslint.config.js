@@ -2,6 +2,7 @@ import globals from "globals";
 import jsPlugin from "@eslint/js";
 import prettierConfig from "eslint-config-prettier";
 import tseslint from "typescript-eslint";
+import reactPlugin from "eslint-plugin-react";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import reactRefreshPlugin from "eslint-plugin-react-refresh";
 import tailwindPlugin from "eslint-plugin-tailwindcss";
@@ -60,15 +61,18 @@ const config = [
         ],
       },
     },
-    ...tailwindPlugin.configs["flat/recommended"].map(
-      ({ languageOptions: _ignore, ...c }) => c,
-    ),
+    ...tailwindPlugin.configs["flat/recommended"],
     {
-      plugins: { "react-hooks": reactHooksPlugin },
-      rules: reactHooksPlugin.configs.recommended.rules,
+      plugins: {
+        react: reactPlugin,
+        "react-hooks": reactHooksPlugin,
+        "react-refresh": reactRefreshPlugin,
+      },
     },
+    { rules: reactPlugin.configs.recommended.rules },
+    { rules: reactPlugin.configs["jsx-runtime"].rules },
+    { rules: reactHooksPlugin.configs.recommended.rules },
     {
-      plugins: { "react-refresh": reactRefreshPlugin },
       rules: {
         "react-refresh/only-export-components": [
           "warn",
@@ -76,13 +80,17 @@ const config = [
         ],
       },
     },
-  ].map((config) => ({ ...config, files: [jsFiles, tsFiles] })),
+  ].map(({ languageOptions: _ignore, ...config }) => ({
+    ...config,
+    files: [jsFiles, tsFiles],
+  })),
   // TS固有のルール設定
-  ...[
-    ...tseslint.configs.recommendedTypeChecked.map(
-      ({ languageOptions: _ignore, ...c }) => c,
-    ),
-  ].map((config) => ({ ...config, files: [tsFiles] })),
+  ...[...tseslint.configs.recommendedTypeChecked].map(
+    ({ languageOptions: _ignore, ...config }) => ({
+      ...config,
+      files: [tsFiles],
+    }),
+  ),
   // Storybookルール設定
   {
     files: ["**/*.stories.{ts,tsx}"],
