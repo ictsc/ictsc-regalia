@@ -1,6 +1,6 @@
 import { useReducer } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { AppShellLayout as Layout } from "./layout";
+import { Layout } from "./layout";
 import { HeaderView } from "./header";
 import { NavbarView } from "./navbar";
 import { ContestStateView } from "./contest-state";
