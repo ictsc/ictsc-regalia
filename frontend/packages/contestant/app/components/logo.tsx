@@ -4,14 +4,21 @@ const RATIO = 1000 / 327;
 
 export type LogoProps = {
   readonly className?: string;
-  readonly height: number;
+  readonly width?: number;
+  readonly height?: number;
 };
 
-export function Logo({ className, height }: LogoProps) {
+export function Logo({ className, width, height }: LogoProps) {
+  if (width != null && height == null) {
+    height = width / RATIO;
+  }
+  if (height != null && width == null) {
+    width = height * RATIO;
+  }
   return (
     <img
       className={className}
-      width={height * RATIO}
+      width={width}
       height={height}
       src={pathToLogo}
       alt="ICTSC: ICT Trouble Shooting Contest"
