@@ -1,0 +1,19 @@
+{
+  "name": "@ictsc/proto",
+  "type": "module",
+  "exports": {
+    "./admin/v1": "./exports/admin/v1/index.ts"
+  },
+  "scripts": {
+    "generate": "buf generate"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.0.0"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.38.0",
+    "@bufbuild/protoc-gen-es": "^2.0.0",
+    "@types/node": "^22.5.0",
+    "tsx": "^4.18.0"
+  }
+}

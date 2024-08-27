@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://json.schemastore.org/buf.gen.json
+
+version: v2
+clean: true
+managed:
+  enabled: true
+inputs:
+  - directory: ../../../proto
+plugins:
+  - local: protoc-gen-es
+    opt: target=ts
+    out: proto
+    include_imports: true
