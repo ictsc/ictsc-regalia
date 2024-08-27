@@ -27,7 +27,6 @@ export function MaterialSymbol({
   return (
     <span
       // material symbols の提供するクラスを使わないとフォントを指定できない
-      // eslint-disable-next-line tailwindcss/no-custom-classname
       className={clsx("material-symbols-outlined select-none", className)}
       style={style}
     >

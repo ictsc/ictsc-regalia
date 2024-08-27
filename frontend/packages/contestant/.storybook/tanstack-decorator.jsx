@@ -1,4 +1,3 @@
-import type { Decorator } from "@storybook/react";
 import { createContext, use } from "react";
 import {
   RouterProvider,
@@ -11,9 +10,7 @@ import {
 
 /* eslint-disable react-refresh/only-export-components */
 
-const StoryContext = createContext<Parameters<Decorator>[0] | undefined>(
-  undefined,
-);
+const StoryContext = createContext(undefined);
 
 function NotFound() {
   const state = useRouterState();
@@ -45,10 +42,9 @@ const router = createRouter({
   routeTree: rootRoute,
 });
 
-export const withTanstack: Decorator = (storyFn) => (
+/** @type{import("@storybook/react").Decorator} */
+export const withTanstack = (storyFn) => (
   <StoryContext.Provider value={storyFn}>
-    {/* 嘘のルートなので any で合わせる */}
-    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-assignment */}
-    <RouterProvider router={router as any} />
+    <RouterProvider router={router} />
   </StoryContext.Provider>
 );

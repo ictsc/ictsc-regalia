@@ -1,8 +1,8 @@
-import type { Preview } from "@storybook/react";
 import { withTanstack } from "./tanstack-decorator";
 import "../app/index.css";
 
-const preview: Preview = {
+/** @type{import("@storybook/react").Preview} */
+const preview = {
   parameters: {
     controls: {
       matchers: {
