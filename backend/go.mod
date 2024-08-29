@@ -16,7 +16,7 @@ require (
 	github.com/rs/zerolog v1.32.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.18.2
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/uptrace/bun v1.1.17
 	github.com/uptrace/bun/dialect/mysqldialect v1.1.17
 	github.com/uptrace/bun/extra/bundebug v1.1.17
