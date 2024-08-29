@@ -103,6 +103,8 @@ github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINE
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRIccs7FGNTlIRMkT8wgtp5eCXdBlqhYGL6U=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/puzpuzpuz/xsync/v3 v3.4.0 h1:DuVBAdXuGFHv8adVXjWWZ63pJq+NRXOWVXlKDBZ+mJ4=
+github.com/puzpuzpuz/xsync/v3 v3.4.0/go.mod h1:VjzYrABPabuM4KyBh1Ftq6u8nhwY5tBPKP9jpmh0nnA=
 github.com/redis/go-redis/v9 v9.6.1 h1:HHDteefn6ZkTtY5fGUE8tj8uy85AHk6zP7CpzIAM0y4=
 github.com/redis/go-redis/v9 v9.6.1/go.mod h1:0C0c6ycQsdpVNQpxb1njEQIqkx5UcsM8FJCQLgE9+RA=
 github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
@@ -145,8 +147,8 @@ github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc h1:9lRDQMhESg+zvGYm
 github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc/go.mod h1:bciPuU6GHm1iF1pBvUfxfsH0Wmnc2VbpgvbI9ZWuIRs=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=
 github.com/twitchyliquid64/golang-asm v0.15.1/go.mod h1:a1lVb/DtPvCB8fslRZhAngC2+aY1QWCk3Cedj/Gdt08=
-github.com/uptrace/bun v1.1.17 h1:qxBaEIo0hC/8O3O6GrMDKxqyT+mw5/s0Pn/n6xjyGIk=
-github.com/uptrace/bun v1.1.17/go.mod h1:hATAzivtTIRsSJR4B8AXR+uABqnQxr3myKDKEf5iQ9U=
+github.com/uptrace/bun v1.2.2 h1:+PxDjUQotbncTDJ66ieIvoJ0ax/uzDeQrz+HQUVYzfo=
+github.com/uptrace/bun v1.2.2/go.mod h1:8frYFHrO/Zol3I4FEjoXam0HoNk+t5k7aJRl3FXp0mk=
 github.com/uptrace/bun/dialect/mysqldialect v1.1.17 h1:CsaZu+C3hW6jH5XnbQWPeZbHOoeURRpX9wd9wNy9fYU=
 github.com/uptrace/bun/dialect/mysqldialect v1.1.17/go.mod h1:PDT12yHB0yLidZWFoPjhXfEKvsu7tLyjY67+OSMQsVw=
 github.com/uptrace/bun/extra/bundebug v1.1.17 h1:LcZ8DzyyGdXAmbUqmnCpBq7TPFegMp59FGy+uzEE21c=
