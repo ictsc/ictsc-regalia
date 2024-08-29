@@ -65,7 +65,7 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
-	go.uber.org/atomic v1.9.0 // indirect
+	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/arch v0.7.0 // indirect
 	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948 // indirect
