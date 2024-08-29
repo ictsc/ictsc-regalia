@@ -56,11 +56,16 @@ var (
 	configFile string
 )
 
+const (
+	defaultServerPort = 8080
+	defaultMySQLPort  = 3306
+)
+
 func init() {
 	viper.SetDefault("dev", false)
-	viper.SetDefault("port", 8080)
+	viper.SetDefault("port", defaultServerPort)
 	viper.SetDefault("rdb.hostname", "mysql")
-	viper.SetDefault("rdb.port", 3306)
+	viper.SetDefault("rdb.port", defaultMySQLPort)
 	viper.SetDefault("rdb.username", "root")
 	viper.SetDefault("rdb.password", "password")
 	viper.SetDefault("rdb.database", "anita")
