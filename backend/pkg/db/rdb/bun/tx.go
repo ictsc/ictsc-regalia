@@ -26,7 +26,7 @@ func (d *DB) Do(ctx context.Context, options *sql.TxOptions, callBack func(conte
 
 	tx, err := idb.BeginTx(ctx, options)
 	if err != nil {
-		return errors.Wrap(err)
+		return errors.Wrap(errors.ErrUnknown, err)
 	}
 
 	defer func() {
@@ -42,10 +42,10 @@ func (d *DB) Do(ctx context.Context, options *sql.TxOptions, callBack func(conte
 
 	err = ctx.Err()
 	if err != nil {
-		return errors.Wrap(err)
+		return errors.Wrap(errors.ErrUnknown, err)
 	}
 
-	return errors.Wrap(tx.Commit())
+	return errors.Wrap(errors.ErrUnknown, tx.Commit())
 }
 
 // GetIDB bun.IDBインスタンスを取得

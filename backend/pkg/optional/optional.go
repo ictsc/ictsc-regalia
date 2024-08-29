@@ -1,4 +1,3 @@
-// Package optional オプショナル型ユーティリティー
 package optional
 
 import "database/sql"

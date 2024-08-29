@@ -1,18 +1,12 @@
 linters:
   enable-all: true
   disable:
-    - deadcode # deprecated
-    - exhaustivestruct # deprecated
-    - golint # deprecated
-    - ifshort # deprecated
-    - interfacer # deprecated
-    - maligned # deprecated
-    - nosnakecase # deprecated
-    - scopelint # deprecated
-    - structcheck # deprecated
-    - varcheck # deprecated
+    - exportloopref # deprecated
+    - gomnd # deprecated
+    - execinquery # deprecated
     - depguard
     - dogsled
+    - gci
     - godot
     - nolintlint
 
@@ -23,14 +17,38 @@ issues:
       linters:
         - containedctx
         - funlen
+    - path: cmd/(.+)/cmd/
+      linters:
+        - exhaustruct
+        - gomnd
+        - gochecknoglobals
+        - gochecknoinits
+    - path: internal/(.+)/repository/bun/migration/
+      linters:
+        - gochecknoglobals
+        - gochecknoinits
 
 linters-settings:
+  cyclop:
+    max-complexity: 15
   lll:
     line-length: 150
+  revive:
+    rules:
+      - name: package-comments
+        disabled: true
+  stylecheck:
+    checks:
+      - all
+      - -ST1000
   varnamelen:
     ignore-names:
       - tt
       - tx
+      - id
+      - db
+      - to
+      - i
   wrapcheck:
     ignoreSigs:
       - .Wrap(
@@ -39,4 +57,4 @@ linters-settings:
       - .WithMessagef(
       - .WithStack(
       - github.com/cockroachdb/errors.Newf(
-      - github.com/ictsc/ictsc-outlands/backend/pkg/errors.New(
+      - github.com/ictsc/ictsc-outlands/backend

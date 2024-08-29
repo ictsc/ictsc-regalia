@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package admin.v1;
+
+import "admin/v1/team.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/admin/v1";
+
+message GetAdminConnectionInfoRequest {}
+
+message GetAdminConnectionInfoResponse {
+  Bastion bastion = 1 [(buf.validate.field).required = true];
+}
+
+message PutAdminConnectionInfoRequest {
+  Bastion bastion = 1;
+}
+
+message PutAdminConnectionInfoResponse {}
+
+service AdminEnvService {
+  rpc GetAdminConnectionInfo(GetAdminConnectionInfoRequest) returns (GetAdminConnectionInfoResponse);
+  rpc PutAdminConnectionInfo(PutAdminConnectionInfoRequest) returns (PutAdminConnectionInfoResponse);
+}

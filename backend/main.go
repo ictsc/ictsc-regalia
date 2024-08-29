@@ -1,8 +1,7 @@
-// Package main プログラムのエントリーポイント
 package main
 
-import "log"
+import "github.com/ictsc/ictsc-outlands/backend/cmd/anita/cmd"
 
 func main() {
-	log.Print("Hello ictsc-outlands!")
+	cmd.Execute()
 }

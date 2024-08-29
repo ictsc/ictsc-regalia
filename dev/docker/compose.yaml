@@ -1,0 +1,51 @@
+services:
+  anita:
+    container_name: ictsc-outlands_anita
+    build:
+      context: ../../backend
+      target: anita
+    image: anita
+    restart: always
+    environment:
+      DEV: "true"
+    entrypoint: ./anita run
+    expose:
+      - 8080
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    container_name: ictsc-outlands_mysql
+    image: mysql:8.3.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    expose:
+      - 3306
+    volumes:
+      - mysql:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: mysql --user=root --password=password --execute "SHOW DATABASES;"
+      interval: 1s
+      timeout: 10s
+      retries: 60
+
+  phpmyadmin:
+    container_name: ictsc-outlands_phpmyadmin
+    image: phpmyadmin/phpmyadmin:5.2.1
+    restart: always
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=password
+    ports:
+      - 2420:80
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql:

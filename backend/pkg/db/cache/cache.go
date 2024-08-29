@@ -1,4 +1,3 @@
-// Package cache キャッシュ用データベースインターフェス定義
 package cache
 
 import "context"

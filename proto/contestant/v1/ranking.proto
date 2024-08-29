@@ -8,9 +8,9 @@ import "contestant/v1/team.proto";
 option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/contestant/v1";
 
 message Rank {
-  int32 rank = 1 [(buf.validate.field).int32.gt = 0];
+  int64 rank = 1 [(buf.validate.field).int64.gt = 0];
   Team team = 2 [(buf.validate.field).required = true];
-  int32 point = 3 [(buf.validate.field).int32.gte = 0];
+  int64 point = 3 [(buf.validate.field).int64.gte = 0];
 }
 
 message GetRankingRequest {}

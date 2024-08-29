@@ -1,4 +1,3 @@
-// Package bun Bunユーティリティー
 package bun
 
 import (
@@ -36,12 +35,13 @@ type Config struct {
 func NewDB(conf *Config) (*DB, error) {
 	jst, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
-		return nil, errors.Wrap(err)
+		return nil, errors.Wrap(errors.ErrUnknown, err)
 	}
 
 	mysqlConf := mysql.NewConfig()
 	mysqlConf.User = conf.Username
 	mysqlConf.Passwd = conf.Password
+	mysqlConf.Net = "tcp"
 	mysqlConf.Addr = conf.Hostname + ":" + strconv.Itoa(conf.Port)
 	mysqlConf.DBName = conf.Database
 	mysqlConf.Collation = "utf8mb4_general_ci"
@@ -51,7 +51,7 @@ func NewDB(conf *Config) (*DB, error) {
 
 	sqlDB, err := sql.Open("mysql", mysqlConf.FormatDSN())
 	if err != nil {
-		return nil, errors.Wrap(err)
+		return nil, errors.Wrap(errors.ErrUnknown, err)
 	}
 
 	bunDB := bun.NewDB(sqlDB, mysqldialect.New())
@@ -60,4 +60,8 @@ func NewDB(conf *Config) (*DB, error) {
 	}
 
 	return &DB{db: bunDB}, nil
+}
+
+func (d *DB) GetBunDB() *bun.DB {
+	return d.db
 }

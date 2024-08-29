@@ -1,4 +1,3 @@
-// Package log ログユーティリティー
 package log
 
 import (

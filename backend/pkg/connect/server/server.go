@@ -1,12 +1,13 @@
-// Package server Connectサーバーユーティリティ
 package server
 
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/ictsc/ictsc-outlands/backend/pkg/errors"
 	"github.com/ictsc/ictsc-outlands/backend/pkg/log"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
@@ -21,7 +22,8 @@ const (
 	TypeInternal
 )
 
-type registerer struct {
+// Registerer Connectサーバーハンドラー登録構造体
+type Registerer struct {
 	mux             *http.ServeMux
 	commonOpt       []connect.HandlerOption
 	authInterceptor connect.HandlerOption
@@ -31,15 +33,16 @@ type registerer struct {
 func New(
 	dev bool,
 	_ serverType,
-	addr string,
-	register func(reg *registerer),
+	port int,
+	register func(reg *Registerer),
 ) (*http.Server, func()) {
 	mux := http.NewServeMux()
-	reg := &registerer{
+	reg := &Registerer{
 		mux: mux,
 		commonOpt: []connect.HandlerOption{
 			connect.WithInterceptors(
 				log.NewLoggerInterceptor(log.NewLogger(dev)),
+				errors.NewErrorInterceptor(),
 			),
 		},
 		authInterceptor: nil,
@@ -47,8 +50,13 @@ func New(
 
 	register(reg)
 
+	// Healthcheckのため、pingハンドラを追加
+	mux.Handle("/ping", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte("pong"))
+	}))
+
 	srv := &http.Server{ // nolint:exhaustruct
-		Addr:        addr,
+		Addr:        "0.0.0.0:" + strconv.Itoa(port),
 		Handler:     mux,
 		ReadTimeout: time.Second,
 	}
@@ -65,7 +73,7 @@ func New(
 
 // Register Connectサービスを認証無しで登録する
 func Register[H any](
-	reg *registerer,
+	reg *Registerer,
 	newServiceHandler func(svc H, opts ...connect.HandlerOption) (string, http.Handler),
 	svc H,
 	opts ...connect.HandlerOption,
@@ -76,7 +84,7 @@ func Register[H any](
 
 // RegisterWithAuth Connectサービスを認証付きで登録する
 func RegisterWithAuth[H any](
-	reg *registerer,
+	reg *Registerer,
 	newServiceHandler func(svc H, opts ...connect.HandlerOption) (string, http.Handler),
 	svc H,
 	opts ...connect.HandlerOption,

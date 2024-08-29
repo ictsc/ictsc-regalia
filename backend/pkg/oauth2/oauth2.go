@@ -1,4 +1,3 @@
-// Package oauth2 OAuth2認証プロバイダーインターフェース定義
 package oauth2
 
 import (

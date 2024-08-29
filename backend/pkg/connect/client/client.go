@@ -1,4 +1,3 @@
-// Package client Connectクライアントラッパー実装
 package client
 
 import (

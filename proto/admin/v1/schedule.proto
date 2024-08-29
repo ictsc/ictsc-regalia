@@ -7,19 +7,19 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/admin/v1";
 
-enum Rounds {
-  ROUNDS_UNSPECIFIED = 0;
-  ROUNDS_QUALIFYING = 1;
-  ROUNDS_FINALS = 2;
+enum Phases {
+  PHASES_UNSPECIFIED = 0;
+  PHASES_QUALIFYING = 1;
+  PHASES_FINALS = 2;
 }
 
 message Schedule {
   string id = 1 [(buf.validate.field).string.len = 26];
   string name = 2 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 100
   }];
-  Rounds round = 3 [(buf.validate.field).enum = {defined_only: true}];
+  Phases phase = 3 [(buf.validate.field).enum = {defined_only: true}];
   google.protobuf.Timestamp start_at = 4 [(buf.validate.field).required = true];
   google.protobuf.Timestamp end_at = 5 [(buf.validate.field).required = true];
 }
@@ -33,13 +33,13 @@ message GetSchedulesResponse {
 message PatchScheduleRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
   optional string name = 2 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 100
   }];
-  optional Rounds round = 3 [(buf.validate.field).enum = {defined_only: true}];
+  optional Phases phase = 3 [(buf.validate.field).enum = {defined_only: true}];
   optional google.protobuf.Timestamp start_at = 4 [(buf.validate.field).required = true];
   optional google.protobuf.Timestamp end_at = 5 [(buf.validate.field) = {
-    required: true,
+    required: true
     timestamp: {gt_now: true}
   }];
 }
@@ -50,16 +50,16 @@ message PatchScheduleResponse {
 
 message PostScheduleRequest {
   string name = 1 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 100
   }];
-  Rounds round = 2 [(buf.validate.field).enum = {defined_only: true}];
+  Phases phase = 2 [(buf.validate.field).enum = {defined_only: true}];
   google.protobuf.Timestamp start_at = 3 [(buf.validate.field) = {
-    required: true,
+    required: true
     timestamp: {gt_now: true}
   }];
   google.protobuf.Timestamp end_at = 4 [(buf.validate.field) = {
-    required: true,
+    required: true
     timestamp: {gt_now: true}
   }];
 }

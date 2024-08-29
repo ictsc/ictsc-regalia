@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package anita.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/anita/v1";
+
+message User {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string team_id = 3 [(buf.validate.field).string.len = 26];
+}
+
+message GetUserRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message GetUserResponse {
+  User user = 1 [(buf.validate.field).required = true];
+}
+
+message GetUsersRequest {}
+
+message GetUsersResponse {
+  repeated User users = 1 [(buf.validate.field).required = true];
+}
+
+message PostUserRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+  string invitation_code = 3 [(buf.validate.field).string.len = 32];
+}
+
+message PostUserResponse {
+  User user = 1 [(buf.validate.field).required = true];
+}
+
+message PatchUserRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+  string name = 2 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 20
+  }];
+}
+
+message PatchUserResponse {
+  User user = 1 [(buf.validate.field).required = true];
+}
+
+message DeleteUserRequest {
+  string id = 1 [(buf.validate.field).string.len = 26];
+}
+
+message DeleteUserResponse {}
+
+service UserService {
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
+  rpc GetUsers(GetUsersRequest) returns (GetUsersResponse) {}
+  rpc PostUser(PostUserRequest) returns (PostUserResponse) {}
+  rpc PatchUser(PatchUserRequest) returns (PatchUserResponse) {}
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
+}

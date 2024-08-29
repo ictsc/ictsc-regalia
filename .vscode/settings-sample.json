@@ -1,5 +1,3 @@
 {
-  "cSpell.import": ["dev/cspell/cspell.config.yaml"],
-  "go.lintOnSave": "package",
-  "go.lintTool": "golangci-lint"
+  "cSpell.import": ["${workspaceFolder}/dev/cspell/cspell.config.yaml"]
 }

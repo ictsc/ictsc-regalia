@@ -8,9 +8,9 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/contestant/v1";
 
 enum Phases {
-  ROUNDS_UNSPECIFIED = 0;
-  ROUNDS_QUALIFYING = 1;
-  ROUNDS_FINALS = 2;
+  PHASES_UNSPECIFIED = 0;
+  PHASES_QUALIFYING = 1;
+  PHASES_FINALS = 2;
 }
 
 message Schedule {
