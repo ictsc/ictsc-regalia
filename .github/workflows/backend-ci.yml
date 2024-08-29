@@ -82,7 +82,7 @@ jobs:
       - name: Mod Download
         run: go mod download
       - name: Build
-        run: go build
+        run: CGO_ENABLED=0 go build -ldflags "-s -w" -trimpath .
   test:
     name: Test
     runs-on: ubuntu-latest
