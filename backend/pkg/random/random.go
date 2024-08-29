@@ -7,7 +7,7 @@ import (
 )
 
 // NewString 指定された長さのランダム文字列を生成
-func NewString(digit uint32) (string, error) {
+func NewString(digit int) (string, error) {
 	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$"
 
 	if digit == 0 {

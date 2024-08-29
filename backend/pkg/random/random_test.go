@@ -1,7 +1,8 @@
 package random_test
 
 import (
-	"math/rand/v2"
+	"crypto/rand"
+	"math/big"
 	"testing"
 
 	"github.com/ictsc/ictsc-outlands/backend/pkg/random"
@@ -11,8 +12,11 @@ import (
 func TestNewString(t *testing.T) {
 	t.Parallel()
 
+	randomNum, err := rand.Int(rand.Reader, big.NewInt(100))
+	require.NoError(t, err)
+
 	type args struct {
-		digit uint32
+		digit int
 	}
 
 	tests := []struct {
@@ -23,7 +27,7 @@ func TestNewString(t *testing.T) {
 		{
 			name: "success",
 			args: args{
-				digit: uint32(rand.IntN(100) + 1),
+				digit: int(randomNum.Int64() + 1),
 			},
 			assertion: require.NoError,
 		},
@@ -36,7 +40,7 @@ func TestNewString(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests { // nolint:paralleltest
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -44,7 +48,7 @@ func TestNewString(t *testing.T) {
 			tt.assertion(t, err)
 
 			if err == nil {
-				require.Len(t, got, int(tt.args.digit))
+				require.Len(t, got, tt.args.digit)
 			}
 		})
 	}
