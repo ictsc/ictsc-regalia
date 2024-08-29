@@ -9,7 +9,7 @@ option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/admi
 
 message Team {
   string id = 1 [(buf.validate.field).string.len = 26];
-  int32 code = 2 [(buf.validate.field).int32 = {
+  int64 code = 2 [(buf.validate.field).int64 = {
     gt: 1
     lt: 100
   }];
@@ -22,7 +22,7 @@ message Team {
     max_len: 50
   }];
   string invitation_code = 5 [(buf.validate.field).string.len = 32];
-  int32 code_remaining = 6 [(buf.validate.field).int32 = {
+  int64 code_remaining = 6 [(buf.validate.field).int64 = {
     gte: 0
     lte: 5
   }];
@@ -55,7 +55,7 @@ message Bastion {
     min_len: 1
     max_len: 100
   }];
-  int32 port = 4 [(buf.validate.field).int32.gte = 0];
+  int64 port = 4 [(buf.validate.field).int64.gte = 0];
 }
 
 message GetConnectionInfoRequest {
@@ -79,7 +79,7 @@ message GetMembersResponse {
 
 message PatchTeamRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
-  optional int32 code = 2 [(buf.validate.field).int32 = {
+  optional int64 code = 2 [(buf.validate.field).int64 = {
     gt: 1
     lt: 100
   }];
@@ -91,7 +91,7 @@ message PatchTeamRequest {
     min_len: 1
     max_len: 50
   }];
-  optional int32 code_remaining = 5 [(buf.validate.field).int32 = {
+  optional int64 code_remaining = 5 [(buf.validate.field).int64 = {
     gte: 0
     lte: 5
   }];
@@ -109,7 +109,7 @@ message PutConnectionInfoRequest {
 message PutConnectionInfoResponse {}
 
 message PostTeamRequest {
-  int32 code = 1 [(buf.validate.field).int32 = {
+  int64 code = 1 [(buf.validate.field).int64 = {
     gt: 1
     lt: 100
   }];
@@ -121,7 +121,7 @@ message PostTeamRequest {
     min_len: 1
     max_len: 50
   }];
-  int32 code_remaining = 4 [(buf.validate.field).int32 = {
+  int64 code_remaining = 4 [(buf.validate.field).int64 = {
     gte: 0
     lte: 5
   }];

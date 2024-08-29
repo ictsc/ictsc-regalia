@@ -27,11 +27,11 @@ func fromDomainUsers(users []*domain.User) []*v1.User {
 func fromDomainTeam(team *domain.Team) *v1.Team {
 	return &v1.Team{
 		Id:             team.ID().String(),
-		Code:           int32(team.Code().Value()),
+		Code:           int64(team.Code().Value()),
 		Name:           team.Name().Value(),
 		Organization:   team.Organization().Value(),
 		InvitationCode: team.InvitationCode().Value(),
-		CodeRemaining:  int32(team.CodeRemaining().Value()),
+		CodeRemaining:  int64(team.CodeRemaining().Value()),
 	}
 }
 
@@ -50,6 +50,6 @@ func fromDomainBastion(bastion value.Bastion) *v1.Bastion {
 		User:     bastion.User(),
 		Password: bastion.Password(),
 		Host:     bastion.Host(),
-		Port:     int32(bastion.Port()),
+		Port:     int64(bastion.Port()),
 	}
 }

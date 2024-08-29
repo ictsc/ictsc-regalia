@@ -13,7 +13,7 @@ enum QuestionType {
 }
 
 message Choice {
-  int32 index = 1 [(buf.validate.field).int32.gte = 0];
+  int64 index = 1 [(buf.validate.field).int64.gte = 0];
   string body = 2 [(buf.validate.field).string = {
     min_len: 1,
     max_len: 1000
@@ -31,13 +31,13 @@ message Question {
     min_items: 2,
     max_items: 10
   }];
-  int32 point = 5 [(buf.validate.field).int32.gt = 0];
-  repeated int32 answer = 6 [(buf.validate.field).repeated = {
+  int64 point = 5 [(buf.validate.field).int64.gt = 0];
+  repeated int64 answer = 6 [(buf.validate.field).repeated = {
     unique: true,
     min_items: 1,
     max_items: 10,
     items: {
-      int32: {gte: 0}
+      int64: {gte: 0}
     }
   }];
 }
@@ -100,7 +100,7 @@ message Problem {
     max_len: 100
   }];
   string code = 3 [(buf.validate.field).string.len = 3];
-  int32 point = 4 [(buf.validate.field).int32.gt = 0];
+  int64 point = 4 [(buf.validate.field).int64.gt = 0];
   ProblemType type = 5 [(buf.validate.field).enum.defined_only = true];
   oneof body {
     option (buf.validate.oneof).required = true;
@@ -137,7 +137,7 @@ message PatchProblemRequest {
     max_len: 100
   }];
   optional string code = 3 [(buf.validate.field).string.len = 3];
-  optional int32 point = 4 [(buf.validate.field).int32.gt = 0];
+  optional int64 point = 4 [(buf.validate.field).int64.gt = 0];
   optional ProblemType type = 5 [(buf.validate.field).enum.defined_only = true];
   oneof body {
     DescriptiveProblem descriptive = 6;
@@ -155,7 +155,7 @@ message PostProblemRequest {
     max_len: 100
   }];
   string code = 2 [(buf.validate.field).string.len = 3];
-  int32 point = 3 [(buf.validate.field).int32.gt = 0];
+  int64 point = 3 [(buf.validate.field).int64.gt = 0];
   ProblemType type = 4 [(buf.validate.field).enum.defined_only = true];
   oneof body {
     option (buf.validate.oneof).required = true;

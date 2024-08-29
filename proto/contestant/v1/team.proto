@@ -9,7 +9,7 @@ option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/cont
 
 message Team {
   string id = 1 [(buf.validate.field).string.len = 26];
-  int32 code = 2 [(buf.validate.field).int32 = {
+  int64 code = 2 [(buf.validate.field).int64 = {
     gt: 1
     lt: 100
   }];
@@ -61,7 +61,7 @@ message Bastion {
     min_len: 1
     max_len: 100
   }];
-  int32 port = 4 [(buf.validate.field).int32.gte = 0];
+  int64 port = 4 [(buf.validate.field).int64.gte = 0];
 }
 
 message GetConnectionInfoRequest {}
