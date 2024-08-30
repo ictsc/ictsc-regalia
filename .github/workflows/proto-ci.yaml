@@ -41,10 +41,11 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Run buf-breaking
-        uses: bufbuild/buf-breaking-action@v1
+        uses: bufbuild/buf-action@v1
         with:
           input: proto
-          against: https://github.com/ictsc/ictsc-outlands.git#branch=main
+          breaking: true
+          breaking_against: https://github.com/ictsc/ictsc-regalia.git#branch=main
   format:
     name: Format
     runs-on: ubuntu-latest
