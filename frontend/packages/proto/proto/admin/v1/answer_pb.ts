@@ -15,16 +15,16 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file admin/v1/answer.proto.
  */
 export const file_admin_v1_answer: GenFile = /*@__PURE__*/
-  fileDesc("ChVhZG1pbi92MS9hbnN3ZXIucHJvdG8SCGFkbWluLnYxIjQKDlF1ZXN0aW9uQW5zd2VyEiIKBmFuc3dlchgGIAMoBUISukgPkgEMCAEQChgBIgQaAigAIlUKFE11bHRpcGxlQ2hvaWNlQW5zd2VyEj0KD3F1ZXN0aW9uX2Fuc3dlchgBIAMoCzIYLmFkbWluLnYxLlF1ZXN0aW9uQW5zd2VyQgq6SAeSAQQIARAKIi0KEURlc2NyaXB0aXZlQW5zd2VyEhgKBGJvZHkYASABKAlCCrpIB3IFEAEY6AcigwMKBkFuc3dlchIUCgJpZBgBIAEoCUIIukgFcgOYARoSHAoKcHJvYmxlbV9pZBgCIAEoCUIIukgFcgOYARoSGQoHdGVhbV9pZBgDIAEoCUIIukgFcgOYARoSNQoMcHJvYmxlbV90eXBlGAQgASgOMhUuYWRtaW4udjEuUHJvYmxlbVR5cGVCCLpIBYIBAhABEjkKD211bHRpcGxlX2Nob2ljZRgFIAEoCzIeLmFkbWluLnYxLk11bHRpcGxlQ2hvaWNlQW5zd2VySAASMgoLZGVzY3JpcHRpdmUYBiABKAsyGy5hZG1pbi52MS5EZXNjcmlwdGl2ZUFuc3dlckgAEhsKBXBvaW50GAcgASgFQge6SAQaAigASAGIAQESFgoObWFya19wdWJsaXNoZWQYCCABKAgSNgoKY3JlYXRlZF9hdBgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCBrpIA8gBAUINCgRib2R5EgW6SAIIAUIICgZfcG9pbnQiKAoQR2V0QW5zd2VyUmVxdWVzdBIUCgJpZBgBIAEoCUIIukgFcgOYARoiPQoRR2V0QW5zd2VyUmVzcG9uc2USKAoGYW5zd2VyGAEgASgLMhAuYWRtaW4udjEuQW5zd2VyQga6SAPIAQEiZgoKUGFnaW5hdGlvbhIWCgVsaW1pdBgBIAEoBUIHukgEGgIoARJAChRsYXN0X2l0ZW1fY3JlYXRlZF9hdBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCBrpIA8gBASKjAQoRR2V0QW5zd2Vyc1JlcXVlc3QSHAoKcHJvYmxlbV9pZBgBIAEoCUIIukgFcgOYARoSHgoHdGVhbV9pZBgCIAEoCUIIukgFcgOYARpIAIgBARI1CgpwYWdpbmF0aW9uGAMgASgLMhQuYWRtaW4udjEuUGFnaW5hdGlvbkIGukgDyAEBSAGIAQFCCgoIX3RlYW1faWRCDQoLX3BhZ2luYXRpb24iPwoSR2V0QW5zd2Vyc1Jlc3BvbnNlEikKB2Fuc3dlcnMYASADKAsyEC5hZG1pbi52MS5BbnN3ZXJCBrpIA8gBASI/Cg9QdXRQb2ludFJlcXVlc3QSFAoCaWQYASABKAlCCLpIBXIDmAEaEhYKBXBvaW50GAIgASgFQge6SAQaAigAIhIKEFB1dFBvaW50UmVzcG9uc2Uy4QEKDUFuc3dlclNlcnZpY2USRAoJR2V0QW5zd2VyEhouYWRtaW4udjEuR2V0QW5zd2VyUmVxdWVzdBobLmFkbWluLnYxLkdldEFuc3dlclJlc3BvbnNlEkcKCkdldEFuc3dlcnMSGy5hZG1pbi52MS5HZXRBbnN3ZXJzUmVxdWVzdBocLmFkbWluLnYxLkdldEFuc3dlcnNSZXNwb25zZRJBCghQdXRQb2ludBIZLmFkbWluLnYxLlB1dFBvaW50UmVxdWVzdBoaLmFkbWluLnYxLlB1dFBvaW50UmVzcG9uc2VCnQEKDGNvbS5hZG1pbi52MUILQW5zd2VyUHJvdG9QAVo/Z2l0aHViLmNvbS9pY3RzYy9pY3RzYy1vdXRsYW5kcy9iYWNrZW5kL2ludGVybmFsL3Byb3RvL2FkbWluL3YxogIDQVhYqgIIQWRtaW4uVjHKAghBZG1pblxWMeICFEFkbWluXFYxXEdQQk1ldGFkYXRh6gIJQWRtaW46OlYxYgZwcm90bzM", [file_admin_v1_problem, file_buf_validate_validate, file_google_protobuf_timestamp]);
+  fileDesc("ChVhZG1pbi92MS9hbnN3ZXIucHJvdG8SCGFkbWluLnYxIjQKDlF1ZXN0aW9uQW5zd2VyEiIKBmFuc3dlchgGIAMoA0ISukgPkgEMCAEQChgBIgQiAigAIlUKFE11bHRpcGxlQ2hvaWNlQW5zd2VyEj0KD3F1ZXN0aW9uX2Fuc3dlchgBIAMoCzIYLmFkbWluLnYxLlF1ZXN0aW9uQW5zd2VyQgq6SAeSAQQIARAKIi0KEURlc2NyaXB0aXZlQW5zd2VyEhgKBGJvZHkYASABKAlCCrpIB3IFEAEY6AcigwMKBkFuc3dlchIUCgJpZBgBIAEoCUIIukgFcgOYARoSHAoKcHJvYmxlbV9pZBgCIAEoCUIIukgFcgOYARoSGQoHdGVhbV9pZBgDIAEoCUIIukgFcgOYARoSNQoMcHJvYmxlbV90eXBlGAQgASgOMhUuYWRtaW4udjEuUHJvYmxlbVR5cGVCCLpIBYIBAhABEjkKD211bHRpcGxlX2Nob2ljZRgFIAEoCzIeLmFkbWluLnYxLk11bHRpcGxlQ2hvaWNlQW5zd2VySAASMgoLZGVzY3JpcHRpdmUYBiABKAsyGy5hZG1pbi52MS5EZXNjcmlwdGl2ZUFuc3dlckgAEhsKBXBvaW50GAcgASgDQge6SAQiAigASAGIAQESFgoObWFya19wdWJsaXNoZWQYCCABKAgSNgoKY3JlYXRlZF9hdBgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCBrpIA8gBAUINCgRib2R5EgW6SAIIAUIICgZfcG9pbnQiKAoQR2V0QW5zd2VyUmVxdWVzdBIUCgJpZBgBIAEoCUIIukgFcgOYARoiPQoRR2V0QW5zd2VyUmVzcG9uc2USKAoGYW5zd2VyGAEgASgLMhAuYWRtaW4udjEuQW5zd2VyQga6SAPIAQEiZgoKUGFnaW5hdGlvbhIWCgVsaW1pdBgBIAEoA0IHukgEIgIoARJAChRsYXN0X2l0ZW1fY3JlYXRlZF9hdBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCBrpIA8gBASKjAQoRR2V0QW5zd2Vyc1JlcXVlc3QSHAoKcHJvYmxlbV9pZBgBIAEoCUIIukgFcgOYARoSHgoHdGVhbV9pZBgCIAEoCUIIukgFcgOYARpIAIgBARI1CgpwYWdpbmF0aW9uGAMgASgLMhQuYWRtaW4udjEuUGFnaW5hdGlvbkIGukgDyAEBSAGIAQFCCgoIX3RlYW1faWRCDQoLX3BhZ2luYXRpb24iPwoSR2V0QW5zd2Vyc1Jlc3BvbnNlEikKB2Fuc3dlcnMYASADKAsyEC5hZG1pbi52MS5BbnN3ZXJCBrpIA8gBASI/Cg9QdXRQb2ludFJlcXVlc3QSFAoCaWQYASABKAlCCLpIBXIDmAEaEhYKBXBvaW50GAIgASgDQge6SAQiAigAIhIKEFB1dFBvaW50UmVzcG9uc2Uy4QEKDUFuc3dlclNlcnZpY2USRAoJR2V0QW5zd2VyEhouYWRtaW4udjEuR2V0QW5zd2VyUmVxdWVzdBobLmFkbWluLnYxLkdldEFuc3dlclJlc3BvbnNlEkcKCkdldEFuc3dlcnMSGy5hZG1pbi52MS5HZXRBbnN3ZXJzUmVxdWVzdBocLmFkbWluLnYxLkdldEFuc3dlcnNSZXNwb25zZRJBCghQdXRQb2ludBIZLmFkbWluLnYxLlB1dFBvaW50UmVxdWVzdBoaLmFkbWluLnYxLlB1dFBvaW50UmVzcG9uc2VCnQEKDGNvbS5hZG1pbi52MUILQW5zd2VyUHJvdG9QAVo/Z2l0aHViLmNvbS9pY3RzYy9pY3RzYy1vdXRsYW5kcy9iYWNrZW5kL2ludGVybmFsL3Byb3RvL2FkbWluL3YxogIDQVhYqgIIQWRtaW4uVjHKAghBZG1pblxWMeICFEFkbWluXFYxXEdQQk1ldGFkYXRh6gIJQWRtaW46OlYxYgZwcm90bzM", [file_admin_v1_problem, file_buf_validate_validate, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message admin.v1.QuestionAnswer
  */
 export type QuestionAnswer = Message<"admin.v1.QuestionAnswer"> & {
   /**
-   * @generated from field: repeated int32 answer = 6;
+   * @generated from field: repeated int64 answer = 6;
    */
-  answer: number[];
+  answer: bigint[];
 };
 
 /**
@@ -110,9 +110,9 @@ export type Answer = Message<"admin.v1.Answer"> & {
   } | { case: undefined; value?: undefined };
 
   /**
-   * @generated from field: optional int32 point = 7;
+   * @generated from field: optional int64 point = 7;
    */
-  point?: number;
+  point?: bigint;
 
   /**
    * @generated from field: bool mark_published = 8;
@@ -171,9 +171,9 @@ export const GetAnswerResponseSchema: GenMessage<GetAnswerResponse> = /*@__PURE_
  */
 export type Pagination = Message<"admin.v1.Pagination"> & {
   /**
-   * @generated from field: int32 limit = 1;
+   * @generated from field: int64 limit = 1;
    */
-  limit: number;
+  limit: bigint;
 
   /**
    * @generated from field: google.protobuf.Timestamp last_item_created_at = 2;
@@ -242,9 +242,9 @@ export type PutPointRequest = Message<"admin.v1.PutPointRequest"> & {
   id: string;
 
   /**
-   * @generated from field: int32 point = 2;
+   * @generated from field: int64 point = 2;
    */
-  point: number;
+  point: bigint;
 };
 
 /**

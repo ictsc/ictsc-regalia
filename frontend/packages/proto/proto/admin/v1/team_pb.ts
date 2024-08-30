@@ -4,8 +4,8 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
-import type { User } from "./user_pb";
-import { file_admin_v1_user } from "./user_pb";
+import type { Contestant } from "./contestant_pb";
+import { file_admin_v1_contestant } from "./contestant_pb";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -13,7 +13,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file admin/v1/team.proto.
  */
 export const file_admin_v1_team: GenFile = /*@__PURE__*/
-  fileDesc("ChNhZG1pbi92MS90ZWFtLnByb3RvEghhZG1pbi52MSK1AQoEVGVhbRIUCgJpZBgBIAEoCUIIukgFcgOYARoSFwoEY29kZRgCIAEoBUIJukgGGgQQZCABEhcKBG5hbWUYAyABKAlCCbpIBnIEEAEYFBIfCgxvcmdhbml6YXRpb24YBCABKAlCCbpIBnIEEAEYMhIhCg9pbnZpdGF0aW9uX2NvZGUYBSABKAlCCLpIBXIDmAEgEiEKDmNvZGVfcmVtYWluaW5nGAYgASgFQgm6SAYaBBgFKAAiEQoPR2V0VGVhbXNSZXF1ZXN0IjkKEEdldFRlYW1zUmVzcG9uc2USJQoFdGVhbXMYASADKAsyDi5hZG1pbi52MS5UZWFtQga6SAPIAQEiJgoOR2V0VGVhbVJlcXVlc3QSFAoCaWQYASABKAlCCLpIBXIDmAEaIjcKD0dldFRlYW1SZXNwb25zZRIkCgR0ZWFtGAEgASgLMg4uYWRtaW4udjEuVGVhbUIGukgDyAEBIm8KB0Jhc3Rpb24SFwoEdXNlchgBIAEoCUIJukgGcgQQARgUEhsKCHBhc3N3b3JkGAIgASgJQgm6SAZyBBABGBQSFwoEaG9zdBgDIAEoCUIJukgGcgQQARhkEhUKBHBvcnQYBCABKAVCB7pIBBoCKAAiNAocR2V0VGVhbUNvbm5lY3Rpb25JbmZvUmVxdWVzdBIUCgJpZBgBIAEoCUIIukgFcgOYARoiSwodR2V0VGVhbUNvbm5lY3Rpb25JbmZvUmVzcG9uc2USKgoHYmFzdGlvbhgBIAEoCzIRLmFkbWluLnYxLkJhc3Rpb25CBrpIA8gBASIfCh1HZXRBZG1pbkNvbm5lY3Rpb25JbmZvUmVxdWVzdCJMCh5HZXRBZG1pbkNvbm5lY3Rpb25JbmZvUmVzcG9uc2USKgoHYmFzdGlvbhgBIAEoCzIRLmFkbWluLnYxLkJhc3Rpb25CBrpIA8gBASIpChFHZXRNZW1iZXJzUmVxdWVzdBIUCgJpZBgBIAEoCUIIukgFcgOYARoiQQoSR2V0TWVtYmVyc1Jlc3BvbnNlEisKB21lbWJlcnMYASADKAsyDi5hZG1pbi52MS5Vc2VyQgq6SAeSAQQIABAFIugBChBQYXRjaFRlYW1SZXF1ZXN0EhQKAmlkGAEgASgJQgi6SAVyA5gBGhIcCgRjb2RlGAIgASgFQgm6SAYaBBBkIAFIAIgBARIcCgRuYW1lGAMgASgJQgm6SAZyBBABGBRIAYgBARIkCgxvcmdhbml6YXRpb24YBCABKAlCCbpIBnIEEAEYMkgCiAEBEiYKDmNvZGVfcmVtYWluaW5nGAUgASgFQgm6SAYaBBgFKABIA4gBAUIHCgVfY29kZUIHCgVfbmFtZUIPCg1fb3JnYW5pemF0aW9uQhEKD19jb2RlX3JlbWFpbmluZyI5ChFQYXRjaFRlYW1SZXNwb25zZRIkCgR0ZWFtGAEgASgLMg4uYWRtaW4udjEuVGVhbUIGukgDyAEBImAKHFB1dFRlYW1Db25uZWN0aW9uSW5mb1JlcXVlc3QSFAoCaWQYASABKAlCCLpIBXIDmAEaEioKB2Jhc3Rpb24YAiABKAsyES5hZG1pbi52MS5CYXN0aW9uQga6SAPIAQEiHwodUHV0VGVhbUNvbm5lY3Rpb25JbmZvUmVzcG9uc2UiSwodUHV0QWRtaW5Db25uZWN0aW9uSW5mb1JlcXVlc3QSKgoHYmFzdGlvbhgBIAEoCzIRLmFkbWluLnYxLkJhc3Rpb25CBrpIA8gBASIgCh5QdXRBZG1pbkNvbm5lY3Rpb25JbmZvUmVzcG9uc2UihwEKD1Bvc3RUZWFtUmVxdWVzdBIXCgRjb2RlGAEgASgFQgm6SAYaBBBkIAESFwoEbmFtZRgCIAEoCUIJukgGcgQQARgUEh8KDG9yZ2FuaXphdGlvbhgDIAEoCUIJukgGcgQQARgyEiEKDmNvZGVfcmVtYWluaW5nGAQgASgFQgm6SAYaBBgFKAAiOAoQUG9zdFRlYW1SZXNwb25zZRIkCgR0ZWFtGAEgASgLMg4uYWRtaW4udjEuVGVhbUIGukgDyAEBIkMKEEFkZE1lbWJlclJlcXVlc3QSFAoCaWQYASABKAlCCLpIBXIDmAEaEhkKB3VzZXJfaWQYAiABKAlCCLpIBXIDmAEaIhMKEUFkZE1lbWJlclJlc3BvbnNlIikKEURlbGV0ZVRlYW1SZXF1ZXN0EhQKAmlkGAEgASgJQgi6SAVyA5gBGiIUChJEZWxldGVUZWFtUmVzcG9uc2UiRgoTRGVsZXRlTWVtYmVyUmVxdWVzdBIUCgJpZBgBIAEoCUIIukgFcgOYARoSGQoHdXNlcl9pZBgCIAEoCUIIukgFcgOYARoiFgoURGVsZXRlTWVtYmVyUmVzcG9uc2Uy7gcKC1RlYW1TZXJ2aWNlEkEKCEdldFRlYW1zEhkuYWRtaW4udjEuR2V0VGVhbXNSZXF1ZXN0GhouYWRtaW4udjEuR2V0VGVhbXNSZXNwb25zZRI+CgdHZXRUZWFtEhguYWRtaW4udjEuR2V0VGVhbVJlcXVlc3QaGS5hZG1pbi52MS5HZXRUZWFtUmVzcG9uc2USaAoVR2V0VGVhbUNvbm5lY3Rpb25JbmZvEiYuYWRtaW4udjEuR2V0VGVhbUNvbm5lY3Rpb25JbmZvUmVxdWVzdBonLmFkbWluLnYxLkdldFRlYW1Db25uZWN0aW9uSW5mb1Jlc3BvbnNlEmsKFkdldEFkbWluQ29ubmVjdGlvbkluZm8SJy5hZG1pbi52MS5HZXRBZG1pbkNvbm5lY3Rpb25JbmZvUmVxdWVzdBooLmFkbWluLnYxLkdldEFkbWluQ29ubmVjdGlvbkluZm9SZXNwb25zZRJHCgpHZXRNZW1iZXJzEhsuYWRtaW4udjEuR2V0TWVtYmVyc1JlcXVlc3QaHC5hZG1pbi52MS5HZXRNZW1iZXJzUmVzcG9uc2USRAoJUGF0Y2hUZWFtEhouYWRtaW4udjEuUGF0Y2hUZWFtUmVxdWVzdBobLmFkbWluLnYxLlBhdGNoVGVhbVJlc3BvbnNlEmgKFVB1dFRlYW1Db25uZWN0aW9uSW5mbxImLmFkbWluLnYxLlB1dFRlYW1Db25uZWN0aW9uSW5mb1JlcXVlc3QaJy5hZG1pbi52MS5QdXRUZWFtQ29ubmVjdGlvbkluZm9SZXNwb25zZRJrChZQdXRBZG1pbkNvbm5lY3Rpb25JbmZvEicuYWRtaW4udjEuUHV0QWRtaW5Db25uZWN0aW9uSW5mb1JlcXVlc3QaKC5hZG1pbi52MS5QdXRBZG1pbkNvbm5lY3Rpb25JbmZvUmVzcG9uc2USQQoIUG9zdFRlYW0SGS5hZG1pbi52MS5Qb3N0VGVhbVJlcXVlc3QaGi5hZG1pbi52MS5Qb3N0VGVhbVJlc3BvbnNlEkQKCUFkZE1lbWJlchIaLmFkbWluLnYxLkFkZE1lbWJlclJlcXVlc3QaGy5hZG1pbi52MS5BZGRNZW1iZXJSZXNwb25zZRJHCgpEZWxldGVUZWFtEhsuYWRtaW4udjEuRGVsZXRlVGVhbVJlcXVlc3QaHC5hZG1pbi52MS5EZWxldGVUZWFtUmVzcG9uc2USTQoMRGVsZXRlTWVtYmVyEh0uYWRtaW4udjEuRGVsZXRlTWVtYmVyUmVxdWVzdBoeLmFkbWluLnYxLkRlbGV0ZU1lbWJlclJlc3BvbnNlQpsBCgxjb20uYWRtaW4udjFCCVRlYW1Qcm90b1ABWj9naXRodWIuY29tL2ljdHNjL2ljdHNjLW91dGxhbmRzL2JhY2tlbmQvaW50ZXJuYWwvcHJvdG8vYWRtaW4vdjGiAgNBWFiqAghBZG1pbi5WMcoCCEFkbWluXFYx4gIUQWRtaW5cVjFcR1BCTWV0YWRhdGHqAglBZG1pbjo6VjFiBnByb3RvMw", [file_admin_v1_user, file_buf_validate_validate]);
+  fileDesc("ChNhZG1pbi92MS90ZWFtLnByb3RvEghhZG1pbi52MSK1AQoEVGVhbRIUCgJpZBgBIAEoCUIIukgFcgOYARoSFwoEY29kZRgCIAEoA0IJukgGIgQQZCABEhcKBG5hbWUYAyABKAlCCbpIBnIEEAEYFBIfCgxvcmdhbml6YXRpb24YBCABKAlCCbpIBnIEEAEYMhIhCg9pbnZpdGF0aW9uX2NvZGUYBSABKAlCCLpIBXIDmAEgEiEKDmNvZGVfcmVtYWluaW5nGAYgASgDQgm6SAYiBBgFKAAiEQoPR2V0VGVhbXNSZXF1ZXN0IjkKEEdldFRlYW1zUmVzcG9uc2USJQoFdGVhbXMYASADKAsyDi5hZG1pbi52MS5UZWFtQga6SAPIAQEiJgoOR2V0VGVhbVJlcXVlc3QSFAoCaWQYASABKAlCCLpIBXIDmAEaIjcKD0dldFRlYW1SZXNwb25zZRIkCgR0ZWFtGAEgASgLMg4uYWRtaW4udjEuVGVhbUIGukgDyAEBIm8KB0Jhc3Rpb24SFwoEdXNlchgBIAEoCUIJukgGcgQQARgUEhsKCHBhc3N3b3JkGAIgASgJQgm6SAZyBBABGBQSFwoEaG9zdBgDIAEoCUIJukgGcgQQARhkEhUKBHBvcnQYBCABKANCB7pIBCICKAAiMAoYR2V0Q29ubmVjdGlvbkluZm9SZXF1ZXN0EhQKAmlkGAEgASgJQgi6SAVyA5gBGiI/ChlHZXRDb25uZWN0aW9uSW5mb1Jlc3BvbnNlEiIKB2Jhc3Rpb24YASABKAsyES5hZG1pbi52MS5CYXN0aW9uIikKEUdldE1lbWJlcnNSZXF1ZXN0EhQKAmlkGAEgASgJQgi6SAVyA5gBGiJHChJHZXRNZW1iZXJzUmVzcG9uc2USMQoHbWVtYmVycxgBIAMoCzIULmFkbWluLnYxLkNvbnRlc3RhbnRCCrpIB5IBBAgAEAUi6AEKEFBhdGNoVGVhbVJlcXVlc3QSFAoCaWQYASABKAlCCLpIBXIDmAEaEhwKBGNvZGUYAiABKANCCbpIBiIEEGQgAUgAiAEBEhwKBG5hbWUYAyABKAlCCbpIBnIEEAEYFEgBiAEBEiQKDG9yZ2FuaXphdGlvbhgEIAEoCUIJukgGcgQQARgySAKIAQESJgoOY29kZV9yZW1haW5pbmcYBSABKANCCbpIBiIEGAUoAEgDiAEBQgcKBV9jb2RlQgcKBV9uYW1lQg8KDV9vcmdhbml6YXRpb25CEQoPX2NvZGVfcmVtYWluaW5nIjkKEVBhdGNoVGVhbVJlc3BvbnNlEiQKBHRlYW0YASABKAsyDi5hZG1pbi52MS5UZWFtQga6SAPIAQEiXAoYUHV0Q29ubmVjdGlvbkluZm9SZXF1ZXN0EhQKAmlkGAEgASgJQgi6SAVyA5gBGhIqCgdiYXN0aW9uGAIgASgLMhEuYWRtaW4udjEuQmFzdGlvbkIGukgDyAEBIhsKGVB1dENvbm5lY3Rpb25JbmZvUmVzcG9uc2UihwEKD1Bvc3RUZWFtUmVxdWVzdBIXCgRjb2RlGAEgASgDQgm6SAYiBBBkIAESFwoEbmFtZRgCIAEoCUIJukgGcgQQARgUEh8KDG9yZ2FuaXphdGlvbhgDIAEoCUIJukgGcgQQARgyEiEKDmNvZGVfcmVtYWluaW5nGAQgASgDQgm6SAYiBBgFKAAiOAoQUG9zdFRlYW1SZXNwb25zZRIkCgR0ZWFtGAEgASgLMg4uYWRtaW4udjEuVGVhbUIGukgDyAEBIkMKEEFkZE1lbWJlclJlcXVlc3QSFAoCaWQYASABKAlCCLpIBXIDmAEaEhkKB3VzZXJfaWQYAiABKAlCCLpIBXIDmAEaIhMKEUFkZE1lbWJlclJlc3BvbnNlIikKEURlbGV0ZVRlYW1SZXF1ZXN0EhQKAmlkGAEgASgJQgi6SAVyA5gBGiIUChJEZWxldGVUZWFtUmVzcG9uc2UiTAoRTW92ZU1lbWJlclJlcXVlc3QSHAoKdG9fdGVhbV9pZBgBIAEoCUIIukgFcgOYARoSGQoHdXNlcl9pZBgCIAEoCUIIukgFcgOYARoiFAoSTW92ZU1lbWJlclJlc3BvbnNlMrAFCgtUZWFtU2VydmljZRJBCghHZXRUZWFtcxIZLmFkbWluLnYxLkdldFRlYW1zUmVxdWVzdBoaLmFkbWluLnYxLkdldFRlYW1zUmVzcG9uc2USPgoHR2V0VGVhbRIYLmFkbWluLnYxLkdldFRlYW1SZXF1ZXN0GhkuYWRtaW4udjEuR2V0VGVhbVJlc3BvbnNlElwKEUdldENvbm5lY3Rpb25JbmZvEiIuYWRtaW4udjEuR2V0Q29ubmVjdGlvbkluZm9SZXF1ZXN0GiMuYWRtaW4udjEuR2V0Q29ubmVjdGlvbkluZm9SZXNwb25zZRJHCgpHZXRNZW1iZXJzEhsuYWRtaW4udjEuR2V0TWVtYmVyc1JlcXVlc3QaHC5hZG1pbi52MS5HZXRNZW1iZXJzUmVzcG9uc2USRAoJUGF0Y2hUZWFtEhouYWRtaW4udjEuUGF0Y2hUZWFtUmVxdWVzdBobLmFkbWluLnYxLlBhdGNoVGVhbVJlc3BvbnNlElwKEVB1dENvbm5lY3Rpb25JbmZvEiIuYWRtaW4udjEuUHV0Q29ubmVjdGlvbkluZm9SZXF1ZXN0GiMuYWRtaW4udjEuUHV0Q29ubmVjdGlvbkluZm9SZXNwb25zZRJBCghQb3N0VGVhbRIZLmFkbWluLnYxLlBvc3RUZWFtUmVxdWVzdBoaLmFkbWluLnYxLlBvc3RUZWFtUmVzcG9uc2USRwoKRGVsZXRlVGVhbRIbLmFkbWluLnYxLkRlbGV0ZVRlYW1SZXF1ZXN0GhwuYWRtaW4udjEuRGVsZXRlVGVhbVJlc3BvbnNlEkcKCk1vdmVNZW1iZXISGy5hZG1pbi52MS5Nb3ZlTWVtYmVyUmVxdWVzdBocLmFkbWluLnYxLk1vdmVNZW1iZXJSZXNwb25zZUKbAQoMY29tLmFkbWluLnYxQglUZWFtUHJvdG9QAVo/Z2l0aHViLmNvbS9pY3RzYy9pY3RzYy1vdXRsYW5kcy9iYWNrZW5kL2ludGVybmFsL3Byb3RvL2FkbWluL3YxogIDQVhYqgIIQWRtaW4uVjHKAghBZG1pblxWMeICFEFkbWluXFYxXEdQQk1ldGFkYXRh6gIJQWRtaW46OlYxYgZwcm90bzM", [file_admin_v1_contestant, file_buf_validate_validate]);
 
 /**
  * @generated from message admin.v1.Team
@@ -25,9 +25,9 @@ export type Team = Message<"admin.v1.Team"> & {
   id: string;
 
   /**
-   * @generated from field: int32 code = 2;
+   * @generated from field: int64 code = 2;
    */
-  code: number;
+  code: bigint;
 
   /**
    * @generated from field: string name = 3;
@@ -45,9 +45,9 @@ export type Team = Message<"admin.v1.Team"> & {
   invitationCode: string;
 
   /**
-   * @generated from field: int32 code_remaining = 6;
+   * @generated from field: int64 code_remaining = 6;
    */
-  codeRemaining: number;
+  codeRemaining: bigint;
 };
 
 /**
@@ -141,9 +141,9 @@ export type Bastion = Message<"admin.v1.Bastion"> & {
   host: string;
 
   /**
-   * @generated from field: int32 port = 4;
+   * @generated from field: int64 port = 4;
    */
-  port: number;
+  port: bigint;
 };
 
 /**
@@ -154,9 +154,9 @@ export const BastionSchema: GenMessage<Bastion> = /*@__PURE__*/
   messageDesc(file_admin_v1_team, 5);
 
 /**
- * @generated from message admin.v1.GetTeamConnectionInfoRequest
+ * @generated from message admin.v1.GetConnectionInfoRequest
  */
-export type GetTeamConnectionInfoRequest = Message<"admin.v1.GetTeamConnectionInfoRequest"> & {
+export type GetConnectionInfoRequest = Message<"admin.v1.GetConnectionInfoRequest"> & {
   /**
    * @generated from field: string id = 1;
    */
@@ -164,16 +164,16 @@ export type GetTeamConnectionInfoRequest = Message<"admin.v1.GetTeamConnectionIn
 };
 
 /**
- * Describes the message admin.v1.GetTeamConnectionInfoRequest.
- * Use `create(GetTeamConnectionInfoRequestSchema)` to create a new message.
+ * Describes the message admin.v1.GetConnectionInfoRequest.
+ * Use `create(GetConnectionInfoRequestSchema)` to create a new message.
  */
-export const GetTeamConnectionInfoRequestSchema: GenMessage<GetTeamConnectionInfoRequest> = /*@__PURE__*/
+export const GetConnectionInfoRequestSchema: GenMessage<GetConnectionInfoRequest> = /*@__PURE__*/
   messageDesc(file_admin_v1_team, 6);
 
 /**
- * @generated from message admin.v1.GetTeamConnectionInfoResponse
+ * @generated from message admin.v1.GetConnectionInfoResponse
  */
-export type GetTeamConnectionInfoResponse = Message<"admin.v1.GetTeamConnectionInfoResponse"> & {
+export type GetConnectionInfoResponse = Message<"admin.v1.GetConnectionInfoResponse"> & {
   /**
    * @generated from field: admin.v1.Bastion bastion = 1;
    */
@@ -181,41 +181,11 @@ export type GetTeamConnectionInfoResponse = Message<"admin.v1.GetTeamConnectionI
 };
 
 /**
- * Describes the message admin.v1.GetTeamConnectionInfoResponse.
- * Use `create(GetTeamConnectionInfoResponseSchema)` to create a new message.
+ * Describes the message admin.v1.GetConnectionInfoResponse.
+ * Use `create(GetConnectionInfoResponseSchema)` to create a new message.
  */
-export const GetTeamConnectionInfoResponseSchema: GenMessage<GetTeamConnectionInfoResponse> = /*@__PURE__*/
+export const GetConnectionInfoResponseSchema: GenMessage<GetConnectionInfoResponse> = /*@__PURE__*/
   messageDesc(file_admin_v1_team, 7);
-
-/**
- * @generated from message admin.v1.GetAdminConnectionInfoRequest
- */
-export type GetAdminConnectionInfoRequest = Message<"admin.v1.GetAdminConnectionInfoRequest"> & {
-};
-
-/**
- * Describes the message admin.v1.GetAdminConnectionInfoRequest.
- * Use `create(GetAdminConnectionInfoRequestSchema)` to create a new message.
- */
-export const GetAdminConnectionInfoRequestSchema: GenMessage<GetAdminConnectionInfoRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 8);
-
-/**
- * @generated from message admin.v1.GetAdminConnectionInfoResponse
- */
-export type GetAdminConnectionInfoResponse = Message<"admin.v1.GetAdminConnectionInfoResponse"> & {
-  /**
-   * @generated from field: admin.v1.Bastion bastion = 1;
-   */
-  bastion?: Bastion;
-};
-
-/**
- * Describes the message admin.v1.GetAdminConnectionInfoResponse.
- * Use `create(GetAdminConnectionInfoResponseSchema)` to create a new message.
- */
-export const GetAdminConnectionInfoResponseSchema: GenMessage<GetAdminConnectionInfoResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 9);
 
 /**
  * @generated from message admin.v1.GetMembersRequest
@@ -232,16 +202,16 @@ export type GetMembersRequest = Message<"admin.v1.GetMembersRequest"> & {
  * Use `create(GetMembersRequestSchema)` to create a new message.
  */
 export const GetMembersRequestSchema: GenMessage<GetMembersRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 10);
+  messageDesc(file_admin_v1_team, 8);
 
 /**
  * @generated from message admin.v1.GetMembersResponse
  */
 export type GetMembersResponse = Message<"admin.v1.GetMembersResponse"> & {
   /**
-   * @generated from field: repeated admin.v1.User members = 1;
+   * @generated from field: repeated admin.v1.Contestant members = 1;
    */
-  members: User[];
+  members: Contestant[];
 };
 
 /**
@@ -249,7 +219,7 @@ export type GetMembersResponse = Message<"admin.v1.GetMembersResponse"> & {
  * Use `create(GetMembersResponseSchema)` to create a new message.
  */
 export const GetMembersResponseSchema: GenMessage<GetMembersResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 11);
+  messageDesc(file_admin_v1_team, 9);
 
 /**
  * @generated from message admin.v1.PatchTeamRequest
@@ -261,9 +231,9 @@ export type PatchTeamRequest = Message<"admin.v1.PatchTeamRequest"> & {
   id: string;
 
   /**
-   * @generated from field: optional int32 code = 2;
+   * @generated from field: optional int64 code = 2;
    */
-  code?: number;
+  code?: bigint;
 
   /**
    * @generated from field: optional string name = 3;
@@ -276,9 +246,9 @@ export type PatchTeamRequest = Message<"admin.v1.PatchTeamRequest"> & {
   organization?: string;
 
   /**
-   * @generated from field: optional int32 code_remaining = 5;
+   * @generated from field: optional int64 code_remaining = 5;
    */
-  codeRemaining?: number;
+  codeRemaining?: bigint;
 };
 
 /**
@@ -286,7 +256,7 @@ export type PatchTeamRequest = Message<"admin.v1.PatchTeamRequest"> & {
  * Use `create(PatchTeamRequestSchema)` to create a new message.
  */
 export const PatchTeamRequestSchema: GenMessage<PatchTeamRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 12);
+  messageDesc(file_admin_v1_team, 10);
 
 /**
  * @generated from message admin.v1.PatchTeamResponse
@@ -303,12 +273,12 @@ export type PatchTeamResponse = Message<"admin.v1.PatchTeamResponse"> & {
  * Use `create(PatchTeamResponseSchema)` to create a new message.
  */
 export const PatchTeamResponseSchema: GenMessage<PatchTeamResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 13);
+  messageDesc(file_admin_v1_team, 11);
 
 /**
- * @generated from message admin.v1.PutTeamConnectionInfoRequest
+ * @generated from message admin.v1.PutConnectionInfoRequest
  */
-export type PutTeamConnectionInfoRequest = Message<"admin.v1.PutTeamConnectionInfoRequest"> & {
+export type PutConnectionInfoRequest = Message<"admin.v1.PutConnectionInfoRequest"> & {
   /**
    * @generated from field: string id = 1;
    */
@@ -321,63 +291,33 @@ export type PutTeamConnectionInfoRequest = Message<"admin.v1.PutTeamConnectionIn
 };
 
 /**
- * Describes the message admin.v1.PutTeamConnectionInfoRequest.
- * Use `create(PutTeamConnectionInfoRequestSchema)` to create a new message.
+ * Describes the message admin.v1.PutConnectionInfoRequest.
+ * Use `create(PutConnectionInfoRequestSchema)` to create a new message.
  */
-export const PutTeamConnectionInfoRequestSchema: GenMessage<PutTeamConnectionInfoRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 14);
+export const PutConnectionInfoRequestSchema: GenMessage<PutConnectionInfoRequest> = /*@__PURE__*/
+  messageDesc(file_admin_v1_team, 12);
 
 /**
- * @generated from message admin.v1.PutTeamConnectionInfoResponse
+ * @generated from message admin.v1.PutConnectionInfoResponse
  */
-export type PutTeamConnectionInfoResponse = Message<"admin.v1.PutTeamConnectionInfoResponse"> & {
+export type PutConnectionInfoResponse = Message<"admin.v1.PutConnectionInfoResponse"> & {
 };
 
 /**
- * Describes the message admin.v1.PutTeamConnectionInfoResponse.
- * Use `create(PutTeamConnectionInfoResponseSchema)` to create a new message.
+ * Describes the message admin.v1.PutConnectionInfoResponse.
+ * Use `create(PutConnectionInfoResponseSchema)` to create a new message.
  */
-export const PutTeamConnectionInfoResponseSchema: GenMessage<PutTeamConnectionInfoResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 15);
-
-/**
- * @generated from message admin.v1.PutAdminConnectionInfoRequest
- */
-export type PutAdminConnectionInfoRequest = Message<"admin.v1.PutAdminConnectionInfoRequest"> & {
-  /**
-   * @generated from field: admin.v1.Bastion bastion = 1;
-   */
-  bastion?: Bastion;
-};
-
-/**
- * Describes the message admin.v1.PutAdminConnectionInfoRequest.
- * Use `create(PutAdminConnectionInfoRequestSchema)` to create a new message.
- */
-export const PutAdminConnectionInfoRequestSchema: GenMessage<PutAdminConnectionInfoRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 16);
-
-/**
- * @generated from message admin.v1.PutAdminConnectionInfoResponse
- */
-export type PutAdminConnectionInfoResponse = Message<"admin.v1.PutAdminConnectionInfoResponse"> & {
-};
-
-/**
- * Describes the message admin.v1.PutAdminConnectionInfoResponse.
- * Use `create(PutAdminConnectionInfoResponseSchema)` to create a new message.
- */
-export const PutAdminConnectionInfoResponseSchema: GenMessage<PutAdminConnectionInfoResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 17);
+export const PutConnectionInfoResponseSchema: GenMessage<PutConnectionInfoResponse> = /*@__PURE__*/
+  messageDesc(file_admin_v1_team, 13);
 
 /**
  * @generated from message admin.v1.PostTeamRequest
  */
 export type PostTeamRequest = Message<"admin.v1.PostTeamRequest"> & {
   /**
-   * @generated from field: int32 code = 1;
+   * @generated from field: int64 code = 1;
    */
-  code: number;
+  code: bigint;
 
   /**
    * @generated from field: string name = 2;
@@ -390,9 +330,9 @@ export type PostTeamRequest = Message<"admin.v1.PostTeamRequest"> & {
   organization: string;
 
   /**
-   * @generated from field: int32 code_remaining = 4;
+   * @generated from field: int64 code_remaining = 4;
    */
-  codeRemaining: number;
+  codeRemaining: bigint;
 };
 
 /**
@@ -400,7 +340,7 @@ export type PostTeamRequest = Message<"admin.v1.PostTeamRequest"> & {
  * Use `create(PostTeamRequestSchema)` to create a new message.
  */
 export const PostTeamRequestSchema: GenMessage<PostTeamRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 18);
+  messageDesc(file_admin_v1_team, 14);
 
 /**
  * @generated from message admin.v1.PostTeamResponse
@@ -417,7 +357,7 @@ export type PostTeamResponse = Message<"admin.v1.PostTeamResponse"> & {
  * Use `create(PostTeamResponseSchema)` to create a new message.
  */
 export const PostTeamResponseSchema: GenMessage<PostTeamResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 19);
+  messageDesc(file_admin_v1_team, 15);
 
 /**
  * @generated from message admin.v1.AddMemberRequest
@@ -439,7 +379,7 @@ export type AddMemberRequest = Message<"admin.v1.AddMemberRequest"> & {
  * Use `create(AddMemberRequestSchema)` to create a new message.
  */
 export const AddMemberRequestSchema: GenMessage<AddMemberRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 20);
+  messageDesc(file_admin_v1_team, 16);
 
 /**
  * @generated from message admin.v1.AddMemberResponse
@@ -452,7 +392,7 @@ export type AddMemberResponse = Message<"admin.v1.AddMemberResponse"> & {
  * Use `create(AddMemberResponseSchema)` to create a new message.
  */
 export const AddMemberResponseSchema: GenMessage<AddMemberResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 21);
+  messageDesc(file_admin_v1_team, 17);
 
 /**
  * @generated from message admin.v1.DeleteTeamRequest
@@ -469,7 +409,7 @@ export type DeleteTeamRequest = Message<"admin.v1.DeleteTeamRequest"> & {
  * Use `create(DeleteTeamRequestSchema)` to create a new message.
  */
 export const DeleteTeamRequestSchema: GenMessage<DeleteTeamRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 22);
+  messageDesc(file_admin_v1_team, 18);
 
 /**
  * @generated from message admin.v1.DeleteTeamResponse
@@ -482,16 +422,16 @@ export type DeleteTeamResponse = Message<"admin.v1.DeleteTeamResponse"> & {
  * Use `create(DeleteTeamResponseSchema)` to create a new message.
  */
 export const DeleteTeamResponseSchema: GenMessage<DeleteTeamResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 23);
+  messageDesc(file_admin_v1_team, 19);
 
 /**
- * @generated from message admin.v1.DeleteMemberRequest
+ * @generated from message admin.v1.MoveMemberRequest
  */
-export type DeleteMemberRequest = Message<"admin.v1.DeleteMemberRequest"> & {
+export type MoveMemberRequest = Message<"admin.v1.MoveMemberRequest"> & {
   /**
-   * @generated from field: string id = 1;
+   * @generated from field: string to_team_id = 1;
    */
-  id: string;
+  toTeamId: string;
 
   /**
    * @generated from field: string user_id = 2;
@@ -500,24 +440,24 @@ export type DeleteMemberRequest = Message<"admin.v1.DeleteMemberRequest"> & {
 };
 
 /**
- * Describes the message admin.v1.DeleteMemberRequest.
- * Use `create(DeleteMemberRequestSchema)` to create a new message.
+ * Describes the message admin.v1.MoveMemberRequest.
+ * Use `create(MoveMemberRequestSchema)` to create a new message.
  */
-export const DeleteMemberRequestSchema: GenMessage<DeleteMemberRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 24);
+export const MoveMemberRequestSchema: GenMessage<MoveMemberRequest> = /*@__PURE__*/
+  messageDesc(file_admin_v1_team, 20);
 
 /**
- * @generated from message admin.v1.DeleteMemberResponse
+ * @generated from message admin.v1.MoveMemberResponse
  */
-export type DeleteMemberResponse = Message<"admin.v1.DeleteMemberResponse"> & {
+export type MoveMemberResponse = Message<"admin.v1.MoveMemberResponse"> & {
 };
 
 /**
- * Describes the message admin.v1.DeleteMemberResponse.
- * Use `create(DeleteMemberResponseSchema)` to create a new message.
+ * Describes the message admin.v1.MoveMemberResponse.
+ * Use `create(MoveMemberResponseSchema)` to create a new message.
  */
-export const DeleteMemberResponseSchema: GenMessage<DeleteMemberResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_team, 25);
+export const MoveMemberResponseSchema: GenMessage<MoveMemberResponse> = /*@__PURE__*/
+  messageDesc(file_admin_v1_team, 21);
 
 /**
  * @generated from service admin.v1.TeamService
@@ -540,20 +480,12 @@ export const TeamService: GenService<{
     output: typeof GetTeamResponseSchema;
   },
   /**
-   * @generated from rpc admin.v1.TeamService.GetTeamConnectionInfo
+   * @generated from rpc admin.v1.TeamService.GetConnectionInfo
    */
-  getTeamConnectionInfo: {
+  getConnectionInfo: {
     methodKind: "unary";
-    input: typeof GetTeamConnectionInfoRequestSchema;
-    output: typeof GetTeamConnectionInfoResponseSchema;
-  },
-  /**
-   * @generated from rpc admin.v1.TeamService.GetAdminConnectionInfo
-   */
-  getAdminConnectionInfo: {
-    methodKind: "unary";
-    input: typeof GetAdminConnectionInfoRequestSchema;
-    output: typeof GetAdminConnectionInfoResponseSchema;
+    input: typeof GetConnectionInfoRequestSchema;
+    output: typeof GetConnectionInfoResponseSchema;
   },
   /**
    * @generated from rpc admin.v1.TeamService.GetMembers
@@ -572,20 +504,12 @@ export const TeamService: GenService<{
     output: typeof PatchTeamResponseSchema;
   },
   /**
-   * @generated from rpc admin.v1.TeamService.PutTeamConnectionInfo
+   * @generated from rpc admin.v1.TeamService.PutConnectionInfo
    */
-  putTeamConnectionInfo: {
+  putConnectionInfo: {
     methodKind: "unary";
-    input: typeof PutTeamConnectionInfoRequestSchema;
-    output: typeof PutTeamConnectionInfoResponseSchema;
-  },
-  /**
-   * @generated from rpc admin.v1.TeamService.PutAdminConnectionInfo
-   */
-  putAdminConnectionInfo: {
-    methodKind: "unary";
-    input: typeof PutAdminConnectionInfoRequestSchema;
-    output: typeof PutAdminConnectionInfoResponseSchema;
+    input: typeof PutConnectionInfoRequestSchema;
+    output: typeof PutConnectionInfoResponseSchema;
   },
   /**
    * @generated from rpc admin.v1.TeamService.PostTeam
@@ -596,14 +520,6 @@ export const TeamService: GenService<{
     output: typeof PostTeamResponseSchema;
   },
   /**
-   * @generated from rpc admin.v1.TeamService.AddMember
-   */
-  addMember: {
-    methodKind: "unary";
-    input: typeof AddMemberRequestSchema;
-    output: typeof AddMemberResponseSchema;
-  },
-  /**
    * @generated from rpc admin.v1.TeamService.DeleteTeam
    */
   deleteTeam: {
@@ -612,12 +528,12 @@ export const TeamService: GenService<{
     output: typeof DeleteTeamResponseSchema;
   },
   /**
-   * @generated from rpc admin.v1.TeamService.DeleteMember
+   * @generated from rpc admin.v1.TeamService.MoveMember
    */
-  deleteMember: {
+  moveMember: {
     methodKind: "unary";
-    input: typeof DeleteMemberRequestSchema;
-    output: typeof DeleteMemberResponseSchema;
+    input: typeof MoveMemberRequestSchema;
+    output: typeof MoveMemberResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_admin_v1_team, 0);

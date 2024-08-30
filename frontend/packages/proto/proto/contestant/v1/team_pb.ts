@@ -5,15 +5,15 @@
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb";
-import type { User } from "./user_pb";
-import { file_contestant_v1_user } from "./user_pb";
+import type { Contestant } from "./contestant_pb";
+import { file_contestant_v1_contestant } from "./contestant_pb";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file contestant/v1/team.proto.
  */
 export const file_contestant_v1_team: GenFile = /*@__PURE__*/
-  fileDesc("Chhjb250ZXN0YW50L3YxL3RlYW0ucHJvdG8SDWNvbnRlc3RhbnQudjEibwoEVGVhbRIUCgJpZBgBIAEoCUIIukgFcgOYARoSFwoEY29kZRgCIAEoBUIJukgGGgQQZCABEhcKBG5hbWUYAyABKAlCCbpIBnIEEAEYFBIfCgxvcmdhbml6YXRpb24YBCABKAlCCbpIBnIEEAEYMiIRCg9HZXRUZWFtc1JlcXVlc3QiPgoQR2V0VGVhbXNSZXNwb25zZRIqCgV0ZWFtcxgBIAMoCzITLmNvbnRlc3RhbnQudjEuVGVhbUIGukgDyAEBIiYKDkdldFRlYW1SZXF1ZXN0EhQKAmlkGAEgASgJQgi6SAVyA5gBGiI8Cg9HZXRUZWFtUmVzcG9uc2USKQoEdGVhbRgBIAEoCzITLmNvbnRlc3RhbnQudjEuVGVhbUIGukgDyAEBIi0KFUdldFRlYW1NZW1iZXJzUmVxdWVzdBIUCgJpZBgBIAEoCUIIukgFcgOYARoiSgoWR2V0VGVhbU1lbWJlcnNSZXNwb25zZRIwCgdtZW1iZXJzGAEgAygLMhMuY29udGVzdGFudC52MS5Vc2VyQgq6SAeSAQQIABAFIm8KB0Jhc3Rpb24SFwoEdXNlchgBIAEoCUIJukgGcgQQARgUEhsKCHBhc3N3b3JkGAIgASgJQgm6SAZyBBABGBQSFwoEaG9zdBgDIAEoCUIJukgGcgQQARhkEhUKBHBvcnQYBCABKAVCB7pIBBoCKAAiGgoYR2V0Q29ubmVjdGlvbkluZm9SZXF1ZXN0IkwKGUdldENvbm5lY3Rpb25JbmZvUmVzcG9uc2USLwoHYmFzdGlvbhgBIAEoCzIWLmNvbnRlc3RhbnQudjEuQmFzdGlvbkIGukgDyAEBMusCCgtUZWFtU2VydmljZRJLCghHZXRUZWFtcxIeLmNvbnRlc3RhbnQudjEuR2V0VGVhbXNSZXF1ZXN0Gh8uY29udGVzdGFudC52MS5HZXRUZWFtc1Jlc3BvbnNlEkgKB0dldFRlYW0SHS5jb250ZXN0YW50LnYxLkdldFRlYW1SZXF1ZXN0Gh4uY29udGVzdGFudC52MS5HZXRUZWFtUmVzcG9uc2USXQoOR2V0VGVhbU1lbWJlcnMSJC5jb250ZXN0YW50LnYxLkdldFRlYW1NZW1iZXJzUmVxdWVzdBolLmNvbnRlc3RhbnQudjEuR2V0VGVhbU1lbWJlcnNSZXNwb25zZRJmChFHZXRDb25uZWN0aW9uSW5mbxInLmNvbnRlc3RhbnQudjEuR2V0Q29ubmVjdGlvbkluZm9SZXF1ZXN0GiguY29udGVzdGFudC52MS5HZXRDb25uZWN0aW9uSW5mb1Jlc3BvbnNlQrkBChFjb20uY29udGVzdGFudC52MUIJVGVhbVByb3RvUAFaRGdpdGh1Yi5jb20vaWN0c2MvaWN0c2Mtb3V0bGFuZHMvYmFja2VuZC9pbnRlcm5hbC9wcm90by9jb250ZXN0YW50L3YxogIDQ1hYqgINQ29udGVzdGFudC5WMcoCDUNvbnRlc3RhbnRcVjHiAhlDb250ZXN0YW50XFYxXEdQQk1ldGFkYXRh6gIOQ29udGVzdGFudDo6VjFiBnByb3RvMw", [file_buf_validate_validate, file_contestant_v1_user]);
+  fileDesc("Chhjb250ZXN0YW50L3YxL3RlYW0ucHJvdG8SDWNvbnRlc3RhbnQudjEibwoEVGVhbRIUCgJpZBgBIAEoCUIIukgFcgOYARoSFwoEY29kZRgCIAEoA0IJukgGIgQQZCABEhcKBG5hbWUYAyABKAlCCbpIBnIEEAEYFBIfCgxvcmdhbml6YXRpb24YBCABKAlCCbpIBnIEEAEYMiIRCg9HZXRUZWFtc1JlcXVlc3QiPgoQR2V0VGVhbXNSZXNwb25zZRIqCgV0ZWFtcxgBIAMoCzITLmNvbnRlc3RhbnQudjEuVGVhbUIGukgDyAEBIiYKDkdldFRlYW1SZXF1ZXN0EhQKAmlkGAEgASgJQgi6SAVyA5gBGiI8Cg9HZXRUZWFtUmVzcG9uc2USKQoEdGVhbRgBIAEoCzITLmNvbnRlc3RhbnQudjEuVGVhbUIGukgDyAEBIikKEUdldE1lbWJlcnNSZXF1ZXN0EhQKAmlkGAEgASgJQgi6SAVyA5gBGiJMChJHZXRNZW1iZXJzUmVzcG9uc2USNgoHbWVtYmVycxgBIAMoCzIZLmNvbnRlc3RhbnQudjEuQ29udGVzdGFudEIKukgHkgEECAAQBSJvCgdCYXN0aW9uEhcKBHVzZXIYASABKAlCCbpIBnIEEAEYFBIbCghwYXNzd29yZBgCIAEoCUIJukgGcgQQARgUEhcKBGhvc3QYAyABKAlCCbpIBnIEEAEYZBIVCgRwb3J0GAQgASgDQge6SAQiAigAIhoKGEdldENvbm5lY3Rpb25JbmZvUmVxdWVzdCJEChlHZXRDb25uZWN0aW9uSW5mb1Jlc3BvbnNlEicKB2Jhc3Rpb24YASABKAsyFi5jb250ZXN0YW50LnYxLkJhc3Rpb24y3wIKC1RlYW1TZXJ2aWNlEksKCEdldFRlYW1zEh4uY29udGVzdGFudC52MS5HZXRUZWFtc1JlcXVlc3QaHy5jb250ZXN0YW50LnYxLkdldFRlYW1zUmVzcG9uc2USSAoHR2V0VGVhbRIdLmNvbnRlc3RhbnQudjEuR2V0VGVhbVJlcXVlc3QaHi5jb250ZXN0YW50LnYxLkdldFRlYW1SZXNwb25zZRJRCgpHZXRNZW1iZXJzEiAuY29udGVzdGFudC52MS5HZXRNZW1iZXJzUmVxdWVzdBohLmNvbnRlc3RhbnQudjEuR2V0TWVtYmVyc1Jlc3BvbnNlEmYKEUdldENvbm5lY3Rpb25JbmZvEicuY29udGVzdGFudC52MS5HZXRDb25uZWN0aW9uSW5mb1JlcXVlc3QaKC5jb250ZXN0YW50LnYxLkdldENvbm5lY3Rpb25JbmZvUmVzcG9uc2VCuQEKEWNvbS5jb250ZXN0YW50LnYxQglUZWFtUHJvdG9QAVpEZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1vdXRsYW5kcy9iYWNrZW5kL2ludGVybmFsL3Byb3RvL2NvbnRlc3RhbnQvdjGiAgNDWFiqAg1Db250ZXN0YW50LlYxygINQ29udGVzdGFudFxWMeICGUNvbnRlc3RhbnRcVjFcR1BCTWV0YWRhdGHqAg5Db250ZXN0YW50OjpWMWIGcHJvdG8z", [file_buf_validate_validate, file_contestant_v1_contestant]);
 
 /**
  * @generated from message contestant.v1.Team
@@ -25,9 +25,9 @@ export type Team = Message<"contestant.v1.Team"> & {
   id: string;
 
   /**
-   * @generated from field: int32 code = 2;
+   * @generated from field: int64 code = 2;
    */
-  code: number;
+  code: bigint;
 
   /**
    * @generated from field: string name = 3;
@@ -112,9 +112,9 @@ export const GetTeamResponseSchema: GenMessage<GetTeamResponse> = /*@__PURE__*/
   messageDesc(file_contestant_v1_team, 4);
 
 /**
- * @generated from message contestant.v1.GetTeamMembersRequest
+ * @generated from message contestant.v1.GetMembersRequest
  */
-export type GetTeamMembersRequest = Message<"contestant.v1.GetTeamMembersRequest"> & {
+export type GetMembersRequest = Message<"contestant.v1.GetMembersRequest"> & {
   /**
    * @generated from field: string id = 1;
    */
@@ -122,27 +122,27 @@ export type GetTeamMembersRequest = Message<"contestant.v1.GetTeamMembersRequest
 };
 
 /**
- * Describes the message contestant.v1.GetTeamMembersRequest.
- * Use `create(GetTeamMembersRequestSchema)` to create a new message.
+ * Describes the message contestant.v1.GetMembersRequest.
+ * Use `create(GetMembersRequestSchema)` to create a new message.
  */
-export const GetTeamMembersRequestSchema: GenMessage<GetTeamMembersRequest> = /*@__PURE__*/
+export const GetMembersRequestSchema: GenMessage<GetMembersRequest> = /*@__PURE__*/
   messageDesc(file_contestant_v1_team, 5);
 
 /**
- * @generated from message contestant.v1.GetTeamMembersResponse
+ * @generated from message contestant.v1.GetMembersResponse
  */
-export type GetTeamMembersResponse = Message<"contestant.v1.GetTeamMembersResponse"> & {
+export type GetMembersResponse = Message<"contestant.v1.GetMembersResponse"> & {
   /**
-   * @generated from field: repeated contestant.v1.User members = 1;
+   * @generated from field: repeated contestant.v1.Contestant members = 1;
    */
-  members: User[];
+  members: Contestant[];
 };
 
 /**
- * Describes the message contestant.v1.GetTeamMembersResponse.
- * Use `create(GetTeamMembersResponseSchema)` to create a new message.
+ * Describes the message contestant.v1.GetMembersResponse.
+ * Use `create(GetMembersResponseSchema)` to create a new message.
  */
-export const GetTeamMembersResponseSchema: GenMessage<GetTeamMembersResponse> = /*@__PURE__*/
+export const GetMembersResponseSchema: GenMessage<GetMembersResponse> = /*@__PURE__*/
   messageDesc(file_contestant_v1_team, 6);
 
 /**
@@ -165,9 +165,9 @@ export type Bastion = Message<"contestant.v1.Bastion"> & {
   host: string;
 
   /**
-   * @generated from field: int32 port = 4;
+   * @generated from field: int64 port = 4;
    */
-  port: number;
+  port: bigint;
 };
 
 /**
@@ -228,12 +228,12 @@ export const TeamService: GenService<{
     output: typeof GetTeamResponseSchema;
   },
   /**
-   * @generated from rpc contestant.v1.TeamService.GetTeamMembers
+   * @generated from rpc contestant.v1.TeamService.GetMembers
    */
-  getTeamMembers: {
+  getMembers: {
     methodKind: "unary";
-    input: typeof GetTeamMembersRequestSchema;
-    output: typeof GetTeamMembersResponseSchema;
+    input: typeof GetMembersRequestSchema;
+    output: typeof GetMembersResponseSchema;
   },
   /**
    * @generated from rpc contestant.v1.TeamService.GetConnectionInfo

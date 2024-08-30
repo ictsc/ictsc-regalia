@@ -13,16 +13,16 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file admin/v1/ranking.proto.
  */
 export const file_admin_v1_ranking: GenFile = /*@__PURE__*/
-  fileDesc("ChZhZG1pbi92MS9yYW5raW5nLnByb3RvEghhZG1pbi52MSJbCgRSYW5rEhUKBHJhbmsYASABKAVCB7pIBBoCIAASJAoEdGVhbRgCIAEoCzIOLmFkbWluLnYxLlRlYW1CBrpIA8gBARIWCgVwb2ludBgDIAEoBUIHukgEGgIoACIoChFHZXRSYW5raW5nUmVxdWVzdBITCgt1bnB1Ymxpc2hlZBgBIAEoCCI9ChJHZXRSYW5raW5nUmVzcG9uc2USJwoHcmFua2luZxgBIAMoCzIOLmFkbWluLnYxLlJhbmtCBrpIA8gBATJZCg5SYW5raW5nU2VydmljZRJHCgpHZXRSYW5raW5nEhsuYWRtaW4udjEuR2V0UmFua2luZ1JlcXVlc3QaHC5hZG1pbi52MS5HZXRSYW5raW5nUmVzcG9uc2VCngEKDGNvbS5hZG1pbi52MUIMUmFua2luZ1Byb3RvUAFaP2dpdGh1Yi5jb20vaWN0c2MvaWN0c2Mtb3V0bGFuZHMvYmFja2VuZC9pbnRlcm5hbC9wcm90by9hZG1pbi92MaICA0FYWKoCCEFkbWluLlYxygIIQWRtaW5cVjHiAhRBZG1pblxWMVxHUEJNZXRhZGF0YeoCCUFkbWluOjpWMWIGcHJvdG8z", [file_admin_v1_team, file_buf_validate_validate]);
+  fileDesc("ChZhZG1pbi92MS9yYW5raW5nLnByb3RvEghhZG1pbi52MSJbCgRSYW5rEhUKBHJhbmsYASABKANCB7pIBCICIAASJAoEdGVhbRgCIAEoCzIOLmFkbWluLnYxLlRlYW1CBrpIA8gBARIWCgVwb2ludBgDIAEoA0IHukgEIgIoACIoChFHZXRSYW5raW5nUmVxdWVzdBITCgt1bnB1Ymxpc2hlZBgBIAEoCCI9ChJHZXRSYW5raW5nUmVzcG9uc2USJwoHcmFua2luZxgBIAMoCzIOLmFkbWluLnYxLlJhbmtCBrpIA8gBATJZCg5SYW5raW5nU2VydmljZRJHCgpHZXRSYW5raW5nEhsuYWRtaW4udjEuR2V0UmFua2luZ1JlcXVlc3QaHC5hZG1pbi52MS5HZXRSYW5raW5nUmVzcG9uc2VCngEKDGNvbS5hZG1pbi52MUIMUmFua2luZ1Byb3RvUAFaP2dpdGh1Yi5jb20vaWN0c2MvaWN0c2Mtb3V0bGFuZHMvYmFja2VuZC9pbnRlcm5hbC9wcm90by9hZG1pbi92MaICA0FYWKoCCEFkbWluLlYxygIIQWRtaW5cVjHiAhRBZG1pblxWMVxHUEJNZXRhZGF0YeoCCUFkbWluOjpWMWIGcHJvdG8z", [file_admin_v1_team, file_buf_validate_validate]);
 
 /**
  * @generated from message admin.v1.Rank
  */
 export type Rank = Message<"admin.v1.Rank"> & {
   /**
-   * @generated from field: int32 rank = 1;
+   * @generated from field: int64 rank = 1;
    */
-  rank: number;
+  rank: bigint;
 
   /**
    * @generated from field: admin.v1.Team team = 2;
@@ -30,9 +30,9 @@ export type Rank = Message<"admin.v1.Rank"> & {
   team?: Team;
 
   /**
-   * @generated from field: int32 point = 3;
+   * @generated from field: int64 point = 3;
    */
-  point: number;
+  point: bigint;
 };
 
 /**

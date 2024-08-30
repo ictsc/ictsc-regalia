@@ -13,7 +13,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file admin/v1/schedule.proto.
  */
 export const file_admin_v1_schedule: GenFile = /*@__PURE__*/
-  fileDesc("ChdhZG1pbi92MS9zY2hlZHVsZS5wcm90bxIIYWRtaW4udjEizgEKCFNjaGVkdWxlEhQKAmlkGAEgASgJQgi6SAVyA5gBGhIXCgRuYW1lGAIgASgJQgm6SAZyBBABGGQSKQoFcm91bmQYAyABKA4yEC5hZG1pbi52MS5Sb3VuZHNCCLpIBYIBAhABEjQKCHN0YXJ0X2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEIGukgDyAEBEjIKBmVuZF9hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCBrpIA8gBASIVChNHZXRTY2hlZHVsZXNSZXF1ZXN0IkUKFEdldFNjaGVkdWxlc1Jlc3BvbnNlEi0KCXNjaGVkdWxlcxgBIAMoCzISLmFkbWluLnYxLlNjaGVkdWxlQga6SAPIAQEingIKFFBhdGNoU2NoZWR1bGVSZXF1ZXN0EhQKAmlkGAEgASgJQgi6SAVyA5gBGhIcCgRuYW1lGAIgASgJQgm6SAZyBBABGGRIAIgBARIuCgVyb3VuZBgDIAEoDjIQLmFkbWluLnYxLlJvdW5kc0IIukgFggECEAFIAYgBARI5CghzdGFydF9hdBgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCBrpIA8gBAUgCiAEBEjwKBmVuZF9hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCC7pICMgBAbIBAkABSAOIAQFCBwoFX25hbWVCCAoGX3JvdW5kQgsKCV9zdGFydF9hdEIJCgdfZW5kX2F0IkUKFVBhdGNoU2NoZWR1bGVSZXNwb25zZRIsCghzY2hlZHVsZRgBIAEoCzISLmFkbWluLnYxLlNjaGVkdWxlQga6SAPIAQEizQEKE1Bvc3RTY2hlZHVsZVJlcXVlc3QSFwoEbmFtZRgBIAEoCUIJukgGcgQQARhkEikKBXJvdW5kGAIgASgOMhAuYWRtaW4udjEuUm91bmRzQgi6SAWCAQIQARI5CghzdGFydF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCC7pICMgBAbIBAkABEjcKBmVuZF9hdBgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCC7pICMgBAbIBAkABIkQKFFBvc3RTY2hlZHVsZVJlc3BvbnNlEiwKCHNjaGVkdWxlGAEgASgLMhIuYWRtaW4udjEuU2NoZWR1bGVCBrpIA8gBASItChVEZWxldGVTY2hlZHVsZVJlcXVlc3QSFAoCaWQYASABKAlCCLpIBXIDmAEaIhgKFkRlbGV0ZVNjaGVkdWxlUmVzcG9uc2UqSgoGUm91bmRzEhYKElJPVU5EU19VTlNQRUNJRklFRBAAEhUKEVJPVU5EU19RVUFMSUZZSU5HEAESEQoNUk9VTkRTX0ZJTkFMUxACMtYCCg9TY2hlZHVsZVNlcnZpY2USTQoMR2V0U2NoZWR1bGVzEh0uYWRtaW4udjEuR2V0U2NoZWR1bGVzUmVxdWVzdBoeLmFkbWluLnYxLkdldFNjaGVkdWxlc1Jlc3BvbnNlElAKDVBhdGNoU2NoZWR1bGUSHi5hZG1pbi52MS5QYXRjaFNjaGVkdWxlUmVxdWVzdBofLmFkbWluLnYxLlBhdGNoU2NoZWR1bGVSZXNwb25zZRJNCgxQb3N0U2NoZWR1bGUSHS5hZG1pbi52MS5Qb3N0U2NoZWR1bGVSZXF1ZXN0Gh4uYWRtaW4udjEuUG9zdFNjaGVkdWxlUmVzcG9uc2USUwoORGVsZXRlU2NoZWR1bGUSHy5hZG1pbi52MS5EZWxldGVTY2hlZHVsZVJlcXVlc3QaIC5hZG1pbi52MS5EZWxldGVTY2hlZHVsZVJlc3BvbnNlQp8BCgxjb20uYWRtaW4udjFCDVNjaGVkdWxlUHJvdG9QAVo/Z2l0aHViLmNvbS9pY3RzYy9pY3RzYy1vdXRsYW5kcy9iYWNrZW5kL2ludGVybmFsL3Byb3RvL2FkbWluL3YxogIDQVhYqgIIQWRtaW4uVjHKAghBZG1pblxWMeICFEFkbWluXFYxXEdQQk1ldGFkYXRh6gIJQWRtaW46OlYxYgZwcm90bzM", [file_buf_validate_validate, file_google_protobuf_timestamp]);
+  fileDesc("ChdhZG1pbi92MS9zY2hlZHVsZS5wcm90bxIIYWRtaW4udjEizgEKCFNjaGVkdWxlEhQKAmlkGAEgASgJQgi6SAVyA5gBGhIXCgRuYW1lGAIgASgJQgm6SAZyBBABGGQSKQoFcGhhc2UYAyABKA4yEC5hZG1pbi52MS5QaGFzZXNCCLpIBYIBAhABEjQKCHN0YXJ0X2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEIGukgDyAEBEjIKBmVuZF9hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCBrpIA8gBASIVChNHZXRTY2hlZHVsZXNSZXF1ZXN0IkUKFEdldFNjaGVkdWxlc1Jlc3BvbnNlEi0KCXNjaGVkdWxlcxgBIAMoCzISLmFkbWluLnYxLlNjaGVkdWxlQga6SAPIAQEingIKFFBhdGNoU2NoZWR1bGVSZXF1ZXN0EhQKAmlkGAEgASgJQgi6SAVyA5gBGhIcCgRuYW1lGAIgASgJQgm6SAZyBBABGGRIAIgBARIuCgVwaGFzZRgDIAEoDjIQLmFkbWluLnYxLlBoYXNlc0IIukgFggECEAFIAYgBARI5CghzdGFydF9hdBgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCBrpIA8gBAUgCiAEBEjwKBmVuZF9hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCC7pICMgBAbIBAkABSAOIAQFCBwoFX25hbWVCCAoGX3BoYXNlQgsKCV9zdGFydF9hdEIJCgdfZW5kX2F0IkUKFVBhdGNoU2NoZWR1bGVSZXNwb25zZRIsCghzY2hlZHVsZRgBIAEoCzISLmFkbWluLnYxLlNjaGVkdWxlQga6SAPIAQEizQEKE1Bvc3RTY2hlZHVsZVJlcXVlc3QSFwoEbmFtZRgBIAEoCUIJukgGcgQQARhkEikKBXBoYXNlGAIgASgOMhAuYWRtaW4udjEuUGhhc2VzQgi6SAWCAQIQARI5CghzdGFydF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCC7pICMgBAbIBAkABEjcKBmVuZF9hdBgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCC7pICMgBAbIBAkABIkQKFFBvc3RTY2hlZHVsZVJlc3BvbnNlEiwKCHNjaGVkdWxlGAEgASgLMhIuYWRtaW4udjEuU2NoZWR1bGVCBrpIA8gBASItChVEZWxldGVTY2hlZHVsZVJlcXVlc3QSFAoCaWQYASABKAlCCLpIBXIDmAEaIhgKFkRlbGV0ZVNjaGVkdWxlUmVzcG9uc2UqSgoGUGhhc2VzEhYKElBIQVNFU19VTlNQRUNJRklFRBAAEhUKEVBIQVNFU19RVUFMSUZZSU5HEAESEQoNUEhBU0VTX0ZJTkFMUxACMtYCCg9TY2hlZHVsZVNlcnZpY2USTQoMR2V0U2NoZWR1bGVzEh0uYWRtaW4udjEuR2V0U2NoZWR1bGVzUmVxdWVzdBoeLmFkbWluLnYxLkdldFNjaGVkdWxlc1Jlc3BvbnNlElAKDVBhdGNoU2NoZWR1bGUSHi5hZG1pbi52MS5QYXRjaFNjaGVkdWxlUmVxdWVzdBofLmFkbWluLnYxLlBhdGNoU2NoZWR1bGVSZXNwb25zZRJNCgxQb3N0U2NoZWR1bGUSHS5hZG1pbi52MS5Qb3N0U2NoZWR1bGVSZXF1ZXN0Gh4uYWRtaW4udjEuUG9zdFNjaGVkdWxlUmVzcG9uc2USUwoORGVsZXRlU2NoZWR1bGUSHy5hZG1pbi52MS5EZWxldGVTY2hlZHVsZVJlcXVlc3QaIC5hZG1pbi52MS5EZWxldGVTY2hlZHVsZVJlc3BvbnNlQp8BCgxjb20uYWRtaW4udjFCDVNjaGVkdWxlUHJvdG9QAVo/Z2l0aHViLmNvbS9pY3RzYy9pY3RzYy1vdXRsYW5kcy9iYWNrZW5kL2ludGVybmFsL3Byb3RvL2FkbWluL3YxogIDQVhYqgIIQWRtaW4uVjHKAghBZG1pblxWMeICFEFkbWluXFYxXEdQQk1ldGFkYXRh6gIJQWRtaW46OlYxYgZwcm90bzM", [file_buf_validate_validate, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message admin.v1.Schedule
@@ -30,9 +30,9 @@ export type Schedule = Message<"admin.v1.Schedule"> & {
   name: string;
 
   /**
-   * @generated from field: admin.v1.Rounds round = 3;
+   * @generated from field: admin.v1.Phases phase = 3;
    */
-  round: Rounds;
+  phase: Phases;
 
   /**
    * @generated from field: google.protobuf.Timestamp start_at = 4;
@@ -97,9 +97,9 @@ export type PatchScheduleRequest = Message<"admin.v1.PatchScheduleRequest"> & {
   name?: string;
 
   /**
-   * @generated from field: optional admin.v1.Rounds round = 3;
+   * @generated from field: optional admin.v1.Phases phase = 3;
    */
-  round?: Rounds;
+  phase?: Phases;
 
   /**
    * @generated from field: optional google.protobuf.Timestamp start_at = 4;
@@ -146,9 +146,9 @@ export type PostScheduleRequest = Message<"admin.v1.PostScheduleRequest"> & {
   name: string;
 
   /**
-   * @generated from field: admin.v1.Rounds round = 2;
+   * @generated from field: admin.v1.Phases phase = 2;
    */
-  round: Rounds;
+  phase: Phases;
 
   /**
    * @generated from field: google.protobuf.Timestamp start_at = 3;
@@ -216,29 +216,29 @@ export const DeleteScheduleResponseSchema: GenMessage<DeleteScheduleResponse> = 
   messageDesc(file_admin_v1_schedule, 8);
 
 /**
- * @generated from enum admin.v1.Rounds
+ * @generated from enum admin.v1.Phases
  */
-export enum Rounds {
+export enum Phases {
   /**
-   * @generated from enum value: ROUNDS_UNSPECIFIED = 0;
+   * @generated from enum value: PHASES_UNSPECIFIED = 0;
    */
   UNSPECIFIED = 0,
 
   /**
-   * @generated from enum value: ROUNDS_QUALIFYING = 1;
+   * @generated from enum value: PHASES_QUALIFYING = 1;
    */
   QUALIFYING = 1,
 
   /**
-   * @generated from enum value: ROUNDS_FINALS = 2;
+   * @generated from enum value: PHASES_FINALS = 2;
    */
   FINALS = 2,
 }
 
 /**
- * Describes the enum admin.v1.Rounds.
+ * Describes the enum admin.v1.Phases.
  */
-export const RoundsSchema: GenEnum<Rounds> = /*@__PURE__*/
+export const PhasesSchema: GenEnum<Phases> = /*@__PURE__*/
   enumDesc(file_admin_v1_schedule, 0);
 
 /**

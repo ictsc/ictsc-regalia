@@ -13,16 +13,16 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file contestant/v1/ranking.proto.
  */
 export const file_contestant_v1_ranking: GenFile = /*@__PURE__*/
-  fileDesc("Chtjb250ZXN0YW50L3YxL3JhbmtpbmcucHJvdG8SDWNvbnRlc3RhbnQudjEiYAoEUmFuaxIVCgRyYW5rGAEgASgFQge6SAQaAiAAEikKBHRlYW0YAiABKAsyEy5jb250ZXN0YW50LnYxLlRlYW1CBrpIA8gBARIWCgVwb2ludBgDIAEoBUIHukgEGgIoACITChFHZXRSYW5raW5nUmVxdWVzdCJCChJHZXRSYW5raW5nUmVzcG9uc2USLAoHcmFua2luZxgBIAMoCzITLmNvbnRlc3RhbnQudjEuUmFua0IGukgDyAEBMmMKDlJhbmtpbmdTZXJ2aWNlElEKCkdldFJhbmtpbmcSIC5jb250ZXN0YW50LnYxLkdldFJhbmtpbmdSZXF1ZXN0GiEuY29udGVzdGFudC52MS5HZXRSYW5raW5nUmVzcG9uc2VCvAEKEWNvbS5jb250ZXN0YW50LnYxQgxSYW5raW5nUHJvdG9QAVpEZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1vdXRsYW5kcy9iYWNrZW5kL2ludGVybmFsL3Byb3RvL2NvbnRlc3RhbnQvdjGiAgNDWFiqAg1Db250ZXN0YW50LlYxygINQ29udGVzdGFudFxWMeICGUNvbnRlc3RhbnRcVjFcR1BCTWV0YWRhdGHqAg5Db250ZXN0YW50OjpWMWIGcHJvdG8z", [file_buf_validate_validate, file_contestant_v1_team]);
+  fileDesc("Chtjb250ZXN0YW50L3YxL3JhbmtpbmcucHJvdG8SDWNvbnRlc3RhbnQudjEiYAoEUmFuaxIVCgRyYW5rGAEgASgDQge6SAQiAiAAEikKBHRlYW0YAiABKAsyEy5jb250ZXN0YW50LnYxLlRlYW1CBrpIA8gBARIWCgVwb2ludBgDIAEoA0IHukgEIgIoACITChFHZXRSYW5raW5nUmVxdWVzdCJCChJHZXRSYW5raW5nUmVzcG9uc2USLAoHcmFua2luZxgBIAMoCzITLmNvbnRlc3RhbnQudjEuUmFua0IGukgDyAEBMmMKDlJhbmtpbmdTZXJ2aWNlElEKCkdldFJhbmtpbmcSIC5jb250ZXN0YW50LnYxLkdldFJhbmtpbmdSZXF1ZXN0GiEuY29udGVzdGFudC52MS5HZXRSYW5raW5nUmVzcG9uc2VCvAEKEWNvbS5jb250ZXN0YW50LnYxQgxSYW5raW5nUHJvdG9QAVpEZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1vdXRsYW5kcy9iYWNrZW5kL2ludGVybmFsL3Byb3RvL2NvbnRlc3RhbnQvdjGiAgNDWFiqAg1Db250ZXN0YW50LlYxygINQ29udGVzdGFudFxWMeICGUNvbnRlc3RhbnRcVjFcR1BCTWV0YWRhdGHqAg5Db250ZXN0YW50OjpWMWIGcHJvdG8z", [file_buf_validate_validate, file_contestant_v1_team]);
 
 /**
  * @generated from message contestant.v1.Rank
  */
 export type Rank = Message<"contestant.v1.Rank"> & {
   /**
-   * @generated from field: int32 rank = 1;
+   * @generated from field: int64 rank = 1;
    */
-  rank: number;
+  rank: bigint;
 
   /**
    * @generated from field: contestant.v1.Team team = 2;
@@ -30,9 +30,9 @@ export type Rank = Message<"contestant.v1.Rank"> & {
   team?: Team;
 
   /**
-   * @generated from field: int32 point = 3;
+   * @generated from field: int64 point = 3;
    */
-  point: number;
+  point: bigint;
 };
 
 /**
