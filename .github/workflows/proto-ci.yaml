@@ -45,7 +45,7 @@ jobs:
         with:
           input: proto
           breaking: true
-          breaking_against: https://github.com/ictsc/ictsc-regalia.git#branch=main
+          breaking_against: https://github.com/ictsc/ictsc-regalia.git#branch=main,subdir=proto
   format:
     name: Format
     runs-on: ubuntu-latest
