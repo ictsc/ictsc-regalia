@@ -11,11 +11,11 @@ message Announcement {
   string id = 1 [(buf.validate.field).string.len = 26];
   optional string problem_id = 2 [(buf.validate.field).string.len = 26];
   string title = 3 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 100
   }];
   string body = 4 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 1000
   }];
   google.protobuf.Timestamp created_at = 5 [(buf.validate.field).required = true];

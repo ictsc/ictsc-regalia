@@ -9,7 +9,7 @@ option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/anit
 message User {
   string id = 1 [(buf.validate.field).string.len = 26];
   string name = 2 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 20
   }];
   string team_id = 3 [(buf.validate.field).string.len = 26];
@@ -32,7 +32,7 @@ message GetUsersResponse {
 message PostUserRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
   string name = 2 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 20
   }];
   string invitation_code = 3 [(buf.validate.field).string.len = 32];
@@ -45,7 +45,7 @@ message PostUserResponse {
 message PatchUserRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
   string name = 2 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 20
   }];
 }

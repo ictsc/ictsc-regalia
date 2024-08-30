@@ -15,7 +15,7 @@ enum QuestionType {
 message Choice {
   int64 index = 1 [(buf.validate.field).int64.gte = 0];
   string body = 2 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 1000
   }];
 }
@@ -23,19 +23,19 @@ message Choice {
 message Question {
   string id = 1 [(buf.validate.field).string.len = 26];
   string body = 2 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 1000
   }];
   QuestionType type = 3 [(buf.validate.field).enum.defined_only = true];
   repeated Choice choices = 4 [(buf.validate.field).repeated = {
-    min_items: 2,
+    min_items: 2
     max_items: 10
   }];
   int64 point = 5 [(buf.validate.field).int64.gt = 0];
   repeated int64 answer = 6 [(buf.validate.field).repeated = {
-    unique: true,
-    min_items: 1,
-    max_items: 10,
+    unique: true
+    min_items: 1
+    max_items: 10
     items: {
       int64: {gte: 0}
     }
@@ -44,45 +44,45 @@ message Question {
 
 message MultipleChoiceProblem {
   optional string body = 1 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 1000
   }];
   repeated Question questions = 2 [(buf.validate.field).repeated = {
-    min_items: 1,
+    min_items: 1
     max_items: 10
   }];
 }
 
 message ConnectionInfo {
   string hostname = 1 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 100
   }];
   string command = 2 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 100
   }];
   string password = 3 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 20
   }];
   string type = 4 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 20
   }];
 }
 
 message DescriptiveProblem {
   string body = 1 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 1000
   }];
   repeated ConnectionInfo connection_infos = 2 [(buf.validate.field).repeated = {
-    min_items: 0,
+    min_items: 0
     max_items: 10
   }];
   string answer = 3 [(buf.validate.field).string = {
-    min_len: 0,
+    min_len: 0
     max_len: 1000
   }];
 }
@@ -96,7 +96,7 @@ enum ProblemType {
 message Problem {
   string id = 1 [(buf.validate.field).string.len = 26];
   string title = 2 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 100
   }];
   string code = 3 [(buf.validate.field).string.len = 3];
@@ -108,8 +108,8 @@ message Problem {
     MultipleChoiceProblem multiple_choice = 7;
   }
   repeated string assignee_ids = 8 [(buf.validate.field).repeated = {
-    min_items: 0,
-    max_items: 10,
+    min_items: 0
+    max_items: 10
     items: {
       string: {len: 26}
     }
@@ -133,7 +133,7 @@ message GetProblemsResponse {
 message PatchProblemRequest {
   string id = 1 [(buf.validate.field).string.len = 26];
   optional string title = 2 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 100
   }];
   optional string code = 3 [(buf.validate.field).string.len = 3];
@@ -151,7 +151,7 @@ message PatchProblemResponse {
 
 message PostProblemRequest {
   string title = 1 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 100
   }];
   string code = 2 [(buf.validate.field).string.len = 3];

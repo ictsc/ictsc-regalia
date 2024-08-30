@@ -73,7 +73,7 @@ jobs:
         id: push
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "run go mod tidy & format go codes"
+          commit_message: "run buf format"
           branch: ${{ github.head_ref }}
           commit_user_name: ictsc-actions[bot]
           commit_user_email: 154957684+ictsc-actions[bot]@users.noreply.github.com

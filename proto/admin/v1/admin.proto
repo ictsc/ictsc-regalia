@@ -9,7 +9,7 @@ option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/admi
 message Admin {
   string id = 1 [(buf.validate.field).string.len = 26];
   string name = 2 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 20
   }];
 }
@@ -36,7 +36,7 @@ message GetAdminsResponse {
 
 message PostAdminRequest {
   string name = 1 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 20
   }];
 }
@@ -47,7 +47,7 @@ message PostAdminResponse {
 
 message PatchMeRequest {
   string name = 1 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 20
   }];
 }

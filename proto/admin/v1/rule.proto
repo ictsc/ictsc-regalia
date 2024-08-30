@@ -8,15 +8,15 @@ option go_package = "github.com/ictsc/ictsc-outlands/backend/internal/proto/admi
 
 message Rule {
   string rule = 1 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 1000
   }];
   string short_rule = 2 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 200
   }];
   string recreation_rule = 3 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 1000
   }];
 }
@@ -29,15 +29,15 @@ message GetRuleResponse {
 
 message PatchRuleRequest {
   optional string rule = 1 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 1000
   }];
   optional string short_rule = 2 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 200
   }];
   optional string recreation_rule = 3 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 1000
   }];
 }
