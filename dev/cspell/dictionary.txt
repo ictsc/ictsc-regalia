@@ -54,6 +54,7 @@ phpmyadmin
 proto
 protobuf
 protoc
+protocolbuffers
 protovalidate
 signin
 signout
