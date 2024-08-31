@@ -17,7 +17,7 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
-	github.com/uptrace/bun v1.2.2
+	github.com/uptrace/bun v1.2.3
 	github.com/uptrace/bun/dialect/mysqldialect v1.2.2
 	github.com/uptrace/bun/extra/bundebug v1.2.2
 	golang.org/x/net v0.28.0
