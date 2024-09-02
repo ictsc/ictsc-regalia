@@ -13,6 +13,7 @@
     "story": "storybook dev -p 6006",
     "story:build": "storybook build"
   },
+  "prettier": "@ictsc/config/prettier",
   "devDependencies": {
     "@chromatic-com/storybook": "^1.7.0",
     "@ictsc/config": "workspace:*",

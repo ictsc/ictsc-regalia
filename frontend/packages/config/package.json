@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./eslint": "./eslint/config.js"
+    "./eslint": "./eslint/config.js",
+    "./prettier": "./prettier/config.js"
   },
   "dependencies": {
     "@eslint/compat": "^1.1.1",
@@ -16,9 +17,11 @@
     "eslint-plugin-react-refresh": "^0.4.9",
     "eslint-plugin-storybook": "^0.8.0",
     "globals": "^15.9.0",
+    "prettier-plugin-tailwindcss": "^0.6.6",
     "typescript-eslint": "^8.1.0"
   },
   "devDependencies": {
-    "eslint": "^9.9.1"
+    "eslint": "^9.9.1",
+    "prettier": "^3.3.3"
   }
 }
