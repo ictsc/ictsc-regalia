@@ -4,7 +4,7 @@ import clsx from "clsx";
 
 export type { MaterialSymbol as MaterialSymbolType };
 
-export type MaterilaSymbolProps = {
+export type MaterialSymbolProps = {
   readonly icon: MaterialSymbol;
   readonly fill?: boolean;
   readonly size?: 20 | 24 | 40 | 48;
@@ -18,7 +18,7 @@ export function MaterialSymbol({
   size = 24,
   className,
   style: propStyle,
-}: MaterilaSymbolProps) {
+}: MaterialSymbolProps) {
   const style: CSSProperties = {
     ...propStyle,
     fontVariationSettings: `"FILL" ${fill ? "1" : "0"}`,
