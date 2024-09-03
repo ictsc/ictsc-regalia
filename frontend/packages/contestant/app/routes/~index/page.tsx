@@ -1,7 +1,14 @@
 import { Logo } from "@app/components/logo";
 import { MaterialSymbol } from "@app/components/material-symbol";
 
-export function IndexPage() {
+export type IndexPageProps = {
+  readonly inContest: boolean;
+};
+export function IndexPage({ inContest }: IndexPageProps) {
+  return inContest ? <InContest /> : <OutOfContest />;
+}
+
+function InContest() {
   return (
     <div className="flex h-full flex-col items-center justify-center">
       <Logo width={500} />
@@ -29,6 +36,18 @@ export function IndexPage() {
           </div>
           <div className="ml-8 text-14">次のフェーズ: 競技終了</div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function OutOfContest() {
+  return (
+    <div className="flex h-full flex-col items-center justify-center">
+      <h1 className="text-48 font-bold underline">競技開始まであと</h1>
+      <div className="mt-40 flex items-center">
+        <MaterialSymbol icon="schedule" size={48} className="text-icon" />
+        <span className="ml-16 text-48 font-bold">03 : 30 : 50</span>
       </div>
     </div>
   );

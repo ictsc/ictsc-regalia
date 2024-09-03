@@ -35,6 +35,7 @@ export default {
       16: ["16px", "24px"],
       24: ["24px", "32px"],
       32: ["32px", "40px"],
+      48: ["48px", "1"],
     },
     borderRadius: {
       none: "0",
