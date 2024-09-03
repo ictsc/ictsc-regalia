@@ -1,6 +1,5 @@
-import {} from "react";
-import { Logo } from "../../components/logo";
-import { MaterialSymbol } from "../../components/material-symbol";
+import { Logo } from "@app/components/logo";
+import { MaterialSymbol } from "@app/components/material-symbol";
 
 export function IndexPage() {
   return (

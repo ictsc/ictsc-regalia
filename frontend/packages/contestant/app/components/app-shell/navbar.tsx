@@ -1,6 +1,9 @@
 import { Button } from "@headlessui/react";
 import { clsx } from "clsx";
-import { MaterialSymbol, type MaterialSymbolType } from "../material-symbol";
+import {
+  MaterialSymbol,
+  type MaterialSymbolType,
+} from "@app/components/material-symbol";
 
 export function NavbarView({
   collapsed = false,

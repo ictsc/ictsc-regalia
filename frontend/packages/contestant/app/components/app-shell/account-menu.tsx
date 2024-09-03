@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { clsx } from "clsx";
 import {
   Menu,
   MenuItems,
@@ -6,8 +7,10 @@ import {
   Button,
   type ButtonProps,
 } from "@headlessui/react";
-import { clsx } from "clsx";
-import { MaterialSymbol, type MaterialSymbolType } from "../material-symbol";
+import {
+  MaterialSymbol,
+  type MaterialSymbolType,
+} from "@app/components/material-symbol";
 
 export function AccountMenu({
   children,

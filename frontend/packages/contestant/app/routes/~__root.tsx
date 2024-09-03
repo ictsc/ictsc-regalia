@@ -1,6 +1,6 @@
 import { Suspense, lazy } from "react";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
-import { AppShell } from "../components/app-shell";
+import { AppShell } from "@app/components/app-shell";
 
 const TanStackRouterDevtools = import.meta.env.DEV
   ? lazy(() =>

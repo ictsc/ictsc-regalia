@@ -1,4 +1,4 @@
-import { MaterialSymbol } from "../material-symbol";
+import { MaterialSymbol } from "@app/components/material-symbol";
 
 export type ContestState = "before" | "running" | "break" | "finished";
 export type ContentStateViewProps = {

@@ -1,8 +1,8 @@
 import { type ReactNode } from "react";
 import { MenuButton } from "@headlessui/react";
 import { Link } from "@tanstack/react-router";
-import { MaterialSymbol } from "../material-symbol";
-import { Logo } from "../logo";
+import { MaterialSymbol } from "@app/components/material-symbol";
+import { Logo } from "@app/components/logo";
 import { AccountMenu } from "./account-menu";
 
 export type HeaderViewProps = {
