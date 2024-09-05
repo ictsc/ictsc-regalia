@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type { MaterialSymbol } from "material-symbols";
-import clsx from "clsx";
+import { clsx } from "clsx";
 
 export type { MaterialSymbol as MaterialSymbolType };
 

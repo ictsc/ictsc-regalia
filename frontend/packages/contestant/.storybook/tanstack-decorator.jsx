@@ -1,4 +1,4 @@
-import { createContext, use } from "react";
+import { createContext, useContext } from "react";
 import {
   RouterProvider,
   createMemoryHistory,
@@ -18,7 +18,7 @@ function NotFound() {
 }
 
 function RoutedStory() {
-  const Story = use(StoryContext);
+  const Story = useContext(StoryContext);
   if (Story == null) {
     throw new Error("story not found");
   }

@@ -3,7 +3,7 @@ import globals from "globals";
 import jsPlugin from "@eslint/js";
 import prettierConfig from "eslint-config-prettier";
 import importPlugin from "eslint-plugin-import";
-import tseslint from "typescript-eslint";
+import * as tseslint from "typescript-eslint";
 import reactPlugin from "eslint-plugin-react";
 import reacthooksPlugin from "eslint-plugin-react-hooks";
 import reactRefreshPlugin from "eslint-plugin-react-refresh";
@@ -15,7 +15,7 @@ const tsFiles = ["**/*.{ts,tsx,cts,mts}"];
 
 /**
  * @param [opts]
- * @returns {import("eslint").Linter.FlatConfig[]}
+ * @returns {import("eslint").Linter.Config[]}
  */
 function config(opts = {}) {
   const { react = false, storybook = false } = opts;
@@ -35,11 +35,22 @@ function config(opts = {}) {
       name: namePrefix + "/parser",
       files: [...jsFiles, ...tsFiles],
       languageOptions: {
+        ecmaVersion: "latest",
         sourceType: "module",
-        parserOptions: react ? { ecmaFeatures: { jsx: true } } : {},
+        parserOptions: {
+          ecmaVersion: "latest",
+          sourceType: "module",
+          ...(react ? { ecmaFeatures: { jsx: true } } : {}),
+        },
       },
       settings: {
         react: { version: "detect" },
+        "import/parsers": {
+          espree: [".js", ".cjs", ".mjs", ".jsx"],
+        },
+        "import/resolver": {
+          typescript: {},
+        },
       },
     },
     {
@@ -59,6 +70,9 @@ function config(opts = {}) {
       },
       settings: {
         ...importPlugin.configs.typescript.settings,
+        "import/resolver": {
+          typescript: {},
+        },
       },
     },
     ...mapToFiles(
@@ -81,16 +95,7 @@ function config(opts = {}) {
         {
           name: namePrefix + "/import",
           rules: {
-            ...importPlugin.configs.recommended.rules,
-            // eslint-plugin-import の resolver を用いるルールを無効化する
-            // JS では resolver が exports を解釈できずうまく動かない
-            // TS では TypeScript が解決するため必要ない
-            "import/named": "off",
-            "import/namespace": "off",
-            "import/default": "off",
-            "import/no-named-as-default-member": "off",
-            "import/no-named-as-default": "off",
-            "import/no-unresolved": "off",
+            ...importPlugin.flatConfigs.recommended.rules,
           },
         },
         ...(react
@@ -121,7 +126,12 @@ function config(opts = {}) {
             (rules, config) => ({ ...rules, ...config.rules }),
             {},
           ),
-          ...importPlugin.configs.typescript.rules,
+          // TypeScript が解決するため必要ないルールを無効化する
+          "import/named": "off",
+          "import/namespace": "off",
+          "import/default": "off",
+          "import/no-named-as-default-member": "off",
+          "import/no-unresolved": "off",
         },
       },
     ]),
@@ -145,7 +155,7 @@ function config(opts = {}) {
           },
         ]
       : []),
-    { rules: prettierConfig.rules },
+    { name: "eslint-config-prettier", rules: prettierConfig.rules },
   ];
 }
 
