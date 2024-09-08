@@ -17,4 +17,3 @@ export const OutOfContest: Story = {
   name: "競技時間外",
   args: { inContest: false },
 };
-
