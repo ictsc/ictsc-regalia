@@ -1,5 +1,5 @@
 ### 依存関係のインストール
-FROM node:18 AS deps
+FROM node:20 AS deps
 
 WORKDIR /app
 
@@ -31,7 +31,7 @@ RUN wget https://github.com/googlefonts/noto-cjk/releases/download/Sans2.004/01_
 
 
 ### Next.js のビルド
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 ARG next_public_api_url
 ARG next_public_site_name
@@ -57,7 +57,7 @@ RUN pnpm build
 
 
 ### Next.js の実行
-FROM node:16-alpine AS runner
+FROM node:20-alpine AS runner
 
 ENV NODE_ENV=production
 
