@@ -89,8 +89,8 @@ importers:
         version: 19.0.0-rc-1eaccd82-20240816(react@19.0.0-rc-1eaccd82-20240816)
     devDependencies:
       '@chromatic-com/storybook':
-        specifier: ^1.7.0
-        version: 1.9.0(react@19.0.0-rc-1eaccd82-20240816)
+        specifier: ^2.0.0
+        version: 2.0.0(react@19.0.0-rc-1eaccd82-20240816)(storybook@8.2.9(@babel/preset-env@7.25.3(@babel/core@7.25.2)))
       '@ictsc/config':
         specifier: workspace:*
         version: link:../config
@@ -894,9 +894,11 @@ packages:
   '@bufbuild/protoplugin@2.0.0':
     resolution: {integrity: sha512-y77IarGNbJfr5YZHQ+biO0O9B8rXicKLLOFRJu9mKr9LYE5/CLIKqonIBfkc/lggCK2YOtinjZJEYb39HymIog==}
 
-  '@chromatic-com/storybook@1.9.0':
-    resolution: {integrity: sha512-vYQ+TcfktEE3GHnLZXHCzXF/sN9dw+KivH8a5cmPyd9YtQs7fZtHrEgsIjWpYycXiweKMo1Lm1RZsjxk8DH3rA==}
+  '@chromatic-com/storybook@2.0.0':
+    resolution: {integrity: sha512-9sG8BVdf4ipEbX9OGNFX/USvnpi3SffEuRiIn1Qzsp/dM263EVdCAPcS9GOAZz6zOgcgaScdyvjTQozBYJrIVA==}
     engines: {node: '>=16.0.0', yarn: '>=1.22.18'}
+    peerDependencies:
+      storybook: ^8.2.0
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -5382,12 +5384,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@chromatic-com/storybook@1.9.0(react@19.0.0-rc-1eaccd82-20240816)':
+  '@chromatic-com/storybook@2.0.0(react@19.0.0-rc-1eaccd82-20240816)(storybook@8.2.9(@babel/preset-env@7.25.3(@babel/core@7.25.2)))':
     dependencies:
       chromatic: 11.7.1
       filesize: 10.1.6
       jsonfile: 6.1.0
       react-confetti: 6.1.0(react@19.0.0-rc-1eaccd82-20240816)
+      storybook: 8.2.9(@babel/preset-env@7.25.3(@babel/core@7.25.2))
       strip-ansi: 7.1.0
     transitivePeerDependencies:
       - '@chromatic-com/cypress'
