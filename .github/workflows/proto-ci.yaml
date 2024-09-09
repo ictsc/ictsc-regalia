@@ -97,6 +97,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ steps.token.outputs.token }}
+      # Setup backend
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
@@ -110,8 +111,27 @@ jobs:
         uses: arduino/setup-task@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Generate
+      # Setup frontend
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+          run_install: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - name: Install dependencies
+        working-directory: frontend
+        run: pnpm install
+      # Generate
+      - name: Generate backend
         run: task generate
+      - name: Generate frontend
+        working-directory: frontend
+        run: pnpm generate:proto
       - name: Push
         id: push
         uses: stefanzweifel/git-auto-commit-action@v5

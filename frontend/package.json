@@ -1,6 +1,8 @@
 {
   "name": "frontend",
-  "scripts": {},
+  "scripts": {
+    "generate:proto": "pnpm run --filter proto generate"
+  },
   "devDependencies": {
     "@tsconfig/vite-react": "^3.0.2",
     "typescript": "^5.5.4"
