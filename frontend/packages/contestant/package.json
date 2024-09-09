@@ -1,0 +1,52 @@
+{
+  "name": "@ictsc/competition",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "lint": "run-p -c lint:*",
+    "lint:tsc": "tsc",
+    "lint:eslint": "eslint --cache --cache-location node_modules/.cache/eslint/ --cache-strategy content .",
+    "lint:prettier": "prettier --cache --check .",
+    "lint-fix": "run-s -c lint-fix:eslint lint-fix:prettier",
+    "lint-fix:eslint": "eslint --fix .",
+    "lint-fix:prettier": "prettier --write .",
+    "story": "storybook dev -p 6006",
+    "story:build": "storybook build"
+  },
+  "prettier": "@ictsc/config/prettier",
+  "devDependencies": {
+    "@chromatic-com/storybook": "^1.7.0",
+    "@ictsc/config": "workspace:*",
+    "@storybook/addon-essentials": "^8.2.9",
+    "@storybook/addon-interactions": "^8.2.9",
+    "@storybook/addon-links": "^8.2.9",
+    "@storybook/addon-onboarding": "^8.2.9",
+    "@storybook/blocks": "^8.2.9",
+    "@storybook/react": "^8.2.9",
+    "@storybook/react-vite": "^8.2.9",
+    "@storybook/test": "^8.2.9",
+    "@tanstack/router-plugin": "^1.49.3",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.9.1",
+    "globals": "^15.9.0",
+    "npm-run-all2": "^6.2.2",
+    "postcss": "^8.4.41",
+    "prettier": "^3.3.3",
+    "storybook": "^8.2.9",
+    "tailwindcss": "^3.4.10",
+    "vite": "^5.4.1",
+    "vite-tsconfig-paths": "^5.0.1"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.1.2",
+    "@tanstack/react-router": "^1.49.2",
+    "@tanstack/router-devtools": "^1.49.2",
+    "clsx": "^2.1.1",
+    "material-symbols": "^0.22.1",
+    "react": "^19.0.0-rc",
+    "react-dom": "^19.0.0-rc"
+  }
+}

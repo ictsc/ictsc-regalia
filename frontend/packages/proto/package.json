@@ -1,0 +1,27 @@
+{
+  "name": "@ictsc/proto",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./admin/v1": "./exports/admin-v1.ts",
+    "./contestant/v1": "./exports/contestant-v1.ts"
+  },
+  "scripts": {
+    "generate": "run-s generate:buf generate:exports",
+    "generate:buf": "buf generate",
+    "generate:exports": "tsx scripts/generate-exports.ts"
+  },
+  "prettier": "@ictsc/config/prettier",
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.0.0"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.38.0",
+    "@bufbuild/protoc-gen-es": "^2.0.0",
+    "@ictsc/config": "workspace:*",
+    "@types/node": "^22.5.0",
+    "npm-run-all2": "^6.2.2",
+    "prettier": "^3.3.3",
+    "tsx": "^4.18.0"
+  }
+}

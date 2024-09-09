@@ -2,8 +2,8 @@
 
 ## 構成
 
-- `octavio`: 競技者用ダッシュボード
-- `duardo`: 運営用ダッシュボード
+- `packages/competition`: 競技者用ダッシュボード
+- `packages/admin`: 運営用ダッシュボード
 
 ## 開発方法
 

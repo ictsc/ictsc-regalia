@@ -1,7 +1,4 @@
 packages:
-  - "duardo"
-  - "octavio"
-  - "packages/ui"
-  - "packages/zenn-editor/packages/zenn-content-css"
-  - "packages/zenn-editor/packages/zenn-embed-elements"
-  - "packages/zenn-editor/packages/zenn-markdown-html"
+  - packages/contestant
+  - packages/proto
+  - packages/config
