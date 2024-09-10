@@ -15,7 +15,6 @@
   },
   "prettier": "@ictsc/config/prettier",
   "devDependencies": {
-    "@chromatic-com/storybook": "^2.0.0",
     "@ictsc/config": "workspace:*",
     "@storybook/addon-essentials": "^8.2.9",
     "@storybook/addon-interactions": "^8.2.9",
