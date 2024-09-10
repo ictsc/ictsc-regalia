@@ -13,7 +13,7 @@ export function HeaderView({ contestState }: HeaderViewProps) {
   return (
     <div className="flex size-full items-center border-b-[3px] border-primary bg-surface-0">
       <div className="flex-none">
-        <Link>
+        <Link to="/">
           <Logo height={60} />
         </Link>
       </div>
