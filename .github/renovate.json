@@ -5,6 +5,7 @@
   "prConcurrentLimit": 0,
   "labels": ["dependencies"],
   "postUpdateOptions": ["gomodUpdateImportPaths", "gomodTidy"],
+  "ignorePaths": ["frontend-old/**"],
   "packageRules": [
     {
       "description": "Upgrade go indirect dependencies",
