@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { use, type ReactNode } from "react";
 import { clsx } from "clsx";
 import {
   Menu,
@@ -6,24 +6,39 @@ import {
   MenuItem,
   Button,
   type ButtonProps,
+  MenuButton,
 } from "@headlessui/react";
 import {
   MaterialSymbol,
   type MaterialSymbolType,
 } from "@app/components/material-symbol";
+import { type User } from "@app/features/account";
 
 export function AccountMenu({
-  children,
-  static: staticOpen,
+  user: userPromise,
 }: {
-  readonly children?: ReactNode;
-  readonly static?: boolean;
+  readonly user: Promise<User | undefined>;
 }) {
+  const user = use(userPromise);
+  return user != null && <AccountMenuView name={user.name} />;
+}
+
+export function AccountMenuView({ name }: { readonly name: string }) {
   return (
     <Menu>
-      {children}
+      <MenuButton
+        title="アカウントメニュー"
+        className="flex size-[50px] items-center justify-center rounded-full transition data-[hover]:bg-surface-0/50"
+      >
+        <MaterialSymbol
+          icon="person"
+          fill
+          size={40}
+          className="text-surface-0"
+        />
+      </MenuButton>
+
       <MenuItems
-        static={staticOpen}
         anchor={{ to: "bottom", gap: 15 }}
         transition
         className={clsx(
@@ -31,7 +46,7 @@ export function AccountMenu({
           "transition duration-200 ease-out data-[closed]:opacity-0",
         )}
       >
-        <span className="mx-[15px] text-14 text-text">ictsc</span>
+        <span className="mx-[15px] text-14 text-text">{name}</span>
         <MenuItem>
           <AccountMenuButton icon="settings">アカウント設定</AccountMenuButton>
         </MenuItem>

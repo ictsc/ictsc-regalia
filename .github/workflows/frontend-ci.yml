@@ -36,3 +36,25 @@ jobs:
 
       - name: Lint
         run: pnpm run --recursive --parallel --aggregate-output lint
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+          run_install: false
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Test
+        run: pnpm run --recursive --parallel --aggregate-output test

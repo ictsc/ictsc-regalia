@@ -4,6 +4,7 @@ import { Layout } from "./layout";
 import { HeaderView } from "./header";
 import { NavbarView } from "./navbar";
 import { ContestStateView } from "./contest-state";
+import { AccountMenuView } from "./account-menu";
 
 function AppShell() {
   const [collapsed, toggle] = useReducer((o) => !o, false);
@@ -14,6 +15,7 @@ function AppShell() {
           contestState={
             <ContestStateView state="before" restDurationSeconds={73850} />
           }
+          accountMenu={<AccountMenuView name="Alice" />}
         />
       }
       navbar={<NavbarView collapsed={collapsed} onOpenToggleClick={toggle} />}
