@@ -162,14 +162,14 @@ importers:
     dependencies:
       '@bufbuild/protobuf':
         specifier: ^2.0.0
-        version: 2.0.0
+        version: 2.1.0
     devDependencies:
       '@bufbuild/buf':
         specifier: ^1.38.0
         version: 1.41.0
       '@bufbuild/protoc-gen-es':
         specifier: ^2.0.0
-        version: 2.0.0(@bufbuild/protobuf@2.0.0)
+        version: 2.0.0(@bufbuild/protobuf@2.1.0)
       '@ictsc/config':
         specifier: workspace:*
         version: link:../config
@@ -348,6 +348,9 @@ packages:
 
   '@bufbuild/protobuf@2.0.0':
     resolution: {integrity: sha512-sw2JhwJyvyL0zlhG61aDzOVryEfJg2PDZFSV7i7IdC7nAE41WuXCru3QWLGiP87At0BMzKOoKO/FqEGoKygGZQ==}
+
+  '@bufbuild/protobuf@2.1.0':
+    resolution: {integrity: sha512-+2Mx67Y3skJ4NCD/qNSdBJNWtu6x6Qr53jeNg+QcwiL6mt0wK+3jwHH2x1p7xaYH6Ve2JKOVn0OxU35WsmqI9A==}
 
   '@bufbuild/protoc-gen-es@2.0.0':
     resolution: {integrity: sha512-xXDrDFjSD97jGu9RMA8O4Myj66DdCLOFeYG7Z0mX1aCE9hayymfor+BKgKCQouUfty6CYv8709FPYpEtDurLFQ==}
@@ -3688,11 +3691,13 @@ snapshots:
 
   '@bufbuild/protobuf@2.0.0': {}
 
-  '@bufbuild/protoc-gen-es@2.0.0(@bufbuild/protobuf@2.0.0)':
+  '@bufbuild/protobuf@2.1.0': {}
+
+  '@bufbuild/protoc-gen-es@2.0.0(@bufbuild/protobuf@2.1.0)':
     dependencies:
       '@bufbuild/protoplugin': 2.0.0
     optionalDependencies:
-      '@bufbuild/protobuf': 2.0.0
+      '@bufbuild/protobuf': 2.1.0
     transitivePeerDependencies:
       - supports-color
 
