@@ -3,7 +3,7 @@ module github.com/ictsc/ictsc-outlands/backend
 go 1.22.0
 
 require (
-	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.34.2-20240717164558-a6c49f84cc0f.2
+	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.34.2-20240920164238-5a7b106cbb87.2
 	connectrpc.com/connect v1.17.0
 	github.com/bytedance/sonic v1.12.2
 	github.com/cockroachdb/errors v1.11.3
