@@ -55,7 +55,7 @@ tasks:
           BINARY: go
           INSTALL_DOC: https://go.dev/doc/install
     cmds:
-      - go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.3.0
+      - go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.4.0
 
   generate:
     desc: 自動生成ファイルをすべて生成
