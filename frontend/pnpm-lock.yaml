@@ -111,13 +111,13 @@ importers:
         version: 8.3.2(@storybook/test@8.3.2(storybook@8.3.2))(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)(storybook@8.3.2)(typescript@5.6.2)
       '@storybook/react-vite':
         specifier: ^8.2.9
-        version: 8.3.2(@storybook/test@8.3.2(storybook@8.3.2))(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)(rollup@4.22.2)(storybook@8.3.2)(typescript@5.6.2)(vite@5.4.7(@types/node@22.5.5))(webpack-sources@3.2.3)
+        version: 8.3.2(@storybook/test@8.3.2(storybook@8.3.2))(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)(rollup@4.22.2)(storybook@8.3.2)(typescript@5.6.2)(vite@5.4.7(@types/node@22.6.0))(webpack-sources@3.2.3)
       '@storybook/test':
         specifier: ^8.2.9
         version: 8.3.2(storybook@8.3.2)
       '@tanstack/router-plugin':
         specifier: ^1.49.3
-        version: 1.58.4(vite@5.4.7(@types/node@22.5.5))(webpack-sources@3.2.3)
+        version: 1.58.4(vite@5.4.7(@types/node@22.6.0))(webpack-sources@3.2.3)
       '@types/react':
         specifier: ^18.3.3
         version: 18.3.8
@@ -126,7 +126,7 @@ importers:
         version: 18.3.0
       '@vitejs/plugin-react':
         specifier: ^4.3.1
-        version: 4.3.1(vite@5.4.7(@types/node@22.5.5))
+        version: 4.3.1(vite@5.4.7(@types/node@22.6.0))
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.47)
@@ -153,10 +153,10 @@ importers:
         version: 3.4.13
       vite:
         specifier: ^5.4.1
-        version: 5.4.7(@types/node@22.5.5)
+        version: 5.4.7(@types/node@22.6.0)
       vite-tsconfig-paths:
         specifier: ^5.0.1
-        version: 5.0.1(typescript@5.6.2)(vite@5.4.7(@types/node@22.5.5))
+        version: 5.0.1(typescript@5.6.2)(vite@5.4.7(@types/node@22.6.0))
 
   packages/proto:
     dependencies:
@@ -175,7 +175,7 @@ importers:
         version: link:../config
       '@types/node':
         specifier: ^22.5.0
-        version: 22.5.5
+        version: 22.6.0
       npm-run-all2:
         specifier: ^6.2.2
         version: 6.2.3
@@ -1237,6 +1237,9 @@ packages:
 
   '@types/node@22.5.5':
     resolution: {integrity: sha512-Xjs4y5UPO/CLdzpgR6GirZJx36yScjh73+2NlLlkFRSoQN8B0DpfXPdZGnvVmLRLOsqDpOfTNv7D9trgGhmOIA==}
+
+  '@types/node@22.6.0':
+    resolution: {integrity: sha512-QyR8d5bmq+eR72TwQDfujwShHMcIrWIYsaQFtXRE58MHPTEKUNxjxvl0yS0qPMds5xbSDWtp7ZpvGFtd7dfMdQ==}
 
   '@types/prop-types@15.7.13':
     resolution: {integrity: sha512-hCZTSvwbzWGvhqxp/RqVqwU999pBf2vp7hzIjiYOsl8wqOmUxkQ6ddw1cV3l8811+kdUFus/q4d1Y3E3SyEifA==}
@@ -3930,13 +3933,13 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
-  '@joshwooding/vite-plugin-react-docgen-typescript@0.3.1(typescript@5.6.2)(vite@5.4.7(@types/node@22.5.5))':
+  '@joshwooding/vite-plugin-react-docgen-typescript@0.3.1(typescript@5.6.2)(vite@5.4.7(@types/node@22.6.0))':
     dependencies:
       glob: 7.2.3
       glob-promise: 4.2.2(glob@7.2.3)
       magic-string: 0.27.0
       react-docgen-typescript: 2.2.2(typescript@5.6.2)
-      vite: 5.4.7(@types/node@22.5.5)
+      vite: 5.4.7(@types/node@22.6.0)
     optionalDependencies:
       typescript: 5.6.2
 
@@ -4229,7 +4232,7 @@ snapshots:
       react: 19.0.0-rc-fb9a90fa48-20240614
       react-dom: 19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614)
 
-  '@storybook/builder-vite@8.3.2(storybook@8.3.2)(typescript@5.6.2)(vite@5.4.7(@types/node@22.5.5))(webpack-sources@3.2.3)':
+  '@storybook/builder-vite@8.3.2(storybook@8.3.2)(typescript@5.6.2)(vite@5.4.7(@types/node@22.6.0))(webpack-sources@3.2.3)':
     dependencies:
       '@storybook/csf-plugin': 8.3.2(storybook@8.3.2)(webpack-sources@3.2.3)
       '@types/find-cache-dir': 3.2.1
@@ -4241,7 +4244,7 @@ snapshots:
       magic-string: 0.30.11
       storybook: 8.3.2
       ts-dedent: 2.2.0
-      vite: 5.4.7(@types/node@22.5.5)
+      vite: 5.4.7(@types/node@22.6.0)
     optionalDependencies:
       typescript: 5.6.2
     transitivePeerDependencies:
@@ -4326,11 +4329,11 @@ snapshots:
       react-dom: 19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614)
       storybook: 8.3.2
 
-  '@storybook/react-vite@8.3.2(@storybook/test@8.3.2(storybook@8.3.2))(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)(rollup@4.22.2)(storybook@8.3.2)(typescript@5.6.2)(vite@5.4.7(@types/node@22.5.5))(webpack-sources@3.2.3)':
+  '@storybook/react-vite@8.3.2(@storybook/test@8.3.2(storybook@8.3.2))(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)(rollup@4.22.2)(storybook@8.3.2)(typescript@5.6.2)(vite@5.4.7(@types/node@22.6.0))(webpack-sources@3.2.3)':
     dependencies:
-      '@joshwooding/vite-plugin-react-docgen-typescript': 0.3.1(typescript@5.6.2)(vite@5.4.7(@types/node@22.5.5))
+      '@joshwooding/vite-plugin-react-docgen-typescript': 0.3.1(typescript@5.6.2)(vite@5.4.7(@types/node@22.6.0))
       '@rollup/pluginutils': 5.1.0(rollup@4.22.2)
-      '@storybook/builder-vite': 8.3.2(storybook@8.3.2)(typescript@5.6.2)(vite@5.4.7(@types/node@22.5.5))(webpack-sources@3.2.3)
+      '@storybook/builder-vite': 8.3.2(storybook@8.3.2)(typescript@5.6.2)(vite@5.4.7(@types/node@22.6.0))(webpack-sources@3.2.3)
       '@storybook/react': 8.3.2(@storybook/test@8.3.2(storybook@8.3.2))(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)(storybook@8.3.2)(typescript@5.6.2)
       find-up: 5.0.0
       magic-string: 0.30.11
@@ -4340,7 +4343,7 @@ snapshots:
       resolve: 1.22.8
       storybook: 8.3.2
       tsconfig-paths: 4.2.0
-      vite: 5.4.7(@types/node@22.5.5)
+      vite: 5.4.7(@types/node@22.6.0)
     transitivePeerDependencies:
       - '@preact/preset-vite'
       - '@storybook/test'
@@ -4443,7 +4446,7 @@ snapshots:
       tsx: 4.19.1
       zod: 3.23.8
 
-  '@tanstack/router-plugin@1.58.4(vite@5.4.7(@types/node@22.5.5))(webpack-sources@3.2.3)':
+  '@tanstack/router-plugin@1.58.4(vite@5.4.7(@types/node@22.6.0))(webpack-sources@3.2.3)':
     dependencies:
       '@babel/core': 7.25.2
       '@babel/generator': 7.25.6
@@ -4464,7 +4467,7 @@ snapshots:
       unplugin: 1.14.1(webpack-sources@3.2.3)
       zod: 3.23.8
     optionalDependencies:
-      vite: 5.4.7(@types/node@22.5.5)
+      vite: 5.4.7(@types/node@22.6.0)
     transitivePeerDependencies:
       - supports-color
       - webpack-sources
@@ -4528,11 +4531,11 @@ snapshots:
   '@types/body-parser@1.19.5':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 22.5.5
+      '@types/node': 22.6.0
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 22.5.5
+      '@types/node': 22.6.0
 
   '@types/doctrine@0.0.9': {}
 
@@ -4551,7 +4554,7 @@ snapshots:
 
   '@types/express-serve-static-core@4.19.5':
     dependencies:
-      '@types/node': 22.5.5
+      '@types/node': 22.6.0
       '@types/qs': 6.9.16
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
@@ -4568,7 +4571,7 @@ snapshots:
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 22.5.5
+      '@types/node': 22.6.0
 
   '@types/hast@3.0.4':
     dependencies:
@@ -4589,6 +4592,10 @@ snapshots:
   '@types/minimatch@5.1.2': {}
 
   '@types/node@22.5.5':
+    dependencies:
+      undici-types: 6.19.8
+
+  '@types/node@22.6.0':
     dependencies:
       undici-types: 6.19.8
 
@@ -4614,12 +4621,12 @@ snapshots:
   '@types/send@0.17.4':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 22.5.5
+      '@types/node': 22.6.0
 
   '@types/serve-static@1.15.7':
     dependencies:
       '@types/http-errors': 2.0.4
-      '@types/node': 22.5.5
+      '@types/node': 22.6.0
       '@types/send': 0.17.4
 
   '@types/unist@3.0.3': {}
@@ -4757,14 +4764,14 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-react@4.3.1(vite@5.4.7(@types/node@22.5.5))':
+  '@vitejs/plugin-react@4.3.1(vite@5.4.7(@types/node@22.6.0))':
     dependencies:
       '@babel/core': 7.25.2
       '@babel/plugin-transform-react-jsx-self': 7.24.7(@babel/core@7.25.2)
       '@babel/plugin-transform-react-jsx-source': 7.24.7(@babel/core@7.25.2)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 5.4.7(@types/node@22.5.5)
+      vite: 5.4.7(@types/node@22.6.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -7000,24 +7007,24 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite-tsconfig-paths@5.0.1(typescript@5.6.2)(vite@5.4.7(@types/node@22.5.5)):
+  vite-tsconfig-paths@5.0.1(typescript@5.6.2)(vite@5.4.7(@types/node@22.6.0)):
     dependencies:
       debug: 4.3.6
       globrex: 0.1.2
       tsconfck: 3.1.3(typescript@5.6.2)
     optionalDependencies:
-      vite: 5.4.7(@types/node@22.5.5)
+      vite: 5.4.7(@types/node@22.6.0)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  vite@5.4.7(@types/node@22.5.5):
+  vite@5.4.7(@types/node@22.6.0):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.47
       rollup: 4.22.2
     optionalDependencies:
-      '@types/node': 22.5.5
+      '@types/node': 22.6.0
       fsevents: 2.3.3
 
   webpack-sources@3.2.3:
