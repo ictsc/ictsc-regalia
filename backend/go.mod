@@ -5,7 +5,7 @@ go 1.22.0
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.34.2-20240920164238-5a7b106cbb87.2
 	connectrpc.com/connect v1.17.0
-	github.com/bytedance/sonic v1.12.2
+	github.com/bytedance/sonic v1.12.3
 	github.com/cockroachdb/errors v1.11.3
 	github.com/defval/di v1.12.0
 	github.com/go-chi/chi/v5 v5.1.0
