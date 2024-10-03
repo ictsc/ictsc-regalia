@@ -71,10 +71,10 @@ importers:
         version: 2.1.8(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)
       '@tanstack/react-router':
         specifier: ^1.49.2
-        version: 1.58.16(@tanstack/router-generator@1.58.12)(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)
+        version: 1.58.17(@tanstack/router-generator@1.58.12)(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)
       '@tanstack/router-devtools':
         specifier: ^1.49.2
-        version: 1.58.16(@tanstack/react-router@1.58.16(@tanstack/router-generator@1.58.12)(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614))(csstype@3.1.3)(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)
+        version: 1.58.17(@tanstack/react-router@1.58.17(@tanstack/router-generator@1.58.12)(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614))(csstype@3.1.3)(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -1087,8 +1087,8 @@ packages:
     resolution: {integrity: sha512-M36Ke2Q2v8Iv4Cx0xw04iVkixuOligiFLOifH35DqGnzXe9PAtTHIooieQowqYkAjC09KuLo5j6sgvwKTZ+U5Q==}
     engines: {node: '>=12'}
 
-  '@tanstack/react-router@1.58.16':
-    resolution: {integrity: sha512-3kRTNNI+xgpXHhpI5xMw/S0/6ff23k2ubKvkf0LPv1X4B/WzctnH1nfFPpQq9DK0HBtgG8TIk7+gIJx0mV8KOA==}
+  '@tanstack/react-router@1.58.17':
+    resolution: {integrity: sha512-t9QDunhRywq043ArnwWo6OgJh99jHkTJRQS+Yl25CLalfbi7qyNvTXSQuAzwIKz0GK0JjkD4eGf7ZtTayaOZ1w==}
     engines: {node: '>=12'}
     peerDependencies:
       '@tanstack/router-generator': 1.58.12
@@ -1110,11 +1110,11 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
 
-  '@tanstack/router-devtools@1.58.16':
-    resolution: {integrity: sha512-dpAfsTdeABqRdZyDaKbNNfQKEE29evX3G/YspUNzSxGwVQH1mMgliUJoNQe/J3EEPSlJFaRVBJ25SrwfE685OQ==}
+  '@tanstack/router-devtools@1.58.17':
+    resolution: {integrity: sha512-VdvVldHigm9E49Q0FOSz2mLqf67SY7F8TF3TAbLlr06iI99QBMcnEU7u+pGsO/wlX8hSirliX1Lbj+9zDY57Ow==}
     engines: {node: '>=12'}
     peerDependencies:
-      '@tanstack/react-router': ^1.58.16
+      '@tanstack/react-router': ^1.58.17
       react: '>=18'
       react-dom: '>=18'
 
@@ -4429,7 +4429,7 @@ snapshots:
 
   '@tanstack/history@1.58.15': {}
 
-  '@tanstack/react-router@1.58.16(@tanstack/router-generator@1.58.12)(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)':
+  '@tanstack/react-router@1.58.17(@tanstack/router-generator@1.58.12)(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)':
     dependencies:
       '@tanstack/history': 1.58.15
       '@tanstack/react-store': 0.5.5(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)
@@ -4453,9 +4453,9 @@ snapshots:
       react: 19.0.0-rc-fb9a90fa48-20240614
       react-dom: 19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614)
 
-  '@tanstack/router-devtools@1.58.16(@tanstack/react-router@1.58.16(@tanstack/router-generator@1.58.12)(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614))(csstype@3.1.3)(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)':
+  '@tanstack/router-devtools@1.58.17(@tanstack/react-router@1.58.17(@tanstack/router-generator@1.58.12)(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614))(csstype@3.1.3)(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)':
     dependencies:
-      '@tanstack/react-router': 1.58.16(@tanstack/router-generator@1.58.12)(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)
+      '@tanstack/react-router': 1.58.17(@tanstack/router-generator@1.58.12)(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)
       clsx: 2.1.1
       goober: 2.1.14(csstype@3.1.3)
       react: 19.0.0-rc-fb9a90fa48-20240614
