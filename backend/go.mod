@@ -20,7 +20,7 @@ require (
 	github.com/uptrace/bun v1.2.3
 	github.com/uptrace/bun/dialect/mysqldialect v1.2.3
 	github.com/uptrace/bun/extra/bundebug v1.2.3
-	golang.org/x/net v0.29.0
+	golang.org/x/net v0.30.0
 	google.golang.org/protobuf v1.34.2
 )
 
@@ -71,7 +71,7 @@ require (
 	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0 // indirect
 	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
