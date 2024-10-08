@@ -79,8 +79,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       material-symbols:
-        specifier: ^0.23.0
-        version: 0.23.0
+        specifier: ^0.24.0
+        version: 0.24.0
       react:
         specifier: ^19.0.0-rc
         version: 19.0.0-rc-fb9a90fa48-20240614
@@ -2612,8 +2612,8 @@ packages:
     peerDependencies:
       react: '>= 0.14.0'
 
-  material-symbols@0.23.0:
-    resolution: {integrity: sha512-ciq9bPgw5bFGC807lT3KgbvU97bC7w6DeUQmqLXdIHD28L/FD9ajvX11swtQXcMV/nEjQ/fI6u5NVtli18qUqQ==}
+  material-symbols@0.24.0:
+    resolution: {integrity: sha512-PfQ6S+vuYmm9F8f4xUwF8RfahbKxBPFbkfIe6du66Lyh5jFohqC4s2J87PB8L8T76TwqsnJLza1Wnt08NKtBtw==}
 
   media-typer@0.3.0:
     resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
@@ -6327,7 +6327,7 @@ snapshots:
     dependencies:
       react: 19.0.0-rc-fb9a90fa48-20240614
 
-  material-symbols@0.23.0: {}
+  material-symbols@0.24.0: {}
 
   media-typer@0.3.0: {}
 
