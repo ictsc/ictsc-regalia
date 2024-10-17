@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import {
+  Link,
   RouterProvider,
   createMemoryHistory,
   createRootRoute,
@@ -11,10 +12,16 @@ import {
 /* eslint-disable react-refresh/only-export-components */
 
 const StoryContext = createContext(undefined);
+const storyPath = "/__story__";
 
 function NotFound() {
   const state = useRouterState();
-  return <div>Simulated route not found for path: {state.location.href}</div>;
+  return (
+    <div>
+      <p>Simulated route not found for path: {state.location.href}</p>
+      <Link to={storyPath}>Back to story</Link>
+    </div>
+  );
 }
 
 function RoutedStory() {
@@ -25,7 +32,6 @@ function RoutedStory() {
   return <Story />;
 }
 
-const storyPath = "/__story__";
 const rootRoute = createRootRoute({
   notFoundComponent: NotFound,
 });

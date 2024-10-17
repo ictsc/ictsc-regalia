@@ -1,6 +1,19 @@
 import { Suspense, lazy } from "react";
-import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
+import type { Transport } from "@connectrpc/connect";
 import { AppShell } from "@app/components/app-shell";
+import { fetchMe } from "@app/features/account";
+
+interface RouterContext {
+  transport: Transport;
+}
+
+export const Route = createRootRouteWithContext<RouterContext>()({
+  loader: ({ context: { transport } }) => ({
+    me: fetchMe(transport),
+  }),
+  component: Root,
+});
 
 const TanStackRouterDevtools = import.meta.env.DEV
   ? lazy(() =>
@@ -10,15 +23,16 @@ const TanStackRouterDevtools = import.meta.env.DEV
     )
   : () => null;
 
-export const Route = createRootRoute({
-  component: () => (
+function Root() {
+  const { me } = Route.useLoaderData();
+  return (
     <>
-      <AppShell>
+      <AppShell me={me}>
         <Outlet />
       </AppShell>
       <Suspense>
         <TanStackRouterDevtools />
       </Suspense>
     </>
-  ),
-});
+  );
+}

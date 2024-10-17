@@ -2,9 +2,18 @@ import "./index.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { createConnectTransport } from "@connectrpc/connect-web";
 import { routeTree } from "./routes.gen";
 
-const router = createRouter({ routeTree });
+const transport = createConnectTransport({
+  baseUrl: "/api",
+});
+const router = createRouter({
+  routeTree,
+  context: {
+    transport,
+  },
+});
 
 declare module "@tanstack/react-router" {
   interface Register {
