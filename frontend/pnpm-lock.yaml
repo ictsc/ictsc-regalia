@@ -70,11 +70,11 @@ importers:
         specifier: ^2.0.0
         version: 2.2.0
       '@connectrpc/connect':
-        specifier: 2.0.0-alpha.1
-        version: 2.0.0-alpha.1(@bufbuild/protobuf@2.2.0)
+        specifier: 2.0.0-rc.1
+        version: 2.0.0-rc.1(@bufbuild/protobuf@2.2.0)
       '@connectrpc/connect-web':
         specifier: 2.0.0-rc.1
-        version: 2.0.0-rc.1(@bufbuild/protobuf@2.2.0)(@connectrpc/connect@2.0.0-alpha.1(@bufbuild/protobuf@2.2.0))
+        version: 2.0.0-rc.1(@bufbuild/protobuf@2.2.0)(@connectrpc/connect@2.0.0-rc.1(@bufbuild/protobuf@2.2.0))
       '@headlessui/react':
         specifier: ^2.1.2
         version: 2.1.10(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)
@@ -395,10 +395,10 @@ packages:
       '@bufbuild/protobuf': ^2.2.0
       '@connectrpc/connect': 2.0.0-rc.1
 
-  '@connectrpc/connect@2.0.0-alpha.1':
-    resolution: {integrity: sha512-eAjezEy1m+7bDtWt/TeXY2qIayq7R+WW8Jqwq3p8Q7ZTHpFJu0SBQivhRGQbNXSYR+QmqMk+j/FLAVlgB6CfHA==}
+  '@connectrpc/connect@2.0.0-rc.1':
+    resolution: {integrity: sha512-AupiGDh2Ht0wgslatfdU/Jp8zDPHwvsCrLcChi7Ea3zZT/biSpPMqj8LiaR5ri/EHexZ58jYvtBbTNqCP7H3fg==}
     peerDependencies:
-      '@bufbuild/protobuf': ^2.0.0-beta.2
+      '@bufbuild/protobuf': ^2.2.0
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -4001,12 +4001,12 @@ snapshots:
       '@types/tough-cookie': 4.0.5
       tough-cookie: 4.1.4
 
-  '@connectrpc/connect-web@2.0.0-rc.1(@bufbuild/protobuf@2.2.0)(@connectrpc/connect@2.0.0-alpha.1(@bufbuild/protobuf@2.2.0))':
+  '@connectrpc/connect-web@2.0.0-rc.1(@bufbuild/protobuf@2.2.0)(@connectrpc/connect@2.0.0-rc.1(@bufbuild/protobuf@2.2.0))':
     dependencies:
       '@bufbuild/protobuf': 2.2.0
-      '@connectrpc/connect': 2.0.0-alpha.1(@bufbuild/protobuf@2.2.0)
+      '@connectrpc/connect': 2.0.0-rc.1(@bufbuild/protobuf@2.2.0)
 
-  '@connectrpc/connect@2.0.0-alpha.1(@bufbuild/protobuf@2.2.0)':
+  '@connectrpc/connect@2.0.0-rc.1(@bufbuild/protobuf@2.2.0)':
     dependencies:
       '@bufbuild/protobuf': 2.2.0
 
