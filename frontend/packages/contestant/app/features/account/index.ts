@@ -1,4 +1,4 @@
-import { type Transport, createPromiseClient } from "@connectrpc/connect";
+import { type Transport, createClient } from "@connectrpc/connect";
 import { ContestantService } from "@ictsc/proto/contestant/v1";
 
 export type User = {
@@ -8,7 +8,7 @@ export type User = {
 };
 
 export async function fetchMe(transport: Transport): Promise<User | undefined> {
-  const client = createPromiseClient(ContestantService, transport);
+  const client = createClient(ContestantService, transport);
   const { user } = await client.getMe({});
   if (user == null) {
     return;
