@@ -68,13 +68,13 @@ importers:
     dependencies:
       '@bufbuild/protobuf':
         specifier: ^2.0.0
-        version: 2.2.1
+        version: 2.2.2
       '@connectrpc/connect':
         specifier: 2.0.0-rc.2
-        version: 2.0.0-rc.2(@bufbuild/protobuf@2.2.1)
+        version: 2.0.0-rc.2(@bufbuild/protobuf@2.2.2)
       '@connectrpc/connect-web':
         specifier: 2.0.0-rc.2
-        version: 2.0.0-rc.2(@bufbuild/protobuf@2.2.1)(@connectrpc/connect@2.0.0-rc.2(@bufbuild/protobuf@2.2.1))
+        version: 2.0.0-rc.2(@bufbuild/protobuf@2.2.2)(@connectrpc/connect@2.0.0-rc.2(@bufbuild/protobuf@2.2.2))
       '@headlessui/react':
         specifier: ^2.1.2
         version: 2.2.0(react-dom@19.0.0-rc-fb9a90fa48-20240614(react@19.0.0-rc-fb9a90fa48-20240614))(react@19.0.0-rc-fb9a90fa48-20240614)
@@ -180,14 +180,14 @@ importers:
     dependencies:
       '@bufbuild/protobuf':
         specifier: ^2.0.0
-        version: 2.2.1
+        version: 2.2.2
     devDependencies:
       '@bufbuild/buf':
         specifier: ^1.38.0
         version: 1.46.0
       '@bufbuild/protoc-gen-es':
         specifier: ^2.0.0
-        version: 2.2.1(@bufbuild/protobuf@2.2.1)
+        version: 2.2.1(@bufbuild/protobuf@2.2.2)
       '@ictsc/config':
         specifier: workspace:*
         version: link:../config
@@ -355,6 +355,9 @@ packages:
 
   '@bufbuild/protobuf@2.2.1':
     resolution: {integrity: sha512-gdWzq7eX017a1kZCU/bP/sbk4e0GZ6idjsXOcMrQwODCb/rx985fHJJ8+hCu79KpuG7PfZh7bo3BBjPH37JuZw==}
+
+  '@bufbuild/protobuf@2.2.2':
+    resolution: {integrity: sha512-UNtPCbrwrenpmrXuRwn9jYpPoweNXj8X5sMvYgsqYyaH8jQ6LfUJSk3dJLnBK+6sfYPrF4iAIo5sd5HQ+tg75A==}
 
   '@bufbuild/protoc-gen-es@2.2.1':
     resolution: {integrity: sha512-ysaQTf52lYQTdK0zWpfgxKHVQqCoSe6TV3rD+JZUbiyqT4zloII7VZqmAWXoHk0SZiWdCIvkzMIHQpBxN7v6nA==}
@@ -3646,11 +3649,13 @@ snapshots:
 
   '@bufbuild/protobuf@2.2.1': {}
 
-  '@bufbuild/protoc-gen-es@2.2.1(@bufbuild/protobuf@2.2.1)':
+  '@bufbuild/protobuf@2.2.2': {}
+
+  '@bufbuild/protoc-gen-es@2.2.1(@bufbuild/protobuf@2.2.2)':
     dependencies:
       '@bufbuild/protoplugin': 2.2.1
     optionalDependencies:
-      '@bufbuild/protobuf': 2.2.1
+      '@bufbuild/protobuf': 2.2.2
     transitivePeerDependencies:
       - supports-color
 
@@ -3675,14 +3680,14 @@ snapshots:
       '@types/tough-cookie': 4.0.5
       tough-cookie: 4.1.4
 
-  '@connectrpc/connect-web@2.0.0-rc.2(@bufbuild/protobuf@2.2.1)(@connectrpc/connect@2.0.0-rc.2(@bufbuild/protobuf@2.2.1))':
+  '@connectrpc/connect-web@2.0.0-rc.2(@bufbuild/protobuf@2.2.2)(@connectrpc/connect@2.0.0-rc.2(@bufbuild/protobuf@2.2.2))':
     dependencies:
-      '@bufbuild/protobuf': 2.2.1
-      '@connectrpc/connect': 2.0.0-rc.2(@bufbuild/protobuf@2.2.1)
+      '@bufbuild/protobuf': 2.2.2
+      '@connectrpc/connect': 2.0.0-rc.2(@bufbuild/protobuf@2.2.2)
 
-  '@connectrpc/connect@2.0.0-rc.2(@bufbuild/protobuf@2.2.1)':
+  '@connectrpc/connect@2.0.0-rc.2(@bufbuild/protobuf@2.2.2)':
     dependencies:
-      '@bufbuild/protobuf': 2.2.1
+      '@bufbuild/protobuf': 2.2.2
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
