@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.23.3 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.23.4 AS builder
 
 ENV GOCACHE=/tmp/go/cache
 ENV CGO_ENABLED=0
