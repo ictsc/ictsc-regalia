@@ -1,0 +1,14 @@
+#!/bin/sh
+# vim: ft=sh :
+
+compose_file="$(dirname "$0")/../compose.yaml"
+
+DB_HOST=127.0.0.1
+DB_PORT="$(docker compose -f "$compose_file" port postgres 5432 | cut -d: -f2)"
+DB_USER=ictsc
+PGPASSWORD=password
+DB_NAME=ictscore
+
+export DB_HOST DB_PORT DB_USER PGPASSWORD DB_NAME
+
+exec "$@"
