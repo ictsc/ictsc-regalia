@@ -103,14 +103,6 @@ jobs:
         with:
           go-version-file: backend/go.mod
           cache-dependency-path: backend/go.sum
-      - name: Install buf
-        uses: bufbuild/buf-setup-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
       # Setup frontend
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -128,7 +120,8 @@ jobs:
         run: pnpm install
       # Generate
       - name: Generate backend
-        run: task generate
+        working-directory: backend
+        run: go generate .
       - name: Generate frontend
         working-directory: frontend
         run: pnpm generate:proto

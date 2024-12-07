@@ -3,8 +3,7 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./admin/v1": "./exports/admin-v1.ts",
-    "./contestant/v1": "./exports/contestant-v1.ts"
+    "./admin/v1": "./exports/admin-v1.ts"
   },
   "scripts": {
     "generate": "run-s generate:buf generate:exports",
