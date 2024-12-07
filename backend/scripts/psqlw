@@ -1,0 +1,4 @@
+#!/bin/sh
+# vim: ft=sh :
+
+psql --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USER" "$DB_NAME" "$@"

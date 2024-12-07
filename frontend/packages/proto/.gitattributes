@@ -1,0 +1,2 @@
+proto/**/*.ts linguist-generated=true
+exports/**/*.ts linguist-generated=true

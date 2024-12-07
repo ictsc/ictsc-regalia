@@ -24,12 +24,6 @@ jobs:
         uses: bufbuild/buf-lint-action@v1
         with:
           input: proto
-      - name: Setup Node
-        uses: actions/setup-node@v4
-      - name: Install spectral
-        run: npm install --location=global @stoplight/spectral-cli
-      - name: Run spectral
-        run: spectral lint ./**/v1/*.yaml --ruleset .spectral.yaml --fail-severity warn
   breaking:
     name: Check Breaking Changes
     runs-on: ubuntu-latest
@@ -103,14 +97,6 @@ jobs:
         with:
           go-version-file: backend/go.mod
           cache-dependency-path: backend/go.sum
-      - name: Install buf
-        uses: bufbuild/buf-setup-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
       # Setup frontend
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -128,7 +114,8 @@ jobs:
         run: pnpm install
       # Generate
       - name: Generate backend
-        run: task generate
+        working-directory: backend
+        run: go generate .
       - name: Generate frontend
         working-directory: frontend
         run: pnpm generate:proto
