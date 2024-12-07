@@ -50,6 +50,12 @@ func start() int {
 		return 1
 	}
 
+	shutdownOTel, err := setupOpenTelemetry(ctx)
+	if err != nil {
+		slog.ErrorContext(ctx, "Failed to setup OpenTelemetry", "error", err)
+		return 1
+	}
+
 	cfg, err := newConfig()
 	if err != nil {
 		slog.Error("Failed to create app config", "error", err)
@@ -75,6 +81,11 @@ func start() int {
 
 	if err := server.Shutdown(ctx); err != nil {
 		slog.ErrorContext(ctx, "Failed to shutdown the server gracefully", "error", err)
+		return 1
+	}
+
+	if err := shutdownOTel(ctx); err != nil {
+		slog.ErrorContext(ctx, "Failed to shutdown OpenTelemetry", "error", err)
 		return 1
 	}
 
