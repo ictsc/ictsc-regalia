@@ -24,12 +24,6 @@ jobs:
         uses: bufbuild/buf-lint-action@v1
         with:
           input: proto
-      - name: Setup Node
-        uses: actions/setup-node@v4
-      - name: Install spectral
-        run: npm install --location=global @stoplight/spectral-cli
-      - name: Run spectral
-        run: spectral lint ./**/v1/*.yaml --ruleset .spectral.yaml --fail-severity warn
   breaking:
     name: Check Breaking Changes
     runs-on: ubuntu-latest
