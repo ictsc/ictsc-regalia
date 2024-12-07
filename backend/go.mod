@@ -1,4 +1,4 @@
-module github.com/ictsc/ictsc-outlands/backend
+module github.com/ictsc/ictsc-regalia/backend
 
 go 1.23
 

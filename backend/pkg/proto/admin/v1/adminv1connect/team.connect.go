@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	v1 "github.com/ictsc/ictsc-outlands/backend/pkg/proto/admin/v1"
+	v1 "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1"
 	http "net/http"
 	strings "strings"
 )
