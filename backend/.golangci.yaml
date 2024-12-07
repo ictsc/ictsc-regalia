@@ -2,8 +2,8 @@ linters:
   enable-all: true
   disable:
     - exportloopref # deprecated
-    - gomnd # deprecated
-    - execinquery # deprecated
+    - wsl
+    - nlreturn
     - depguard
     - dogsled
     - gci
@@ -31,6 +31,9 @@ issues:
 linters-settings:
   cyclop:
     max-complexity: 15
+  exhaustruct:
+    include:
+      - github\.com/ictsc/ictsc-regalia/backend/.+
   lll:
     line-length: 150
   revive:
@@ -57,4 +60,6 @@ linters-settings:
       - .WithMessagef(
       - .WithStack(
       - github.com/cockroachdb/errors.Newf(
-      - github.com/ictsc/ictsc-outlands/backend
+      - github.com/cockroachdb/errors.New(
+      - github.com/cockroachdb/errors.Join(
+      - github.com/ictsc/ictsc-regalia/backend
