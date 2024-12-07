@@ -5,7 +5,7 @@ package admin.v1;
 import "buf/validate/validate.proto";
 import "google/protobuf/field_mask.proto";
 
-option go_package = "github.com/ictsc/ictsc-outlands/backend/pkg/proto/admin/v1;adminv1";
+option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1";
 
 message Team {
   int64 code = 2 [(buf.validate.field).int64 = {
