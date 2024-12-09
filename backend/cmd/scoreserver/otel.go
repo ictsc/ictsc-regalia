@@ -87,27 +87,45 @@ func setupOpenTelemetry(ctx context.Context) (shutdown func(context.Context) err
 }
 
 func newResource(ctx context.Context) (*resource.Resource, error) {
-	return withStack2(resource.New(
+	res, err := resource.New(
 		ctx,
 		resource.WithAttributes(semconv.ServiceName(defaultServiceName)),
 		resource.WithFromEnv(),
 		resource.WithTelemetrySDK(),
-	))
+	)
+	return res, errors.WithStack(err)
 }
 
-// nolint:ireturn
+type noopSpanExporter struct{}
+
+var _ trace.SpanExporter = &noopSpanExporter{}
+
+func (n *noopSpanExporter) ExportSpans(context.Context, []trace.ReadOnlySpan) error {
+	return nil
+}
+
+func (n *noopSpanExporter) Shutdown(context.Context) error {
+	return nil
+}
+
 func newSpanExporter(ctx context.Context) (trace.SpanExporter, error) {
 	switch os.Getenv("OTEL_TRACES_EXPORTER") {
+	case "none":
+		return &noopSpanExporter{}, nil
 	case "console":
-		return withStack2(stdouttrace.New())
+		exp, err := stdouttrace.New()
+		return exp, errors.WithStack(err)
 	default /* otlp */ :
-		return withStack2(otlptracegrpc.New(ctx))
+		exp, err := otlptracegrpc.New(ctx)
+		return exp, errors.WithStack(err)
 	}
 }
 
-// nolint:ireturn
 func newMericReader(ctx context.Context) (metric.Reader, error) {
 	switch os.Getenv("OTEL_METRICS_EXPORTER") {
+	case "none":
+		// ManualReader は単体では何もしない
+		return metric.NewManualReader(), nil
 	case "prometheus":
 		return newPrometheusMetricExporter()
 	default: /* otlp */
@@ -124,12 +142,11 @@ type prometheusReader struct {
 	s *http.Server
 }
 
-func newPrometheusMetricExporter() (*prometheusReader, error) {
+func newPrometheusMetricExporter(opts ...otelprom.Option) (*prometheusReader, error) {
 	registry := prometheus.NewRegistry()
-	exporter, err := otelprom.New(
-		otelprom.WithRegisterer(registry),
-		otelprom.WithoutScopeInfo(),
-	)
+
+	opts = append(opts, otelprom.WithRegisterer(registry), otelprom.WithoutScopeInfo())
+	exporter, err := otelprom.New(opts...)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create prometheus exporter")
 	}
@@ -144,8 +161,10 @@ func newPrometheusMetricExporter() (*prometheusReader, error) {
 	}
 	// nolint:gosec
 	srv := &http.Server{
-		Addr:    net.JoinHostPort(host, port),
-		Handler: promhttp.HandlerFor(registry, promhttp.HandlerOpts{}),
+		Addr: net.JoinHostPort(host, port),
+		Handler: promhttp.HandlerFor(registry, promhttp.HandlerOpts{
+			EnableOpenMetrics: true,
+		}),
 	}
 
 	go func() {
@@ -169,8 +188,4 @@ func (r *prometheusReader) Shutdown(ctx context.Context) error {
 		return errors.Wrap(err, "failed to shutdown prometheus server")
 	}
 	return nil
-}
-
-func withStack2[T any](v T, err error) (T, error) {
-	return v, errors.WithStack(err)
 }
