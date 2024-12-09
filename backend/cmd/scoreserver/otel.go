@@ -51,6 +51,10 @@ func setupOpenTelemetry(ctx context.Context) (shutdown func(context.Context) err
 		propagation.Baggage{},
 	))
 
+	otel.SetErrorHandler(otel.ErrorHandlerFunc(func(cause error) {
+		slog.Error("OpenTelemetry error", "error", cause)
+	}))
+
 	spanExporter, err := newSpanExporter(ctx)
 	if err != nil {
 		return nil, err
