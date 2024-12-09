@@ -3,7 +3,6 @@ package connectutil
 import (
 	"context"
 	"net/http"
-	"strings"
 	"time"
 
 	"connectrpc.com/connect"
@@ -107,9 +106,7 @@ func (o *otelInterceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 
 		duration := requestEndTime.Sub(requestStartTime)
 
-		proc := request.Spec().Procedure
-		procName := strings.TrimLeft(proc, "/")
-		service, method, _ := strings.Cut(procName, "/")
+		service, method := splitProceduce(request.Spec().Procedure)
 
 		protocol := protocolToSemConv(request.Peer().Protocol)
 
@@ -122,7 +119,7 @@ func (o *otelInterceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 			attrs = append(attrs, attr)
 		}
 
-		o.serverDurationMetric.Record(ctx, duration.Microseconds(), metric.WithAttributes(attrs...))
+		o.serverDurationMetric.Record(ctx, duration.Milliseconds(), metric.WithAttributes(attrs...))
 		o.serverRequestSizeMetric.Record(ctx, int64(requestSize), metric.WithAttributes(attrs...))
 		o.serverResponseSizeMetric.Record(ctx, int64(responseSize), metric.WithAttributes(attrs...))
 
