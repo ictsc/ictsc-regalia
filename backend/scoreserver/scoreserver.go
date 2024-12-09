@@ -7,11 +7,9 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	"connectrpc.com/otelconnect"
 	"github.com/cockroachdb/errors"
-	"github.com/ictsc/ictsc-regalia/backend/pkg/connectslog"
+	"github.com/ictsc/ictsc-regalia/backend/pkg/connectutil"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
-	"go.opentelemetry.io/otel"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
@@ -38,14 +36,10 @@ func New(cfg *Config) (*ScoreServer, error) {
 func (cfg *AdminAPIConfig) new() *http.Server {
 	var interceptors []connect.Interceptor
 
-	interceptors = append(interceptors, connectslog.New())
-
-	if otelInterceptor, err := otelconnect.NewInterceptor(); err != nil {
-		otel.Handle(err)
-	} else {
-		interceptors = append(interceptors, otelInterceptor)
-	}
-
+	interceptors = append(interceptors,
+		connectutil.NewOtelInterceptor(),
+		connectutil.NewSlogInterceptor(),
+	)
 
 	mux := http.NewServeMux()
 
