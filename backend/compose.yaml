@@ -18,6 +18,11 @@ services:
       - postgres
     ports:
       - 8080:8080
+  jaeger:
+    image: jaegertracing/all-in-one
+    ports:
+      - :4317
+      - 16686:16686
 
 volumes:
   db:

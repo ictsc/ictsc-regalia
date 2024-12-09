@@ -3,12 +3,21 @@
 
 compose_file="$(dirname "$0")/../compose.yaml"
 
-DB_HOST=127.0.0.1
+export DB_HOST=127.0.0.1
 DB_PORT="$(docker compose -f "$compose_file" port postgres 5432 | cut -d: -f2)"
-DB_USER=ictsc
-PGPASSWORD=password
-DB_NAME=ictscore
+export DB_PORT
+export DB_USER=ictsc
+export PGPASSWORD=password
+export DB_NAME=ictscore
 
-export DB_HOST DB_PORT DB_USER PGPASSWORD DB_NAME
+export OTEL_METRICS_EXPORTER=prometheus
+
+if docker compose -f "$compose_file" ps | grep -q jaeger; then
+	export OTEL_TRACES_EXPORTER=otlp
+	OTEL_EXPORTER_OTLP_TRACES_ENDPOINT="http://localhost:$(docker compose -f "$compose_file" port jaeger 4317 | cut -d: -f2)"
+	export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+else
+	export OTEL_TRACES_EXPORTER=none
+fi
 
 exec "$@"
