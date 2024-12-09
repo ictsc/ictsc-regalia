@@ -1,17 +1,14 @@
-package connectslog
+package connectutil
 
 import (
 	"context"
 	"log/slog"
 	"strings"
-	"time"
 
 	"connectrpc.com/connect"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
-func New() connect.Interceptor {
+func NewSlogInterceptor() connect.Interceptor {
 	logger := slog.Default()
 	unaryInterceptor := func(next connect.UnaryFunc) connect.UnaryFunc {
 		return connect.UnaryFunc(func(
@@ -24,13 +21,13 @@ func New() connect.Interceptor {
 			resp, err := next(ctx, req)
 			duration := now().Sub(start)
 
-			code := status.Code(err)
+			code := connect.CodeOf(err)
 			lvl := serverCodeToLevel(code)
 			attrs := []slog.Attr{
-				slog.String("grpc.service", service),
-				slog.String("grpc.method", method),
-				slog.String("grpc.duration", duration.String()),
-				slog.Int("grpc.code", int(code)),
+				slog.String("rpc.service", service),
+				slog.String("rpc.method", method),
+				slog.String("duration", duration.String()),
+				slog.String("rpc.code", code.String()),
 			}
 			if err != nil {
 				attrs = append(attrs, slog.String("grpc.error", err.Error()))
@@ -43,22 +40,24 @@ func New() connect.Interceptor {
 	return connect.UnaryInterceptorFunc(unaryInterceptor)
 }
 
-var now = time.Now
-
-func serverCodeToLevel(code codes.Code) slog.Level {
+func serverCodeToLevel(code connect.Code) slog.Level {
 	switch code {
-	case codes.OK, codes.NotFound, codes.Canceled, codes.AlreadyExists, codes.InvalidArgument, codes.Unauthenticated:
+	case 0, connect.CodeNotFound, connect.CodeCanceled, connect.CodeAlreadyExists,
+		connect.CodeInvalidArgument, connect.CodeUnauthenticated:
 		return slog.LevelInfo
-	case codes.DeadlineExceeded, codes.PermissionDenied, codes.ResourceExhausted, codes.FailedPrecondition, codes.Aborted,
-		codes.OutOfRange, codes.Unavailable:
+	case connect.CodeDeadlineExceeded, connect.CodePermissionDenied, connect.CodeResourceExhausted,
+		connect.CodeFailedPrecondition, connect.CodeAborted,
+		connect.CodeOutOfRange, connect.CodeUnavailable:
 		return slog.LevelWarn
-	case codes.Unknown, codes.Unimplemented, codes.Internal, codes.DataLoss:
+	case connect.CodeUnknown, connect.CodeUnimplemented,
+		connect.CodeInternal, connect.CodeDataLoss:
 		return slog.LevelError
 	default:
 		return slog.LevelError
 	}
 }
 
+//nolint:nonamedreturns // 名前が付いたほうが適切
 func splitProceduce(proc string) (service, method string) {
 	proc = strings.TrimLeft(proc, "/")
 	service, method, _ = strings.Cut(proc, "/")

@@ -9,8 +9,8 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/cockroachdb/errors/errbase"
-	"github.com/phsym/console-slog"
 	"github.com/go-slog/otelslog"
+	"github.com/phsym/console-slog"
 	slogformatter "github.com/samber/slog-formatter"
 )
 
