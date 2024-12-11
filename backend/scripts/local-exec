@@ -10,14 +10,16 @@ export DB_USER=ictsc
 export PGPASSWORD=password
 export DB_NAME=ictscore
 
-export OTEL_METRICS_EXPORTER=prometheus
+export OTEL_METRICS_EXPORTER=${OTEL_METRICS_EXPORTER:-prometheus}
 
 if docker compose -f "$compose_file" ps | grep -q jaeger; then
-	export OTEL_TRACES_EXPORTER=otlp
-	OTEL_EXPORTER_OTLP_TRACES_ENDPOINT="http://localhost:$(docker compose -f "$compose_file" port jaeger 4317 | cut -d: -f2)"
-	export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+	traces_exporter=otlp
+	trace_endpoint="http://localhost:$(docker compose -f "$compose_file" port jaeger 4317 | cut -d: -f2)"
+	export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT:-$trace_endpoint}
+	export OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=${OTEL_EXPORTER_OTLP_TRACES_PROTOCOL:-grpc}
 else
-	export OTEL_TRACES_EXPORTER=none
+	traces_exporter=none
 fi
+export OTEL_TRACES_EXPORTER="${OTEL_TRACES_EXPORTER:-$traces_exporter}"
 
 exec "$@"
