@@ -9,6 +9,8 @@ linters:
     - gci
     - godot
     - nolintlint
+    - gochecknoglobals
+    - ireturn
 
 issues:
   exclude-use-default: false

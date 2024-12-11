@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"connectrpc.com/grpchealth"
 	"github.com/cockroachdb/errors"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/connectutil"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
@@ -47,6 +48,9 @@ func (cfg *AdminAPIConfig) new() *http.Server {
 		adminv1connect.UnimplementedTeamServiceHandler{},
 		connect.WithInterceptors(interceptors...),
 	))
+
+	checker := grpchealth.NewStaticChecker("admin.v1.TeamService")
+	mux.Handle(grpchealth.NewHandler(checker))
 
 	handler := http.Handler(mux)
 

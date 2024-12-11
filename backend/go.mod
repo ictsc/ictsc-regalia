@@ -7,6 +7,7 @@ toolchain go1.23.4
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.35.2-20241127180247-a33202765966.1
 	connectrpc.com/connect v1.17.0
+	connectrpc.com/grpchealth v1.3.0
 	connectrpc.com/otelconnect v0.7.1
 	github.com/cockroachdb/errors v1.11.3
 	github.com/go-slog/otelslog v0.3.0
