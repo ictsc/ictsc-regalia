@@ -73,7 +73,11 @@ func SetupDB(tb testing.TB) (*sqlx.DB, bool) {
 		return nil, false
 	}
 
-	return sqlx.NewDb(sql.OpenDB(txdb.New("pgx", connString)), "pgx"), true
+	db := sqlx.NewDb(sql.OpenDB(txdb.New("pgx", connString)), "pgx")
+	tb.Cleanup(func() {
+		db.Close()
+	})
+	return db, true
 }
 
 func SetupTrueDB(tb testing.TB) (*sqlx.DB, bool) {
