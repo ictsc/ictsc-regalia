@@ -11,6 +11,7 @@ linters:
     - nolintlint
     - gochecknoglobals
     - ireturn
+    - gofumpt
 
 issues:
   exclude-use-default: false
