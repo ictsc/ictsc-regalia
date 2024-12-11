@@ -13,7 +13,9 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	otelprom "go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/propagation"
@@ -96,6 +98,12 @@ func newResource(ctx context.Context) (*resource.Resource, error) {
 	return res, errors.WithStack(err)
 }
 
+const (
+	otlpProtocolGRPC         = "grpc"
+	otlpProtocolHTTPProtobuf = "http/protobuf"
+	otlpProtocolHTTPJSON     = "http/json"
+)
+
 type noopSpanExporter struct{}
 
 var _ trace.SpanExporter = &noopSpanExporter{}
@@ -109,31 +117,76 @@ func (n *noopSpanExporter) Shutdown(context.Context) error {
 }
 
 func newSpanExporter(ctx context.Context) (trace.SpanExporter, error) {
-	switch os.Getenv("OTEL_TRACES_EXPORTER") {
+	expType := "otlp"
+	if t := os.Getenv("OTEL_TRACES_EXPORTER"); t != "" {
+		expType = t
+	}
+	switch expType {
 	case "none":
 		return &noopSpanExporter{}, nil
-	case "console":
+	case "console", "logging":
 		exp, err := stdouttrace.New()
 		return exp, errors.WithStack(err)
-	default /* otlp */ :
-		exp, err := otlptracegrpc.New(ctx)
-		return exp, errors.WithStack(err)
+	case "otlp":
+		proto := otlpProtocolHTTPProtobuf
+		if p := os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL"); p != "" {
+			proto = p
+		}
+		if p := os.Getenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL"); p != "" {
+			proto = p
+		}
+		switch proto {
+		case otlpProtocolGRPC:
+			exp, err := otlptracegrpc.New(ctx)
+			return exp, errors.WithStack(err)
+		case otlpProtocolHTTPProtobuf:
+			exp, err := otlptracehttp.New(ctx)
+			return exp, errors.WithStack(err)
+		default:
+			return nil, errors.Newf("unsupported OTLP protocol: %s", proto)
+		}
+	default:
+		return nil, errors.Newf("unsupported trace exporter type: %s", expType)
 	}
 }
 
 func newMericReader(ctx context.Context) (metric.Reader, error) {
-	switch os.Getenv("OTEL_METRICS_EXPORTER") {
+	expTyp := "otlp"
+	if t := os.Getenv("OTEL_METRICS_EXPORTER"); t != "" {
+		expTyp = t
+	}
+	switch expTyp {
 	case "none":
 		// ManualReader は単体では何もしない
 		return metric.NewManualReader(), nil
 	case "prometheus":
 		return newPrometheusMetricExporter()
-	default: /* otlp */
-		exporter, err := otlpmetricgrpc.New(ctx)
-		if err != nil {
-			return nil, errors.WithStack(err)
+	case "otlp":
+		proto := otlpProtocolHTTPProtobuf
+		if p := os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL"); p != "" {
+			proto = p
 		}
-		return metric.NewPeriodicReader(exporter), nil
+		if p := os.Getenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL"); p != "" {
+			proto = p
+		}
+		switch proto {
+		case otlpProtocolHTTPProtobuf:
+			exporter, err := otlpmetrichttp.New(ctx)
+			if err != nil {
+				return nil, errors.WithStack(err)
+			}
+			return metric.NewPeriodicReader(exporter), nil
+		case otlpProtocolGRPC:
+			exporter, err := otlpmetricgrpc.New(ctx)
+			if err != nil {
+				return nil, errors.WithStack(err)
+			}
+			return metric.NewPeriodicReader(exporter), nil
+		default:
+			return nil, errors.Newf("unsupported OTLP protocol: %s", proto)
+		}
+	default:
+		return nil, errors.Newf("unsupported metric exporter type: %s", expTyp)
 	}
 }
 
