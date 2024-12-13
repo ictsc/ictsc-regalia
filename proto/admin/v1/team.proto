@@ -40,10 +40,10 @@ message CreateTeamResponse {
 
 message UpdateTeamRequest {
   Team team = 1 [(buf.validate.field).required = true];
+  google.protobuf.FieldMask update_mask = 2;
 }
 message UpdateTeamResponse {
   Team team = 1 [(buf.validate.field).required = true];
-  google.protobuf.FieldMask update_mask = 2;
 }
 
 message DeleteTeamRequest {
