@@ -8,9 +8,16 @@ import (
 
 	"connectrpc.com/connect"
 	"connectrpc.com/grpchealth"
+	"github.com/XSAM/otelsql"
 	"github.com/cockroachdb/errors"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/connectutil"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin"
+	pgxuuid "github.com/jackc/pgx-gofrs-uuid"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/jmoiron/sqlx"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
@@ -27,14 +34,32 @@ type ScoreServer struct {
 }
 
 func New(cfg *Config) (*ScoreServer, error) {
-	adminServer := cfg.AdminAPI.new()
+	pgcfg, err := pgx.ParseConfig(cfg.DBDSN)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to parse DB URL")
+	}
+
+	db := sqlx.NewDb(otelsql.OpenDB(
+		stdlib.GetConnector(*pgcfg,
+			stdlib.OptionAfterConnect(func(_ context.Context, c *pgx.Conn) error {
+				pgxuuid.Register(c.TypeMap())
+				return nil
+			}),
+		),
+		otelsql.WithAttributes(
+			semconv.DBSystemPostgreSQL,
+			semconv.DBNamespace(pgcfg.Database),
+		),
+	), "pgx")
+
+	adminServer := cfg.AdminAPI.new(db)
 
 	return &ScoreServer{
 		adminServer: adminServer,
 	}, nil
 }
 
-func (cfg *AdminAPIConfig) new() *http.Server {
+func (cfg *AdminAPIConfig) new(db *sqlx.DB) *http.Server {
 	var interceptors []connect.Interceptor
 
 	interceptors = append(interceptors,
@@ -45,7 +70,7 @@ func (cfg *AdminAPIConfig) new() *http.Server {
 	mux := http.NewServeMux()
 
 	mux.Handle(adminv1connect.NewTeamServiceHandler(
-		adminv1connect.UnimplementedTeamServiceHandler{},
+		admin.NewTeamServiceHandler(db),
 		connect.WithInterceptors(interceptors...),
 	))
 
