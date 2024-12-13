@@ -21,16 +21,24 @@ func NewSlogInterceptor() connect.Interceptor {
 			resp, err := next(ctx, req)
 			duration := now().Sub(start)
 
-			code := connect.CodeOf(err)
+			var code connect.Code
+			if err != nil {
+				code = connect.CodeOf(err)
+			}
 			lvl := serverCodeToLevel(code)
-			attrs := []slog.Attr{
+
+			//nolint:mnd // パフォーマンスのために決め打ち
+			attrs := make([]slog.Attr, 0, 5)
+			attrs = append(attrs,
 				slog.String("rpc.service", service),
 				slog.String("rpc.method", method),
 				slog.String("duration", duration.String()),
-				slog.String("rpc.code", code.String()),
-			}
+			)
 			if err != nil {
-				attrs = append(attrs, slog.String("grpc.error", err.Error()))
+				attrs = append(attrs,
+					slog.String("grpc.code", code.String()),
+					slog.String("grpc.error", err.Error()),
+				)
 			}
 			logger.LogAttrs(ctx, lvl, "Call finished", attrs...)
 
