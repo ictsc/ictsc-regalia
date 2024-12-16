@@ -23,7 +23,7 @@ require (
 	github.com/uptrace/bun/dialect/mysqldialect v1.2.6
 	github.com/uptrace/bun/extra/bundebug v1.2.6
 	golang.org/x/net v0.32.0
-	google.golang.org/protobuf v1.35.2
+	google.golang.org/protobuf v1.36.0
 )
 
 require (
