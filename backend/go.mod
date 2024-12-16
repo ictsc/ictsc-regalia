@@ -7,7 +7,7 @@ toolchain go1.23.4
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.35.2-20241127180247-a33202765966.1
 	connectrpc.com/connect v1.17.0
-	github.com/bytedance/sonic v1.12.5
+	github.com/bytedance/sonic v1.12.6
 	github.com/cockroachdb/errors v1.11.3
 	github.com/defval/di v1.12.0
 	github.com/go-chi/chi/v5 v5.2.0
