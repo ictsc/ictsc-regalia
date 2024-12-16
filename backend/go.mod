@@ -10,7 +10,7 @@ require (
 	github.com/bytedance/sonic v1.12.5
 	github.com/cockroachdb/errors v1.11.3
 	github.com/defval/di v1.12.0
-	github.com/go-chi/chi/v5 v5.1.0
+	github.com/go-chi/chi/v5 v5.2.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/oklog/ulid/v2 v2.1.0
