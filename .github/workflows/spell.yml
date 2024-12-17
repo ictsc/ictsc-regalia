@@ -14,8 +14,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Run Spell Check
-        uses: streetsidesoftware/cspell-action@v6
+        uses: reviewdog/action-misspell@v1
         with:
-          incremental_files_only: false
-          config: ./dev/cspell/cspell.config.yaml
-          verbose: true
+          github_token: ${{ secrets.github_token }}
+          locale: US
+          exclude: |
+            **/Dockerfile
+            **/*.svg
+            frontend/**/package.json
+            frontend/**/pnpm-lock.yaml
+            frontend/**/node_modules
+            frontend/packages/proto
+            backend/.golangci.yaml
+            backend/**/go.mod
+            backend/**/go.sum
+            backend/pkg/proto
