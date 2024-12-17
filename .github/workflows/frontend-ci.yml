@@ -20,41 +20,109 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           package_json_file: frontend/package.json
-          run_install: false
-      - name: Install Node.js
-        uses: actions/setup-node@v4
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+      - name: Restore pnpm cache
+        uses: actions/cache/restore@v4
+        id: pnpm-cache
         with:
-          node-version: 20
-          cache: pnpm
-          cache-dependency-path: frontend/pnpm-lock.yaml
-      - name: Install dependencies
-        run: pnpm install
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies
 
       - name: Lint
         run: pnpm run --recursive --parallel --aggregate-output lint
+
+      - name: Save pnpm cache
+        if: always() && steps.pnpm-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ steps.pnpm-cache.outputs.cache-primary-key }}
+
+  generate:
+    name: Generate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+      - name: Restore pnpm cache
+        uses: actions/cache/restore@v4
+        id: pnpm-cache
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies
+
+      - name: Generate
+        run: pnpm run --recursive --parallel --aggregate-output generate
+      - name: Check diff
+        run: git diff --name-only --exit-code
+
+      - name: Save pnpm cache
+        if: always() && steps.pnpm-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ steps.pnpm-cache.outputs.cache-primary-key }}
+
   test:
     name: Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           package_json_file: frontend/package.json
-          run_install: false
-      - name: Install Node.js
-        uses: actions/setup-node@v4
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+      - name: Restore pnpm cache
+        uses: actions/cache/restore@v4
+        id: pnpm-cache
         with:
-          node-version: 20
-          cache: pnpm
-          cache-dependency-path: frontend/pnpm-lock.yaml
-      - name: Install dependencies
-        run: pnpm install
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies
 
       - name: Test
         run: pnpm run --recursive --parallel --aggregate-output test
+
+      - name: Save pnpm cache
+        if: always() && steps.pnpm-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ steps.pnpm-cache.outputs.cache-primary-key }}
