@@ -75,7 +75,9 @@ func SetupDB(tb testing.TB) (*sqlx.DB, bool) {
 
 	db := sqlx.NewDb(sql.OpenDB(txdb.New("pgx", connString)), "pgx")
 	tb.Cleanup(func() {
-		db.Close()
+		if err := db.Close(); err != nil {
+			log.Printf("Failed to close DB: %v\n", err)
+		}
 	})
 	return db, true
 }
