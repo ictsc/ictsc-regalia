@@ -30,35 +30,35 @@ func TestAdminTeamService_Create(t *testing.T) {
 	}{
 		"ok": {
 			in: &adminv1.CreateTeamRequest{
-				Team: &adminv1.Team{Code: 3, Name: "トラブルバスターズ", Organization: "ICTSC Comittee"},
+				Team: &adminv1.Team{Code: 3, Name: "トラブルバスターズ", Organization: "ICTSC Committee"},
 			},
 			wants: &adminv1.CreateTeamResponse{
-				Team: &adminv1.Team{Code: 3, Name: "トラブルバスターズ", Organization: "ICTSC Comittee"},
+				Team: &adminv1.Team{Code: 3, Name: "トラブルバスターズ", Organization: "ICTSC Committee"},
 			},
 		},
 
 		"invalid code": {
 			in: &adminv1.CreateTeamRequest{
-				Team: &adminv1.Team{Code: -1, Name: "below zero", Organization: "ICTSC Comittee"},
+				Team: &adminv1.Team{Code: -1, Name: "below zero", Organization: "ICTSC Committee"},
 			},
 			wantCode: connect.CodeInvalidArgument,
 		},
 		"duplicate code": {
 			in: &adminv1.CreateTeamRequest{
-				Team: &adminv1.Team{Code: 1, Name: "duplicator", Organization: "ICTSC Comittee"},
+				Team: &adminv1.Team{Code: 1, Name: "duplicator", Organization: "ICTSC Committee"},
 			},
 			wantCode: connect.CodeAlreadyExists,
 		},
 
 		"empty name": {
 			in: &adminv1.CreateTeamRequest{
-				Team: &adminv1.Team{Code: 3, Name: "", Organization: "ICTSC Comittee"},
+				Team: &adminv1.Team{Code: 3, Name: "", Organization: "ICTSC Committee"},
 			},
 			wantCode: connect.CodeInvalidArgument,
 		},
 		"duplicate name": {
 			in: &adminv1.CreateTeamRequest{
-				Team: &adminv1.Team{Code: 3, Name: "トラブルシューターズ", Organization: "ICTSC Comittee"},
+				Team: &adminv1.Team{Code: 3, Name: "トラブルシューターズ", Organization: "ICTSC Committee"},
 			},
 			wantCode: connect.CodeAlreadyExists,
 		},
@@ -198,10 +198,10 @@ func TestAdminTeamService_Update(t *testing.T) {
 	}{
 		"update org": {
 			in: &adminv1.UpdateTeamRequest{
-				Team: &adminv1.Team{Code: 1, Organization: "ICTSC Comittee"},
+				Team: &adminv1.Team{Code: 1, Organization: "ICTSC Committee"},
 			},
 			wants: &adminv1.UpdateTeamResponse{
-				Team: &adminv1.Team{Code: 1, Name: "トラブルシューターズ", Organization: "ICTSC Comittee"},
+				Team: &adminv1.Team{Code: 1, Name: "トラブルシューターズ", Organization: "ICTSC Committee"},
 			},
 		},
 		"cannot update name": {
