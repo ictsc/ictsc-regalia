@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createConnectTransport } from "@connectrpc/connect-web";
 import { setupMSW } from "@app/__test__/msw/node";
 import { connect } from "@app/__test__/msw/connect";
-import { ContestantService } from "@ictsc/proto/contestant/v1";
+import { ViewerService } from "@ictsc/proto/contestant/v1";
 import { fetchMe } from "./index";
 
 const server = setupMSW();
@@ -10,11 +10,9 @@ const server = setupMSW();
 describe("fetchMe", () => {
   it("fetches current user data while logged in", async () => {
     server.use(
-      connect.rpc(ContestantService.method.getMe, () => ({
-        user: {
-          id: "1",
+      connect.rpc(ViewerService.method.getViewer, () => ({
+        viewer: {
           name: "Alice",
-          teamId: "1",
         },
       })),
     );
@@ -22,9 +20,7 @@ describe("fetchMe", () => {
       baseUrl: "http://example.test",
     });
     expect(await fetchMe(transport)).toEqual({
-      id: "1",
       name: "Alice",
-      teamID: "1",
     });
   });
 });
