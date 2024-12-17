@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/XSAM/otelsql"
-	pgxuuid "github.com/jackc/pgx-gofrs-uuid"
 	"github.com/jackc/pgx/v5"
 	pgxstdlib "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
@@ -48,12 +47,7 @@ func NewDBx(pgcfg pgx.ConnConfig, opts ...OpenOption) *sqlx.DB {
 }
 
 func newConnector(pgcfg pgx.ConnConfig) driver.Connector {
-	return pgxstdlib.GetConnector(pgcfg,
-		pgxstdlib.OptionAfterConnect(func(_ context.Context, c *pgx.Conn) error {
-			pgxuuid.Register(c.TypeMap())
-			return nil
-		}),
-	)
+	return pgxstdlib.GetConnector(pgcfg)
 }
 
 func defaultOTelOptions(pgcfg pgx.ConnConfig) []otelsql.Option {
