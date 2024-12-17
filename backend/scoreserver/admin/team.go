@@ -17,9 +17,9 @@ type TeamServiceHandler struct {
 	CreateWorkflow domain.TeamCreateWorkflow
 	UpdateWorkflow domain.TeamUpdateWorkflow
 	DeleteWorkflow domain.TeamDeleteWorkflow
-
-	adminv1connect.UnimplementedTeamServiceHandler
 }
+
+var _ adminv1connect.TeamServiceHandler = (*TeamServiceHandler)(nil)
 
 func NewTeamServiceHandler(db *sqlx.DB) *TeamServiceHandler {
 	repo := pg.NewRepository(db)
@@ -29,9 +29,7 @@ func NewTeamServiceHandler(db *sqlx.DB) *TeamServiceHandler {
 		GetWorkflow:  domain.TeamGetWorkflow{Getter: repo},
 		CreateWorkflow: domain.TeamCreateWorkflow{
 			RunTx: func(ctx context.Context, f func(domain.TeamCreateTxEffect) error) error {
-				return repo.RunTx(ctx, func(tx *pg.RepositoryTx) error {
-					return f(tx)
-				})
+				return repo.RunTx(ctx, func(tx *pg.RepositoryTx) error { return f(tx) })
 			},
 		},
 		UpdateWorkflow: domain.TeamUpdateWorkflow{
@@ -41,13 +39,9 @@ func NewTeamServiceHandler(db *sqlx.DB) *TeamServiceHandler {
 		},
 		DeleteWorkflow: domain.TeamDeleteWorkflow{
 			RunTx: func(ctx context.Context, f func(domain.TeamDeleteTxEffect) error) error {
-				return repo.RunTx(ctx, func(tx *pg.RepositoryTx) error {
-					return f(tx)
-				})
+				return repo.RunTx(ctx, func(tx *pg.RepositoryTx) error { return f(tx) })
 			},
 		},
-
-		UnimplementedTeamServiceHandler: adminv1connect.UnimplementedTeamServiceHandler{},
 	}
 }
 
@@ -145,6 +139,9 @@ func convertTeam(team *domain.Team) *adminv1.Team {
 	}
 }
 
+// connectError は domain のエラーを connect のエラーに変換する
+//
+// 置き場所はもう少し考えたほうがいい
 func connectError(err error) error {
 	if err == nil {
 		return nil
