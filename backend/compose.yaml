@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:13
+    restart: always
+    ports:
+      - ":5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: ictsc
+      POSTGRES_DB: ictscore
+
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+  jaeger:
+    image: jaegertracing/all-in-one
+    ports:
+      - :4317
+      - 16686:16686
+
+volumes:
+  db:

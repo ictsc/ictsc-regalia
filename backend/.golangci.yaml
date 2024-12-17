@@ -2,13 +2,16 @@ linters:
   enable-all: true
   disable:
     - exportloopref # deprecated
-    - gomnd # deprecated
-    - execinquery # deprecated
+    - wsl
+    - nlreturn
     - depguard
     - dogsled
     - gci
     - godot
     - nolintlint
+    - gochecknoglobals
+    - ireturn
+    - gofumpt
 
 issues:
   exclude-use-default: false
@@ -17,20 +20,15 @@ issues:
       linters:
         - containedctx
         - funlen
-    - path: cmd/(.+)/cmd/
-      linters:
-        - exhaustruct
-        - gomnd
-        - gochecknoglobals
-        - gochecknoinits
-    - path: internal/(.+)/repository/bun/migration/
-      linters:
-        - gochecknoglobals
-        - gochecknoinits
+        - contextcheck
+        - noctx
 
 linters-settings:
   cyclop:
     max-complexity: 15
+  exhaustruct:
+    include:
+      - github\.com/ictsc/ictsc-regalia/backend/scoreserver/domain/.+
   lll:
     line-length: 150
   revive:
@@ -57,4 +55,6 @@ linters-settings:
       - .WithMessagef(
       - .WithStack(
       - github.com/cockroachdb/errors.Newf(
-      - github.com/ictsc/ictsc-outlands/backend
+      - github.com/cockroachdb/errors.New(
+      - github.com/cockroachdb/errors.Join(
+      - github.com/ictsc/ictsc-regalia/backend

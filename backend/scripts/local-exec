@@ -1,0 +1,26 @@
+#!/bin/sh
+# vim: ft=sh :
+
+compose_file="$(dirname "$0")/../compose.yaml"
+
+export DB_HOST=127.0.0.1
+DB_PORT="$(docker compose -f "$compose_file" port postgres 5432 | cut -d: -f2)"
+export DB_PORT
+export DB_USER=ictsc
+export PGPASSWORD=password
+export DB_NAME=ictscore
+export DB_DSN="host=$DB_HOST port=$DB_PORT user=$DB_USER password=$PGPASSWORD dbname=$DB_NAME sslmode=disable"
+
+export OTEL_METRICS_EXPORTER=${OTEL_METRICS_EXPORTER:-prometheus}
+
+if docker compose -f "$compose_file" ps | grep -q jaeger; then
+	traces_exporter=otlp
+	trace_endpoint="http://localhost:$(docker compose -f "$compose_file" port jaeger 4317 | cut -d: -f2)"
+	export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT:-$trace_endpoint}
+	export OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=${OTEL_EXPORTER_OTLP_TRACES_PROTOCOL:-grpc}
+else
+	traces_exporter=none
+fi
+export OTEL_TRACES_EXPORTER="${OTEL_TRACES_EXPORTER:-$traces_exporter}"
+
+exec "$@"

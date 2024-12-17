@@ -1,36 +1,30 @@
+# syntax=docker/dockerfile:1
 FROM --platform=$BUILDPLATFORM golang:1.23.4 AS builder
-
-ENV GOCACHE=/tmp/go/cache
-ENV CGO_ENABLED=0
+WORKDIR /src
+RUN --mount=type=cache,target=/go/pkg/mod,sharing=locked \
+    --mount=type=bind,source=go.mod,target=go.mod \
+    --mount=type=bind,source=go.sum,target=go.sum \
+    go mod download -x
 
 ARG TARGETOS
 ARG TARGETARCH
 ENV GOOS=$TARGETOS
 ENV GOARCH=$TARGETARCH
+ENV CGO_ENABLED=0
 
-ENV GOPROXY=https://goproxy.io,direct
+# --- score server ---
+FROM --platform=$BUILDPLATFORM builder AS scoreserver-builder
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build,sharing=locked \
+    --mount=type=bind,source=.,target=. \
+    go build -o /scoreserver -ldflags "-s -w" -trimpath ./cmd/scoreserver
+RUN env
 
-WORKDIR /workdir
-
-COPY ./go.* ./
-RUN --mount=type=cache,target=/go/pkg/mod go mod download
-
-COPY . .
-
-# ---------------------anita---------------------
-
-FROM --platform=$BUILDPLATFORM builder AS anita-builder
-
-RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/tmp/go/cache \
-  go build -o /anita -ldflags "-s -w" -trimpath ./cmd/anita
-
-FROM gcr.io/distroless/static:nonroot AS anita
+FROM gcr.io/distroless/static-debian12:nonroot AS scoreserver
 
 WORKDIR /app
-EXPOSE 8080
+EXPOSE 8080 8081
 
-COPY --from=anita-builder --chown=nonroot:nonroot /anita .
+COPY --from=scoreserver-builder --chown=nonroot:nonroot /scoreserver /
 
-HEALTHCHECK CMD ["./anita", "ping"]
-ENTRYPOINT ["./anita"]
-CMD ["run"]
+ENTRYPOINT ["/scoreserver"]
