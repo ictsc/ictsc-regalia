@@ -48,6 +48,10 @@ func (e *Error) Error() string {
 	return e.typ.String() + ": " + e.err.Error()
 }
 
+func (e *Error) Unwrap() error {
+	return e.err
+}
+
 func ErrTypeFrom(err error) ErrType {
 	if e := new(Error); errors.As(err, &e) {
 		return e.typ
