@@ -20,23 +20,15 @@ issues:
       linters:
         - containedctx
         - funlen
-    - path: cmd/(.+)/cmd/
-      linters:
-        - exhaustruct
-        - gomnd
-        - gochecknoglobals
-        - gochecknoinits
-    - path: internal/(.+)/repository/bun/migration/
-      linters:
-        - gochecknoglobals
-        - gochecknoinits
+        - contextcheck
+        - noctx
 
 linters-settings:
   cyclop:
     max-complexity: 15
   exhaustruct:
     include:
-      - github\.com/ictsc/ictsc-regalia/backend/.+
+      - github\.com/ictsc/ictsc-regalia/backend/scoreserver/domain/.+
   lll:
     line-length: 150
   revive:

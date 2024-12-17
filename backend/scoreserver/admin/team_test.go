@@ -329,5 +329,3 @@ func teamFixtures(db *sqlx.DB) {
 		}
 	}
 }
-
-
