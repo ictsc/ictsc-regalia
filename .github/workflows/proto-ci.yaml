@@ -20,59 +20,11 @@ jobs:
         uses: bufbuild/buf-setup-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run buf-lint
-        uses: bufbuild/buf-lint-action@v1
-        with:
-          input: proto
-  breaking:
-    name: Check Breaking Changes
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install buf
-        uses: bufbuild/buf-setup-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run buf-breaking
+      - name: Run buf
         uses: bufbuild/buf-action@v1
         with:
           input: proto
+          format: true
+          lint: true
           breaking: true
           breaking_against: https://github.com/ictsc/ictsc-regalia.git#branch=main,subdir=proto
-  format:
-    name: Format
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: proto
-    steps:
-      - name: Generate a token
-        id: token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ secrets.PUSHER_APP_ID }}
-          private-key: ${{ secrets.PUSHER_PRIVATE_KEY }}
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ steps.token.outputs.token }}
-      - name: Install buf
-        uses: bufbuild/buf-setup-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Run Format
-        run: |
-          buf format --write
-      - name: Push
-        id: push
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "run buf format"
-          branch: ${{ github.head_ref }}
-          commit_user_name: ictsc-actions[bot]
-          commit_user_email: 154957684+ictsc-actions[bot]@users.noreply.github.com
-          commit_author: ictsc-actions[bot] <154957684+ictsc-actions[bot]@users.noreply.github.com>
-      - name: Exit with Error If Files Are Changed
-        if: steps.push.outputs.changes_detected == 'true'
-        run: exit 1
