@@ -28,8 +28,8 @@ jobs:
           fail_on_error: true # deprecated
           filter_mode: nofilter
           golangci_lint_flags: --timeout=10m
-  generate:
-    name: Generate
+  generation:
+    name: Generation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -53,7 +53,7 @@ jobs:
       - name: Check Diff
         run: git diff --exit-code
       - uses: actions/cache/save@v4
-        if: steps.go-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
+        if: always() && steps.go-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
         with:
           path: |
             ~/.cache/go-build
@@ -85,7 +85,7 @@ jobs:
       - name: Run Test
         run: go test -race -shuffle on -parallel 8 -v ./...
       - uses: actions/cache/save@v4
-        if: steps.go-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
+        if: always() && steps.go-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
         with:
           path: |
             ~/.cache/go-build

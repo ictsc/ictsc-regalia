@@ -52,7 +52,7 @@ jobs:
           key: ${{ steps.pnpm-cache.outputs.cache-primary-key }}
 
   generate:
-    name: Generate
+    name: Generation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
