@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package contestant.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1;contestantv1";
+
+message Viewer {
+  string name = 1;
+  // TODO: チームに関する情報が必要
+  // コードかチーム自体か
+}
+
+message GetViewerRequest {}
+message GetViewerResponse {
+  Viewer viewer = 1 [(buf.validate.field).required = true];
+}
+
+service ViewerService {
+  rpc GetViewer(GetViewerRequest) returns (GetViewerResponse);
+}
