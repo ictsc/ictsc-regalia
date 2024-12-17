@@ -94,21 +94,20 @@ func CreateTeam(input TeamCreateInput) (*Team, error) {
 
 type TeamUpdateInput = TeamCreateInput
 
-func (t *Team) Updated(input TeamUpdateInput) (*Team, error) {
-	updated := *t
-	if input.Code != int(t.code) {
+func (t Team) Updated(input TeamUpdateInput) (*Team, error) {
+	if input.Code != 0 && input.Code != int(t.code) {
 		return nil, NewError(ErrTypeInvalidArgument, errors.New("cannot update team code"))
 	}
-	if input.Name != t.name {
+	if input.Name != "" && input.Name != t.name {
 		// Discord のラベル名がチーム名に紐付くため，チーム名を変更可能にするには Discord のラベル ID とチーム ID の結びつきを保存して管理する必要がある
 		// これは実装を複雑にするため，現状はチーム名の変更を許可しない
 		// オペレーション上必要になった場合は実装を検討する
 		return nil, NewError(ErrTypeInvalidArgument, errors.New("cannot update team name"))
 	}
 	if len(input.Organization) > 0 {
-		updated.organization = input.Organization
+		t.organization = input.Organization
 	}
-	return &updated, nil
+	return &t, nil
 }
 
 // チームに関するワークフロー
