@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package admin.v1;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1";
+
+message Problem {
+  // 問題コード
+  string code = 1 [(buf.validate.field).string.min_len = 1];
+  // タイトル
+  string title = 2;
+  // 最大得点
+  int64 max_score = 4;
+
+  // VM などのホストを使う問題
+  // optional HostInfo host = 5;
+
+  // ProblemBody body = 6;
+}
+
+/*
+   TODO: 問題の細かい情報を決める
+   再展開を考える上では不要
+
+   message HostInfo {
+     // TODO
+   }
+
+   message ProblemBody {
+     ProblemType type = 1;
+     oneof body {
+       DescriptiveProblem descriptive = 2;
+     }
+   }
+
+   enum ProblemType {
+     PROBLEM_TYPE_UNSPECIFIED = 0;
+     PROBLEM_TYPE_DESCRIPTIVE = 1;
+   }
+
+   message DescriptiveProblem {
+     // TODO
+   }
+*/
+
+message ListProblemsRequest {}
+message ListProblemsResponse {
+  repeated Problem problems = 1;
+}
+
+message GetProblemRequest {
+  string code = 1;
+}
+message GetProblemResponse {
+  Problem problem = 1;
+}
+
+message CreateProblemRequest {
+  Problem problem = 1;
+}
+message CreateProblemResponse {
+  Problem problem = 1;
+}
+
+message DeleteProblemRequest {
+  string code = 1;
+}
+message DeleteProblemResponse {}
+
+service ProblemService {
+  rpc ListProblems(ListProblemsRequest) returns (ListProblemsResponse);
+  rpc GetProblem(GetProblemRequest) returns (GetProblemResponse);
+  rpc CreateProblem(CreateProblemRequest) returns (CreateProblemResponse);
+  rpc DeleteProblem(DeleteProblemRequest) returns (DeleteProblemResponse);
+}
