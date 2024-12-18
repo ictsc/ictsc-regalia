@@ -1,101 +1,20 @@
 version: 3
-
-# タスク定義の順番
-#
-# 1.
-#   desc
-#
-# 2.
-#   internal
-#   dir
-#   silent
-#
-# 3.
-#   vars
-#   status / sources / generates / methods / preconditions
-#   deps
-#
-# 4.
-#   cmds
-
 tasks:
-  check-binary:
-    desc: 指定されたバイナリがインストールされているか確認
-    internal: true
-    silent: true
-    cmds:
-      - |
-        if ! (type {{.BINARY}} >/dev/null 2>&1); then
-          echo "下記公式ドキュメントを参考に、{{.BINARY}}をインストールした後、もう一度実行してください"
-          echo {{.INSTALL_DOC}}
-          exit 1
-        fi
-
-  init:
-    desc: ワークスペースを初期化
-    cmds:
-      - cp .vscode/settings-sample.json .vscode/settings.json
-      - cp backend/.vscode/settings-sample.json backend/.vscode/settings.json
-
-  init-buf:
-    desc: bufの初期化
-    internal: true
-    deps:
-      - task: check-binary
-        vars:
-          BINARY: buf
-          INSTALL_DOC: https://buf.build/docs/installation
-
-  init-oapi:
-    desc: OpenAPI Generatorの初期化
-    internal: true
-    deps:
-      - task: check-binary
-        vars:
-          BINARY: go
-          INSTALL_DOC: https://go.dev/doc/install
-    cmds:
-      - go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.4.1
-
   generate:
     desc: 自動生成ファイルをすべて生成
     cmds:
-      - rm -rf backend/internal/proto
-      - task: generate-buf
-      - task: generate-oapi
+      - task: generate-backend
+      - task: generate-frontend
 
-  generate-buf:
-    desc: Protobuf & Connectの自動生成ファイルを生成
+  generate-backend:
     internal: true
-    dir: proto
-    deps:
-      - init-buf
+    dir: backend
     cmds:
-      - buf generate --template buf.gen-backend.yaml
+      - go generate -x ./...
 
-  generate-oapi:
-    desc: OpenAPIの自動生成ファイルを生成
+  generate-frontend:
     internal: true
-    dir: proto
-    deps:
-      - init-oapi
+    dir: frontend
     cmds:
-      - for: ["admin", "contestant"]
-        cmd: |-
-          mkdir -p ../backend/internal/proto/{{ .ITEM }}/v1/v1oapi
-          oapi-codegen -package v1oapi -generate chi-server {{ .ITEM }}/v1/file.yaml \
-            > ../backend/internal/proto/{{ .ITEM }}/v1/v1oapi/file-server.oapi.go
-          oapi-codegen -package v1oapi -generate client {{ .ITEM }}/v1/file.yaml \
-            > ../backend/internal/proto/{{ .ITEM }}/v1/v1oapi/file-client.oapi.go
-
-  up:
-    desc: ローカル開発環境を立ち上げる
-    dir: dev/docker
-    cmds:
-      - docker compose up --build -d
-
-  down:
-    desc: ローカル開発環境を終了する
-    dir: dev/docker
-    cmds:
-      - docker compose down
+      - pnpm install
+      - pnpm run --recursive --parallel --aggregate-output generate
