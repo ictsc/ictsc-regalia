@@ -18,8 +18,8 @@ github.com/DATA-DOG/go-txdb v0.2.0 h1:p1VAEZGN0U58Z5efRbI9mI6fDhcMn2+hV1sPBeOp/A
 github.com/DATA-DOG/go-txdb v0.2.0/go.mod h1:Dqk6PhlGpMk1JZ3n8sjybgBLcW69nuijArOMubFCXM0=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
-github.com/XSAM/otelsql v0.35.0 h1:nMdbU/XLmBIB6qZF61uDqy46E0LVA4ZgF/FCNw8Had4=
-github.com/XSAM/otelsql v0.35.0/go.mod h1:wO028mnLzmBpstK8XPsoeRLl/kgt417yjAwOGDIptTc=
+github.com/XSAM/otelsql v0.36.0 h1:SvrlOd/Hp0ttvI9Hu0FUWtISTTDNhQYwxe8WB4J5zxo=
+github.com/XSAM/otelsql v0.36.0/go.mod h1:fo4M8MU+fCn/jDfu+JwTQ0n6myv4cZ+FU5VxrllIlxY=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
 github.com/cenkalti/backoff/v4 v4.3.0 h1:MyRJ/UdXutAwSAT+s3wNd7MfTIcy71VQueUuFK343L8=
