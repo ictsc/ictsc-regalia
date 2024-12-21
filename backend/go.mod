@@ -15,7 +15,7 @@ require (
 	github.com/go-slog/otelslog v0.3.0
 	github.com/gofrs/uuid/v5 v5.3.0
 	github.com/google/go-cmp v0.6.0
-	github.com/jackc/pgx/v5 v5.7.1
+	github.com/jackc/pgx/v5 v5.7.2
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/phsym/console-slog v0.3.1
 	github.com/prometheus/client_golang v1.20.5
