@@ -1,0 +1,13 @@
+name: On Push Main
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/wf-docker-build.yaml
+    with:
+      push-ghcr: false
+      save-cache: false
