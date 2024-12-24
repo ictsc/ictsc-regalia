@@ -43,7 +43,7 @@ jobs:
       - name: Build and Push Artifacts
         uses: docker/bake-action@v5
         with:
-          push: true
+          push: ${{ inputs.push-ghcr }}
           # Metadata Action のタグ出力を加工したいのでここではラベルのみを渡す
           # タグの情報は環境変数 DOCKER_METADATA_OUTPUT_TAGS を使って受け取る
           files: |
