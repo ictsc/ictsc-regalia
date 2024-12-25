@@ -8,7 +8,10 @@ target "backend" {
   inherits = ["docker-metadata-action"]
   context = "./backend"
   matrix = {
-    image = ["scoreserver"]
+    image = [
+      "scoreserver",
+      "toolbox"
+    ]
   }
   name = "backend-${image}"
   tags = make_tags("${image}")
