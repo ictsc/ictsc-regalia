@@ -111,7 +111,7 @@ Jaeger UI (http://localhost:16686) でトレースを確認できます。
 
 ### データベース
 
-- PostgreSQL 13 を使用
+- PostgreSQL を使用
 - スキーマは`schema.sql`で管理
 - Adminer (http://localhost:8080) でデータベースを管理可能
 
