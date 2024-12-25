@@ -37,7 +37,6 @@ backend/
 - **開発ツール**:
   - golangci-lint: リンター
   - buf: Protocol Buffers ツール
-  - docker-compose: ローカル開発環境
 
 ## セットアップ
 
