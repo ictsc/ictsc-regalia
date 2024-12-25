@@ -70,7 +70,7 @@ $ ./scripts/local-exec go run ./cmd/scoreserver/ -dev
 スキーマの変更を適用するには:
 
 ```console
-$ ./scripts/migrate
+$ ./scripts/local-exec ./scripts/migrate
 ```
 
 ### 開発用コマンド
