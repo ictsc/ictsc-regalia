@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package admin.v1;
+
+// import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1";
+
+// 問題の展開状態
+message Deployment {
+  // チームコード
+  int64 team_code = 1;
+  // 問題コード
+  string problem_code = 2;
+  // リビジョン - 0 が初期状態で再展開される度にインクリメントされる
+  int64 revision = 3;
+  // 最新のイベント
+  DeploymentEventType latest_event = 4;
+  // イベント
+  repeated DeploymentEvent events = 5;
+}
+
+// 問題展開に関するイベント
+message DeploymentEvent {
+  google.protobuf.Timestamp occurred_at = 1;
+  DeploymentEventType type = 2;
+}
+
+enum DeploymentEventType {
+  DEPLOYMENT_EVENT_TYPE_UNSPECIFIED = 0;
+  DEPLOYMENT_EVENT_TYPE_QUEUED = 1;
+  DEPLOYMENT_EVENT_TYPE_CREATING = 2;
+  DEPLOYMENT_EVENT_TYPE_FINISHED = 3;
+  DEPLOYMENT_EVENT_TYPE_ERROR = 4;
+}
+
+message ListDeploymentsRequest {
+  int64 team_code = 1;
+  string problem_code = 2;
+}
+message ListDeploymentsResponse {
+  repeated Deployment deployments = 1;
+}
+
+message SyncDeploymentRequest {
+  int64 team_code = 1;
+  string problem_code = 2;
+}
+message SyncDeploymentResponse {}
+
+message DeployRequest {
+  int64 team_code = 1;
+  string problem_code = 2;
+}
+message DeployResponse {
+  Deployment deployment = 1;
+}
+
+service DeploymentService {
+  rpc ListDeployments(ListDeploymentsRequest) returns (ListDeploymentsResponse);
+  rpc SyncDeployment(SyncDeploymentRequest) returns (SyncDeploymentResponse);
+  rpc Deploy(DeployRequest) returns (DeployResponse);
+}
