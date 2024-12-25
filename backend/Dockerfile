@@ -5,7 +5,6 @@ RUN --mount=type=cache,target=/go/pkg/mod,sharing=locked \
     --mount=type=bind,source=go.mod,target=go.mod \
     --mount=type=bind,source=go.sum,target=go.sum \
     go mod download -x
-
 ARG TARGETOS
 ARG TARGETARCH
 ENV GOOS=$TARGETOS
@@ -18,13 +17,36 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build,sharing=locked \
     --mount=type=bind,source=.,target=. \
     go build -o /scoreserver -ldflags "-s -w" -trimpath ./cmd/scoreserver
-RUN env
 
 FROM gcr.io/distroless/static-debian12:nonroot AS scoreserver
-
 WORKDIR /app
 EXPOSE 8080 8081
-
 COPY --from=scoreserver-builder --chown=nonroot:nonroot /scoreserver /
 
 ENTRYPOINT ["/scoreserver"]
+
+# -- toolbox ---
+FROM debian:12-slim AS toolbox
+# Install tools
+RUN --mount=type=cache,target=/var/lib/apt \
+    --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y \
+      curl \
+      postgresql-client
+ARG SQLDEF_VERSION=v0.17.24
+ARG TARGETOS
+ARG TARGETARCH
+RUN <<-EOF
+curl -L -o psqldef.tar.gz https://github.com/sqldef/sqldef/releases/download/${SQLDEF_VERSION}/psqldef_${TARGETOS}_${TARGETARCH}.tar.gz
+tar -xf psqldef.tar.gz -C /usr/local/bin
+chmod +x /usr/local/bin/psqldef
+rm psqldef.tar.gz
+EOF
+# Add a user
+ARG UID=1000
+RUN adduser --uid ${UID} --disabled-password --gecos '' toolbox
+USER toolbox
+# Copy scripts
+WORKDIR /home/toolbox
+COPY schema.sql .
+COPY scripts ./scripts
