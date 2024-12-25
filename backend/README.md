@@ -36,7 +36,6 @@ backend/
 - **監視**: OpenTelemetry
 - **開発ツール**:
   - golangci-lint: リンター
-  - buf: Protocol Buffers ツール
 
 ## セットアップ
 
