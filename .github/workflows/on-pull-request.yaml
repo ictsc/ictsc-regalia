@@ -13,9 +13,11 @@ jobs:
 
   lint:
     name: Lint
-    strategy:
-      matrix:
-        workflow:
-          - wf-lint-backend.yaml
-    # uses: ./.github/workflows/${{ matrix.workflow }}
+    needs:
+      - lint-backend
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo
+
+  lint-backend:
     uses: ./.github/workflows/wf-lint-backend.yaml
