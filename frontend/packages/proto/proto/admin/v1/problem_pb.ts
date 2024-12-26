@@ -2,8 +2,8 @@
 // @generated from file admin/v1/problem.proto (package admin.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
+import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
+import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -11,7 +11,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file admin/v1/problem.proto.
  */
 export const file_admin_v1_problem: GenFile = /*@__PURE__*/
-  fileDesc("ChZhZG1pbi92MS9wcm9ibGVtLnByb3RvEghhZG1pbi52MSJCCgdQcm9ibGVtEhUKBGNvZGUYASABKAlCB7pIBHICEAESDQoFdGl0bGUYAiABKAkSEQoJbWF4X3Njb3JlGAQgASgDIhUKE0xpc3RQcm9ibGVtc1JlcXVlc3QiOwoUTGlzdFByb2JsZW1zUmVzcG9uc2USIwoIcHJvYmxlbXMYASADKAsyES5hZG1pbi52MS5Qcm9ibGVtIiEKEUdldFByb2JsZW1SZXF1ZXN0EgwKBGNvZGUYASABKAkiOAoSR2V0UHJvYmxlbVJlc3BvbnNlEiIKB3Byb2JsZW0YASABKAsyES5hZG1pbi52MS5Qcm9ibGVtIjoKFENyZWF0ZVByb2JsZW1SZXF1ZXN0EiIKB3Byb2JsZW0YASABKAsyES5hZG1pbi52MS5Qcm9ibGVtIjsKFUNyZWF0ZVByb2JsZW1SZXNwb25zZRIiCgdwcm9ibGVtGAEgASgLMhEuYWRtaW4udjEuUHJvYmxlbSIkChREZWxldGVQcm9ibGVtUmVxdWVzdBIMCgRjb2RlGAEgASgJIhcKFURlbGV0ZVByb2JsZW1SZXNwb25zZTLMAgoOUHJvYmxlbVNlcnZpY2USTQoMTGlzdFByb2JsZW1zEh0uYWRtaW4udjEuTGlzdFByb2JsZW1zUmVxdWVzdBoeLmFkbWluLnYxLkxpc3RQcm9ibGVtc1Jlc3BvbnNlEkcKCkdldFByb2JsZW0SGy5hZG1pbi52MS5HZXRQcm9ibGVtUmVxdWVzdBocLmFkbWluLnYxLkdldFByb2JsZW1SZXNwb25zZRJQCg1DcmVhdGVQcm9ibGVtEh4uYWRtaW4udjEuQ3JlYXRlUHJvYmxlbVJlcXVlc3QaHy5hZG1pbi52MS5DcmVhdGVQcm9ibGVtUmVzcG9uc2USUAoNRGVsZXRlUHJvYmxlbRIeLmFkbWluLnYxLkRlbGV0ZVByb2JsZW1SZXF1ZXN0Gh8uYWRtaW4udjEuRGVsZXRlUHJvYmxlbVJlc3BvbnNlQqABCgxjb20uYWRtaW4udjFCDFByb2JsZW1Qcm90b1ABWkFnaXRodWIuY29tL2ljdHNjL2ljdHNjLXJlZ2FsaWEvYmFja2VuZC9wa2cvcHJvdG8vYWRtaW4vdjE7YWRtaW52MaICA0FYWKoCCEFkbWluLlYxygIIQWRtaW5cVjHiAhRBZG1pblxWMVxHUEJNZXRhZGF0YeoCCUFkbWluOjpWMWIGcHJvdG8z", [file_buf_validate_validate]);
+  fileDesc("ChZhZG1pbi92MS9wcm9ibGVtLnByb3RvEghhZG1pbi52MSKWAQoHUHJvYmxlbRIVCgRjb2RlGAEgASgJQge6SARyAhABEg0KBXRpdGxlGAIgASgJEhEKCW1heF9zY29yZRgDIAEoAxItCg1yZWRlcGxveV9ydWxlGAQgASgLMhYuYWRtaW4udjEuUmVkZXBsb3lSdWxlEiMKBGJvZHkYBSABKAsyFS5hZG1pbi52MS5Qcm9ibGVtQm9keSJvCgxSZWRlcGxveVJ1bGUSKAoEdHlwZRgBIAEoDjIaLmFkbWluLnYxLlJlZGVwbG95UnVsZVR5cGUSGQoRcGVuYWx0eV90aHJlc2hvbGQYAiABKAMSGgoScGVuYWx0eV9wZXJjZW50YWdlGAMgASgCIm0KCkNvbm5lY3Rpb24SEQoJaG9zdF9uYW1lGAEgASgJEgwKBGhvc3QYAiABKAkSEQoEdXNlchgDIAEoCUgAiAEBEhUKCHBhc3N3b3JkGAQgASgJSAGIAQFCBwoFX3VzZXJCCwoJX3Bhc3N3b3JkIm8KC1Byb2JsZW1Cb2R5EiMKBHR5cGUYASABKA4yFS5hZG1pbi52MS5Qcm9ibGVtVHlwZRIzCgtkZXNjcmlwdGl2ZRgCIAEoCzIcLmFkbWluLnYxLkRlc2NyaXB0aXZlUHJvYmxlbUgAQgYKBGJvZHkihAEKEkRlc2NyaXB0aXZlUHJvYmxlbRIMCgRwYXRoGAEgASgJEigKCmNvbm5lY3Rpb24YAiADKAsyFC5hZG1pbi52MS5Db25uZWN0aW9uEhgKEHByb2JsZW1fbWFya2Rvd24YAyABKAkSHAoUZXhwbGFuYXRpb25fbWFya2Rvd24YBCABKAkiFQoTTGlzdFByb2JsZW1zUmVxdWVzdCI7ChRMaXN0UHJvYmxlbXNSZXNwb25zZRIjCghwcm9ibGVtcxgBIAMoCzIRLmFkbWluLnYxLlByb2JsZW0iIQoRR2V0UHJvYmxlbVJlcXVlc3QSDAoEY29kZRgBIAEoCSI4ChJHZXRQcm9ibGVtUmVzcG9uc2USIgoHcHJvYmxlbRgBIAEoCzIRLmFkbWluLnYxLlByb2JsZW0iOgoUQ3JlYXRlUHJvYmxlbVJlcXVlc3QSIgoHcHJvYmxlbRgBIAEoCzIRLmFkbWluLnYxLlByb2JsZW0iOwoVQ3JlYXRlUHJvYmxlbVJlc3BvbnNlEiIKB3Byb2JsZW0YASABKAsyES5hZG1pbi52MS5Qcm9ibGVtIjoKFFVwZGF0ZVByb2JsZW1SZXF1ZXN0EiIKB3Byb2JsZW0YASABKAsyES5hZG1pbi52MS5Qcm9ibGVtIjsKFVVwZGF0ZVByb2JsZW1SZXNwb25zZRIiCgdwcm9ibGVtGAEgASgLMhEuYWRtaW4udjEuUHJvYmxlbSIkChREZWxldGVQcm9ibGVtUmVxdWVzdBIMCgRjb2RlGAEgASgJIhcKFURlbGV0ZVByb2JsZW1SZXNwb25zZSqIAQoQUmVkZXBsb3lSdWxlVHlwZRIiCh5SRURFUExPWV9SVUxFX1RZUEVfVU5TUEVDSUZJRUQQABIlCiFSRURFUExPWV9SVUxFX1RZUEVfVU5SRURFUExPWUFCTEUQARIpCiVSRURFUExPWV9SVUxFX1RZUEVfUEVSQ0VOVEFHRV9QRU5BTFRZEAIqSQoLUHJvYmxlbVR5cGUSHAoYUFJPQkxFTV9UWVBFX1VOU1BFQ0lGSUVEEAASHAoYUFJPQkxFTV9UWVBFX0RFU0NSSVBUSVZFEAEyngMKDlByb2JsZW1TZXJ2aWNlEk0KDExpc3RQcm9ibGVtcxIdLmFkbWluLnYxLkxpc3RQcm9ibGVtc1JlcXVlc3QaHi5hZG1pbi52MS5MaXN0UHJvYmxlbXNSZXNwb25zZRJHCgpHZXRQcm9ibGVtEhsuYWRtaW4udjEuR2V0UHJvYmxlbVJlcXVlc3QaHC5hZG1pbi52MS5HZXRQcm9ibGVtUmVzcG9uc2USUAoNQ3JlYXRlUHJvYmxlbRIeLmFkbWluLnYxLkNyZWF0ZVByb2JsZW1SZXF1ZXN0Gh8uYWRtaW4udjEuQ3JlYXRlUHJvYmxlbVJlc3BvbnNlElAKDVVwZGF0ZVByb2JsZW0SHi5hZG1pbi52MS5VcGRhdGVQcm9ibGVtUmVxdWVzdBofLmFkbWluLnYxLlVwZGF0ZVByb2JsZW1SZXNwb25zZRJQCg1EZWxldGVQcm9ibGVtEh4uYWRtaW4udjEuRGVsZXRlUHJvYmxlbVJlcXVlc3QaHy5hZG1pbi52MS5EZWxldGVQcm9ibGVtUmVzcG9uc2VCoAEKDGNvbS5hZG1pbi52MUIMUHJvYmxlbVByb3RvUAFaQWdpdGh1Yi5jb20vaWN0c2MvaWN0c2MtcmVnYWxpYS9iYWNrZW5kL3BrZy9wcm90by9hZG1pbi92MTthZG1pbnYxogIDQVhYqgIIQWRtaW4uVjHKAghBZG1pblxWMeICFEFkbWluXFYxXEdQQk1ldGFkYXRh6gIJQWRtaW46OlYxYgZwcm90bzM", [file_buf_validate_validate]);
 
 /**
  * @generated from message admin.v1.Problem
@@ -34,9 +34,19 @@ export type Problem = Message<"admin.v1.Problem"> & {
   /**
    * 最大得点
    *
-   * @generated from field: int64 max_score = 4;
+   * @generated from field: int64 max_score = 3;
    */
   maxScore: bigint;
+
+  /**
+   * @generated from field: admin.v1.RedeployRule redeploy_rule = 4;
+   */
+  redeployRule?: RedeployRule;
+
+  /**
+   * @generated from field: admin.v1.ProblemBody body = 5;
+   */
+  body?: ProblemBody;
 };
 
 /**
@@ -45,6 +55,145 @@ export type Problem = Message<"admin.v1.Problem"> & {
  */
 export const ProblemSchema: GenMessage<Problem> = /*@__PURE__*/
   messageDesc(file_admin_v1_problem, 0);
+
+/**
+ * @generated from message admin.v1.RedeployRule
+ */
+export type RedeployRule = Message<"admin.v1.RedeployRule"> & {
+  /**
+   * @generated from field: admin.v1.RedeployRuleType type = 1;
+   */
+  type: RedeployRuleType;
+
+  /**
+   * 再展開ペナルティの発生する再展開回数の閾値
+   *
+   * @generated from field: int64 penalty_threshold = 2;
+   */
+  penaltyThreshold: bigint;
+
+  /**
+   * 再展開ペナルティの割合
+   *
+   * @generated from field: float penalty_percentage = 3;
+   */
+  penaltyPercentage: number;
+};
+
+/**
+ * Describes the message admin.v1.RedeployRule.
+ * Use `create(RedeployRuleSchema)` to create a new message.
+ */
+export const RedeployRuleSchema: GenMessage<RedeployRule> = /*@__PURE__*/
+  messageDesc(file_admin_v1_problem, 1);
+
+/**
+ * @generated from message admin.v1.Connection
+ */
+export type Connection = Message<"admin.v1.Connection"> & {
+  /**
+   * ホスト名
+   *
+   * @generated from field: string host_name = 1;
+   */
+  hostName: string;
+
+  /**
+   * ホスト(IP アドレス or ドメイン)
+   *
+   * @generated from field: string host = 2;
+   */
+  host: string;
+
+  /**
+   * ユーザ
+   *
+   * @generated from field: optional string user = 3;
+   */
+  user?: string;
+
+  /**
+   * パスワード
+   *
+   * @generated from field: optional string password = 4;
+   */
+  password?: string;
+};
+
+/**
+ * Describes the message admin.v1.Connection.
+ * Use `create(ConnectionSchema)` to create a new message.
+ */
+export const ConnectionSchema: GenMessage<Connection> = /*@__PURE__*/
+  messageDesc(file_admin_v1_problem, 2);
+
+/**
+ * @generated from message admin.v1.ProblemBody
+ */
+export type ProblemBody = Message<"admin.v1.ProblemBody"> & {
+  /**
+   * @generated from field: admin.v1.ProblemType type = 1;
+   */
+  type: ProblemType;
+
+  /**
+   * @generated from oneof admin.v1.ProblemBody.body
+   */
+  body: {
+    /**
+     * @generated from field: admin.v1.DescriptiveProblem descriptive = 2;
+     */
+    value: DescriptiveProblem;
+    case: "descriptive";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message admin.v1.ProblemBody.
+ * Use `create(ProblemBodySchema)` to create a new message.
+ */
+export const ProblemBodySchema: GenMessage<ProblemBody> = /*@__PURE__*/
+  messageDesc(file_admin_v1_problem, 3);
+
+/**
+ * @generated from message admin.v1.DescriptiveProblem
+ */
+export type DescriptiveProblem = Message<"admin.v1.DescriptiveProblem"> & {
+  /**
+   * Growi のページのパス
+   *
+   * @generated from field: string path = 1;
+   */
+  path: string;
+
+  /**
+   * 接続情報
+   *
+   * @generated from field: repeated admin.v1.Connection connection = 2;
+   */
+  connection: Connection[];
+
+  /**
+   * Markdown 形式の問題文
+   *
+   * @generated from field: string problem_markdown = 3;
+   */
+  problemMarkdown: string;
+
+  /**
+   * Markdown 形式の解説文
+   *
+   * @generated from field: string explanation_markdown = 4;
+   */
+  explanationMarkdown: string;
+};
+
+/**
+ * Describes the message admin.v1.DescriptiveProblem.
+ * Use `create(DescriptiveProblemSchema)` to create a new message.
+ */
+export const DescriptiveProblemSchema: GenMessage<DescriptiveProblem> = /*@__PURE__*/
+  messageDesc(file_admin_v1_problem, 4);
 
 /**
  * @generated from message admin.v1.ListProblemsRequest
@@ -57,7 +206,7 @@ export type ListProblemsRequest = Message<"admin.v1.ListProblemsRequest"> & {
  * Use `create(ListProblemsRequestSchema)` to create a new message.
  */
 export const ListProblemsRequestSchema: GenMessage<ListProblemsRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_problem, 1);
+  messageDesc(file_admin_v1_problem, 5);
 
 /**
  * @generated from message admin.v1.ListProblemsResponse
@@ -74,7 +223,7 @@ export type ListProblemsResponse = Message<"admin.v1.ListProblemsResponse"> & {
  * Use `create(ListProblemsResponseSchema)` to create a new message.
  */
 export const ListProblemsResponseSchema: GenMessage<ListProblemsResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_problem, 2);
+  messageDesc(file_admin_v1_problem, 6);
 
 /**
  * @generated from message admin.v1.GetProblemRequest
@@ -91,7 +240,7 @@ export type GetProblemRequest = Message<"admin.v1.GetProblemRequest"> & {
  * Use `create(GetProblemRequestSchema)` to create a new message.
  */
 export const GetProblemRequestSchema: GenMessage<GetProblemRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_problem, 3);
+  messageDesc(file_admin_v1_problem, 7);
 
 /**
  * @generated from message admin.v1.GetProblemResponse
@@ -108,7 +257,7 @@ export type GetProblemResponse = Message<"admin.v1.GetProblemResponse"> & {
  * Use `create(GetProblemResponseSchema)` to create a new message.
  */
 export const GetProblemResponseSchema: GenMessage<GetProblemResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_problem, 4);
+  messageDesc(file_admin_v1_problem, 8);
 
 /**
  * @generated from message admin.v1.CreateProblemRequest
@@ -125,7 +274,7 @@ export type CreateProblemRequest = Message<"admin.v1.CreateProblemRequest"> & {
  * Use `create(CreateProblemRequestSchema)` to create a new message.
  */
 export const CreateProblemRequestSchema: GenMessage<CreateProblemRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_problem, 5);
+  messageDesc(file_admin_v1_problem, 9);
 
 /**
  * @generated from message admin.v1.CreateProblemResponse
@@ -142,7 +291,41 @@ export type CreateProblemResponse = Message<"admin.v1.CreateProblemResponse"> & 
  * Use `create(CreateProblemResponseSchema)` to create a new message.
  */
 export const CreateProblemResponseSchema: GenMessage<CreateProblemResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_problem, 6);
+  messageDesc(file_admin_v1_problem, 10);
+
+/**
+ * @generated from message admin.v1.UpdateProblemRequest
+ */
+export type UpdateProblemRequest = Message<"admin.v1.UpdateProblemRequest"> & {
+  /**
+   * @generated from field: admin.v1.Problem problem = 1;
+   */
+  problem?: Problem;
+};
+
+/**
+ * Describes the message admin.v1.UpdateProblemRequest.
+ * Use `create(UpdateProblemRequestSchema)` to create a new message.
+ */
+export const UpdateProblemRequestSchema: GenMessage<UpdateProblemRequest> = /*@__PURE__*/
+  messageDesc(file_admin_v1_problem, 11);
+
+/**
+ * @generated from message admin.v1.UpdateProblemResponse
+ */
+export type UpdateProblemResponse = Message<"admin.v1.UpdateProblemResponse"> & {
+  /**
+   * @generated from field: admin.v1.Problem problem = 1;
+   */
+  problem?: Problem;
+};
+
+/**
+ * Describes the message admin.v1.UpdateProblemResponse.
+ * Use `create(UpdateProblemResponseSchema)` to create a new message.
+ */
+export const UpdateProblemResponseSchema: GenMessage<UpdateProblemResponse> = /*@__PURE__*/
+  messageDesc(file_admin_v1_problem, 12);
 
 /**
  * @generated from message admin.v1.DeleteProblemRequest
@@ -159,7 +342,7 @@ export type DeleteProblemRequest = Message<"admin.v1.DeleteProblemRequest"> & {
  * Use `create(DeleteProblemRequestSchema)` to create a new message.
  */
 export const DeleteProblemRequestSchema: GenMessage<DeleteProblemRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_problem, 7);
+  messageDesc(file_admin_v1_problem, 13);
 
 /**
  * @generated from message admin.v1.DeleteProblemResponse
@@ -172,7 +355,58 @@ export type DeleteProblemResponse = Message<"admin.v1.DeleteProblemResponse"> & 
  * Use `create(DeleteProblemResponseSchema)` to create a new message.
  */
 export const DeleteProblemResponseSchema: GenMessage<DeleteProblemResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_problem, 8);
+  messageDesc(file_admin_v1_problem, 14);
+
+/**
+ * @generated from enum admin.v1.RedeployRuleType
+ */
+export enum RedeployRuleType {
+  /**
+   * @generated from enum value: REDEPLOY_RULE_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * 自動での再展開ができない問題
+   *
+   * @generated from enum value: REDEPLOY_RULE_TYPE_UNREDEPLOYABLE = 1;
+   */
+  UNREDEPLOYABLE = 1,
+
+  /**
+   * 再展開に最大点数への割合ペナルティがある問題
+   *
+   * @generated from enum value: REDEPLOY_RULE_TYPE_PERCENTAGE_PENALTY = 2;
+   */
+  PERCENTAGE_PENALTY = 2,
+}
+
+/**
+ * Describes the enum admin.v1.RedeployRuleType.
+ */
+export const RedeployRuleTypeSchema: GenEnum<RedeployRuleType> = /*@__PURE__*/
+  enumDesc(file_admin_v1_problem, 0);
+
+/**
+ * @generated from enum admin.v1.ProblemType
+ */
+export enum ProblemType {
+  /**
+   * @generated from enum value: PROBLEM_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: PROBLEM_TYPE_DESCRIPTIVE = 1;
+   */
+  DESCRIPTIVE = 1,
+}
+
+/**
+ * Describes the enum admin.v1.ProblemType.
+ */
+export const ProblemTypeSchema: GenEnum<ProblemType> = /*@__PURE__*/
+  enumDesc(file_admin_v1_problem, 1);
 
 /**
  * @generated from service admin.v1.ProblemService
@@ -201,6 +435,14 @@ export const ProblemService: GenService<{
     methodKind: "unary";
     input: typeof CreateProblemRequestSchema;
     output: typeof CreateProblemResponseSchema;
+  },
+  /**
+   * @generated from rpc admin.v1.ProblemService.UpdateProblem
+   */
+  updateProblem: {
+    methodKind: "unary";
+    input: typeof UpdateProblemRequestSchema;
+    output: typeof UpdateProblemResponseSchema;
   },
   /**
    * @generated from rpc admin.v1.ProblemService.DeleteProblem
