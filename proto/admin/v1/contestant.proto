@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package admin.v1;
+
+option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1";
+
+message Contestant {
+  string name = 1;
+  string display_name = 2;
+  int64 team_code = 3;
+  Profile profile = 4;
+
+  bool discord_joined = 5;
+}
+
+message Profile {
+  string self_introduction = 1;
+}
+
+message ListContestantsRequest {
+  int64 team_code = 1;
+}
+message ListContestantsResponse {
+  repeated Contestant contestants = 1;
+}
+
+service ContestantService {
+  rpc ListContestants(ListContestantsRequest) returns (ListContestantsResponse);
+}
