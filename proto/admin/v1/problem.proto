@@ -12,38 +12,62 @@ message Problem {
   // タイトル
   string title = 2;
   // 最大得点
-  int64 max_score = 4;
+  int64 max_score = 3;
 
-  // VM などのホストを使う問題
-  // optional HostInfo host = 5;
+  RedeployRule redeploy_rule = 4;
 
-  // ProblemBody body = 6;
+  ProblemBody body = 5;
 }
 
-/*
-   TODO: 問題の細かい情報を決める
-   再展開を考える上では不要
+enum RedeployRuleType {
+  REDEPLOY_RULE_TYPE_UNSPECIFIED = 0;
+  // 自動での再展開ができない問題
+  REDEPLOY_RULE_TYPE_UNREDEPLOYABLE = 1;
+  // 再展開に最大点数への割合ペナルティがある問題
+  REDEPLOY_RULE_TYPE_PERCENTAGE_PENALTY = 2;
+}
 
-   message HostInfo {
-     // TODO
-   }
+message RedeployRule {
+  RedeployRuleType type = 1;
+  // 再展開ペナルティの発生する再展開回数の閾値
+  int64 penalty_threshold = 2;
+  // 再展開ペナルティの割合
+  float penalty_percentage = 3;
+}
 
-   message ProblemBody {
-     ProblemType type = 1;
-     oneof body {
-       DescriptiveProblem descriptive = 2;
-     }
-   }
+message Connection {
+  // ホスト名
+  string host_name = 1;
+  // ホスト(IP アドレス or ドメイン)
+  string host = 2;
+  // ユーザ
+  optional string user = 3;
+  // パスワード
+  optional string password = 4;
+}
 
-   enum ProblemType {
-     PROBLEM_TYPE_UNSPECIFIED = 0;
-     PROBLEM_TYPE_DESCRIPTIVE = 1;
-   }
+message ProblemBody {
+  ProblemType type = 1;
+  oneof body {
+    DescriptiveProblem descriptive = 2;
+  }
+}
 
-   message DescriptiveProblem {
-     // TODO
-   }
-*/
+enum ProblemType {
+  PROBLEM_TYPE_UNSPECIFIED = 0;
+  PROBLEM_TYPE_DESCRIPTIVE = 1;
+}
+
+message DescriptiveProblem {
+  // Growi のページのパス
+  string path = 1;
+  // 接続情報
+  repeated Connection connection = 2;
+  // Markdown 形式の問題文
+  string problem_markdown = 3;
+  // Markdown 形式の解説文
+  string explanation_markdown = 4;
+}
 
 message ListProblemsRequest {}
 message ListProblemsResponse {
@@ -64,6 +88,13 @@ message CreateProblemResponse {
   Problem problem = 1;
 }
 
+message UpdateProblemRequest {
+  Problem problem = 1;
+}
+message UpdateProblemResponse {
+  Problem problem = 1;
+}
+
 message DeleteProblemRequest {
   string code = 1;
 }
@@ -73,5 +104,6 @@ service ProblemService {
   rpc ListProblems(ListProblemsRequest) returns (ListProblemsResponse);
   rpc GetProblem(GetProblemRequest) returns (GetProblemResponse);
   rpc CreateProblem(CreateProblemRequest) returns (CreateProblemResponse);
+  rpc UpdateProblem(UpdateProblemRequest) returns (UpdateProblemResponse);
   rpc DeleteProblem(DeleteProblemRequest) returns (DeleteProblemResponse);
 }

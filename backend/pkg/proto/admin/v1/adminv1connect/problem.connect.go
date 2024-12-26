@@ -42,6 +42,9 @@ const (
 	// ProblemServiceCreateProblemProcedure is the fully-qualified name of the ProblemService's
 	// CreateProblem RPC.
 	ProblemServiceCreateProblemProcedure = "/admin.v1.ProblemService/CreateProblem"
+	// ProblemServiceUpdateProblemProcedure is the fully-qualified name of the ProblemService's
+	// UpdateProblem RPC.
+	ProblemServiceUpdateProblemProcedure = "/admin.v1.ProblemService/UpdateProblem"
 	// ProblemServiceDeleteProblemProcedure is the fully-qualified name of the ProblemService's
 	// DeleteProblem RPC.
 	ProblemServiceDeleteProblemProcedure = "/admin.v1.ProblemService/DeleteProblem"
@@ -53,6 +56,7 @@ var (
 	problemServiceListProblemsMethodDescriptor  = problemServiceServiceDescriptor.Methods().ByName("ListProblems")
 	problemServiceGetProblemMethodDescriptor    = problemServiceServiceDescriptor.Methods().ByName("GetProblem")
 	problemServiceCreateProblemMethodDescriptor = problemServiceServiceDescriptor.Methods().ByName("CreateProblem")
+	problemServiceUpdateProblemMethodDescriptor = problemServiceServiceDescriptor.Methods().ByName("UpdateProblem")
 	problemServiceDeleteProblemMethodDescriptor = problemServiceServiceDescriptor.Methods().ByName("DeleteProblem")
 )
 
@@ -61,6 +65,7 @@ type ProblemServiceClient interface {
 	ListProblems(context.Context, *connect.Request[v1.ListProblemsRequest]) (*connect.Response[v1.ListProblemsResponse], error)
 	GetProblem(context.Context, *connect.Request[v1.GetProblemRequest]) (*connect.Response[v1.GetProblemResponse], error)
 	CreateProblem(context.Context, *connect.Request[v1.CreateProblemRequest]) (*connect.Response[v1.CreateProblemResponse], error)
+	UpdateProblem(context.Context, *connect.Request[v1.UpdateProblemRequest]) (*connect.Response[v1.UpdateProblemResponse], error)
 	DeleteProblem(context.Context, *connect.Request[v1.DeleteProblemRequest]) (*connect.Response[v1.DeleteProblemResponse], error)
 }
 
@@ -92,6 +97,12 @@ func NewProblemServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(problemServiceCreateProblemMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		updateProblem: connect.NewClient[v1.UpdateProblemRequest, v1.UpdateProblemResponse](
+			httpClient,
+			baseURL+ProblemServiceUpdateProblemProcedure,
+			connect.WithSchema(problemServiceUpdateProblemMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 		deleteProblem: connect.NewClient[v1.DeleteProblemRequest, v1.DeleteProblemResponse](
 			httpClient,
 			baseURL+ProblemServiceDeleteProblemProcedure,
@@ -106,6 +117,7 @@ type problemServiceClient struct {
 	listProblems  *connect.Client[v1.ListProblemsRequest, v1.ListProblemsResponse]
 	getProblem    *connect.Client[v1.GetProblemRequest, v1.GetProblemResponse]
 	createProblem *connect.Client[v1.CreateProblemRequest, v1.CreateProblemResponse]
+	updateProblem *connect.Client[v1.UpdateProblemRequest, v1.UpdateProblemResponse]
 	deleteProblem *connect.Client[v1.DeleteProblemRequest, v1.DeleteProblemResponse]
 }
 
@@ -124,6 +136,11 @@ func (c *problemServiceClient) CreateProblem(ctx context.Context, req *connect.R
 	return c.createProblem.CallUnary(ctx, req)
 }
 
+// UpdateProblem calls admin.v1.ProblemService.UpdateProblem.
+func (c *problemServiceClient) UpdateProblem(ctx context.Context, req *connect.Request[v1.UpdateProblemRequest]) (*connect.Response[v1.UpdateProblemResponse], error) {
+	return c.updateProblem.CallUnary(ctx, req)
+}
+
 // DeleteProblem calls admin.v1.ProblemService.DeleteProblem.
 func (c *problemServiceClient) DeleteProblem(ctx context.Context, req *connect.Request[v1.DeleteProblemRequest]) (*connect.Response[v1.DeleteProblemResponse], error) {
 	return c.deleteProblem.CallUnary(ctx, req)
@@ -134,6 +151,7 @@ type ProblemServiceHandler interface {
 	ListProblems(context.Context, *connect.Request[v1.ListProblemsRequest]) (*connect.Response[v1.ListProblemsResponse], error)
 	GetProblem(context.Context, *connect.Request[v1.GetProblemRequest]) (*connect.Response[v1.GetProblemResponse], error)
 	CreateProblem(context.Context, *connect.Request[v1.CreateProblemRequest]) (*connect.Response[v1.CreateProblemResponse], error)
+	UpdateProblem(context.Context, *connect.Request[v1.UpdateProblemRequest]) (*connect.Response[v1.UpdateProblemResponse], error)
 	DeleteProblem(context.Context, *connect.Request[v1.DeleteProblemRequest]) (*connect.Response[v1.DeleteProblemResponse], error)
 }
 
@@ -161,6 +179,12 @@ func NewProblemServiceHandler(svc ProblemServiceHandler, opts ...connect.Handler
 		connect.WithSchema(problemServiceCreateProblemMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	problemServiceUpdateProblemHandler := connect.NewUnaryHandler(
+		ProblemServiceUpdateProblemProcedure,
+		svc.UpdateProblem,
+		connect.WithSchema(problemServiceUpdateProblemMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	problemServiceDeleteProblemHandler := connect.NewUnaryHandler(
 		ProblemServiceDeleteProblemProcedure,
 		svc.DeleteProblem,
@@ -175,6 +199,8 @@ func NewProblemServiceHandler(svc ProblemServiceHandler, opts ...connect.Handler
 			problemServiceGetProblemHandler.ServeHTTP(w, r)
 		case ProblemServiceCreateProblemProcedure:
 			problemServiceCreateProblemHandler.ServeHTTP(w, r)
+		case ProblemServiceUpdateProblemProcedure:
+			problemServiceUpdateProblemHandler.ServeHTTP(w, r)
 		case ProblemServiceDeleteProblemProcedure:
 			problemServiceDeleteProblemHandler.ServeHTTP(w, r)
 		default:
@@ -196,6 +222,10 @@ func (UnimplementedProblemServiceHandler) GetProblem(context.Context, *connect.R
 
 func (UnimplementedProblemServiceHandler) CreateProblem(context.Context, *connect.Request[v1.CreateProblemRequest]) (*connect.Response[v1.CreateProblemResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.ProblemService.CreateProblem is not implemented"))
+}
+
+func (UnimplementedProblemServiceHandler) UpdateProblem(context.Context, *connect.Request[v1.UpdateProblemRequest]) (*connect.Response[v1.UpdateProblemResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.ProblemService.UpdateProblem is not implemented"))
 }
 
 func (UnimplementedProblemServiceHandler) DeleteProblem(context.Context, *connect.Request[v1.DeleteProblemRequest]) (*connect.Response[v1.DeleteProblemResponse], error) {
