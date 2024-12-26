@@ -1,0 +1,23 @@
+name: Lint Backend
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run golangci-lint
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          go_version_file: backend/go.mod
+          workdir: backend
+          level: warning
+          fail_on_error: true # deprecated
+          filter_mode: nofilter
+          golangci_lint_flags: --timeout=10m

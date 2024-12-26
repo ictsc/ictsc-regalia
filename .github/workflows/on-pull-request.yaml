@@ -10,3 +10,11 @@ jobs:
     with:
       push-ghcr: false
       save-cache: false
+
+  lint:
+    name: Lint
+    strategy:
+      matrix:
+        workflow:
+          - wf-lint-backend.yaml
+    uses: ./.github/workflows/${{ matrix.workflow }}

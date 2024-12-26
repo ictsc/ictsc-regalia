@@ -11,3 +11,6 @@ jobs:
     with:
       push-ghcr: true
       save-cache: true
+
+  lint-backend:
+    uses: ./.github/workflows/wf-lint-backend.yaml
