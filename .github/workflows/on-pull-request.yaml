@@ -17,4 +17,5 @@ jobs:
       matrix:
         workflow:
           - wf-lint-backend.yaml
-    uses: ./.github/workflows/${{ matrix.workflow }}
+    # uses: ./.github/workflows/${{ matrix.workflow }}
+    uses: ./.github/workflows/wf-lint-backend.yaml
