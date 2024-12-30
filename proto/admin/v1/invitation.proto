@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package admin.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1";
+
+message InvitationCode {
+  string code = 1;
+  int64 team_code = 2;
+  uint64 total_uses = 3;
+  uint64 remaining_uses = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp expires_at = 6;
+}
+
+message ListInvitationCodesRequest {
+  int64 team_code = 1;
+  bool include_expired = 2;
+}
+message ListInvitationCodesResponse {
+  repeated InvitationCode invitation_codes = 1;
+}
+
+message CreateInvitationCodeRequest {
+  InvitationCode invitation_code = 1;
+}
+message CreateInvitationCodeResponse {
+  InvitationCode invitation_code = 1;
+}
+
+message UpdateInvitationCodeRequest {
+  InvitationCode invitation_code = 1;
+}
+message UpdateInvitationCodeResponse {
+  InvitationCode invitation_code = 1;
+}
+
+message DeleteInvitationCodeRequest {
+  string code = 1;
+}
+message DeleteInvitationCodeResponse {}
+
+service InvitationService {
+  rpc ListInvitationCodes(ListInvitationCodesRequest) returns (ListInvitationCodesResponse);
+  rpc CreateInvitationCode(CreateInvitationCodeRequest) returns (CreateInvitationCodeResponse);
+  rpc UpdateInvitationCode(UpdateInvitationCodeRequest) returns (UpdateInvitationCodeResponse);
+  rpc DeleteInvitationCode(DeleteInvitationCodeRequest) returns (DeleteInvitationCodeResponse);
+}
