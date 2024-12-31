@@ -11,6 +11,7 @@ message Contestant {
   Profile profile = 4;
 
   bool discord_joined = 5;
+  string invitation_code = 6;
 }
 
 message Profile {
