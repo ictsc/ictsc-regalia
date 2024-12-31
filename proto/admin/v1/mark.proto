@@ -27,6 +27,7 @@ message MarkingResult {
   Admin judge = 2;
   int64 score = 3;
   string comment = 4;
+  google.protobuf.Timestamp created_at = 5;
 }
 
 message ListAnswersRequest {
