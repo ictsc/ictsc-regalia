@@ -1,15 +1,16 @@
 # syntax=docker/dockerfile:1
-FROM --platform=$BUILDPLATFORM golang:1.23.4 AS builder
+FROM --platform=$BUILDPLATFORM golang AS builder
+ENV GOTOOLCHAIN=auto
+ENV CGO_ENABLED=0
 WORKDIR /src
 RUN --mount=type=cache,target=/go/pkg/mod,sharing=locked \
     --mount=type=bind,source=go.mod,target=go.mod \
     --mount=type=bind,source=go.sum,target=go.sum \
-    go mod download -x
+    go mod download
 ARG TARGETOS
 ARG TARGETARCH
 ENV GOOS=$TARGETOS
 ENV GOARCH=$TARGETARCH
-ENV CGO_ENABLED=0
 
 # --- score server ---
 FROM --platform=$BUILDPLATFORM builder AS scoreserver-builder
