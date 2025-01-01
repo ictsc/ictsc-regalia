@@ -52,15 +52,14 @@ jobs:
         run: go generate -x ./...
       - name: Check Diff
         run: git diff --exit-code
-      - uses: actions/cache/save@v4
-        if: always() && steps.go-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ steps.go-cache.outputs.cache-primary-key }}
   test:
     name: Test
+    needs: [test-go, test-schema]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo
+  test-go:
+    name: Test Go
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -91,3 +90,36 @@ jobs:
             ~/.cache/go-build
             ~/go/pkg/mod
           key: ${{ steps.go-cache.outputs.cache-primary-key }}
+  test-schema:
+    name: Test Schema
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: ictsc
+          POSTGRES_DB: ictscore
+        options: >-
+          --health-cmd pg-isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+          cache: false
+      - name: Run Migration
+        run: ./scripts/migrate
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: ictsc
+          PGPASSWORD: password
+          DB_NAME: ictscore
