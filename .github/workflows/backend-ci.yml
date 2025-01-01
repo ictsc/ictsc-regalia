@@ -58,6 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo
+        working-directory: /
   test-go:
     name: Test Go
     runs-on: ubuntu-latest
@@ -101,7 +102,7 @@ jobs:
           POSTGRES_USER: ictsc
           POSTGRES_DB: ictscore
         options: >-
-          --health-cmd pg-isready
+          --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
