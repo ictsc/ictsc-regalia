@@ -33,15 +33,16 @@ RUN --mount=type=cache,target=/var/lib/apt \
     apt-get update && apt-get install -y \
       curl \
       postgresql-client
-ARG SQLDEF_VERSION=v0.17.24
 ARG TARGETOS
 ARG TARGETARCH
-RUN <<-EOF
-curl -L -o psqldef.tar.gz https://github.com/sqldef/sqldef/releases/download/${SQLDEF_VERSION}/psqldef_${TARGETOS}_${TARGETARCH}.tar.gz
+RUN --mount=type=bind,source=go.mod,target=go.mod \
+<<-EOS
+SQLDEF_VERSION="$(grep github.com/sqldef/sqldef go.mod | cut -d" " -f2)"
+curl -fsSL -o psqldef.tar.gz "https://github.com/sqldef/sqldef/releases/download/${SQLDEF_VERSION}/psqldef_${TARGETOS}_${TARGETARCH}.tar.gz"
 tar -xf psqldef.tar.gz -C /usr/local/bin
-chmod +x /usr/local/bin/psqldef
 rm psqldef.tar.gz
-EOF
+chmod +x /usr/local/bin/psqldef
+EOS
 # Add a user
 ARG UID=1000
 RUN adduser --uid ${UID} --disabled-password --gecos '' toolbox
