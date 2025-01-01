@@ -11,7 +11,7 @@ require (
 	connectrpc.com/otelconnect v0.7.1
 	github.com/DATA-DOG/go-txdb v0.2.0
 	github.com/XSAM/otelsql v0.36.0
-	github.com/bufbuild/buf v1.47.2
+	github.com/bufbuild/buf v1.48.0
 	github.com/cockroachdb/errors v1.11.3
 	github.com/go-slog/otelslog v0.3.0
 	github.com/gofrs/uuid/v5 v5.3.0
@@ -41,12 +41,12 @@ require (
 )
 
 require (
-	buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.1-20241031151143-70f632351282.1 // indirect
+	buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.0-20241031151143-70f632351282.1 // indirect
 	buf.build/gen/go/bufbuild/registry/connectrpc/go v1.17.0-20241227185654-946b6dd39b27.1 // indirect
-	buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.35.1-20241025140216-aa40f2c93090.1 // indirect
+	buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.0-20241210175624-28487aef65cd.1 // indirect
 	buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.1-20241007202033-cf42259fcbfc.1 // indirect
 	buf.build/go/bufplugin v0.6.0 // indirect
-	buf.build/go/protoyaml v0.2.0 // indirect
+	buf.build/go/protoyaml v0.3.1 // indirect
 	buf.build/go/spdx v0.2.0 // indirect
 	cel.dev/expr v0.19.1 // indirect
 	dario.cat/mergo v1.0.1 // indirect
@@ -58,7 +58,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bufbuild/protocompile v0.14.1 // indirect
 	github.com/bufbuild/protoplugin v0.0.0-20240911180120-7bb73e41a54a // indirect
-	github.com/bufbuild/protovalidate-go v0.7.3-0.20241015162221-1446f1e1d576 // indirect
+	github.com/bufbuild/protovalidate-go v0.8.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20241215232642-bb51bb14a506 // indirect
