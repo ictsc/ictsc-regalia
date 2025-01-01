@@ -105,7 +105,7 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jdx/go-netrc v1.0.0 // indirect
 	github.com/jessevdk/go-flags v1.6.1 // indirect
-	github.com/k0kubun/pp/v3 v3.3.0 // indirect
+	github.com/k0kubun/pp/v3 v3.4.1 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
