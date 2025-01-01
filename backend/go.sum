@@ -10,8 +10,8 @@ buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.1-20241007202033-c
 buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.1-20241007202033-cf42259fcbfc.1/go.mod h1:Uy8SKofLXIAUjswDmz6AIN8W+bGVTF4kNczZikMPHLM=
 buf.build/go/bufplugin v0.6.0 h1:3lhoh+0z+IUPS3ZajTPn/27LaLIkero2BDVnV7yXD1s=
 buf.build/go/bufplugin v0.6.0/go.mod h1:hWCjxxv24xdR6F5pNlQavZV2oo0J3uF4Ff1XEoyV6vU=
-buf.build/go/protoyaml v0.2.0 h1:2g3OHjtLDqXBREIOjpZGHmQ+U/4mkN1YiQjxNB68Ip8=
-buf.build/go/protoyaml v0.2.0/go.mod h1:L/9QvTDkTWcDTzAL6HMfN+mYC6CmZRm2KnsUA054iL0=
+buf.build/go/protoyaml v0.3.1 h1:ucyzE7DRnjX+mQ6AH4JzN0Kg50ByHHu+yrSKbgQn2D4=
+buf.build/go/protoyaml v0.3.1/go.mod h1:0TzNpFQDXhwbkXb/ajLvxIijqbve+vMQvWY/b3/Dzxg=
 buf.build/go/spdx v0.2.0 h1:IItqM0/cMxvFJJumcBuP8NrsIzMs/UYjp/6WSpq8LTw=
 buf.build/go/spdx v0.2.0/go.mod h1:bXdwQFem9Si3nsbNy8aJKGPoaPi5DKwdeEp5/ArZ6w8=
 cel.dev/expr v0.19.1 h1:NciYrtDRIR0lNCnH1LFJegdjspNx9fI59O7TWcua/W4=
@@ -50,8 +50,8 @@ github.com/bufbuild/protocompile v0.14.1 h1:iA73zAf/fyljNjQKwYzUHD6AD4R8KMasmwa/
 github.com/bufbuild/protocompile v0.14.1/go.mod h1:ppVdAIhbr2H8asPk6k4pY7t9zB1OU5DoEw9xY/FUi1c=
 github.com/bufbuild/protoplugin v0.0.0-20240911180120-7bb73e41a54a h1:l3RhVoG0RtC61h6TVWnkniGj4TgBebuyPQRdleFAmTg=
 github.com/bufbuild/protoplugin v0.0.0-20240911180120-7bb73e41a54a/go.mod h1:c5D8gWRIZ2HLWO3gXYTtUfw/hbJyD8xikv2ooPxnklQ=
-github.com/bufbuild/protovalidate-go v0.7.3-0.20241015162221-1446f1e1d576 h1:A4TfjZJqApnAvGKDgxHqA1rG6BK1OswyNcTcnSrDbJc=
-github.com/bufbuild/protovalidate-go v0.7.3-0.20241015162221-1446f1e1d576/go.mod h1:R/UFeIPyFAh0eH7Ic/JJbO2ABdkxFuZZKDbzsI5UiwM=
+github.com/bufbuild/protovalidate-go v0.8.0 h1:Xs3kCLCJ4tQiogJ0iOXm+ClKw/KviW3nLAryCGW2I3Y=
+github.com/bufbuild/protovalidate-go v0.8.0/go.mod h1:JPWZInGm2y2NBg3vKDKdDIkvDjyLv31J3hLH5GIFc/Q=
 github.com/cenkalti/backoff/v4 v4.3.0 h1:MyRJ/UdXutAwSAT+s3wNd7MfTIcy71VQueUuFK343L8=
 github.com/cenkalti/backoff/v4 v4.3.0/go.mod h1:Y3VNntkOUPxTVeUxJ/G5vcM//AlwfmyYozVcomhLiZE=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
