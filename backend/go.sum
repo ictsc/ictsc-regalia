@@ -1,11 +1,11 @@
-buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.0-20241031151143-70f632351282.1 h1:FXEFgDFrBYuXjn3twNRo/t80qSbdKmkfZSgR2JGTuyk=
-buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.0-20241031151143-70f632351282.1/go.mod h1:/bPD5uslGsdRKBeVavIK7D7yr+3ISI0OoyUOkokSJTA=
+buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.1-20241023225133-42bdb4b67625.1 h1:ag9j0wsyF860+KXqJN2GLfck8DadNEGyRHja4FY5xtY=
+buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.1-20241023225133-42bdb4b67625.1/go.mod h1:VfQZo/3dl9O9Yg1nseI0gNGDXvLrNQfBRMMIhV9fyII=
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.1-20241127180247-a33202765966.1 h1:v223wh/bhlSHSc0tU9PXRWXHhkw3UWMtth7TmYGfHAQ=
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.1-20241127180247-a33202765966.1/go.mod h1:/zlFuuECgFgewxwW6qQKgvMJ07YZkWlVkcSxEhJprJw=
 buf.build/gen/go/bufbuild/registry/connectrpc/go v1.17.0-20241227185654-946b6dd39b27.1 h1:410axzwOITvAHu1w8pN9Gwhmk1QxrWneq6I/gowLfH8=
 buf.build/gen/go/bufbuild/registry/connectrpc/go v1.17.0-20241227185654-946b6dd39b27.1/go.mod h1:i4UUrB1UIqScCCj4d+OFXpUREDDz+p1gCl9WfjpYweY=
-buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.0-20241210175624-28487aef65cd.1 h1:NOuNS+nCp3xc4CALIC7sNz7irT63UMcYAfofrxurUfE=
-buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.0-20241210175624-28487aef65cd.1/go.mod h1:NeX3YCZgM9E/wNp9e3g/9u5bu8/OPntr7K0ygUlgrDE=
+buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.1-20241227185654-946b6dd39b27.1 h1:5vU2X68XNaJtF/NGS9shI/0X0jze8/5XH4RmHbsZg5w=
+buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.1-20241227185654-946b6dd39b27.1/go.mod h1:DgqZjUk2avpwh8jiMHBOoVXUyceQ3HxNwcRLEWWwNtQ=
 buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.1-20241007202033-cf42259fcbfc.1 h1:0Pi0EQh6z2zJigi4UonoqczBQjvOzZ0CFYUfwPRM41M=
 buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.1-20241007202033-cf42259fcbfc.1/go.mod h1:Uy8SKofLXIAUjswDmz6AIN8W+bGVTF4kNczZikMPHLM=
 buf.build/go/bufplugin v0.6.0 h1:3lhoh+0z+IUPS3ZajTPn/27LaLIkero2BDVnV7yXD1s=
