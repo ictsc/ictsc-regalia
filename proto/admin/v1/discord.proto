@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package admin.v1;
+
+option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1";
+
+message SyncTeamsRequest {}
+message SyncTeamsResponse {}
+
+message SyncUsersRequest {}
+message SyncUsersResponse {}
+
+service DiscordService {
+  rpc SyncTeams(SyncTeamsRequest) returns (SyncTeamsResponse);
+  rpc SyncUsers(SyncUsersRequest) returns (SyncUsersResponse);
+}

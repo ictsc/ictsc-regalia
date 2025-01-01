@@ -2,6 +2,7 @@
 export * from "../proto/admin/v1/actor_pb.ts";
 export * from "../proto/admin/v1/contestant_pb.ts";
 export * from "../proto/admin/v1/deployment_pb.ts";
+export * from "../proto/admin/v1/discord_pb.ts";
 export * from "../proto/admin/v1/invitation_pb.ts";
 export * from "../proto/admin/v1/mark_pb.ts";
 export * from "../proto/admin/v1/problem_pb.ts";
