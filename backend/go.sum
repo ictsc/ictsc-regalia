@@ -74,8 +74,8 @@ github.com/cockroachdb/logtags v0.0.0-20241215232642-bb51bb14a506 h1:ASDL+UJcILM
 github.com/cockroachdb/logtags v0.0.0-20241215232642-bb51bb14a506/go.mod h1:Mw7HqKr2kdtu6aYGn3tPmAftiP3QPX63LdK/zcariIo=
 github.com/cockroachdb/redact v1.1.5 h1:u1PMllDkdFfPWaNGMyLD1+so+aq3uUItthCFqzwPJ30=
 github.com/cockroachdb/redact v1.1.5/go.mod h1:BVNblN9mBWFyMyqK1k3AAiSxhvhfK2oOZZ2lK+dpvRg=
-github.com/containerd/cgroups/v3 v3.0.3 h1:S5ByHZ/h9PMe5IOQoN7E+nMc2UcLEM/V48DGDJ9kip0=
-github.com/containerd/cgroups/v3 v3.0.3/go.mod h1:8HBe7V3aWGLFPd/k03swSIsGjZhHI2WzJmticMgVuz0=
+github.com/containerd/cgroups/v3 v3.0.5 h1:44na7Ud+VwyE7LIoJ8JTNQOa549a8543BmzaJHo6Bzo=
+github.com/containerd/cgroups/v3 v3.0.5/go.mod h1:SA5DLYnXO8pTGYiAHXz94qvLQTKfVM5GEVisn4jpins=
 github.com/containerd/containerd v1.7.23 h1:H2CClyUkmpKAGlhQp95g2WXHfLYc7whAuvZGBNYOOwQ=
 github.com/containerd/containerd v1.7.23/go.mod h1:7QUzfURqZWCZV7RLNEn1XjUCQLEf0bkaK4GjUaZehxw=
 github.com/containerd/continuity v0.4.4 h1:/fNVfTJ7wIl/YPMHjf+5H32uFhl63JucB34PlCpMKII=
