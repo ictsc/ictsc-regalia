@@ -5,6 +5,7 @@ export * from "../proto/admin/v1/deployment_pb.ts";
 export * from "../proto/admin/v1/discord_pb.ts";
 export * from "../proto/admin/v1/invitation_pb.ts";
 export * from "../proto/admin/v1/mark_pb.ts";
+export * from "../proto/admin/v1/notice_pb.ts";
 export * from "../proto/admin/v1/problem_pb.ts";
 export * from "../proto/admin/v1/ranking_pb.ts";
 export * from "../proto/admin/v1/team_pb.ts";

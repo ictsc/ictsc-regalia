@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package admin.v1;
+
+option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1";
+
+message Notice {
+  string path = 1;
+  string title = 2;
+  string markdown = 3;
+}
+
+message ListNoticesRequest {}
+message ListNoticesResponse {
+  repeated Notice notices = 1;
+}
+
+message SyncNoticesRequest {
+  string path = 1;
+}
+message SyncNoticesResponse {
+  Notice notice = 1;
+}
+
+service NoticeService {
+  rpc ListNotices(ListNoticesRequest) returns (ListNoticesResponse);
+  rpc SyncNotices(SyncNoticesRequest) returns (SyncNoticesResponse);
+}
