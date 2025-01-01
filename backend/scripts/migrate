@@ -1,9 +1,7 @@
 #!/bin/sh
 # vim: ft=sh :
 
-SQLDEF_VERSION=v0.17.24
-
-PSQLDEF="go run github.com/sqldef/sqldef/cmd/psqldef@$SQLDEF_VERSION"
+PSQLDEF="go run github.com/sqldef/sqldef/cmd/psqldef"
 if which psqldef > /dev/null; then
     PSQLDEF=psqldef
 fi
