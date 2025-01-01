@@ -8,4 +8,5 @@ export * from "../proto/admin/v1/mark_pb.ts";
 export * from "../proto/admin/v1/notice_pb.ts";
 export * from "../proto/admin/v1/problem_pb.ts";
 export * from "../proto/admin/v1/ranking_pb.ts";
+export * from "../proto/admin/v1/schedule_pb.ts";
 export * from "../proto/admin/v1/team_pb.ts";
