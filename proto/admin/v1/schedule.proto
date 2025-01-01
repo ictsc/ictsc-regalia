@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package admin.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1";
+
+enum Phase {
+  PHASE_UNSPECIFIED = 0;
+  PHASE_OUT_OF_CONTEST = 1;
+  PHASE_IN_CONTEST = 2;
+  PHASE_BREAK = 3;
+  PHASE_AFTER_CONTEST = 4;
+}
+
+message Schedule {
+  Phase phase = 1;
+  google.protobuf.Timestamp start_at = 2;
+  google.protobuf.Timestamp end_at = 3;
+}
+
+message GetScheduleRequest {}
+message GetScheduleResponse {
+  repeated Schedule schedule = 1;
+}
+
+message UpdateScheduleRequest {
+  repeated Schedule schedule = 1;
+}
+message UpdateScheduleResponse {}
+
+service ScheduleService {
+  rpc GetSchedule(GetScheduleRequest) returns (GetScheduleResponse);
+  rpc UpdateSchedule(UpdateScheduleRequest) returns (UpdateScheduleResponse);
+}
