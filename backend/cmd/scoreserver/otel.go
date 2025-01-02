@@ -99,6 +99,12 @@ func newResource(ctx context.Context) (*resource.Resource, error) {
 }
 
 const (
+	exporterTypeNone       = "none"
+	exporterTypeConsole    = "console"
+	exporterTypeLogging    = "logging"
+	exporterTypeOTLP       = "otlp"
+	exporterTypePrometheus = "prometheus"
+
 	otlpProtocolGRPC         = "grpc"
 	otlpProtocolHTTPProtobuf = "http/protobuf"
 	otlpProtocolHTTPJSON     = "http/json"
@@ -117,17 +123,17 @@ func (n *noopSpanExporter) Shutdown(context.Context) error {
 }
 
 func newSpanExporter(ctx context.Context) (trace.SpanExporter, error) {
-	expType := "otlp"
+	expType := exporterTypeOTLP
 	if t := os.Getenv("OTEL_TRACES_EXPORTER"); t != "" {
 		expType = t
 	}
 	switch expType {
-	case "none":
+	case exporterTypeNone:
 		return &noopSpanExporter{}, nil
-	case "console", "logging":
+	case exporterTypeConsole, exporterTypeLogging:
 		exp, err := stdouttrace.New()
 		return exp, errors.WithStack(err)
-	case "otlp":
+	case exporterTypeOTLP:
 		proto := otlpProtocolHTTPProtobuf
 		if p := os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL"); p != "" {
 			proto = p
@@ -151,17 +157,17 @@ func newSpanExporter(ctx context.Context) (trace.SpanExporter, error) {
 }
 
 func newMericReader(ctx context.Context) (metric.Reader, error) {
-	expTyp := "otlp"
+	expTyp := exporterTypeOTLP
 	if t := os.Getenv("OTEL_METRICS_EXPORTER"); t != "" {
 		expTyp = t
 	}
 	switch expTyp {
-	case "none":
+	case exporterTypeNone:
 		// ManualReader は単体では何もしない
 		return metric.NewManualReader(), nil
-	case "prometheus":
+	case exporterTypePrometheus:
 		return newPrometheusMetricExporter()
-	case "otlp":
+	case exporterTypeOTLP:
 		proto := otlpProtocolHTTPProtobuf
 		if p := os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL"); p != "" {
 			proto = p
