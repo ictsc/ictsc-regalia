@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package contestant.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1;contestantv1";
+
+message Answer {
+  string body = 1;
+  google.protobuf.Timestamp submitted_at = 2;
+  optional int64 score = 3;
+}
+
+message ListAnswersRequest {
+  string problem_code = 1;
+}
+message ListAnswersResponse {
+  repeated Answer answers = 1;
+}
+
+message SubmitAnswerRequest {
+  string problem_code = 1;
+  string body = 2;
+}
+message SubmitAnswerResponse {
+  Answer answer = 1;
+}
+
+service AnswerService {
+  rpc ListAnswers(ListAnswersRequest) returns (ListAnswersResponse);
+  rpc SubmitAnswer(SubmitAnswerRequest) returns (SubmitAnswerResponse);
+}
