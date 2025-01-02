@@ -52,19 +52,19 @@ func NewTeamCode(code int) (TeamCode, error) {
 	return TeamCode(code), nil
 }
 
-func (t *Team) ID() uuid.UUID {
+func (t Team) ID() uuid.UUID {
 	return t.id
 }
 
-func (t *Team) Code() TeamCode {
+func (t Team) Code() TeamCode {
 	return t.code
 }
 
-func (t *Team) Name() string {
+func (t Team) Name() string {
 	return t.name
 }
 
-func (t *Team) Organization() string {
+func (t Team) Organization() string {
 	return t.organization
 }
 
