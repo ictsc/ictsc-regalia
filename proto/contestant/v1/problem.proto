@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package contestant.v1;
+
+option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1;contestantv1";
+
+message Problem {
+  // 問題コード
+  string code = 1;
+  // タイトル
+  string title = 2;
+  // 最大得点
+  int64 max_score = 3;
+
+  optional Score score = 4;
+  Deployment deployment = 5;
+  ProblemBody body = 6;
+}
+
+message Score {
+  // 採点による得点
+  int64 marked_score = 1;
+  // ペナルティによる減点
+  int64 penalty = 2;
+  // 最終的な得点
+  int64 score = 3;
+}
+
+message Deployment {
+  DeploymentStatus status = 1;
+  bool redeployable = 2;
+}
+
+enum DeploymentStatus {
+  DEPLOYMENT_STATUS_UNSPECIFIED = 0;
+  // 展開済み
+  DEPLOYMENT_STATUS_DEPLOYED = 1;
+  // 展開中
+  DEPLOYMENT_STATUS_DEPLOYING = 2;
+  // 展開失敗
+  DEPLOYMENT_STATUS_FAILED = 3;
+}
+
+message ProblemBody {
+  ProblemType type = 1;
+  oneof body {
+    DescriptiveProblem descriptive = 2;
+  }
+}
+
+enum ProblemType {
+  PROBLEM_TYPE_UNSPECIFIED = 0;
+  PROBLEM_TYPE_DESCRIPTIVE = 1;
+}
+
+message Connection {
+  // ホスト名
+  string host_name = 1;
+  // ホスト(IP アドレス or ドメイン)
+  string host = 2;
+  // ユーザ
+  optional string user = 3;
+  // パスワード
+  optional string password = 4;
+}
+
+message DescriptiveProblem {
+  // 問題文
+  string body = 1;
+  // 接続情報
+  repeated Connection connection = 2;
+}
+
+message ListProblemsRequest {}
+message ListProblemsResponse {
+  repeated Problem problems = 1;
+}
+
+message GetProblemRequest {
+  string code = 1;
+}
+message GetProblemResponse {
+  Problem problem = 1;
+}
+
+message DeployRequest {
+  string code = 1;
+}
+message DeployResponse {}
+
+service ProblemService {
+  rpc ListProblems(ListProblemsRequest) returns (ListProblemsResponse);
+  rpc GetProblem(GetProblemRequest) returns (GetProblemResponse);
+  rpc Deploy(DeployRequest) returns (DeployResponse);
+}
