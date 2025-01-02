@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package contestant.v1;
+
+option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1;contestantv1";
+
+message TeamProfile {
+  string name = 1;
+  string organization = 2;
+
+  repeated ContestantProfile members = 3;
+}
+
+message ContestantProfile {
+  string name = 1;
+  string display_name = 2;
+
+  string self_introduction = 3;
+}
+
+message ListTeamsRequest {}
+message ListTeamsResponse {
+  repeated TeamProfile teams = 1;
+}
+
+message UpdateProfileRequest {
+  ContestantProfile profile = 1;
+}
+message UpdateProfileResponse {
+  ContestantProfile profile = 1;
+}
+
+service ProfileService {
+  rpc ListTeams(ListTeamsRequest) returns (ListTeamsResponse);
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+}

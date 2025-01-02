@@ -3,5 +3,6 @@ export * from "../proto/contestant/v1/answer_pb.ts";
 export * from "../proto/contestant/v1/contest_pb.ts";
 export * from "../proto/contestant/v1/notice_pb.ts";
 export * from "../proto/contestant/v1/problem_pb.ts";
+export * from "../proto/contestant/v1/profile_pb.ts";
 export * from "../proto/contestant/v1/ranking_pb.ts";
 export * from "../proto/contestant/v1/viewer_pb.ts";
