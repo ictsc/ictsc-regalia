@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package contestant.v1;
+
+option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1;contestantv1";
+
+message Notice {
+  string title = 1;
+  string body = 2;
+}
+
+message ListNoticesRequest {}
+message ListNoticesResponse {
+  repeated Notice notices = 1;
+}
+
+service NoticeService {
+  rpc ListNotices(ListNoticesRequest) returns (ListNoticesResponse);
+}
