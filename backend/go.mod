@@ -57,7 +57,7 @@ require (
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bufbuild/protocompile v0.14.1 // indirect
-	github.com/bufbuild/protoplugin v0.0.0-20240911180120-7bb73e41a54a // indirect
+	github.com/bufbuild/protoplugin v0.0.0-20250106231243-3a819552c9d9 // indirect
 	github.com/bufbuild/protovalidate-go v0.8.2 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
