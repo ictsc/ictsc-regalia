@@ -11,7 +11,7 @@ require (
 	connectrpc.com/otelconnect v0.7.1
 	github.com/DATA-DOG/go-txdb v0.2.0
 	github.com/XSAM/otelsql v0.36.0
-	github.com/bufbuild/buf v1.48.0
+	github.com/bufbuild/buf v1.49.0
 	github.com/cockroachdb/errors v1.11.3
 	github.com/go-slog/otelslog v0.3.0
 	github.com/gofrs/uuid/v5 v5.3.0
