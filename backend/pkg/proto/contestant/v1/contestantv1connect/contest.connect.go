@@ -38,12 +38,6 @@ const (
 	ContestServiceGetScheduleProcedure = "/contestant.v1.ContestService/GetSchedule"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	contestServiceServiceDescriptor           = v1.File_contestant_v1_contest_proto.Services().ByName("ContestService")
-	contestServiceGetScheduleMethodDescriptor = contestServiceServiceDescriptor.Methods().ByName("GetSchedule")
-)
-
 // ContestServiceClient is a client for the contestant.v1.ContestService service.
 type ContestServiceClient interface {
 	GetSchedule(context.Context, *connect.Request[v1.GetScheduleRequest]) (*connect.Response[v1.GetScheduleResponse], error)
@@ -58,11 +52,12 @@ type ContestServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewContestServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ContestServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	contestServiceMethods := v1.File_contestant_v1_contest_proto.Services().ByName("ContestService").Methods()
 	return &contestServiceClient{
 		getSchedule: connect.NewClient[v1.GetScheduleRequest, v1.GetScheduleResponse](
 			httpClient,
 			baseURL+ContestServiceGetScheduleProcedure,
-			connect.WithSchema(contestServiceGetScheduleMethodDescriptor),
+			connect.WithSchema(contestServiceMethods.ByName("GetSchedule")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -89,10 +84,11 @@ type ContestServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewContestServiceHandler(svc ContestServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	contestServiceMethods := v1.File_contestant_v1_contest_proto.Services().ByName("ContestService").Methods()
 	contestServiceGetScheduleHandler := connect.NewUnaryHandler(
 		ContestServiceGetScheduleProcedure,
 		svc.GetSchedule,
-		connect.WithSchema(contestServiceGetScheduleMethodDescriptor),
+		connect.WithSchema(contestServiceMethods.ByName("GetSchedule")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/contestant.v1.ContestService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

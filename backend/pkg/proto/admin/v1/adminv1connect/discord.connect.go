@@ -41,13 +41,6 @@ const (
 	DiscordServiceSyncUsersProcedure = "/admin.v1.DiscordService/SyncUsers"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	discordServiceServiceDescriptor         = v1.File_admin_v1_discord_proto.Services().ByName("DiscordService")
-	discordServiceSyncTeamsMethodDescriptor = discordServiceServiceDescriptor.Methods().ByName("SyncTeams")
-	discordServiceSyncUsersMethodDescriptor = discordServiceServiceDescriptor.Methods().ByName("SyncUsers")
-)
-
 // DiscordServiceClient is a client for the admin.v1.DiscordService service.
 type DiscordServiceClient interface {
 	SyncTeams(context.Context, *connect.Request[v1.SyncTeamsRequest]) (*connect.Response[v1.SyncTeamsResponse], error)
@@ -63,17 +56,18 @@ type DiscordServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewDiscordServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) DiscordServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	discordServiceMethods := v1.File_admin_v1_discord_proto.Services().ByName("DiscordService").Methods()
 	return &discordServiceClient{
 		syncTeams: connect.NewClient[v1.SyncTeamsRequest, v1.SyncTeamsResponse](
 			httpClient,
 			baseURL+DiscordServiceSyncTeamsProcedure,
-			connect.WithSchema(discordServiceSyncTeamsMethodDescriptor),
+			connect.WithSchema(discordServiceMethods.ByName("SyncTeams")),
 			connect.WithClientOptions(opts...),
 		),
 		syncUsers: connect.NewClient[v1.SyncUsersRequest, v1.SyncUsersResponse](
 			httpClient,
 			baseURL+DiscordServiceSyncUsersProcedure,
-			connect.WithSchema(discordServiceSyncUsersMethodDescriptor),
+			connect.WithSchema(discordServiceMethods.ByName("SyncUsers")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -107,16 +101,17 @@ type DiscordServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewDiscordServiceHandler(svc DiscordServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	discordServiceMethods := v1.File_admin_v1_discord_proto.Services().ByName("DiscordService").Methods()
 	discordServiceSyncTeamsHandler := connect.NewUnaryHandler(
 		DiscordServiceSyncTeamsProcedure,
 		svc.SyncTeams,
-		connect.WithSchema(discordServiceSyncTeamsMethodDescriptor),
+		connect.WithSchema(discordServiceMethods.ByName("SyncTeams")),
 		connect.WithHandlerOptions(opts...),
 	)
 	discordServiceSyncUsersHandler := connect.NewUnaryHandler(
 		DiscordServiceSyncUsersProcedure,
 		svc.SyncUsers,
-		connect.WithSchema(discordServiceSyncUsersMethodDescriptor),
+		connect.WithSchema(discordServiceMethods.ByName("SyncUsers")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/admin.v1.DiscordService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

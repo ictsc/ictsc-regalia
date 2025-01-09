@@ -45,16 +45,6 @@ const (
 	TeamServiceDeleteTeamProcedure = "/admin.v1.TeamService/DeleteTeam"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	teamServiceServiceDescriptor          = v1.File_admin_v1_team_proto.Services().ByName("TeamService")
-	teamServiceListTeamsMethodDescriptor  = teamServiceServiceDescriptor.Methods().ByName("ListTeams")
-	teamServiceGetTeamMethodDescriptor    = teamServiceServiceDescriptor.Methods().ByName("GetTeam")
-	teamServiceCreateTeamMethodDescriptor = teamServiceServiceDescriptor.Methods().ByName("CreateTeam")
-	teamServiceUpdateTeamMethodDescriptor = teamServiceServiceDescriptor.Methods().ByName("UpdateTeam")
-	teamServiceDeleteTeamMethodDescriptor = teamServiceServiceDescriptor.Methods().ByName("DeleteTeam")
-)
-
 // TeamServiceClient is a client for the admin.v1.TeamService service.
 type TeamServiceClient interface {
 	ListTeams(context.Context, *connect.Request[v1.ListTeamsRequest]) (*connect.Response[v1.ListTeamsResponse], error)
@@ -73,35 +63,36 @@ type TeamServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewTeamServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) TeamServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	teamServiceMethods := v1.File_admin_v1_team_proto.Services().ByName("TeamService").Methods()
 	return &teamServiceClient{
 		listTeams: connect.NewClient[v1.ListTeamsRequest, v1.ListTeamsResponse](
 			httpClient,
 			baseURL+TeamServiceListTeamsProcedure,
-			connect.WithSchema(teamServiceListTeamsMethodDescriptor),
+			connect.WithSchema(teamServiceMethods.ByName("ListTeams")),
 			connect.WithClientOptions(opts...),
 		),
 		getTeam: connect.NewClient[v1.GetTeamRequest, v1.GetTeamResponse](
 			httpClient,
 			baseURL+TeamServiceGetTeamProcedure,
-			connect.WithSchema(teamServiceGetTeamMethodDescriptor),
+			connect.WithSchema(teamServiceMethods.ByName("GetTeam")),
 			connect.WithClientOptions(opts...),
 		),
 		createTeam: connect.NewClient[v1.CreateTeamRequest, v1.CreateTeamResponse](
 			httpClient,
 			baseURL+TeamServiceCreateTeamProcedure,
-			connect.WithSchema(teamServiceCreateTeamMethodDescriptor),
+			connect.WithSchema(teamServiceMethods.ByName("CreateTeam")),
 			connect.WithClientOptions(opts...),
 		),
 		updateTeam: connect.NewClient[v1.UpdateTeamRequest, v1.UpdateTeamResponse](
 			httpClient,
 			baseURL+TeamServiceUpdateTeamProcedure,
-			connect.WithSchema(teamServiceUpdateTeamMethodDescriptor),
+			connect.WithSchema(teamServiceMethods.ByName("UpdateTeam")),
 			connect.WithClientOptions(opts...),
 		),
 		deleteTeam: connect.NewClient[v1.DeleteTeamRequest, v1.DeleteTeamResponse](
 			httpClient,
 			baseURL+TeamServiceDeleteTeamProcedure,
-			connect.WithSchema(teamServiceDeleteTeamMethodDescriptor),
+			connect.WithSchema(teamServiceMethods.ByName("DeleteTeam")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -156,34 +147,35 @@ type TeamServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewTeamServiceHandler(svc TeamServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	teamServiceMethods := v1.File_admin_v1_team_proto.Services().ByName("TeamService").Methods()
 	teamServiceListTeamsHandler := connect.NewUnaryHandler(
 		TeamServiceListTeamsProcedure,
 		svc.ListTeams,
-		connect.WithSchema(teamServiceListTeamsMethodDescriptor),
+		connect.WithSchema(teamServiceMethods.ByName("ListTeams")),
 		connect.WithHandlerOptions(opts...),
 	)
 	teamServiceGetTeamHandler := connect.NewUnaryHandler(
 		TeamServiceGetTeamProcedure,
 		svc.GetTeam,
-		connect.WithSchema(teamServiceGetTeamMethodDescriptor),
+		connect.WithSchema(teamServiceMethods.ByName("GetTeam")),
 		connect.WithHandlerOptions(opts...),
 	)
 	teamServiceCreateTeamHandler := connect.NewUnaryHandler(
 		TeamServiceCreateTeamProcedure,
 		svc.CreateTeam,
-		connect.WithSchema(teamServiceCreateTeamMethodDescriptor),
+		connect.WithSchema(teamServiceMethods.ByName("CreateTeam")),
 		connect.WithHandlerOptions(opts...),
 	)
 	teamServiceUpdateTeamHandler := connect.NewUnaryHandler(
 		TeamServiceUpdateTeamProcedure,
 		svc.UpdateTeam,
-		connect.WithSchema(teamServiceUpdateTeamMethodDescriptor),
+		connect.WithSchema(teamServiceMethods.ByName("UpdateTeam")),
 		connect.WithHandlerOptions(opts...),
 	)
 	teamServiceDeleteTeamHandler := connect.NewUnaryHandler(
 		TeamServiceDeleteTeamProcedure,
 		svc.DeleteTeam,
-		connect.WithSchema(teamServiceDeleteTeamMethodDescriptor),
+		connect.WithSchema(teamServiceMethods.ByName("DeleteTeam")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/admin.v1.TeamService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

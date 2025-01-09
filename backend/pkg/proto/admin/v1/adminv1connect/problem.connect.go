@@ -50,16 +50,6 @@ const (
 	ProblemServiceDeleteProblemProcedure = "/admin.v1.ProblemService/DeleteProblem"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	problemServiceServiceDescriptor             = v1.File_admin_v1_problem_proto.Services().ByName("ProblemService")
-	problemServiceListProblemsMethodDescriptor  = problemServiceServiceDescriptor.Methods().ByName("ListProblems")
-	problemServiceGetProblemMethodDescriptor    = problemServiceServiceDescriptor.Methods().ByName("GetProblem")
-	problemServiceCreateProblemMethodDescriptor = problemServiceServiceDescriptor.Methods().ByName("CreateProblem")
-	problemServiceUpdateProblemMethodDescriptor = problemServiceServiceDescriptor.Methods().ByName("UpdateProblem")
-	problemServiceDeleteProblemMethodDescriptor = problemServiceServiceDescriptor.Methods().ByName("DeleteProblem")
-)
-
 // ProblemServiceClient is a client for the admin.v1.ProblemService service.
 type ProblemServiceClient interface {
 	ListProblems(context.Context, *connect.Request[v1.ListProblemsRequest]) (*connect.Response[v1.ListProblemsResponse], error)
@@ -78,35 +68,36 @@ type ProblemServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewProblemServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ProblemServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	problemServiceMethods := v1.File_admin_v1_problem_proto.Services().ByName("ProblemService").Methods()
 	return &problemServiceClient{
 		listProblems: connect.NewClient[v1.ListProblemsRequest, v1.ListProblemsResponse](
 			httpClient,
 			baseURL+ProblemServiceListProblemsProcedure,
-			connect.WithSchema(problemServiceListProblemsMethodDescriptor),
+			connect.WithSchema(problemServiceMethods.ByName("ListProblems")),
 			connect.WithClientOptions(opts...),
 		),
 		getProblem: connect.NewClient[v1.GetProblemRequest, v1.GetProblemResponse](
 			httpClient,
 			baseURL+ProblemServiceGetProblemProcedure,
-			connect.WithSchema(problemServiceGetProblemMethodDescriptor),
+			connect.WithSchema(problemServiceMethods.ByName("GetProblem")),
 			connect.WithClientOptions(opts...),
 		),
 		createProblem: connect.NewClient[v1.CreateProblemRequest, v1.CreateProblemResponse](
 			httpClient,
 			baseURL+ProblemServiceCreateProblemProcedure,
-			connect.WithSchema(problemServiceCreateProblemMethodDescriptor),
+			connect.WithSchema(problemServiceMethods.ByName("CreateProblem")),
 			connect.WithClientOptions(opts...),
 		),
 		updateProblem: connect.NewClient[v1.UpdateProblemRequest, v1.UpdateProblemResponse](
 			httpClient,
 			baseURL+ProblemServiceUpdateProblemProcedure,
-			connect.WithSchema(problemServiceUpdateProblemMethodDescriptor),
+			connect.WithSchema(problemServiceMethods.ByName("UpdateProblem")),
 			connect.WithClientOptions(opts...),
 		),
 		deleteProblem: connect.NewClient[v1.DeleteProblemRequest, v1.DeleteProblemResponse](
 			httpClient,
 			baseURL+ProblemServiceDeleteProblemProcedure,
-			connect.WithSchema(problemServiceDeleteProblemMethodDescriptor),
+			connect.WithSchema(problemServiceMethods.ByName("DeleteProblem")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -161,34 +152,35 @@ type ProblemServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewProblemServiceHandler(svc ProblemServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	problemServiceMethods := v1.File_admin_v1_problem_proto.Services().ByName("ProblemService").Methods()
 	problemServiceListProblemsHandler := connect.NewUnaryHandler(
 		ProblemServiceListProblemsProcedure,
 		svc.ListProblems,
-		connect.WithSchema(problemServiceListProblemsMethodDescriptor),
+		connect.WithSchema(problemServiceMethods.ByName("ListProblems")),
 		connect.WithHandlerOptions(opts...),
 	)
 	problemServiceGetProblemHandler := connect.NewUnaryHandler(
 		ProblemServiceGetProblemProcedure,
 		svc.GetProblem,
-		connect.WithSchema(problemServiceGetProblemMethodDescriptor),
+		connect.WithSchema(problemServiceMethods.ByName("GetProblem")),
 		connect.WithHandlerOptions(opts...),
 	)
 	problemServiceCreateProblemHandler := connect.NewUnaryHandler(
 		ProblemServiceCreateProblemProcedure,
 		svc.CreateProblem,
-		connect.WithSchema(problemServiceCreateProblemMethodDescriptor),
+		connect.WithSchema(problemServiceMethods.ByName("CreateProblem")),
 		connect.WithHandlerOptions(opts...),
 	)
 	problemServiceUpdateProblemHandler := connect.NewUnaryHandler(
 		ProblemServiceUpdateProblemProcedure,
 		svc.UpdateProblem,
-		connect.WithSchema(problemServiceUpdateProblemMethodDescriptor),
+		connect.WithSchema(problemServiceMethods.ByName("UpdateProblem")),
 		connect.WithHandlerOptions(opts...),
 	)
 	problemServiceDeleteProblemHandler := connect.NewUnaryHandler(
 		ProblemServiceDeleteProblemProcedure,
 		svc.DeleteProblem,
-		connect.WithSchema(problemServiceDeleteProblemMethodDescriptor),
+		connect.WithSchema(problemServiceMethods.ByName("DeleteProblem")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/admin.v1.ProblemService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -41,13 +41,6 @@ const (
 	AnswerServiceSubmitAnswerProcedure = "/contestant.v1.AnswerService/SubmitAnswer"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	answerServiceServiceDescriptor            = v1.File_contestant_v1_answer_proto.Services().ByName("AnswerService")
-	answerServiceListAnswersMethodDescriptor  = answerServiceServiceDescriptor.Methods().ByName("ListAnswers")
-	answerServiceSubmitAnswerMethodDescriptor = answerServiceServiceDescriptor.Methods().ByName("SubmitAnswer")
-)
-
 // AnswerServiceClient is a client for the contestant.v1.AnswerService service.
 type AnswerServiceClient interface {
 	ListAnswers(context.Context, *connect.Request[v1.ListAnswersRequest]) (*connect.Response[v1.ListAnswersResponse], error)
@@ -63,17 +56,18 @@ type AnswerServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewAnswerServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) AnswerServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	answerServiceMethods := v1.File_contestant_v1_answer_proto.Services().ByName("AnswerService").Methods()
 	return &answerServiceClient{
 		listAnswers: connect.NewClient[v1.ListAnswersRequest, v1.ListAnswersResponse](
 			httpClient,
 			baseURL+AnswerServiceListAnswersProcedure,
-			connect.WithSchema(answerServiceListAnswersMethodDescriptor),
+			connect.WithSchema(answerServiceMethods.ByName("ListAnswers")),
 			connect.WithClientOptions(opts...),
 		),
 		submitAnswer: connect.NewClient[v1.SubmitAnswerRequest, v1.SubmitAnswerResponse](
 			httpClient,
 			baseURL+AnswerServiceSubmitAnswerProcedure,
-			connect.WithSchema(answerServiceSubmitAnswerMethodDescriptor),
+			connect.WithSchema(answerServiceMethods.ByName("SubmitAnswer")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -107,16 +101,17 @@ type AnswerServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewAnswerServiceHandler(svc AnswerServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	answerServiceMethods := v1.File_contestant_v1_answer_proto.Services().ByName("AnswerService").Methods()
 	answerServiceListAnswersHandler := connect.NewUnaryHandler(
 		AnswerServiceListAnswersProcedure,
 		svc.ListAnswers,
-		connect.WithSchema(answerServiceListAnswersMethodDescriptor),
+		connect.WithSchema(answerServiceMethods.ByName("ListAnswers")),
 		connect.WithHandlerOptions(opts...),
 	)
 	answerServiceSubmitAnswerHandler := connect.NewUnaryHandler(
 		AnswerServiceSubmitAnswerProcedure,
 		svc.SubmitAnswer,
-		connect.WithSchema(answerServiceSubmitAnswerMethodDescriptor),
+		connect.WithSchema(answerServiceMethods.ByName("SubmitAnswer")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/contestant.v1.AnswerService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

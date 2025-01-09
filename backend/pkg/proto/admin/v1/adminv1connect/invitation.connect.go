@@ -47,15 +47,6 @@ const (
 	InvitationServiceDeleteInvitationCodeProcedure = "/admin.v1.InvitationService/DeleteInvitationCode"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	invitationServiceServiceDescriptor                    = v1.File_admin_v1_invitation_proto.Services().ByName("InvitationService")
-	invitationServiceListInvitationCodesMethodDescriptor  = invitationServiceServiceDescriptor.Methods().ByName("ListInvitationCodes")
-	invitationServiceCreateInvitationCodeMethodDescriptor = invitationServiceServiceDescriptor.Methods().ByName("CreateInvitationCode")
-	invitationServiceUpdateInvitationCodeMethodDescriptor = invitationServiceServiceDescriptor.Methods().ByName("UpdateInvitationCode")
-	invitationServiceDeleteInvitationCodeMethodDescriptor = invitationServiceServiceDescriptor.Methods().ByName("DeleteInvitationCode")
-)
-
 // InvitationServiceClient is a client for the admin.v1.InvitationService service.
 type InvitationServiceClient interface {
 	ListInvitationCodes(context.Context, *connect.Request[v1.ListInvitationCodesRequest]) (*connect.Response[v1.ListInvitationCodesResponse], error)
@@ -73,29 +64,30 @@ type InvitationServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewInvitationServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) InvitationServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	invitationServiceMethods := v1.File_admin_v1_invitation_proto.Services().ByName("InvitationService").Methods()
 	return &invitationServiceClient{
 		listInvitationCodes: connect.NewClient[v1.ListInvitationCodesRequest, v1.ListInvitationCodesResponse](
 			httpClient,
 			baseURL+InvitationServiceListInvitationCodesProcedure,
-			connect.WithSchema(invitationServiceListInvitationCodesMethodDescriptor),
+			connect.WithSchema(invitationServiceMethods.ByName("ListInvitationCodes")),
 			connect.WithClientOptions(opts...),
 		),
 		createInvitationCode: connect.NewClient[v1.CreateInvitationCodeRequest, v1.CreateInvitationCodeResponse](
 			httpClient,
 			baseURL+InvitationServiceCreateInvitationCodeProcedure,
-			connect.WithSchema(invitationServiceCreateInvitationCodeMethodDescriptor),
+			connect.WithSchema(invitationServiceMethods.ByName("CreateInvitationCode")),
 			connect.WithClientOptions(opts...),
 		),
 		updateInvitationCode: connect.NewClient[v1.UpdateInvitationCodeRequest, v1.UpdateInvitationCodeResponse](
 			httpClient,
 			baseURL+InvitationServiceUpdateInvitationCodeProcedure,
-			connect.WithSchema(invitationServiceUpdateInvitationCodeMethodDescriptor),
+			connect.WithSchema(invitationServiceMethods.ByName("UpdateInvitationCode")),
 			connect.WithClientOptions(opts...),
 		),
 		deleteInvitationCode: connect.NewClient[v1.DeleteInvitationCodeRequest, v1.DeleteInvitationCodeResponse](
 			httpClient,
 			baseURL+InvitationServiceDeleteInvitationCodeProcedure,
-			connect.WithSchema(invitationServiceDeleteInvitationCodeMethodDescriptor),
+			connect.WithSchema(invitationServiceMethods.ByName("DeleteInvitationCode")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -143,28 +135,29 @@ type InvitationServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewInvitationServiceHandler(svc InvitationServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	invitationServiceMethods := v1.File_admin_v1_invitation_proto.Services().ByName("InvitationService").Methods()
 	invitationServiceListInvitationCodesHandler := connect.NewUnaryHandler(
 		InvitationServiceListInvitationCodesProcedure,
 		svc.ListInvitationCodes,
-		connect.WithSchema(invitationServiceListInvitationCodesMethodDescriptor),
+		connect.WithSchema(invitationServiceMethods.ByName("ListInvitationCodes")),
 		connect.WithHandlerOptions(opts...),
 	)
 	invitationServiceCreateInvitationCodeHandler := connect.NewUnaryHandler(
 		InvitationServiceCreateInvitationCodeProcedure,
 		svc.CreateInvitationCode,
-		connect.WithSchema(invitationServiceCreateInvitationCodeMethodDescriptor),
+		connect.WithSchema(invitationServiceMethods.ByName("CreateInvitationCode")),
 		connect.WithHandlerOptions(opts...),
 	)
 	invitationServiceUpdateInvitationCodeHandler := connect.NewUnaryHandler(
 		InvitationServiceUpdateInvitationCodeProcedure,
 		svc.UpdateInvitationCode,
-		connect.WithSchema(invitationServiceUpdateInvitationCodeMethodDescriptor),
+		connect.WithSchema(invitationServiceMethods.ByName("UpdateInvitationCode")),
 		connect.WithHandlerOptions(opts...),
 	)
 	invitationServiceDeleteInvitationCodeHandler := connect.NewUnaryHandler(
 		InvitationServiceDeleteInvitationCodeProcedure,
 		svc.DeleteInvitationCode,
-		connect.WithSchema(invitationServiceDeleteInvitationCodeMethodDescriptor),
+		connect.WithSchema(invitationServiceMethods.ByName("DeleteInvitationCode")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/admin.v1.InvitationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

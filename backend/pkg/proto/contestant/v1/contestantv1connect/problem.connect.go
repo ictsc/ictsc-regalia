@@ -43,14 +43,6 @@ const (
 	ProblemServiceDeployProcedure = "/contestant.v1.ProblemService/Deploy"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	problemServiceServiceDescriptor            = v1.File_contestant_v1_problem_proto.Services().ByName("ProblemService")
-	problemServiceListProblemsMethodDescriptor = problemServiceServiceDescriptor.Methods().ByName("ListProblems")
-	problemServiceGetProblemMethodDescriptor   = problemServiceServiceDescriptor.Methods().ByName("GetProblem")
-	problemServiceDeployMethodDescriptor       = problemServiceServiceDescriptor.Methods().ByName("Deploy")
-)
-
 // ProblemServiceClient is a client for the contestant.v1.ProblemService service.
 type ProblemServiceClient interface {
 	ListProblems(context.Context, *connect.Request[v1.ListProblemsRequest]) (*connect.Response[v1.ListProblemsResponse], error)
@@ -67,23 +59,24 @@ type ProblemServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewProblemServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ProblemServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	problemServiceMethods := v1.File_contestant_v1_problem_proto.Services().ByName("ProblemService").Methods()
 	return &problemServiceClient{
 		listProblems: connect.NewClient[v1.ListProblemsRequest, v1.ListProblemsResponse](
 			httpClient,
 			baseURL+ProblemServiceListProblemsProcedure,
-			connect.WithSchema(problemServiceListProblemsMethodDescriptor),
+			connect.WithSchema(problemServiceMethods.ByName("ListProblems")),
 			connect.WithClientOptions(opts...),
 		),
 		getProblem: connect.NewClient[v1.GetProblemRequest, v1.GetProblemResponse](
 			httpClient,
 			baseURL+ProblemServiceGetProblemProcedure,
-			connect.WithSchema(problemServiceGetProblemMethodDescriptor),
+			connect.WithSchema(problemServiceMethods.ByName("GetProblem")),
 			connect.WithClientOptions(opts...),
 		),
 		deploy: connect.NewClient[v1.DeployRequest, v1.DeployResponse](
 			httpClient,
 			baseURL+ProblemServiceDeployProcedure,
-			connect.WithSchema(problemServiceDeployMethodDescriptor),
+			connect.WithSchema(problemServiceMethods.ByName("Deploy")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -124,22 +117,23 @@ type ProblemServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewProblemServiceHandler(svc ProblemServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	problemServiceMethods := v1.File_contestant_v1_problem_proto.Services().ByName("ProblemService").Methods()
 	problemServiceListProblemsHandler := connect.NewUnaryHandler(
 		ProblemServiceListProblemsProcedure,
 		svc.ListProblems,
-		connect.WithSchema(problemServiceListProblemsMethodDescriptor),
+		connect.WithSchema(problemServiceMethods.ByName("ListProblems")),
 		connect.WithHandlerOptions(opts...),
 	)
 	problemServiceGetProblemHandler := connect.NewUnaryHandler(
 		ProblemServiceGetProblemProcedure,
 		svc.GetProblem,
-		connect.WithSchema(problemServiceGetProblemMethodDescriptor),
+		connect.WithSchema(problemServiceMethods.ByName("GetProblem")),
 		connect.WithHandlerOptions(opts...),
 	)
 	problemServiceDeployHandler := connect.NewUnaryHandler(
 		ProblemServiceDeployProcedure,
 		svc.Deploy,
-		connect.WithSchema(problemServiceDeployMethodDescriptor),
+		connect.WithSchema(problemServiceMethods.ByName("Deploy")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/contestant.v1.ProblemService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

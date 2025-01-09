@@ -41,13 +41,6 @@ const (
 	ScheduleServiceUpdateScheduleProcedure = "/admin.v1.ScheduleService/UpdateSchedule"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	scheduleServiceServiceDescriptor              = v1.File_admin_v1_schedule_proto.Services().ByName("ScheduleService")
-	scheduleServiceGetScheduleMethodDescriptor    = scheduleServiceServiceDescriptor.Methods().ByName("GetSchedule")
-	scheduleServiceUpdateScheduleMethodDescriptor = scheduleServiceServiceDescriptor.Methods().ByName("UpdateSchedule")
-)
-
 // ScheduleServiceClient is a client for the admin.v1.ScheduleService service.
 type ScheduleServiceClient interface {
 	GetSchedule(context.Context, *connect.Request[v1.GetScheduleRequest]) (*connect.Response[v1.GetScheduleResponse], error)
@@ -63,17 +56,18 @@ type ScheduleServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewScheduleServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ScheduleServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	scheduleServiceMethods := v1.File_admin_v1_schedule_proto.Services().ByName("ScheduleService").Methods()
 	return &scheduleServiceClient{
 		getSchedule: connect.NewClient[v1.GetScheduleRequest, v1.GetScheduleResponse](
 			httpClient,
 			baseURL+ScheduleServiceGetScheduleProcedure,
-			connect.WithSchema(scheduleServiceGetScheduleMethodDescriptor),
+			connect.WithSchema(scheduleServiceMethods.ByName("GetSchedule")),
 			connect.WithClientOptions(opts...),
 		),
 		updateSchedule: connect.NewClient[v1.UpdateScheduleRequest, v1.UpdateScheduleResponse](
 			httpClient,
 			baseURL+ScheduleServiceUpdateScheduleProcedure,
-			connect.WithSchema(scheduleServiceUpdateScheduleMethodDescriptor),
+			connect.WithSchema(scheduleServiceMethods.ByName("UpdateSchedule")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -107,16 +101,17 @@ type ScheduleServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewScheduleServiceHandler(svc ScheduleServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	scheduleServiceMethods := v1.File_admin_v1_schedule_proto.Services().ByName("ScheduleService").Methods()
 	scheduleServiceGetScheduleHandler := connect.NewUnaryHandler(
 		ScheduleServiceGetScheduleProcedure,
 		svc.GetSchedule,
-		connect.WithSchema(scheduleServiceGetScheduleMethodDescriptor),
+		connect.WithSchema(scheduleServiceMethods.ByName("GetSchedule")),
 		connect.WithHandlerOptions(opts...),
 	)
 	scheduleServiceUpdateScheduleHandler := connect.NewUnaryHandler(
 		ScheduleServiceUpdateScheduleProcedure,
 		svc.UpdateSchedule,
-		connect.WithSchema(scheduleServiceUpdateScheduleMethodDescriptor),
+		connect.WithSchema(scheduleServiceMethods.ByName("UpdateSchedule")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/admin.v1.ScheduleService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

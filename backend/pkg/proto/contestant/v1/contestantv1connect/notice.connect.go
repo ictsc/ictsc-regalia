@@ -38,12 +38,6 @@ const (
 	NoticeServiceListNoticesProcedure = "/contestant.v1.NoticeService/ListNotices"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	noticeServiceServiceDescriptor           = v1.File_contestant_v1_notice_proto.Services().ByName("NoticeService")
-	noticeServiceListNoticesMethodDescriptor = noticeServiceServiceDescriptor.Methods().ByName("ListNotices")
-)
-
 // NoticeServiceClient is a client for the contestant.v1.NoticeService service.
 type NoticeServiceClient interface {
 	ListNotices(context.Context, *connect.Request[v1.ListNoticesRequest]) (*connect.Response[v1.ListNoticesResponse], error)
@@ -58,11 +52,12 @@ type NoticeServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewNoticeServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) NoticeServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	noticeServiceMethods := v1.File_contestant_v1_notice_proto.Services().ByName("NoticeService").Methods()
 	return &noticeServiceClient{
 		listNotices: connect.NewClient[v1.ListNoticesRequest, v1.ListNoticesResponse](
 			httpClient,
 			baseURL+NoticeServiceListNoticesProcedure,
-			connect.WithSchema(noticeServiceListNoticesMethodDescriptor),
+			connect.WithSchema(noticeServiceMethods.ByName("ListNotices")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -89,10 +84,11 @@ type NoticeServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewNoticeServiceHandler(svc NoticeServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	noticeServiceMethods := v1.File_contestant_v1_notice_proto.Services().ByName("NoticeService").Methods()
 	noticeServiceListNoticesHandler := connect.NewUnaryHandler(
 		NoticeServiceListNoticesProcedure,
 		svc.ListNotices,
-		connect.WithSchema(noticeServiceListNoticesMethodDescriptor),
+		connect.WithSchema(noticeServiceMethods.ByName("ListNotices")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/contestant.v1.NoticeService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
