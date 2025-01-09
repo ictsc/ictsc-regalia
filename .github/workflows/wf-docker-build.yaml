@@ -43,12 +43,11 @@ jobs:
       - name: Build and Push Artifacts
         uses: docker/bake-action@v6
         with:
+          source: .
           push: ${{ inputs.push-ghcr }}
-          # Metadata Action のタグ出力を加工したいのでここではラベルのみを渡す
-          # タグの情報は環境変数 DOCKER_METADATA_OUTPUT_TAGS を使って受け取る
           files: |
             docker-bake.hcl
-            ${{ steps.meta.outputs.bake-file-labels }}
+            ${{ steps.meta.outputs.bake-file }}
           # 基本的に main ブランチのキャッシュしか共有できないのでキャッシュの保存はオプトインにしておく
           set: |
             *.cache-from=type=gha
