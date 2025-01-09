@@ -41,7 +41,7 @@ jobs:
             type=ref,event=pr
             type=sha
       - name: Build and Push Artifacts
-        uses: docker/bake-action@v5
+        uses: docker/bake-action@v6
         with:
           push: ${{ inputs.push-ghcr }}
           # Metadata Action のタグ出力を加工したいのでここではラベルのみを渡す
