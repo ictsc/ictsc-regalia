@@ -2,10 +2,18 @@ group "default" {
   targets = ["backend"]
 }
 
-target "docker-metadata-action" {}
+target "docker-metadata-action" {
+  tags = []
+}
+
+target "base" {
+  args = target.docker-metadata-action.args
+  labels = target.docker-metadata-action.labels
+  annotations = target.docker-metadata-action.annotations
+}
 
 target "backend" {
-  inherits = ["docker-metadata-action"]
+  inherits = ["base"]
   context = "./backend"
   matrix = {
     image = [
@@ -14,14 +22,11 @@ target "backend" {
     ]
   }
   name = "backend-${image}"
-  tags = make_tags("${image}")
+  tags = make_tags(target.docker-metadata-action.tags, "${image}")
   target = "${image}"
 }
 
-variable "DOCKER_METADATA_OUTPUT_TAGS" {
-    default = ""
-}
 function "make_tags" {
-    params = [ns]
-    result = split("\n", replace("${DOCKER_METADATA_OUTPUT_TAGS}", ":", "/${ns}:"))
+    params = [tags, name]
+    result = split("\n", replace(join("\n", tags), ":", "/${name}:"))
 }
