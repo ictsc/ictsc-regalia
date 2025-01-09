@@ -37,12 +37,6 @@ const (
 	ViewerServiceGetViewerProcedure = "/contestant.v1.ViewerService/GetViewer"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	viewerServiceServiceDescriptor         = v1.File_contestant_v1_viewer_proto.Services().ByName("ViewerService")
-	viewerServiceGetViewerMethodDescriptor = viewerServiceServiceDescriptor.Methods().ByName("GetViewer")
-)
-
 // ViewerServiceClient is a client for the contestant.v1.ViewerService service.
 type ViewerServiceClient interface {
 	GetViewer(context.Context, *connect.Request[v1.GetViewerRequest]) (*connect.Response[v1.GetViewerResponse], error)
@@ -57,11 +51,12 @@ type ViewerServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewViewerServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ViewerServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	viewerServiceMethods := v1.File_contestant_v1_viewer_proto.Services().ByName("ViewerService").Methods()
 	return &viewerServiceClient{
 		getViewer: connect.NewClient[v1.GetViewerRequest, v1.GetViewerResponse](
 			httpClient,
 			baseURL+ViewerServiceGetViewerProcedure,
-			connect.WithSchema(viewerServiceGetViewerMethodDescriptor),
+			connect.WithSchema(viewerServiceMethods.ByName("GetViewer")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -88,10 +83,11 @@ type ViewerServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewViewerServiceHandler(svc ViewerServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	viewerServiceMethods := v1.File_contestant_v1_viewer_proto.Services().ByName("ViewerService").Methods()
 	viewerServiceGetViewerHandler := connect.NewUnaryHandler(
 		ViewerServiceGetViewerProcedure,
 		svc.GetViewer,
-		connect.WithSchema(viewerServiceGetViewerMethodDescriptor),
+		connect.WithSchema(viewerServiceMethods.ByName("GetViewer")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/contestant.v1.ViewerService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

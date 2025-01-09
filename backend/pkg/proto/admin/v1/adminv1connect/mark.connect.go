@@ -43,14 +43,6 @@ const (
 	MarkServiceCreateMarkingResultProcedure = "/admin.v1.MarkService/CreateMarkingResult"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	markServiceServiceDescriptor                   = v1.File_admin_v1_mark_proto.Services().ByName("MarkService")
-	markServiceListAnswersMethodDescriptor         = markServiceServiceDescriptor.Methods().ByName("ListAnswers")
-	markServiceListMarkingResultsMethodDescriptor  = markServiceServiceDescriptor.Methods().ByName("ListMarkingResults")
-	markServiceCreateMarkingResultMethodDescriptor = markServiceServiceDescriptor.Methods().ByName("CreateMarkingResult")
-)
-
 // MarkServiceClient is a client for the admin.v1.MarkService service.
 type MarkServiceClient interface {
 	ListAnswers(context.Context, *connect.Request[v1.ListAnswersRequest]) (*connect.Response[v1.ListAnswersResponse], error)
@@ -67,23 +59,24 @@ type MarkServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewMarkServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) MarkServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	markServiceMethods := v1.File_admin_v1_mark_proto.Services().ByName("MarkService").Methods()
 	return &markServiceClient{
 		listAnswers: connect.NewClient[v1.ListAnswersRequest, v1.ListAnswersResponse](
 			httpClient,
 			baseURL+MarkServiceListAnswersProcedure,
-			connect.WithSchema(markServiceListAnswersMethodDescriptor),
+			connect.WithSchema(markServiceMethods.ByName("ListAnswers")),
 			connect.WithClientOptions(opts...),
 		),
 		listMarkingResults: connect.NewClient[v1.ListMarkingResultsRequest, v1.ListMarkingResultsResponse](
 			httpClient,
 			baseURL+MarkServiceListMarkingResultsProcedure,
-			connect.WithSchema(markServiceListMarkingResultsMethodDescriptor),
+			connect.WithSchema(markServiceMethods.ByName("ListMarkingResults")),
 			connect.WithClientOptions(opts...),
 		),
 		createMarkingResult: connect.NewClient[v1.CreateMarkingResultRequest, v1.CreateMarkingResultResponse](
 			httpClient,
 			baseURL+MarkServiceCreateMarkingResultProcedure,
-			connect.WithSchema(markServiceCreateMarkingResultMethodDescriptor),
+			connect.WithSchema(markServiceMethods.ByName("CreateMarkingResult")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -124,22 +117,23 @@ type MarkServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewMarkServiceHandler(svc MarkServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	markServiceMethods := v1.File_admin_v1_mark_proto.Services().ByName("MarkService").Methods()
 	markServiceListAnswersHandler := connect.NewUnaryHandler(
 		MarkServiceListAnswersProcedure,
 		svc.ListAnswers,
-		connect.WithSchema(markServiceListAnswersMethodDescriptor),
+		connect.WithSchema(markServiceMethods.ByName("ListAnswers")),
 		connect.WithHandlerOptions(opts...),
 	)
 	markServiceListMarkingResultsHandler := connect.NewUnaryHandler(
 		MarkServiceListMarkingResultsProcedure,
 		svc.ListMarkingResults,
-		connect.WithSchema(markServiceListMarkingResultsMethodDescriptor),
+		connect.WithSchema(markServiceMethods.ByName("ListMarkingResults")),
 		connect.WithHandlerOptions(opts...),
 	)
 	markServiceCreateMarkingResultHandler := connect.NewUnaryHandler(
 		MarkServiceCreateMarkingResultProcedure,
 		svc.CreateMarkingResult,
-		connect.WithSchema(markServiceCreateMarkingResultMethodDescriptor),
+		connect.WithSchema(markServiceMethods.ByName("CreateMarkingResult")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/admin.v1.MarkService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

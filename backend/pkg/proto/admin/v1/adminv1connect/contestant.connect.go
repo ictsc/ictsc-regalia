@@ -38,12 +38,6 @@ const (
 	ContestantServiceListContestantsProcedure = "/admin.v1.ContestantService/ListContestants"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	contestantServiceServiceDescriptor               = v1.File_admin_v1_contestant_proto.Services().ByName("ContestantService")
-	contestantServiceListContestantsMethodDescriptor = contestantServiceServiceDescriptor.Methods().ByName("ListContestants")
-)
-
 // ContestantServiceClient is a client for the admin.v1.ContestantService service.
 type ContestantServiceClient interface {
 	ListContestants(context.Context, *connect.Request[v1.ListContestantsRequest]) (*connect.Response[v1.ListContestantsResponse], error)
@@ -58,11 +52,12 @@ type ContestantServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewContestantServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) ContestantServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	contestantServiceMethods := v1.File_admin_v1_contestant_proto.Services().ByName("ContestantService").Methods()
 	return &contestantServiceClient{
 		listContestants: connect.NewClient[v1.ListContestantsRequest, v1.ListContestantsResponse](
 			httpClient,
 			baseURL+ContestantServiceListContestantsProcedure,
-			connect.WithSchema(contestantServiceListContestantsMethodDescriptor),
+			connect.WithSchema(contestantServiceMethods.ByName("ListContestants")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -89,10 +84,11 @@ type ContestantServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewContestantServiceHandler(svc ContestantServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	contestantServiceMethods := v1.File_admin_v1_contestant_proto.Services().ByName("ContestantService").Methods()
 	contestantServiceListContestantsHandler := connect.NewUnaryHandler(
 		ContestantServiceListContestantsProcedure,
 		svc.ListContestants,
-		connect.WithSchema(contestantServiceListContestantsMethodDescriptor),
+		connect.WithSchema(contestantServiceMethods.ByName("ListContestants")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/admin.v1.ContestantService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

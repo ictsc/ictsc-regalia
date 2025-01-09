@@ -44,14 +44,6 @@ const (
 	DeploymentServiceDeployProcedure = "/admin.v1.DeploymentService/Deploy"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	deploymentServiceServiceDescriptor               = v1.File_admin_v1_deployment_proto.Services().ByName("DeploymentService")
-	deploymentServiceListDeploymentsMethodDescriptor = deploymentServiceServiceDescriptor.Methods().ByName("ListDeployments")
-	deploymentServiceSyncDeploymentMethodDescriptor  = deploymentServiceServiceDescriptor.Methods().ByName("SyncDeployment")
-	deploymentServiceDeployMethodDescriptor          = deploymentServiceServiceDescriptor.Methods().ByName("Deploy")
-)
-
 // DeploymentServiceClient is a client for the admin.v1.DeploymentService service.
 type DeploymentServiceClient interface {
 	ListDeployments(context.Context, *connect.Request[v1.ListDeploymentsRequest]) (*connect.Response[v1.ListDeploymentsResponse], error)
@@ -68,23 +60,24 @@ type DeploymentServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewDeploymentServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) DeploymentServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	deploymentServiceMethods := v1.File_admin_v1_deployment_proto.Services().ByName("DeploymentService").Methods()
 	return &deploymentServiceClient{
 		listDeployments: connect.NewClient[v1.ListDeploymentsRequest, v1.ListDeploymentsResponse](
 			httpClient,
 			baseURL+DeploymentServiceListDeploymentsProcedure,
-			connect.WithSchema(deploymentServiceListDeploymentsMethodDescriptor),
+			connect.WithSchema(deploymentServiceMethods.ByName("ListDeployments")),
 			connect.WithClientOptions(opts...),
 		),
 		syncDeployment: connect.NewClient[v1.SyncDeploymentRequest, v1.SyncDeploymentResponse](
 			httpClient,
 			baseURL+DeploymentServiceSyncDeploymentProcedure,
-			connect.WithSchema(deploymentServiceSyncDeploymentMethodDescriptor),
+			connect.WithSchema(deploymentServiceMethods.ByName("SyncDeployment")),
 			connect.WithClientOptions(opts...),
 		),
 		deploy: connect.NewClient[v1.DeployRequest, v1.DeployResponse](
 			httpClient,
 			baseURL+DeploymentServiceDeployProcedure,
-			connect.WithSchema(deploymentServiceDeployMethodDescriptor),
+			connect.WithSchema(deploymentServiceMethods.ByName("Deploy")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -125,22 +118,23 @@ type DeploymentServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewDeploymentServiceHandler(svc DeploymentServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	deploymentServiceMethods := v1.File_admin_v1_deployment_proto.Services().ByName("DeploymentService").Methods()
 	deploymentServiceListDeploymentsHandler := connect.NewUnaryHandler(
 		DeploymentServiceListDeploymentsProcedure,
 		svc.ListDeployments,
-		connect.WithSchema(deploymentServiceListDeploymentsMethodDescriptor),
+		connect.WithSchema(deploymentServiceMethods.ByName("ListDeployments")),
 		connect.WithHandlerOptions(opts...),
 	)
 	deploymentServiceSyncDeploymentHandler := connect.NewUnaryHandler(
 		DeploymentServiceSyncDeploymentProcedure,
 		svc.SyncDeployment,
-		connect.WithSchema(deploymentServiceSyncDeploymentMethodDescriptor),
+		connect.WithSchema(deploymentServiceMethods.ByName("SyncDeployment")),
 		connect.WithHandlerOptions(opts...),
 	)
 	deploymentServiceDeployHandler := connect.NewUnaryHandler(
 		DeploymentServiceDeployProcedure,
 		svc.Deploy,
-		connect.WithSchema(deploymentServiceDeployMethodDescriptor),
+		connect.WithSchema(deploymentServiceMethods.ByName("Deploy")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/admin.v1.DeploymentService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

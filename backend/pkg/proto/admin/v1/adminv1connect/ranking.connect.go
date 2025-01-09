@@ -41,13 +41,6 @@ const (
 	RankingServiceGetRankingProcedure = "/admin.v1.RankingService/GetRanking"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
-var (
-	rankingServiceServiceDescriptor          = v1.File_admin_v1_ranking_proto.Services().ByName("RankingService")
-	rankingServiceListScoreMethodDescriptor  = rankingServiceServiceDescriptor.Methods().ByName("ListScore")
-	rankingServiceGetRankingMethodDescriptor = rankingServiceServiceDescriptor.Methods().ByName("GetRanking")
-)
-
 // RankingServiceClient is a client for the admin.v1.RankingService service.
 type RankingServiceClient interface {
 	ListScore(context.Context, *connect.Request[v1.ListScoreRequest]) (*connect.Response[v1.ListScoreResponse], error)
@@ -63,17 +56,18 @@ type RankingServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewRankingServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) RankingServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
+	rankingServiceMethods := v1.File_admin_v1_ranking_proto.Services().ByName("RankingService").Methods()
 	return &rankingServiceClient{
 		listScore: connect.NewClient[v1.ListScoreRequest, v1.ListScoreResponse](
 			httpClient,
 			baseURL+RankingServiceListScoreProcedure,
-			connect.WithSchema(rankingServiceListScoreMethodDescriptor),
+			connect.WithSchema(rankingServiceMethods.ByName("ListScore")),
 			connect.WithClientOptions(opts...),
 		),
 		getRanking: connect.NewClient[v1.GetRankingRequest, v1.GetRankingResponse](
 			httpClient,
 			baseURL+RankingServiceGetRankingProcedure,
-			connect.WithSchema(rankingServiceGetRankingMethodDescriptor),
+			connect.WithSchema(rankingServiceMethods.ByName("GetRanking")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -107,16 +101,17 @@ type RankingServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewRankingServiceHandler(svc RankingServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
+	rankingServiceMethods := v1.File_admin_v1_ranking_proto.Services().ByName("RankingService").Methods()
 	rankingServiceListScoreHandler := connect.NewUnaryHandler(
 		RankingServiceListScoreProcedure,
 		svc.ListScore,
-		connect.WithSchema(rankingServiceListScoreMethodDescriptor),
+		connect.WithSchema(rankingServiceMethods.ByName("ListScore")),
 		connect.WithHandlerOptions(opts...),
 	)
 	rankingServiceGetRankingHandler := connect.NewUnaryHandler(
 		RankingServiceGetRankingProcedure,
 		svc.GetRanking,
-		connect.WithSchema(rankingServiceGetRankingMethodDescriptor),
+		connect.WithSchema(rankingServiceMethods.ByName("GetRanking")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/admin.v1.RankingService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
