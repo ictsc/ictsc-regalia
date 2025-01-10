@@ -3,13 +3,13 @@
 
 compose_file="$(dirname "$0")/../compose.yaml"
 
-export DB_HOST=127.0.0.1
-DB_PORT="$(docker compose -f "$compose_file" port postgres 5432 | cut -d: -f2)"
-export DB_PORT
-export DB_USER=ictsc
+export PGHOST=127.0.0.1
+PGPORT="$(docker compose -f "$compose_file" port postgres 5432 | cut -d: -f2)"
+export PGPORT
+export PGUSER=ictsc
 export PGPASSWORD=password
-export DB_NAME=ictscore
-export DB_DSN="host=$DB_HOST port=$DB_PORT user=$DB_USER password=$PGPASSWORD dbname=$DB_NAME sslmode=disable"
+export PGDATABASE=ictscore
+export PGSSLMODE=disable
 
 export OTEL_METRICS_EXPORTER=${OTEL_METRICS_EXPORTER:-prometheus}
 

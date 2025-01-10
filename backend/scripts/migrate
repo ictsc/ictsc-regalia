@@ -2,10 +2,10 @@
 # vim: ft=sh :
 
 PSQLDEF="go run github.com/sqldef/sqldef/cmd/psqldef"
-if which psqldef > /dev/null; then
+if which psqldef 2>/dev/null; then
     PSQLDEF=psqldef
 fi
 
 schema_file=$(dirname "$0")/../schema.sql
 
-exec $PSQLDEF --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USER" "$DB_NAME" < "$schema_file" "$@"
+exec $PSQLDEF --host="${PGHOST:-localhost}" --port="${PGPORT:-5432}" --user="${PGUSER:-ictsc}" "${PGDATABASE:-ictscore}" < "$schema_file" "$@"
