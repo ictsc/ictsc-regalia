@@ -13,7 +13,6 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/pkg/pgxutil"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin"
-	"github.com/jackc/pgx/v5"
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
@@ -31,12 +30,7 @@ type ScoreServer struct {
 }
 
 func New(cfg *Config) (*ScoreServer, error) {
-	pgcfg, err := pgx.ParseConfig(cfg.DBDSN)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse DB URL")
-	}
-
-	db := pgxutil.NewDBx(*pgcfg, pgxutil.WithOTel(true))
+	db := pgxutil.NewDBx(cfg.PgConfig, pgxutil.WithOTel(true))
 
 	adminServer := cfg.AdminAPI.new(db)
 

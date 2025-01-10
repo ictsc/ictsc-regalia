@@ -7,23 +7,18 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver"
+	"github.com/jackc/pgx/v5"
 )
 
 func newConfig() (*scoreserver.Config, error) {
-	var errs []error
-
 	adminHTTPAddr, err := netip.ParseAddrPort(*flagAdminHTTPAddr)
 	if err != nil {
-		errs = append(errs, errors.Wrap(err, "invalid admin HTTP address"))
+		return nil, errors.Wrap(err, "invalid admin HTTP address")
 	}
 
-	dsn := os.Getenv("DB_DSN")
-	if dsn == "" {
-		errs = append(errs, errors.New("DB_DSN must be set"))
-	}
-
-	if len(errs) > 0 {
-		return nil, errors.Join(errs...)
+	cfg, err := pgx.ParseConfig(os.Getenv("DB_DSN"))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to parse DB_DSN")
 	}
 
 	return &scoreserver.Config{
@@ -34,6 +29,6 @@ func newConfig() (*scoreserver.Config, error) {
 		ContestantHTTPAddress: netip.AddrPort{},
 		ContestantBaseURLs:    []url.URL{},
 
-		DBDSN: dsn,
+		PgConfig: *cfg,
 	}, nil
 }

@@ -3,6 +3,8 @@ package scoreserver
 import (
 	"net/netip"
 	"net/url"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type Config struct {
@@ -11,7 +13,7 @@ type Config struct {
 	ContestantHTTPAddress netip.AddrPort
 	ContestantBaseURLs    []url.URL
 
-	DBDSN string
+	PgConfig pgx.ConnConfig
 }
 
 type AdminAPIConfig struct {
