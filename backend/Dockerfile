@@ -3,7 +3,7 @@ FROM --platform=$BUILDPLATFORM golang AS builder
 ENV GOTOOLCHAIN=auto
 ENV CGO_ENABLED=0
 WORKDIR /src
-RUN --mount=type=cache,target=/go/pkg/mod,sharing=locked \
+RUN --mount=type=cache,target=/go/pkg/mod/,sharing=locked \
     --mount=type=bind,source=go.mod,target=go.mod \
     --mount=type=bind,source=go.sum,target=go.sum \
     go mod download
@@ -14,7 +14,7 @@ ENV GOARCH=$TARGETARCH
 
 # --- score server ---
 FROM --platform=$BUILDPLATFORM builder AS scoreserver-builder
-RUN --mount=type=cache,target=/go/pkg/mod \
+RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=cache,target=/root/.cache/go-build,sharing=locked \
     --mount=type=bind,source=.,target=. \
     go build -o /scoreserver -ldflags "-s -w" -trimpath ./cmd/scoreserver
@@ -23,14 +23,13 @@ FROM gcr.io/distroless/static-debian12:nonroot AS scoreserver
 WORKDIR /app
 EXPOSE 8080 8081
 COPY --from=scoreserver-builder --chown=nonroot:nonroot /scoreserver /
-
 ENTRYPOINT ["/scoreserver"]
 
 # -- toolbox ---
 FROM debian:12-slim AS toolbox
 # Install tools
-RUN --mount=type=cache,target=/var/lib/apt \
-    --mount=type=cache,target=/var/cache/apt \
+RUN --mount=type=cache,target=/var/lib/apt/ \
+    --mount=type=cache,target=/var/cache/apt/ \
     apt-get update && apt-get install -y \
       curl \
       postgresql-client
@@ -50,5 +49,5 @@ RUN adduser --uid ${UID} --disabled-password --gecos '' toolbox
 USER toolbox
 # Copy scripts
 WORKDIR /home/toolbox
-COPY schema.sql .
-COPY scripts ./scripts
+COPY --link schema.sql .
+COPY --link scripts ./scripts
