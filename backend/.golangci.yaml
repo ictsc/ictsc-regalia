@@ -12,6 +12,7 @@ linters:
     - gochecknoglobals
     - ireturn
     - gofumpt
+    - tagliatelle
 
 issues:
   exclude-use-default: false

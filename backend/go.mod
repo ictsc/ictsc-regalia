@@ -13,6 +13,7 @@ require (
 	github.com/XSAM/otelsql v0.36.0
 	github.com/bufbuild/buf v1.49.0
 	github.com/cockroachdb/errors v1.11.3
+	github.com/coreos/go-oidc/v3 v3.12.0
 	github.com/go-slog/otelslog v0.3.0
 	github.com/gofrs/uuid/v5 v5.3.0
 	github.com/google/go-cmp v0.6.0
@@ -36,6 +37,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.33.0
 	go.opentelemetry.io/otel/sdk/metric v1.33.0
 	golang.org/x/net v0.34.0
+	golang.org/x/oauth2 v0.25.0
 	golang.org/x/sys v0.29.0
 	google.golang.org/protobuf v1.36.2
 )
@@ -87,6 +89,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/getsentry/sentry-go v0.31.1 // indirect
 	github.com/go-chi/chi/v5 v5.2.0 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.4 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
