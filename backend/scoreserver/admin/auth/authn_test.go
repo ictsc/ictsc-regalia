@@ -3,10 +3,12 @@ package auth_test
 import (
 	"bytes"
 	"context"
+	"encoding/gob"
 	"fmt"
 	"io/fs"
 	"net"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/cockroachdb/errors"
@@ -19,6 +21,83 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 	"golang.org/x/oauth2"
 )
+
+func Test_AuthHandler(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]struct {
+		auth HTTPAuthenticatorFunc
+
+		want           auth.Viewer
+		wantStatusCode int
+	}{
+		"authenticated": {
+			auth: func(*http.Request) (*auth.Viewer, error) {
+				return &auth.Viewer{Name: "admin", Groups: []string{"admin"}}, nil
+			},
+			want: auth.Viewer{Name: "admin", Groups: []string{"admin", "system:authenticated"}},
+		},
+		"unauthenticated": {
+			auth: func(*http.Request) (*auth.Viewer, error) {
+				return nil, auth.ErrUnauthenticated
+			},
+			want: auth.Viewer{Name: "anonymous", Groups: []string{"system:unauthenticated"}},
+		},
+		"error": {
+			auth: func(*http.Request) (*auth.Viewer, error) {
+				return nil, errors.New("error")
+			},
+			wantStatusCode: http.StatusInternalServerError,
+		},
+	}
+
+	for name, tt := range cases {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			handler := auth.WithAuthn(
+				http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					viewer := auth.GetViewer(r.Context())
+
+					w.WriteHeader(http.StatusOK)
+					if err := gob.NewEncoder(w).Encode(&viewer); err != nil {
+						t.Errorf("Failed to encode response: %v", err)
+					}
+				}),
+				tt.auth,
+			)
+
+			ctx := context.Background()
+			req := httptest.NewRequestWithContext(ctx, "GET", "/", nil)
+			resp := httptest.NewRecorder()
+			handler.ServeHTTP(resp, req)
+			if t.Failed() {
+				return
+			}
+
+			if tt.wantStatusCode != 0 && resp.Code != tt.wantStatusCode {
+				t.Errorf("unexpected status code: %d", resp.Code)
+			}
+			if resp.Code != http.StatusOK {
+				return
+			}
+
+			var viewer auth.Viewer
+			if err := gob.NewDecoder(resp.Body).Decode(&viewer); err != nil {
+				t.Fatalf("Failed to decode response: %v", err)
+			}
+			if diff := cmp.Diff(tt.want, viewer); diff != "" {
+				t.Errorf("unexpected viewer: %s", diff)
+			}
+		})
+	}
+}
+
+type HTTPAuthenticatorFunc func(*http.Request) (*auth.Viewer, error)
+
+func (f HTTPAuthenticatorFunc) HandleRequest(req *http.Request) (*auth.Viewer, error) {
+	return f(req)
+}
 
 func Test_JWTAuth(t *testing.T) {
 	t.Parallel()

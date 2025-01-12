@@ -31,7 +31,7 @@ var (
 
 func GetViewer(ctx context.Context) Viewer {
 	viewer, ok := ctx.Value(viewerKey{}).(*Viewer)
-	if !ok {
+	if !ok || viewer == nil {
 		return Viewer{
 			Name:   "anonymous",
 			Groups: []string{"system:unauthenticated"},
@@ -51,9 +51,10 @@ func WithAuthn(handler http.Handler, authenticator HTTPAuthenticator) http.Handl
 			}
 		} else {
 			viewer.Groups = append(viewer.Groups, "system:authenticated")
+			ctx := context.WithValue(r.Context(), viewerKey{}, viewer)
+			r = r.WithContext(ctx)
 		}
-		ctx := context.WithValue(r.Context(), viewerKey{}, viewer)
-		handler.ServeHTTP(w, r.WithContext(ctx))
+		handler.ServeHTTP(w, r)
 	})
 }
 
