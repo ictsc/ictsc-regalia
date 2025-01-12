@@ -17,7 +17,10 @@ import (
 // nolint:gochecknoglobals
 var (
 	// flagContestantHTTPAddr = flag.String("contestant-http-addr", "0.0.0.0:8080", "Contestant API HTTP Address")
-	flagAdminHTTPAddr  = flag.String("admin-http-addr", "0.0.0.0:8081", "Admin API HTTP Address")
+	flagAdminHTTPAddr         = flag.String("admin-http-addr", "0.0.0.0:8081", "Admin API HTTP Address")
+	flagAdminAuthConfig       = flag.String("admin-auth-config", "", "Admin API authentication config file")
+	flagAdminAuthConfigInline = flag.String("admin-auth-config-inline", "", "Admin API authentication config (inline)")
+
 	flagGracefulPeriod = flag.String("graceful-period", "30s", "Graceful period before shutting down the server")
 	flagDev            = flag.Bool("dev", false, "Run in development mode")
 	flagVerbose        = flag.Bool("v", false, "Verbose logging")
@@ -58,7 +61,7 @@ func start() int {
 		return 1
 	}
 
-	server, err := scoreserver.New(cfg)
+	server, err := scoreserver.New(ctx, cfg)
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to init score server", "error", err)
 		return 1

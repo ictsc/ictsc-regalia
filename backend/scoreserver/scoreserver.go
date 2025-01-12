@@ -29,17 +29,20 @@ type ScoreServer struct {
 	adminServer *http.Server
 }
 
-func New(cfg *Config) (*ScoreServer, error) {
+func New(ctx context.Context, cfg *config.Config) (*ScoreServer, error) {
 	db := pgxutil.NewDBx(cfg.PgConfig, pgxutil.WithOTel(true))
 
-	adminServer := cfg.AdminAPI.new(db)
+	adminServer, err := newAdminAPI(ctx, cfg.AdminAPI, db)
+	if err != nil {
+		return nil, err
+	}
 
 	return &ScoreServer{
 		adminServer: adminServer,
 	}, nil
 }
 
-func (cfg *AdminAPIConfig) new(db *sqlx.DB) *http.Server {
+func newAdminAPI(ctx context.Context, cfg config.AdminAPIConfig, db *sqlx.DB) (*http.Server, error) {
 	var interceptors []connect.Interceptor
 
 	interceptors = append(interceptors,
@@ -69,7 +72,7 @@ func (cfg *AdminAPIConfig) new(db *sqlx.DB) *http.Server {
 		ReadTimeout:       readTimeout,
 		WriteTimeout:      writeTimeout,
 		MaxHeaderBytes:    maxHeaderBytes,
-	}
+	}, nil
 }
 
 func (s *ScoreServer) Start(_ context.Context) error {
