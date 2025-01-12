@@ -27,7 +27,7 @@ func newConfig() (*config.Config, error) {
 			return nil, errors.Wrap(err, "failed to read admin-auth-config")
 		}
 	}
-	var adminAuthnConfig config.AdminAuthnConfig
+	var adminAuthnConfig config.AdminAuthn
 	if err := yaml.Unmarshal(adminAuthConfigData, &adminAuthnConfig); err != nil {
 		return nil, errors.Wrap(err, "failed to parse admin-auth-config")
 	}

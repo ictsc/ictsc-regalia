@@ -18,14 +18,14 @@ type Config struct {
 
 type AdminAPIConfig struct {
 	Address netip.AddrPort
-	Authn   AdminAuthnConfig
+	Authn   AdminAuthn
 }
 
-type AdminAuthnConfig struct {
-	Issuers []IssuerConfig `yaml:"issuers"`
+type AdminAuthn struct {
+	Issuers []Issuer `yaml:"issuers"`
 }
 
-type IssuerConfig struct {
+type Issuer struct {
 	Issuer            string `yaml:"issuer"`
 	InsecureIssuerURL string `yaml:"insecure_issuer_url"`
 	ClientID          string `yaml:"client_id"`

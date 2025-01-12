@@ -13,6 +13,8 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/pkg/pgxutil"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin"
+	adminauth "github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
@@ -43,6 +45,10 @@ func New(ctx context.Context, cfg *config.Config) (*ScoreServer, error) {
 }
 
 func newAdminAPI(ctx context.Context, cfg config.AdminAPIConfig, db *sqlx.DB) (*http.Server, error) {
+	authenticator, err := adminauth.NewJWTAuthenticator(ctx, cfg.Authn)
+	if err != nil {
+		return nil, err
+	}
 	var interceptors []connect.Interceptor
 
 	interceptors = append(interceptors,
@@ -61,6 +67,7 @@ func newAdminAPI(ctx context.Context, cfg config.AdminAPIConfig, db *sqlx.DB) (*
 	mux.Handle(grpchealth.NewHandler(checker))
 
 	handler := http.Handler(mux)
+	handler = adminauth.WithAuthn(handler, authenticator)
 
 	// gRPC requires HTTP/2
 	handler = h2c.NewHandler(handler, &http2.Server{})
