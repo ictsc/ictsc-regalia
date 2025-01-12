@@ -14,6 +14,7 @@ require (
 	github.com/bufbuild/buf v1.49.0
 	github.com/cockroachdb/errors v1.11.3
 	github.com/coreos/go-oidc/v3 v3.12.0
+	github.com/docker/go-connections v0.5.0
 	github.com/go-slog/otelslog v0.3.0
 	github.com/gofrs/uuid/v5 v5.3.0
 	github.com/google/go-cmp v0.6.0
@@ -84,7 +85,6 @@ require (
 	github.com/docker/distribution v2.8.3+incompatible // indirect
 	github.com/docker/docker v27.4.1+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.8.2 // indirect
-	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/felixge/fgprof v0.9.5 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
