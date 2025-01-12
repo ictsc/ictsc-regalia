@@ -48,6 +48,9 @@ linters-settings:
       - db
       - to
       - i
+    ignore-decls:
+      - w http.ResponseWriter
+      - r *http.Request
   wrapcheck:
     ignoreSigs:
       - .Wrap(
