@@ -13,6 +13,8 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/pkg/pgxutil"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin"
+	adminauth "github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
@@ -29,17 +31,24 @@ type ScoreServer struct {
 	adminServer *http.Server
 }
 
-func New(cfg *Config) (*ScoreServer, error) {
+func New(ctx context.Context, cfg *config.Config) (*ScoreServer, error) {
 	db := pgxutil.NewDBx(cfg.PgConfig, pgxutil.WithOTel(true))
 
-	adminServer := cfg.AdminAPI.new(db)
+	adminServer, err := newAdminAPI(ctx, cfg.AdminAPI, db)
+	if err != nil {
+		return nil, err
+	}
 
 	return &ScoreServer{
 		adminServer: adminServer,
 	}, nil
 }
 
-func (cfg *AdminAPIConfig) new(db *sqlx.DB) *http.Server {
+func newAdminAPI(ctx context.Context, cfg config.AdminAPIConfig, db *sqlx.DB) (*http.Server, error) {
+	authenticator, err := adminauth.NewJWTAuthenticator(ctx, cfg.Authn)
+	if err != nil {
+		return nil, err
+	}
 	var interceptors []connect.Interceptor
 
 	interceptors = append(interceptors,
@@ -58,6 +67,7 @@ func (cfg *AdminAPIConfig) new(db *sqlx.DB) *http.Server {
 	mux.Handle(grpchealth.NewHandler(checker))
 
 	handler := http.Handler(mux)
+	handler = adminauth.WithAuthn(handler, authenticator)
 
 	// gRPC requires HTTP/2
 	handler = h2c.NewHandler(handler, &http2.Server{})
@@ -69,7 +79,7 @@ func (cfg *AdminAPIConfig) new(db *sqlx.DB) *http.Server {
 		ReadTimeout:       readTimeout,
 		WriteTimeout:      writeTimeout,
 		MaxHeaderBytes:    maxHeaderBytes,
-	}
+	}, nil
 }
 
 func (s *ScoreServer) Start(_ context.Context) error {
