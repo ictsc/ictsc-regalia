@@ -11,18 +11,18 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func newConfig() (*config.Config, error) {
-	adminHTTPAddr, err := netip.ParseAddrPort(*flagAdminHTTPAddr)
+func newConfig(opts *CLIOption) (*config.Config, error) {
+	adminHTTPAddr, err := netip.ParseAddrPort(opts.AdminHTTPAddr)
 	if err != nil {
 		return nil, errors.Wrap(err, "invalid admin HTTP address")
 	}
 
-	adminAuthConfigData := []byte(*flagAdminAuthConfigInline)
-	if *flagAdminAuthConfig != "" {
+	adminAuthConfigData := []byte(opts.AdminAuthConfigInline)
+	if opts.AdminAuthConfig != "" {
 		if len(adminAuthConfigData) != 0 {
 			return nil, errors.New("both admin-auth-config and admin-auth-config-inline are specified")
 		}
-		adminAuthConfigData, err = os.ReadFile(*flagAdminAuthConfig)
+		adminAuthConfigData, err = os.ReadFile(opts.AdminAuthConfig)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to read admin-auth-config")
 		}

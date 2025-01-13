@@ -14,36 +14,26 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-// nolint:gochecknoglobals
-var (
-	// flagContestantHTTPAddr = flag.String("contestant-http-addr", "0.0.0.0:8080", "Contestant API HTTP Address")
-	flagAdminHTTPAddr         = flag.String("admin-http-addr", "0.0.0.0:8081", "Admin API HTTP Address")
-	flagAdminAuthConfig       = flag.String("admin-auth-config", "", "Admin API authentication config file")
-	flagAdminAuthConfigInline = flag.String("admin-auth-config-inline", "", "Admin API authentication config (inline)")
-
-	flagGracefulPeriod = flag.String("graceful-period", "30s", "Graceful period before shutting down the server")
-	flagDev            = flag.Bool("dev", false, "Run in development mode")
-	flagVerbose        = flag.Bool("v", false, "Verbose logging")
-)
-
 func main() {
-	os.Exit(start())
+	fs := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	opts := NewOption(fs)
+	_ = fs.Parse(os.Args[1:])
+
+	os.Exit(start(opts))
 }
 
-func start() int {
-	flag.Parse()
-
+func start(opts *CLIOption) int {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, unix.SIGTERM)
 	defer stop()
 
 	logLevel := slog.LevelInfo
-	if *flagVerbose {
+	if opts.Verbose {
 		logLevel = slog.LevelDebug
 	}
 
-	slog.SetDefault(slog.New(slogutil.NewHandler(*flagDev, logLevel)))
+	slog.SetDefault(slog.New(slogutil.NewHandler(opts.Dev, logLevel)))
 
-	gracefulPeriod, err := parseGracefulPeriod()
+	gracefulPeriod, err := parseGracefulPeriod(opts.GracefulPeriod)
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to parse graceful period", "error", err)
 		return 1
@@ -55,7 +45,7 @@ func start() int {
 		return 1
 	}
 
-	cfg, err := newConfig()
+	cfg, err := newConfig(opts)
 	if err != nil {
 		slog.Error("Failed to create app config", "error", err)
 		return 1
@@ -91,8 +81,8 @@ func start() int {
 	return 0
 }
 
-func parseGracefulPeriod() (time.Duration, error) {
-	gracefulPeriod, err := time.ParseDuration(*flagGracefulPeriod)
+func parseGracefulPeriod(s string) (time.Duration, error) {
+	gracefulPeriod, err := time.ParseDuration(s)
 	if err != nil {
 		return 0, errors.WithStack(err)
 	}
