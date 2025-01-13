@@ -6,48 +6,25 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"time"
 
-	"github.com/cockroachdb/errors"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/slogutil"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver"
 	"golang.org/x/sys/unix"
 )
 
-// nolint:gochecknoglobals
-var (
-	// flagContestantHTTPAddr = flag.String("contestant-http-addr", "0.0.0.0:8080", "Contestant API HTTP Address")
-	flagAdminHTTPAddr         = flag.String("admin-http-addr", "0.0.0.0:8081", "Admin API HTTP Address")
-	flagAdminAuthConfig       = flag.String("admin-auth-config", "", "Admin API authentication config file")
-	flagAdminAuthConfigInline = flag.String("admin-auth-config-inline", "", "Admin API authentication config (inline)")
-
-	flagGracefulPeriod = flag.String("graceful-period", "30s", "Graceful period before shutting down the server")
-	flagDev            = flag.Bool("dev", false, "Run in development mode")
-	flagVerbose        = flag.Bool("v", false, "Verbose logging")
-)
-
 func main() {
-	os.Exit(start())
+	fs := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
+	opts := NewOption(fs)
+	_ = fs.Parse(os.Args[1:])
+
+	os.Exit(start(opts))
 }
 
-func start() int {
-	flag.Parse()
-
+func start(opts *CLIOption) int {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, unix.SIGTERM)
 	defer stop()
 
-	logLevel := slog.LevelInfo
-	if *flagVerbose {
-		logLevel = slog.LevelDebug
-	}
-
-	slog.SetDefault(slog.New(slogutil.NewHandler(*flagDev, logLevel)))
-
-	gracefulPeriod, err := parseGracefulPeriod()
-	if err != nil {
-		slog.ErrorContext(ctx, "Failed to parse graceful period", "error", err)
-		return 1
-	}
+	slog.SetDefault(slog.New(slogutil.NewHandler(os.Stdout, opts.LogFormat, opts.LogLevel)))
 
 	shutdownOTel, err := setupOpenTelemetry(ctx)
 	if err != nil {
@@ -55,7 +32,7 @@ func start() int {
 		return 1
 	}
 
-	cfg, err := newConfig()
+	cfg, err := newConfig(opts)
 	if err != nil {
 		slog.Error("Failed to create app config", "error", err)
 		return 1
@@ -74,8 +51,8 @@ func start() int {
 
 	<-ctx.Done()
 
-	slog.Info("Shutting down the server gracefully", "graceful_period", gracefulPeriod)
-	ctx, cancel := context.WithTimeout(context.Background(), gracefulPeriod)
+	slog.Info("Shutting down the server gracefully", "graceful_period", opts.GracefulPeriod)
+	ctx, cancel := context.WithTimeout(context.Background(), opts.GracefulPeriod)
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
@@ -89,15 +66,4 @@ func start() int {
 	}
 
 	return 0
-}
-
-func parseGracefulPeriod() (time.Duration, error) {
-	gracefulPeriod, err := time.ParseDuration(*flagGracefulPeriod)
-	if err != nil {
-		return 0, errors.WithStack(err)
-	}
-	if gracefulPeriod < 0 {
-		return 0, errors.New("graceful period must be positive")
-	}
-	return gracefulPeriod, nil
 }
