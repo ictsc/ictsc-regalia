@@ -36,7 +36,7 @@ func newConfig(opts *CLIOption) (*config.Config, error) {
 
 	return &config.Config{
 		AdminAPI: config.AdminAPIConfig{
-			Address: netip.AddrPort(opts.AdminHTTPAddr),
+			Address: opts.AdminHTTPAddr,
 			Authn:   adminAuthnConfig,
 		},
 
