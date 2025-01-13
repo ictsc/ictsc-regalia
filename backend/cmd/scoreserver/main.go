@@ -6,9 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"time"
 
-	"github.com/cockroachdb/errors"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/slogutil"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver"
 	"golang.org/x/sys/unix"
@@ -32,12 +30,6 @@ func start(opts *CLIOption) int {
 	}
 
 	slog.SetDefault(slog.New(slogutil.NewHandler(opts.Dev, logLevel)))
-
-	gracefulPeriod, err := parseGracefulPeriod(opts.GracefulPeriod)
-	if err != nil {
-		slog.ErrorContext(ctx, "Failed to parse graceful period", "error", err)
-		return 1
-	}
 
 	shutdownOTel, err := setupOpenTelemetry(ctx)
 	if err != nil {
@@ -64,8 +56,8 @@ func start(opts *CLIOption) int {
 
 	<-ctx.Done()
 
-	slog.Info("Shutting down the server gracefully", "graceful_period", gracefulPeriod)
-	ctx, cancel := context.WithTimeout(context.Background(), gracefulPeriod)
+	slog.Info("Shutting down the server gracefully", "graceful_period", opts.GracefulPeriod.String())
+	ctx, cancel := context.WithTimeout(context.Background(), opts.GracefulPeriod.Duration)
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
@@ -79,15 +71,4 @@ func start(opts *CLIOption) int {
 	}
 
 	return 0
-}
-
-func parseGracefulPeriod(s string) (time.Duration, error) {
-	gracefulPeriod, err := time.ParseDuration(s)
-	if err != nil {
-		return 0, errors.WithStack(err)
-	}
-	if gracefulPeriod < 0 {
-		return 0, errors.New("graceful period must be positive")
-	}
-	return gracefulPeriod, nil
 }
