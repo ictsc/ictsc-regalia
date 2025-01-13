@@ -1,7 +1,6 @@
 package auth_test
 
 import (
-	"bytes"
 	"context"
 	"encoding/gob"
 	"fmt"
@@ -233,7 +232,7 @@ const (
 	dexImage       = "dexidp/dex:v2.41.1"
 	dexWebHTTPPort = "5556/tcp"
 	dexConfigYAML  = `
-issuer: %q
+issuer: "%s"
 
 storage:
   type: sqlite3
@@ -275,18 +274,6 @@ func setupDex(tb testing.TB, _ dexConfig) string {
 				"while [ ! -f /etc/dex/dex.yaml ]; do sleep 1; done; /usr/local/bin/dex serve /etc/dex/dex.yaml",
 			},
 			ExposedPorts: []string{dexWebHTTPPort, "5558/tcp"},
-			Files: []testcontainers.ContainerFile{
-				{
-					ContainerFilePath: "/etc/dex/dex.yaml",
-					FileMode:          int64(fs.ModePerm),
-					Reader:            bytes.NewReader([]byte(dexConfigYAML)),
-				},
-			},
-			LogConsumerCfg: &testcontainers.LogConsumerConfig{
-				Consumers: []testcontainers.LogConsumer{
-					&testcontainers.StdoutLogConsumer{},
-				},
-			},
 		},
 		Logger:  testcontainers.TestLogger(tb),
 		Started: true,
