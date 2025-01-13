@@ -24,7 +24,7 @@ func start(opts *CLIOption) int {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, unix.SIGTERM)
 	defer stop()
 
-	slog.SetDefault(slog.New(slogutil.NewHandler(opts.Dev, opts.LogLevel)))
+	slog.SetDefault(slog.New(slogutil.NewHandler(os.Stdout, opts.LogFormat, opts.LogLevel)))
 
 	shutdownOTel, err := setupOpenTelemetry(ctx)
 	if err != nil {

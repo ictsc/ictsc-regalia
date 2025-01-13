@@ -5,12 +5,13 @@ import (
 	"log/slog"
 	"net/netip"
 	"time"
+
+	"github.com/ictsc/ictsc-regalia/backend/pkg/slogutil"
 )
 
 type CLIOption struct {
-	Dev bool
-
 	GracefulPeriod time.Duration
+	LogFormat      slogutil.Format
 	LogLevel       slog.Level
 
 	AdminHTTPAddr         netip.AddrPort
@@ -24,9 +25,8 @@ type CLIOption struct {
 func NewOption(fs *flag.FlagSet) *CLIOption {
 	opt := CLIOption{}
 
-	fs.BoolVar(&opt.Dev, "dev", false, "Development mode")
-
 	fs.DurationVar(&opt.GracefulPeriod, "graceful-period", 30*time.Second, "Graceful period for shutdown")
+	fs.TextVar(&opt.LogFormat, "log-format", slogutil.FormatJSON, "Log format (json, console, pretty)")
 	fs.TextVar(&opt.LogLevel, "log-level", slog.LevelInfo, "Log level")
 
 	fs.TextVar(&opt.AdminHTTPAddr, "admin.http-addr", netip.MustParseAddrPort("127.0.0.1:8081"), "Admin HTTP server address")
@@ -35,6 +35,12 @@ func NewOption(fs *flag.FlagSet) *CLIOption {
 
 	fs.BoolFunc("v", "Verbose logging", func(string) error {
 		opt.LogLevel = slog.LevelDebug
+		return nil
+	})
+
+	fs.BoolFunc("dev", "Development mode", func(string) error {
+		opt.LogFormat = slogutil.FormatPretty
+
 		return nil
 	})
 

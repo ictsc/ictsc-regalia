@@ -2,8 +2,8 @@ package slogutil
 
 import (
 	"fmt"
+	"io"
 	"log/slog"
-	"os"
 	"strings"
 	"time"
 
@@ -14,21 +14,26 @@ import (
 	slogformatter "github.com/samber/slog-formatter"
 )
 
-func NewHandler(dev bool, level slog.Leveler) slog.Handler {
+func NewHandler(out io.Writer, format Format, level slog.Leveler) slog.Handler {
 	var handler slog.Handler
-	if dev {
-		handler = console.NewHandler(os.Stderr, &console.HandlerOptions{
+	switch format {
+	case FormatJSON:
+		handler = slog.NewJSONHandler(out, &slog.HandlerOptions{
+			AddSource: true,
+			Level:     level,
+		})
+	case FormatConsole:
+		handler = slog.NewTextHandler(out, &slog.HandlerOptions{
+			AddSource: true,
+			Level:     level,
+		})
+	case FormatPretty:
+		handler = console.NewHandler(out, &console.HandlerOptions{
 			AddSource:  true,
 			Level:      level,
 			NoColor:    false,
 			TimeFormat: time.RFC3339,
 			Theme:      console.NewDefaultTheme(),
-		})
-	} else {
-		handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-			AddSource:   true,
-			Level:       level,
-			ReplaceAttr: nil,
 		})
 	}
 
