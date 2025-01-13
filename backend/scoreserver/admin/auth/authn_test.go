@@ -282,6 +282,11 @@ func setupDex(tb testing.TB, _ dexConfig) string {
 					Reader:            bytes.NewReader([]byte(dexConfigYAML)),
 				},
 			},
+			LogConsumerCfg: &testcontainers.LogConsumerConfig{
+				Consumers: []testcontainers.LogConsumer{
+					&testcontainers.StdoutLogConsumer{},
+				},
+			},
 		},
 		Logger:  testcontainers.TestLogger(tb),
 		Started: true,
