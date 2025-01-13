@@ -43,9 +43,11 @@ func setupEnforcer(tb testing.TB) *auth.Enforcer {
 }
 
 func setupServer(tb testing.TB, handler http.Handler) *httptest.Server {
+	tb.Helper()
+
 	handler = auth.WithAuthn(handler, &staticAuthenticator{
 		Viewer: auth.Viewer{
-			Name: "tester",
+			Name:   "tester",
 			Groups: []string{"tester"},
 		},
 	})
