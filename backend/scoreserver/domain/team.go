@@ -46,7 +46,7 @@ func NewTeam(input TeamInput) (*Team, error) {
 }
 
 func NewTeamCode(code int) (TeamCode, error) {
-	if code < 0 || 100 < code {
+	if code < 1 || 99 < code {
 		return 0, NewError(ErrTypeInvalidArgument, errors.New("invalid team code"))
 	}
 	return TeamCode(code), nil

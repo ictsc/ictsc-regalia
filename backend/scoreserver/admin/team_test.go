@@ -157,7 +157,7 @@ func TestAdminTeamService_Get(t *testing.T) {
 			},
 		},
 		"no code": {
-			in:       &adminv1.GetTeamRequest{Code: 100},
+			in:       &adminv1.GetTeamRequest{Code: 10},
 			wantCode: connect.CodeNotFound,
 		},
 	}
@@ -210,7 +210,7 @@ func TestAdminTeamService_Update(t *testing.T) {
 			wantCode: connect.CodeInvalidArgument,
 		},
 		"no team": {
-			in:       &adminv1.UpdateTeamRequest{Team: &adminv1.Team{Code: 100}},
+			in:       &adminv1.UpdateTeamRequest{Team: &adminv1.Team{Code: 10}},
 			wantCode: connect.CodeNotFound,
 		},
 	}
@@ -252,7 +252,7 @@ func TestAdminTeamService_Delete(t *testing.T) {
 			wants: &adminv1.DeleteTeamResponse{},
 		},
 		"no team": {
-			in:       &adminv1.DeleteTeamRequest{Code: 100},
+			in:       &adminv1.DeleteTeamRequest{Code: 10},
 			wantCode: connect.CodeNotFound,
 		},
 	}
