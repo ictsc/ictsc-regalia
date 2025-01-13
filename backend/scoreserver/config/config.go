@@ -8,7 +8,7 @@ import (
 )
 
 type Config struct {
-	AdminAPI AdminAPIConfig
+	AdminAPI AdminAPI
 
 	ContestantHTTPAddress netip.AddrPort
 	ContestantBaseURLs    []url.URL
@@ -16,7 +16,7 @@ type Config struct {
 	PgConfig pgx.ConnConfig
 }
 
-type AdminAPIConfig struct {
+type AdminAPI struct {
 	Address netip.AddrPort
 	Authn   AdminAuthn
 	Authz   AdminAuthz

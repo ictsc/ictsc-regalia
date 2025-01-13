@@ -35,7 +35,7 @@ func newConfig(opts *CLIOption) (*config.Config, error) {
 	}
 
 	return &config.Config{
-		AdminAPI: config.AdminAPIConfig{
+		AdminAPI: config.AdminAPI{
 			Address: opts.AdminHTTPAddr,
 			Authn:   adminAuthnConfig,
 		},
