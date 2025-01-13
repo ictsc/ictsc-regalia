@@ -56,8 +56,8 @@ func start(opts *CLIOption) int {
 
 	<-ctx.Done()
 
-	slog.Info("Shutting down the server gracefully", "graceful_period", opts.GracefulPeriod.String())
-	ctx, cancel := context.WithTimeout(context.Background(), opts.GracefulPeriod.Duration)
+	slog.Info("Shutting down the server gracefully", "graceful_period", opts.GracefulPeriod)
+	ctx, cancel := context.WithTimeout(context.Background(), opts.GracefulPeriod)
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {

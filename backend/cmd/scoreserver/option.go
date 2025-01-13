@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"net/netip"
 	"time"
 )
 
@@ -11,7 +12,7 @@ type CLIOption struct {
 
 	GracefulPeriod time.Duration
 
-	AdminHTTPAddr         string
+	AdminHTTPAddr         AddrPortValue
 	AdminAuthConfig       string
 	AdminAuthConfigInline string
 }
@@ -27,9 +28,24 @@ func NewOption(fs *flag.FlagSet) *CLIOption {
 
 	fs.DurationVar(&opt.GracefulPeriod, "graceful-period", 30*time.Second, "Graceful period for shutdown")
 
-	fs.StringVar(&opt.AdminHTTPAddr, "admin.http-addr", "0.0.0.0:8080", "Admin HTTP server address")
+	opt.AdminHTTPAddr = AddrPortValue(netip.MustParseAddrPort("127.0.0.1:8081"))
+	fs.Var(&opt.AdminHTTPAddr, "admin.http-addr", "Admin HTTP server address")
 	fs.StringVar(&opt.AdminAuthConfig, "admin.auth-config", "", "Admin API authentication config file")
 	fs.StringVar(&opt.AdminAuthConfigInline, "admin.auth-config-inline", "", "Admin API authentication config (inline)")
 
 	return &opt
+}
+
+type AddrPortValue netip.AddrPort
+
+func (v *AddrPortValue) Set(s string) error {
+	addrPort, err := netip.ParseAddrPort(s)
+	if err != nil {
+		return err
+	}
+	*v = AddrPortValue(addrPort)
+	return nil
+}
+func (v *AddrPortValue) String() string {
+	return netip.AddrPort(*v).String()
 }

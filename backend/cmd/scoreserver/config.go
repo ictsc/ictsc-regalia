@@ -12,10 +12,7 @@ import (
 )
 
 func newConfig(opts *CLIOption) (*config.Config, error) {
-	adminHTTPAddr, err := netip.ParseAddrPort(opts.AdminHTTPAddr)
-	if err != nil {
-		return nil, errors.Wrap(err, "invalid admin HTTP address")
-	}
+	var err error
 
 	adminAuthConfigData := []byte(opts.AdminAuthConfigInline)
 	if opts.AdminAuthConfig != "" {
@@ -39,7 +36,7 @@ func newConfig(opts *CLIOption) (*config.Config, error) {
 
 	return &config.Config{
 		AdminAPI: config.AdminAPIConfig{
-			Address: adminHTTPAddr,
+			Address: netip.AddrPort(opts.AdminHTTPAddr),
 			Authn:   adminAuthnConfig,
 		},
 
