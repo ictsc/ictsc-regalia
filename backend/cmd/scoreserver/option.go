@@ -15,8 +15,8 @@ type CLIOption struct {
 	LogLevel       slog.Level
 
 	AdminHTTPAddr         netip.AddrPort
-	AdminAuthConfig       string
-	AdminAuthConfigInline string
+	AdminAuthConfigFile       string
+	AdminAuthConfig string
 }
 
 // NewOption creates a new CLIOption combined with the given flag.FlagSet.
@@ -30,8 +30,8 @@ func NewOption(fs *flag.FlagSet) *CLIOption {
 	fs.TextVar(&opt.LogLevel, "log-level", slog.LevelInfo, "Log level")
 
 	fs.TextVar(&opt.AdminHTTPAddr, "admin.http-addr", netip.MustParseAddrPort("127.0.0.1:8081"), "Admin HTTP server address")
-	fs.StringVar(&opt.AdminAuthConfig, "admin.auth-config", "", "Admin API authentication config file")
-	fs.StringVar(&opt.AdminAuthConfigInline, "admin.auth-config-inline", "", "Admin API authentication config (inline)")
+	fs.StringVar(&opt.AdminAuthConfig, "admin.auth-config", "", "Admin API authentication config")
+	fs.StringVar(&opt.AdminAuthConfigFile, "admin.auth-config-file", "", "Admin API authentication config file")
 
 	fs.BoolFunc("v", "Verbose logging", func(string) error {
 		opt.LogLevel = slog.LevelDebug
