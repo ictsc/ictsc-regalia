@@ -14,9 +14,9 @@ type CLIOption struct {
 	LogFormat      slogutil.Format
 	LogLevel       slog.Level
 
-	AdminHTTPAddr         netip.AddrPort
-	AdminAuthConfigFile       string
-	AdminAuthConfig string
+	AdminHTTPAddr       netip.AddrPort
+	AdminAuthConfigFile string
+	AdminAuthConfig     string
 }
 
 // NewOption creates a new CLIOption combined with the given flag.FlagSet.
