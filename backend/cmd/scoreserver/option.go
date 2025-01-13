@@ -45,6 +45,10 @@ func NewOption(fs *flag.FlagSet) *CLIOption {
 	fs.BoolFunc("dev", "Development mode", func(string) error {
 		opt.LogFormat = slogutil.FormatPretty
 
+		if opt.AdminAuthPolicy == "" && opt.AdminAuthPolicyFile == "" {
+			opt.AdminAuthPolicy = "g, system:unauthenticated, role:admin"
+		}
+
 		return nil
 	})
 
