@@ -19,6 +19,7 @@ type Config struct {
 type AdminAPIConfig struct {
 	Address netip.AddrPort
 	Authn   AdminAuthn
+	Authz   AdminAuthz
 }
 
 type AdminAuthn struct {
@@ -33,4 +34,8 @@ type Issuer struct {
 
 	UsernameKey string   `yaml:"username_key"`
 	GroupKeys   []string `yaml:"group_keys"`
+}
+
+type AdminAuthz struct {
+	Policy string
 }
