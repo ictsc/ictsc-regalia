@@ -12,6 +12,7 @@ require (
 	github.com/DATA-DOG/go-txdb v0.2.0
 	github.com/XSAM/otelsql v0.36.0
 	github.com/bufbuild/buf v1.49.0
+	github.com/casbin/casbin/v2 v2.103.0
 	github.com/cockroachdb/errors v1.11.3
 	github.com/coreos/go-oidc/v3 v3.12.0
 	github.com/docker/go-connections v0.5.0
@@ -60,9 +61,11 @@ require (
 	github.com/Microsoft/hcsshim v0.12.9 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/bmatcuk/doublestar/v4 v4.7.1 // indirect
 	github.com/bufbuild/protocompile v0.14.1 // indirect
 	github.com/bufbuild/protoplugin v0.0.0-20250106231243-3a819552c9d9 // indirect
 	github.com/bufbuild/protovalidate-go v0.8.2 // indirect
+	github.com/casbin/govaluate v1.3.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20241215232642-bb51bb14a506 // indirect

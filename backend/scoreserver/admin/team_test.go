@@ -3,7 +3,6 @@ package admin_test
 import (
 	"context"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"connectrpc.com/connect"
@@ -290,12 +289,14 @@ func setupTeamService(t *testing.T) (adminv1connect.TeamServiceClient, *sqlx.DB)
 		t.FailNow()
 	}
 
-	handler := admin.NewTeamServiceHandler(db)
+	enforcer := setupEnforcer(t)
+	repo := pg.NewRepository(db)
+
+	handler := admin.NewTeamServiceHandler(enforcer, repo)
 	mux := http.NewServeMux()
 	mux.Handle(adminv1connect.NewTeamServiceHandler(handler))
 
-	server := httptest.NewServer(mux)
-	t.Cleanup(server.Close)
+	server := setupServer(t, mux)
 
 	client := adminv1connect.NewTeamServiceClient(http.DefaultClient, server.URL)
 	return client, db

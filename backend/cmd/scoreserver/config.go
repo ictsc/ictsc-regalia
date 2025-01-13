@@ -17,16 +17,28 @@ func newConfig(opts *CLIOption) (*config.Config, error) {
 	adminAuthConfigData := []byte(opts.AdminAuthConfig)
 	if opts.AdminAuthConfigFile != "" {
 		if len(adminAuthConfigData) != 0 {
-			return nil, errors.New("both admin-auth-config and admin-auth-config-file are specified")
+			return nil, errors.New("both admin.auth-config and admin.auth-config-file are specified")
 		}
 		adminAuthConfigData, err = os.ReadFile(opts.AdminAuthConfigFile)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to read admin-auth-config")
+			return nil, errors.Wrap(err, "failed to read admin.auth-config-file")
 		}
 	}
 	var adminAuthnConfig config.AdminAuthn
 	if err := yaml.Unmarshal(adminAuthConfigData, &adminAuthnConfig); err != nil {
-		return nil, errors.Wrap(err, "failed to parse admin-auth-config")
+		return nil, errors.Wrap(err, "failed to parse admin.auth-config")
+	}
+
+	adminAuthPolicy := opts.AdminAuthPolicy
+	if opts.AdminAuthPolicyFile != "" {
+		if adminAuthPolicy != "" {
+			return nil, errors.New("both admin.auth-policy and admin.auth-policy-file are specified")
+		}
+		data, err := os.ReadFile(opts.AdminAuthPolicyFile)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to read admin.auth-policy-file")
+		}
+		adminAuthPolicy = string(data)
 	}
 
 	cfg, err := pgx.ParseConfig(os.Getenv("DB_DSN"))
@@ -35,9 +47,12 @@ func newConfig(opts *CLIOption) (*config.Config, error) {
 	}
 
 	return &config.Config{
-		AdminAPI: config.AdminAPIConfig{
+		AdminAPI: config.AdminAPI{
 			Address: opts.AdminHTTPAddr,
 			Authn:   adminAuthnConfig,
+			Authz: config.AdminAuthz{
+				Policy: adminAuthPolicy,
+			},
 		},
 
 		ContestantHTTPAddress: netip.AddrPort{},

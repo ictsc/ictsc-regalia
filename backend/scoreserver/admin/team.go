@@ -6,12 +6,13 @@ import (
 	"connectrpc.com/connect"
 	adminv1 "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
-	"github.com/jmoiron/sqlx"
 )
 
 type TeamServiceHandler struct {
+	Enforcer       *auth.Enforcer
 	ListWorkflow   domain.TeamListWorkflow
 	GetWorkflow    domain.TeamGetWorkflow
 	CreateWorkflow domain.TeamCreateWorkflow
@@ -21,10 +22,10 @@ type TeamServiceHandler struct {
 
 var _ adminv1connect.TeamServiceHandler = (*TeamServiceHandler)(nil)
 
-func NewTeamServiceHandler(db *sqlx.DB) *TeamServiceHandler {
-	repo := pg.NewRepository(db)
-
+func NewTeamServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *TeamServiceHandler {
 	return &TeamServiceHandler{
+		Enforcer: enforcer,
+
 		ListWorkflow: domain.TeamListWorkflow{Lister: repo},
 		GetWorkflow:  domain.TeamGetWorkflow{Getter: repo},
 		CreateWorkflow: domain.TeamCreateWorkflow{
@@ -49,6 +50,10 @@ func (h *TeamServiceHandler) ListTeams(
 	ctx context.Context,
 	req *connect.Request[adminv1.ListTeamsRequest],
 ) (*connect.Response[adminv1.ListTeamsResponse], error) {
+	if err := enforce(ctx, h.Enforcer, "teams", "list"); err != nil {
+		return nil, err
+	}
+
 	teams, err := h.ListWorkflow.Run(ctx)
 	if err != nil {
 		return nil, connectError(err)
@@ -68,6 +73,9 @@ func (h *TeamServiceHandler) GetTeam(
 	ctx context.Context,
 	req *connect.Request[adminv1.GetTeamRequest],
 ) (*connect.Response[adminv1.GetTeamResponse], error) {
+	if err := enforce(ctx, h.Enforcer, "teams", "get"); err != nil {
+		return nil, err
+	}
 	team, err := h.GetWorkflow.Run(ctx, domain.TeamGetInput{
 		Code: int(req.Msg.GetCode()),
 	})
@@ -84,6 +92,9 @@ func (h *TeamServiceHandler) CreateTeam(
 	ctx context.Context,
 	req *connect.Request[adminv1.CreateTeamRequest],
 ) (*connect.Response[adminv1.CreateTeamResponse], error) {
+	if err := enforce(ctx, h.Enforcer, "teams", "create"); err != nil {
+		return nil, err
+	}
 	team, err := h.CreateWorkflow.Run(ctx, domain.TeamCreateInput{
 		Code:         int(req.Msg.GetTeam().GetCode()),
 		Name:         req.Msg.GetTeam().GetName(),
@@ -102,6 +113,9 @@ func (h *TeamServiceHandler) UpdateTeam(
 	ctx context.Context,
 	req *connect.Request[adminv1.UpdateTeamRequest],
 ) (*connect.Response[adminv1.UpdateTeamResponse], error) {
+	if err := enforce(ctx, h.Enforcer, "teams", "update"); err != nil {
+		return nil, err
+	}
 	protoTeam := req.Msg.GetTeam()
 
 	team, err := h.UpdateWorkflow.Run(ctx, domain.TeamUpdateInput{
@@ -122,6 +136,9 @@ func (h *TeamServiceHandler) DeleteTeam(
 	ctx context.Context,
 	req *connect.Request[adminv1.DeleteTeamRequest],
 ) (*connect.Response[adminv1.DeleteTeamResponse], error) {
+	if err := enforce(ctx, h.Enforcer, "teams", "delete"); err != nil {
+		return nil, err
+	}
 	if err := h.DeleteWorkflow.Run(ctx, domain.TeamDeleteInput{
 		Code: int(req.Msg.GetCode()),
 	}); err != nil {
@@ -137,29 +154,4 @@ func convertTeam(team *domain.Team) *adminv1.Team {
 		Name:         team.Name(),
 		Organization: team.Organization(),
 	}
-}
-
-// connectError は domain のエラーを connect のエラーに変換する
-//
-// 置き場所はもう少し考えたほうがいい
-func connectError(err error) error {
-	if err == nil {
-		return nil
-	}
-	var code connect.Code
-	switch domain.ErrTypeFrom(err) {
-	case domain.ErrTypeInternal:
-		code = connect.CodeInternal
-	case domain.ErrTypeInvalidArgument:
-		code = connect.CodeInvalidArgument
-	case domain.ErrTypeAlreadyExists:
-		code = connect.CodeAlreadyExists
-	case domain.ErrTypeNotFound:
-		code = connect.CodeNotFound
-	case domain.ErrTypeUnknown:
-		fallthrough
-	default:
-		code = connect.CodeUnknown
-	}
-	return connect.NewError(code, err)
 }
