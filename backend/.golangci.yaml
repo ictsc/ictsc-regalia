@@ -51,6 +51,7 @@ linters-settings:
     ignore-decls:
       - w http.ResponseWriter
       - r *http.Request
+      - wg sync.WaitGroup
   wrapcheck:
     ignoreSigs:
       - .Wrap(

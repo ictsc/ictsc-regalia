@@ -4,8 +4,10 @@ import (
 	"flag"
 	"log/slog"
 	"net/netip"
+	"net/url"
 	"time"
 
+	"github.com/cockroachdb/errors"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/slogutil"
 )
 
@@ -19,6 +21,9 @@ type CLIOption struct {
 	AdminAuthConfigFile string
 	AdminAuthPolicy     string
 	AdminAuthPolicyFile string
+
+	ContestantHTTPAddr netip.AddrPort
+	ContestantBaseURL  URLValue
 }
 
 // NewOption creates a new CLIOption combined with the given flag.FlagSet.
@@ -37,6 +42,10 @@ func NewOption(fs *flag.FlagSet) *CLIOption {
 	fs.StringVar(&opt.AdminAuthPolicy, "admin.auth-policy", "", "Admin API authorization policy")
 	fs.StringVar(&opt.AdminAuthPolicyFile, "admin.auth-policy-file", "", "Admin API authorization policy file")
 
+	fs.TextVar(&opt.ContestantHTTPAddr, "contestant.http-addr", netip.MustParseAddrPort("127.0.0.1:8080"), "Contestant API server address")
+	_ = opt.ContestantBaseURL.Set("http://localhost:8080")
+	fs.Var(&opt.ContestantBaseURL, "contestant.base-url", "Contestant API base URL")
+
 	fs.BoolFunc("v", "Verbose logging", func(string) error {
 		opt.LogLevel = slog.LevelDebug
 		return nil
@@ -53,4 +62,23 @@ func NewOption(fs *flag.FlagSet) *CLIOption {
 	})
 
 	return &opt
+}
+
+type URLValue url.URL
+
+func (v *URLValue) Set(s string) error {
+	url, err := url.Parse(s)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	*v = URLValue(*url)
+	return nil
+}
+
+func (v *URLValue) String() string {
+	return (*url.URL)(v).String()
+}
+
+func (v *URLValue) Value() *url.URL {
+	return (*url.URL)(v)
 }
