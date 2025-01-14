@@ -11,6 +11,9 @@ export PGPASSWORD=password
 export PGDATABASE=ictscore
 export PGSSLMODE=disable
 
+redis_port="$(docker compose -f "$compose_file" port redis 6379 | cut -d: -f2)"
+export REDIS_URL="redis://localhost:$redis_port/0"
+
 export OTEL_METRICS_EXPORTER=${OTEL_METRICS_EXPORTER:-prometheus}
 
 if docker compose -f "$compose_file" ps | grep -q jaeger; then

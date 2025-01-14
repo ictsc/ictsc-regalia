@@ -11,13 +11,12 @@ services:
       POSTGRES_USER: ictsc
       POSTGRES_DB: ictscore
 
-  adminer:
-    image: adminer
+  redis:
+    image: redis:7
     restart: always
-    depends_on:
-      - postgres
     ports:
-      - 8080:8080
+      - ":6379"
+
   jaeger:
     image: jaegertracing/all-in-one
     ports:
