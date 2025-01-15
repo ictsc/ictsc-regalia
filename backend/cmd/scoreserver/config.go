@@ -88,7 +88,9 @@ func parseContestantConfig(opts *CLIOption) (*config.ContestantAPI, error) {
 	return &config.ContestantAPI{
 		Address: opts.ContestantHTTPAddr,
 		Auth: config.ContestantAuth{
-			BaseURL: *opts.ContestantBaseURL.Value(),
+			BaseURL:             *opts.ContestantBaseURL.Value(),
+			DiscordClientID:     os.Getenv("DISCORD_CLIENT_ID"),
+			DiscordClientSecret: os.Getenv("DISCORD_CLIENT_SECRET"),
 		},
 	}, nil
 }
