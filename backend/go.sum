@@ -2,10 +2,10 @@ buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.2-20241031151143-70
 buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.2-20241031151143-70f632351282.1/go.mod h1:MX7ir1mUpGuEenIC/vwfBhS2AQwQzkbXYfmJCaINssY=
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.2-20241127180247-a33202765966.1 h1:BICM6du/XzvEgeorNo4xgohK3nMTmEPViGyd5t7xVqk=
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.2-20241127180247-a33202765966.1/go.mod h1:JnMVLi3qrNYPODVpEKG7UjHLl/d2zR221e66YCSmP2Q=
-buf.build/gen/go/bufbuild/registry/connectrpc/go v1.18.1-20250106231242-56271afbd6ce.1 h1:4bJ5Sh3FovNqit+k1rYn03YpckFkgpBjeZe52eoiuUY=
-buf.build/gen/go/bufbuild/registry/connectrpc/go v1.18.1-20250106231242-56271afbd6ce.1/go.mod h1:GI0Fv/enMZ/dJPfDwU5zamn8P3LUEEl2L/1yg0qw4ZQ=
-buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.2-20250106231242-56271afbd6ce.1 h1:BaCsU/g/Od9XBPexzV+486UWv2Vdi3FFNkrkNgqvN7A=
-buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.2-20250106231242-56271afbd6ce.1/go.mod h1:mge2ZWW6jyUH6VaR+EImrAu0GvItt0kJKbsXBMRc//8=
+buf.build/gen/go/bufbuild/registry/connectrpc/go v1.18.1-20250116203702-1c024d64352b.1 h1:1SDs5tEGoWWv2vmKLx2B0Bp+yfhlxiU4DaZUII8+Pvs=
+buf.build/gen/go/bufbuild/registry/connectrpc/go v1.18.1-20250116203702-1c024d64352b.1/go.mod h1:o2AgVM1j3MczvxnMqfZTpiqGwK1VD4JbEagseY0QcjE=
+buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.2-20250116203702-1c024d64352b.1 h1:UDEEUrl61wSZ0r8iIDu0fa1nY1Bs73syiaKfaZwxVYA=
+buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.2-20250116203702-1c024d64352b.1/go.mod h1:mge2ZWW6jyUH6VaR+EImrAu0GvItt0kJKbsXBMRc//8=
 buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.2-20241007202033-cf42259fcbfc.1 h1:g+VqvesBFd4hLlLd+EpoyzHf7pGM2msvXtRZ+YHdz0o=
 buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.2-20241007202033-cf42259fcbfc.1/go.mod h1:HreagKBdLMvrTzlNYDU7j/aHbN+Y0b/X1mo16hK7X1s=
 buf.build/go/bufplugin v0.6.0 h1:3lhoh+0z+IUPS3ZajTPn/27LaLIkero2BDVnV7yXD1s=
