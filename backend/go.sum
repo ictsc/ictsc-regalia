@@ -1,5 +1,5 @@
-buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.3-20250121211657-a7d90c401d49.1 h1:oZexXsCUJa+ql2+rWKchYeYv0NuWKpLmMt4P5juw+qc=
-buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.3-20250121211657-a7d90c401d49.1/go.mod h1:MYDFm9IHRP085R5Bis68mLc0mIqp5Q27Uk4o8YXjkAI=
+buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.3-20250121211742-6d880cc6cc8d.1 h1:1v+ez1GRKKKdI1IwDDQqV98lGKo8489+Ekql+prUW6c=
+buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.3-20250121211742-6d880cc6cc8d.1/go.mod h1:MYDFm9IHRP085R5Bis68mLc0mIqp5Q27Uk4o8YXjkAI=
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.3-20241127180247-a33202765966.1 h1:cQZXKoQ+eB0kykzfJe80RP3nc+3PWbbBrUBm8XNYAQY=
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.3-20241127180247-a33202765966.1/go.mod h1:6VPKM8zbmgf9qsmkmKeH49a36Vtmidw3rG53B5mTenc=
 buf.build/gen/go/bufbuild/registry/connectrpc/go v1.18.1-20250116203702-1c024d64352b.1 h1:1SDs5tEGoWWv2vmKLx2B0Bp+yfhlxiU4DaZUII8+Pvs=
@@ -8,8 +8,8 @@ buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.3-20250116203702-1c0
 buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.3-20250116203702-1c024d64352b.1/go.mod h1:UOdD+CmwdvN3oRHXeZ+WDeIthKVXKo7Dm+2E/233xd0=
 buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.3-20241007202033-cf42259fcbfc.1 h1:NOipq02MS20WQCr6rfAG1o0n2AuQnY4Xg9avLl16csA=
 buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.3-20241007202033-cf42259fcbfc.1/go.mod h1:jceo5esD5zSbflHHGad57RXzBpRrcPaiLrLQRA+Mbec=
-buf.build/go/bufplugin v0.6.0 h1:3lhoh+0z+IUPS3ZajTPn/27LaLIkero2BDVnV7yXD1s=
-buf.build/go/bufplugin v0.6.0/go.mod h1:hWCjxxv24xdR6F5pNlQavZV2oo0J3uF4Ff1XEoyV6vU=
+buf.build/go/bufplugin v0.7.0 h1:Tq8FXBVfpMxhl3QR6P/gMQHROg1Ss7WhpyD4QVV61ds=
+buf.build/go/bufplugin v0.7.0/go.mod h1:LuQzv36Ezu2zQIQUtwg4WJJFe58tXn1anL1IosAh6ik=
 buf.build/go/protoyaml v0.3.1 h1:ucyzE7DRnjX+mQ6AH4JzN0Kg50ByHHu+yrSKbgQn2D4=
 buf.build/go/protoyaml v0.3.1/go.mod h1:0TzNpFQDXhwbkXb/ajLvxIijqbve+vMQvWY/b3/Dzxg=
 buf.build/go/spdx v0.2.0 h1:IItqM0/cMxvFJJumcBuP8NrsIzMs/UYjp/6WSpq8LTw=
