@@ -118,7 +118,10 @@ type TeamListWorkflow struct {
 
 func (w *TeamListWorkflow) Run(ctx context.Context) ([]*Team, error) {
 	teams, err := w.Lister.ListTeams(ctx)
-	return teams, NewError(ErrTypeInternal, err)
+	if err != nil {
+		return nil, NewError(ErrTypeInternal, err)
+	}
+	return teams, nil
 }
 
 type TeamGetWorkflow struct {
@@ -188,7 +191,7 @@ type (
 )
 
 func (w *TeamUpdateWorkflow) Run(ctx context.Context, input TeamUpdateInput) (*Team, error) {
-	var teamResult *Team
+	var result *Team
 	if err := w.RunTx(ctx, func(effect TeamUpdateTxEffect) error {
 		getWf := TeamGetWorkflow{Getter: effect}
 		team, err := getWf.Run(ctx, TeamGetInput{Code: input.Code})
@@ -208,13 +211,13 @@ func (w *TeamUpdateWorkflow) Run(ctx context.Context, input TeamUpdateInput) (*T
 			return NewError(ErrTypeInternal, err)
 		}
 
-		teamResult = updated
+		result = updated
 
 		return nil
 	}); err != nil {
 		return nil, err
 	}
-	return teamResult, nil
+	return result, nil
 }
 
 type (

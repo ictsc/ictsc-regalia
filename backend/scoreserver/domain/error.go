@@ -44,6 +44,10 @@ func NewError(typ ErrType, err error) error {
 	}
 }
 
+func WrapAsInternal(err error, msg string) error {
+	return NewError(ErrTypeInternal, errors.WrapWithDepth(1, err, msg))
+}
+
 func (e *Error) Error() string {
 	return e.typ.String() + ": " + e.err.Error()
 }
