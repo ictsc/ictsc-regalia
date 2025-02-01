@@ -13,6 +13,7 @@ linters:
     - ireturn
     - gofumpt
     - tagliatelle
+    - funlen
 
 issues:
   exclude-use-default: false
