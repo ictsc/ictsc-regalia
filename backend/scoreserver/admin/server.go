@@ -36,6 +36,10 @@ func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB) (http.Handler, e
 		NewTeamServiceHandler(enforcer, repo),
 		connect.WithInterceptors(interceptors...),
 	))
+	mux.Handle(adminv1connect.NewInvitationServiceHandler(
+		NewInvitationServiceHandler(enforcer, repo),
+		connect.WithInterceptors(interceptors...),
+	))
 
 	checker := grpchealth.NewStaticChecker("admin.v1.TeamService")
 	mux.Handle(grpchealth.NewHandler(checker))

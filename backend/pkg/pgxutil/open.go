@@ -84,16 +84,16 @@ func defaultAttributeGetter(_ context.Context, _ otelsql.Method, query string, _
 }
 
 var (
-	queryReMap = map[string]*regexp.Regexp{
-		"SELECT": regexp.MustCompile(`(?i)^\s*SELECT\s+.*\s+FROM\s+([^\s]+)`),
-		"INSERT": regexp.MustCompile(`(?i)^\s*INSERT\s+INTO\s+([^\s]+)`),
-		"UPDATE": regexp.MustCompile(`(?i)^\s*UPDATE\s+([^\s]+)`),
-		"DELETE": regexp.MustCompile(`(?i)^\s*DELETE\s+FROM\s+([^\s]+)`),
+	queryRegexMap = map[string]*regexp.Regexp{
+		"SELECT": regexp.MustCompile(`(?ims)^\s*SELECT\s+[\s\S]*?\sFROM\s+([^\s]+)`),
+		"UPDATE": regexp.MustCompile(`(?ims)^\s*UPDATE\s+([^\s]+)`),
+		"DELETE": regexp.MustCompile(`(?ims)^\s*DELETE\s+FROM\s+([^\s]+)`),
+		"INSERT": regexp.MustCompile(`(?ims)^\s*INSERT\s+INTO\s+([^\s]+)`),
 	}
 )
 
 func summarizeQuery(query string) string {
-	for key, re := range queryReMap {
+	for key, re := range queryRegexMap {
 		if match := re.FindStringSubmatch(query); match != nil {
 			table := strings.Trim(match[1], `"`)
 			return fmt.Sprintf("%s %s", key, table)
