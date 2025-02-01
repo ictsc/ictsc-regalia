@@ -16,11 +16,11 @@ CREATE TABLE invitation_codes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
     code VARCHAR(255) NOT NULL UNIQUE,
-    expired_at TIMESTAMPTZ NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE invitation_codes IS '招待コード';
 COMMENT ON COLUMN invitation_codes.id IS '招待コード ID';
 COMMENT ON COLUMN invitation_codes.team_id IS 'チーム ID';
 COMMENT ON COLUMN invitation_codes.code IS '招待コード';
-COMMENT ON COLUMN invitation_codes.expired_at IS '有効期限';
+COMMENT ON COLUMN invitation_codes.expires_at IS '有効期限';

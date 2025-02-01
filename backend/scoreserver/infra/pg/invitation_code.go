@@ -13,7 +13,7 @@ import (
 type invitationCodeRow struct {
 	ID        uuid.UUID `db:"id"`
 	Code      string    `db:"code"`
-	ExpiredAt time.Time `db:"expired_at"`
+	ExpiresAt time.Time `db:"expires_at"`
 	CreatedAt time.Time `db:"created_at"`
 }
 
@@ -26,7 +26,7 @@ func (r *invitationCodeRow) asDomain(teamRow *teamRow) (*domain.InvitationCode, 
 		ID:        r.ID,
 		Team:      team,
 		Code:      r.Code,
-		ExpiresAt: r.ExpiredAt,
+		ExpiresAt: r.ExpiresAt,
 		CreatedAt: r.CreatedAt,
 	})
 }
@@ -46,7 +46,7 @@ func (r *repo) ListInvitationCodes(ctx context.Context, filter domain.Invitation
 		SELECT
 			ic.id AS "ic.id",
 			ic.code AS "ic.code",
-			ic.expired_at AS "ic.expired_at",
+			ic.expires_at AS "ic.expires_at",
 			ic.created_at AS "ic.created_at",
 			t.id AS "t.id",
 			t.code AS "t.code",
@@ -92,7 +92,7 @@ var _ domain.InvitationCodeCreator = (*repo)(nil)
 
 func (r *repo) CreateInvitationCode(ctx context.Context, code *domain.InvitationCode) error {
 	if _, err := r.ext.ExecContext(ctx, r.ext.Rebind(`
-		INSERT INTO invitation_codes (id, team_id, code, expired_at, created_at)
+		INSERT INTO invitation_codes (id, team_id, code, expires_at, created_at)
 		VALUES (?, ?, ?, ?, ?)
 	`), code.ID(), code.Team().ID(), code.Code(), code.ExpiresAt(), code.CreatedAt()); err != nil {
 		return domain.WrapAsInternal(err, "failed to insert invitation_code")

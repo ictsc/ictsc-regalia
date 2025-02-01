@@ -52,7 +52,7 @@ func Test_PgRepo_InvitationCode(t *testing.T) {
 				"id":         invitationCode.ID().String(),
 				"code":       invitationCode.Code(),
 				"team_id":    invitationCode.Team().ID().String(),
-				"expired_at": invitationCode.ExpiresAt(),
+				"expires_at": invitationCode.ExpiresAt(),
 				"created_at": invitationCode.CreatedAt(),
 			}); diff != "" {
 				t.Errorf("differs: (-got +want)\n%s", diff)
