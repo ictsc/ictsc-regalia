@@ -82,7 +82,13 @@ func Test_InvitationCodeListWorkflow(t *testing.T) {
 	}
 }
 
-func Test_InvitationCodeCreateWorkflow(t *testing.T) {
+type invitationCodeListerFunc func(ctx context.Context, filter domain.InvitationCodeFilter) ([]*domain.InvitationCode, error)
+
+func (f invitationCodeListerFunc) ListInvitationCodes(ctx context.Context, filter domain.InvitationCodeFilter) ([]*domain.InvitationCode, error) {
+	return f(ctx, filter)
+}
+
+func Test_CreateInvitationCode(t *testing.T) {
 	t.Parallel()
 
 	team1 := must(domain.NewTeam(domain.TeamInput{
@@ -91,80 +97,60 @@ func Test_InvitationCodeCreateWorkflow(t *testing.T) {
 		Name:         "team1",
 		Organization: "org",
 	}))
-	icCreator := invitationCodeCreatorFunc(
-		func(context.Context, *domain.InvitationCode) error { return nil })
-	workflow := &domain.InvitationCodeCreateWorkflow{
-		TeamGetter: teamCodeGetterFunc(
-			func(_ context.Context, code domain.TeamCode) (*domain.Team, error) {
-				if code != 1 {
-					return nil, domain.NewError(domain.ErrTypeNotFound, errors.New("team not found"))
-				}
-				return team1, nil
-			}),
 
-		RunTx: func(_ context.Context, f func(eff domain.InvitationCodeCreator) error) error {
-			return f(icCreator)
+	now := must(time.Parse(time.RFC3339, "2025-01-01T00:00:00Z"))
+	expiresAt := now.Add(24 * time.Hour)
+
+	effect := &struct {
+		invitationCodeCreatorFunc
+		domain.ClockerFunc
+	}{
+		invitationCodeCreatorFunc: func(ctx context.Context, ic *domain.InvitationCode) error {
+			return nil
 		},
-		Clock: func() time.Time {
-			return must(time.Parse(time.RFC3339, "2025-01-01T00:00:00Z"))
+		ClockerFunc: func() time.Time {
+			return now
 		},
 	}
 
 	cases := map[string]struct {
-		w  *domain.InvitationCodeCreateWorkflow
-		in domain.InvitationCodeCreateInput
-
-		want    *domain.InvitationCode
-		wantErr domain.ErrType
+		team      *domain.Team
+		effect    domain.InvitationCodeCreateEffect
+		expiresAt time.Time
+		wantErr   domain.ErrType
+		want      *domain.InvitationCode
 	}{
 		"ok": {
-			w: workflow,
-			in: domain.InvitationCodeCreateInput{
-				TeamCode:  1,
-				ExpiresAt: must(time.Parse(time.RFC3339, "2025-04-03T09:00:00Z")),
-			},
-
+			team:      team1,
+			effect:    effect,
+			expiresAt: expiresAt,
 			want: must(domain.NewInvitationCode(domain.InvitationCodeInput{
 				ID:        must(uuid.NewV4()),
-				Code:      "dummy",
 				Team:      team1,
-				ExpiresAt: must(time.Parse(time.RFC3339, "2025-04-03T09:00:00Z")),
-				CreatedAt: must(time.Parse(time.RFC3339, "2025-01-01T00:00:00Z")),
+				Code:      "dummy",
+				ExpiresAt: expiresAt,
+				CreatedAt: now,
 			})),
 		},
-		"no team code": {
-			w: workflow,
-			in: domain.InvitationCodeCreateInput{
-				ExpiresAt: must(time.Parse(time.RFC3339, "2025-04-03T09:00:00Z")),
-			},
-
-			wantErr: domain.ErrTypeInvalidArgument,
-		},
-		"no expires at": {
-			w: workflow,
-			in: domain.InvitationCodeCreateInput{
-				TeamCode: 1,
-			},
-
-			wantErr: domain.ErrTypeInvalidArgument,
-		},
-		"team not found": {
-			w: workflow,
-			in: domain.InvitationCodeCreateInput{
-				TeamCode:  2,
-				ExpiresAt: must(time.Parse(time.RFC3339, "2025-04-03T09:00:00Z")),
-			},
-
-			wantErr: domain.ErrTypeNotFound,
-		},
 		"already expired": {
-			w: workflow,
-			in: domain.InvitationCodeCreateInput{
-				TeamCode:  1,
-				ExpiresAt: must(time.Parse(time.RFC3339, "2024-04-01T00:00:00Z")),
+			team:      team1,
+			effect:    effect,
+			expiresAt: now.Add(-24 * time.Hour),
+			wantErr:   domain.ErrTypeInvalidArgument,
+		},
+		"creation fails": {
+			team: team1,
+			effect: &struct {
+				invitationCodeCreatorFunc
+				domain.Clocker
+			}{
+				Clocker: effect,
+				invitationCodeCreatorFunc: func(ctx context.Context, ic *domain.InvitationCode) error {
+					return domain.NewError(domain.ErrTypeInternal, errors.New("dummy"))
+				},
 			},
-
-			wantErr: domain.ErrTypeInvalidArgument,
+			expiresAt: expiresAt,
+			wantErr:   domain.ErrTypeInternal,
 		},
 	}
 
@@ -172,14 +158,15 @@ func Test_InvitationCodeCreateWorkflow(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			actual, err := tt.w.Run(context.Background(), tt.in)
+			actual, err := tt.team.CreateInvitationCode(context.Background(), tt.effect, tt.expiresAt)
 			if domain.ErrTypeFrom(err) != tt.wantErr {
-				t.Errorf("want error typ %v, got %v", tt.wantErr, err)
+				t.Errorf("want error type %v, got %v", tt.wantErr, err)
 			}
 			if err != nil {
 				t.Logf("error: %v", err)
 				return
 			}
+
 			if diff := cmp.Diff(
 				tt.want, actual,
 				cmp.AllowUnexported(domain.InvitationCode{}, domain.Team{}),
@@ -189,12 +176,6 @@ func Test_InvitationCodeCreateWorkflow(t *testing.T) {
 			}
 		})
 	}
-}
-
-type invitationCodeListerFunc func(ctx context.Context, filter domain.InvitationCodeFilter) ([]*domain.InvitationCode, error)
-
-func (f invitationCodeListerFunc) ListInvitationCodes(ctx context.Context, filter domain.InvitationCodeFilter) ([]*domain.InvitationCode, error) {
-	return f(ctx, filter)
 }
 
 type invitationCodeCreatorFunc func(ctx context.Context, ic *domain.InvitationCode) error

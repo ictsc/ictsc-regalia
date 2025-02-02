@@ -2,11 +2,18 @@ package domain
 
 import "time"
 
-type Clock func() time.Time
+type Clocker interface {
+	Now() time.Time
+}
 
-func (c Clock) Now() time.Time {
-	if c == nil {
-		return time.Now()
-	}
-	return c()
+type ClockerFunc func() time.Time
+
+func (f ClockerFunc) Now() time.Time {
+	return f()
+}
+
+type SystemClock struct{}
+
+func (SystemClock) Now() time.Time {
+	return time.Now()
 }

@@ -78,10 +78,6 @@ func (tc TeamCode) Team(ctx context.Context, effect TeamGetEffect) (*Team, error
 	return team, nil
 }
 
-func (tc TeamCode) Team(ctx context.Context, effect TeamGetEffect) (*Team, error) {
-	return GetTeamByCode(ctx, effect, tc)
-}
-
 type TeamListEffect = TeamsLister
 
 func ListTeams(ctx context.Context, effect TeamListEffect) ([]*Team, error) {
