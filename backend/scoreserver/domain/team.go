@@ -52,20 +52,40 @@ func NewTeamCode(code int) (TeamCode, error) {
 	return TeamCode(code), nil
 }
 
-func (t Team) ID() uuid.UUID {
+func (t *Team) ID() uuid.UUID {
 	return t.id
 }
 
-func (t Team) Code() TeamCode {
+func (t *Team) Code() TeamCode {
 	return t.code
 }
 
-func (t Team) Name() string {
+func (t *Team) Name() string {
 	return t.name
 }
 
-func (t Team) Organization() string {
+func (t *Team) Organization() string {
 	return t.organization
+}
+
+type TeamGetEffect = TeamGetter
+
+func (tc TeamCode) Team(ctx context.Context, effect TeamGetEffect) (*Team, error) {
+	team, err := effect.GetTeamByCode(ctx, tc)
+	if err != nil {
+		return nil, err
+	}
+	return team, nil
+}
+
+type TeamListEffect = TeamsLister
+
+func ListTeams(ctx context.Context, effect TeamListEffect) ([]*Team, error) {
+	teams, err := effect.ListTeams(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return teams, nil
 }
 
 type TeamCreateInput struct {
@@ -112,40 +132,8 @@ func (t Team) Updated(input TeamUpdateInput) (*Team, error) {
 
 // チームに関するワークフロー
 
-type TeamListWorkflow struct {
-	Lister TeamsLister
-}
-
-func (w *TeamListWorkflow) Run(ctx context.Context) ([]*Team, error) {
-	teams, err := w.Lister.ListTeams(ctx)
-	if err != nil {
-		return nil, NewError(ErrTypeInternal, err)
-	}
-	return teams, nil
-}
-
-type TeamGetWorkflow struct {
-	Getter TeamGetter
-}
 type TeamGetInput struct {
 	Code int
-}
-
-func (w *TeamGetWorkflow) Run(ctx context.Context, input TeamGetInput) (*Team, error) {
-	code, err := NewTeamCode(input.Code)
-	if err != nil {
-		return nil, err
-	}
-
-	team, err := w.Getter.GetTeamByCode(ctx, code)
-	if err != nil {
-		if ErrTypeFrom(err) == ErrTypeNotFound {
-			return nil, err
-		}
-		return nil, NewError(ErrTypeInternal, err)
-	}
-
-	return team, nil
 }
 
 type (
@@ -191,10 +179,14 @@ type (
 )
 
 func (w *TeamUpdateWorkflow) Run(ctx context.Context, input TeamUpdateInput) (*Team, error) {
+	code, err := NewTeamCode(input.Code)
+	if err != nil {
+		return nil, err
+	}
+
 	var result *Team
 	if err := w.RunTx(ctx, func(effect TeamUpdateTxEffect) error {
-		getWf := TeamGetWorkflow{Getter: effect}
-		team, err := getWf.Run(ctx, TeamGetInput{Code: input.Code})
+		team, err := GetTeamByCode(ctx, effect, code)
 		if err != nil {
 			return err
 		}
@@ -232,9 +224,12 @@ type (
 )
 
 func (w *TeamDeleteWorkflow) Run(ctx context.Context, input TeamDeleteInput) error {
+	code, err := NewTeamCode(input.Code)
+	if err != nil {
+		return err
+	}
 	if err := w.RunTx(ctx, func(effect TeamDeleteTxEffect) error {
-		getWf := TeamGetWorkflow{Getter: effect}
-		team, err := getWf.Run(ctx, input)
+		team, err := code.Team(ctx, effect)
 		if err != nil {
 			return err
 		}

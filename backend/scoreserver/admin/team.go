@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
+	"github.com/cockroachdb/errors"
 	adminv1 "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
@@ -13,8 +14,8 @@ import (
 
 type TeamServiceHandler struct {
 	Enforcer       *auth.Enforcer
-	ListWorkflow   domain.TeamListWorkflow
-	GetWorkflow    domain.TeamGetWorkflow
+	ListEffect     domain.TeamListEffect
+	GetEffect      domain.TeamGetEffect
 	CreateWorkflow domain.TeamCreateWorkflow
 	UpdateWorkflow domain.TeamUpdateWorkflow
 	DeleteWorkflow domain.TeamDeleteWorkflow
@@ -26,8 +27,8 @@ func NewTeamServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *TeamSe
 	return &TeamServiceHandler{
 		Enforcer: enforcer,
 
-		ListWorkflow: domain.TeamListWorkflow{Lister: repo},
-		GetWorkflow:  domain.TeamGetWorkflow{Getter: repo},
+		ListEffect: repo,
+		GetEffect:  repo,
 		CreateWorkflow: domain.TeamCreateWorkflow{
 			RunTx: func(ctx context.Context, f func(domain.TeamCreateTxEffect) error) error {
 				return repo.RunTx(ctx, func(tx *pg.RepositoryTx) error { return f(tx) })
@@ -54,7 +55,7 @@ func (h *TeamServiceHandler) ListTeams(
 		return nil, err
 	}
 
-	teams, err := h.ListWorkflow.Run(ctx)
+	teams, err := domain.ListTeams(ctx, h.ListEffect)
 	if err != nil {
 		return nil, connectError(err)
 	}
@@ -76,9 +77,18 @@ func (h *TeamServiceHandler) GetTeam(
 	if err := enforce(ctx, h.Enforcer, "teams", "get"); err != nil {
 		return nil, err
 	}
-	team, err := h.GetWorkflow.Run(ctx, domain.TeamGetInput{
-		Code: int(req.Msg.GetCode()),
-	})
+
+	inCode := req.Msg.GetCode()
+	if inCode == 0 {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("code is required"))
+	}
+
+	code, err := domain.NewTeamCode(int(inCode))
+	if err != nil {
+		return nil, connectError(err)
+	}
+
+	team, err := code.Team(ctx, h.GetEffect)
 	if err != nil {
 		return nil, connectError(err)
 	}
