@@ -3,19 +3,12 @@ package admin_test
 import (
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"connectrpc.com/connect"
-	"github.com/ictsc/ictsc-regalia/backend/pkg/pgtest"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 )
-
-func TestMain(m *testing.M) {
-	run := pgtest.WrapRun(m.Run)
-	os.Exit(run())
-}
 
 func assertCode(t *testing.T, expected connect.Code, got error) {
 	t.Helper()

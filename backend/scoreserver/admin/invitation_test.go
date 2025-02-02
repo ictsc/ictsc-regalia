@@ -51,10 +51,7 @@ func TestAdminInvitationService_Create(t *testing.T) {
 
 			enforcer := setupEnforcer(t)
 
-			db, ok := pgtest.SetupDB(t)
-			if !ok {
-				t.FailNow()
-			}
+			db := pgtest.SetupDB(t)
 			teamFixtures(db)
 
 			mux := http.NewServeMux()

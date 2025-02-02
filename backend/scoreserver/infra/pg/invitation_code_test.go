@@ -98,10 +98,7 @@ func Test_PgRepo_InvitationCode(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			db, ok := pgtest.SetupDB(t)
-			if !ok {
-				t.FailNow()
-			}
+			db := pgtest.SetupDB(t)
 			setup(t, db)
 			test(t, db)
 		})

@@ -284,10 +284,7 @@ func TestAdminTeamService_Delete(t *testing.T) {
 func setupTeamService(t *testing.T) (adminv1connect.TeamServiceClient, *sqlx.DB) {
 	t.Helper()
 
-	db, ok := pgtest.SetupDB(t)
-	if !ok {
-		t.FailNow()
-	}
+	db := pgtest.SetupDB(t)
 
 	enforcer := setupEnforcer(t)
 	repo := pg.NewRepository(db)
