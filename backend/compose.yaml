@@ -6,6 +6,8 @@ services:
       - ":5432"
     volumes:
       - db:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./seed.sql:/docker-entrypoint-initdb.d/2-seed.sql
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: ictsc
