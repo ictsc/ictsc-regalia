@@ -20,11 +20,6 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-const (
-	postgresImage = "postgres:17"
-	schemaFile    = "schema.sql"
-)
-
 // SetupDB はテスト用の DB を用意します。
 //
 // txdb を用いているため高速ですが，本物の DB とは異なる挙動をする可能性があります。
@@ -75,6 +70,12 @@ func getContainer(ctx context.Context) *postgres.PostgresContainer {
 	return container
 }
 
+const (
+	postgresImage = "postgres:17"
+	schemaFile    = "schema.sql"
+	seedFile      = "seed.sql"
+)
+
 func startContainer(ctx context.Context) (*postgres.PostgresContainer, error) {
 	execDir, err := os.Getwd()
 	if err != nil {
@@ -98,7 +99,10 @@ func startContainer(ctx context.Context) (*postgres.PostgresContainer, error) {
 
 	container, err := postgres.Run(ctx,
 		postgresImage,
-		postgres.WithInitScripts(filepath.Join(baseDir, schemaFile)),
+		postgres.WithInitScripts(
+			filepath.Join(baseDir, schemaFile),
+			filepath.Join(baseDir, seedFile),
+		),
 		testcontainers.WithWaitStrategy(
 			//nolint:mnd
 			wait.ForLog("database system is ready to accept connections").
