@@ -25,22 +25,11 @@ const (
 	schemaFile    = "schema.sql"
 )
 
-type RunFunc func() int
-
-// WrapRun は関数をラップして Postgres のライフサイクルを管理します。
-//
-// TestMain で呼び出すことを想定しています。
-func WrapRun(run RunFunc) RunFunc {
-	return func() int {
-		return run()
-	}
-}
-
 // SetupDB はテスト用の DB を用意します。
 //
 // txdb を用いているため高速ですが，本物の DB とは異なる挙動をする可能性があります。
 // 問題が起きた場合は SetupTrueDB を用いてください
-func SetupDB(tb testing.TB) (*sqlx.DB, bool) {
+func SetupDB(tb testing.TB) *sqlx.DB {
 	tb.Helper()
 
 	ctx := context.Background()
@@ -49,8 +38,8 @@ func SetupDB(tb testing.TB) (*sqlx.DB, bool) {
 
 	connString, err := ctr.ConnectionString(ctx)
 	if err != nil {
-		tb.Errorf("Failed to get connection string: %v", err)
-		return nil, false
+		tb.Fatalf("Failed to get connection string: %v", err)
+		return nil
 	}
 
 	db := sqlx.NewDb(sql.OpenDB(txdb.New("pgx", connString)), "pgx")
@@ -59,15 +48,15 @@ func SetupDB(tb testing.TB) (*sqlx.DB, bool) {
 			log.Printf("Failed to close DB: %v\n", err)
 		}
 	})
-	return db, true
+	return db
 }
 
-func SetupTrueDB(tb testing.TB) (*sqlx.DB, bool) {
+func SetupTrueDB(tb testing.TB) *sqlx.DB {
 	tb.Helper()
 
 	// TODO: startContainer を使って DB を起動し，tb.Cleanup で停止する
-	tb.Error("unimplemented")
-	return nil, false
+	tb.Fatal("unimplemented")
+	return nil
 }
 
 var (
