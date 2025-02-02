@@ -88,13 +88,31 @@ func ListTeams(ctx context.Context, effect TeamListEffect) ([]*Team, error) {
 	return teams, nil
 }
 
-type TeamCreateInput struct {
-	Code         int
-	Name         string
-	Organization string
+type (
+	TeamCreateInput struct {
+		Code         int
+		Name         string
+		Organization string
+	}
+	TeamCreateEffect   = Tx[TeamCreateTxEffect]
+	TeamCreateTxEffect = TeamCreator
+)
+
+func CreateTeam(ctx context.Context, effect TeamCreateEffect, input TeamCreateInput) (*Team, error) {
+	team, err := createTeam(input)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := effect.RunInTx(ctx, func(effect TeamCreateTxEffect) error {
+		return effect.CreateTeam(ctx, team)
+	}); err != nil {
+		return nil, err
+	}
+	return team, nil
 }
 
-func CreateTeam(input TeamCreateInput) (*Team, error) {
+func createTeam(input TeamCreateInput) (*Team, error) {
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, NewError(ErrTypeInternal, errors.Wrap(err, "failed to generate uuid"))
@@ -134,37 +152,6 @@ func (t Team) Updated(input TeamUpdateInput) (*Team, error) {
 
 type TeamGetInput struct {
 	Code int
-}
-
-type (
-	TeamCreateWorkflow struct {
-		RunTx TxFunc[TeamCreateTxEffect]
-	}
-	TeamCreateTxEffect interface {
-		TeamCreator
-	}
-)
-
-func (w *TeamCreateWorkflow) Run(ctx context.Context, input TeamCreateInput) (*Team, error) {
-	team, err := CreateTeam(input)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := w.RunTx(ctx, func(effect TeamCreateTxEffect) error {
-		if err := effect.CreateTeam(ctx, team); err != nil {
-			if ErrTypeFrom(err) == ErrTypeAlreadyExists {
-				return NewError(ErrTypeAlreadyExists, errors.New("team already exists"))
-			}
-			return NewError(ErrTypeInternal, err)
-		}
-
-		return nil
-	}); err != nil {
-		return nil, err
-	}
-
-	return team, nil
 }
 
 // チームを更新するワークフロー

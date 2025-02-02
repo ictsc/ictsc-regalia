@@ -16,7 +16,7 @@ type TeamServiceHandler struct {
 	Enforcer       *auth.Enforcer
 	ListEffect     domain.TeamListEffect
 	GetEffect      domain.TeamGetEffect
-	CreateWorkflow domain.TeamCreateWorkflow
+	CreateEffect   domain.TeamCreateEffect
 	UpdateWorkflow domain.TeamUpdateWorkflow
 	DeleteWorkflow domain.TeamDeleteWorkflow
 }
@@ -27,13 +27,9 @@ func NewTeamServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *TeamSe
 	return &TeamServiceHandler{
 		Enforcer: enforcer,
 
-		ListEffect: repo,
-		GetEffect:  repo,
-		CreateWorkflow: domain.TeamCreateWorkflow{
-			RunTx: func(ctx context.Context, f func(domain.TeamCreateTxEffect) error) error {
-				return repo.RunTx(ctx, func(tx *pg.RepositoryTx) error { return f(tx) })
-			},
-		},
+		ListEffect:   repo,
+		GetEffect:    repo,
+		CreateEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) domain.TeamCreateTxEffect { return rt }),
 		UpdateWorkflow: domain.TeamUpdateWorkflow{
 			RunTx: func(ctx context.Context, f func(domain.TeamUpdateTxEffect) error) error {
 				return repo.RunTx(ctx, func(tx *pg.RepositoryTx) error { return f(tx) })
@@ -105,7 +101,7 @@ func (h *TeamServiceHandler) CreateTeam(
 	if err := enforce(ctx, h.Enforcer, "teams", "create"); err != nil {
 		return nil, err
 	}
-	team, err := h.CreateWorkflow.Run(ctx, domain.TeamCreateInput{
+	team, err := domain.CreateTeam(ctx, h.CreateEffect, domain.TeamCreateInput{
 		Code:         int(req.Msg.GetTeam().GetCode()),
 		Name:         req.Msg.GetTeam().GetName(),
 		Organization: req.Msg.GetTeam().GetOrganization(),
