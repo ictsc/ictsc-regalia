@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cockroachdb/errors"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -46,4 +47,12 @@ func (r *Repository) RunTx(ctx context.Context, fn func(tx *RepositoryTx) error)
 	}
 
 	return nil
+}
+
+func Tx[E any](r *Repository, weaker func(*RepositoryTx) E) domain.Tx[E] {
+	return domain.TxFunc[E](func(ctx context.Context, f func(E) error) error {
+		return r.RunTx(ctx, func(tx *RepositoryTx) error {
+			return f(weaker(tx))
+		})
+	})
 }

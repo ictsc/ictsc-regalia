@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
+	"github.com/cockroachdb/errors"
 	adminv1 "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
@@ -15,22 +16,20 @@ import (
 type InvitationServiceHandler struct {
 	adminv1connect.UnimplementedInvitationServiceHandler
 	Enforcer       *auth.Enforcer
-	ListWorkflow   *domain.InvitationCodeListWorkflow
-	CreateWorkflow *domain.InvitationCodeCreateWorkflow
+	ListEffect     domain.InvitationCodeLister
+	CreateEffect   createInvitationCodeEffect
 }
 
 func NewInvitationServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *InvitationServiceHandler {
 	return &InvitationServiceHandler{
 		UnimplementedInvitationServiceHandler: adminv1connect.UnimplementedInvitationServiceHandler{},
 
-		Enforcer:     enforcer,
-		ListWorkflow: &domain.InvitationCodeListWorkflow{Lister: repo},
-		CreateWorkflow: &domain.InvitationCodeCreateWorkflow{
-			TeamGetter: repo,
-			RunTx: func(ctx context.Context, f func(eff domain.InvitationCodeCreator) error) error {
-				return repo.RunTx(ctx, func(tx *pg.RepositoryTx) error { return f(tx) })
-			},
-		},
+		Enforcer:   enforcer,
+		ListEffect: repo,
+		CreateEffect: struct {
+			*pg.Repository
+			domain.SystemClock
+		}{Repository: repo},
 	}
 }
 
@@ -44,7 +43,7 @@ func (h *InvitationServiceHandler) ListInvitationCodes(
 		return nil, err
 	}
 
-	ics, err := h.ListWorkflow.Run(ctx)
+	ics, err := domain.ListInvitationCodes(ctx, h.ListEffect)
 	if err != nil {
 		return nil, connectError(err)
 	}
@@ -59,6 +58,12 @@ func (h *InvitationServiceHandler) ListInvitationCodes(
 	}), nil
 }
 
+type createInvitationCodeEffect interface {
+	domain.TeamGetter
+	domain.InvitationCodeCreator
+	domain.Clocker
+}
+
 func (h *InvitationServiceHandler) CreateInvitationCode(
 	ctx context.Context,
 	req *connect.Request[adminv1.CreateInvitationCodeRequest],
@@ -67,16 +72,28 @@ func (h *InvitationServiceHandler) CreateInvitationCode(
 		return nil, err
 	}
 
-	code, err := h.CreateWorkflow.Run(ctx, domain.InvitationCodeCreateInput{
-		TeamCode:  int(req.Msg.GetInvitationCode().GetTeamCode()),
-		ExpiresAt: req.Msg.GetInvitationCode().GetExpiresAt().AsTime(),
-	})
+	protoIC := req.Msg.GetInvitationCode()
+	protoTeamCode := protoIC.GetTeamCode()
+	if protoTeamCode == 0 {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("team_code is required"))
+	}
+	teamCode, err := domain.NewTeamCode(int(protoTeamCode))
+	if err != nil {
+		return nil, connectError(err)
+	}
+
+	team, err := teamCode.Team(ctx, h.CreateEffect)
+	if err != nil {
+		return nil, connectError(err)
+	}
+
+	invitationCode, err := team.CreateInvitationCode(ctx, h.CreateEffect, protoIC.GetExpiresAt().AsTime())
 	if err != nil {
 		return nil, connectError(err)
 	}
 
 	return connect.NewResponse(&adminv1.CreateInvitationCodeResponse{
-		InvitationCode: convertInvitationCode(code),
+		InvitationCode: convertInvitationCode(invitationCode),
 	}), nil
 }
 

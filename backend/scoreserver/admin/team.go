@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
+	"github.com/cockroachdb/errors"
 	adminv1 "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
@@ -12,12 +13,12 @@ import (
 )
 
 type TeamServiceHandler struct {
-	Enforcer       *auth.Enforcer
-	ListWorkflow   domain.TeamListWorkflow
-	GetWorkflow    domain.TeamGetWorkflow
-	CreateWorkflow domain.TeamCreateWorkflow
-	UpdateWorkflow domain.TeamUpdateWorkflow
-	DeleteWorkflow domain.TeamDeleteWorkflow
+	Enforcer     *auth.Enforcer
+	ListEffect   domain.TeamListEffect
+	GetEffect    domain.TeamGetEffect
+	CreateEffect domain.TeamCreateEffect
+	UpdateEffect domain.TeamUpdateEffect
+	DeleteEffect domain.Tx[teamDeleteEffect]
 }
 
 var _ adminv1connect.TeamServiceHandler = (*TeamServiceHandler)(nil)
@@ -26,23 +27,11 @@ func NewTeamServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *TeamSe
 	return &TeamServiceHandler{
 		Enforcer: enforcer,
 
-		ListWorkflow: domain.TeamListWorkflow{Lister: repo},
-		GetWorkflow:  domain.TeamGetWorkflow{Getter: repo},
-		CreateWorkflow: domain.TeamCreateWorkflow{
-			RunTx: func(ctx context.Context, f func(domain.TeamCreateTxEffect) error) error {
-				return repo.RunTx(ctx, func(tx *pg.RepositoryTx) error { return f(tx) })
-			},
-		},
-		UpdateWorkflow: domain.TeamUpdateWorkflow{
-			RunTx: func(ctx context.Context, f func(domain.TeamUpdateTxEffect) error) error {
-				return repo.RunTx(ctx, func(tx *pg.RepositoryTx) error { return f(tx) })
-			},
-		},
-		DeleteWorkflow: domain.TeamDeleteWorkflow{
-			RunTx: func(ctx context.Context, f func(domain.TeamDeleteTxEffect) error) error {
-				return repo.RunTx(ctx, func(tx *pg.RepositoryTx) error { return f(tx) })
-			},
-		},
+		ListEffect:   repo,
+		GetEffect:    repo,
+		CreateEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) domain.TeamCreateTxEffect { return rt }),
+		UpdateEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) domain.TeamUpdateTxEffect { return rt }),
+		DeleteEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) teamDeleteEffect { return rt }),
 	}
 }
 
@@ -54,7 +43,7 @@ func (h *TeamServiceHandler) ListTeams(
 		return nil, err
 	}
 
-	teams, err := h.ListWorkflow.Run(ctx)
+	teams, err := domain.ListTeams(ctx, h.ListEffect)
 	if err != nil {
 		return nil, connectError(err)
 	}
@@ -76,9 +65,18 @@ func (h *TeamServiceHandler) GetTeam(
 	if err := enforce(ctx, h.Enforcer, "teams", "get"); err != nil {
 		return nil, err
 	}
-	team, err := h.GetWorkflow.Run(ctx, domain.TeamGetInput{
-		Code: int(req.Msg.GetCode()),
-	})
+
+	inCode := req.Msg.GetCode()
+	if inCode == 0 {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("code is required"))
+	}
+
+	code, err := domain.NewTeamCode(int(inCode))
+	if err != nil {
+		return nil, connectError(err)
+	}
+
+	team, err := code.Team(ctx, h.GetEffect)
 	if err != nil {
 		return nil, connectError(err)
 	}
@@ -95,7 +93,7 @@ func (h *TeamServiceHandler) CreateTeam(
 	if err := enforce(ctx, h.Enforcer, "teams", "create"); err != nil {
 		return nil, err
 	}
-	team, err := h.CreateWorkflow.Run(ctx, domain.TeamCreateInput{
+	team, err := domain.CreateTeam(ctx, h.CreateEffect, domain.TeamCreateInput{
 		Code:         int(req.Msg.GetTeam().GetCode()),
 		Name:         req.Msg.GetTeam().GetName(),
 		Organization: req.Msg.GetTeam().GetOrganization(),
@@ -116,20 +114,42 @@ func (h *TeamServiceHandler) UpdateTeam(
 	if err := enforce(ctx, h.Enforcer, "teams", "update"); err != nil {
 		return nil, err
 	}
+
 	protoTeam := req.Msg.GetTeam()
 
-	team, err := h.UpdateWorkflow.Run(ctx, domain.TeamUpdateInput{
-		Code:         int(protoTeam.GetCode()),
-		Name:         protoTeam.GetName(),
-		Organization: protoTeam.GetOrganization(),
-	})
+	protoCode := protoTeam.GetCode()
+	if protoCode == 0 {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("code is required"))
+	}
+
+	teamCode, err := domain.NewTeamCode(int(protoCode))
 	if err != nil {
+		return nil, connectError(err)
+	}
+
+	team, err := teamCode.Team(ctx, h.GetEffect)
+	if err != nil {
+		return nil, connectError(err)
+	}
+
+	if name := protoTeam.GetName(); name != "" && name != team.Name() {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("name cannot be updated"))
+	}
+
+	if err := team.Update(ctx, h.UpdateEffect, domain.TeamUpdateInput{
+		Organization: protoTeam.GetOrganization(),
+	}); err != nil {
 		return nil, connectError(err)
 	}
 
 	return connect.NewResponse(&adminv1.UpdateTeamResponse{
 		Team: convertTeam(team),
 	}), nil
+}
+
+type teamDeleteEffect interface {
+	domain.TeamGetter
+	domain.TeamDeleter
 }
 
 func (h *TeamServiceHandler) DeleteTeam(
@@ -139,8 +159,23 @@ func (h *TeamServiceHandler) DeleteTeam(
 	if err := enforce(ctx, h.Enforcer, "teams", "delete"); err != nil {
 		return nil, err
 	}
-	if err := h.DeleteWorkflow.Run(ctx, domain.TeamDeleteInput{
-		Code: int(req.Msg.GetCode()),
+
+	protoCode := req.Msg.GetCode()
+	if protoCode == 0 {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("code is required"))
+	}
+	code, err := domain.NewTeamCode(int(protoCode))
+	if err != nil {
+		return nil, connectError(err)
+	}
+
+	if err := h.DeleteEffect.RunInTx(ctx, func(effect teamDeleteEffect) error {
+		team, err := code.Team(ctx, effect)
+		if err != nil {
+			return err
+		}
+
+		return team.Delete(ctx, effect)
 	}); err != nil {
 		return nil, connectError(err)
 	}

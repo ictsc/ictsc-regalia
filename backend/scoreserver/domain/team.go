@@ -52,29 +52,67 @@ func NewTeamCode(code int) (TeamCode, error) {
 	return TeamCode(code), nil
 }
 
-func (t Team) ID() uuid.UUID {
+func (t *Team) ID() uuid.UUID {
 	return t.id
 }
 
-func (t Team) Code() TeamCode {
+func (t *Team) Code() TeamCode {
 	return t.code
 }
 
-func (t Team) Name() string {
+func (t *Team) Name() string {
 	return t.name
 }
 
-func (t Team) Organization() string {
+func (t *Team) Organization() string {
 	return t.organization
 }
 
-type TeamCreateInput struct {
-	Code         int
-	Name         string
-	Organization string
+type TeamGetEffect = TeamGetter
+
+func (tc TeamCode) Team(ctx context.Context, effect TeamGetEffect) (*Team, error) {
+	team, err := effect.GetTeamByCode(ctx, tc)
+	if err != nil {
+		return nil, err
+	}
+	return team, nil
 }
 
-func CreateTeam(input TeamCreateInput) (*Team, error) {
+type TeamListEffect = TeamsLister
+
+func ListTeams(ctx context.Context, effect TeamListEffect) ([]*Team, error) {
+	teams, err := effect.ListTeams(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return teams, nil
+}
+
+type (
+	TeamCreateInput struct {
+		Code         int
+		Name         string
+		Organization string
+	}
+	TeamCreateEffect   = Tx[TeamCreateTxEffect]
+	TeamCreateTxEffect = TeamCreator
+)
+
+func CreateTeam(ctx context.Context, effect TeamCreateEffect, input TeamCreateInput) (*Team, error) {
+	team, err := createTeam(input)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := effect.RunInTx(ctx, func(effect TeamCreateTxEffect) error {
+		return effect.CreateTeam(ctx, team)
+	}); err != nil {
+		return nil, err
+	}
+	return team, nil
+}
+
+func createTeam(input TeamCreateInput) (*Team, error) {
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, NewError(ErrTypeInternal, errors.Wrap(err, "failed to generate uuid"))
@@ -92,163 +130,42 @@ func CreateTeam(input TeamCreateInput) (*Team, error) {
 	return team, nil
 }
 
-type TeamUpdateInput = TeamCreateInput
-
-func (t Team) Updated(input TeamUpdateInput) (*Team, error) {
-	if input.Code != 0 && input.Code != int(t.code) {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("cannot update team code"))
-	}
-	if input.Name != "" && input.Name != t.name {
+type (
+	TeamUpdateInput struct {
 		// Discord のラベル名がチーム名に紐付くため，チーム名を変更可能にするには Discord のラベル ID とチーム ID の結びつきを保存して管理する必要がある
 		// これは実装を複雑にするため，現状はチーム名の変更を許可しない
 		// オペレーション上必要になった場合は実装を検討する
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("cannot update team name"))
+		// Name string
+
+		Organization string
 	}
-	if len(input.Organization) > 0 {
-		t.organization = input.Organization
-	}
-	return &t, nil
-}
-
-// チームに関するワークフロー
-
-type TeamListWorkflow struct {
-	Lister TeamsLister
-}
-
-func (w *TeamListWorkflow) Run(ctx context.Context) ([]*Team, error) {
-	teams, err := w.Lister.ListTeams(ctx)
-	if err != nil {
-		return nil, NewError(ErrTypeInternal, err)
-	}
-	return teams, nil
-}
-
-type TeamGetWorkflow struct {
-	Getter TeamGetter
-}
-type TeamGetInput struct {
-	Code int
-}
-
-func (w *TeamGetWorkflow) Run(ctx context.Context, input TeamGetInput) (*Team, error) {
-	code, err := NewTeamCode(input.Code)
-	if err != nil {
-		return nil, err
-	}
-
-	team, err := w.Getter.GetTeamByCode(ctx, code)
-	if err != nil {
-		if ErrTypeFrom(err) == ErrTypeNotFound {
-			return nil, err
-		}
-		return nil, NewError(ErrTypeInternal, err)
-	}
-
-	return team, nil
-}
-
-type (
-	TeamCreateWorkflow struct {
-		RunTx TxFunc[TeamCreateTxEffect]
-	}
-	TeamCreateTxEffect interface {
-		TeamCreator
-	}
+	TeamUpdateEffect   = Tx[TeamUpdateTxEffect]
+	TeamUpdateTxEffect = TeamUpdater
 )
 
-func (w *TeamCreateWorkflow) Run(ctx context.Context, input TeamCreateInput) (*Team, error) {
-	team, err := CreateTeam(input)
-	if err != nil {
-		return nil, err
-	}
+func (t *Team) Update(ctx context.Context, effect TeamUpdateEffect, input TeamUpdateInput) error {
+	updated := t.update(input)
 
-	if err := w.RunTx(ctx, func(effect TeamCreateTxEffect) error {
-		if err := effect.CreateTeam(ctx, team); err != nil {
-			if ErrTypeFrom(err) == ErrTypeAlreadyExists {
-				return NewError(ErrTypeAlreadyExists, errors.New("team already exists"))
-			}
-			return NewError(ErrTypeInternal, err)
-		}
-
-		return nil
-	}); err != nil {
-		return nil, err
-	}
-
-	return team, nil
-}
-
-// チームを更新するワークフロー
-type (
-	TeamUpdateWorkflow struct {
-		RunTx TxFunc[TeamUpdateTxEffect]
-	}
-	TeamUpdateTxEffect interface {
-		TeamGetter
-		TeamUpdater
-	}
-)
-
-func (w *TeamUpdateWorkflow) Run(ctx context.Context, input TeamUpdateInput) (*Team, error) {
-	var result *Team
-	if err := w.RunTx(ctx, func(effect TeamUpdateTxEffect) error {
-		getWf := TeamGetWorkflow{Getter: effect}
-		team, err := getWf.Run(ctx, TeamGetInput{Code: input.Code})
-		if err != nil {
-			return err
-		}
-
-		updated, err := team.Updated(input)
-		if err != nil {
-			return err
-		}
-
-		if err := effect.UpdateTeam(ctx, updated); err != nil {
-			if ErrTypeFrom(err) == ErrTypeAlreadyExists {
-				return err
-			}
-			return NewError(ErrTypeInternal, err)
-		}
-
-		result = updated
-
-		return nil
-	}); err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
-type (
-	TeamDeleteWorkflow struct {
-		RunTx TxFunc[TeamDeleteTxEffect]
-	}
-	TeamDeleteTxEffect interface {
-		TeamGetter
-		TeamDeleter
-	}
-	TeamDeleteInput = TeamGetInput
-)
-
-func (w *TeamDeleteWorkflow) Run(ctx context.Context, input TeamDeleteInput) error {
-	if err := w.RunTx(ctx, func(effect TeamDeleteTxEffect) error {
-		getWf := TeamGetWorkflow{Getter: effect}
-		team, err := getWf.Run(ctx, input)
-		if err != nil {
-			return err
-		}
-
-		if err := effect.DeleteTeam(ctx, team); err != nil {
-			return NewError(ErrTypeInternal, err)
-		}
-
-		return nil
+	if err := effect.RunInTx(ctx, func(effect TeamUpdateTxEffect) error {
+		return effect.UpdateTeam(ctx, updated)
 	}); err != nil {
 		return err
 	}
 
+	*t = *updated
 	return nil
+}
+
+func (t *Team) update(input TeamUpdateInput) *Team {
+	updated := *t
+	if len(input.Organization) > 0 {
+		updated.organization = input.Organization
+	}
+	return &updated
+}
+
+func (t *Team) Delete(ctx context.Context, effect TeamDeleter) error {
+	return effect.DeleteTeam(ctx, t)
 }
 
 // チームの操作のためのインターフェース
