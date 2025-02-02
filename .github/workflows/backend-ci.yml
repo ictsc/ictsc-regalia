@@ -103,9 +103,18 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
+    env:
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGUSER: ictsc
+      PGPASSWORD: password
+      PGDATABASE: ictscore
     steps:
-      - name: Checkout
+      - name: Checkout Default Branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
       - name: Setup Go
         uses: ./.github/actions/setup-go
       - name: Restore Cache
@@ -115,14 +124,16 @@ jobs:
           path: ~/.cache/go-build
           key: sqldef-cache-${{ hashFiles('backend/go.sum') }}
           restore-keys: sqldef-cache-
+
+      - name: Run Migration With Default Branch
+        run: ./scripts/migrate
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Run Migration
         run: ./scripts/migrate
-        env:
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_USER: ictsc
-          PGPASSWORD: password
-          DB_NAME: ictscore
+
       - name: Save Cache
         uses: actions/cache/save@v4
         if: >-
