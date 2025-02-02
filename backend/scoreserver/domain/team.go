@@ -168,45 +168,8 @@ func (t *Team) update(input TeamUpdateInput) *Team {
 	return &updated
 }
 
-// チームに関するワークフロー
-
-type TeamGetInput struct {
-	Code int
-}
-
-// チームを更新するワークフロー
-type (
-	TeamDeleteWorkflow struct {
-		RunTx TxFunc[TeamDeleteTxEffect]
-	}
-	TeamDeleteTxEffect interface {
-		TeamGetter
-		TeamDeleter
-	}
-	TeamDeleteInput = TeamGetInput
-)
-
-func (w *TeamDeleteWorkflow) Run(ctx context.Context, input TeamDeleteInput) error {
-	code, err := NewTeamCode(input.Code)
-	if err != nil {
-		return err
-	}
-	if err := w.RunTx(ctx, func(effect TeamDeleteTxEffect) error {
-		team, err := code.Team(ctx, effect)
-		if err != nil {
-			return err
-		}
-
-		if err := effect.DeleteTeam(ctx, team); err != nil {
-			return NewError(ErrTypeInternal, err)
-		}
-
-		return nil
-	}); err != nil {
-		return err
-	}
-
-	return nil
+func (t *Team) Delete(ctx context.Context, effect TeamDeleter) error {
+	return effect.DeleteTeam(ctx, t)
 }
 
 // チームの操作のためのインターフェース
