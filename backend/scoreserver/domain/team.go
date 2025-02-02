@@ -78,6 +78,10 @@ func (tc TeamCode) Team(ctx context.Context, effect TeamGetEffect) (*Team, error
 	return team, nil
 }
 
+func (tc TeamCode) Team(ctx context.Context, effect TeamGetEffect) (*Team, error) {
+	return GetTeamByCode(ctx, effect, tc)
+}
+
 type TeamListEffect = TeamsLister
 
 func ListTeams(ctx context.Context, effect TeamListEffect) ([]*Team, error) {
@@ -130,22 +134,38 @@ func createTeam(input TeamCreateInput) (*Team, error) {
 	return team, nil
 }
 
-type TeamUpdateInput = TeamCreateInput
-
-func (t Team) Updated(input TeamUpdateInput) (*Team, error) {
-	if input.Code != 0 && input.Code != int(t.code) {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("cannot update team code"))
-	}
-	if input.Name != "" && input.Name != t.name {
+type (
+	TeamUpdateInput struct {
 		// Discord のラベル名がチーム名に紐付くため，チーム名を変更可能にするには Discord のラベル ID とチーム ID の結びつきを保存して管理する必要がある
 		// これは実装を複雑にするため，現状はチーム名の変更を許可しない
 		// オペレーション上必要になった場合は実装を検討する
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("cannot update team name"))
+		// Name string
+
+		Organization string
 	}
+	TeamUpdateEffect   = Tx[TeamUpdateTxEffect]
+	TeamUpdateTxEffect = TeamUpdater
+)
+
+func (t *Team) Update(ctx context.Context, effect TeamUpdateEffect, input TeamUpdateInput) error {
+	updated := t.update(input)
+
+	if err := effect.RunInTx(ctx, func(effect TeamUpdateTxEffect) error {
+		return effect.UpdateTeam(ctx, updated)
+	}); err != nil {
+		return err
+	}
+
+	*t = *updated
+	return nil
+}
+
+func (t *Team) update(input TeamUpdateInput) *Team {
+	updated := *t
 	if len(input.Organization) > 0 {
-		t.organization = input.Organization
+		updated.organization = input.Organization
 	}
-	return &t, nil
+	return &updated
 }
 
 // チームに関するワークフロー
@@ -155,50 +175,6 @@ type TeamGetInput struct {
 }
 
 // チームを更新するワークフロー
-type (
-	TeamUpdateWorkflow struct {
-		RunTx TxFunc[TeamUpdateTxEffect]
-	}
-	TeamUpdateTxEffect interface {
-		TeamGetter
-		TeamUpdater
-	}
-)
-
-func (w *TeamUpdateWorkflow) Run(ctx context.Context, input TeamUpdateInput) (*Team, error) {
-	code, err := NewTeamCode(input.Code)
-	if err != nil {
-		return nil, err
-	}
-
-	var result *Team
-	if err := w.RunTx(ctx, func(effect TeamUpdateTxEffect) error {
-		team, err := GetTeamByCode(ctx, effect, code)
-		if err != nil {
-			return err
-		}
-
-		updated, err := team.Updated(input)
-		if err != nil {
-			return err
-		}
-
-		if err := effect.UpdateTeam(ctx, updated); err != nil {
-			if ErrTypeFrom(err) == ErrTypeAlreadyExists {
-				return err
-			}
-			return NewError(ErrTypeInternal, err)
-		}
-
-		result = updated
-
-		return nil
-	}); err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
 type (
 	TeamDeleteWorkflow struct {
 		RunTx TxFunc[TeamDeleteTxEffect]

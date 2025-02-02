@@ -17,7 +17,7 @@ type TeamServiceHandler struct {
 	ListEffect     domain.TeamListEffect
 	GetEffect      domain.TeamGetEffect
 	CreateEffect   domain.TeamCreateEffect
-	UpdateWorkflow domain.TeamUpdateWorkflow
+	UpdateEffect   domain.TeamUpdateEffect
 	DeleteWorkflow domain.TeamDeleteWorkflow
 }
 
@@ -30,11 +30,7 @@ func NewTeamServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *TeamSe
 		ListEffect:   repo,
 		GetEffect:    repo,
 		CreateEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) domain.TeamCreateTxEffect { return rt }),
-		UpdateWorkflow: domain.TeamUpdateWorkflow{
-			RunTx: func(ctx context.Context, f func(domain.TeamUpdateTxEffect) error) error {
-				return repo.RunTx(ctx, func(tx *pg.RepositoryTx) error { return f(tx) })
-			},
-		},
+		UpdateEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) domain.TeamUpdateTxEffect { return rt }),
 		DeleteWorkflow: domain.TeamDeleteWorkflow{
 			RunTx: func(ctx context.Context, f func(domain.TeamDeleteTxEffect) error) error {
 				return repo.RunTx(ctx, func(tx *pg.RepositoryTx) error { return f(tx) })
@@ -122,14 +118,31 @@ func (h *TeamServiceHandler) UpdateTeam(
 	if err := enforce(ctx, h.Enforcer, "teams", "update"); err != nil {
 		return nil, err
 	}
+
 	protoTeam := req.Msg.GetTeam()
 
-	team, err := h.UpdateWorkflow.Run(ctx, domain.TeamUpdateInput{
-		Code:         int(protoTeam.GetCode()),
-		Name:         protoTeam.GetName(),
-		Organization: protoTeam.GetOrganization(),
-	})
+	protoCode := protoTeam.GetCode()
+	if protoCode == 0 {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("code is required"))
+	}
+
+	teamCode, err := domain.NewTeamCode(int(protoCode))
 	if err != nil {
+		return nil, connectError(err)
+	}
+
+	team, err := teamCode.Team(ctx, h.GetEffect)
+	if err != nil {
+		return nil, connectError(err)
+	}
+
+	if name := protoTeam.GetName(); name != "" && name != team.Name() {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("name cannot be updated"))
+	}
+
+	if err := team.Update(ctx, h.UpdateEffect, domain.TeamUpdateInput{
+		Organization: protoTeam.GetOrganization(),
+	}); err != nil {
 		return nil, connectError(err)
 	}
 
