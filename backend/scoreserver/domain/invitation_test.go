@@ -12,7 +12,7 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 )
 
-func Test_InvitationCodeListWorkflow(t *testing.T) {
+func Test_ListInvitationCode(t *testing.T) {
 	t.Parallel()
 
 	team1 := must(domain.NewTeam(domain.TeamInput{
@@ -46,19 +46,17 @@ func Test_InvitationCodeListWorkflow(t *testing.T) {
 		CreatedAt: now,
 	}))
 
-	workflow := &domain.InvitationCodeListWorkflow{
-		Lister: invitationCodeListerFunc(func(_ context.Context, _ domain.InvitationCodeFilter) ([]*domain.InvitationCode, error) {
-			return []*domain.InvitationCode{ic1, ic2}, nil
-		}),
-	}
+	effect := invitationCodeListerFunc(func(_ context.Context, _ domain.InvitationCodeFilter) ([]*domain.InvitationCode, error) {
+		return []*domain.InvitationCode{ic1, ic2}, nil
+	})
 
 	cases := map[string]struct {
-		w *domain.InvitationCodeListWorkflow
+		effect domain.InvitationCodeLister
 
 		wants []*domain.InvitationCode
 	}{
 		"ok": {
-			w: workflow,
+			effect: effect,
 
 			wants: []*domain.InvitationCode{ic1, ic2},
 		},
@@ -68,7 +66,7 @@ func Test_InvitationCodeListWorkflow(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			ics, err := tt.w.Run(context.Background())
+			ics, err := domain.ListInvitationCodes(context.Background(), tt.effect)
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}

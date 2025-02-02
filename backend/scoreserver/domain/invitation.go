@@ -76,22 +76,18 @@ func (c *InvitationCode) CreatedAt() time.Time {
 	return c.createdAt
 }
 
-// 招待コードの一覧を取得するワークフロー
-type (
-	InvitationCodeListWorkflow struct {
-		Lister InvitationCodeLister
-	}
-)
-
-func (w *InvitationCodeListWorkflow) Run(ctx context.Context) ([]*InvitationCode, error) {
-	ics, err := w.Lister.ListInvitationCodes(ctx, InvitationCodeFilter{})
+// ListInvitationCodes - 招待コードの一覧を取得する
+func ListInvitationCodes(
+	ctx context.Context, eff InvitationCodeLister,
+) ([]*InvitationCode, error) {
+	ics, err := eff.ListInvitationCodes(ctx, InvitationCodeFilter{})
 	if err != nil {
 		return nil, err
 	}
 	return ics, nil
 }
 
-// 招待コードの作成
+// CreateInvitationCode - 招待コードの作成
 func (t *Team) CreateInvitationCode(
 	ctx context.Context, eff InvitationCodeCreateEffect, expiresAt time.Time,
 ) (*InvitationCode, error) {
