@@ -16,44 +16,48 @@ import (
 func Test_PgRepo_InvitationCode(t *testing.T) {
 	t.Parallel()
 
-	now := must(time.Parse(time.RFC3339, "2025-01-01T00:00:00Z"))
-
-	team1 := must(domain.NewTeam(domain.TeamInput{
-		ID:           must(uuid.NewV4()),
-		Code:         1,
-		Name:         "team1",
-		Organization: "org1",
-	}))
-	invitationCode := must(domain.NewInvitationCode(domain.InvitationCodeInput{
-		ID:        must(uuid.NewV4()),
-		Code:      "ABCD1234EFGH5678",
-		Team:      team1,
-		ExpiresAt: now.Add(24 * time.Hour),
-		CreatedAt: now,
-	}))
-
 	//nolint:thelper //ここではテストケースを書いているため
 	tests := map[string]func(t *testing.T, db *sqlx.DB){
 		"create": func(t *testing.T, db *sqlx.DB) {
+			ctx, cancel := context.WithCancel(context.Background())
+			t.Cleanup(cancel)
+
 			repo := pg.NewRepository(db)
-			if err := repo.CreateInvitationCode(context.Background(), invitationCode); err != nil {
+
+			team2, err := repo.GetTeamByCode(ctx, domain.TeamCode(2))
+			if err != nil {
+				t.Fatalf("failed to get team2: %+v", err)
+			}
+
+			code, err := domain.NewInvitationCode(domain.InvitationCodeInput{
+				ID:        uuid.FromStringOrNil("00000000-0000-0000-0000-000000000001"),
+				Code:      "ABCD1234EFGH5678",
+				Team:      team2,
+				ExpiresAt: must(time.Parse(time.RFC3339, "2025-01-02T00:00:00Z")),
+				CreatedAt: must(time.Parse(time.RFC3339, "2025-01-01T00:00:00Z")),
+			})
+			if err != nil {
 				t.Fatalf("failed to create invitation code: %+v", err)
 			}
 
-			row := db.QueryRowx("SELECT * FROM invitation_codes WHERE id = $1", invitationCode.ID())
-			if row.Err() != nil {
-				t.Fatalf("failed to get invitation code: %+v", row.Err())
+			if err := repo.CreateInvitationCode(ctx, code); err != nil {
+				t.Fatalf("failed to create invitation code: %+v", err)
+			}
+
+			row := db.QueryRowxContext(ctx, "SELECT * FROM invitation_codes WHERE id = $1", code.ID())
+			if err := row.Err(); err != nil {
+				t.Fatalf("failed to get invitation code: %+v", err)
 			}
 			got := map[string]any{}
 			if err := row.MapScan(got); err != nil {
-				t.Fatalf("failed to map scan: %+v", err)
+				t.Fatalf("failed to scan invitation code: %+v", err)
 			}
 			if diff := cmp.Diff(got, map[string]any{
-				"id":         invitationCode.ID().String(),
-				"code":       invitationCode.Code(),
-				"team_id":    invitationCode.Team().ID().String(),
-				"expires_at": invitationCode.ExpiresAt(),
-				"created_at": invitationCode.CreatedAt(),
+				"id":         "00000000-0000-0000-0000-000000000001",
+				"code":       "ABCD1234EFGH5678",
+				"team_id":    "83027d5e-fa32-41d6-b290-fc38ba337f89",
+				"expires_at": must(time.Parse(time.RFC3339, "2025-01-02T00:00:00Z")),
+				"created_at": must(time.Parse(time.RFC3339, "2025-01-01T00:00:00Z")),
 			}); diff != "" {
 				t.Errorf("differs: (-got +want)\n%s", diff)
 			}
@@ -61,24 +65,25 @@ func Test_PgRepo_InvitationCode(t *testing.T) {
 		"list": func(t *testing.T, db *sqlx.DB) {
 			repo := pg.NewRepository(db)
 
-			before, err := repo.ListInvitationCodes(context.Background(), domain.InvitationCodeFilter{})
-			if err != nil {
-				t.Fatalf("%+v", err)
-			}
-			if len(before) != 0 {
-				t.Errorf("unexpected invitation codes: %+v", before)
-			}
-
-			if err := repo.CreateInvitationCode(context.Background(), invitationCode); err != nil {
-				t.Fatalf("failed to create invitation code: %+v", err)
-			}
-
 			got, err := repo.ListInvitationCodes(context.Background(), domain.InvitationCodeFilter{})
 			if err != nil {
 				t.Fatalf("failed to list invitation codes: %+v", err)
 			}
 			if diff := cmp.Diff(
-				got, []*domain.InvitationCode{invitationCode},
+				got, []*domain.InvitationCode{
+					must(domain.NewInvitationCode(domain.InvitationCodeInput{
+						ID: uuid.FromStringOrNil("ad3f83d3-65be-4884-8a03-adb11a8127ef"),
+						Team: must(domain.NewTeam(domain.TeamInput{
+							ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
+							Code:         1,
+							Name:         "トラブルシューターズ",
+							Organization: "ICTSC Association",
+						})),
+						Code:      "LHNZXGSF7L59WCG9",
+						ExpiresAt: must(time.Parse(time.RFC3339, "2038-04-03T00:00:00+09:00")),
+						CreatedAt: must(time.Parse(time.RFC3339, "2025-02-02T17:10:00+09:00")),
+					})),
+				},
 				cmp.AllowUnexported(domain.InvitationCode{}, domain.Team{}),
 			); diff != "" {
 				t.Errorf("differs: (-got +want)\n%s", diff)
@@ -86,20 +91,11 @@ func Test_PgRepo_InvitationCode(t *testing.T) {
 		},
 	}
 
-	setup := func(t *testing.T, db *sqlx.DB) {
-		t.Helper()
-
-		repo := pg.NewRepository(db)
-		if err := repo.CreateTeam(context.Background(), team1); err != nil {
-			t.Fatalf("failed to create team: %+v", err)
-		}
-	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
 			db := pgtest.SetupDB(t)
-			setup(t, db)
 			test(t, db)
 		})
 	}

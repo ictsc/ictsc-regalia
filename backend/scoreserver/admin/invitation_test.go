@@ -52,7 +52,6 @@ func TestAdminInvitationService_Create(t *testing.T) {
 			enforcer := setupEnforcer(t)
 
 			db := pgtest.SetupDB(t)
-			teamFixtures(db)
 
 			mux := http.NewServeMux()
 			mux.Handle(adminv1connect.NewInvitationServiceHandler(admin.NewInvitationServiceHandler(
