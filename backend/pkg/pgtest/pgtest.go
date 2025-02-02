@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
@@ -24,10 +25,6 @@ const (
 	schemaFile    = "schema.sql"
 )
 
-var (
-	postgresContainer *postgres.PostgresContainer
-)
-
 type RunFunc func() int
 
 // WrapRun は関数をラップして Postgres のライフサイクルを管理します。
@@ -35,20 +32,6 @@ type RunFunc func() int
 // TestMain で呼び出すことを想定しています。
 func WrapRun(run RunFunc) RunFunc {
 	return func() int {
-		ctx := context.Background()
-
-		ctr, err := startContainer(ctx)
-		if err != nil {
-			log.Printf("Failed to start Postgres container: %v\n", err)
-			return 1
-		}
-		defer func() {
-			if err := testcontainers.TerminateContainer(ctr); err != nil {
-				log.Printf("Failed to terminate Postgres container: %v\n", err)
-			}
-		}()
-
-		postgresContainer = ctr
 		return run()
 	}
 }
@@ -62,12 +45,9 @@ func SetupDB(tb testing.TB) (*sqlx.DB, bool) {
 
 	ctx := context.Background()
 
-	if postgresContainer == nil {
-		tb.Errorf("Postgres Container is not initialized. May forgot to call WrapRun?")
-		return nil, false
-	}
+	ctr := getContainer(ctx)
 
-	connString, err := postgresContainer.ConnectionString(ctx)
+	connString, err := ctr.ConnectionString(ctx)
 	if err != nil {
 		tb.Errorf("Failed to get connection string: %v", err)
 		return nil, false
@@ -88,6 +68,22 @@ func SetupTrueDB(tb testing.TB) (*sqlx.DB, bool) {
 	// TODO: startContainer を使って DB を起動し，tb.Cleanup で停止する
 	tb.Error("unimplemented")
 	return nil, false
+}
+
+var (
+	container *postgres.PostgresContainer
+	startOnce sync.Once
+)
+
+func getContainer(ctx context.Context) *postgres.PostgresContainer {
+	startOnce.Do(func() {
+		var err error
+		container, err = startContainer(ctx)
+		if err != nil {
+			panic(err)
+		}
+	})
+	return container
 }
 
 func startContainer(ctx context.Context) (*postgres.PostgresContainer, error) {
@@ -120,5 +116,8 @@ func startContainer(ctx context.Context) (*postgres.PostgresContainer, error) {
 				WithOccurrence(2).
 				WithStartupTimeout(5*time.Second),
 		))
-	return container, errors.WithStack(err)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to start Postgres container")
+	}
+	return container, nil
 }
