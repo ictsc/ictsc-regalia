@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	postgresImage = "postgres:13"
+	postgresImage = "postgres:17"
 	schemaFile    = "schema.sql"
 )
 
