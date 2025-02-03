@@ -1,0 +1,67 @@
+package pg
+
+import (
+	"context"
+	"iter"
+
+	"github.com/cockroachdb/errors"
+	"github.com/gofrs/uuid/v5"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jmoiron/sqlx"
+)
+
+var _ domain.UserLister = (*repo)(nil)
+
+func (r *repo) ListUsers(ctx context.Context, filter domain.UserListFilter) iter.Seq2[*domain.UserData, error] {
+	return func(yield func(*domain.UserData, error) bool) {
+		cond := "TRUE"
+		var args []any
+		if filter.Name != "" {
+			cond += " AND name = ?"
+			args = append(args, filter.Name)
+		}
+		rows, err := r.ext.QueryxContext(ctx, r.ext.Rebind(`
+			SELECT id, name FROM users
+			WHERE `+cond,
+		), args...)
+		if err != nil {
+			yield(nil, err)
+			return
+		}
+		defer func() { _ = rows.Close() }()
+
+		for rows.Next() {
+			var row userRow
+			if err := rows.StructScan(&row); err != nil {
+				yield(nil, err)
+				return
+			}
+			if !yield((*domain.UserData)(&row), nil) {
+				return
+			}
+		}
+	}
+}
+
+var _ domain.UserCreator = (*repo)(nil)
+
+func (r *repo) CreateUser(ctx context.Context, user *domain.UserData) error {
+	if _, err := sqlx.NamedExecContext(ctx, r.ext, `
+		INSERT INTO users (id, name, created_at) VALUES (:id, :name, NOW())
+	`, (*userRow)(user)); err != nil {
+		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
+			// 一意制約違反
+			if pgErr.Code == "23505" {
+				return domain.NewError(domain.ErrTypeAlreadyExists, errors.New("user already exists"))
+			}
+		}
+		return errors.Wrap(err, "failed to insert into users")
+	}
+	return nil
+}
+
+type userRow struct {
+	ID   uuid.UUID `db:"id"`
+	Name string    `db:"name"`
+}

@@ -24,3 +24,12 @@ COMMENT ON COLUMN invitation_codes.id IS '招待コード ID';
 COMMENT ON COLUMN invitation_codes.team_id IS 'チーム ID';
 COMMENT ON COLUMN invitation_codes.code IS '招待コード';
 COMMENT ON COLUMN invitation_codes.expires_at IS '有効期限';
+
+CREATE TABLE users (
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	name VARCHAR(32) NOT NULL UNIQUE,
+	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON TABLE users IS 'ユーザ';
+COMMENT ON COLUMN users.id IS 'ユーザ ID';
+COMMENT ON COLUMN users.name IS 'ユーザ名';
