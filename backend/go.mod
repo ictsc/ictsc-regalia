@@ -12,6 +12,7 @@ require (
 	github.com/DATA-DOG/go-txdb v0.2.0
 	github.com/XSAM/otelsql v0.36.0
 	github.com/bufbuild/buf v1.50.0
+	github.com/bwmarrin/discordgo v0.28.1
 	github.com/casbin/casbin/v2 v2.103.0
 	github.com/cockroachdb/errors v1.11.3
 	github.com/coreos/go-oidc/v3 v3.12.0
@@ -105,6 +106,7 @@ require (
 	github.com/google/go-containerregistry v0.20.3 // indirect
 	github.com/google/pprof v0.0.0-20250202011525-fc3143867406 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
