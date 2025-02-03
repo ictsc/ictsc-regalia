@@ -44,12 +44,15 @@ func (r *repo) ListUsers(ctx context.Context, filter domain.UserListFilter) iter
 	}
 }
 
-var _ domain.UserCreator = (*repo)(nil)
+var _ domain.UserCreator = (*RepositoryTx)(nil)
 
-func (r *repo) CreateUser(ctx context.Context, user *domain.UserData) error {
+// CreateUser - ユーザ+プロフィールを作成する
+//
+// 複数のテーブルに関与するのでトランザクション内でしか呼び出せない
+func (r *RepositoryTx) CreateUser(ctx context.Context, profile *domain.UserProfileData) error {
 	if _, err := sqlx.NamedExecContext(ctx, r.ext, `
 		INSERT INTO users (id, name, created_at) VALUES (:id, :name, NOW())
-	`, (*userRow)(user)); err != nil {
+	`, (*userRow)(profile.User)); err != nil {
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
 			// 一意制約違反
 			if pgErr.Code == "23505" {
@@ -58,10 +61,34 @@ func (r *repo) CreateUser(ctx context.Context, user *domain.UserData) error {
 		}
 		return errors.Wrap(err, "failed to insert into users")
 	}
+
+	if _, err := sqlx.NamedExecContext(ctx, r.ext, `
+		INSERT INTO user_profiles (id, user_id, display_name, created_at, updated_at)
+		VALUES (:id, :user_id, :display_name, NOW(), NOW())`,
+		newUserProfileRow(profile),
+	); err != nil {
+		return errors.Wrap(err, "failed to insert into user_profiles")
+	}
+
 	return nil
 }
 
-type userRow struct {
-	ID   uuid.UUID `db:"id"`
-	Name string    `db:"name"`
+type (
+	userRow struct {
+		ID   uuid.UUID `db:"id"`
+		Name string    `db:"name"`
+	}
+	userProfileRow struct {
+		ID          uuid.UUID `db:"id"`
+		UserID      uuid.UUID `db:"user_id"`
+		DisplayName string    `db:"display_name"`
+	}
+)
+
+func newUserProfileRow(profile *domain.UserProfileData) *userProfileRow {
+	return &userProfileRow{
+		ID:          profile.ID,
+		UserID:      profile.User.ID,
+		DisplayName: profile.DisplayName,
+	}
 }

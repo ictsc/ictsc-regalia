@@ -72,10 +72,7 @@ type (
 		ListUsers(ctx context.Context, filter UserListFilter) iter.Seq2[*UserData, error]
 	}
 	UserCreator interface {
-		CreateUser(ctx context.Context, user *UserData) error
-	}
-	UserProfileCreator interface {
-		CreateUserProfile(ctx context.Context, profile *UserProfileData) error
+		CreateUser(ctx context.Context, user *UserProfileData) error
 	}
 )
 
