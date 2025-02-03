@@ -20,6 +20,16 @@ type (
 		ID   uuid.UUID
 		Name string
 	}
+	UserProfile struct {
+		id          uuid.UUID
+		user        *User
+		displayName string
+	}
+	UserProfileData struct {
+		ID          uuid.UUID
+		User        *UserData
+		DisplayName string
+	}
 )
 
 func NewUserName(name string) (UserName, error) {
@@ -38,6 +48,18 @@ func (u *User) Name() UserName {
 	return u.name
 }
 
+func NewUserProfile(input *UserProfileData) (*UserProfile, error) {
+	return newUserProfile(input)
+}
+
+func (u *UserProfile) User() *User {
+	return u.user
+}
+
+func (u *UserProfile) DisplayName() string {
+	return u.displayName
+}
+
 // ユーザーに関する操作集合
 type (
 	UserListFilter struct {
@@ -51,6 +73,9 @@ type (
 	}
 	UserCreator interface {
 		CreateUser(ctx context.Context, user *UserData) error
+	}
+	UserProfileCreator interface {
+		CreateUserProfile(ctx context.Context, profile *UserProfileData) error
 	}
 )
 
@@ -81,6 +106,23 @@ func newUser(input *UserData) (*User, error) {
 	return &User{
 		id:   input.ID,
 		name: name,
+	}, nil
+}
+
+func newUserProfile(input *UserProfileData) (*UserProfile, error) {
+	user, err := newUser(input.User)
+	if err != nil {
+		return nil, err
+	}
+
+	//nolint:mnd
+	if len(input.DisplayName) > 128 {
+		return nil, NewError(ErrTypeInvalidArgument, errors.New("display name length must be less than 128"))
+	}
+	return &UserProfile{
+		id:          input.ID,
+		user:        user,
+		displayName: input.DisplayName,
 	}, nil
 }
 
