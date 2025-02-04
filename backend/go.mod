@@ -154,7 +154,7 @@ require (
 	github.com/rs/cors v1.11.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/samber/lo v1.49.1 // indirect
-	github.com/samber/slog-multi v1.3.3 // indirect
+	github.com/samber/slog-multi v1.4.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/segmentio/encoding v0.4.1 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
