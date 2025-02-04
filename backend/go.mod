@@ -23,7 +23,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/phsym/console-slog v0.3.1
 	github.com/prometheus/client_golang v1.20.5
-	github.com/samber/slog-formatter v1.1.2
+	github.com/samber/slog-formatter v1.2.0
 	github.com/sqldef/sqldef v0.17.29
 	github.com/testcontainers/testcontainers-go v0.35.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.35.0
