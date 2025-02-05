@@ -181,6 +181,7 @@ func Test_PgRepo_CreateUser(t *testing.T) {
 func Test_PgRepo_LinkDiscordUser(t *testing.T) {
 	t.Parallel()
 
+	//nolint:thelper //サブテスト
 	tests := map[string]func(t *testing.T, repo *pg.Repository, db *sqlx.DB){
 		"ok": func(t *testing.T, repo *pg.Repository, db *sqlx.DB) {
 			ctx := context.Background()
@@ -210,7 +211,7 @@ func Test_PgRepo_LinkDiscordUser(t *testing.T) {
 
 			actual, expected := map[string]any{}, map[string]any{
 				"user_id":         userID.String(),
-				"discord_user_id": int64(discordUserID),
+				"discord_user_id": discordUserID,
 			}
 			if err := row.MapScan(actual); err != nil {
 				t.Fatalf("failed to scan discord user: %+v", err)

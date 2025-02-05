@@ -13,7 +13,6 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
-	"github.com/jmoiron/sqlx"
 )
 
 func TestAdminTeamService_Create(t *testing.T) {
@@ -73,7 +72,7 @@ func TestAdminTeamService_Create(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			client, _ := setupTeamService(t)
+			client := setupTeamService(t)
 
 			resp, err := client.CreateTeam(ctx, connect.NewRequest(tt.in))
 			assertCode(t, tt.wantCode, err)
@@ -117,7 +116,7 @@ func TestAdminTeamService_List(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			client, _ := setupTeamService(t)
+			client := setupTeamService(t)
 
 			resp, err := client.ListTeams(ctx, connect.NewRequest(tt.in))
 			assertCode(t, tt.wantCode, err)
@@ -161,7 +160,7 @@ func TestAdminTeamService_Get(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			client, _ := setupTeamService(t)
+			client := setupTeamService(t)
 
 			resp, err := client.GetTeam(ctx, connect.NewRequest(tt.in))
 			assertCode(t, tt.wantCode, err)
@@ -213,7 +212,7 @@ func TestAdminTeamService_Update(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			client, _ := setupTeamService(t)
+			client := setupTeamService(t)
 
 			resp, err := client.UpdateTeam(ctx, connect.NewRequest(tt.in))
 			assertCode(t, tt.wantCode, err)
@@ -254,7 +253,7 @@ func TestAdminTeamService_Delete(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			client, _ := setupTeamService(t)
+			client := setupTeamService(t)
 
 			resp, err := client.DeleteTeam(ctx, connect.NewRequest(tt.in))
 			assertCode(t, tt.wantCode, err)
@@ -272,7 +271,7 @@ func TestAdminTeamService_Delete(t *testing.T) {
 	}
 }
 
-func setupTeamService(t *testing.T) (adminv1connect.TeamServiceClient, *sqlx.DB) {
+func setupTeamService(t *testing.T) adminv1connect.TeamServiceClient {
 	t.Helper()
 
 	db := pgtest.SetupDB(t)
@@ -287,5 +286,5 @@ func setupTeamService(t *testing.T) (adminv1connect.TeamServiceClient, *sqlx.DB)
 	server := setupServer(t, mux)
 
 	client := adminv1connect.NewTeamServiceClient(http.DefaultClient, server.URL)
-	return client, db
+	return client
 }

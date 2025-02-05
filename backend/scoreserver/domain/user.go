@@ -109,7 +109,8 @@ func (d *UserData) parse() (*user, error) {
 	}, nil
 }
 
-func (d *UserProfileData) parse() (*UserProfile, error) {
+//nolint:unused
+func (d *UserProfileData) _parse() (*UserProfile, error) {
 	user, err := d.User.parse()
 	if err != nil {
 		return nil, err

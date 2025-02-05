@@ -25,7 +25,7 @@ func (r *repo) ListTeams(ctx context.Context) ([]*domain.TeamData, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to select teams")
 	}
-	defer rows.Close()
+	defer rows.Close() //nolint:errcheck
 
 	var teams []*domain.TeamData
 	for rows.Next() {

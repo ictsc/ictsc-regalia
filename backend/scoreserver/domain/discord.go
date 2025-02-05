@@ -66,7 +66,7 @@ func (id DiscordUserID) User(ctx context.Context, eff DiscordLinkedUserGetter) (
 	if err != nil {
 		return nil, err
 	}
-	return (*User)(user), nil
+	return user, nil
 }
 
 type (

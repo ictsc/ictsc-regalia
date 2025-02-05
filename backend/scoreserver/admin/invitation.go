@@ -15,9 +15,9 @@ import (
 
 type InvitationServiceHandler struct {
 	adminv1connect.UnimplementedInvitationServiceHandler
-	Enforcer       *auth.Enforcer
-	ListEffect     domain.InvitationCodeLister
-	CreateEffect   createInvitationCodeEffect
+	Enforcer     *auth.Enforcer
+	ListEffect   domain.InvitationCodeLister
+	CreateEffect createInvitationCodeEffect
 }
 
 func NewInvitationServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *InvitationServiceHandler {

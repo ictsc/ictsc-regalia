@@ -16,7 +16,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// nolint:gochecknonglobals
 var (
 	flagIssuer      = flag.String("issuer", "", "Issuer")
 	flagClientID    = flag.String("client-id", "", "Client ID")
