@@ -24,27 +24,24 @@ func Test_PgRepo_InvitationCode(t *testing.T) {
 
 			repo := pg.NewRepository(db)
 
-			team2, err := repo.GetTeamByCode(ctx, domain.TeamCode(2))
+			team2, err := repo.GetTeamByCode(ctx, 2)
 			if err != nil {
 				t.Fatalf("failed to get team2: %+v", err)
 			}
 
-			code, err := domain.NewInvitationCode(domain.InvitationCodeInput{
+			code := &domain.InvitationCodeData{
 				ID:        uuid.FromStringOrNil("00000000-0000-0000-0000-000000000001"),
 				Code:      "ABCD1234EFGH5678",
 				Team:      team2,
 				ExpiresAt: must(time.Parse(time.RFC3339, "2025-01-02T00:00:00Z")),
 				CreatedAt: must(time.Parse(time.RFC3339, "2025-01-01T00:00:00Z")),
-			})
-			if err != nil {
-				t.Fatalf("failed to create invitation code: %+v", err)
 			}
 
 			if err := repo.CreateInvitationCode(ctx, code); err != nil {
 				t.Fatalf("failed to create invitation code: %+v", err)
 			}
 
-			row := db.QueryRowxContext(ctx, "SELECT * FROM invitation_codes WHERE id = $1", code.ID())
+			row := db.QueryRowxContext(ctx, "SELECT * FROM invitation_codes WHERE id = $1", code.ID)
 			if err := row.Err(); err != nil {
 				t.Fatalf("failed to get invitation code: %+v", err)
 			}
@@ -70,19 +67,19 @@ func Test_PgRepo_InvitationCode(t *testing.T) {
 				t.Fatalf("failed to list invitation codes: %+v", err)
 			}
 			if diff := cmp.Diff(
-				got, []*domain.InvitationCode{
-					must(domain.NewInvitationCode(domain.InvitationCodeInput{
+				got, []*domain.InvitationCodeData{
+					{
 						ID: uuid.FromStringOrNil("ad3f83d3-65be-4884-8a03-adb11a8127ef"),
-						Team: must(domain.NewTeam(domain.TeamInput{
+						Team: &domain.TeamData{
 							ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
 							Code:         1,
 							Name:         "トラブルシューターズ",
 							Organization: "ICTSC Association",
-						})),
+						},
 						Code:      "LHNZXGSF7L59WCG9",
 						ExpiresAt: must(time.Parse(time.RFC3339, "2038-04-03T00:00:00+09:00")),
 						CreatedAt: must(time.Parse(time.RFC3339, "2025-02-02T17:10:00+09:00")),
-					})),
+					},
 				},
 				cmp.AllowUnexported(domain.InvitationCode{}, domain.Team{}),
 			); diff != "" {

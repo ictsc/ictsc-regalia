@@ -72,6 +72,8 @@ func (h *InvitationServiceHandler) CreateInvitationCode(
 		return nil, err
 	}
 
+	now := h.CreateEffect.Now()
+
 	protoIC := req.Msg.GetInvitationCode()
 	protoTeamCode := protoIC.GetTeamCode()
 	if protoTeamCode == 0 {
@@ -87,7 +89,7 @@ func (h *InvitationServiceHandler) CreateInvitationCode(
 		return nil, connectError(err)
 	}
 
-	invitationCode, err := team.CreateInvitationCode(ctx, h.CreateEffect, protoIC.GetExpiresAt().AsTime())
+	invitationCode, err := team.CreateInvitationCode(ctx, h.CreateEffect, now, protoIC.GetExpiresAt().AsTime())
 	if err != nil {
 		return nil, connectError(err)
 	}

@@ -15,50 +15,46 @@ import (
 func Test_ListInvitationCode(t *testing.T) {
 	t.Parallel()
 
-	team1 := must(domain.NewTeam(domain.TeamInput{
-		ID:           must(uuid.NewV4()),
-		Code:         1,
-		Name:         "team1",
-		Organization: "org1",
-	}))
-
-	team2 := must(domain.NewTeam(domain.TeamInput{
-		ID:           must(uuid.NewV4()),
-		Code:         2,
-		Name:         "team2",
-		Organization: "org2",
-	}))
-
 	now := must(time.Parse(time.RFC3339, "2025-01-01T00:00:00Z"))
-	ic1 := must(domain.NewInvitationCode(domain.InvitationCodeInput{
-		ID:        must(uuid.NewV4()),
-		Team:      team1,
+	ic1 := &domain.InvitationCodeData{
+		ID: must(uuid.NewV4()),
+		Team: &domain.TeamData{
+			ID:           must(uuid.NewV4()),
+			Code:         1,
+			Name:         "team1",
+			Organization: "org1",
+		},
 		Code:      "ABCD1234EFGH5678",
 		ExpiresAt: now.Add(24 * time.Hour),
 		CreatedAt: now,
-	}))
+	}
 
-	ic2 := must(domain.NewInvitationCode(domain.InvitationCodeInput{
-		ID:        must(uuid.NewV4()),
-		Team:      team2,
+	ic2 := &domain.InvitationCodeData{
+		ID: must(uuid.NewV4()),
+		Team: &domain.TeamData{
+			ID:           must(uuid.NewV4()),
+			Code:         2,
+			Name:         "team2",
+			Organization: "org2",
+		},
 		Code:      "WXYZ9876MNPQ5432",
 		ExpiresAt: now.Add(48 * time.Hour),
 		CreatedAt: now,
-	}))
+	}
 
-	effect := invitationCodeListerFunc(func(_ context.Context, _ domain.InvitationCodeFilter) ([]*domain.InvitationCode, error) {
-		return []*domain.InvitationCode{ic1, ic2}, nil
+	effect := invitationCodeListerFunc(func(_ context.Context, _ domain.InvitationCodeFilter) ([]*domain.InvitationCodeData, error) {
+		return []*domain.InvitationCodeData{ic1, ic2}, nil
 	})
 
 	cases := map[string]struct {
 		effect domain.InvitationCodeLister
 
-		wants []*domain.InvitationCode
+		wants []*domain.InvitationCodeData
 	}{
 		"ok": {
 			effect: effect,
 
-			wants: []*domain.InvitationCode{ic1, ic2},
+			wants: []*domain.InvitationCodeData{ic1, ic2},
 		},
 	}
 
@@ -70,9 +66,14 @@ func Test_ListInvitationCode(t *testing.T) {
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
+
+			actual := make([]*domain.InvitationCodeData, 0, len(ics))
+			for _, ic := range ics {
+				actual = append(actual, ic.Data())
+			}
 			if diff := cmp.Diff(
-				tt.wants, ics,
-				cmp.AllowUnexported(domain.InvitationCode{}, domain.Team{}),
+				tt.wants, actual,
+				cmp.AllowUnexported(domain.Team{}),
 			); diff != "" {
 				t.Errorf("mismatch (-want +got):\n%s", diff)
 			}
@@ -80,55 +81,40 @@ func Test_ListInvitationCode(t *testing.T) {
 	}
 }
 
-type invitationCodeListerFunc func(ctx context.Context, filter domain.InvitationCodeFilter) ([]*domain.InvitationCode, error)
+type invitationCodeListerFunc func(ctx context.Context, filter domain.InvitationCodeFilter) ([]*domain.InvitationCodeData, error)
 
-func (f invitationCodeListerFunc) ListInvitationCodes(ctx context.Context, filter domain.InvitationCodeFilter) ([]*domain.InvitationCode, error) {
+func (f invitationCodeListerFunc) ListInvitationCodes(ctx context.Context, filter domain.InvitationCodeFilter) ([]*domain.InvitationCodeData, error) {
 	return f(ctx, filter)
 }
 
 func Test_CreateInvitationCode(t *testing.T) {
 	t.Parallel()
 
-	team1 := must(domain.NewTeam(domain.TeamInput{
-		ID:           must(uuid.NewV4()),
-		Code:         1,
-		Name:         "team1",
-		Organization: "org",
-	}))
+	team1 := domain.FixTeam1(t)
 
 	now := must(time.Parse(time.RFC3339, "2025-01-01T00:00:00Z"))
 	expiresAt := now.Add(24 * time.Hour)
 
-	effect := &struct {
-		invitationCodeCreatorFunc
-		domain.ClockerFunc
-	}{
-		invitationCodeCreatorFunc: func(ctx context.Context, ic *domain.InvitationCode) error {
-			return nil
-		},
-		ClockerFunc: func() time.Time {
-			return now
-		},
-	}
+	effect := invitationCodeCreatorFunc(func(context.Context, *domain.InvitationCodeData) error {
+		return nil
+	})
 
 	cases := map[string]struct {
 		team      *domain.Team
 		effect    domain.InvitationCodeCreateEffect
 		expiresAt time.Time
 		wantErr   domain.ErrType
-		want      *domain.InvitationCode
+		want      *domain.InvitationCodeData
 	}{
 		"ok": {
 			team:      team1,
 			effect:    effect,
 			expiresAt: expiresAt,
-			want: must(domain.NewInvitationCode(domain.InvitationCodeInput{
-				ID:        must(uuid.NewV4()),
-				Team:      team1,
-				Code:      "dummy",
+			want: &domain.InvitationCodeData{
+				Team:      team1.Data(),
 				ExpiresAt: expiresAt,
 				CreatedAt: now,
-			})),
+			},
 		},
 		"already expired": {
 			team:      team1,
@@ -138,15 +124,9 @@ func Test_CreateInvitationCode(t *testing.T) {
 		},
 		"creation fails": {
 			team: team1,
-			effect: &struct {
-				invitationCodeCreatorFunc
-				domain.Clocker
-			}{
-				Clocker: effect,
-				invitationCodeCreatorFunc: func(ctx context.Context, ic *domain.InvitationCode) error {
-					return domain.NewError(domain.ErrTypeInternal, errors.New("dummy"))
-				},
-			},
+			effect: invitationCodeCreatorFunc(func(context.Context, *domain.InvitationCodeData) error {
+				return domain.NewError(domain.ErrTypeInternal, errors.New("dummy"))
+			}),
 			expiresAt: expiresAt,
 			wantErr:   domain.ErrTypeInternal,
 		},
@@ -156,7 +136,7 @@ func Test_CreateInvitationCode(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			actual, err := tt.team.CreateInvitationCode(context.Background(), tt.effect, tt.expiresAt)
+			code, err := tt.team.CreateInvitationCode(context.Background(), tt.effect, now, tt.expiresAt)
 			if domain.ErrTypeFrom(err) != tt.wantErr {
 				t.Errorf("want error type %v, got %v", tt.wantErr, err)
 			}
@@ -165,10 +145,11 @@ func Test_CreateInvitationCode(t *testing.T) {
 				return
 			}
 
+			actual := code.Data()
 			if diff := cmp.Diff(
 				tt.want, actual,
-				cmp.AllowUnexported(domain.InvitationCode{}, domain.Team{}),
-				cmpopts.IgnoreFields(domain.InvitationCode{}, "id", "code"),
+				cmp.AllowUnexported(domain.Team{}),
+				cmpopts.IgnoreFields(domain.InvitationCodeData{}, "ID", "Code"),
 			); diff != "" {
 				t.Errorf("mismatch (-want +got):\n%s", diff)
 			}
@@ -176,9 +157,9 @@ func Test_CreateInvitationCode(t *testing.T) {
 	}
 }
 
-type invitationCodeCreatorFunc func(ctx context.Context, ic *domain.InvitationCode) error
+type invitationCodeCreatorFunc func(ctx context.Context, ic *domain.InvitationCodeData) error
 
-func (f invitationCodeCreatorFunc) CreateInvitationCode(ctx context.Context, ic *domain.InvitationCode) error {
+func (f invitationCodeCreatorFunc) CreateInvitationCode(ctx context.Context, ic *domain.InvitationCodeData) error {
 	return f(ctx, ic)
 }
 
