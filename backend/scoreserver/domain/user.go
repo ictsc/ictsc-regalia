@@ -21,12 +21,10 @@ type (
 		Name string
 	}
 	UserProfile struct {
-		id          uuid.UUID
 		user        *User
 		displayName string
 	}
 	UserProfileData struct {
-		ID          uuid.UUID
 		User        *UserData
 		DisplayName string
 	}
@@ -117,7 +115,6 @@ func newUserProfile(input *UserProfileData) (*UserProfile, error) {
 		return nil, NewError(ErrTypeInvalidArgument, errors.New("display name length must be less than 128"))
 	}
 	return &UserProfile{
-		id:          input.ID,
 		user:        user,
 		displayName: input.DisplayName,
 	}, nil

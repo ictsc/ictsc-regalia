@@ -35,14 +35,11 @@ COMMENT ON COLUMN users.id IS 'ユーザ ID';
 COMMENT ON COLUMN users.name IS 'ユーザ名';
 
 CREATE TABLE user_profiles (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+	user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
 	display_name VARCHAR(255) NOT NULL,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	UNIQUE (user_id)
+	updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE user_profiles IS 'ユーザプロフィール';
-COMMENT ON COLUMN user_profiles.id IS 'ユーザプロフィール ID';
 COMMENT ON COLUMN user_profiles.user_id IS 'ユーザ ID';
 COMMENT ON COLUMN user_profiles.display_name IS 'ユーザ表示名';

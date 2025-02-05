@@ -63,8 +63,8 @@ func (r *RepositoryTx) CreateUser(ctx context.Context, profile *domain.UserProfi
 	}
 
 	if _, err := sqlx.NamedExecContext(ctx, r.ext, `
-		INSERT INTO user_profiles (id, user_id, display_name, created_at, updated_at)
-		VALUES (:id, :user_id, :display_name, NOW(), NOW())`,
+		INSERT INTO user_profiles (user_id, display_name, created_at, updated_at)
+		VALUES (:user_id, :display_name, NOW(), NOW())`,
 		newUserProfileRow(profile),
 	); err != nil {
 		return errors.Wrap(err, "failed to insert into user_profiles")
@@ -79,7 +79,6 @@ type (
 		Name string    `db:"name"`
 	}
 	userProfileRow struct {
-		ID          uuid.UUID `db:"id"`
 		UserID      uuid.UUID `db:"user_id"`
 		DisplayName string    `db:"display_name"`
 	}
@@ -87,7 +86,6 @@ type (
 
 func newUserProfileRow(profile *domain.UserProfileData) *userProfileRow {
 	return &userProfileRow{
-		ID:          profile.ID,
 		UserID:      profile.User.ID,
 		DisplayName: profile.DisplayName,
 	}

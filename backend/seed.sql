@@ -13,6 +13,6 @@ INSERT INTO users (id, name, created_at) VALUES
 	('c4530ce6-d990-4414-8389-feca26883115', 'bob', '2025-02-03 00:00:00+00');
 
 TRUNCATE TABLE user_profiles CASCADE;
-INSERT INTO user_profiles (id, user_id, display_name, created_at, updated_at) VALUES
-	('9a7fdd32-b3cd-4146-96ff-925be6f190da', '3a4ca027-5e02-4ade-8e2d-eddb39adc235', 'Alice', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
-	('6ba12200-3fcb-464b-b7b5-54d6e79ccbcc', 'c4530ce6-d990-4414-8389-feca26883115', 'ボブ', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00');
+INSERT INTO user_profiles (user_id, display_name, created_at, updated_at) VALUES
+	('3a4ca027-5e02-4ade-8e2d-eddb39adc235', 'Alice', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('c4530ce6-d990-4414-8389-feca26883115', 'ボブ', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00');

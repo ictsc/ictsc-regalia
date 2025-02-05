@@ -67,7 +67,6 @@ func Test_PgRepo_CreateUser(t *testing.T) {
 			ctx := context.Background()
 
 			profile := &domain.UserProfileData{
-				ID: uuid.FromStringOrNil("e50fea87-67f8-4123-8eb0-3bdef34811f2"),
 				User: &domain.UserData{
 					ID:   uuid.FromStringOrNil("ab072031-3cf8-4795-9902-01e9e7fdf0bc"),
 					Name: "charlie",
@@ -84,7 +83,7 @@ func Test_PgRepo_CreateUser(t *testing.T) {
 			row := db.QueryRowxContext(ctx, `
 				SELECT
 					u.id AS "u.id", u.name AS "u.name",
-					p.id AS "p.id", p.display_name AS "p.display_name"
+					p.display_name AS "p.display_name"
 				FROM users AS u
 				LEFT JOIN user_profiles AS p ON p.user_id = u.id
 				WHERE u.id = 'ab072031-3cf8-4795-9902-01e9e7fdf0bc'`,
@@ -96,7 +95,6 @@ func Test_PgRepo_CreateUser(t *testing.T) {
 			actual, expected := map[string]any{}, map[string]any{
 				"u.id":           "ab072031-3cf8-4795-9902-01e9e7fdf0bc",
 				"u.name":         "charlie",
-				"p.id":           "e50fea87-67f8-4123-8eb0-3bdef34811f2",
 				"p.display_name": "Charlie",
 			}
 			if err := row.MapScan(actual); err != nil {
@@ -110,7 +108,6 @@ func Test_PgRepo_CreateUser(t *testing.T) {
 			ctx := context.Background()
 
 			profile := &domain.UserProfileData{
-				ID: uuid.FromStringOrNil("0792f1b0-8767-48d9-a14e-335297ad8c44"),
 				User: &domain.UserData{
 					ID:   uuid.FromStringOrNil("1aacaafb-0f63-4746-be40-3b3511844c73"),
 					Name: "alice",
