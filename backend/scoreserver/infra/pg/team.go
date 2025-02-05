@@ -3,7 +3,6 @@ package pg
 import (
 	"context"
 	"database/sql"
-	"time"
 
 	"github.com/cockroachdb/errors"
 	"github.com/gofrs/uuid/v5"
@@ -17,36 +16,24 @@ type teamRow struct {
 	Code         int64     `db:"code"`
 	Name         string    `db:"name"`
 	Organization string    `db:"organization"`
-	CreatedAt    time.Time `db:"created_at"`
-	UpdatedAt    time.Time `db:"updated_at"`
-}
-
-func (t *teamRow) asDomain() (*domain.Team, error) {
-	return domain.NewTeam(domain.TeamInput{
-		ID:           t.ID,
-		Code:         int(t.Code),
-		Name:         t.Name,
-		Organization: t.Organization,
-	})
 }
 
 var _ domain.TeamsLister = (*repo)(nil)
 
-func (r *repo) ListTeams(ctx context.Context) ([]*domain.Team, error) {
-	var rows []teamRow
-	if err := sqlx.SelectContext(ctx, r.ext,
-		&rows, "SELECT * FROM teams ORDER BY code ASC",
-	); err != nil && !errors.Is(err, sql.ErrNoRows) {
+func (r *repo) ListTeams(ctx context.Context) ([]*domain.TeamData, error) {
+	rows, err := r.ext.QueryxContext(ctx, "SELECT id, code, name, organization FROM teams ORDER BY code ASC")
+	if err != nil {
 		return nil, errors.Wrap(err, "failed to select teams")
 	}
+	defer rows.Close()
 
-	teams := make([]*domain.Team, 0, len(rows))
-	for _, row := range rows {
-		team, err := row.asDomain()
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to validate: code=%d", row.Code)
+	var teams []*domain.TeamData
+	for rows.Next() {
+		var row teamRow
+		if err := rows.StructScan(&row); err != nil {
+			return nil, errors.Wrap(err, "failed to scan team")
 		}
-		teams = append(teams, team)
+		teams = append(teams, (*domain.TeamData)(&row))
 	}
 
 	return teams, nil
@@ -54,38 +41,27 @@ func (r *repo) ListTeams(ctx context.Context) ([]*domain.Team, error) {
 
 var _ domain.TeamGetter = (*repo)(nil)
 
-func (r *repo) GetTeamByCode(ctx context.Context, code domain.TeamCode) (*domain.Team, error) {
+func (r *repo) GetTeamByCode(ctx context.Context, code int64) (*domain.TeamData, error) {
 	var row teamRow
 	if err := sqlx.GetContext(ctx, r.ext,
-		&row, "SELECT * FROM teams WHERE code = $1 LIMIT 1",
-		int64(code),
+		&row, "SELECT id, code, name, organization FROM teams WHERE code = $1 LIMIT 1",
+		code,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, domain.NewError(domain.ErrTypeNotFound, errors.New("team not found"))
 		}
 		return nil, errors.Wrap(err, "failed to select team")
 	}
-	return row.asDomain()
+	return (*domain.TeamData)(&row), nil
 }
 
 var _ domain.TeamCreator = (*repo)(nil)
 
-func (r *repo) CreateTeam(ctx context.Context, team *domain.Team) error {
-	now := time.Now()
-
-	row := teamRow{
-		ID:           team.ID(),
-		Code:         int64(team.Code()),
-		Name:         team.Name(),
-		Organization: team.Organization(),
-		CreatedAt:    now,
-		UpdatedAt:    now,
-	}
-
+func (r *repo) CreateTeam(ctx context.Context, team *domain.TeamData) error {
 	if _, err := sqlx.NamedExecContext(ctx, r.ext,
 		`INSERT INTO teams (id, code, name, organization, created_at, updated_at)
-		 VALUES (:id, :code, :name, :organization, :created_at, :updated_at)`,
-		row,
+		 VALUES (:id, :code, :name, :organization, NOW(), NOW())`,
+		(*teamRow)(team),
 	); err != nil {
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
 			// 一意性制約違反
@@ -101,13 +77,12 @@ func (r *repo) CreateTeam(ctx context.Context, team *domain.Team) error {
 
 var _ domain.TeamUpdater = (*repo)(nil)
 
-func (r *repo) UpdateTeam(ctx context.Context, team *domain.Team) error {
-	now := time.Now()
-	if _, err := r.ext.ExecContext(ctx,
-		`UPDATE teams
-		 SET code = $1, name = $2, organization = $3, updated_at = $4
-		 WHERE id = $5`,
-		team.Code(), team.Name(), team.Organization(), now, team.ID(),
+func (r *repo) UpdateTeam(ctx context.Context, team *domain.TeamData) error {
+	if _, err := sqlx.NamedExecContext(ctx, r.ext, `
+		UPDATE teams
+		SET code = :code, name = :name, organization = :organization, updated_at = NOW()
+		WHERE id = :id`,
+		(*teamRow)(team),
 	); err != nil {
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
 			if pgErr.Code == "23505" {
@@ -121,8 +96,8 @@ func (r *repo) UpdateTeam(ctx context.Context, team *domain.Team) error {
 
 var _ domain.TeamDeleter = (*repo)(nil)
 
-func (r *repo) DeleteTeam(ctx context.Context, team *domain.Team) error {
-	if _, err := r.ext.ExecContext(ctx, "DELETE FROM teams WHERE id = $1", team.ID()); err != nil {
+func (r *repo) DeleteTeam(ctx context.Context, teamID uuid.UUID) error {
+	if _, err := r.ext.ExecContext(ctx, "DELETE FROM teams WHERE id = $1", teamID); err != nil {
 		return errors.Wrap(err, "failed to delete team")
 	}
 

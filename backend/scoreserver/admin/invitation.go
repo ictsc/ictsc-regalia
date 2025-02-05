@@ -77,7 +77,7 @@ func (h *InvitationServiceHandler) CreateInvitationCode(
 	if protoTeamCode == 0 {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("team_code is required"))
 	}
-	teamCode, err := domain.NewTeamCode(int(protoTeamCode))
+	teamCode, err := domain.NewTeamCode(protoTeamCode)
 	if err != nil {
 		return nil, connectError(err)
 	}

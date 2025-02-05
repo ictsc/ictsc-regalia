@@ -8,52 +8,15 @@ import (
 )
 
 type (
-	TeamCode int
-	Team     struct {
-		id           uuid.UUID
-		code         TeamCode
-		name         string
-		organization string
-	}
-	TeamInput struct {
-		ID           uuid.UUID
-		Code         int
-		Name         string
-		Organization string
-	}
+	TeamCode = teamCode
+	Team     = team
 )
 
-func NewTeam(input TeamInput) (*Team, error) {
-	code, err := NewTeamCode(input.Code)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(input.Name) == 0 {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("team name must not be empty"))
-	}
-
-	if len(input.Organization) == 0 {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("team organization must not be empty"))
-	}
-
-	return &Team{
-		id:           input.ID,
-		code:         code,
-		name:         input.Name,
-		organization: input.Organization,
-	}, nil
-}
-
-func NewTeamCode(code int) (TeamCode, error) {
+func NewTeamCode(code int64) (TeamCode, error) {
 	if code < 1 || 99 < code {
 		return 0, NewError(ErrTypeInvalidArgument, errors.New("invalid team code"))
 	}
 	return TeamCode(code), nil
-}
-
-func (t *Team) ID() uuid.UUID {
-	return t.id
 }
 
 func (t *Team) Code() TeamCode {
@@ -71,20 +34,30 @@ func (t *Team) Organization() string {
 type TeamGetEffect = TeamGetter
 
 func (tc TeamCode) Team(ctx context.Context, effect TeamGetEffect) (*Team, error) {
-	team, err := effect.GetTeamByCode(ctx, tc)
+	data, err := effect.GetTeamByCode(ctx, int64(tc))
 	if err != nil {
 		return nil, err
 	}
-	return team, nil
+	return data.parse()
 }
 
 type TeamListEffect = TeamsLister
 
 func ListTeams(ctx context.Context, effect TeamListEffect) ([]*Team, error) {
-	teams, err := effect.ListTeams(ctx)
+	data, err := effect.ListTeams(ctx)
 	if err != nil {
-		return nil, err
+		return nil, WrapAsInternal(err, "failed to list teams")
 	}
+
+	teams := make([]*Team, 0, len(data))
+	for _, d := range data {
+		t, err := d.parse()
+		if err != nil {
+			return nil, err
+		}
+		teams = append(teams, t)
+	}
+
 	return teams, nil
 }
 
@@ -105,7 +78,7 @@ func CreateTeam(ctx context.Context, effect TeamCreateEffect, input TeamCreateIn
 	}
 
 	if err := effect.RunInTx(ctx, func(effect TeamCreateTxEffect) error {
-		return effect.CreateTeam(ctx, team)
+		return effect.CreateTeam(ctx, team.Data())
 	}); err != nil {
 		return nil, err
 	}
@@ -118,12 +91,12 @@ func createTeam(input TeamCreateInput) (*Team, error) {
 		return nil, NewError(ErrTypeInternal, errors.Wrap(err, "failed to generate uuid"))
 	}
 
-	team, err := NewTeam(TeamInput{
+	team, err := (&TeamData{
 		ID:           id,
-		Code:         input.Code,
+		Code:         int64(input.Code),
 		Name:         input.Name,
 		Organization: input.Organization,
-	})
+	}).parse()
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +120,7 @@ func (t *Team) Update(ctx context.Context, effect TeamUpdateEffect, input TeamUp
 	updated := t.update(input)
 
 	if err := effect.RunInTx(ctx, func(effect TeamUpdateTxEffect) error {
-		return effect.UpdateTeam(ctx, updated)
+		return effect.UpdateTeam(ctx, updated.Data())
 	}); err != nil {
 		return err
 	}
@@ -165,24 +138,72 @@ func (t *Team) update(input TeamUpdateInput) *Team {
 }
 
 func (t *Team) Delete(ctx context.Context, effect TeamDeleter) error {
-	return effect.DeleteTeam(ctx, t)
+	return effect.DeleteTeam(ctx, uuid.UUID(t.teamID))
 }
 
 // チームの操作のためのインターフェース
 type (
+	TeamData struct {
+		ID           uuid.UUID
+		Code         int64
+		Name         string
+		Organization string
+	}
 	TeamsLister interface {
-		ListTeams(ctx context.Context) ([]*Team, error)
+		ListTeams(ctx context.Context) ([]*TeamData, error)
 	}
 	TeamGetter interface {
-		GetTeamByCode(ctx context.Context, code TeamCode) (*Team, error)
+		GetTeamByCode(ctx context.Context, code int64) (*TeamData, error)
 	}
 	TeamCreator interface {
-		CreateTeam(ctx context.Context, team *Team) error
+		CreateTeam(ctx context.Context, team *TeamData) error
 	}
 	TeamUpdater interface {
-		UpdateTeam(ctx context.Context, team *Team) error
+		UpdateTeam(ctx context.Context, team *TeamData) error
 	}
 	TeamDeleter interface {
-		DeleteTeam(ctx context.Context, team *Team) error
+		DeleteTeam(ctx context.Context, teamID uuid.UUID) error
 	}
 )
+
+func (t *Team) Data() *TeamData {
+	return &TeamData{
+		ID:           uuid.UUID(t.teamID),
+		Code:         int64(t.code),
+		Name:         t.name,
+		Organization: t.organization,
+	}
+}
+
+type (
+	teamID   uuid.UUID
+	teamCode int64
+	team     struct {
+		teamID
+		code         teamCode
+		name         string
+		organization string
+	}
+)
+
+func (t *TeamData) parse() (*team, error) {
+	code, err := NewTeamCode(t.Code)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(t.Name) == 0 {
+		return nil, NewError(ErrTypeInvalidArgument, errors.New("team name must not be empty"))
+	}
+
+	if len(t.Organization) == 0 {
+		return nil, NewError(ErrTypeInvalidArgument, errors.New("team organization must not be empty"))
+	}
+
+	return &Team{
+		teamID:       teamID(t.ID),
+		code:         code,
+		name:         t.Name,
+		organization: t.Organization,
+	}, nil
+}

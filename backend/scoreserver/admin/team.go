@@ -71,7 +71,7 @@ func (h *TeamServiceHandler) GetTeam(
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("code is required"))
 	}
 
-	code, err := domain.NewTeamCode(int(inCode))
+	code, err := domain.NewTeamCode(inCode)
 	if err != nil {
 		return nil, connectError(err)
 	}
@@ -122,7 +122,7 @@ func (h *TeamServiceHandler) UpdateTeam(
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("code is required"))
 	}
 
-	teamCode, err := domain.NewTeamCode(int(protoCode))
+	teamCode, err := domain.NewTeamCode(protoCode)
 	if err != nil {
 		return nil, connectError(err)
 	}
@@ -164,7 +164,7 @@ func (h *TeamServiceHandler) DeleteTeam(
 	if protoCode == 0 {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("code is required"))
 	}
-	code, err := domain.NewTeamCode(int(protoCode))
+	code, err := domain.NewTeamCode(protoCode)
 	if err != nil {
 		return nil, connectError(err)
 	}
