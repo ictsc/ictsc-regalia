@@ -10,7 +10,7 @@ import (
 
 var _ domain.DiscordIdentityGetter = (*UserClient)(nil)
 
-func (c *UserClient) GetIdentity(ctx context.Context, token string) (*domain.DiscordIdentity, error) {
+func (c *UserClient) GetIdentity(ctx context.Context, token string) (*domain.DiscordIdentityData, error) {
 	session, err := discordgo.New("Bot " + token)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create discord session")
@@ -21,8 +21,8 @@ func (c *UserClient) GetIdentity(ctx context.Context, token string) (*domain.Dis
 		return nil, errors.Wrap(err, "failed to get user")
 	}
 
-	return &domain.DiscordIdentity{
-		ID:         domain.DiscordUserID(user.ID),
+	return &domain.DiscordIdentityData{
+		ID:         user.ID,
 		Username:   user.Username,
 		GlobalName: user.GlobalName,
 	}, nil
