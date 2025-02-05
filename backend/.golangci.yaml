@@ -62,4 +62,5 @@ linters-settings:
       - github.com/cockroachdb/errors.Newf(
       - github.com/cockroachdb/errors.New(
       - github.com/cockroachdb/errors.Join(
+      - github.com/cockroachdb/errors.WrapWithDepth(
       - github.com/ictsc/ictsc-regalia/backend

@@ -11,123 +11,149 @@ import (
 )
 
 type (
-	InvitationCode struct {
-		id        uuid.UUID
-		team      *Team
-		code      string
-		expiresAt time.Time
-		createdAt time.Time
-	}
-	InvitationCodeInput struct {
-		ID        uuid.UUID
-		Team      *Team
-		Code      string
-		ExpiresAt time.Time
-		CreatedAt time.Time
-	}
+	InvitationCodeString = invitationCodeString
+	InvitationCode       = invitationCode
 )
 
-func NewInvitationCode(input InvitationCodeInput) (*InvitationCode, error) {
-	if input.ID.IsNil() {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("id is required"))
-	}
-	if input.Code == "" {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("code is required"))
-	}
-	if input.Team == nil {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("invitation code must belong to a team"))
-	}
-	if input.ExpiresAt == (time.Time{}) {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("expires_at is required"))
-	}
-	if input.CreatedAt == (time.Time{}) {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("created_at is required"))
-	}
-	if input.ExpiresAt.Before(input.CreatedAt) {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("expired before create"))
-	}
-
-	return &InvitationCode{
-		id:        input.ID,
-		team:      input.Team,
-		code:      input.Code,
-		expiresAt: input.ExpiresAt,
-		createdAt: input.CreatedAt,
-	}, nil
+func (i *InvitationCode) Team() *Team {
+	return i.team
 }
 
-func (c *InvitationCode) ID() uuid.UUID {
-	return c.id
+func (i *InvitationCode) Code() string {
+	return string(i.code)
 }
 
-func (c *InvitationCode) Team() *Team {
-	return c.team
+func (i *InvitationCode) ExpiresAt() time.Time {
+	return i.expiresAt
 }
 
-func (c *InvitationCode) Code() string {
-	return c.code
-}
-
-func (c *InvitationCode) ExpiresAt() time.Time {
-	return c.expiresAt
-}
-
-func (c *InvitationCode) CreatedAt() time.Time {
-	return c.createdAt
+func (i *InvitationCode) Expired(now time.Time) bool {
+	return i.expiresAt.Before(now)
 }
 
 // ListInvitationCodes - 招待コードの一覧を取得する
-func ListInvitationCodes(
-	ctx context.Context, eff InvitationCodeLister,
-) ([]*InvitationCode, error) {
-	ics, err := eff.ListInvitationCodes(ctx, InvitationCodeFilter{})
-	if err != nil {
-		return nil, err
-	}
-	return ics, nil
+func ListInvitationCodes(ctx context.Context, eff InvitationCodeLister) ([]*InvitationCode, error) {
+	return listInvitationCodes(ctx, eff)
 }
 
 // CreateInvitationCode - 招待コードの作成
 func (t *Team) CreateInvitationCode(
-	ctx context.Context, eff InvitationCodeCreateEffect, expiresAt time.Time,
+	ctx context.Context, eff InvitationCodeCreator, now time.Time, expiresAt time.Time,
 ) (*InvitationCode, error) {
-	invitationCode, err := createInvitationCode(t, expiresAt, eff.Now())
-	if err != nil {
-		return nil, err
-	}
+	return t.createInvitationCode(ctx, eff, now, expiresAt)
+}
 
-	if err := eff.CreateInvitationCode(ctx, invitationCode); err != nil {
-		return nil, err
-	}
-
-	return invitationCode, nil
+type InvitationCodeCreateEffect interface {
+	InvitationCodeCreator
 }
 
 type (
-	InvitationCodeCreateEffect interface {
-		InvitationCodeCreator
-		Clocker
+	InvitationCodeData struct {
+		ID        uuid.UUID
+		Team      *TeamData
+		Code      string
+		ExpiresAt time.Time
+		CreatedAt time.Time
+	}
+	InvitationCodeFilter struct {
+		Code string
+	}
+	InvitationCodeLister interface {
+		ListInvitationCodes(ctx context.Context, filter InvitationCodeFilter) ([]*InvitationCodeData, error)
+	}
+	InvitationCodeCreator interface {
+		CreateInvitationCode(ctx context.Context, code *InvitationCodeData) error
 	}
 )
 
-func createInvitationCode(team *Team, expiresAt time.Time, now time.Time) (*InvitationCode, error) {
+type (
+	invitationCodeString string
+	invitationCode       struct {
+		id        uuid.UUID
+		team      *Team
+		code      invitationCodeString
+		expiresAt time.Time
+		createdAt time.Time
+	}
+)
+
+func (i *invitationCode) Data() *InvitationCodeData {
+	return &InvitationCodeData{
+		ID:        i.id,
+		Team:      i.team.Data(),
+		Code:      string(i.code),
+		ExpiresAt: i.expiresAt,
+		CreatedAt: i.createdAt,
+	}
+}
+
+func (d *InvitationCodeData) parse() (*invitationCode, error) {
+	team, err := d.Team.parse()
+	if err != nil {
+		return nil, err
+	}
+
+	if d.ExpiresAt.Before(d.CreatedAt) {
+		return nil, NewError(ErrTypeInvalidArgument, errors.New("expired before create"))
+	}
+	return &invitationCode{
+		id:        d.ID,
+		team:      team,
+		code:      invitationCodeString(d.Code),
+		expiresAt: d.ExpiresAt,
+		createdAt: d.CreatedAt,
+	}, nil
+}
+
+func listInvitationCodes(
+	ctx context.Context, eff InvitationCodeLister,
+) ([]*invitationCode, error) {
+	list, err := eff.ListInvitationCodes(ctx, InvitationCodeFilter{})
+	if err != nil {
+		return nil, WrapAsInternal(err, "failed to list invitation codes")
+	}
+	ics := make([]*InvitationCode, 0, len(list))
+	for _, d := range list {
+		ic, err := d.parse()
+		if err != nil {
+			return nil, err
+		}
+		ics = append(ics, ic)
+	}
+	return ics, nil
+}
+
+func (t *team) createInvitationCode(
+	ctx context.Context,
+	eff InvitationCodeCreator, now time.Time,
+	expiresAt time.Time,
+) (*invitationCode, error) {
+	if expiresAt.Before(now) {
+		return nil, NewError(ErrTypeInvalidArgument, errors.New("already expired"))
+	}
+
 	id, err := uuid.NewV4()
 	if err != nil {
-		return nil, NewError(ErrTypeInternal, errors.Wrap(err, "failed to generate uuid"))
+		return nil, WrapAsInternal(err, "failed to generate uuid")
 	}
 
 	code, err := generateInvitationCode()
 	if err != nil {
-		return nil, NewError(ErrTypeInternal, err)
+		return nil, WrapAsInternal(err, "failed to generate invitation code")
 	}
 
-	return NewInvitationCode(InvitationCodeInput{
-		ID:        id,
-		Team:      team,
-		Code:      code,
-		ExpiresAt: expiresAt,
-		CreatedAt: now,
-	})
+	invitationCode := &invitationCode{
+		id:        id,
+		team:      t,
+		code:      code,
+		expiresAt: expiresAt,
+		createdAt: now,
+	}
+	if err := eff.CreateInvitationCode(ctx, invitationCode.Data()); err != nil {
+		return nil, WrapAsInternal(err, "failed to create invitation code")
+	}
+
+	return invitationCode, nil
 }
 
 const (
@@ -136,7 +162,7 @@ const (
 	invitationCodeCharset = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 )
 
-func generateInvitationCode() (string, error) {
+func generateInvitationCode() (invitationCodeString, error) {
 	charsetLen := big.NewInt(int64(len(invitationCodeCharset)))
 	code := make([]byte, invitationCodeLength)
 	for i := range code {
@@ -146,17 +172,5 @@ func generateInvitationCode() (string, error) {
 		}
 		code[i] = invitationCodeCharset[n.Int64()]
 	}
-	return string(code), nil
+	return invitationCodeString(code), nil
 }
-
-type (
-	InvitationCodeFilter struct {
-		Code string
-	}
-	InvitationCodeLister interface {
-		ListInvitationCodes(ctx context.Context, filter InvitationCodeFilter) ([]*InvitationCode, error)
-	}
-	InvitationCodeCreator interface {
-		CreateInvitationCode(ctx context.Context, invitationCode *InvitationCode) error
-	}
-)

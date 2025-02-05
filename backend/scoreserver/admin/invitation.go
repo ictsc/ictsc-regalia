@@ -15,9 +15,9 @@ import (
 
 type InvitationServiceHandler struct {
 	adminv1connect.UnimplementedInvitationServiceHandler
-	Enforcer       *auth.Enforcer
-	ListEffect     domain.InvitationCodeLister
-	CreateEffect   createInvitationCodeEffect
+	Enforcer     *auth.Enforcer
+	ListEffect   domain.InvitationCodeLister
+	CreateEffect createInvitationCodeEffect
 }
 
 func NewInvitationServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *InvitationServiceHandler {
@@ -72,12 +72,14 @@ func (h *InvitationServiceHandler) CreateInvitationCode(
 		return nil, err
 	}
 
+	now := h.CreateEffect.Now()
+
 	protoIC := req.Msg.GetInvitationCode()
 	protoTeamCode := protoIC.GetTeamCode()
 	if protoTeamCode == 0 {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("team_code is required"))
 	}
-	teamCode, err := domain.NewTeamCode(int(protoTeamCode))
+	teamCode, err := domain.NewTeamCode(protoTeamCode)
 	if err != nil {
 		return nil, connectError(err)
 	}
@@ -87,7 +89,7 @@ func (h *InvitationServiceHandler) CreateInvitationCode(
 		return nil, connectError(err)
 	}
 
-	invitationCode, err := team.CreateInvitationCode(ctx, h.CreateEffect, protoIC.GetExpiresAt().AsTime())
+	invitationCode, err := team.CreateInvitationCode(ctx, h.CreateEffect, now, protoIC.GetExpiresAt().AsTime())
 	if err != nil {
 		return nil, connectError(err)
 	}
