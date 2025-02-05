@@ -2,6 +2,7 @@ package pg
 
 import (
 	"context"
+	"database/sql"
 	"iter"
 
 	"github.com/cockroachdb/errors"
@@ -44,6 +45,25 @@ func (r *repo) ListUsers(ctx context.Context, filter domain.UserListFilter) iter
 	}
 }
 
+var _ domain.DiscordLinkedUserGetter = (*repo)(nil)
+
+func (r *repo) GetDiscordLinkedUser(ctx context.Context, discordUserID int64) (*domain.UserData, error) {
+	var row userRow
+	if err := sqlx.GetContext(ctx, r.ext, &row, `
+		SELECT u.id, u.name
+		FROM users AS u
+		JOIN discord_users AS d ON d.user_id = u.id
+		WHERE d.discord_user_id = $1
+	`, discordUserID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, domain.NewError(domain.ErrTypeNotFound, errors.New("discord linked user not found"))
+		}
+		return nil, errors.Wrap(err, "failed to get discord linked user")
+	}
+
+	return (*domain.UserData)(&row), nil
+}
+
 var _ domain.UserCreator = (*RepositoryTx)(nil)
 
 // CreateUser - ユーザ+プロフィールを作成する
@@ -70,6 +90,23 @@ func (r *RepositoryTx) CreateUser(ctx context.Context, profile *domain.UserProfi
 		return errors.Wrap(err, "failed to insert into user_profiles")
 	}
 
+	return nil
+}
+
+var _ domain.DiscordUserLinker = (*RepositoryTx)(nil)
+
+func (r *RepositoryTx) LinkDiscordUser(ctx context.Context, userID uuid.UUID, discordUserID int64) error {
+	if _, err := r.ext.ExecContext(ctx, `
+		INSERT INTO discord_users (user_id, discord_user_id, linked_at)
+		VALUES ($1, $2, NOW())
+	`, userID, discordUserID); err != nil {
+		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
+			if pgErr.Code == "23505" {
+				return domain.NewError(domain.ErrTypeAlreadyExists, errors.New("discord user already linked"))
+			}
+		}
+		return domain.WrapAsInternal(err, "failed to insert into discord_user")
+	}
 	return nil
 }
 

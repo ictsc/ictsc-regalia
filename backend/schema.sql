@@ -43,3 +43,12 @@ CREATE TABLE user_profiles (
 COMMENT ON TABLE user_profiles IS 'ユーザプロフィール';
 COMMENT ON COLUMN user_profiles.user_id IS 'ユーザ ID';
 COMMENT ON COLUMN user_profiles.display_name IS 'ユーザ表示名';
+
+CREATE TABLE discord_users (
+	user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+	discord_user_id BIGINT NOT NULL UNIQUE,
+	linked_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON TABLE discord_users IS 'Discord 上のユーザ情報';
+COMMENT ON COLUMN discord_users.discord_user_id IS 'Discord ユーザ ID';
+COMMENT ON COLUMN discord_users.user_id IS 'ユーザ ID';

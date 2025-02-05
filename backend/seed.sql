@@ -16,3 +16,8 @@ TRUNCATE TABLE user_profiles CASCADE;
 INSERT INTO user_profiles (user_id, display_name, created_at, updated_at) VALUES
 	('3a4ca027-5e02-4ade-8e2d-eddb39adc235', 'Alice', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
 	('c4530ce6-d990-4414-8389-feca26883115', 'ボブ', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00');
+
+TRUNCATE TABLE discord_users CASCADE;
+INSERT INTO discord_users (user_id, discord_user_id, linked_at) VALUES
+	('3a4ca027-5e02-4ade-8e2d-eddb39adc235', 123456789012345678, '2025-02-03 00:00:00+00'),
+	('c4530ce6-d990-4414-8389-feca26883115', 234567890123456789, '2025-02-03 00:00:00+00');
