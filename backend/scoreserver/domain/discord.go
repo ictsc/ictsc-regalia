@@ -51,7 +51,7 @@ func GetDiscordIdentity(ctx context.Context, eff DiscordIdentityGetter, token st
 }
 
 func (u *User) LinkDiscord(ctx context.Context, eff DiscordUserLinker, id DiscordUserID) error {
-	if err := eff.LinkDiscordUser(ctx, u.id, int64(id)); err != nil {
+	if err := eff.LinkDiscordUser(ctx, uuid.UUID(u.userID), int64(id)); err != nil {
 		return WrapAsInternal(err, "failed to link discord user")
 	}
 	return nil
@@ -62,7 +62,11 @@ func (id DiscordUserID) User(ctx context.Context, eff DiscordLinkedUserGetter) (
 	if err != nil {
 		return nil, WrapAsInternal(err, "failed to get linked user")
 	}
-	return newUser(userData)
+	user, err := userData.parse()
+	if err != nil {
+		return nil, err
+	}
+	return (*User)(user), nil
 }
 
 type (

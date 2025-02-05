@@ -12,45 +12,39 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 )
 
-func TestUserValidation(t *testing.T) {
+func TestUserNameValidation(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		in *domain.UserData
+		in string
 
 		wantErr domain.ErrType
 	}{
 		"ok": {
-			in: &domain.UserData{
-				ID:   uuid.FromStringOrNil("00000000-0000-0000-0000-000000000001"),
-				Name: "ok_woman",
-			},
+			in: "ok_woman",
 		},
 		"no name": {
-			in: &domain.UserData{
-				ID: uuid.FromStringOrNil("00000000-0000-0000-0000-000000000001"),
-			},
+			in:      "",
 			wantErr: domain.ErrTypeInvalidArgument,
 		},
 		"too short name": {
-			in: &domain.UserData{
-				ID:   uuid.FromStringOrNil("00000000-0000-0000-0000-000000000001"),
-				Name: "a",
-			},
+			in:      "a",
+			wantErr: domain.ErrTypeInvalidArgument,
+		},
+		"too long name": {
+			in:      "abcdefghijklmnopqrstuvwxyz123456abc",
 			wantErr: domain.ErrTypeInvalidArgument,
 		},
 		"invalid character name": {
-			in: &domain.UserData{
-				ID:   uuid.FromStringOrNil("00000000-0000-0000-0000-000000000001"),
-				Name: "🙆",
-			},
+			in:      "🙆",
 			wantErr: domain.ErrTypeInvalidArgument,
 		},
 		"repeated periods name": {
-			in: &domain.UserData{
-				ID:   uuid.FromStringOrNil("00000000-0000-0000-0000-000000000001"),
-				Name: "a..b",
-			},
+			in:      "a..b",
+			wantErr: domain.ErrTypeInvalidArgument,
+		},
+		"invalid character uppercase": {
+			in:      "ABC",
 			wantErr: domain.ErrTypeInvalidArgument,
 		},
 	}
@@ -59,7 +53,7 @@ func TestUserValidation(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			_, err := domain.NewUser(tt.in)
+			_, err := domain.NewUserName(tt.in)
 			if typ := domain.ErrTypeFrom(err); typ != tt.wantErr {
 				t.Errorf("want error type %v, but got %v", tt.wantErr, typ)
 			}
@@ -90,17 +84,17 @@ func TestGetUserByName(t *testing.T) {
 		effect domain.UserLister
 		name   domain.UserName
 
-		wants   *domain.User
+		wants   *domain.UserData
 		wantErr domain.ErrType
 	}{
 		"ok": {
 			effect: effect,
 			name:   must(domain.NewUserName("user1")),
 
-			wants: must(domain.NewUser(&domain.UserData{
+			wants: &domain.UserData{
 				ID:   uuid.FromStringOrNil("00000000-0000-0000-0000-000000000001"),
 				Name: "user1",
-			})),
+			},
 		},
 		"not found": {
 			effect: effect,
@@ -124,13 +118,15 @@ func TestGetUserByName(t *testing.T) {
 
 			ctx := context.Background()
 
-			actual, err := tt.name.User(ctx, tt.effect)
+			user, err := tt.name.User(ctx, tt.effect)
 			if typ := domain.ErrTypeFrom(err); typ != tt.wantErr {
 				t.Errorf("want error type %v, but got %v", tt.wantErr, typ)
 			}
 			if err != nil {
 				return
 			}
+
+			actual := user.Data()
 			if diff := cmp.Diff(
 				tt.wants, actual,
 				cmp.AllowUnexported(domain.User{}),

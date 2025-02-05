@@ -11,23 +11,9 @@ import (
 )
 
 type (
-	UserName string
-	User     struct {
-		id   uuid.UUID
-		name UserName
-	}
-	UserData struct {
-		ID   uuid.UUID
-		Name string
-	}
-	UserProfile struct {
-		user        *User
-		displayName string
-	}
-	UserProfileData struct {
-		User        *UserData
-		DisplayName string
-	}
+	UserName    = userName
+	User        = user
+	UserProfile = userProfile
 )
 
 func NewUserName(name string) (UserName, error) {
@@ -38,28 +24,16 @@ func (n UserName) User(ctx context.Context, eff UserLister) (*User, error) {
 	return getUser(ctx, eff, UserListFilter{Name: string(n)})
 }
 
-func NewUser(input *UserData) (*User, error) {
-	return newUser(input)
-}
-
 func (u *User) Name() UserName {
 	return u.name
 }
 
-func NewUserProfile(input *UserProfileData) (*UserProfile, error) {
-	return newUserProfile(input)
-}
-
-func (u *UserProfile) User() *User {
-	return u.user
-}
-
-func (u *UserProfile) DisplayName() string {
-	return u.displayName
-}
-
 // ユーザーに関する操作集合
 type (
+	UserData struct {
+		ID   uuid.UUID
+		Name string
+	}
 	UserListFilter struct {
 		Name string
 	}
@@ -69,14 +43,45 @@ type (
 		// `filter`の条件を満たさないユーザを返してもよいが，満たすユーザは全て返す
 		ListUsers(ctx context.Context, filter UserListFilter) iter.Seq2[*UserData, error]
 	}
+	UserProfileData struct {
+		User        *UserData
+		DisplayName string
+	}
 	UserCreator interface {
 		CreateUser(ctx context.Context, user *UserProfileData) error
 	}
 )
 
+func (u *User) Data() *UserData {
+	return &UserData{
+		ID:   uuid.UUID(u.userID),
+		Name: string(u.name),
+	}
+}
+
+func (p *UserProfile) Data() *UserProfileData {
+	return &UserProfileData{
+		User:        p.user.Data(),
+		DisplayName: p.displayName,
+	}
+}
+
+type (
+	userID   uuid.UUID
+	userName string
+	user     struct {
+		userID
+		name userName
+	}
+	userProfile struct {
+		*user
+		displayName string
+	}
+)
+
 var validUserName = regexp.MustCompile(`^[a-z0-9_.]+$`)
 
-func newUserName(name string) (UserName, error) {
+func newUserName(name string) (userName, error) {
 	// Discordのユーザー名の制限に合わせる
 	if name == "" {
 		return "", NewError(ErrTypeInvalidArgument, errors.New("name is required"))
@@ -93,30 +98,29 @@ func newUserName(name string) (UserName, error) {
 	return UserName(name), nil
 }
 
-func newUser(input *UserData) (*User, error) {
-	name, err := NewUserName(input.Name)
+func (d *UserData) parse() (*user, error) {
+	name, err := newUserName(d.Name)
 	if err != nil {
 		return nil, err
 	}
 	return &User{
-		id:   input.ID,
-		name: name,
+		userID: userID(d.ID),
+		name:   name,
 	}, nil
 }
 
-func newUserProfile(input *UserProfileData) (*UserProfile, error) {
-	user, err := newUser(input.User)
+func (d *UserProfileData) parse() (*UserProfile, error) {
+	user, err := d.User.parse()
 	if err != nil {
 		return nil, err
 	}
-
 	//nolint:mnd
-	if len(input.DisplayName) > 128 {
+	if len(d.DisplayName) > 128 {
 		return nil, NewError(ErrTypeInvalidArgument, errors.New("display name length must be less than 128"))
 	}
 	return &UserProfile{
 		user:        user,
-		displayName: input.DisplayName,
+		displayName: d.DisplayName,
 	}, nil
 }
 
@@ -133,7 +137,7 @@ func listUsers(ctx context.Context, lister UserLister, filter UserListFilter) it
 				continue
 			}
 
-			if !yield(NewUser(userIn)) {
+			if !yield(userIn.parse()) {
 				return
 			}
 		}
