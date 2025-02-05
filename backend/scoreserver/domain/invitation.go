@@ -11,7 +11,8 @@ import (
 )
 
 type (
-	InvitationCode = invitationCodeInfo
+	InvitationCodeString = invitationCodeString
+	InvitationCode       = invitationCode
 )
 
 func (i *InvitationCode) Team() *Team {
@@ -66,17 +67,17 @@ type (
 )
 
 type (
-	invitationCode     string
-	invitationCodeInfo struct {
+	invitationCodeString string
+	invitationCode       struct {
 		id        uuid.UUID
 		team      *Team
-		code      invitationCode
+		code      invitationCodeString
 		expiresAt time.Time
 		createdAt time.Time
 	}
 )
 
-func (i *invitationCodeInfo) Data() *InvitationCodeData {
+func (i *invitationCode) Data() *InvitationCodeData {
 	return &InvitationCodeData{
 		ID:        i.id,
 		Team:      i.team.Data(),
@@ -86,7 +87,7 @@ func (i *invitationCodeInfo) Data() *InvitationCodeData {
 	}
 }
 
-func (d *InvitationCodeData) parse() (*invitationCodeInfo, error) {
+func (d *InvitationCodeData) parse() (*invitationCode, error) {
 	team, err := d.Team.parse()
 	if err != nil {
 		return nil, err
@@ -95,10 +96,10 @@ func (d *InvitationCodeData) parse() (*invitationCodeInfo, error) {
 	if d.ExpiresAt.Before(d.CreatedAt) {
 		return nil, NewError(ErrTypeInvalidArgument, errors.New("expired before create"))
 	}
-	return &invitationCodeInfo{
+	return &invitationCode{
 		id:        d.ID,
 		team:      team,
-		code:      invitationCode(d.Code),
+		code:      invitationCodeString(d.Code),
 		expiresAt: d.ExpiresAt,
 		createdAt: d.CreatedAt,
 	}, nil
@@ -106,7 +107,7 @@ func (d *InvitationCodeData) parse() (*invitationCodeInfo, error) {
 
 func listInvitationCodes(
 	ctx context.Context, eff InvitationCodeLister,
-) ([]*invitationCodeInfo, error) {
+) ([]*invitationCode, error) {
 	list, err := eff.ListInvitationCodes(ctx, InvitationCodeFilter{})
 	if err != nil {
 		return nil, WrapAsInternal(err, "failed to list invitation codes")
@@ -126,7 +127,7 @@ func (t *team) createInvitationCode(
 	ctx context.Context,
 	eff InvitationCodeCreator, now time.Time,
 	expiresAt time.Time,
-) (*invitationCodeInfo, error) {
+) (*invitationCode, error) {
 	if expiresAt.Before(now) {
 		return nil, NewError(ErrTypeInvalidArgument, errors.New("already expired"))
 	}
@@ -141,7 +142,7 @@ func (t *team) createInvitationCode(
 		return nil, WrapAsInternal(err, "failed to generate invitation code")
 	}
 
-	invitationCode := &invitationCodeInfo{
+	invitationCode := &invitationCode{
 		id:        id,
 		team:      t,
 		code:      code,
@@ -161,7 +162,7 @@ const (
 	invitationCodeCharset = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 )
 
-func generateInvitationCode() (invitationCode, error) {
+func generateInvitationCode() (invitationCodeString, error) {
 	charsetLen := big.NewInt(int64(len(invitationCodeCharset)))
 	code := make([]byte, invitationCodeLength)
 	for i := range code {
@@ -171,5 +172,5 @@ func generateInvitationCode() (invitationCode, error) {
 		}
 		code[i] = invitationCodeCharset[n.Int64()]
 	}
-	return invitationCode(code), nil
+	return invitationCodeString(code), nil
 }
