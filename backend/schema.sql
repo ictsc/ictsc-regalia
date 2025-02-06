@@ -52,3 +52,15 @@ CREATE TABLE discord_users (
 COMMENT ON TABLE discord_users IS 'Discord 上のユーザ情報';
 COMMENT ON COLUMN discord_users.discord_user_id IS 'Discord ユーザ ID';
 COMMENT ON COLUMN discord_users.user_id IS 'ユーザ ID';
+
+CREATE TABLE team_members (
+	user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+	team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+	invitation_code_id UUID NOT NULL REFERENCES invitation_codes(id) ON DELETE CASCADE,
+	invited_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON TABLE team_members IS 'チームメンバ';
+COMMENT ON COLUMN team_members.user_id IS 'ユーザ ID';
+COMMENT ON COLUMN team_members.team_id IS 'チーム ID';
+COMMENT ON COLUMN team_members.invitation_code_id IS '招待コード ID';
+COMMENT ON COLUMN team_members.invited_at IS '招待日時';

@@ -21,3 +21,7 @@ TRUNCATE TABLE discord_users CASCADE;
 INSERT INTO discord_users (user_id, discord_user_id, linked_at) VALUES
 	('3a4ca027-5e02-4ade-8e2d-eddb39adc235', 123456789012345678, '2025-02-03 00:00:00+00'),
 	('c4530ce6-d990-4414-8389-feca26883115', 234567890123456789, '2025-02-03 00:00:00+00');
+
+TRUNCATE TABLE team_members CASCADE;
+INSERT INTO team_members (user_id, team_id, invitation_code_id) VALUES
+    ('3a4ca027-5e02-4ade-8e2d-eddb39adc235', 'a1de8fe6-26c8-42d7-b494-dea48e409091', 'ad3f83d3-65be-4884-8a03-adb11a8127ef');

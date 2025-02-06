@@ -90,7 +90,7 @@ func (f invitationCodeListerFunc) ListInvitationCodes(ctx context.Context, filte
 func Test_CreateInvitationCode(t *testing.T) {
 	t.Parallel()
 
-	team1 := domain.FixTeam1(t)
+	team1 := domain.FixTeam1(t, nil)
 
 	now := must(time.Parse(time.RFC3339, "2025-01-01T00:00:00Z"))
 	expiresAt := now.Add(24 * time.Hour)
