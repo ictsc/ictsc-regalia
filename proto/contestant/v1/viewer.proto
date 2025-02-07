@@ -8,8 +8,30 @@ option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant
 
 message Viewer {
   string name = 1;
+  ViewerType type = 2;
+  oneof viewer {
+    ContestantViewer contestant = 3;
+    SignUpViewer sign_up = 4;
+  }
+}
+
+enum ViewerType {
+  VIEWER_TYPE_UNSPECIFIED = 0;
+  VIEWER_TYPE_CONTESTANT = 1;
+  VIEWER_TYPE_SIGN_UP = 2;
+}
+
+message ContestantViewer {
+  string name = 1;
+  string display_name = 2;
   // TODO: チームに関する情報が必要
   // コードかチーム自体か
+}
+
+//サインアップ中のユーザ
+message SignUpViewer {
+  string name = 1;
+  string display_name = 2;
 }
 
 message GetViewerRequest {}
@@ -17,6 +39,14 @@ message GetViewerResponse {
   Viewer viewer = 1 [(buf.validate.field).required = true];
 }
 
+message SignUpRequest {
+  string name = 1;
+  string display_name = 2;
+  string invitation_code = 3;
+}
+message SignUpResponse {}
+
 service ViewerService {
   rpc GetViewer(GetViewerRequest) returns (GetViewerResponse);
+  rpc SignUp(SignUpRequest) returns (SignUpResponse);
 }
