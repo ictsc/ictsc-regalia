@@ -14,6 +14,7 @@ message Team {
   }];
   string name = 3 [(buf.validate.field).string.min_len = 1];
   string organization = 4 [(buf.validate.field).string.min_len = 1];
+  uint32 member_limit = 5;
 }
 
 message ListTeamsRequest {}

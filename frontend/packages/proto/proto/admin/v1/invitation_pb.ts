@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file admin/v1/invitation.proto.
  */
 export const file_admin_v1_invitation: GenFile = /*@__PURE__*/
-  fileDesc("ChlhZG1pbi92MS9pbnZpdGF0aW9uLnByb3RvEghhZG1pbi52MSK9AQoOSW52aXRhdGlvbkNvZGUSDAoEY29kZRgBIAEoCRIRCgl0ZWFtX2NvZGUYAiABKAMSEgoKdG90YWxfdXNlcxgDIAEoBBIWCg5yZW1haW5pbmdfdXNlcxgEIAEoBBIuCgpjcmVhdGVkX2F0GAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpleHBpcmVzX2F0GAYgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJIChpMaXN0SW52aXRhdGlvbkNvZGVzUmVxdWVzdBIRCgl0ZWFtX2NvZGUYASABKAMSFwoPaW5jbHVkZV9leHBpcmVkGAIgASgIIlEKG0xpc3RJbnZpdGF0aW9uQ29kZXNSZXNwb25zZRIyChBpbnZpdGF0aW9uX2NvZGVzGAEgAygLMhguYWRtaW4udjEuSW52aXRhdGlvbkNvZGUiUAobQ3JlYXRlSW52aXRhdGlvbkNvZGVSZXF1ZXN0EjEKD2ludml0YXRpb25fY29kZRgBIAEoCzIYLmFkbWluLnYxLkludml0YXRpb25Db2RlIlEKHENyZWF0ZUludml0YXRpb25Db2RlUmVzcG9uc2USMQoPaW52aXRhdGlvbl9jb2RlGAEgASgLMhguYWRtaW4udjEuSW52aXRhdGlvbkNvZGUiUAobVXBkYXRlSW52aXRhdGlvbkNvZGVSZXF1ZXN0EjEKD2ludml0YXRpb25fY29kZRgBIAEoCzIYLmFkbWluLnYxLkludml0YXRpb25Db2RlIlEKHFVwZGF0ZUludml0YXRpb25Db2RlUmVzcG9uc2USMQoPaW52aXRhdGlvbl9jb2RlGAEgASgLMhguYWRtaW4udjEuSW52aXRhdGlvbkNvZGUiKwobRGVsZXRlSW52aXRhdGlvbkNvZGVSZXF1ZXN0EgwKBGNvZGUYASABKAkiHgocRGVsZXRlSW52aXRhdGlvbkNvZGVSZXNwb25zZTKsAwoRSW52aXRhdGlvblNlcnZpY2USYgoTTGlzdEludml0YXRpb25Db2RlcxIkLmFkbWluLnYxLkxpc3RJbnZpdGF0aW9uQ29kZXNSZXF1ZXN0GiUuYWRtaW4udjEuTGlzdEludml0YXRpb25Db2Rlc1Jlc3BvbnNlEmUKFENyZWF0ZUludml0YXRpb25Db2RlEiUuYWRtaW4udjEuQ3JlYXRlSW52aXRhdGlvbkNvZGVSZXF1ZXN0GiYuYWRtaW4udjEuQ3JlYXRlSW52aXRhdGlvbkNvZGVSZXNwb25zZRJlChRVcGRhdGVJbnZpdGF0aW9uQ29kZRIlLmFkbWluLnYxLlVwZGF0ZUludml0YXRpb25Db2RlUmVxdWVzdBomLmFkbWluLnYxLlVwZGF0ZUludml0YXRpb25Db2RlUmVzcG9uc2USZQoURGVsZXRlSW52aXRhdGlvbkNvZGUSJS5hZG1pbi52MS5EZWxldGVJbnZpdGF0aW9uQ29kZVJlcXVlc3QaJi5hZG1pbi52MS5EZWxldGVJbnZpdGF0aW9uQ29kZVJlc3BvbnNlQqMBCgxjb20uYWRtaW4udjFCD0ludml0YXRpb25Qcm90b1ABWkFnaXRodWIuY29tL2ljdHNjL2ljdHNjLXJlZ2FsaWEvYmFja2VuZC9wa2cvcHJvdG8vYWRtaW4vdjE7YWRtaW52MaICA0FYWKoCCEFkbWluLlYxygIIQWRtaW5cVjHiAhRBZG1pblxWMVxHUEJNZXRhZGF0YeoCCUFkbWluOjpWMWIGcHJvdG8z", [file_google_protobuf_timestamp]);
+  fileDesc("ChlhZG1pbi92MS9pbnZpdGF0aW9uLnByb3RvEghhZG1pbi52MSKRAQoOSW52aXRhdGlvbkNvZGUSDAoEY29kZRgBIAEoCRIRCgl0ZWFtX2NvZGUYAiABKAMSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKZXhwaXJlc19hdBgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiSAoaTGlzdEludml0YXRpb25Db2Rlc1JlcXVlc3QSEQoJdGVhbV9jb2RlGAEgASgDEhcKD2luY2x1ZGVfZXhwaXJlZBgCIAEoCCJRChtMaXN0SW52aXRhdGlvbkNvZGVzUmVzcG9uc2USMgoQaW52aXRhdGlvbl9jb2RlcxgBIAMoCzIYLmFkbWluLnYxLkludml0YXRpb25Db2RlIlAKG0NyZWF0ZUludml0YXRpb25Db2RlUmVxdWVzdBIxCg9pbnZpdGF0aW9uX2NvZGUYASABKAsyGC5hZG1pbi52MS5JbnZpdGF0aW9uQ29kZSJRChxDcmVhdGVJbnZpdGF0aW9uQ29kZVJlc3BvbnNlEjEKD2ludml0YXRpb25fY29kZRgBIAEoCzIYLmFkbWluLnYxLkludml0YXRpb25Db2RlMt4BChFJbnZpdGF0aW9uU2VydmljZRJiChNMaXN0SW52aXRhdGlvbkNvZGVzEiQuYWRtaW4udjEuTGlzdEludml0YXRpb25Db2Rlc1JlcXVlc3QaJS5hZG1pbi52MS5MaXN0SW52aXRhdGlvbkNvZGVzUmVzcG9uc2USZQoUQ3JlYXRlSW52aXRhdGlvbkNvZGUSJS5hZG1pbi52MS5DcmVhdGVJbnZpdGF0aW9uQ29kZVJlcXVlc3QaJi5hZG1pbi52MS5DcmVhdGVJbnZpdGF0aW9uQ29kZVJlc3BvbnNlQqMBCgxjb20uYWRtaW4udjFCD0ludml0YXRpb25Qcm90b1ABWkFnaXRodWIuY29tL2ljdHNjL2ljdHNjLXJlZ2FsaWEvYmFja2VuZC9wa2cvcHJvdG8vYWRtaW4vdjE7YWRtaW52MaICA0FYWKoCCEFkbWluLlYxygIIQWRtaW5cVjHiAhRBZG1pblxWMVxHUEJNZXRhZGF0YeoCCUFkbWluOjpWMWIGcHJvdG8z", [file_google_protobuf_timestamp]);
 
 /**
  * @generated from message admin.v1.InvitationCode
@@ -29,22 +29,12 @@ export type InvitationCode = Message<"admin.v1.InvitationCode"> & {
   teamCode: bigint;
 
   /**
-   * @generated from field: uint64 total_uses = 3;
-   */
-  totalUses: bigint;
-
-  /**
-   * @generated from field: uint64 remaining_uses = 4;
-   */
-  remainingUses: bigint;
-
-  /**
-   * @generated from field: google.protobuf.Timestamp created_at = 5;
+   * @generated from field: google.protobuf.Timestamp created_at = 3;
    */
   createdAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp expires_at = 6;
+   * @generated from field: google.protobuf.Timestamp expires_at = 4;
    */
   expiresAt?: Timestamp;
 };
@@ -130,70 +120,6 @@ export const CreateInvitationCodeResponseSchema: GenMessage<CreateInvitationCode
   messageDesc(file_admin_v1_invitation, 4);
 
 /**
- * @generated from message admin.v1.UpdateInvitationCodeRequest
- */
-export type UpdateInvitationCodeRequest = Message<"admin.v1.UpdateInvitationCodeRequest"> & {
-  /**
-   * @generated from field: admin.v1.InvitationCode invitation_code = 1;
-   */
-  invitationCode?: InvitationCode;
-};
-
-/**
- * Describes the message admin.v1.UpdateInvitationCodeRequest.
- * Use `create(UpdateInvitationCodeRequestSchema)` to create a new message.
- */
-export const UpdateInvitationCodeRequestSchema: GenMessage<UpdateInvitationCodeRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_invitation, 5);
-
-/**
- * @generated from message admin.v1.UpdateInvitationCodeResponse
- */
-export type UpdateInvitationCodeResponse = Message<"admin.v1.UpdateInvitationCodeResponse"> & {
-  /**
-   * @generated from field: admin.v1.InvitationCode invitation_code = 1;
-   */
-  invitationCode?: InvitationCode;
-};
-
-/**
- * Describes the message admin.v1.UpdateInvitationCodeResponse.
- * Use `create(UpdateInvitationCodeResponseSchema)` to create a new message.
- */
-export const UpdateInvitationCodeResponseSchema: GenMessage<UpdateInvitationCodeResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_invitation, 6);
-
-/**
- * @generated from message admin.v1.DeleteInvitationCodeRequest
- */
-export type DeleteInvitationCodeRequest = Message<"admin.v1.DeleteInvitationCodeRequest"> & {
-  /**
-   * @generated from field: string code = 1;
-   */
-  code: string;
-};
-
-/**
- * Describes the message admin.v1.DeleteInvitationCodeRequest.
- * Use `create(DeleteInvitationCodeRequestSchema)` to create a new message.
- */
-export const DeleteInvitationCodeRequestSchema: GenMessage<DeleteInvitationCodeRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_invitation, 7);
-
-/**
- * @generated from message admin.v1.DeleteInvitationCodeResponse
- */
-export type DeleteInvitationCodeResponse = Message<"admin.v1.DeleteInvitationCodeResponse"> & {
-};
-
-/**
- * Describes the message admin.v1.DeleteInvitationCodeResponse.
- * Use `create(DeleteInvitationCodeResponseSchema)` to create a new message.
- */
-export const DeleteInvitationCodeResponseSchema: GenMessage<DeleteInvitationCodeResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_invitation, 8);
-
-/**
  * @generated from service admin.v1.InvitationService
  */
 export const InvitationService: GenService<{
@@ -212,22 +138,6 @@ export const InvitationService: GenService<{
     methodKind: "unary";
     input: typeof CreateInvitationCodeRequestSchema;
     output: typeof CreateInvitationCodeResponseSchema;
-  },
-  /**
-   * @generated from rpc admin.v1.InvitationService.UpdateInvitationCode
-   */
-  updateInvitationCode: {
-    methodKind: "unary";
-    input: typeof UpdateInvitationCodeRequestSchema;
-    output: typeof UpdateInvitationCodeResponseSchema;
-  },
-  /**
-   * @generated from rpc admin.v1.InvitationService.DeleteInvitationCode
-   */
-  deleteInvitationCode: {
-    methodKind: "unary";
-    input: typeof DeleteInvitationCodeRequestSchema;
-    output: typeof DeleteInvitationCodeResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_admin_v1_invitation, 0);

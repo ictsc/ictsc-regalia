@@ -39,20 +39,12 @@ const (
 	// InvitationServiceCreateInvitationCodeProcedure is the fully-qualified name of the
 	// InvitationService's CreateInvitationCode RPC.
 	InvitationServiceCreateInvitationCodeProcedure = "/admin.v1.InvitationService/CreateInvitationCode"
-	// InvitationServiceUpdateInvitationCodeProcedure is the fully-qualified name of the
-	// InvitationService's UpdateInvitationCode RPC.
-	InvitationServiceUpdateInvitationCodeProcedure = "/admin.v1.InvitationService/UpdateInvitationCode"
-	// InvitationServiceDeleteInvitationCodeProcedure is the fully-qualified name of the
-	// InvitationService's DeleteInvitationCode RPC.
-	InvitationServiceDeleteInvitationCodeProcedure = "/admin.v1.InvitationService/DeleteInvitationCode"
 )
 
 // InvitationServiceClient is a client for the admin.v1.InvitationService service.
 type InvitationServiceClient interface {
 	ListInvitationCodes(context.Context, *connect.Request[v1.ListInvitationCodesRequest]) (*connect.Response[v1.ListInvitationCodesResponse], error)
 	CreateInvitationCode(context.Context, *connect.Request[v1.CreateInvitationCodeRequest]) (*connect.Response[v1.CreateInvitationCodeResponse], error)
-	UpdateInvitationCode(context.Context, *connect.Request[v1.UpdateInvitationCodeRequest]) (*connect.Response[v1.UpdateInvitationCodeResponse], error)
-	DeleteInvitationCode(context.Context, *connect.Request[v1.DeleteInvitationCodeRequest]) (*connect.Response[v1.DeleteInvitationCodeResponse], error)
 }
 
 // NewInvitationServiceClient constructs a client for the admin.v1.InvitationService service. By
@@ -78,18 +70,6 @@ func NewInvitationServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithSchema(invitationServiceMethods.ByName("CreateInvitationCode")),
 			connect.WithClientOptions(opts...),
 		),
-		updateInvitationCode: connect.NewClient[v1.UpdateInvitationCodeRequest, v1.UpdateInvitationCodeResponse](
-			httpClient,
-			baseURL+InvitationServiceUpdateInvitationCodeProcedure,
-			connect.WithSchema(invitationServiceMethods.ByName("UpdateInvitationCode")),
-			connect.WithClientOptions(opts...),
-		),
-		deleteInvitationCode: connect.NewClient[v1.DeleteInvitationCodeRequest, v1.DeleteInvitationCodeResponse](
-			httpClient,
-			baseURL+InvitationServiceDeleteInvitationCodeProcedure,
-			connect.WithSchema(invitationServiceMethods.ByName("DeleteInvitationCode")),
-			connect.WithClientOptions(opts...),
-		),
 	}
 }
 
@@ -97,8 +77,6 @@ func NewInvitationServiceClient(httpClient connect.HTTPClient, baseURL string, o
 type invitationServiceClient struct {
 	listInvitationCodes  *connect.Client[v1.ListInvitationCodesRequest, v1.ListInvitationCodesResponse]
 	createInvitationCode *connect.Client[v1.CreateInvitationCodeRequest, v1.CreateInvitationCodeResponse]
-	updateInvitationCode *connect.Client[v1.UpdateInvitationCodeRequest, v1.UpdateInvitationCodeResponse]
-	deleteInvitationCode *connect.Client[v1.DeleteInvitationCodeRequest, v1.DeleteInvitationCodeResponse]
 }
 
 // ListInvitationCodes calls admin.v1.InvitationService.ListInvitationCodes.
@@ -111,22 +89,10 @@ func (c *invitationServiceClient) CreateInvitationCode(ctx context.Context, req 
 	return c.createInvitationCode.CallUnary(ctx, req)
 }
 
-// UpdateInvitationCode calls admin.v1.InvitationService.UpdateInvitationCode.
-func (c *invitationServiceClient) UpdateInvitationCode(ctx context.Context, req *connect.Request[v1.UpdateInvitationCodeRequest]) (*connect.Response[v1.UpdateInvitationCodeResponse], error) {
-	return c.updateInvitationCode.CallUnary(ctx, req)
-}
-
-// DeleteInvitationCode calls admin.v1.InvitationService.DeleteInvitationCode.
-func (c *invitationServiceClient) DeleteInvitationCode(ctx context.Context, req *connect.Request[v1.DeleteInvitationCodeRequest]) (*connect.Response[v1.DeleteInvitationCodeResponse], error) {
-	return c.deleteInvitationCode.CallUnary(ctx, req)
-}
-
 // InvitationServiceHandler is an implementation of the admin.v1.InvitationService service.
 type InvitationServiceHandler interface {
 	ListInvitationCodes(context.Context, *connect.Request[v1.ListInvitationCodesRequest]) (*connect.Response[v1.ListInvitationCodesResponse], error)
 	CreateInvitationCode(context.Context, *connect.Request[v1.CreateInvitationCodeRequest]) (*connect.Response[v1.CreateInvitationCodeResponse], error)
-	UpdateInvitationCode(context.Context, *connect.Request[v1.UpdateInvitationCodeRequest]) (*connect.Response[v1.UpdateInvitationCodeResponse], error)
-	DeleteInvitationCode(context.Context, *connect.Request[v1.DeleteInvitationCodeRequest]) (*connect.Response[v1.DeleteInvitationCodeResponse], error)
 }
 
 // NewInvitationServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -148,28 +114,12 @@ func NewInvitationServiceHandler(svc InvitationServiceHandler, opts ...connect.H
 		connect.WithSchema(invitationServiceMethods.ByName("CreateInvitationCode")),
 		connect.WithHandlerOptions(opts...),
 	)
-	invitationServiceUpdateInvitationCodeHandler := connect.NewUnaryHandler(
-		InvitationServiceUpdateInvitationCodeProcedure,
-		svc.UpdateInvitationCode,
-		connect.WithSchema(invitationServiceMethods.ByName("UpdateInvitationCode")),
-		connect.WithHandlerOptions(opts...),
-	)
-	invitationServiceDeleteInvitationCodeHandler := connect.NewUnaryHandler(
-		InvitationServiceDeleteInvitationCodeProcedure,
-		svc.DeleteInvitationCode,
-		connect.WithSchema(invitationServiceMethods.ByName("DeleteInvitationCode")),
-		connect.WithHandlerOptions(opts...),
-	)
 	return "/admin.v1.InvitationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case InvitationServiceListInvitationCodesProcedure:
 			invitationServiceListInvitationCodesHandler.ServeHTTP(w, r)
 		case InvitationServiceCreateInvitationCodeProcedure:
 			invitationServiceCreateInvitationCodeHandler.ServeHTTP(w, r)
-		case InvitationServiceUpdateInvitationCodeProcedure:
-			invitationServiceUpdateInvitationCodeHandler.ServeHTTP(w, r)
-		case InvitationServiceDeleteInvitationCodeProcedure:
-			invitationServiceDeleteInvitationCodeHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -185,12 +135,4 @@ func (UnimplementedInvitationServiceHandler) ListInvitationCodes(context.Context
 
 func (UnimplementedInvitationServiceHandler) CreateInvitationCode(context.Context, *connect.Request[v1.CreateInvitationCodeRequest]) (*connect.Response[v1.CreateInvitationCodeResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.InvitationService.CreateInvitationCode is not implemented"))
-}
-
-func (UnimplementedInvitationServiceHandler) UpdateInvitationCode(context.Context, *connect.Request[v1.UpdateInvitationCodeRequest]) (*connect.Response[v1.UpdateInvitationCodeResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.InvitationService.UpdateInvitationCode is not implemented"))
-}
-
-func (UnimplementedInvitationServiceHandler) DeleteInvitationCode(context.Context, *connect.Request[v1.DeleteInvitationCodeRequest]) (*connect.Response[v1.DeleteInvitationCodeResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.InvitationService.DeleteInvitationCode is not implemented"))
 }
