@@ -10,25 +10,16 @@ import (
 func FixTeam1(tb testing.TB, data *TeamData) *Team {
 	tb.Helper()
 
+	//nolint:mnd
 	teamData := &TeamData{
 		ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
 		Code:         1,
 		Name:         "トラブルシューターズ",
 		Organization: "ICTSC Association",
+		MaxMembers:   6,
 	}
 	if data != nil {
-		if !data.ID.IsNil() {
-			teamData.ID = data.ID
-		}
-		if data.Code != 0 {
-			teamData.Code = data.Code
-		}
-		if data.Name != "" {
-			teamData.Name = data.Name
-		}
-		if data.Organization != "" {
-			teamData.Organization = data.Organization
-		}
+		teamData.merge(data)
 	}
 
 	team, err := teamData.parse()

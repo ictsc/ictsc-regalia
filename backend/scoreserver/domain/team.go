@@ -31,6 +31,10 @@ func (t *Team) Organization() string {
 	return t.organization
 }
 
+func (t *Team) MaxMembers() uint {
+	return t.maxMembers
+}
+
 type TeamGetEffect = TeamGetter
 
 func (tc TeamCode) Team(ctx context.Context, effect TeamGetEffect) (*Team, error) {
@@ -66,6 +70,7 @@ type (
 		Code         int
 		Name         string
 		Organization string
+		MaxMembers   uint
 	}
 	TeamCreateEffect   = Tx[TeamCreateTxEffect]
 	TeamCreateTxEffect = TeamCreator
@@ -96,6 +101,7 @@ func createTeam(input TeamCreateInput) (*Team, error) {
 		Code:         int64(input.Code),
 		Name:         input.Name,
 		Organization: input.Organization,
+		MaxMembers:   input.MaxMembers,
 	}).parse()
 	if err != nil {
 		return nil, err
@@ -148,6 +154,7 @@ type (
 		Code         int64
 		Name         string
 		Organization string
+		MaxMembers   uint
 	}
 	TeamsLister interface {
 		ListTeams(ctx context.Context) ([]*TeamData, error)
@@ -166,12 +173,32 @@ type (
 	}
 )
 
+func (t *TeamData) merge(data *TeamData) *TeamData {
+	if !data.ID.IsNil() {
+		t.ID = data.ID
+	}
+	if data.Code != 0 {
+		t.Code = data.Code
+	}
+	if data.Name != "" {
+		t.Name = data.Name
+	}
+	if data.Organization != "" {
+		t.Organization = data.Organization
+	}
+	if data.MaxMembers != 0 {
+		t.MaxMembers = data.MaxMembers
+	}
+	return t
+}
+
 func (t *Team) Data() *TeamData {
 	return &TeamData{
 		ID:           uuid.UUID(t.teamID),
 		Code:         int64(t.code),
 		Name:         t.name,
 		Organization: t.organization,
+		MaxMembers:   t.maxMembers,
 	}
 }
 
@@ -183,6 +210,7 @@ type (
 		code         teamCode
 		name         string
 		organization string
+		maxMembers   uint
 	}
 )
 
@@ -200,10 +228,15 @@ func (t *TeamData) parse() (*team, error) {
 		return nil, NewError(ErrTypeInvalidArgument, errors.New("team organization must not be empty"))
 	}
 
+	if t.MaxMembers < 1 {
+		return nil, NewError(ErrTypeInvalidArgument, errors.New("team max members must be greater than 0"))
+	}
+
 	return &Team{
 		teamID:       teamID(t.ID),
 		code:         code,
 		name:         t.Name,
 		organization: t.Organization,
+		maxMembers:   t.MaxMembers,
 	}, nil
 }

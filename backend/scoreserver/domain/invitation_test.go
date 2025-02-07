@@ -15,7 +15,7 @@ import (
 func Test_ListInvitationCode(t *testing.T) {
 	t.Parallel()
 
-	now := must(time.Parse(time.RFC3339, "2025-01-01T00:00:00Z"))
+	now := time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC)
 	ic1 := &domain.InvitationCodeData{
 		ID: must(uuid.NewV4()),
 		Team: &domain.TeamData{
@@ -23,6 +23,7 @@ func Test_ListInvitationCode(t *testing.T) {
 			Code:         1,
 			Name:         "team1",
 			Organization: "org1",
+			MaxMembers:   5,
 		},
 		Code:      "ABCD1234EFGH5678",
 		ExpiresAt: now.Add(24 * time.Hour),
@@ -36,6 +37,7 @@ func Test_ListInvitationCode(t *testing.T) {
 			Code:         2,
 			Name:         "team2",
 			Organization: "org2",
+			MaxMembers:   3,
 		},
 		Code:      "WXYZ9876MNPQ5432",
 		ExpiresAt: now.Add(48 * time.Hour),
@@ -141,7 +143,6 @@ func Test_CreateInvitationCode(t *testing.T) {
 				t.Errorf("want error type %v, got %v", tt.wantErr, err)
 			}
 			if err != nil {
-				t.Logf("error: %v", err)
 				return
 			}
 
