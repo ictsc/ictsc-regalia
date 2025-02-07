@@ -2,8 +2,8 @@
 // @generated from file contestant/v1/viewer.proto (package contestant.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
+import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
+import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -11,19 +11,38 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file contestant/v1/viewer.proto.
  */
 export const file_contestant_v1_viewer: GenFile = /*@__PURE__*/
-  fileDesc("Chpjb250ZXN0YW50L3YxL3ZpZXdlci5wcm90bxINY29udGVzdGFudC52MSIWCgZWaWV3ZXISDAoEbmFtZRgBIAEoCSISChBHZXRWaWV3ZXJSZXF1ZXN0IkIKEUdldFZpZXdlclJlc3BvbnNlEi0KBnZpZXdlchgBIAEoCzIVLmNvbnRlc3RhbnQudjEuVmlld2VyQga6SAPIAQEyXwoNVmlld2VyU2VydmljZRJOCglHZXRWaWV3ZXISHy5jb250ZXN0YW50LnYxLkdldFZpZXdlclJlcXVlc3QaIC5jb250ZXN0YW50LnYxLkdldFZpZXdlclJlc3BvbnNlQsIBChFjb20uY29udGVzdGFudC52MUILVmlld2VyUHJvdG9QAVpLZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2NvbnRlc3RhbnQvdjE7Y29udGVzdGFudHYxogIDQ1hYqgINQ29udGVzdGFudC5WMcoCDUNvbnRlc3RhbnRcVjHiAhlDb250ZXN0YW50XFYxXEdQQk1ldGFkYXRh6gIOQ29udGVzdGFudDo6VjFiBnByb3RvMw", [file_buf_validate_validate]);
+  fileDesc("Chpjb250ZXN0YW50L3YxL3ZpZXdlci5wcm90bxINY29udGVzdGFudC52MSKwAQoGVmlld2VyEgwKBG5hbWUYASABKAkSJwoEdHlwZRgCIAEoDjIZLmNvbnRlc3RhbnQudjEuVmlld2VyVHlwZRI1Cgpjb250ZXN0YW50GAMgASgLMh8uY29udGVzdGFudC52MS5Db250ZXN0YW50Vmlld2VySAASLgoHc2lnbl91cBgEIAEoCzIbLmNvbnRlc3RhbnQudjEuU2lnblVwVmlld2VySABCCAoGdmlld2VyIjYKEENvbnRlc3RhbnRWaWV3ZXISDAoEbmFtZRgBIAEoCRIUCgxkaXNwbGF5X25hbWUYAiABKAkiMgoMU2lnblVwVmlld2VyEgwKBG5hbWUYASABKAkSFAoMZGlzcGxheV9uYW1lGAIgASgJIhIKEEdldFZpZXdlclJlcXVlc3QiQgoRR2V0Vmlld2VyUmVzcG9uc2USLQoGdmlld2VyGAEgASgLMhUuY29udGVzdGFudC52MS5WaWV3ZXJCBrpIA8gBASJMCg1TaWduVXBSZXF1ZXN0EgwKBG5hbWUYASABKAkSFAoMZGlzcGxheV9uYW1lGAIgASgJEhcKD2ludml0YXRpb25fY29kZRgDIAEoCSIQCg5TaWduVXBSZXNwb25zZSpeCgpWaWV3ZXJUeXBlEhsKF1ZJRVdFUl9UWVBFX1VOU1BFQ0lGSUVEEAASGgoWVklFV0VSX1RZUEVfQ09OVEVTVEFOVBABEhcKE1ZJRVdFUl9UWVBFX1NJR05fVVAQAjKmAQoNVmlld2VyU2VydmljZRJOCglHZXRWaWV3ZXISHy5jb250ZXN0YW50LnYxLkdldFZpZXdlclJlcXVlc3QaIC5jb250ZXN0YW50LnYxLkdldFZpZXdlclJlc3BvbnNlEkUKBlNpZ25VcBIcLmNvbnRlc3RhbnQudjEuU2lnblVwUmVxdWVzdBodLmNvbnRlc3RhbnQudjEuU2lnblVwUmVzcG9uc2VCwgEKEWNvbS5jb250ZXN0YW50LnYxQgtWaWV3ZXJQcm90b1ABWktnaXRodWIuY29tL2ljdHNjL2ljdHNjLXJlZ2FsaWEvYmFja2VuZC9wa2cvcHJvdG8vY29udGVzdGFudC92MTtjb250ZXN0YW50djGiAgNDWFiqAg1Db250ZXN0YW50LlYxygINQ29udGVzdGFudFxWMeICGUNvbnRlc3RhbnRcVjFcR1BCTWV0YWRhdGHqAg5Db250ZXN0YW50OjpWMWIGcHJvdG8z", [file_buf_validate_validate]);
 
 /**
  * @generated from message contestant.v1.Viewer
  */
 export type Viewer = Message<"contestant.v1.Viewer"> & {
   /**
-   * TODO: チームに関する情報が必要
-   * コードかチーム自体か
-   *
    * @generated from field: string name = 1;
    */
   name: string;
+
+  /**
+   * @generated from field: contestant.v1.ViewerType type = 2;
+   */
+  type: ViewerType;
+
+  /**
+   * @generated from oneof contestant.v1.Viewer.viewer
+   */
+  viewer: {
+    /**
+     * @generated from field: contestant.v1.ContestantViewer contestant = 3;
+     */
+    value: ContestantViewer;
+    case: "contestant";
+  } | {
+    /**
+     * @generated from field: contestant.v1.SignUpViewer sign_up = 4;
+     */
+    value: SignUpViewer;
+    case: "signUp";
+  } | { case: undefined; value?: undefined };
 };
 
 /**
@@ -32,6 +51,55 @@ export type Viewer = Message<"contestant.v1.Viewer"> & {
  */
 export const ViewerSchema: GenMessage<Viewer> = /*@__PURE__*/
   messageDesc(file_contestant_v1_viewer, 0);
+
+/**
+ * @generated from message contestant.v1.ContestantViewer
+ */
+export type ContestantViewer = Message<"contestant.v1.ContestantViewer"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * TODO: チームに関する情報が必要
+   * コードかチーム自体か
+   *
+   * @generated from field: string display_name = 2;
+   */
+  displayName: string;
+};
+
+/**
+ * Describes the message contestant.v1.ContestantViewer.
+ * Use `create(ContestantViewerSchema)` to create a new message.
+ */
+export const ContestantViewerSchema: GenMessage<ContestantViewer> = /*@__PURE__*/
+  messageDesc(file_contestant_v1_viewer, 1);
+
+/**
+ * サインアップ中のユーザ
+ *
+ * @generated from message contestant.v1.SignUpViewer
+ */
+export type SignUpViewer = Message<"contestant.v1.SignUpViewer"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string display_name = 2;
+   */
+  displayName: string;
+};
+
+/**
+ * Describes the message contestant.v1.SignUpViewer.
+ * Use `create(SignUpViewerSchema)` to create a new message.
+ */
+export const SignUpViewerSchema: GenMessage<SignUpViewer> = /*@__PURE__*/
+  messageDesc(file_contestant_v1_viewer, 2);
 
 /**
  * @generated from message contestant.v1.GetViewerRequest
@@ -44,7 +112,7 @@ export type GetViewerRequest = Message<"contestant.v1.GetViewerRequest"> & {
  * Use `create(GetViewerRequestSchema)` to create a new message.
  */
 export const GetViewerRequestSchema: GenMessage<GetViewerRequest> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_viewer, 1);
+  messageDesc(file_contestant_v1_viewer, 3);
 
 /**
  * @generated from message contestant.v1.GetViewerResponse
@@ -61,7 +129,73 @@ export type GetViewerResponse = Message<"contestant.v1.GetViewerResponse"> & {
  * Use `create(GetViewerResponseSchema)` to create a new message.
  */
 export const GetViewerResponseSchema: GenMessage<GetViewerResponse> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_viewer, 2);
+  messageDesc(file_contestant_v1_viewer, 4);
+
+/**
+ * @generated from message contestant.v1.SignUpRequest
+ */
+export type SignUpRequest = Message<"contestant.v1.SignUpRequest"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string display_name = 2;
+   */
+  displayName: string;
+
+  /**
+   * @generated from field: string invitation_code = 3;
+   */
+  invitationCode: string;
+};
+
+/**
+ * Describes the message contestant.v1.SignUpRequest.
+ * Use `create(SignUpRequestSchema)` to create a new message.
+ */
+export const SignUpRequestSchema: GenMessage<SignUpRequest> = /*@__PURE__*/
+  messageDesc(file_contestant_v1_viewer, 5);
+
+/**
+ * @generated from message contestant.v1.SignUpResponse
+ */
+export type SignUpResponse = Message<"contestant.v1.SignUpResponse"> & {
+};
+
+/**
+ * Describes the message contestant.v1.SignUpResponse.
+ * Use `create(SignUpResponseSchema)` to create a new message.
+ */
+export const SignUpResponseSchema: GenMessage<SignUpResponse> = /*@__PURE__*/
+  messageDesc(file_contestant_v1_viewer, 6);
+
+/**
+ * @generated from enum contestant.v1.ViewerType
+ */
+export enum ViewerType {
+  /**
+   * @generated from enum value: VIEWER_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: VIEWER_TYPE_CONTESTANT = 1;
+   */
+  CONTESTANT = 1,
+
+  /**
+   * @generated from enum value: VIEWER_TYPE_SIGN_UP = 2;
+   */
+  SIGN_UP = 2,
+}
+
+/**
+ * Describes the enum contestant.v1.ViewerType.
+ */
+export const ViewerTypeSchema: GenEnum<ViewerType> = /*@__PURE__*/
+  enumDesc(file_contestant_v1_viewer, 0);
 
 /**
  * @generated from service contestant.v1.ViewerService
@@ -74,6 +208,14 @@ export const ViewerService: GenService<{
     methodKind: "unary";
     input: typeof GetViewerRequestSchema;
     output: typeof GetViewerResponseSchema;
+  },
+  /**
+   * @generated from rpc contestant.v1.ViewerService.SignUp
+   */
+  signUp: {
+    methodKind: "unary";
+    input: typeof SignUpRequestSchema;
+    output: typeof SignUpResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_contestant_v1_viewer, 0);
