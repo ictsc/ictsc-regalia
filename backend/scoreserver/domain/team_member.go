@@ -29,6 +29,14 @@ func (u *user) JoinTeam(ctx context.Context, eff TeamMemberManager, now time.Tim
 		return NewError(ErrTypeInvalidArgument, errors.New("invitation code is expired"))
 	}
 
+	memberCount, err := eff.CountTeamMembers(ctx, uuid.UUID(invitationCode.team.teamID))
+	if err != nil {
+		return WrapAsInternal(err, "failed to count team members")
+	}
+	if memberCount >= invitationCode.team.maxMembers {
+		return NewError(ErrTypeInvalidArgument, errors.New("team is full"))
+	}
+
 	if err := eff.AddTeamMember(ctx,
 		uuid.UUID(u.userID), invitationCode.id, uuid.UUID(invitationCode.team.teamID),
 	); err != nil {
@@ -48,8 +56,10 @@ type (
 	}
 	TeamMemberGetter interface {
 		GetTeamMemberByID(ctx context.Context, userID uuid.UUID) (*TeamMemberData, error)
+		CountTeamMembers(ctx context.Context, teamID uuid.UUID) (uint, error)
 	}
 	TeamMemberManager interface {
+		TeamMemberGetter
 		AddTeamMember(ctx context.Context, userID uuid.UUID, invitationCodeID uuid.UUID, teamID uuid.UUID) error
 	}
 )
