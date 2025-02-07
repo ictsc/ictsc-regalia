@@ -97,6 +97,7 @@ func (h *TeamServiceHandler) CreateTeam(
 		Code:         int(req.Msg.GetTeam().GetCode()),
 		Name:         req.Msg.GetTeam().GetName(),
 		Organization: req.Msg.GetTeam().GetOrganization(),
+		MaxMembers:   uint(req.Msg.GetTeam().GetMemberLimit()),
 	})
 	if err != nil {
 		return nil, connectError(err)
@@ -188,5 +189,6 @@ func convertTeam(team *domain.Team) *adminv1.Team {
 		Code:         int64(team.Code()),
 		Name:         team.Name(),
 		Organization: team.Organization(),
+		MemberLimit:  uint32(team.MaxMembers()),
 	}
 }

@@ -45,6 +45,14 @@ func (r *repo) GetTeamMemberByID(ctx context.Context, userID uuid.UUID) (*domain
 	return row.toData(), nil
 }
 
+func (r *repo) CountTeamMembers(ctx context.Context, teamID uuid.UUID) (uint, error) {
+	var count uint
+	if err := sqlx.GetContext(ctx, r.ext, &count, "SELECT COUNT(*) FROM team_members WHERE team_id = $1", teamID); err != nil {
+		return 0, errors.Wrap(err, "failed to count team members")
+	}
+	return count, nil
+}
+
 var _ domain.TeamMemberManager = (*RepositoryTx)(nil)
 
 func (r *RepositoryTx) AddTeamMember(ctx context.Context, userID, invitationCodeID, teamID uuid.UUID) error {

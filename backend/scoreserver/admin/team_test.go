@@ -26,10 +26,10 @@ func TestAdminTeamService_Create(t *testing.T) {
 	}{
 		"ok": {
 			in: &adminv1.CreateTeamRequest{
-				Team: &adminv1.Team{Code: 3, Name: "トラブルバスターズ", Organization: "ICTSC Committee"},
+				Team: &adminv1.Team{Code: 3, Name: "トラブルバスターズ", Organization: "ICTSC Committee", MemberLimit: 1},
 			},
 			wants: &adminv1.CreateTeamResponse{
-				Team: &adminv1.Team{Code: 3, Name: "トラブルバスターズ", Organization: "ICTSC Committee"},
+				Team: &adminv1.Team{Code: 3, Name: "トラブルバスターズ", Organization: "ICTSC Committee", MemberLimit: 1},
 			},
 		},
 
@@ -41,7 +41,7 @@ func TestAdminTeamService_Create(t *testing.T) {
 		},
 		"duplicate code": {
 			in: &adminv1.CreateTeamRequest{
-				Team: &adminv1.Team{Code: 1, Name: "duplicator", Organization: "ICTSC Committee"},
+				Team: &adminv1.Team{Code: 1, Name: "duplicator", Organization: "ICTSC Committee", MemberLimit: 2},
 			},
 			wantCode: connect.CodeAlreadyExists,
 		},
@@ -54,7 +54,7 @@ func TestAdminTeamService_Create(t *testing.T) {
 		},
 		"duplicate name": {
 			in: &adminv1.CreateTeamRequest{
-				Team: &adminv1.Team{Code: 3, Name: "トラブルシューターズ", Organization: "ICTSC Committee"},
+				Team: &adminv1.Team{Code: 3, Name: "トラブルシューターズ", Organization: "ICTSC Committee", MemberLimit: 2},
 			},
 			wantCode: connect.CodeAlreadyExists,
 		},
@@ -104,8 +104,8 @@ func TestAdminTeamService_List(t *testing.T) {
 
 			wants: &adminv1.ListTeamsResponse{
 				Teams: []*adminv1.Team{
-					{Code: 1, Name: "トラブルシューターズ", Organization: "ICTSC Association"},
-					{Code: 2, Name: "トラブルメイカーズ", Organization: "ICTSC Association"},
+					{Code: 1, Name: "トラブルシューターズ", Organization: "ICTSC Association", MemberLimit: 6},
+					{Code: 2, Name: "トラブルメイカーズ", Organization: "ICTSC Association", MemberLimit: 2},
 				},
 			},
 		},
@@ -146,7 +146,7 @@ func TestAdminTeamService_Get(t *testing.T) {
 		"by code": {
 			in: &adminv1.GetTeamRequest{Code: 1},
 			wants: &adminv1.GetTeamResponse{
-				Team: &adminv1.Team{Code: 1, Name: "トラブルシューターズ", Organization: "ICTSC Association"},
+				Team: &adminv1.Team{Code: 1, Name: "トラブルシューターズ", Organization: "ICTSC Association", MemberLimit: 6},
 			},
 		},
 		"no code": {
@@ -192,7 +192,7 @@ func TestAdminTeamService_Update(t *testing.T) {
 				Team: &adminv1.Team{Code: 1, Organization: "ICTSC Committee"},
 			},
 			wants: &adminv1.UpdateTeamResponse{
-				Team: &adminv1.Team{Code: 1, Name: "トラブルシューターズ", Organization: "ICTSC Committee"},
+				Team: &adminv1.Team{Code: 1, Name: "トラブルシューターズ", Organization: "ICTSC Committee", MemberLimit: 6},
 			},
 		},
 		"cannot update name": {

@@ -16,12 +16,13 @@ type teamRow struct {
 	Code         int64     `db:"code"`
 	Name         string    `db:"name"`
 	Organization string    `db:"organization"`
+	MaxMembers   uint      `db:"max_members"`
 }
 
 var _ domain.TeamsLister = (*repo)(nil)
 
 func (r *repo) ListTeams(ctx context.Context) ([]*domain.TeamData, error) {
-	rows, err := r.ext.QueryxContext(ctx, "SELECT id, code, name, organization FROM teams ORDER BY code ASC")
+	rows, err := r.ext.QueryxContext(ctx, "SELECT id, code, name, organization, max_members FROM teams ORDER BY code ASC")
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to select teams")
 	}
@@ -44,7 +45,7 @@ var _ domain.TeamGetter = (*repo)(nil)
 func (r *repo) GetTeamByCode(ctx context.Context, code int64) (*domain.TeamData, error) {
 	var row teamRow
 	if err := sqlx.GetContext(ctx, r.ext,
-		&row, "SELECT id, code, name, organization FROM teams WHERE code = $1 LIMIT 1",
+		&row, "SELECT id, code, name, organization, max_members FROM teams WHERE code = $1 LIMIT 1",
 		code,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -58,9 +59,9 @@ func (r *repo) GetTeamByCode(ctx context.Context, code int64) (*domain.TeamData,
 var _ domain.TeamCreator = (*repo)(nil)
 
 func (r *repo) CreateTeam(ctx context.Context, team *domain.TeamData) error {
-	if _, err := sqlx.NamedExecContext(ctx, r.ext,
-		`INSERT INTO teams (id, code, name, organization, created_at, updated_at)
-		 VALUES (:id, :code, :name, :organization, NOW(), NOW())`,
+	if _, err := sqlx.NamedExecContext(ctx, r.ext, `
+		INSERT INTO teams (id, code, name, organization, max_members, created_at, updated_at)
+		VALUES (:id, :code, :name, :organization, :max_members, NOW(), NOW())`,
 		(*teamRow)(team),
 	); err != nil {
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
@@ -79,8 +80,9 @@ var _ domain.TeamUpdater = (*repo)(nil)
 
 func (r *repo) UpdateTeam(ctx context.Context, team *domain.TeamData) error {
 	if _, err := sqlx.NamedExecContext(ctx, r.ext, `
-		UPDATE teams
-		SET code = :code, name = :name, organization = :organization, updated_at = NOW()
+		UPDATE teams SET
+			code = :code, name = :name, organization = :organization,
+			max_members = :max_members, updated_at = NOW()
 		WHERE id = :id`,
 		(*teamRow)(team),
 	); err != nil {

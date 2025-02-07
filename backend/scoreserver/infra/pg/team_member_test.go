@@ -65,6 +65,48 @@ func TestGetTeamMember(t *testing.T) {
 	}
 }
 
+func TestCountTeamMembers(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]struct {
+		inTeamID uuid.UUID
+		wants    uint
+		wantErr  domain.ErrType
+	}{
+		"ok": {
+			inTeamID: uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
+			wants:    1,
+		},
+		"not found": {
+			inTeamID: uuid.FromStringOrNil("00000000-0000-0000-0000-000000000001"),
+			wants:    0,
+		},
+	}
+
+	for name, tt := range cases {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			ctx := context.Background()
+
+			db := pgtest.SetupDB(t)
+			repo := pg.NewRepository(db)
+
+			got, err := repo.CountTeamMembers(ctx, tt.inTeamID)
+			if typ := domain.ErrTypeFrom(err); typ != tt.wantErr {
+				t.Errorf("wantErr: %v, got: %v", tt.wantErr, err)
+			}
+			if err != nil {
+				return
+			}
+
+			if got != tt.wants {
+				t.Errorf("want: %v, got: %v", tt.wants, got)
+			}
+		})
+	}
+}
+
 func TestAddTeamMember(t *testing.T) {
 	t.Parallel()
 
