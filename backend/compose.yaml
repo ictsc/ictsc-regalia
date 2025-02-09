@@ -13,6 +13,12 @@ services:
       POSTGRES_USER: ictsc
       POSTGRES_DB: ictscore
 
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - ":6379"
+
   jaeger:
     image: jaegertracing/all-in-one
     ports:
