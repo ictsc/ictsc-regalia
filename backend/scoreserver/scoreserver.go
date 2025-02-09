@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/cockroachdb/errors"
@@ -78,15 +79,33 @@ func (s *ScoreServer) Start(_ context.Context) error {
 }
 
 func (s *ScoreServer) Shutdown(ctx context.Context) error {
-	slog.DebugContext(ctx, "Shutting down admin API")
-	if err := s.adminServer.Shutdown(ctx); err != nil {
-		return errors.Wrap(err, "failed to shutdown admin API")
+	shutdownFns := []func(context.Context) error{
+		func(ctx context.Context) error {
+			slog.DebugContext(ctx, "Shutting down admin API")
+			if err := s.adminServer.Shutdown(ctx); err != nil {
+				return errors.Wrap(err, "failed to shutdown admin API")
+			}
+			return nil
+		},
+		func(ctx context.Context) error {
+			slog.DebugContext(ctx, "Shutting down contestant API")
+			if err := s.contestantServer.Shutdown(ctx); err != nil {
+				return errors.Wrap(err, "failed to shutdown contestant API")
+			}
+			return nil
+		},
 	}
 
-	slog.DebugContext(ctx, "Shutting down contestant API")
-	if err := s.contestantServer.Shutdown(ctx); err != nil {
-		return errors.Wrap(err, "failed to shutdown contestant API")
+	errs := make([]error, len(shutdownFns))
+	var wg sync.WaitGroup
+	for i, fn := range shutdownFns {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			errs[i] = fn(ctx)
+		}()
 	}
+	wg.Wait()
 
-	return nil
+	return errors.Join(errs...)
 }
