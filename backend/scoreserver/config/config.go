@@ -2,16 +2,13 @@ package config
 
 import (
 	"net/netip"
-	"net/url"
 
 	"github.com/jackc/pgx/v5"
 )
 
 type Config struct {
-	AdminAPI AdminAPI
-
-	ContestantHTTPAddress netip.AddrPort
-	ContestantBaseURLs    []url.URL
+	AdminAPI      AdminAPI
+	ContestantAPI ContestantAPI
 
 	PgConfig pgx.ConnConfig
 }
@@ -38,4 +35,8 @@ type Issuer struct {
 
 type AdminAuthz struct {
 	Policy string
+}
+
+type ContestantAPI struct {
+	Address netip.AddrPort
 }
