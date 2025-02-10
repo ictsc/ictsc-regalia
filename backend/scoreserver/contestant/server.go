@@ -5,14 +5,23 @@ import (
 	"net/http"
 
 	"connectrpc.com/connect"
+	"github.com/cockroachdb/errors"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/connectutil"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1/contestantv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
+	"github.com/rbcervilla/redisstore/v9"
+	"github.com/redis/go-redis/v9"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
 
-func New(ctx context.Context, cfg config.ContestantAPI) (http.Handler, error) {
+func New(ctx context.Context, cfg config.ContestantAPI, rdb redis.UniversalClient) (http.Handler, error) {
+	sessionStore, err := redisstore.NewRedisStore(ctx, rdb)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create session store")
+	}
+	sessionStore.KeyPrefix("contestant-session:")
+
 	interceptors := []connect.Interceptor{
 		connectutil.NewOtelInterceptor(),
 		connectutil.NewSlogInterceptor(),

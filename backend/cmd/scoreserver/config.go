@@ -6,6 +6,7 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/jackc/pgx/v5"
+	"github.com/redis/go-redis/v9"
 	"gopkg.in/yaml.v3"
 )
 
@@ -25,10 +26,21 @@ func newConfig(opts *CLIOption) (*config.Config, error) {
 		return nil, errors.Wrap(err, "failed to parse DB_DSN")
 	}
 
+	redisURL := os.Getenv("REDIS_URL")
+	if redisURL == "" {
+		redisURL = "redis://localhost:6379/0"
+	}
+
+	redisOpts, err := redis.ParseURL(redisURL)
+	if err != nil {
+		return nil, errors.Wrap(err, "invalid REDIS_URL")
+	}
+
 	return &config.Config{
 		AdminAPI:      *adminAPI,
 		ContestantAPI: *contestantAPI,
 		PgConfig:      *cfg,
+		Redis:         *redisOpts,
 	}, nil
 }
 func newAdminConfig(opts *CLIOption) (*config.AdminAPI, error) {

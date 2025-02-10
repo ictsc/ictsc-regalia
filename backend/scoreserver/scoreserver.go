@@ -12,6 +12,7 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/contestant"
+	"github.com/redis/go-redis/v9"
 )
 
 const (
@@ -28,6 +29,7 @@ type ScoreServer struct {
 
 func New(ctx context.Context, cfg *config.Config) (*ScoreServer, error) {
 	db := pgxutil.NewDBx(cfg.PgConfig, pgxutil.WithOTel(true))
+	rdb := redis.NewClient(&cfg.Redis)
 
 	adminHandler, err := admin.New(ctx, cfg.AdminAPI, db)
 	if err != nil {
@@ -42,7 +44,7 @@ func New(ctx context.Context, cfg *config.Config) (*ScoreServer, error) {
 		MaxHeaderBytes:    maxHeaderBytes,
 	}
 
-	contestantHandler, err := contestant.New(ctx, cfg.ContestantAPI)
+	contestantHandler, err := contestant.New(ctx, cfg.ContestantAPI, rdb)
 	if err != nil {
 		return nil, err
 	}

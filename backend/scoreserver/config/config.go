@@ -4,6 +4,7 @@ import (
 	"net/netip"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/redis/go-redis/v9"
 )
 
 type Config struct {
@@ -11,6 +12,7 @@ type Config struct {
 	ContestantAPI ContestantAPI
 
 	PgConfig pgx.ConnConfig
+	Redis    redis.Options
 }
 
 type AdminAPI struct {
