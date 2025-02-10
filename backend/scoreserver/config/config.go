@@ -2,18 +2,17 @@ package config
 
 import (
 	"net/netip"
-	"net/url"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/redis/go-redis/v9"
 )
 
 type Config struct {
-	AdminAPI AdminAPI
-
-	ContestantHTTPAddress netip.AddrPort
-	ContestantBaseURLs    []url.URL
+	AdminAPI      AdminAPI
+	ContestantAPI ContestantAPI
 
 	PgConfig pgx.ConnConfig
+	Redis    redis.Options
 }
 
 type AdminAPI struct {
@@ -38,4 +37,8 @@ type Issuer struct {
 
 type AdminAuthz struct {
 	Policy string
+}
+
+type ContestantAPI struct {
+	Address netip.AddrPort
 }

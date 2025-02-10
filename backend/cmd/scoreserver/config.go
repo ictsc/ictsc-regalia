@@ -1,17 +1,49 @@
 package main
 
 import (
-	"net/netip"
-	"net/url"
 	"os"
 
 	"github.com/cockroachdb/errors"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/jackc/pgx/v5"
+	"github.com/redis/go-redis/v9"
 	"gopkg.in/yaml.v3"
 )
 
 func newConfig(opts *CLIOption) (*config.Config, error) {
+	adminAPI, err := newAdminConfig(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	contestantAPI, err := newContestantConfig(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg, err := pgx.ParseConfig(os.Getenv("DB_DSN"))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to parse DB_DSN")
+	}
+
+	redisURL := os.Getenv("REDIS_URL")
+	if redisURL == "" {
+		redisURL = "redis://localhost:6379/0"
+	}
+
+	redisOpts, err := redis.ParseURL(redisURL)
+	if err != nil {
+		return nil, errors.Wrap(err, "invalid REDIS_URL")
+	}
+
+	return &config.Config{
+		AdminAPI:      *adminAPI,
+		ContestantAPI: *contestantAPI,
+		PgConfig:      *cfg,
+		Redis:         *redisOpts,
+	}, nil
+}
+func newAdminConfig(opts *CLIOption) (*config.AdminAPI, error) {
 	var err error
 
 	adminAuthConfigData := []byte(opts.AdminAuthConfig)
@@ -41,23 +73,17 @@ func newConfig(opts *CLIOption) (*config.Config, error) {
 		adminAuthPolicy = string(data)
 	}
 
-	cfg, err := pgx.ParseConfig(os.Getenv("DB_DSN"))
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse DB_DSN")
-	}
-
-	return &config.Config{
-		AdminAPI: config.AdminAPI{
-			Address: opts.AdminHTTPAddr,
-			Authn:   adminAuthnConfig,
-			Authz: config.AdminAuthz{
-				Policy: adminAuthPolicy,
-			},
+	return &config.AdminAPI{
+		Address: opts.AdminHTTPAddr,
+		Authn:   adminAuthnConfig,
+		Authz: config.AdminAuthz{
+			Policy: adminAuthPolicy,
 		},
+	}, nil
+}
 
-		ContestantHTTPAddress: netip.AddrPort{},
-		ContestantBaseURLs:    []url.URL{},
-
-		PgConfig: *cfg,
+func newContestantConfig(opts *CLIOption) (*config.ContestantAPI, error) {
+	return &config.ContestantAPI{
+		Address: opts.ContestantHTTPAddr,
 	}, nil
 }
