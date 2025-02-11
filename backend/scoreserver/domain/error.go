@@ -45,11 +45,10 @@ func NewError(typ ErrType, err error) error {
 }
 
 func WrapAsInternal(err error, msg string) error {
-	wrappedErr := errors.WrapWithDepth(1, err, msg)
 	if errors.Is(err, &Error{}) {
-		return wrappedErr
+		return err
 	} else {
-		return NewError(ErrTypeInternal, wrappedErr)
+		return NewError(ErrTypeInternal, errors.WrapWithDepth(1, err, msg))
 	}
 }
 
@@ -59,6 +58,11 @@ func (e *Error) Error() string {
 
 func (e *Error) Unwrap() error {
 	return e.err
+}
+
+func (e *Error) Is(target error) bool {
+	t, ok := target.(*Error)
+	return ok && (t.typ == ErrTypeUnknown || t.typ == e.typ)
 }
 
 func ErrTypeFrom(err error) ErrType {
