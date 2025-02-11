@@ -2,6 +2,7 @@ package config
 
 import (
 	"net/netip"
+	"net/url"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/redis/go-redis/v9"
@@ -39,6 +40,14 @@ type AdminAuthz struct {
 	Policy string
 }
 
-type ContestantAPI struct {
-	Address netip.AddrPort
-}
+type (
+	ContestantAPI struct {
+		Address netip.AddrPort
+		Auth    ContestantAuth
+	}
+	ContestantAuth struct {
+		BaseURL             *url.URL
+		DiscordClientID     string
+		DiscordClientSecret string
+	}
+)

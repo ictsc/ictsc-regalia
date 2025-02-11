@@ -83,7 +83,21 @@ func newAdminConfig(opts *CLIOption) (*config.AdminAPI, error) {
 }
 
 func newContestantConfig(opts *CLIOption) (*config.ContestantAPI, error) {
+	discordClientID := os.Getenv("DISCORD_CLIENT_ID")
+	if discordClientID == "" {
+		return nil, errors.New("DISCORD_CLIENT_ID is not set")
+	}
+	discordClientSecret := os.Getenv("DISCORD_CLIENT_SECRET")
+	if discordClientSecret == "" {
+		return nil, errors.New("DISCORD_CLIENT_SECRET is not set")
+	}
+
 	return &config.ContestantAPI{
 		Address: opts.ContestantHTTPAddr,
+		Auth: config.ContestantAuth{
+			BaseURL:             &opts.ContestantBaseURL,
+			DiscordClientID:     discordClientID,
+			DiscordClientSecret: discordClientSecret,
+		},
 	}, nil
 }
