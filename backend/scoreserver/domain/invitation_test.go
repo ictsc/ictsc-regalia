@@ -105,8 +105,9 @@ func Test_CreateInvitationCode(t *testing.T) {
 		team      *domain.Team
 		effect    domain.InvitationCodeCreateEffect
 		expiresAt time.Time
-		wantErr   domain.ErrType
-		want      *domain.InvitationCodeData
+
+		want    *domain.InvitationCodeData
+		wantErr error
 	}{
 		"ok": {
 			team:      team1,
@@ -122,7 +123,7 @@ func Test_CreateInvitationCode(t *testing.T) {
 			team:      team1,
 			effect:    effect,
 			expiresAt: now.Add(-24 * time.Hour),
-			wantErr:   domain.ErrTypeInvalidArgument,
+			wantErr:   domain.ErrInvalidArgument,
 		},
 		"creation fails": {
 			team: team1,
@@ -130,7 +131,7 @@ func Test_CreateInvitationCode(t *testing.T) {
 				return domain.NewError(domain.ErrTypeInternal, errors.New("dummy"))
 			}),
 			expiresAt: expiresAt,
-			wantErr:   domain.ErrTypeInternal,
+			wantErr:   domain.ErrInternal,
 		},
 	}
 
@@ -139,7 +140,7 @@ func Test_CreateInvitationCode(t *testing.T) {
 			t.Parallel()
 
 			code, err := tt.team.CreateInvitationCode(context.Background(), tt.effect, now, tt.expiresAt)
-			if domain.ErrTypeFrom(err) != tt.wantErr {
+			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("want error type %v, got %v", tt.wantErr, err)
 			}
 			if err != nil {

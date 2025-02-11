@@ -64,7 +64,7 @@ func connectError(err error) error {
 		return nil
 	}
 	var code connect.Code
-	switch domain.ErrTypeFrom(err) {
+	switch domain.ErrorType(err) {
 	case domain.ErrTypeInternal:
 		code = connect.CodeInternal
 	case domain.ErrTypeInvalidArgument:

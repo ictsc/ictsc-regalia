@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/pgtest"
@@ -64,8 +65,8 @@ func Test_PgRepo_GetDiscordLinkedUser(t *testing.T) {
 	cases := map[string]struct {
 		discordUserID int64
 
-		want        *domain.UserData
-		wantErrType domain.ErrType
+		want    *domain.UserData
+		wantErr error
 	}{
 		"ok": {
 			discordUserID: 123456789012345678,
@@ -76,7 +77,7 @@ func Test_PgRepo_GetDiscordLinkedUser(t *testing.T) {
 		},
 		"not found": {
 			discordUserID: 999999999999999999,
-			wantErrType:   domain.ErrTypeNotFound,
+			wantErr:       domain.ErrNotFound,
 		},
 	}
 
@@ -87,8 +88,8 @@ func Test_PgRepo_GetDiscordLinkedUser(t *testing.T) {
 			repo := pg.NewRepository(pgtest.SetupDB(t))
 
 			got, err := repo.GetDiscordLinkedUser(context.Background(), tt.discordUserID)
-			if actualType := domain.ErrTypeFrom(err); actualType != tt.wantErrType {
-				t.Errorf("want error type %v, but got %v", tt.wantErrType, actualType)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("want error type %v, but got %v", tt.wantErr, err)
 			}
 			if err != nil {
 				return
@@ -162,9 +163,8 @@ func Test_PgRepo_CreateUser(t *testing.T) {
 				return tx.CreateUser(ctx, profile)
 			})
 
-			expectedType, actualType := domain.ErrTypeAlreadyExists, domain.ErrTypeFrom(err)
-			if expectedType != actualType {
-				t.Errorf("want error type %v, but got %v", expectedType, actualType)
+			if !errors.Is(err, domain.ErrAlreadyExists) {
+				t.Errorf("want error type %v, but got %v", domain.ErrAlreadyExists, err)
 			}
 		},
 	}
@@ -229,9 +229,8 @@ func Test_PgRepo_LinkDiscordUser(t *testing.T) {
 				return tx.LinkDiscordUser(ctx, userID, discordUserID)
 			})
 
-			expectedType := domain.ErrTypeAlreadyExists
-			if actualType := domain.ErrTypeFrom(err); expectedType != actualType {
-				t.Errorf("want error type %v, but got %v", expectedType, actualType)
+			if !errors.Is(err, domain.ErrAlreadyExists) {
+				t.Errorf("want error type %v, but got %v", domain.ErrAlreadyExists, err)
 			}
 		},
 	}

@@ -18,34 +18,34 @@ func TestUserNameValidation(t *testing.T) {
 	cases := map[string]struct {
 		in string
 
-		wantErr domain.ErrType
+		wantErr error
 	}{
 		"ok": {
 			in: "ok_woman",
 		},
 		"no name": {
 			in:      "",
-			wantErr: domain.ErrTypeInvalidArgument,
+			wantErr: domain.ErrInvalidArgument,
 		},
 		"too short name": {
 			in:      "a",
-			wantErr: domain.ErrTypeInvalidArgument,
+			wantErr: domain.ErrInvalidArgument,
 		},
 		"too long name": {
 			in:      "abcdefghijklmnopqrstuvwxyz123456abc",
-			wantErr: domain.ErrTypeInvalidArgument,
+			wantErr: domain.ErrInvalidArgument,
 		},
 		"invalid character name": {
 			in:      "🙆",
-			wantErr: domain.ErrTypeInvalidArgument,
+			wantErr: domain.ErrInvalidArgument,
 		},
 		"repeated periods name": {
 			in:      "a..b",
-			wantErr: domain.ErrTypeInvalidArgument,
+			wantErr: domain.ErrInvalidArgument,
 		},
 		"invalid character uppercase": {
 			in:      "ABC",
-			wantErr: domain.ErrTypeInvalidArgument,
+			wantErr: domain.ErrInvalidArgument,
 		},
 	}
 
@@ -54,8 +54,8 @@ func TestUserNameValidation(t *testing.T) {
 			t.Parallel()
 
 			_, err := domain.NewUserName(tt.in)
-			if typ := domain.ErrTypeFrom(err); typ != tt.wantErr {
-				t.Errorf("want error type %v, but got %v", tt.wantErr, typ)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("want error type %v, but got %v", tt.wantErr, err)
 			}
 			if err != nil {
 				return
@@ -85,7 +85,7 @@ func TestGetUserByName(t *testing.T) {
 		name   domain.UserName
 
 		wants   *domain.UserData
-		wantErr domain.ErrType
+		wantErr error
 	}{
 		"ok": {
 			effect: effect,
@@ -100,7 +100,7 @@ func TestGetUserByName(t *testing.T) {
 			effect: effect,
 			name:   must(domain.NewUserName("user3")),
 
-			wantErr: domain.ErrTypeNotFound,
+			wantErr: domain.ErrNotFound,
 		},
 		"error": {
 			effect: userListerFunc(func(context.Context, domain.UserListFilter) iter.Seq2[*domain.UserData, error] {
@@ -108,7 +108,7 @@ func TestGetUserByName(t *testing.T) {
 			}),
 			name: must(domain.NewUserName("user1")),
 
-			wantErr: domain.ErrTypeInternal,
+			wantErr: domain.ErrInternal,
 		},
 	}
 
@@ -119,8 +119,8 @@ func TestGetUserByName(t *testing.T) {
 			ctx := context.Background()
 
 			user, err := tt.name.User(ctx, tt.effect)
-			if typ := domain.ErrTypeFrom(err); typ != tt.wantErr {
-				t.Errorf("want error type %v, but got %v", tt.wantErr, typ)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("want error %v, but got %v", tt.wantErr, err)
 			}
 			if err != nil {
 				return

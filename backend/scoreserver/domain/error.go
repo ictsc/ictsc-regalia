@@ -34,6 +34,14 @@ type Error struct {
 	err error
 }
 
+var (
+	ErrInternal        = &Error{typ: ErrTypeInternal}
+	ErrInvalidArgument = &Error{typ: ErrTypeInvalidArgument}
+	ErrNotFound        = &Error{typ: ErrTypeNotFound}
+	ErrAlreadyExists   = &Error{typ: ErrTypeAlreadyExists}
+)
+
+// Deprecated: Use New{typ}Error instead.
 func NewError(typ ErrType, err error) error {
 	if err == nil {
 		return nil
@@ -65,7 +73,7 @@ func (e *Error) Is(target error) bool {
 	return ok && (t.typ == ErrTypeUnknown || t.typ == e.typ)
 }
 
-func ErrTypeFrom(err error) ErrType {
+func ErrorType(err error) ErrType {
 	if e := new(Error); errors.As(err, &e) {
 		return e.typ
 	}
