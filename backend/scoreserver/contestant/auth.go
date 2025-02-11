@@ -132,7 +132,7 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	// Get session
 	oauthSess, err := session.OAuth2SessionStore.Get(r.Context())
 	if err != nil {
-		if typ := domain.ErrTypeFrom(err); typ == domain.ErrTypeNotFound {
+		if errors.Is(err, domain.ErrNotFound) {
 			h.error(w, r, &url.URL{Path: "/"}, oauthErrorInvalidRequest)
 			return
 		}
@@ -185,7 +185,7 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := identity.ID().User(r.Context(), h.DiscordCallbackEffect)
-	if err != nil && domain.ErrTypeFrom(err) != domain.ErrTypeNotFound {
+	if err != nil && !errors.Is(err, domain.ErrNotFound) {
 		slog.ErrorContext(r.Context(), "failed to get discord linked user", "error", err)
 		h.error(w, r, oauthSess.NextPath, oauthErrorServerError)
 		return

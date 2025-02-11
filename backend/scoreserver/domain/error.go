@@ -1,6 +1,10 @@
 package domain
 
-import "github.com/cockroachdb/errors"
+import (
+	"strings"
+
+	"github.com/cockroachdb/errors"
+)
 
 type ErrType int
 
@@ -30,30 +34,56 @@ func (t ErrType) String() string {
 }
 
 type Error struct {
-	typ ErrType
-	err error
+	Type ErrType
+	Msg  string
+	err  error
 }
 
-func NewError(typ ErrType, err error) error {
-	if err == nil {
-		return nil
-	}
-	return &Error{
-		typ: typ,
-		err: err,
-	}
+var (
+	ErrInternal        = &Error{Type: ErrTypeInternal}
+	ErrInvalidArgument = &Error{Type: ErrTypeInvalidArgument}
+	ErrNotFound        = &Error{Type: ErrTypeNotFound}
+	ErrAlreadyExists   = &Error{Type: ErrTypeAlreadyExists}
+
+	errUnknown = &Error{}
+)
+
+func newInternalError(err error) error {
+	return &Error{Type: ErrTypeInternal, err: errors.WithStackDepth(err, 1)}
+}
+
+func NewInvalidArgumentError(msg string, err error) error {
+	return &Error{Type: ErrTypeInvalidArgument, Msg: msg, err: errors.WithStackDepth(err, 1)}
+}
+
+func NewNotFoundError(msg string, err error) error {
+	return &Error{Type: ErrTypeNotFound, Msg: msg, err: errors.WithStackDepth(err, 1)}
+}
+
+func NewAlreadyExistsError(msg string, err error) error {
+	return &Error{Type: ErrTypeAlreadyExists, Msg: msg, err: errors.WithStackDepth(err, 1)}
 }
 
 func WrapAsInternal(err error, msg string) error {
-	if errors.Is(err, &Error{}) {
+	if errors.Is(err, errUnknown) {
 		return err
 	} else {
-		return NewError(ErrTypeInternal, errors.WrapWithDepth(1, err, msg))
+		return &Error{Type: ErrTypeInternal, err: errors.WrapWithDepth(1, err, msg)}
 	}
 }
 
 func (e *Error) Error() string {
-	return e.typ.String() + ": " + e.err.Error()
+	var builder strings.Builder
+	builder.WriteString(e.Type.String())
+	if e.Msg != "" {
+		builder.WriteString(": ")
+		builder.WriteString(e.Msg)
+	}
+	if e.err != nil {
+		builder.WriteString(": ")
+		builder.WriteString(e.err.Error())
+	}
+	return builder.String()
 }
 
 func (e *Error) Unwrap() error {
@@ -62,12 +92,12 @@ func (e *Error) Unwrap() error {
 
 func (e *Error) Is(target error) bool {
 	t, ok := target.(*Error)
-	return ok && (t.typ == ErrTypeUnknown || t.typ == e.typ)
+	return ok && (t.Type == ErrTypeUnknown || t.Type == e.Type)
 }
 
-func ErrTypeFrom(err error) ErrType {
+func ErrorType(err error) ErrType {
 	if e := new(Error); errors.As(err, &e) {
-		return e.typ
+		return e.Type
 	}
 	return ErrTypeUnknown
 }

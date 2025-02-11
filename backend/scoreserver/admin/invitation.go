@@ -45,7 +45,7 @@ func (h *InvitationServiceHandler) ListInvitationCodes(
 
 	ics, err := domain.ListInvitationCodes(ctx, h.ListEffect)
 	if err != nil {
-		return nil, connectError(err)
+		return nil, err
 	}
 
 	protoICs := make([]*adminv1.InvitationCode, 0, len(ics))
@@ -81,17 +81,17 @@ func (h *InvitationServiceHandler) CreateInvitationCode(
 	}
 	teamCode, err := domain.NewTeamCode(protoTeamCode)
 	if err != nil {
-		return nil, connectError(err)
+		return nil, err
 	}
 
 	team, err := teamCode.Team(ctx, h.CreateEffect)
 	if err != nil {
-		return nil, connectError(err)
+		return nil, err
 	}
 
 	invitationCode, err := team.CreateInvitationCode(ctx, h.CreateEffect, now, protoIC.GetExpiresAt().AsTime())
 	if err != nil {
-		return nil, connectError(err)
+		return nil, err
 	}
 
 	return connect.NewResponse(&adminv1.CreateInvitationCodeResponse{

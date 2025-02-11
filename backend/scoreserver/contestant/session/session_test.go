@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/gob"
+	"errors"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -181,7 +182,7 @@ func setupTestHandler(t *testing.T) http.Handler {
 	mux.HandleFunc("GET /session", func(w http.ResponseWriter, r *http.Request) {
 		val, err := session.OAuth2SessionStore.Get(r.Context())
 		if err != nil {
-			if domain.ErrTypeFrom(err) == domain.ErrTypeNotFound {
+			if errors.Is(err, domain.ErrNotFound) {
 				w.WriteHeader(http.StatusNotFound)
 				return
 			}

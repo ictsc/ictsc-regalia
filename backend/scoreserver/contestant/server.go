@@ -9,6 +9,7 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/pkg/connectutil"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1/contestantv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/connectdomain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/contestant/session"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 	"github.com/jmoiron/sqlx"
@@ -29,7 +30,8 @@ func New(ctx context.Context, cfg config.ContestantAPI, db *sqlx.DB, rdb redis.U
 
 	interceptors := []connect.Interceptor{
 		connectutil.NewOtelInterceptor(),
-		connectutil.NewSlogInterceptor(),
+		connectdomain.NewErrorInterceptor(),
+		connectdomain.NewLoggingInterceptor(),
 	}
 
 	mux := http.NewServeMux()

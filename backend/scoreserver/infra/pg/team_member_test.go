@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/pgtest"
@@ -18,7 +19,7 @@ func TestGetTeamMember(t *testing.T) {
 	cases := map[string]struct {
 		inUserID uuid.UUID
 		wants    *domain.TeamMemberData
-		wantErr  domain.ErrType
+		wantErr  error
 	}{
 		"ok": {
 			inUserID: uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
@@ -37,7 +38,7 @@ func TestGetTeamMember(t *testing.T) {
 		},
 		"not found": {
 			inUserID:/* bob */ uuid.FromStringOrNil("c4530ce6-d990-4414-8389-feca26883115"),
-			wantErr: domain.ErrTypeNotFound,
+			wantErr: domain.ErrNotFound,
 		},
 	}
 
@@ -51,7 +52,7 @@ func TestGetTeamMember(t *testing.T) {
 			repo := pg.NewRepository(db)
 
 			got, err := repo.GetTeamMemberByID(ctx, tt.inUserID)
-			if typ := domain.ErrTypeFrom(err); typ != tt.wantErr {
+			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("wantErr: %v, got: %v", tt.wantErr, err)
 			}
 			if err != nil {
@@ -71,7 +72,7 @@ func TestCountTeamMembers(t *testing.T) {
 	cases := map[string]struct {
 		inTeamID uuid.UUID
 		wants    uint
-		wantErr  domain.ErrType
+		wantErr  error
 	}{
 		"ok": {
 			inTeamID: uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
@@ -93,7 +94,7 @@ func TestCountTeamMembers(t *testing.T) {
 			repo := pg.NewRepository(db)
 
 			got, err := repo.CountTeamMembers(ctx, tt.inTeamID)
-			if typ := domain.ErrTypeFrom(err); typ != tt.wantErr {
+			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("wantErr: %v, got: %v", tt.wantErr, err)
 			}
 			if err != nil {
@@ -156,9 +157,8 @@ func TestAddTeamMember(t *testing.T) {
 			err := repo.RunTx(ctx, func(tx *pg.RepositoryTx) error {
 				return tx.AddTeamMember(ctx, userID, codeID, teamID)
 			})
-			expecedTyp := domain.ErrTypeAlreadyExists
-			if typ := domain.ErrTypeFrom(err); typ != expecedTyp {
-				t.Errorf("wantErr: %v, got: %v", expecedTyp, err)
+			if !errors.Is(err, domain.ErrAlreadyExists) {
+				t.Errorf("wantErr: %v, got: %v", domain.ErrAlreadyExists, err)
 			}
 		},
 	}

@@ -2,6 +2,7 @@ package domain_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -22,7 +23,7 @@ func TestJoinTeam(t *testing.T) {
 		wantUserID uuid.UUID
 		wantCodeID uuid.UUID
 		wantTeamID uuid.UUID
-		wantErr    domain.ErrType
+		wantErr    error
 	}{
 		"ok": {
 			inUser: domain.FixUser1(t, &domain.UserData{
@@ -50,7 +51,7 @@ func TestJoinTeam(t *testing.T) {
 			}),
 			inTeamMemberCount: 0,
 
-			wantErr: domain.ErrTypeInvalidArgument,
+			wantErr: domain.ErrInvalidArgument,
 		},
 		"full member": {
 			inUser: domain.FixUser1(t, nil),
@@ -59,7 +60,7 @@ func TestJoinTeam(t *testing.T) {
 			}),
 			inTeamMemberCount: 3,
 
-			wantErr: domain.ErrTypeInvalidArgument,
+			wantErr: domain.ErrInvalidArgument,
 		},
 	}
 
@@ -81,8 +82,8 @@ func TestJoinTeam(t *testing.T) {
 			}
 
 			err := tt.inUser.JoinTeam(context.Background(), manager, now, tt.inCode)
-			if typ := domain.ErrTypeFrom(err); typ != tt.wantErr {
-				t.Errorf("got error type %v, want %v", typ, tt.wantErr)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("got error type %v, want %v", err, tt.wantErr)
 			}
 			if err != nil {
 				return
