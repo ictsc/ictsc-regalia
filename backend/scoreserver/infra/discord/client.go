@@ -1,3 +1,7 @@
 package discord
 
-type UserClient struct{}
+import "net/http"
+
+type UserClient struct {
+	HTTPClient *http.Client
+}
