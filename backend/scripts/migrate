@@ -1,7 +1,7 @@
 #!/bin/sh
 # vim: ft=sh :
 
-PSQLDEF="go run github.com/sqldef/sqldef/cmd/psqldef"
+PSQLDEF="go tool github.com/sqldef/sqldef/cmd/psqldef"
 if which psqldef 2>/dev/null; then
     PSQLDEF=psqldef
 fi
