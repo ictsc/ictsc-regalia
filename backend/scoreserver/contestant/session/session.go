@@ -78,7 +78,7 @@ func (s *SessionStore[V]) Get(ctx context.Context) (V, error) {
 
 	valAny, ok := sess.Values[0]
 	if !ok {
-		return zero, domain.NewError(domain.ErrTypeNotFound, errors.New("session value not found"))
+		return zero, domain.NewNotFoundError("session value", nil)
 	}
 	val, ok := valAny.(V)
 	if !ok {

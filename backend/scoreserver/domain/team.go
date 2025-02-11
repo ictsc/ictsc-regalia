@@ -3,7 +3,6 @@ package domain
 import (
 	"context"
 
-	"github.com/cockroachdb/errors"
 	"github.com/gofrs/uuid/v5"
 )
 
@@ -14,7 +13,7 @@ type (
 
 func NewTeamCode(code int64) (TeamCode, error) {
 	if code < 1 || 99 < code {
-		return 0, NewError(ErrTypeInvalidArgument, errors.New("invalid team code"))
+		return 0, NewInvalidArgumentError("invalid team code", nil)
 	}
 	return TeamCode(code), nil
 }
@@ -93,7 +92,7 @@ func CreateTeam(ctx context.Context, effect TeamCreateEffect, input TeamCreateIn
 func createTeam(input TeamCreateInput) (*Team, error) {
 	id, err := uuid.NewV4()
 	if err != nil {
-		return nil, NewError(ErrTypeInternal, errors.Wrap(err, "failed to generate uuid"))
+		return nil, WrapAsInternal(err, "failed to generate uuid")
 	}
 
 	team, err := (&TeamData{
@@ -221,15 +220,15 @@ func (t *TeamData) parse() (*team, error) {
 	}
 
 	if len(t.Name) == 0 {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("team name must not be empty"))
+		return nil, NewInvalidArgumentError("team name must not be empty", nil)
 	}
 
 	if len(t.Organization) == 0 {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("team organization must not be empty"))
+		return nil, NewInvalidArgumentError("team organization must not be empty", nil)
 	}
 
 	if t.MaxMembers < 1 {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("team max members must be greater than 0"))
+		return nil, NewInvalidArgumentError("team max members must be greater than 0", nil)
 	}
 
 	return &Team{

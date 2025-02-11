@@ -89,16 +89,16 @@ var validUserName = regexp.MustCompile(`^[a-z0-9_.]+$`)
 func newUserName(name string) (userName, error) {
 	// Discordのユーザー名の制限に合わせる
 	if name == "" {
-		return "", NewError(ErrTypeInvalidArgument, errors.New("name is required"))
+		return "", NewInvalidArgumentError("name is required", nil)
 	}
 	if len(name) < 2 || len(name) > 32 {
-		return "", NewError(ErrTypeInvalidArgument, errors.New("name length must be between 2 and 32"))
+		return "", NewInvalidArgumentError("name length must be between 2 and 32", nil)
 	}
 	if !validUserName.MatchString(name) {
-		return "", NewError(ErrTypeInvalidArgument, errors.New("name contains invalid characters"))
+		return "", NewInvalidArgumentError("name contains invalid characters", nil)
 	}
 	if strings.Contains(name, "..") {
-		return "", NewError(ErrTypeInvalidArgument, errors.New("name contains repeated periods"))
+		return "", NewInvalidArgumentError("name contains repeated periods", nil)
 	}
 	return UserName(name), nil
 }
@@ -122,7 +122,7 @@ func (d *UserProfileData) _parse() (*UserProfile, error) {
 	}
 	//nolint:mnd
 	if len(d.DisplayName) > 128 {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("display name length must be less than 128"))
+		return nil, NewInvalidArgumentError("display name length must be less than 128", nil)
 	}
 	return &UserProfile{
 		user:        user,
@@ -157,12 +157,12 @@ func getUser(ctx context.Context, lister UserLister, filter UserListFilter) (*Us
 			return nil, err
 		}
 		if result != nil {
-			return nil, NewError(ErrTypeInternal, errors.New("multiple users found"))
+			return nil, newInternalError(errors.New("multiple users found"))
 		}
 		result = user
 	}
 	if result == nil {
-		return nil, NewError(ErrTypeNotFound, errors.New("user not found"))
+		return nil, NewNotFoundError("user", nil)
 	}
 	return result, nil
 }

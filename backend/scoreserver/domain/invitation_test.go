@@ -128,7 +128,7 @@ func Test_CreateInvitationCode(t *testing.T) {
 		"creation fails": {
 			team: team1,
 			effect: invitationCodeCreatorFunc(func(context.Context, *domain.InvitationCodeData) error {
-				return domain.NewError(domain.ErrTypeInternal, errors.New("dummy"))
+				return domain.WrapAsInternal(errors.New("dummy"), "failed to create invitation code")
 			}),
 			expiresAt: expiresAt,
 			wantErr:   domain.ErrInternal,

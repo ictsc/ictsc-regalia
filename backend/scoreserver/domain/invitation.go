@@ -94,7 +94,7 @@ func (d *InvitationCodeData) parse() (*invitationCode, error) {
 	}
 
 	if d.ExpiresAt.Before(d.CreatedAt) {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("expired before create"))
+		return nil, NewInvalidArgumentError("expired before create", nil)
 	}
 	return &invitationCode{
 		id:        d.ID,
@@ -129,7 +129,7 @@ func (t *team) createInvitationCode(
 	expiresAt time.Time,
 ) (*invitationCode, error) {
 	if expiresAt.Before(now) {
-		return nil, NewError(ErrTypeInvalidArgument, errors.New("already expired"))
+		return nil, NewInvalidArgumentError("already expired", nil)
 	}
 
 	id, err := uuid.NewV4()

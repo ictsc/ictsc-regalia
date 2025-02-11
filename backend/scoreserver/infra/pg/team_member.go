@@ -37,7 +37,7 @@ func (r *repo) GetTeamMemberByID(ctx context.Context, userID uuid.UUID) (*domain
 		WHERE tm.user_id = $1
 	`, userID); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, domain.NewError(domain.ErrTypeNotFound, errors.New("team member not found"))
+			return nil, domain.NewNotFoundError("team member", nil)
 		}
 		return nil, errors.Wrap(err, "failed to select team member")
 	}
@@ -61,7 +61,7 @@ func (r *RepositoryTx) AddTeamMember(ctx context.Context, userID, invitationCode
 		VALUES ($1, $2, $3)
 	`, userID, invitationCodeID, teamID); err != nil {
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) && pgErr.Code == "23505" {
-			return domain.NewError(domain.ErrTypeAlreadyExists, errors.New("team member already exists"))
+			return domain.NewAlreadyExistsError("team member", nil)
 		}
 		return errors.Wrap(err, "failed to insert team member")
 	}

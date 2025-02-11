@@ -56,7 +56,7 @@ func (r *repo) GetDiscordLinkedUser(ctx context.Context, discordUserID int64) (*
 		WHERE d.discord_user_id = $1
 	`, discordUserID); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, domain.NewError(domain.ErrTypeNotFound, errors.New("discord linked user not found"))
+			return nil, domain.NewNotFoundError("discord linked user", nil)
 		}
 		return nil, errors.Wrap(err, "failed to get discord linked user")
 	}
@@ -76,7 +76,7 @@ func (r *RepositoryTx) CreateUser(ctx context.Context, profile *domain.UserProfi
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
 			// 一意制約違反
 			if pgErr.Code == "23505" {
-				return domain.NewError(domain.ErrTypeAlreadyExists, errors.New("user already exists"))
+				return domain.NewAlreadyExistsError("user", nil)
 			}
 		}
 		return errors.Wrap(err, "failed to insert into users")
@@ -102,7 +102,7 @@ func (r *RepositoryTx) LinkDiscordUser(ctx context.Context, userID uuid.UUID, di
 	`, userID, discordUserID); err != nil {
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
 			if pgErr.Code == "23505" {
-				return domain.NewError(domain.ErrTypeAlreadyExists, errors.New("discord user already linked"))
+				return domain.NewAlreadyExistsError("discord user", nil)
 			}
 		}
 		return domain.WrapAsInternal(err, "failed to insert into discord_user")

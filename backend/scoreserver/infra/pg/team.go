@@ -49,7 +49,7 @@ func (r *repo) GetTeamByCode(ctx context.Context, code int64) (*domain.TeamData,
 		code,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, domain.NewError(domain.ErrTypeNotFound, errors.New("team not found"))
+			return nil, domain.NewNotFoundError("team", nil)
 		}
 		return nil, errors.Wrap(err, "failed to select team")
 	}
@@ -67,7 +67,7 @@ func (r *repo) CreateTeam(ctx context.Context, team *domain.TeamData) error {
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
 			// 一意性制約違反
 			if pgErr.Code == "23505" {
-				return domain.NewError(domain.ErrTypeAlreadyExists, errors.New("team already exists"))
+				return domain.NewAlreadyExistsError("team", nil)
 			}
 		}
 		return errors.Wrap(err, "failed to insert team")
@@ -88,7 +88,7 @@ func (r *repo) UpdateTeam(ctx context.Context, team *domain.TeamData) error {
 	); err != nil {
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
 			if pgErr.Code == "23505" {
-				return domain.NewError(domain.ErrTypeAlreadyExists, errors.New("team already exists"))
+				return domain.NewAlreadyExistsError("team", nil)
 			}
 		}
 		return errors.Wrap(err, "failed to update team")
