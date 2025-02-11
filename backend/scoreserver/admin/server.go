@@ -11,7 +11,6 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/connectdomain"
-	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/net/http2"
@@ -59,34 +58,11 @@ func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB) (http.Handler, e
 	return handler, nil
 }
 
-// connectError は domain のエラーを connect のエラーに変換する
-func connectError(err error) error {
-	if err == nil {
-		return nil
-	}
-	var code connect.Code
-	switch domain.ErrorType(err) {
-	case domain.ErrTypeInternal:
-		code = connect.CodeInternal
-	case domain.ErrTypeInvalidArgument:
-		code = connect.CodeInvalidArgument
-	case domain.ErrTypeAlreadyExists:
-		code = connect.CodeAlreadyExists
-	case domain.ErrTypeNotFound:
-		code = connect.CodeNotFound
-	case domain.ErrTypeUnknown:
-		fallthrough
-	default:
-		code = connect.CodeUnknown
-	}
-	return connect.NewError(code, err)
-}
-
 func enforce(ctx context.Context, enforcer *auth.Enforcer, obj, act string) error {
 	viewer := auth.GetViewer(ctx)
 	ok, err := enforcer.Enforce(viewer, obj, act)
 	if err != nil {
-		return connectError(err)
+		return err
 	}
 	if !ok {
 		return connect.NewError(connect.CodePermissionDenied, nil)

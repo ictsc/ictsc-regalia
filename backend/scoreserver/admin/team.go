@@ -45,7 +45,7 @@ func (h *TeamServiceHandler) ListTeams(
 
 	teams, err := domain.ListTeams(ctx, h.ListEffect)
 	if err != nil {
-		return nil, connectError(err)
+		return nil, err
 	}
 
 	protoTeams := make([]*adminv1.Team, 0, len(teams))
@@ -73,12 +73,12 @@ func (h *TeamServiceHandler) GetTeam(
 
 	code, err := domain.NewTeamCode(inCode)
 	if err != nil {
-		return nil, connectError(err)
+		return nil, err
 	}
 
 	team, err := code.Team(ctx, h.GetEffect)
 	if err != nil {
-		return nil, connectError(err)
+		return nil, err
 	}
 
 	return connect.NewResponse(&adminv1.GetTeamResponse{
@@ -100,7 +100,7 @@ func (h *TeamServiceHandler) CreateTeam(
 		MaxMembers:   uint(req.Msg.GetTeam().GetMemberLimit()),
 	})
 	if err != nil {
-		return nil, connectError(err)
+		return nil, err
 	}
 
 	return connect.NewResponse(&adminv1.CreateTeamResponse{
@@ -125,12 +125,12 @@ func (h *TeamServiceHandler) UpdateTeam(
 
 	teamCode, err := domain.NewTeamCode(protoCode)
 	if err != nil {
-		return nil, connectError(err)
+		return nil, err
 	}
 
 	team, err := teamCode.Team(ctx, h.GetEffect)
 	if err != nil {
-		return nil, connectError(err)
+		return nil, err
 	}
 
 	if name := protoTeam.GetName(); name != "" && name != team.Name() {
@@ -140,7 +140,7 @@ func (h *TeamServiceHandler) UpdateTeam(
 	if err := team.Update(ctx, h.UpdateEffect, domain.TeamUpdateInput{
 		Organization: protoTeam.GetOrganization(),
 	}); err != nil {
-		return nil, connectError(err)
+		return nil, err
 	}
 
 	return connect.NewResponse(&adminv1.UpdateTeamResponse{
@@ -167,7 +167,7 @@ func (h *TeamServiceHandler) DeleteTeam(
 	}
 	code, err := domain.NewTeamCode(protoCode)
 	if err != nil {
-		return nil, connectError(err)
+		return nil, err
 	}
 
 	if err := h.DeleteEffect.RunInTx(ctx, func(effect teamDeleteEffect) error {
@@ -178,7 +178,7 @@ func (h *TeamServiceHandler) DeleteTeam(
 
 		return team.Delete(ctx, effect)
 	}); err != nil {
-		return nil, connectError(err)
+		return nil, err
 	}
 
 	return connect.NewResponse(&adminv1.DeleteTeamResponse{}), nil

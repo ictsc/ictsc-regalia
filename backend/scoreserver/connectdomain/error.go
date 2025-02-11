@@ -17,8 +17,7 @@ func (e *sanitizedError) Error() string {
 }
 
 func connectError(err error) *connect.Error {
-	if err != nil {
-		//nolint:nilerr // 空エラーを返しても問題ない
+	if err == nil {
 		return nil
 	}
 	if domErr := new(domain.Error); errors.As(err, &domErr) {
