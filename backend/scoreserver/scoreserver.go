@@ -12,6 +12,7 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/contestant"
+	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -29,7 +30,14 @@ type ScoreServer struct {
 
 func New(ctx context.Context, cfg *config.Config) (*ScoreServer, error) {
 	db := pgxutil.NewDBx(cfg.PgConfig, pgxutil.WithOTel(true))
+
 	rdb := redis.NewClient(&cfg.Redis)
+	if err := redisotel.InstrumentTracing(rdb); err != nil {
+		slog.InfoContext(ctx, "Failed to instrument tracing for redis", "error", errors.WithStack(err))
+	}
+	if err := redisotel.InstrumentMetrics(rdb); err != nil {
+		slog.InfoContext(ctx, "Failed to instrument metrics for redis", "error", errors.WithStack(err))
+	}
 
 	adminHandler, err := admin.New(ctx, cfg.AdminAPI, db)
 	if err != nil {
