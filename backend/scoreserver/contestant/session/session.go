@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/gob"
 	"net/http"
+	"net/url"
 
 	"github.com/cockroachdb/errors"
+	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/sessions"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 )
@@ -14,10 +16,13 @@ type (
 	OAuth2Session struct {
 		State    string
 		Verifier string
+		NextPath *url.URL
 	}
 	SignUpSession struct {
-		InvitationCode string
-		Discord        *domain.DiscordIdentityData
+		Discord *domain.DiscordIdentityData
+	}
+	UserSession struct {
+		UserID uuid.UUID
 	}
 
 	sessionCtxKey struct{}
@@ -31,6 +36,8 @@ type (
 func init() {
 	gob.Register(&OAuth2Session{})
 	gob.Register(&SignUpSession{})
+	gob.Register(&domain.DiscordIdentityData{})
+	gob.Register(&UserSession{})
 }
 
 func NewHandler(store sessions.Store) func(http.Handler) http.Handler {
@@ -49,6 +56,7 @@ func NewHandler(store sessions.Store) func(http.Handler) http.Handler {
 var (
 	OAuth2SessionStore = &SessionStore[*OAuth2Session]{key: "oauth2-session"}
 	SignUpSessionStore = &SessionStore[*SignUpSession]{key: "signup-session"}
+	UserSessionStore   = &SessionStore[*UserSession]{key: "user-session"}
 )
 
 type SessionStore[V comparable] struct {
