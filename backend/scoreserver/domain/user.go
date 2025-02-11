@@ -11,6 +11,7 @@ import (
 )
 
 type (
+	UserID      = userID
 	UserName    = userName
 	User        = user
 	UserProfile = userProfile
@@ -22,6 +23,10 @@ func NewUserName(name string) (UserName, error) {
 
 func (n UserName) User(ctx context.Context, eff UserLister) (*User, error) {
 	return getUser(ctx, eff, UserListFilter{Name: string(n)})
+}
+
+func (u *User) ID() UserID {
+	return u.userID
 }
 
 func (u *User) Name() UserName {
