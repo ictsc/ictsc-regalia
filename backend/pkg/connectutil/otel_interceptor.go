@@ -3,6 +3,7 @@ package connectutil
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
 	"connectrpc.com/connect"
@@ -166,4 +167,11 @@ func protocolToSemConv(protocol string) string {
 	default:
 		return protocol
 	}
+}
+
+//nolint:nonamedreturns // 名前が付いたほうが適切
+func splitProceduce(proc string) (service, method string) {
+	proc = strings.TrimLeft(proc, "/")
+	service, method, _ = strings.Cut(proc, "/")
+	return
 }

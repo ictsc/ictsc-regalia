@@ -10,6 +10,7 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/connectdomain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 	"github.com/jmoiron/sqlx"
@@ -27,7 +28,7 @@ func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB) (http.Handler, e
 
 	interceptors := []connect.Interceptor{
 		connectutil.NewOtelInterceptor(),
-		connectutil.NewSlogInterceptor(),
+		connectdomain.NewLoggingInterceptor(),
 	}
 
 	mux := http.NewServeMux()
