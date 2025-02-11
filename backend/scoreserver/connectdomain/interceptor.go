@@ -6,8 +6,21 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/cockroachdb/errors"
 	"go.opentelemetry.io/otel/trace"
 )
+
+func NewErrorInterceptor() connect.UnaryInterceptorFunc {
+	return func(next connect.UnaryFunc) connect.UnaryFunc {
+		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
+			res, err := next(ctx, req)
+			if err != nil {
+				return res, connectError(err)
+			}
+			return res, nil
+		}
+	}
+}
 
 func NewLoggingInterceptor() connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
@@ -31,13 +44,19 @@ func NewLoggingInterceptor() connect.UnaryInterceptorFunc {
 
 			duration := time.Since(start)
 			if err != nil {
-				connectErr := connectError(err)
-				lvl := serverCodeToLevel(connectErr.Code())
+				lvl := slog.LevelError
+				if cErr := new(connect.Error); errors.As(err, &cErr) {
+					lvl = serverCodeToLevel(cErr.Code())
+				}
+				if sErr := new(sanitizedError); errors.As(err, &sErr) {
+					err = sErr.err
+				}
+
 				logger.Log(ctx, lvl, "Call finished",
 					"error", err,
 					"duration_ms", duration.Milliseconds(),
 				)
-				return res, connectErr
+				return res, err
 			}
 
 			logger.InfoContext(ctx, "Call finished",

@@ -12,6 +12,7 @@ import (
 	adminv1 "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/connectdomain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 )
 
@@ -281,7 +282,10 @@ func setupTeamService(t *testing.T) adminv1connect.TeamServiceClient {
 
 	handler := admin.NewTeamServiceHandler(enforcer, repo)
 	mux := http.NewServeMux()
-	mux.Handle(adminv1connect.NewTeamServiceHandler(handler))
+	mux.Handle(adminv1connect.NewTeamServiceHandler(
+		handler,
+		connect.WithInterceptors(connectdomain.NewErrorInterceptor()),
+	))
 
 	server := setupServer(t, mux)
 

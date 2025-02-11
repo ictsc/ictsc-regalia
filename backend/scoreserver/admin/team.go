@@ -120,7 +120,7 @@ func (h *TeamServiceHandler) UpdateTeam(
 
 	protoCode := protoTeam.GetCode()
 	if protoCode == 0 {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("code is required"))
+		return nil, domain.NewInvalidArgumentError("code is required", nil)
 	}
 
 	teamCode, err := domain.NewTeamCode(protoCode)
@@ -134,7 +134,7 @@ func (h *TeamServiceHandler) UpdateTeam(
 	}
 
 	if name := protoTeam.GetName(); name != "" && name != team.Name() {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("name cannot be updated"))
+		return nil, domain.NewInvalidArgumentError("name cannot be updated", nil)
 	}
 
 	if err := team.Update(ctx, h.UpdateEffect, domain.TeamUpdateInput{

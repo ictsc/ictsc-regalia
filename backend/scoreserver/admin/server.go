@@ -27,6 +27,7 @@ func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB) (http.Handler, e
 
 	interceptors := []connect.Interceptor{
 		connectutil.NewOtelInterceptor(),
+		connectdomain.NewErrorInterceptor(),
 		connectdomain.NewLoggingInterceptor(),
 	}
 

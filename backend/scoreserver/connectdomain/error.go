@@ -20,6 +20,9 @@ func connectError(err error) *connect.Error {
 	if err == nil {
 		return nil
 	}
+	if cErr := new(connect.Error); errors.As(err, &cErr) {
+		return cErr
+	}
 	if domErr := new(domain.Error); errors.As(err, &domErr) {
 		return connect.NewError(errTypetoCode(domErr.Type), &sanitizedError{msg: domErr.Msg, err: err})
 	}

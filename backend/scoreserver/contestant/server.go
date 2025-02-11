@@ -30,6 +30,7 @@ func New(ctx context.Context, cfg config.ContestantAPI, db *sqlx.DB, rdb redis.U
 
 	interceptors := []connect.Interceptor{
 		connectutil.NewOtelInterceptor(),
+		connectdomain.NewErrorInterceptor(),
 		connectdomain.NewLoggingInterceptor(),
 	}
 
