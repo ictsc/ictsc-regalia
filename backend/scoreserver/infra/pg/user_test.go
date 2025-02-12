@@ -244,3 +244,46 @@ func Test_PgRepo_LinkDiscordUser(t *testing.T) {
 		})
 	}
 }
+
+func TestGetUserProfileByID(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]struct {
+		userID uuid.UUID
+
+		want    *domain.UserProfileData
+		wantErr error
+	}{
+		"ok": {
+			userID: uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
+			want: &domain.UserProfileData{
+				User: &domain.UserData{
+					ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
+					Name: "alice",
+				},
+				DisplayName: "Alice",
+			},
+		},
+		"not found": {
+			userID:  uuid.FromStringOrNil("00000000-0000-0000-0000-000000000001"),
+			wantErr: domain.ErrNotFound,
+		},
+	}
+
+	for name, tt := range cases {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			repo := pg.NewRepository(pgtest.SetupDB(t))
+			got, err := repo.GetUserProfileByID(context.Background(), tt.userID)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("want error type %v, but got %v", tt.wantErr, err)
+			}
+			if err != nil {
+				return
+			}
+			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}

@@ -33,6 +33,18 @@ func (u *User) Name() UserName {
 	return u.name
 }
 
+func (u UserID) Profile(ctx context.Context, eff UserProfileReader) (*UserProfile, error) {
+	profileData, err := eff.GetUserProfileByID(ctx, uuid.UUID(u))
+	if err != nil {
+		return nil, WrapAsInternal(err, "failed to get user profile")
+	}
+	return profileData.parse()
+}
+
+func (p *UserProfile) DisplayName() string {
+	return p.displayName
+}
+
 // ユーザーに関する操作集合
 type (
 	UserData struct {
@@ -54,6 +66,9 @@ type (
 	}
 	UserCreator interface {
 		CreateUser(ctx context.Context, user *UserProfileData) error
+	}
+	UserProfileReader interface {
+		GetUserProfileByID(ctx context.Context, userID uuid.UUID) (*UserProfileData, error)
 	}
 )
 
@@ -114,8 +129,7 @@ func (d *UserData) parse() (*user, error) {
 	}, nil
 }
 
-//nolint:unused
-func (d *UserProfileData) _parse() (*UserProfile, error) {
+func (d *UserProfileData) parse() (*UserProfile, error) {
 	user, err := d.User.parse()
 	if err != nil {
 		return nil, err
