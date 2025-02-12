@@ -12,7 +12,13 @@ describe("fetchMe", () => {
     server.use(
       connect.rpc(ViewerService.method.getViewer, () => ({
         viewer: {
-          name: "Alice",
+          name: "alice",
+          viewer: {
+            case: "contestant",
+            value: {
+              displayName: "Alice",
+            },
+          },
         },
       })),
     );
@@ -20,7 +26,9 @@ describe("fetchMe", () => {
       baseUrl: "http://example.test",
     });
     expect(await fetchViewer(transport)).toEqual({
-      name: "Alice",
+      type: "contestant",
+      name: "alice",
+      displayName: "Alice",
     });
   });
 });
