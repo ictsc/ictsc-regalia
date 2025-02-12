@@ -1,7 +1,6 @@
 package redistest_test
 
 import (
-	"context"
 	"fmt"
 	"strconv"
 	"sync"
@@ -15,7 +14,7 @@ import (
 func TestSimple(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.Background()
+	ctx := t.Context()
 	rdb := redistest.SetupRedis(t)
 
 	if err := rdb.Set(ctx, "key", "value", 0).Err(); err != nil {
@@ -57,7 +56,7 @@ func TestParalelUse(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			ctx := context.Background()
+			ctx := t.Context()
 			rdb := redistest.SetupRedis(t)
 
 			waitForOthers()
@@ -88,7 +87,7 @@ func TestCleanup(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			ctx := context.Background()
+			ctx := t.Context()
 			var rdb *redis.Client
 			for range 4 {
 				rdb = redistest.SetupRedis(t)

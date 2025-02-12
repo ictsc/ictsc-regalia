@@ -64,7 +64,7 @@ func Test_ListInvitationCode(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			ics, err := domain.ListInvitationCodes(context.Background(), tt.effect)
+			ics, err := domain.ListInvitationCodes(t.Context(), tt.effect)
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
@@ -139,7 +139,7 @@ func Test_CreateInvitationCode(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			code, err := tt.team.CreateInvitationCode(context.Background(), tt.effect, now, tt.expiresAt)
+			code, err := tt.team.CreateInvitationCode(t.Context(), tt.effect, now, tt.expiresAt)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("want error type %v, got %v", tt.wantErr, err)
 			}

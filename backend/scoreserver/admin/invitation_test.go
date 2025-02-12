@@ -1,7 +1,6 @@
 package admin_test
 
 import (
-	"context"
 	"net/http"
 	"testing"
 	"time"
@@ -47,7 +46,7 @@ func TestAdminInvitationService_Create(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			ctx := context.Background()
+			ctx := t.Context()
 
 			enforcer := setupEnforcer(t)
 

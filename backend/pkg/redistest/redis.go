@@ -19,12 +19,16 @@ func SetupRedis(tb testing.TB) *redis.Client {
 		tb.Fatalf("failed to get redis pool: %v", err)
 	}
 
-	rdb, err := pool.acquire(context.Background())
+	rdb, err := pool.acquire(tb.Context())
 	if err != nil {
 		tb.Fatalf("failed to acquire redis client: %v", err)
 	}
 	tb.Cleanup(func() {
-		if err := pool.release(context.Background(), rdb); err != nil {
+		//nolint:usetesting // tb.Context はクリーンアップ前に終了するため使えない
+		ctx, cancel := context.WithTimeout(context.Background(), redisFlushTimeout)
+		defer cancel()
+
+		if err := pool.release(ctx, rdb); err != nil {
 			tb.Logf("failed to release redis client: %v", err)
 		}
 	})
@@ -35,6 +39,7 @@ func SetupRedis(tb testing.TB) *redis.Client {
 const (
 	redisImage          = "redis:7"
 	redisStartupTimeout = 30 * time.Second
+	redisFlushTimeout   = 10 * time.Second
 	redisDatabaseSize   = 16
 )
 

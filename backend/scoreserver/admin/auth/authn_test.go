@@ -66,7 +66,7 @@ func Test_AuthHandler(t *testing.T) {
 				tt.auth,
 			)
 
-			ctx := context.Background()
+			ctx := t.Context()
 			req := httptest.NewRequestWithContext(ctx, "GET", "/", nil)
 			resp := httptest.NewRecorder()
 			handler.ServeHTTP(resp, req)
@@ -103,7 +103,7 @@ func Test_JWTAuth(t *testing.T) {
 
 	issuer := setupDex(t, dexConfig{})
 
-	ctx := context.Background()
+	ctx := t.Context()
 	token, err := retrieveIDTokenWithPasswordCredential(
 		ctx, issuer,
 		"app", "clientsecret",
@@ -264,7 +264,7 @@ staticPasswords:
 func setupDex(tb testing.TB, _ dexConfig) string {
 	tb.Helper()
 
-	ctx := context.Background()
+	ctx := tb.Context()
 
 	ctr, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: testcontainers.ContainerRequest{

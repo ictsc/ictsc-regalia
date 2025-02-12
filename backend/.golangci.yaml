@@ -1,7 +1,7 @@
 linters:
   enable-all: true
   disable:
-    - exportloopref # deprecated
+    - tenv # deprecated
     - wsl
     - nlreturn
     - depguard
