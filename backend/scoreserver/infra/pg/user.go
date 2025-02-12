@@ -64,6 +64,41 @@ func (r *repo) GetDiscordLinkedUser(ctx context.Context, discordUserID int64) (*
 	return (*domain.UserData)(&row), nil
 }
 
+var _ domain.UserProfileReader = (*repo)(nil)
+
+type (
+	userProfileData struct {
+		User        *domain.UserData `db:"-"`
+		DisplayName string           `db:"display_name"`
+	}
+	userProfileDataRow struct {
+		User *userRow `db:"u"`
+		userProfileData
+	}
+)
+
+func (r *userProfileDataRow) data() *domain.UserProfileData {
+	data := r.userProfileData
+	data.User = (*domain.UserData)(r.User)
+	return (*domain.UserProfileData)(&data)
+}
+
+func (r *repo) GetUserProfileByID(ctx context.Context, userID uuid.UUID) (*domain.UserProfileData, error) {
+	var row userProfileDataRow
+	if err := sqlx.GetContext(ctx, r.ext, &row, `
+		SELECT u.id AS "u.id", u.name AS "u.name", display_name
+		FROM user_profiles
+		JOIN users AS u ON u.id = user_id
+		WHERE user_id = $1
+	`, userID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, domain.NewNotFoundError("user profile", nil)
+		}
+		return nil, errors.Wrap(err, "failed to get user profile")
+	}
+	return row.data(), nil
+}
+
 var _ domain.UserCreator = (*RepositoryTx)(nil)
 
 // CreateUser - ユーザ+プロフィールを作成する
