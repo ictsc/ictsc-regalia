@@ -73,6 +73,24 @@ func (r *repo) ListInvitationCodes(ctx context.Context, filter domain.Invitation
 	return ics, nil
 }
 
+var _ domain.InvitationCodeReader = (*repo)(nil)
+
+func (r *repo) GetInvitationCode(ctx context.Context, codeString string) (*domain.InvitationCodeData, error) {
+	var row invitationCodeWithTeamRow
+	if err := sqlx.GetContext(ctx, r.ext, &row,
+		r.ext.Rebind(selectInvitationCode+" WHERE ic.code = ? LIMIT 1"), codeString,
+	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, domain.NewNotFoundError("invitation_code", nil)
+		}
+		return nil, domain.WrapAsInternal(err, "failed to select invitation_code")
+	}
+
+	ic := (*domain.InvitationCodeData)(&row.invitationCodeRow)
+	ic.Team = (*domain.TeamData)(&row.Team)
+	return ic, nil
+}
+
 var _ domain.InvitationCodeCreator = (*repo)(nil)
 
 func (r *repo) CreateInvitationCode(ctx context.Context, code *domain.InvitationCodeData) error {
