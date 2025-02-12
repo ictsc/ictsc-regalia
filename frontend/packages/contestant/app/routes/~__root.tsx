@@ -2,7 +2,7 @@ import { Suspense, lazy } from "react";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import type { Transport } from "@connectrpc/connect";
 import { AppShell } from "@app/components/app-shell";
-import { fetchMe } from "@app/features/account";
+import { fetchViewer } from "@app/features/viewer";
 
 interface RouterContext {
   transport: Transport;
@@ -10,7 +10,7 @@ interface RouterContext {
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   loader: ({ context: { transport } }) => ({
-    me: fetchMe(transport),
+    viewer: fetchViewer(transport),
   }),
   component: Root,
 });
@@ -24,10 +24,10 @@ const TanStackRouterDevtools = import.meta.env.DEV
   : () => null;
 
 function Root() {
-  const { me } = Route.useLoaderData();
+  const { viewer } = Route.useLoaderData();
   return (
     <>
-      <AppShell me={me}>
+      <AppShell viewer={viewer}>
         <Outlet />
       </AppShell>
       <Suspense>
