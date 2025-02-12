@@ -26,16 +26,20 @@ type (
 		handler http.Handler
 		once    sync.Once
 
-		BaseURL               *url.URL
-		DiscordOAuth2Config   oauth2.Config
+		BaseURL             *url.URL
+		DiscordOAuth2Config oauth2.Config
+
 		DiscordCallbackEffect DiscordCallbackEffect
+		SignUpEffect          SignUpEffect
 	}
 	DiscordCallbackEffect interface {
 		domain.DiscordIdentityGetter
 		domain.DiscordLinkedUserGetter
 	}
-	oauthErrorCode string
+	
 )
+
+type oauthErrorCode string
 
 const (
 	oauthErrorInvalidRequest         oauthErrorCode = "invalid_request"
@@ -46,7 +50,8 @@ const (
 	oauthErrorInvalidScope           oauthErrorCode = "invalid_scope"
 	oauthErrorServerError            oauthErrorCode = "server_error"
 	oauthErrorTemporarilyUnavailable oauthErrorCode = "temporarily_unavailable"
-
+)
+const (
 	authCookieAge   = 10 * time.Minute
 	signUpCookieAge = 10 * time.Minute
 	userCookieAge   = 3 * 24 * time.Hour
@@ -65,6 +70,7 @@ func newAuthHandler(cfg config.ContestantAuth, repo *pg.Repository) *AuthHandler
 			RedirectURL: cfg.BaseURL.JoinPath("./auth/callback").String(),
 			Scopes:      []string{"identify"},
 		},
+
 		DiscordCallbackEffect: struct {
 			*discord.UserClient
 			*pg.Repository
@@ -72,6 +78,7 @@ func newAuthHandler(cfg config.ContestantAuth, repo *pg.Repository) *AuthHandler
 			UserClient: &discord.UserClient{HTTPClient: otelhttp.DefaultClient},
 			Repository: repo,
 		},
+		SignUpEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) SignUpTxEffect { return rt }),
 	}
 }
 
@@ -82,6 +89,8 @@ func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			otelhttp.WithRouteTag("/auth/signin", http.HandlerFunc(h.handleSignIn)))
 		mux.Handle("GET /auth/callback",
 			otelhttp.WithRouteTag("/auth/callback", http.HandlerFunc(h.handleCallback)))
+		mux.Handle("POST /auth/signup",
+			otelhttp.WithRouteTag("/auth/signup", http.HandlerFunc(h.handleSignUp)))
 		h.handler = mux
 	})
 	h.handler.ServeHTTP(w, r)
@@ -121,7 +130,7 @@ func (h *AuthHandler) discordAuthCodeURLRedirect(w http.ResponseWriter, r *http.
 		SameSite: http.SameSiteLaxMode,
 	}); err != nil {
 		slog.ErrorContext(r.Context(), "failed to write oauth2 session", "error", errors.WithStack(err))
-		h.error(w, r, sess.NextPath, oauthErrorServerError)
+		h.errorRedirect(w, r, sess.NextPath, oauthErrorServerError)
 		return
 	}
 
@@ -133,37 +142,37 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	oauthSess, err := session.OAuth2SessionStore.Get(r.Context())
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
-			h.error(w, r, &url.URL{Path: "/"}, oauthErrorInvalidRequest)
+			h.errorRedirect(w, r, &url.URL{Path: "/"}, oauthErrorInvalidRequest)
 			return
 		}
 		slog.ErrorContext(r.Context(), "failed to get session", "error", errors.WithStack(err))
-		h.error(w, r, &url.URL{Path: "/"}, oauthErrorServerError)
+		h.errorRedirect(w, r, &url.URL{Path: "/"}, oauthErrorServerError)
 		return
 	}
 
 	// Delete session
 	if err := session.OAuth2SessionStore.Write(r, w, nil, nil); err != nil {
 		slog.ErrorContext(r.Context(), "failed to delete session", "error", errors.WithStack(err))
-		h.error(w, r, oauthSess.NextPath, oauthErrorServerError)
+		h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorServerError)
 		return
 	}
 
 	// Exchange auth code
 	if r.URL.Query().Get("state") != oauthSess.State {
-		h.error(w, r, oauthSess.NextPath, oauthErrorInvalidRequest)
+		h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorInvalidRequest)
 		return
 	}
 
 	if queryErr := r.URL.Query().Get("error"); queryErr != "" {
 		desc := r.URL.Query().Get("error_description")
 		slog.InfoContext(r.Context(), "failed to get discord callback", "error", queryErr, "error_description", desc)
-		h.error(w, r, oauthSess.NextPath, oauthErrorCode(queryErr))
+		h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorCode(queryErr))
 		return
 	}
 
 	code := r.URL.Query().Get("code")
 	if code == "" {
-		h.error(w, r, oauthSess.NextPath, oauthErrorInvalidRequest)
+		h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorInvalidRequest)
 		return
 	}
 
@@ -173,21 +182,21 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil {
 		slog.ErrorContext(r.Context(), "failed to exchange code", "error", errors.WithStack(err))
-		h.error(w, r, oauthSess.NextPath, oauthErrorServerError)
+		h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorServerError)
 		return
 	}
 
 	identity, err := domain.GetDiscordIdentity(r.Context(), h.DiscordCallbackEffect, token.AccessToken)
 	if err != nil {
 		slog.ErrorContext(r.Context(), "failed to get discord identity", "error", err)
-		h.error(w, r, oauthSess.NextPath, oauthErrorServerError)
+		h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorServerError)
 		return
 	}
 
 	user, err := identity.ID().User(r.Context(), h.DiscordCallbackEffect)
 	if err != nil && !errors.Is(err, domain.ErrNotFound) {
 		slog.ErrorContext(r.Context(), "failed to get discord linked user", "error", err)
-		h.error(w, r, oauthSess.NextPath, oauthErrorServerError)
+		h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorServerError)
 		return
 	}
 
@@ -207,7 +216,7 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		sessOpt.MaxAge = int(userCookieAge.Seconds())
 		if err := session.UserSessionStore.Write(r, w, userSess, sessOpt); err != nil {
 			slog.ErrorContext(r.Context(), "failed to write user session", "error", err)
-			h.error(w, r, oauthSess.NextPath, oauthErrorServerError)
+			h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorServerError)
 			return
 		}
 	} else {
@@ -215,7 +224,7 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		sessOpt.MaxAge = int(signUpCookieAge.Seconds())
 		if err := session.SignUpSessionStore.Write(r, w, signUpSess, sessOpt); err != nil {
 			slog.ErrorContext(r.Context(), "failed to write signup session", "error", err)
-			h.error(w, r, oauthSess.NextPath, oauthErrorServerError)
+			h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorServerError)
 			return
 		}
 	}
@@ -223,7 +232,20 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, oauthSess.NextPath.String(), http.StatusFound)
 }
 
-func (h *AuthHandler) error(w http.ResponseWriter, r *http.Request, nextPath *url.URL, errCode oauthErrorCode) {
+func (h *AuthHandler) sessionOption() *sessions.Options {
+	path := h.BaseURL.Path
+	if path == "" {
+		path = "/"
+	}
+	return &sessions.Options{
+		Path:     path,
+		Secure:   h.BaseURL.Scheme == "https",
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	}
+}
+
+func (h *AuthHandler) errorRedirect(w http.ResponseWriter, r *http.Request, nextPath *url.URL, errCode oauthErrorCode) {
 	frag := url.Values{}
 	frag.Set("oauth-error", string(errCode))
 	nextPath.Fragment = frag.Encode()
