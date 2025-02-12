@@ -30,7 +30,7 @@ func (r *repo) GetTeamMemberByID(ctx context.Context, userID uuid.UUID) (*domain
 	if err := sqlx.GetContext(ctx, r.ext, &row, `
 		SELECT
 			u.id AS "u.id", u.name AS "u.name",
-			t.id AS "t.id", t.code AS "t.code", t.name AS "t.name", t.organization AS "t.organization"
+			t.id AS "t.id", t.code AS "t.code", t.name AS "t.name", t.organization AS "t.organization", t.max_members AS "t.max_members"
 		FROM team_members AS tm
 		LEFT JOIN users AS u ON u.id = tm.user_id
 		LEFT JOIN teams AS t ON t.id = tm.team_id

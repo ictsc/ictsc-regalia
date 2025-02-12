@@ -25,6 +25,20 @@ type (
 	}
 )
 
+const selectInvitationCode = `
+SELECT
+	ic.id,
+	ic.code,
+	ic.expires_at,
+	ic.created_at,
+	t.id AS "t.id",
+	t.code AS "t.code",
+	t.name AS "t.name",
+	t.organization AS "t.organization",
+	t.max_members AS "t.max_members"
+FROM invitation_codes AS ic
+LEFT JOIN teams AS t ON ic.team_id = t.id`
+
 var _ domain.InvitationCodeLister = (*repo)(nil)
 
 func (r *repo) ListInvitationCodes(ctx context.Context, filter domain.InvitationCodeFilter) ([]*domain.InvitationCodeData, error) {
@@ -36,20 +50,7 @@ func (r *repo) ListInvitationCodes(ctx context.Context, filter domain.Invitation
 		args = append(args, filter.Code)
 	}
 
-	rows, err := r.ext.QueryxContext(ctx, r.ext.Rebind(`
-		SELECT
-			ic.id,
-			ic.code,
-			ic.expires_at,
-			ic.created_at,
-			t.id AS "t.id",
-			t.code AS "t.code",
-			t.name AS "t.name",
-			t.organization AS "t.organization"
-		FROM invitation_codes AS ic
-		LEFT JOIN teams AS t ON ic.team_id = t.id
-		WHERE `+cond,
-	), args...)
+	rows, err := r.ext.QueryxContext(ctx, r.ext.Rebind(selectInvitationCode+" WHERE "+cond), args...)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return []*domain.InvitationCodeData{}, nil

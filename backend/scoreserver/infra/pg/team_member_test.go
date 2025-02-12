@@ -32,6 +32,7 @@ func TestGetTeamMember(t *testing.T) {
 					Code:         1,
 					Name:         "トラブルシューターズ",
 					Organization: "ICTSC Association",
+					MaxMembers:   6,
 				},
 			},
 		},
