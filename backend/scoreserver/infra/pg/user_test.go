@@ -1,7 +1,6 @@
 package pg_test
 
 import (
-	"context"
 	"slices"
 	"strings"
 	"testing"
@@ -45,7 +44,7 @@ func Test_PgRepo_ListUsers(t *testing.T) {
 
 			repo := pg.NewRepository(pgtest.SetupDB(t))
 
-			actual, err := collectErrIter(repo.ListUsers(context.Background(), tt.filter))
+			actual, err := collectErrIter(repo.ListUsers(t.Context(), tt.filter))
 			if err != nil {
 				return
 			}
@@ -87,7 +86,7 @@ func Test_PgRepo_GetDiscordLinkedUser(t *testing.T) {
 
 			repo := pg.NewRepository(pgtest.SetupDB(t))
 
-			got, err := repo.GetDiscordLinkedUser(context.Background(), tt.discordUserID)
+			got, err := repo.GetDiscordLinkedUser(t.Context(), tt.discordUserID)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("want error type %v, but got %v", tt.wantErr, err)
 			}
@@ -108,7 +107,7 @@ func Test_PgRepo_CreateUser(t *testing.T) {
 	//nolint:thelper //サブテスト
 	tests := map[string]func(t *testing.T, repo *pg.Repository, db *sqlx.DB){
 		"ok": func(t *testing.T, repo *pg.Repository, db *sqlx.DB) {
-			ctx := context.Background()
+			ctx := t.Context()
 
 			profile := &domain.UserProfileData{
 				User: &domain.UserData{
@@ -149,7 +148,7 @@ func Test_PgRepo_CreateUser(t *testing.T) {
 			}
 		},
 		"重複していたらエラー": func(t *testing.T, repo *pg.Repository, _ *sqlx.DB) {
-			ctx := context.Background()
+			ctx := t.Context()
 
 			profile := &domain.UserProfileData{
 				User: &domain.UserData{
@@ -184,7 +183,7 @@ func Test_PgRepo_LinkDiscordUser(t *testing.T) {
 	//nolint:thelper //サブテスト
 	tests := map[string]func(t *testing.T, repo *pg.Repository, db *sqlx.DB){
 		"ok": func(t *testing.T, repo *pg.Repository, db *sqlx.DB) {
-			ctx := context.Background()
+			ctx := t.Context()
 			userID := uuid.FromStringOrNil("c8c698ab-3b98-41a9-83b7-3cedd480112b")
 			discordUserID := int64(123)
 
@@ -221,7 +220,7 @@ func Test_PgRepo_LinkDiscordUser(t *testing.T) {
 			}
 		},
 		"already exists": func(t *testing.T, repo *pg.Repository, _ *sqlx.DB) {
-			ctx := context.Background()
+			ctx := t.Context()
 			userID := uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235")
 			discordUserID := int64(234567890123456789)
 
@@ -274,7 +273,7 @@ func TestGetUserProfileByID(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			repo := pg.NewRepository(pgtest.SetupDB(t))
-			got, err := repo.GetUserProfileByID(context.Background(), tt.userID)
+			got, err := repo.GetUserProfileByID(t.Context(), tt.userID)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("want error type %v, but got %v", tt.wantErr, err)
 			}

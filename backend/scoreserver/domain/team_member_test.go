@@ -81,7 +81,7 @@ func TestJoinTeam(t *testing.T) {
 				},
 			}
 
-			err := tt.inUser.JoinTeam(context.Background(), manager, now, tt.inCode)
+			err := tt.inUser.JoinTeam(t.Context(), manager, now, tt.inCode)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("got error type %v, want %v", err, tt.wantErr)
 			}

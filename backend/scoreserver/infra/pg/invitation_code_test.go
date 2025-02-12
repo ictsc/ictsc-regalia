@@ -19,7 +19,7 @@ func Test_PgRepo_InvitationCode(t *testing.T) {
 	//nolint:thelper //ここではテストケースを書いているため
 	tests := map[string]func(t *testing.T, db *sqlx.DB){
 		"create": func(t *testing.T, db *sqlx.DB) {
-			ctx, cancel := context.WithCancel(context.Background())
+			ctx, cancel := context.WithCancel(t.Context())
 			t.Cleanup(cancel)
 
 			repo := pg.NewRepository(db)
@@ -62,7 +62,7 @@ func Test_PgRepo_InvitationCode(t *testing.T) {
 		"list": func(t *testing.T, db *sqlx.DB) {
 			repo := pg.NewRepository(db)
 
-			got, err := repo.ListInvitationCodes(context.Background(), domain.InvitationCodeFilter{})
+			got, err := repo.ListInvitationCodes(t.Context(), domain.InvitationCodeFilter{})
 			if err != nil {
 				t.Fatalf("failed to list invitation codes: %+v", err)
 			}

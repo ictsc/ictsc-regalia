@@ -27,7 +27,7 @@ import (
 func SetupDB(tb testing.TB) *sqlx.DB {
 	tb.Helper()
 
-	ctx := context.Background()
+	ctx := tb.Context()
 
 	ctr := getContainer(ctx)
 

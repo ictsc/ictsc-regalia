@@ -116,7 +116,7 @@ func TestGetUserByName(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			ctx := context.Background()
+			ctx := t.Context()
 
 			user, err := tt.name.User(ctx, tt.effect)
 			if !errors.Is(err, tt.wantErr) {

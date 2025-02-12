@@ -2,7 +2,6 @@ package session_test
 
 import (
 	"bytes"
-	"context"
 	"encoding/gob"
 	"errors"
 	"net/http"
@@ -23,7 +22,7 @@ import (
 func TestSessionStore(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.Background()
+	ctx := t.Context()
 
 	jar, err := cookiejar.New(nil)
 	if err != nil {
@@ -227,7 +226,7 @@ func setupTestHandler(t *testing.T) http.Handler {
 
 	rdb := redistest.SetupRedis(t)
 
-	store, err := redisstore.NewRedisStore(context.Background(), rdb)
+	store, err := redisstore.NewRedisStore(t.Context(), rdb)
 	if err != nil {
 		t.Fatalf("failed to create session store: %v", err)
 	}

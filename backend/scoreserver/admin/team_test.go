@@ -1,7 +1,6 @@
 package admin_test
 
 import (
-	"context"
 	"net/http"
 	"testing"
 
@@ -68,7 +67,7 @@ func TestAdminTeamService_Create(t *testing.T) {
 		},
 	}
 
-	ctx := context.Background()
+	ctx := t.Context()
 	for name, tt := range cases {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
@@ -112,7 +111,7 @@ func TestAdminTeamService_List(t *testing.T) {
 		},
 	}
 
-	ctx := context.Background()
+	ctx := t.Context()
 	for name, tt := range cases {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
@@ -156,7 +155,7 @@ func TestAdminTeamService_Get(t *testing.T) {
 		},
 	}
 
-	ctx := context.Background()
+	ctx := t.Context()
 	for name, tt := range cases {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
@@ -208,7 +207,7 @@ func TestAdminTeamService_Update(t *testing.T) {
 		},
 	}
 
-	ctx := context.Background()
+	ctx := t.Context()
 	for name, tt := range cases {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
@@ -249,7 +248,7 @@ func TestAdminTeamService_Delete(t *testing.T) {
 		},
 	}
 
-	ctx := context.Background()
+	ctx := t.Context()
 	for name, tt := range cases {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()

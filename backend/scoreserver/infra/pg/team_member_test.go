@@ -1,7 +1,6 @@
 package pg_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/cockroachdb/errors"
@@ -46,7 +45,7 @@ func TestGetTeamMember(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			ctx := context.Background()
+			ctx := t.Context()
 
 			db := pgtest.SetupDB(t)
 			repo := pg.NewRepository(db)
@@ -88,7 +87,7 @@ func TestCountTeamMembers(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			ctx := context.Background()
+			ctx := t.Context()
 
 			db := pgtest.SetupDB(t)
 			repo := pg.NewRepository(db)
@@ -119,7 +118,7 @@ func TestAddTeamMember(t *testing.T) {
 			teamID := uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091")
 			codeID := uuid.FromStringOrNil("ad3f83d3-65be-4884-8a03-adb11a8127ef")
 
-			ctx := context.Background()
+			ctx := t.Context()
 			repo := pg.NewRepository(db)
 			if err := repo.RunTx(ctx, func(tx *pg.RepositoryTx) error {
 				return tx.AddTeamMember(ctx, userID, codeID, teamID)
@@ -151,7 +150,7 @@ func TestAddTeamMember(t *testing.T) {
 			teamID := uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091")
 			codeID := uuid.FromStringOrNil("ad3f83d3-65be-4884-8a03-adb11a8127ef")
 
-			ctx := context.Background()
+			ctx := t.Context()
 			repo := pg.NewRepository(db)
 
 			err := repo.RunTx(ctx, func(tx *pg.RepositoryTx) error {
