@@ -4,7 +4,6 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/cockroachdb/errors"
 	"github.com/gofrs/uuid/v5"
 )
 
@@ -81,14 +80,22 @@ type (
 	}
 )
 
-func (d *DiscordIdentityData) parse() (*DiscordIdentity, error) {
-	id, err := strconv.ParseInt(d.ID, 10, 64)
+func NewDiscordID(id string) (DiscordUserID, error) {
+	i, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse discord user id")
+		return 0, NewInvalidArgumentError("invalid discord user id", err)
+	}
+	return DiscordUserID(i), nil
+}
+
+func (d *DiscordIdentityData) parse() (*DiscordIdentity, error) {
+	id, err := NewDiscordID(d.ID)
+	if err != nil {
+		return nil, err
 	}
 
 	return &DiscordIdentity{
-		id:         DiscordUserID(id),
+		id:         id,
 		username:   d.Username,
 		globalName: d.GlobalName,
 	}, nil
