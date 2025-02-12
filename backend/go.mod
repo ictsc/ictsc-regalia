@@ -1,8 +1,6 @@
 module github.com/ictsc/ictsc-regalia/backend
 
-go 1.23.0
-
-toolchain go1.24.0
+go 1.24.0
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.3-20241127180247-a33202765966.1
@@ -11,7 +9,6 @@ require (
 	connectrpc.com/otelconnect v0.7.1
 	github.com/DATA-DOG/go-txdb v0.2.0
 	github.com/XSAM/otelsql v0.36.0
-	github.com/bufbuild/buf v1.50.0
 	github.com/bwmarrin/discordgo v0.28.1
 	github.com/casbin/casbin/v2 v2.103.0
 	github.com/cockroachdb/errors v1.11.3
@@ -29,7 +26,6 @@ require (
 	github.com/redis/go-redis/extra/redisotel/v9 v9.7.0
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/samber/slog-formatter v1.2.0
-	github.com/sqldef/sqldef v0.17.30
 	github.com/testcontainers/testcontainers-go v0.35.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.35.0
 	github.com/testcontainers/testcontainers-go/modules/redis v0.35.0
@@ -70,6 +66,7 @@ require (
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.8.1 // indirect
+	github.com/bufbuild/buf v1.50.0 // indirect
 	github.com/bufbuild/protocompile v0.14.1 // indirect
 	github.com/bufbuild/protoplugin v0.0.0-20250106231243-3a819552c9d9 // indirect
 	github.com/bufbuild/protovalidate-go v0.8.2 // indirect
@@ -174,6 +171,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/cobra v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
+	github.com/sqldef/sqldef v0.17.30 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/tetratelabs/wazero v1.8.2 // indirect
@@ -206,4 +204,11 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250207221924-e9438ea467c6 // indirect
 	google.golang.org/grpc v1.70.0 // indirect
 	pluginrpc.com/pluginrpc v0.5.0 // indirect
+)
+
+tool (
+	connectrpc.com/connect/cmd/protoc-gen-connect-go
+	github.com/bufbuild/buf/cmd/buf
+	github.com/sqldef/sqldef/cmd/psqldef
+	google.golang.org/protobuf/cmd/protoc-gen-go
 )
