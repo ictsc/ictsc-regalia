@@ -39,7 +39,7 @@ func New(ctx context.Context, cfg config.ContestantAPI, db *sqlx.DB, rdb redis.U
 	mux.Handle("/auth/", otelhttp.NewHandler(newAuthHandler(cfg.Auth, repo), "auth"))
 
 	mux.Handle(contestantv1connect.NewViewerServiceHandler(
-		contestantv1connect.UnimplementedViewerServiceHandler{},
+		newViewerServiceHandler(repo),
 		connect.WithInterceptors(interceptors...),
 	))
 
