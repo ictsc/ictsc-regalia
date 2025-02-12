@@ -15,8 +15,8 @@ type (
 	}
 )
 
-func (u *user) TeamMember(ctx context.Context, eff TeamMemberGetter) (*TeamMember, error) {
-	member, err := eff.GetTeamMemberByID(ctx, uuid.UUID(u.userID))
+func (u userID) TeamMember(ctx context.Context, eff TeamMemberGetter) (*TeamMember, error) {
+	member, err := eff.GetTeamMemberByID(ctx, uuid.UUID(u))
 	if err != nil {
 		return nil, WrapAsInternal(err, "failed to get team member")
 	}
