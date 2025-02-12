@@ -15,6 +15,14 @@ type (
 	InvitationCode       = invitationCode
 )
 
+func (i InvitationCodeString) Code(ctx context.Context, eff InvitationCodeReader) (*InvitationCode, error) {
+	data, err := eff.GetInvitationCode(ctx, string(i))
+	if err != nil {
+		return nil, WrapAsInternal(err, "failed to get invitation code")
+	}
+	return data.parse()
+}
+
 func (i *InvitationCode) Team() *Team {
 	return i.team
 }
@@ -60,6 +68,10 @@ type (
 	}
 	InvitationCodeLister interface {
 		ListInvitationCodes(ctx context.Context, filter InvitationCodeFilter) ([]*InvitationCodeData, error)
+	}
+	InvitationCodeReader interface {
+		InvitationCodeLister
+		GetInvitationCode(ctx context.Context, codeString string) (*InvitationCodeData, error)
 	}
 	InvitationCodeCreator interface {
 		CreateInvitationCode(ctx context.Context, code *InvitationCodeData) error
