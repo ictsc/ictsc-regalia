@@ -92,7 +92,9 @@ func (e *Error) Unwrap() error {
 
 func (e *Error) Is(target error) bool {
 	t, ok := target.(*Error)
-	return ok && (t.Type == ErrTypeUnknown || t.Type == e.Type)
+	return ok &&
+		(t.Type == 0 || t.Type == e.Type) &&
+		(t.Msg == "" || t.Msg == e.Msg)
 }
 
 func ErrorType(err error) ErrType {
