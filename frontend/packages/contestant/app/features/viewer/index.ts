@@ -25,7 +25,7 @@ export async function fetchViewer(transport: Transport): Promise<User> {
   try {
     const { viewer } = await client.getViewer({});
     if (viewer == null) {
-      throw new Error("getViewer must return viewer")
+      throw new Error("getViewer must return viewer");
     }
 
     switch (viewer.viewer.value?.$typeName) {
@@ -39,10 +39,10 @@ export async function fetchViewer(transport: Transport): Promise<User> {
         return {
           type: "pre-signup",
           name: viewer.name,
-          displayName: viewer.viewer.value.displayName
-        }
+          displayName: viewer.viewer.value.displayName,
+        };
       default:
-        throw new Error("unsupported type")
+        throw new Error("unsupported type");
     }
   } catch (err: unknown) {
     if (err instanceof ConnectError && err.code == Code.Unauthenticated) {
