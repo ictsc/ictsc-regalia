@@ -67,7 +67,7 @@ func (h *AuthHandler) handleSignUp(w http.ResponseWriter, r *http.Request) {
 		writeJSON(r.Context(), w, SignUpResponse{Message: "no discord identity"})
 		return
 	}
-	if err := session.SignUpSessionStore.Write(r, w, nil, nil); err != nil {
+	if err := session.SignUpSessionStore.Write(r, w, nil, h.signUpSessionOption()); err != nil {
 		slog.ErrorContext(r.Context(), "failed to delete signup session", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		writeJSON(r.Context(), w, SignUpResponse{})

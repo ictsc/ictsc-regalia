@@ -36,7 +36,6 @@ type (
 		domain.DiscordIdentityGetter
 		domain.DiscordLinkedUserGetter
 	}
-	
 )
 
 type oauthErrorCode string
@@ -122,13 +121,7 @@ func (h *AuthHandler) discordAuthCodeURLRedirect(w http.ResponseWriter, r *http.
 		sess.State,
 		oauth2.S256ChallengeOption(sess.Verifier),
 	)
-	if err := session.OAuth2SessionStore.Write(r, w, sess, &sessions.Options{
-		MaxAge:   int(authCookieAge.Seconds()),
-		Path:     h.BaseURL.JoinPath("./auth").Path,
-		Secure:   h.BaseURL.Scheme == "https",
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-	}); err != nil {
+	if err := session.OAuth2SessionStore.Write(r, w, sess, h.oauth2SessionOption()); err != nil {
 		slog.ErrorContext(r.Context(), "failed to write oauth2 session", "error", errors.WithStack(err))
 		h.errorRedirect(w, r, sess.NextPath, oauthErrorServerError)
 		return
@@ -151,7 +144,7 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Delete session
-	if err := session.OAuth2SessionStore.Write(r, w, nil, nil); err != nil {
+	if err := session.OAuth2SessionStore.Write(r, w, nil, h.oauth2SessionOption()); err != nil {
 		slog.ErrorContext(r.Context(), "failed to delete session", "error", errors.WithStack(err))
 		h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorServerError)
 		return
@@ -200,29 +193,17 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path := h.BaseURL.Path
-	if path == "" {
-		path = "/"
-	}
-	sessOpt := &sessions.Options{
-		Path:     path,
-		Secure:   h.BaseURL.Scheme == "https",
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-	}
 	if user != nil {
 		// 登録済み
 		userSess := &session.UserSession{UserID: uuid.UUID(user.ID())}
-		sessOpt.MaxAge = int(userCookieAge.Seconds())
-		if err := session.UserSessionStore.Write(r, w, userSess, sessOpt); err != nil {
+		if err := session.UserSessionStore.Write(r, w, userSess, h.userSessionOption()); err != nil {
 			slog.ErrorContext(r.Context(), "failed to write user session", "error", err)
 			h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorServerError)
 			return
 		}
 	} else {
 		signUpSess := &session.SignUpSession{Discord: identity.Data()}
-		sessOpt.MaxAge = int(signUpCookieAge.Seconds())
-		if err := session.SignUpSessionStore.Write(r, w, signUpSess, sessOpt); err != nil {
+		if err := session.SignUpSessionStore.Write(r, w, signUpSess, h.signUpSessionOption()); err != nil {
 			slog.ErrorContext(r.Context(), "failed to write signup session", "error", err)
 			h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorServerError)
 			return
@@ -230,6 +211,26 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, oauthSess.NextPath.String(), http.StatusFound)
+}
+
+func (h *AuthHandler) oauth2SessionOption() *sessions.Options {
+	opt := h.sessionOption()
+	opt.MaxAge = int(authCookieAge.Seconds())
+	opt.Path = h.BaseURL.JoinPath("./auth").Path
+	opt.SameSite = http.SameSiteLaxMode
+	return opt
+}
+
+func (h *AuthHandler) userSessionOption() *sessions.Options {
+	opt := h.sessionOption()
+	opt.MaxAge = int(userCookieAge.Seconds())
+	return opt
+}
+
+func (h *AuthHandler) signUpSessionOption() *sessions.Options {
+	opt := h.sessionOption()
+	opt.MaxAge = int(signUpCookieAge.Seconds())
+	return opt
 }
 
 func (h *AuthHandler) sessionOption() *sessions.Options {

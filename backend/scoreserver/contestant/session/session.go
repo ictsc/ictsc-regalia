@@ -99,13 +99,12 @@ func (s *SessionStore[V]) Write(r *http.Request, w http.ResponseWriter, val V, o
 	if err != nil {
 		return err
 	}
-
+	if options != nil {
+		sess.Options = options
+	}
 	var zero V
 	if val != zero {
 		sess.Values[0] = val
-		if options != nil {
-			sess.Options = options
-		}
 	} else {
 		sess.Options.MaxAge = -1
 	}
