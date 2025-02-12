@@ -41,8 +41,32 @@ func (u UserID) Profile(ctx context.Context, eff UserProfileReader) (*UserProfil
 	return profileData.parse()
 }
 
+func (p *UserProfile) User() *User {
+	return p.user
+}
+
 func (p *UserProfile) DisplayName() string {
 	return p.displayName
+}
+
+func CreateUser(ctx context.Context, eff UserCreator, name, displayName string) (*UserProfile, error) {
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, WrapAsInternal(err, "failed to generate user ID")
+	}
+
+	profile, err := (&UserProfileData{
+		User:        &UserData{ID: id, Name: name},
+		DisplayName: displayName,
+	}).parse()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := eff.CreateUser(ctx, profile.Data()); err != nil {
+		return nil, WrapAsInternal(err, "failed to create user")
+	}
+	return profile, nil
 }
 
 // ユーザーに関する操作集合
@@ -130,13 +154,17 @@ func (d *UserData) parse() (*user, error) {
 }
 
 func (d *UserProfileData) parse() (*UserProfile, error) {
+	var errs []error
 	user, err := d.User.parse()
 	if err != nil {
-		return nil, err
+		errs = append(errs, err)
 	}
 	//nolint:mnd
 	if len(d.DisplayName) > 128 {
-		return nil, NewInvalidArgumentError("display name length must be less than 128", nil)
+		errs = append(errs, NewInvalidArgumentError("display name length must be less than 128", nil))
+	}
+	if len(errs) > 0 {
+		return nil, errors.Join(errs...)
 	}
 	return &UserProfile{
 		user:        user,
