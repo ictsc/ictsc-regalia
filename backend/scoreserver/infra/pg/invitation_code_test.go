@@ -75,6 +75,7 @@ func Test_PgRepo_InvitationCode(t *testing.T) {
 							Code:         1,
 							Name:         "トラブルシューターズ",
 							Organization: "ICTSC Association",
+							MaxMembers:   6,
 						},
 						Code:      "LHNZXGSF7L59WCG9",
 						ExpiresAt: must(time.Parse(time.RFC3339, "2038-04-03T00:00:00+09:00")),
