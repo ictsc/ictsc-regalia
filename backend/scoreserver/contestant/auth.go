@@ -190,8 +190,13 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		h.error(w, r, oauthSess.NextPath, oauthErrorServerError)
 		return
 	}
+
+	path := h.BaseURL.Path
+	if path == "" {
+		path = "/"
+	}
 	sessOpt := &sessions.Options{
-		Path:     h.BaseURL.Path,
+		Path:     path,
 		Secure:   h.BaseURL.Scheme == "https",
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
