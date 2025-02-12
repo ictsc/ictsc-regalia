@@ -12,15 +12,15 @@ import {
   MaterialSymbol,
   type MaterialSymbolType,
 } from "@app/components/material-symbol";
-import { type User } from "@app/features/account";
+import { type User } from "@app/features/viewer";
 
 export function AccountMenu({
-  user: userPromise,
+  viewer: viewerPromise,
 }: {
-  readonly user: Promise<User | undefined>;
+  readonly viewer: Promise<User | undefined>;
 }) {
-  const user = use(userPromise);
-  return user != null && <AccountMenuView name={user.name} />;
+  const user = use(viewerPromise);
+  return user?.type == "contestant" && <AccountMenuView name={user.name} />;
 }
 
 export function AccountMenuView({ name }: { readonly name: string }) {

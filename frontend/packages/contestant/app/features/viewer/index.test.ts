@@ -3,7 +3,7 @@ import { createConnectTransport } from "@connectrpc/connect-web";
 import { setupMSW } from "@app/__test__/msw/node";
 import { connect } from "@app/__test__/msw/connect";
 import { ViewerService } from "@ictsc/proto/contestant/v1";
-import { fetchMe } from "./index";
+import { fetchViewer } from "./index";
 
 const server = setupMSW();
 
@@ -19,7 +19,7 @@ describe("fetchMe", () => {
     const transport = createConnectTransport({
       baseUrl: "http://example.test",
     });
-    expect(await fetchMe(transport)).toEqual({
+    expect(await fetchViewer(transport)).toEqual({
       name: "Alice",
     });
   });

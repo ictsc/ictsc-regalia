@@ -2,14 +2,14 @@ import { Suspense, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@app/components/logo";
 import { AccountMenu } from "./account-menu";
-import { User } from "@app/features/account";
+import { User } from "@app/features/viewer";
 
 export function Header({ user }: { readonly user: Promise<User | undefined> }) {
   return (
     <HeaderView
       accountMenu={
         <Suspense>
-          <AccountMenu user={user} />
+          <AccountMenu viewer={user} />
         </Suspense>
       }
     />
