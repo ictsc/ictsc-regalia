@@ -92,7 +92,7 @@ importers:
         version: 2.1.1
       material-symbols:
         specifier: ^0.28.0
-        version: 0.28.1
+        version: 0.28.2
       react:
         specifier: ^19.0.0-rc
         version: 19.0.0
@@ -2583,8 +2583,8 @@ packages:
   map-or-similar@1.5.0:
     resolution: {integrity: sha512-0aF7ZmVon1igznGI4VS30yugpduQW3y3GkcgGJOp7d8x8QrizhigUxjI/m2UojsXXto+jLAH3KSz+xOJTiORjg==}
 
-  material-symbols@0.28.1:
-    resolution: {integrity: sha512-oLaBgTunF04BQEcUP5z+6FStqdfXrNVnYo2CB4Ej8d2RqrhYxSKllcHvXRYWjNNl/hRmlHJF9B62YWuZ4kHYpA==}
+  material-symbols@0.28.2:
+    resolution: {integrity: sha512-JLK+Bgtfg5Dn9V2WYk6lSwmxciNNF2zmqc/V8MLmH0K9LttUhPCaauJzrS1Vw3mJPs/Tyfi/tszynNRX6nWQOA==}
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -6260,7 +6260,7 @@ snapshots:
 
   map-or-similar@1.5.0: {}
 
-  material-symbols@0.28.1: {}
+  material-symbols@0.28.2: {}
 
   math-intrinsics@1.1.0: {}
 
