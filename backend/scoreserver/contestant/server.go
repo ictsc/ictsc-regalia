@@ -8,6 +8,7 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/connectutil"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1/contestantv1connect"
+	"github.com/ictsc/ictsc-regalia/backend/pkg/ratelimiter"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/connectdomain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/contestant/session"
@@ -27,6 +28,7 @@ func New(ctx context.Context, cfg config.ContestantAPI, db *sqlx.DB, rdb redis.U
 		return nil, errors.Wrap(err, "failed to create session store")
 	}
 	sessionStore.KeyPrefix("contestant-session:")
+	rateLimiter := ratelimiter.NewRedisRateLimiter(rdb, "contestant-rate-limiter:")
 
 	interceptors := []connect.Interceptor{
 		connectutil.NewOtelInterceptor(),
@@ -36,7 +38,7 @@ func New(ctx context.Context, cfg config.ContestantAPI, db *sqlx.DB, rdb redis.U
 
 	mux := http.NewServeMux()
 
-	mux.Handle("/auth/", otelhttp.NewHandler(newAuthHandler(cfg.Auth, repo), "auth"))
+	mux.Handle("/auth/", otelhttp.NewHandler(newAuthHandler(cfg.Auth, repo, rateLimiter), "auth"))
 
 	mux.Handle(contestantv1connect.NewViewerServiceHandler(
 		newViewerServiceHandler(repo),

@@ -128,7 +128,7 @@ func TestGetInvitationCode(t *testing.T) {
 		},
 		"not found": {
 			code:    "notfound",
-			wantErr: domain.ErrNotFound,
+			wantErr: domain.ErrInvitationCodeNotFound,
 		},
 	}
 

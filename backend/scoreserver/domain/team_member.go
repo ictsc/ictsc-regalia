@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gofrs/uuid/v5"
 )
 
@@ -25,7 +26,7 @@ func (u userID) TeamMember(ctx context.Context, eff TeamMemberGetter) (*TeamMemb
 
 func (u *user) JoinTeam(ctx context.Context, eff TeamMemberManager, now time.Time, invitationCode *InvitationCode) error {
 	if invitationCode.Expired(now) {
-		return NewInvalidArgumentError("invitation code is expired", nil)
+		return errors.WithStack(ErrInvitationCodeExpired)
 	}
 
 	memberCount, err := eff.CountTeamMembers(ctx, uuid.UUID(invitationCode.team.teamID))
@@ -33,7 +34,7 @@ func (u *user) JoinTeam(ctx context.Context, eff TeamMemberManager, now time.Tim
 		return WrapAsInternal(err, "failed to count team members")
 	}
 	if memberCount >= invitationCode.team.maxMembers {
-		return NewInvalidArgumentError("team is full", nil)
+		return errors.WithStack(ErrTeamIsFull)
 	}
 
 	if err := eff.AddTeamMember(ctx,
@@ -47,6 +48,10 @@ func (u *user) JoinTeam(ctx context.Context, eff TeamMemberManager, now time.Tim
 func (m *teamMember) Team() *Team {
 	return m.team
 }
+
+var (
+	ErrTeamIsFull = NewInvalidArgumentError("team is full", nil)
+)
 
 type (
 	TeamMemberData struct {
