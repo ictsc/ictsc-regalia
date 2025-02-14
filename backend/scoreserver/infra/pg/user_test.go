@@ -147,7 +147,7 @@ func Test_PgRepo_CreateUser(t *testing.T) {
 				t.Errorf("mismatch (-want +got):\n%s", diff)
 			}
 		},
-		"重複していたらエラー": func(t *testing.T, repo *pg.Repository, _ *sqlx.DB) {
+		"duplicate name": func(t *testing.T, repo *pg.Repository, _ *sqlx.DB) {
 			ctx := t.Context()
 
 			profile := &domain.UserProfileData{
@@ -162,8 +162,8 @@ func Test_PgRepo_CreateUser(t *testing.T) {
 				return tx.CreateUser(ctx, profile)
 			})
 
-			if !errors.Is(err, domain.ErrAlreadyExists) {
-				t.Errorf("want error type %v, but got %v", domain.ErrAlreadyExists, err)
+			if !errors.Is(err, domain.ErrDuplicateUserName) {
+				t.Errorf("want error type %v, but got %v", domain.ErrDuplicateUserName, err)
 			}
 		},
 	}

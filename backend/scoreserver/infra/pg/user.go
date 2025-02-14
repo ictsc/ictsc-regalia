@@ -108,11 +108,12 @@ func (r *RepositoryTx) CreateUser(ctx context.Context, profile *domain.UserProfi
 	if _, err := sqlx.NamedExecContext(ctx, r.ext, `
 		INSERT INTO users (id, name, created_at) VALUES (:id, :name, NOW())
 	`, (*userRow)(profile.User)); err != nil {
-		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
-			// 一意制約違反
-			if pgErr.Code == "23505" {
-				return domain.NewAlreadyExistsError("user", nil)
+		// 一意制約違反
+		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			if pgErr.ConstraintName == "users_name_key" {
+				return errors.WithStack(domain.ErrDuplicateUserName)
 			}
+			return domain.NewAlreadyExistsError("user", errors.Newf("constraint: %s", pgErr.ConstraintName))
 		}
 		return errors.Wrap(err, "failed to insert into users")
 	}
