@@ -1,18 +1,24 @@
-import { Suspense, lazy } from "react";
-import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
+import { Suspense, lazy, startTransition, use, useEffect } from "react";
+import {
+  createRootRouteWithContext,
+  Outlet,
+  useNavigate,
+  useRouterState,
+} from "@tanstack/react-router";
 import type { Transport } from "@connectrpc/connect";
 import { AppShell } from "@app/components/app-shell";
-import { fetchViewer } from "@app/features/viewer";
+import { fetchViewer, type User } from "@app/features/viewer";
 
 interface RouterContext {
   transport: Transport;
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
+  component: Root,
   loader: ({ context: { transport } }) => ({
     viewer: fetchViewer(transport),
   }),
-  component: Root,
+  staleTime: 1000 * 60, // 1 minute
 });
 
 const TanStackRouterDevtools = import.meta.env.DEV
@@ -31,8 +37,46 @@ function Root() {
         <Outlet />
       </AppShell>
       <Suspense>
+        <Redirector viewer={viewer} />
+      </Suspense>
+      <Suspense>
         <TanStackRouterDevtools />
       </Suspense>
     </>
   );
+}
+
+function Redirector({ viewer: viewerPromise }: { viewer: Promise<User> }) {
+  const routerState = useRouterState();
+  const navigate = useNavigate();
+  const viewer = use(viewerPromise);
+
+  useEffect(() => {
+    switch (viewer.type) {
+      case "unauthenticated": {
+        if (routerState.location.pathname !== "/signin") {
+          startTransition(() =>
+            navigate({
+              to: "/signin",
+              search: { next: routerState.location.pathname },
+            }),
+          );
+        }
+        break;
+      }
+      case "pre-signup": {
+        if (routerState.location.pathname !== "/signup") {
+          startTransition(() =>
+            navigate({
+              to: "/signup",
+              search: { next: routerState.location.pathname },
+            }),
+          );
+        }
+        break;
+      }
+    }
+  }, [routerState, navigate, viewer]);
+
+  return null;
 }
