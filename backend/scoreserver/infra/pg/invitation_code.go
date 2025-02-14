@@ -81,7 +81,7 @@ func (r *repo) GetInvitationCode(ctx context.Context, codeString string) (*domai
 		r.ext.Rebind(selectInvitationCode+" WHERE ic.code = ? LIMIT 1"), codeString,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, domain.NewNotFoundError("invitation_code", nil)
+			return nil, errors.WithStack(domain.ErrInvitationCodeNotFound)
 		}
 		return nil, domain.WrapAsInternal(err, "failed to select invitation_code")
 	}
