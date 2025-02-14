@@ -1,4 +1,10 @@
-import { startTransition, Suspense, use, useDeferredValue, useEffect } from "react";
+import {
+  startTransition,
+  Suspense,
+  use,
+  useDeferredValue,
+  useEffect,
+} from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { type User } from "@app/features/viewer";
 import { Route as RootRoute } from "../~__root";
