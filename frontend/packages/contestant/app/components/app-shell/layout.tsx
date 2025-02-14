@@ -9,14 +9,19 @@ export function Layout({
 }: {
   readonly children?: ReactNode;
   readonly header: ReactNode;
-  readonly navbar: ReactNode;
+  readonly navbar?: ReactNode;
   readonly navbarCollapsed: boolean;
 }) {
+  const navbarEnabled = navbar != null;
   return (
     <div
       className={clsx(
         "grid h-screen w-screen grid-rows-[70px_1fr] duration-75 motion-safe:transition-[grid-template-columns]",
-        navbarCollapsed ? "grid-cols-[50px_1fr]" : "grid-cols-[220px_1fr]",
+        navbarEnabled
+          ? navbarCollapsed
+            ? "grid-cols-[50px_1fr]"
+            : "grid-cols-[220px_1fr]"
+          : "grid-cols-[0_1fr]",
       )}
     >
       <header className="sticky top-0 col-span-full row-start-1 row-end-2">
