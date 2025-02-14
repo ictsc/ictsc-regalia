@@ -69,6 +69,12 @@ func CreateUser(ctx context.Context, eff UserCreator, name, displayName string) 
 	return profile, nil
 }
 
+var (
+	ErrInvalidUserName    = NewInvalidArgumentError("invalid user name", nil)
+	ErrDuplicateUserName  = NewAlreadyExistsError("user name", nil)
+	ErrInvalidDisplayName = NewInvalidArgumentError("invalid display name", nil)
+)
+
 // ユーザーに関する操作集合
 type (
 	UserData struct {
@@ -128,16 +134,16 @@ var validUserName = regexp.MustCompile(`^[a-z0-9_.]+$`)
 func newUserName(name string) (userName, error) {
 	// Discordのユーザー名の制限に合わせる
 	if name == "" {
-		return "", NewInvalidArgumentError("name is required", nil)
+		return "", errors.Join(ErrInvalidUserName, errors.New("name is required"))
 	}
 	if len(name) < 2 || len(name) > 32 {
-		return "", NewInvalidArgumentError("name length must be between 2 and 32", nil)
+		return "", errors.Join(ErrInvalidUserName, errors.New("name length must be between 2 and 32"))
 	}
 	if !validUserName.MatchString(name) {
-		return "", NewInvalidArgumentError("name contains invalid characters", nil)
+		return "", errors.Join(ErrInvalidUserName, errors.New("name contains invalid characters"))
 	}
 	if strings.Contains(name, "..") {
-		return "", NewInvalidArgumentError("name contains repeated periods", nil)
+		return "", errors.Join(ErrInvalidUserName, errors.New("name contains repeated periods"))
 	}
 	return UserName(name), nil
 }
@@ -160,8 +166,8 @@ func (d *UserProfileData) parse() (*UserProfile, error) {
 		errs = append(errs, err)
 	}
 	//nolint:mnd
-	if len(d.DisplayName) > 128 {
-		errs = append(errs, NewInvalidArgumentError("display name length must be less than 128", nil))
+	if len(d.DisplayName) > 64 {
+		errs = append(errs, errors.Join(ErrInvalidDisplayName, errors.New("display name length must be less than 128")))
 	}
 	if len(errs) > 0 {
 		return nil, errors.Join(errs...)

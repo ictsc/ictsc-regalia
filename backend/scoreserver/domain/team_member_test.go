@@ -51,7 +51,7 @@ func TestJoinTeam(t *testing.T) {
 			}),
 			inTeamMemberCount: 0,
 
-			wantErr: domain.ErrInvalidArgument,
+			wantErr: domain.ErrInvitationCodeExpired,
 		},
 		"full member": {
 			inUser: domain.FixUser1(t, nil),
@@ -60,7 +60,7 @@ func TestJoinTeam(t *testing.T) {
 			}),
 			inTeamMemberCount: 3,
 
-			wantErr: domain.ErrInvalidArgument,
+			wantErr: domain.ErrTeamIsFull,
 		},
 	}
 

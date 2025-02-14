@@ -51,9 +51,10 @@ func (t *Team) CreateInvitationCode(
 	return t.createInvitationCode(ctx, eff, now, expiresAt)
 }
 
-type InvitationCodeCreateEffect interface {
-	InvitationCodeCreator
-}
+var (
+	ErrInvitationCodeNotFound = NewNotFoundError("invitation code", nil)
+	ErrInvitationCodeExpired  = NewInvalidArgumentError("invitation code expired", nil)
+)
 
 type (
 	InvitationCodeData struct {

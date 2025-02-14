@@ -103,7 +103,7 @@ func Test_CreateInvitationCode(t *testing.T) {
 
 	cases := map[string]struct {
 		team      *domain.Team
-		effect    domain.InvitationCodeCreateEffect
+		effect    domain.InvitationCodeCreator
 		expiresAt time.Time
 
 		want    *domain.InvitationCodeData

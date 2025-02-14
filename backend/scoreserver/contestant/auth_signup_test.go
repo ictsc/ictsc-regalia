@@ -59,3 +59,84 @@ func TestSignUpOK(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestSignUpError(t *testing.T) {
+	t.Parallel()
+
+	now := time.Date(2025, 3, 1, 0, 0, 0, 0, time.UTC)
+	cases := map[string]struct {
+		now      time.Time
+		input    *contestant.SignUpInput
+		wantErrs []error
+	}{
+		"invalid name": {
+			now: now,
+			input: &contestant.SignUpInput{
+				InvitationCode: "LHNZXGSF7L59WCG9",
+				Name:           "アルファベットでない",
+				DisplayName:    "漢字でもいい",
+				DiscordID:      "987654321987654321",
+			},
+			wantErrs: []error{domain.ErrInvalidUserName},
+		},
+		"duplicated name": {
+			now: now,
+			input: &contestant.SignUpInput{
+				InvitationCode: "LHNZXGSF7L59WCG9",
+				Name:           "alice",
+				DisplayName:    "Alice",
+				DiscordID:      "987654321987654321",
+			},
+			wantErrs: []error{domain.ErrDuplicateUserName},
+		},
+		"invalid display name": {
+			now: now,
+			input: &contestant.SignUpInput{
+				InvitationCode: "LHNZXGSF7L59WCG9",
+				Name:           "test",
+				DisplayName:    strings.Repeat("あ", 128),
+				DiscordID:      "987654321987654321",
+			},
+			wantErrs: []error{domain.ErrInvalidDisplayName},
+		},
+		"no invitation code": {
+			now: now,
+			input: &contestant.SignUpInput{
+				InvitationCode: "INVALID",
+				Name:           "test",
+				DisplayName:    "Tester",
+				DiscordID:      "987654321987654321",
+			},
+			wantErrs: []error{domain.ErrInvitationCodeNotFound},
+		},
+		"invitation code expired": {
+			now: time.Date(3025, 3, 2, 0, 0, 0, 0, time.UTC),
+			input: &contestant.SignUpInput{
+				InvitationCode: "LHNZXGSF7L59WCG9",
+				Name:           "test",
+				DisplayName:    "Tester",
+				DiscordID:      "987654321987654321",
+			},
+			wantErrs: []error{domain.ErrInvitationCodeExpired},
+		},
+	}
+
+	for name, tt := range cases {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			db := pgtest.SetupDB(t)
+			repo := pg.NewRepository(db)
+			effect := pg.Tx(repo, func(rt *pg.RepositoryTx) contestant.SignUpTxEffect { return rt })
+			_, err := contestant.SignUp(t.Context(), effect, tt.now, tt.input)
+			if err == nil && len(tt.wantErrs) != 0 {
+				t.Errorf("got: nil, want: %v", tt.wantErrs)
+			}
+			for _, wantErr := range tt.wantErrs {
+				if !errors.Is(err, wantErr) {
+					t.Errorf("got: %v, want: %v", err, wantErr)
+				}
+			}
+		})
+	}
+}

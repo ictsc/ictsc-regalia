@@ -101,6 +101,33 @@ func (h *AuthHandler) handleSignUp(w http.ResponseWriter, r *http.Request) {
 	writeJSON(r.Context(), w, SignUpResponse{})
 }
 
+func handleSignUpError(ctx context.Context, w http.ResponseWriter, err error) {
+	if errors.Is(err, domain.ErrInternal) {
+		slog.ErrorContext(ctx, "failed to sign up", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		writeJSON(ctx, w, SignUpResponse{})
+		return
+	}
+	var codes []SignUpErrorCode
+	if errors.Is(err, domain.ErrInvalidUserName) {
+		codes = append(codes, SignUpErrorCodeInvalidName)
+	}
+	if errors.Is(err, domain.ErrDuplicateUserName) {
+		codes = append(codes, SignUpErrorCodeDuplicateName)
+	}
+	if errors.Is(err, domain.ErrInvalidDisplayName) {
+		codes = append(codes, SignUpErrorCodeInvalidDisplayName)
+	}
+	if errors.Is(err, domain.ErrInvitationCodeExpired) || errors.Is(err, domain.ErrInvitationCodeNotFound) {
+		codes = append(codes, SignUpErrorCodeInvalidInvitationCode)
+	}
+	if errors.Is(err, domain.ErrTeamIsFull) {
+		codes = append(codes, SignUpErrorCodeTeamIsFull)
+	}
+	w.WriteHeader(http.StatusBadRequest)
+	writeJSON(ctx, w, SignUpResponse{Codes: codes})
+}
+
 func writeJSON(ctx context.Context, w http.ResponseWriter, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(v); err != nil {
