@@ -1,6 +1,8 @@
 package contestant_test
 
 import (
+	"errors"
+	"strings"
 	"testing"
 	"time"
 

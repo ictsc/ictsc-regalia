@@ -29,7 +29,9 @@ type (
 
 const (
 	SignUpErrorCodeInvalidInvitationCode SignUpErrorCode = "invalid_invitation_code"
+	SignUpErrorCodeTeamIsFull            SignUpErrorCode = "team_is_full"
 	SignUpErrorCodeInvalidName           SignUpErrorCode = "invalid_name"
+	SignUpErrorCodeDuplicateName         SignUpErrorCode = "duplicate_name"
 	SignUpErrorCodeInvalidDisplayName    SignUpErrorCode = "invalid_display_name"
 
 	signUpRequestLimit = 1024
@@ -81,10 +83,7 @@ func (h *AuthHandler) handleSignUp(w http.ResponseWriter, r *http.Request) {
 		DiscordID:      signUpSess.Discord.ID,
 	})
 	if err != nil {
-		// TODO: better error handling
-		slog.ErrorContext(r.Context(), "failed to sign up", "error", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		writeJSON(r.Context(), w, SignUpResponse{})
+		handleSignUpError(r.Context(), w, err)
 		return
 	}
 
@@ -97,7 +96,7 @@ func (h *AuthHandler) handleSignUp(w http.ResponseWriter, r *http.Request) {
 		writeJSON(r.Context(), w, SignUpResponse{})
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	writeJSON(r.Context(), w, SignUpResponse{})
 }
 
@@ -141,6 +140,7 @@ type (
 	SignUpEffect   domain.Tx[SignUpTxEffect]
 	SignUpTxEffect interface {
 		domain.InvitationCodeReader
+		domain.UserLister
 		domain.UserCreator
 		domain.DiscordUserLinker
 		domain.TeamMemberManager
@@ -162,7 +162,21 @@ func SignUp(ctx context.Context, effect SignUpEffect, now time.Time, input *Sign
 
 	return domain.RunTx(ctx, effect, func(effect SignUpTxEffect) (*domain.UserProfile, error) {
 		var errs []error
-		userProfile, err := domain.CreateUser(ctx, effect, input.Name, input.DisplayName)
+		userName, err := domain.NewUserName(input.Name)
+		if err != nil {
+			errs = append(errs, err)
+		}
+		// ユーザー名が被っていない
+		if userName != "" {
+			_, err := userName.User(ctx, effect)
+			if !errors.Is(err, domain.ErrNotFound) {
+				if err == nil {
+					err = domain.ErrDuplicateUsername
+				}
+				errs = append(errs, err)
+			}
+		}
+		userProfile, err := domain.CreateUser(ctx, effect, string(userName), input.DisplayName)
 		if err != nil {
 			errs = append(errs, err)
 		}
