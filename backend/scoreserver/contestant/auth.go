@@ -12,6 +12,7 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/sessions"
+	"github.com/ictsc/ictsc-regalia/backend/pkg/ratelimiter"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/contestant/session"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
@@ -28,6 +29,7 @@ type (
 
 		BaseURL             *url.URL
 		DiscordOAuth2Config oauth2.Config
+		RateLimiter         ratelimiter.RateLimiter
 
 		DiscordCallbackEffect DiscordCallbackEffect
 		SignUpEffect          SignUpEffect
@@ -56,7 +58,7 @@ const (
 	userCookieAge   = 3 * 24 * time.Hour
 )
 
-func newAuthHandler(cfg config.ContestantAuth, repo *pg.Repository) *AuthHandler {
+func newAuthHandler(cfg config.ContestantAuth, repo *pg.Repository, rateLimiter ratelimiter.RateLimiter) *AuthHandler {
 	return &AuthHandler{
 		BaseURL: cfg.BaseURL,
 		DiscordOAuth2Config: oauth2.Config{
@@ -69,6 +71,7 @@ func newAuthHandler(cfg config.ContestantAuth, repo *pg.Repository) *AuthHandler
 			RedirectURL: cfg.BaseURL.JoinPath("./auth/callback").String(),
 			Scopes:      []string{"identify"},
 		},
+		RateLimiter: rateLimiter,
 
 		DiscordCallbackEffect: struct {
 			*discord.UserClient

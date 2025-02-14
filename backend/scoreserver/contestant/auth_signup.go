@@ -34,23 +34,12 @@ const (
 	SignUpErrorCodeDuplicateName         SignUpErrorCode = "duplicate_name"
 	SignUpErrorCodeInvalidDisplayName    SignUpErrorCode = "invalid_display_name"
 
-	signUpRequestLimit = 1024
+	signUpRequestLimit    = 1024
+	signUpRateLimitWindow = 10 * time.Minute
+	signUpRateLimitCount  = 3
 )
 
 func (h *AuthHandler) handleSignUp(w http.ResponseWriter, r *http.Request) {
-	var req SignUpRequest
-	if r.Header.Get("Content-Type") != "application/json" {
-		w.WriteHeader(http.StatusBadRequest)
-		writeJSON(r.Context(), w, SignUpResponse{Message: "Content-Type must be application/json"})
-		return
-	}
-	if err := json.NewDecoder(io.LimitReader(r.Body, signUpRequestLimit)).Decode(&req); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		writeJSON(r.Context(), w, SignUpResponse{})
-		return
-	}
-	_, _ = io.Copy(io.Discard, r.Body)
-
 	signUpSess, err := session.SignUpSessionStore.Get(r.Context())
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
@@ -69,12 +58,32 @@ func (h *AuthHandler) handleSignUp(w http.ResponseWriter, r *http.Request) {
 		writeJSON(r.Context(), w, SignUpResponse{Message: "no discord identity"})
 		return
 	}
-	if err := session.SignUpSessionStore.Write(r, w, nil, h.signUpSessionOption()); err != nil {
-		slog.ErrorContext(r.Context(), "failed to delete signup session", "error", err)
+
+	if isAllowed, err := h.RateLimiter.Check(r.Context(),
+		"auth.signup:"+signUpSess.Discord.ID,
+		signUpRateLimitWindow, signUpRateLimitCount,
+	); err != nil {
+		slog.ErrorContext(r.Context(), "failed to check rate limit", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)
+		writeJSON(r.Context(), w, SignUpResponse{})
+	} else if !isAllowed {
+		w.WriteHeader(http.StatusTooManyRequests)
+		writeJSON(r.Context(), w, SignUpResponse{Message: "rate limit exceeded"})
+		return
+	}
+
+	var req SignUpRequest
+	if r.Header.Get("Content-Type") != "application/json" {
+		w.WriteHeader(http.StatusBadRequest)
+		writeJSON(r.Context(), w, SignUpResponse{Message: "Content-Type must be application/json"})
+		return
+	}
+	if err := json.NewDecoder(io.LimitReader(r.Body, signUpRequestLimit)).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		writeJSON(r.Context(), w, SignUpResponse{})
 		return
 	}
+	_, _ = io.Copy(io.Discard, r.Body)
 
 	userProfile, err := SignUp(r.Context(), h.SignUpEffect, time.Now(), &SignUpInput{
 		InvitationCode: req.InvitationCode,
@@ -84,6 +93,13 @@ func (h *AuthHandler) handleSignUp(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		handleSignUpError(r.Context(), w, err)
+		return
+	}
+
+	if err := session.SignUpSessionStore.Write(r, w, nil, h.signUpSessionOption()); err != nil {
+		slog.ErrorContext(r.Context(), "failed to delete signup session", "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		writeJSON(r.Context(), w, SignUpResponse{})
 		return
 	}
 
