@@ -140,7 +140,6 @@ type (
 	SignUpEffect   domain.Tx[SignUpTxEffect]
 	SignUpTxEffect interface {
 		domain.InvitationCodeReader
-		domain.UserLister
 		domain.UserCreator
 		domain.DiscordUserLinker
 		domain.TeamMemberManager
@@ -161,28 +160,24 @@ func SignUp(ctx context.Context, effect SignUpEffect, now time.Time, input *Sign
 	codeString := domain.InvitationCodeString(input.InvitationCode)
 
 	return domain.RunTx(ctx, effect, func(effect SignUpTxEffect) (*domain.UserProfile, error) {
-		var errs []error
-		userName, err := domain.NewUserName(input.Name)
-		if err != nil {
-			errs = append(errs, err)
-		}
-		// ユーザー名が被っていない
-		if userName != "" {
-			_, err := userName.User(ctx, effect)
-			if !errors.Is(err, domain.ErrNotFound) {
-				if err == nil {
-					err = domain.ErrDuplicateUsername
-				}
+		var (
+			invitationCode *domain.InvitationCode
+			userProfile    *domain.UserProfile
+			errs           []error
+		)
+		{
+			ic, err := codeString.Code(ctx, effect)
+			if err != nil {
 				errs = append(errs, err)
 			}
-		}
-		userProfile, err := domain.CreateUser(ctx, effect, string(userName), input.DisplayName)
-		if err != nil {
-			errs = append(errs, err)
-		}
-		invitationCode, err := codeString.Code(ctx, effect)
-		if err != nil {
-			errs = append(errs, err)
+			invitationCode = ic
+
+			up, err := domain.CreateUser(ctx, effect, input.Name, input.DisplayName)
+			if err != nil {
+				slog.ErrorContext(ctx, "failed to create user", "error", err)
+				errs = append(errs, err)
+			}
+			userProfile = up
 		}
 		if len(errs) > 0 {
 			return nil, errors.Join(errs...)
