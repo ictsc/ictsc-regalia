@@ -3,7 +3,7 @@ services:
     image: postgres:17
     restart: always
     ports:
-      - ":5432"
+      - 127.0.0.1::5432
     volumes:
       - db:/var/lib/postgresql/data
       - ./schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
@@ -17,13 +17,47 @@ services:
     image: redis:7
     restart: always
     ports:
-      - ":6379"
+      - 127.0.0.1::6379
+
+  otelcol:
+    image: otel/opentelemetry-collector
+    restart: always
+    ports:
+      - 127.0.0.1::4317  # OTLP gRPC
+    configs:
+      - source: otelcol_config
+        target: /etc/otelcol/config.yaml
 
   jaeger:
     image: jaegertracing/all-in-one
+    restart: always
     ports:
-      - :4317
-      - 16686:16686
+      - 127.0.0.1:16686:16686
+
+configs:
+  otelcol_config:
+    content: |
+      receivers:
+        otlp:
+          protocols:
+            grpc:
+              endpoint: 0.0.0.0:4317
+
+      processors:
+        batch:
+
+      exporters:
+        otlp:
+          endpoint: jaeger:4317
+          tls:
+            insecure: true
+
+      service:
+        pipelines:
+          traces:
+            receivers: [otlp]
+            processors: [batch]
+            exporters: [otlp]
 
 volumes:
   db:

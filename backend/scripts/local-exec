@@ -1,29 +1,27 @@
-#!/bin/sh
-# vim: ft=sh :
+#!/bin/bash
+
+set -eu
 
 compose_file="$(dirname "$0")/../compose.yaml"
+ps="$(docker compose -f "$compose_file" ps --format=json)"
 
 export PGHOST=127.0.0.1
-PGPORT="$(docker compose -f "$compose_file" port postgres 5432 | cut -d: -f2)"
+PGPORT="$(jq -r 'select(.Service=="postgres").Publishers[] | select(.TargetPort==5432).PublishedPort' <<< "$ps")"
 export PGPORT
 export PGUSER=ictsc
 export PGPASSWORD=password
 export PGDATABASE=ictscore
 export PGSSLMODE=disable
 
-redis_port="$(docker compose -f "$compose_file" port redis 6379 | cut -d: -f2)"
+redis_port="$(jq -r 'select(.Service=="redis").Publishers[] | select(.TargetPort==6379).PublishedPort' <<< "$ps")"
 export REDIS_URL="redis://localhost:$redis_port/0"
 
 export OTEL_METRICS_EXPORTER="${OTEL_METRICS_EXPORTER:-prometheus}"
 
-if docker compose -f "$compose_file" ps | grep -q jaeger; then
-	traces_exporter=otlp
-	trace_endpoint="http://localhost:$(docker compose -f "$compose_file" port jaeger 4317 | cut -d: -f2)"
-	export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT="${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT:-$trace_endpoint}"
-	export OTEL_EXPORTER_OTLP_TRACES_PROTOCOL="${OTEL_EXPORTER_OTLP_TRACES_PROTOCOL:-grpc}"
-else
-	traces_exporter=none
-fi
+traces_exporter=otlp
+otlp_port="$(jq -r 'select(.Service=="otelcol").Publishers[] | select(.TargetPort==4317).PublishedPort' <<< "$ps")"
+export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT="${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT:-"http://localhost:$otlp_port"}"
+export OTEL_EXPORTER_OTLP_TRACES_PROTOCOL="${OTEL_EXPORTER_OTLP_TRACES_PROTOCOL:-grpc}"
 export OTEL_TRACES_EXPORTER="${OTEL_TRACES_EXPORTER:-$traces_exporter}"
 
 exec "$@"
