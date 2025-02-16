@@ -23,6 +23,8 @@ export function MaterialSymbol({
     ...propStyle,
     fontVariationSettings: `"FILL" ${fill ? "1" : "0"}`,
     fontSize: size,
+    width: size,
+    height: size,
   };
   return (
     <span
