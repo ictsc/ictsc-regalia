@@ -171,7 +171,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/cobra v1.9.0 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
-	github.com/sqldef/sqldef v0.17.30 // indirect
+	github.com/sqldef/sqldef v0.17.31 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/tetratelabs/wazero v1.8.2 // indirect
