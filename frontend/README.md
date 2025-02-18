@@ -2,31 +2,42 @@
 
 ## 構成
 
-- `packages/competition`: 競技者用ダッシュボード
-- `packages/admin`: 運営用ダッシュボード
+```
+frontend/
+└── packages/
+    ├── config/
+    ├── proto/
+    └── contestant/
+        ├── app/
+        │   ├── components/ # 複数のページで横断的に使われるロジックを持たないコンポーネント
+        │   ├── features/   # 外界とのやりとりなどのロジック
+        │   └── routes/     # 各ページの定義
+        └── assets/
+```
+
+## 必要なもの
+
+- [Node.js](https://nodejs.org)
+- [pnpm](https://pnpm.io)
 
 ## 開発方法
 
-### 立ち上げ方法
+### 競技者用ダッシュボード
 
-```bash
-git submodule update --init --recursive
+#### 立ち上げ
 
-cd ictsc-outlands/frontend/octavio
-pnpm font
+`http:localhost:8080`でバックエンドサーバーが起動していることを前提とします。
+以下のコマンドで`localhost:3000`で起動します。
 
-cd ..
-pnpm install
-
+```sh
+cd packages/contestant
 pnpm dev
 ```
 
-- http://localhost:3000 で競技者用ダッシュボードが開きます。
-- http://localhost:3000 で運営用ダッシュボードが開きます。
+#### Storybook
 
-### proto ファイルの更新
-
-```bash
-cd ictsc-outlands/frontend
-pnpm generate
+Storybook を起動するには
+```sh
+cd packages/contestant
+pnpm story
 ```

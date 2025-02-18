@@ -1,4 +1,4 @@
-# ictsc-outlands
+# ictsc-regalia
 
 ICTSC Score Server (4th Gen)
 
@@ -25,3 +25,11 @@ ictsc-outlands/
 ```
 
 各フォルダ以下に関しては、それぞれのフォルダにある`README.md`を参照して下さい。
+
+## proto の更新
+
+protobuf のスキーマを更新した後は各言語ごとの定義を再生成する必要があります
+
+```sh
+task generate
+```
