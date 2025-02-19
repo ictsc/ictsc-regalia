@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/cockroachdb/errors"
@@ -83,6 +84,8 @@ func newAdminConfig(opts *CLIOption) (*config.AdminAPI, error) {
 }
 
 func newContestantConfig(opts *CLIOption) (*config.ContestantAPI, error) {
+	origin := fmt.Sprintf("%s://%s", opts.ContestantBaseURL.Scheme, opts.ContestantBaseURL.Host)
+
 	discordClientID := os.Getenv("DISCORD_CLIENT_ID")
 	if discordClientID == "" {
 		return nil, errors.New("DISCORD_CLIENT_ID is not set")
@@ -93,7 +96,8 @@ func newContestantConfig(opts *CLIOption) (*config.ContestantAPI, error) {
 	}
 
 	return &config.ContestantAPI{
-		Address: opts.ContestantHTTPAddr,
+		Address:        opts.ContestantHTTPAddr,
+		AllowedOrigins: []string{origin},
 		Auth: config.ContestantAuth{
 			BaseURL:             &opts.ContestantBaseURL,
 			DiscordClientID:     discordClientID,
