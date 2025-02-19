@@ -51,6 +51,7 @@ linters-settings:
       - i
     ignore-decls:
       - w http.ResponseWriter
+      - w io.Writer
       - r *http.Request
       - wg sync.WaitGroup
   wrapcheck:
