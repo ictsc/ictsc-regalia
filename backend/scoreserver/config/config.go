@@ -42,8 +42,9 @@ type AdminAuthz struct {
 
 type (
 	ContestantAPI struct {
-		Address netip.AddrPort
-		Auth    ContestantAuth
+		Address        netip.AddrPort
+		Auth           ContestantAuth
+		AllowedOrigins []string
 	}
 	ContestantAuth struct {
 		BaseURL             *url.URL
