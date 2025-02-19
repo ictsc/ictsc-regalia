@@ -40,6 +40,8 @@ const (
 )
 
 func (h *AuthHandler) handleSignUp(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	signUpSess, err := session.SignUpSessionStore.Get(r.Context())
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
@@ -144,7 +146,6 @@ func handleSignUpError(ctx context.Context, w http.ResponseWriter, err error) {
 }
 
 func writeJSON(ctx context.Context, w http.ResponseWriter, v any) {
-	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(v); err != nil {
 		slog.ErrorContext(ctx, "failed to write json", "error", errors.WithStack(err))
 		http.Error(w, "{}", http.StatusInternalServerError)
