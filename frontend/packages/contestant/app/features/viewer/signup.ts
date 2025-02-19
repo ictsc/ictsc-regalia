@@ -16,24 +16,24 @@ export async function signUp(
   baseURL?: string,
 ): Promise<SignUpResponse> {
   const result: SignUpResponse = {};
-  let error = false;
   if (request.invitationCode === "") {
     result.invitationCodeError = "required";
-    error = true;
+    result.error = "invalid";
   }
   if (request.name === "") {
     result.nameError = "required";
-    error = true;
+    result.error = "invalid";
   }
   if (request.displayName === "") {
     result.displayNameError = "required";
-    error = true;
+    result.error = "invalid";
   }
-  if (error) {
+  if (result.error != null) {
     return result;
   }
 
   const url = new URL(baseURL ?? window.location.href);
+  url.search = "";
   url.pathname = "/api/auth/signup";
   const resp = await fetch(url, {
     method: "POST",
