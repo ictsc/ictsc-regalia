@@ -65,3 +65,46 @@ COMMENT ON COLUMN team_members.user_id IS 'ユーザ ID';
 COMMENT ON COLUMN team_members.team_id IS 'チーム ID';
 COMMENT ON COLUMN team_members.invitation_code_id IS '招待コード ID';
 COMMENT ON COLUMN team_members.invited_at IS '招待日時';
+
+CREATE TYPE problem_type AS ENUM ('DESCRIPTIVE');
+CREATE TYPE redeploy_rule AS ENUM ('UNREDEPLOYABLE', 'PERCENTAGE_PENALTY');
+CREATE TABLE problems (
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	code VARCHAR(8) NOT NULL UNIQUE,
+	type problem_type NOT NULL,
+	title VARCHAR(255) NOT NULL,
+	max_score INT NOT NULL CHECK (max_score > 0),
+	redeploy_rule redeploy_rule NOT NULL,
+	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON TABLE problems IS '問題';
+COMMENT ON COLUMN problems.id IS '問題 ID';
+COMMENT ON COLUMN problems.type IS '問題の種別';
+COMMENT ON COLUMN problems.title IS '問題名';
+COMMENT ON COLUMN problems.max_score IS '最大得点';
+COMMENT ON COLUMN problems.redeploy_rule IS '再展開時のルール';
+
+CREATE TABLE redeploy_percentage_penalties (
+	problem_id UUID PRIMARY KEY REFERENCES problems(id) ON DELETE CASCADE,
+	threshold INT NOT NULL CHECK (threshold >= 0),
+	percentage INT NOT NULL CHECK (percentage >= 0 AND percentage < 100)
+);
+COMMENT ON TABLE redeploy_percentage_penalties IS '再展開時の割合ペナルティ';
+COMMENT ON COLUMN redeploy_percentage_penalties.problem_id IS 'ペナルティ適用対象の問題 ID';
+COMMENT ON COLUMN redeploy_percentage_penalties.threshold IS 'ペナルティが適用される再展開回数の閾値';
+COMMENT ON COLUMN redeploy_percentage_penalties.percentage IS '再展開一回あたりの最大得点に対する減点率(%)';
+
+CREATE TABLE problem_contents (
+	problem_id UUID PRIMARY KEY REFERENCES problems(id) ON DELETE CASCADE,
+	page_id VARCHAR(255) NOT NULL,
+	page_path VARCHAR(255) NOT NULL,
+	body TEXT NOT NULL,
+	explanation TEXT NOT NULL
+);
+COMMENT ON TABLE problem_contents IS '問題の内容';
+COMMENT ON COLUMN problem_contents.problem_id IS '問題 ID';
+COMMENT ON COLUMN problem_contents.page_id IS 'Wiki上のページ ID';
+COMMENT ON COLUMN problem_contents.page_path IS 'Wiki上のページパス';
+COMMENT ON COLUMN problem_contents.body IS '問題文';
+COMMENT ON COLUMN problem_contents.explanation IS '運営向け解説情報';
