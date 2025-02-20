@@ -1,5 +1,5 @@
 group "default" {
-  targets = ["backend"]
+  targets = ["backend", "frontend"]
 }
 
 target "docker-metadata-action" {
@@ -22,6 +22,17 @@ target "backend" {
     ]
   }
   name = "backend-${image}"
+  tags = make_tags(target.docker-metadata-action.tags, "${image}")
+  target = "${image}"
+}
+
+target "frontend" {
+  inherits = ["base"]
+  context = "./frontend"
+  matrix = {
+    image = ["frontend"]
+  }
+  name = "frontend-${image}"
   tags = make_tags(target.docker-metadata-action.tags, "${image}")
   target = "${image}"
 }
