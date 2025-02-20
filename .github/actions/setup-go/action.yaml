@@ -16,6 +16,16 @@ runs:
         key: go-mod-${{ hashFiles('backend/go.sum') }}
         restore-keys: |
           go-mod-
+    - name: Clean large module cache
+      if: >-
+        steps.go-mod-cache.outputs.cache-hit != 'true'
+        && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+      run: |
+        CACHE_SIZE=$(du -sm ~/go/pkg/mod 2>/dev/null | cut -f1 || echo "0")
+        if [ "$CACHE_SIZE" -gt 200 ]; then
+          rm -rf ~/go/pkg/mod
+        fi
+      shell: bash
     - name: Download Go Modules
       if: steps.go-mod-cache.outputs.cache-hit != 'true'
       run: go mod download
