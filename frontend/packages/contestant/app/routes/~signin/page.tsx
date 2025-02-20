@@ -1,5 +1,6 @@
 import { Logo } from "@app/components/logo";
 import { Button, type ButtonProps } from "@headlessui/react";
+import clydeIcon from "@assets/icon_clyde_white_RGB.svg";
 
 type Props = {
   signInURL: string;
@@ -22,12 +23,7 @@ function DiscordLoginButton(props: ButtonProps<"a">) {
       {...props}
     >
       <span className="flex flex-row gap-[12px] text-surface-0">
-        <img
-          src="/assets/icon_clyde_white_RGB.svg"
-          width={40}
-          height={40}
-          alt=""
-        />
+        <img src={clydeIcon} width={40} height={40} alt="" />
         Discord でログイン
       </span>
     </Button>
