@@ -12,19 +12,21 @@ import (
 )
 
 func newConfig(opts *CLIOption) (*config.Config, error) {
+	var errs []error
+
 	adminAPI, err := newAdminConfig(opts)
 	if err != nil {
-		return nil, err
+		errs = append(errs, err)
 	}
 
 	contestantAPI, err := newContestantConfig(opts)
 	if err != nil {
-		return nil, err
+		errs = append(errs, err)
 	}
 
 	cfg, err := pgx.ParseConfig(os.Getenv("DB_DSN"))
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse DB_DSN")
+		errs = append(errs, errors.Wrap(err, "invalid DB_DSN"))
 	}
 
 	redisURL := os.Getenv("REDIS_URL")
@@ -34,7 +36,11 @@ func newConfig(opts *CLIOption) (*config.Config, error) {
 
 	redisOpts, err := redis.ParseURL(redisURL)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid REDIS_URL")
+		errs = append(errs, errors.Wrap(err, "invalid REDIS_URL"))
+	}
+
+	if err := errors.Join(errs...); err != nil {
+		return nil, err
 	}
 
 	return &config.Config{
@@ -86,13 +92,18 @@ func newAdminConfig(opts *CLIOption) (*config.AdminAPI, error) {
 func newContestantConfig(opts *CLIOption) (*config.ContestantAPI, error) {
 	origin := fmt.Sprintf("%s://%s", opts.ContestantBaseURL.Scheme, opts.ContestantBaseURL.Host)
 
+	var errs []error
 	discordClientID := os.Getenv("DISCORD_CLIENT_ID")
 	if discordClientID == "" {
-		return nil, errors.New("DISCORD_CLIENT_ID is not set")
+		errs = append(errs, errors.New("DISCORD_CLIENT_ID is not set"))
 	}
 	discordClientSecret := os.Getenv("DISCORD_CLIENT_SECRET")
 	if discordClientSecret == "" {
-		return nil, errors.New("DISCORD_CLIENT_SECRET is not set")
+		errs = append(errs, errors.New("DISCORD_CLIENT_SECRET is not set"))
+	}
+
+	if err := errors.Join(errs...); err != nil {
+		return nil, err
 	}
 
 	return &config.ContestantAPI{
