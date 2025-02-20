@@ -10,7 +10,7 @@ message Problem {
   // タイトル
   string title = 2;
   // 最大得点
-  int64 max_score = 3;
+  uint32 max_score = 3;
 
   optional Score score = 4;
   Deployment deployment = 5;
@@ -19,11 +19,11 @@ message Problem {
 
 message Score {
   // 採点による得点
-  int64 marked_score = 1;
+  uint32 marked_score = 1;
   // ペナルティによる減点
-  int64 penalty = 2;
+  uint32 penalty = 2;
   // 最終的な得点
-  int64 score = 3;
+  uint32 score = 3;
 }
 
 message Deployment {
@@ -53,22 +53,9 @@ enum ProblemType {
   PROBLEM_TYPE_DESCRIPTIVE = 1;
 }
 
-message Connection {
-  // ホスト名
-  string host_name = 1;
-  // ホスト(IP アドレス or ドメイン)
-  string host = 2;
-  // ユーザ
-  optional string user = 3;
-  // パスワード
-  optional string password = 4;
-}
-
 message DescriptiveProblem {
   // 問題文
   string body = 1;
-  // 接続情報
-  repeated Connection connection = 2;
 }
 
 message ListProblemsRequest {}

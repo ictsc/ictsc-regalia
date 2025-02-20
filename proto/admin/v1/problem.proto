@@ -12,7 +12,7 @@ message Problem {
   // タイトル
   string title = 2;
   // 最大得点
-  int64 max_score = 3;
+  uint32 max_score = 3;
 
   RedeployRule redeploy_rule = 4;
 
@@ -30,20 +30,9 @@ enum RedeployRuleType {
 message RedeployRule {
   RedeployRuleType type = 1;
   // 再展開ペナルティの発生する再展開回数の閾値
-  int64 penalty_threshold = 2;
+  uint32 penalty_threshold = 2;
   // 再展開ペナルティの割合
-  float penalty_percentage = 3;
-}
-
-message Connection {
-  // ホスト名
-  string host_name = 1;
-  // ホスト(IP アドレス or ドメイン)
-  string host = 2;
-  // ユーザ
-  optional string user = 3;
-  // パスワード
-  optional string password = 4;
+  uint32 penalty_percentage = 3;
 }
 
 message ProblemBody {
@@ -60,9 +49,9 @@ enum ProblemType {
 
 message DescriptiveProblem {
   // Growi のページのパス
-  string path = 1;
-  // 接続情報
-  repeated Connection connection = 2;
+  string page_path = 1;
+  // Growi のページID
+  string page_id = 2;
   // Markdown 形式の問題文
   string problem_markdown = 3;
   // Markdown 形式の解説文
