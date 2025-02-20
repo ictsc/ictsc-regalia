@@ -2,7 +2,7 @@
  * @type{import("prettier").Config}
  */
 const config = {
-  plugins: ["prettier-plugin-tailwindcss"],
+  plugins: [import.meta.resolve("prettier-plugin-tailwindcss")],
   tailwindFunctions: ["clsx", "cva"],
 };
 
