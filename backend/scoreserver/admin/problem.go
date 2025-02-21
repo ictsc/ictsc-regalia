@@ -8,24 +8,37 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/growi"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 )
 
 type ProblemServiceHandler struct {
-	Enforcer   *auth.Enforcer
-	ListEffect ProblemListEffect
-	GetEffect  ProblemGetEffect
+	Enforcer     *auth.Enforcer
+	ListEffect   ProblemListEffect
+	GetEffect    ProblemGetEffect
+	CreateEffect ProblemCreateEffect
 
 	adminv1connect.UnimplementedProblemServiceHandler
 }
 
 var _ adminv1connect.ProblemServiceHandler = (*ProblemServiceHandler)(nil)
 
-func NewProblemServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *ProblemServiceHandler {
+func NewProblemServiceHandler(
+	enforcer *auth.Enforcer,
+	repo *pg.Repository,
+	growiClient *growi.Client,
+) *ProblemServiceHandler {
 	return &ProblemServiceHandler{
 		Enforcer:   enforcer,
 		ListEffect: repo,
 		GetEffect:  repo,
+		CreateEffect: struct {
+			domain.Tx[domain.ProblemWriter]
+			domain.ProblemContentGetter
+		}{
+			Tx:                   pg.Tx(repo, func(rt *pg.RepositoryTx) domain.ProblemWriter { return rt }),
+			ProblemContentGetter: growiClient,
+		},
 	}
 }
 
@@ -96,6 +109,69 @@ func (h *ProblemServiceHandler) GetProblem(
 	}
 }
 
+type ProblemCreateEffect interface {
+	domain.Tx[domain.ProblemWriter]
+	domain.ProblemContentGetter
+}
+
+func (h *ProblemServiceHandler) CreateProblem(
+	ctx context.Context,
+	req *connect.Request[adminv1.CreateProblemRequest],
+) (*connect.Response[adminv1.CreateProblemResponse], error) {
+	if err := enforce(ctx, h.Enforcer, "problems", "create"); err != nil {
+		return nil, err
+	}
+
+	code, err := domain.NewProblemCode(req.Msg.GetProblem().GetCode())
+	if err != nil {
+		return nil, err
+	}
+
+	if req.Msg.GetProblem().GetBody().GetType() != adminv1.ProblemType_PROBLEM_TYPE_DESCRIPTIVE {
+		return nil, domain.NewInvalidArgumentError("only descriptive problem is supported", nil)
+	}
+
+	var content *domain.ProblemContent
+	if pagePath := req.Msg.GetProblem().GetBody().GetDescriptive().GetPagePath(); pagePath != "" {
+		var err error
+		content, err = domain.FetchProblemContentByPath(ctx, h.CreateEffect, pagePath)
+		if err != nil {
+			return nil, err
+		}
+	} else if pageID := req.Msg.GetProblem().GetBody().GetDescriptive().GetPageId(); pageID != "" {
+		var err error
+		content, err = domain.FetchProblemContentByID(ctx, h.CreateEffect, pageID)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, domain.NewInvalidArgumentError("pageId or pagePath is required", nil)
+	}
+
+	rule, penalty := parseRedeployRule(req.Msg.GetProblem().GetRedeployRule())
+	descriptiveProblem, err := domain.CreateDescriptiveProblem(domain.CreateDescriptiveProblemInput{
+		Code:              code,
+		Title:             req.Msg.GetProblem().GetTitle(),
+		MaxScore:          req.Msg.GetProblem().GetMaxScore(),
+		RedeployRule:      rule,
+		PercentagePenalty: penalty,
+		Content:           content,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if err := h.CreateEffect.RunInTx(ctx, func(tx domain.ProblemWriter) error {
+		return descriptiveProblem.Save(ctx, tx)
+	}); err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&adminv1.CreateProblemResponse{
+		Problem: convertDescriptiveProblem(descriptiveProblem),
+	}), nil
+}
+
 func convertProblem(problem *domain.Problem) *adminv1.Problem {
 	var typ adminv1.ProblemType
 	switch problem.Type() {
@@ -149,5 +225,21 @@ func convertRedeployRule(problem *domain.Problem) *adminv1.RedeployRule {
 		return &adminv1.RedeployRule{
 			Type: adminv1.RedeployRuleType_REDEPLOY_RULE_TYPE_UNSPECIFIED,
 		}
+	}
+}
+
+func parseRedeployRule(proto *adminv1.RedeployRule) (domain.RedeployRule, *domain.RedeployPenaltyPercentage) {
+	switch proto.GetType() {
+	case adminv1.RedeployRuleType_REDEPLOY_RULE_TYPE_UNREDEPLOYABLE:
+		return domain.RedeployRuleUnredeployable, nil
+	case adminv1.RedeployRuleType_REDEPLOY_RULE_TYPE_PERCENTAGE_PENALTY:
+		return domain.RedeployRulePercentagePenalty, &domain.RedeployPenaltyPercentage{
+			Threshold:  proto.GetPenaltyThreshold(),
+			Percentage: proto.GetPenaltyPercentage(),
+		}
+	case adminv1.RedeployRuleType_REDEPLOY_RULE_TYPE_UNSPECIFIED:
+		fallthrough
+	default:
+		return domain.RedeployRuleUnknown, nil
 	}
 }
