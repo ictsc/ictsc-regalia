@@ -355,8 +355,8 @@ github.com/rbcervilla/redisstore/v9 v9.0.0 h1:wOPbBaydbdxzi1gTafDftCI/Z7vnsXw0QD
 github.com/rbcervilla/redisstore/v9 v9.0.0/go.mod h1:q/acLpoKkTZzIsBYt0R4THDnf8W/BH6GjQYvxDSSfdI=
 github.com/redis/go-redis/extra/rediscmd/v9 v9.7.1 h1:+o7rrBoj54t8fqQSmnwRLdLzp5rps7bW4xiYZp2MBjs=
 github.com/redis/go-redis/extra/rediscmd/v9 v9.7.1/go.mod h1:bWIjbxmrAk9eKGg9LSko3oQefoYGyWV4xzNS55PgL60=
-github.com/redis/go-redis/extra/redisotel/v9 v9.7.0 h1:bQk8xiVFw+3ln4pfELVktpWgYdFpgLLU+quwSoeIof0=
-github.com/redis/go-redis/extra/redisotel/v9 v9.7.0/go.mod h1:0LyN+GHLIJmKtjYRPF7nHyTTMV6E91YngoOopNifQRo=
+github.com/redis/go-redis/extra/redisotel/v9 v9.7.1 h1:LJF39lvUagUpKfL2/gZIp5vHv3AwXt9zOZ/Xual/CzI=
+github.com/redis/go-redis/extra/redisotel/v9 v9.7.1/go.mod h1:VAY1vDpD/dLwfw/wU5SsexXNhCO9DjhRoGkmJeFONoE=
 github.com/redis/go-redis/v9 v9.7.1 h1:4LhKRCIduqXqtvCUlaq9c8bdHOkICjDMrr1+Zb3osAc=
 github.com/redis/go-redis/v9 v9.7.1/go.mod h1:f6zhXITC7JUJIlPEiBOTXxJgPLdZcA93GewI7inzyWw=
 github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
