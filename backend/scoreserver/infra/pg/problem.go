@@ -8,6 +8,8 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/gofrs/uuid/v5"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
+	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -134,6 +136,11 @@ func (r *RepositoryTx) SaveDescriptiveProblem(ctx context.Context, descriptivePr
 			MaxStore:     problem.MaxScore,
 			RedeployRule: redployRule(problem.RedeployRule),
 		}); err != nil {
+			if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
+				if pgErr.Code == pgerrcode.UniqueViolation && pgErr.ConstraintName == "problems_code_key" {
+					return domain.NewAlreadyExistsError("problem code", nil)
+				}
+			}
 			return errors.Wrap(err, "failed to save problem")
 		}
 	}
@@ -172,6 +179,13 @@ func (r *RepositoryTx) SaveDescriptiveProblem(ctx context.Context, descriptivePr
 		); err != nil {
 			return errors.Wrap(err, "failed to save problem content")
 		}
+	}
+	return nil
+}
+
+func (r *RepositoryTx) DeleteProblem(ctx context.Context, id uuid.UUID) error {
+	if _, err := r.ext.ExecContext(ctx, "DELETE FROM problems WHERE id = $1", id); err != nil {
+		return errors.Wrap(err, "failed to delete problem")
 	}
 	return nil
 }

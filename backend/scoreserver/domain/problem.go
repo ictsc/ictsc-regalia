@@ -13,6 +13,13 @@ import (
 
 type problemID uuid.UUID
 
+func (id problemID) Delete(ctx context.Context, eff ProblemWriter) error {
+	if err := eff.DeleteProblem(ctx, uuid.UUID(id)); err != nil {
+		return WrapAsInternal(err, "failed to delete problem")
+	}
+	return nil
+}
+
 type ProblemCode string
 
 var (
@@ -146,6 +153,10 @@ type (
 	problemContent = ProblemContent
 )
 
+func (pc *ProblemContent) PageID() string {
+	return pc.pageID
+}
+
 func (pc *ProblemContent) PagePath() string {
 	return pc.pagePath
 }
@@ -162,6 +173,14 @@ func FetchProblemContentByPath(ctx context.Context, eff ProblemContentGetter, pa
 	data, err := eff.GetProblemContentByPath(ctx, path)
 	if err != nil {
 		return nil, WrapAsInternal(err, "failed to fetch problem content by path")
+	}
+	return data.parse()
+}
+
+func FetchProblemContentByID(ctx context.Context, eff ProblemContentGetter, id string) (*ProblemContent, error) {
+	data, err := eff.GetProblemContentByID(ctx, id)
+	if err != nil {
+		return nil, WrapAsInternal(err, "failed to fetch problem content by ID")
 	}
 	return data.parse()
 }
@@ -232,18 +251,18 @@ func (dp *DescriptiveProblem) Update(input UpdateDescriptiveProblemInput) (*Desc
 	if input.Title != "" {
 		data.Problem.Title = input.Title
 	}
-	if input.MaxScore != 0 {
+	if input.MaxScore != 0 && input.MaxScore != data.Problem.MaxScore {
 		// TODO: 最大得点の更新
 		// 最大得点が更新される場合，既に採点が行われているならば，それらの採点結果を適切に再計算するか，更新を拒否するかを決定する必要がある
 		// この操作の必要性が認識され，どのような挙動を取るべきかが明確になるまで，最大得点の更新は許可しない
 		return nil, NewInvalidArgumentError("max score cannot be updated", nil)
 	}
-	if input.RedeployRule != RedeployRuleUnknown {
+	if input.RedeployRule != RedeployRuleUnknown && input.RedeployRule != data.Problem.RedeployRule {
 		// TODO: 再展開ルールを変更する場合，Undeployable になるならば再展開が既に行われていないことを確認する必要がある
 		// これは複雑であるため，操作の必要性が認識されるまで再展開ルールの変更は許可しない
 		return nil, NewInvalidArgumentError("redeploy rule cannot be updated", nil)
 	}
-	if input.PercentagePenalty != nil {
+	if input.PercentagePenalty != nil && *input.PercentagePenalty != *data.Problem.PercentagePenalty {
 		// TODO(#1298): 減点率の変更
 		// 減点率が変更される場合，既に行われている採点結果を再計算する必要がある
 		// この操作は問題難易度による微調整として必要性が高いため，優先度が高いが，現状は採点ロジックが未実装であるため，許可しない
@@ -286,7 +305,9 @@ type (
 		GetProblemContentByPath(ctx context.Context, pagePath string) (*ProblemContentRawData, error)
 	}
 	ProblemWriter interface {
+		ProblemReader
 		SaveDescriptiveProblem(ctx context.Context, data *DescriptiveProblemData) error
+		DeleteProblem(ctx context.Context, id uuid.UUID) error
 	}
 )
 

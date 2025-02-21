@@ -39,6 +39,8 @@ backend/
 
 - `DISCORD_CLIENT_ID` Discord App の Client ID
 - `DISCORD_CLIENT_SECRET` Discord App の Client Secret
+- `GROWI_BASE_URL` Growi の Base URL
+- `GROWI_API_TOKEN` Growi の API Token
 
 ### ローカル開発環境の起動
 

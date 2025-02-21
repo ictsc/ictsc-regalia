@@ -16,29 +16,33 @@ type Config struct {
 	Redis    redis.Options
 }
 
-type AdminAPI struct {
-	Address netip.AddrPort
-	Authn   AdminAuthn
-	Authz   AdminAuthz
-}
+type (
+	AdminAPI struct {
+		Address netip.AddrPort
+		Authn   AdminAuthn
+		Authz   AdminAuthz
+		Growi   Growi
+	}
+	AdminAuthn struct {
+		Issuers []Issuer `yaml:"issuers"`
+	}
+	Issuer struct {
+		Issuer            string `yaml:"issuer"`
+		InsecureIssuerURL string `yaml:"insecure_issuer_url"`
+		ClientID          string `yaml:"client_id"`
+		CAFile            string `yaml:"ca_file"`
 
-type AdminAuthn struct {
-	Issuers []Issuer `yaml:"issuers"`
-}
-
-type Issuer struct {
-	Issuer            string `yaml:"issuer"`
-	InsecureIssuerURL string `yaml:"insecure_issuer_url"`
-	ClientID          string `yaml:"client_id"`
-	CAFile            string `yaml:"ca_file"`
-
-	UsernameKey string   `yaml:"username_key"`
-	GroupKeys   []string `yaml:"group_keys"`
-}
-
-type AdminAuthz struct {
-	Policy string
-}
+		UsernameKey string   `yaml:"username_key"`
+		GroupKeys   []string `yaml:"group_keys"`
+	}
+	AdminAuthz struct {
+		Policy string
+	}
+	Growi struct {
+		BaseURL *url.URL
+		Token   string
+	}
+)
 
 type (
 	ContestantAPI struct {

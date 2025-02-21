@@ -11,8 +11,10 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/connectdomain"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/growi"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 	"github.com/jmoiron/sqlx"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
@@ -24,6 +26,11 @@ func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB) (http.Handler, e
 	}
 
 	repo := pg.NewRepository(db)
+	growiClient := &growi.Client{
+		APIToken: cfg.Growi.Token,
+		BaseURL:  cfg.Growi.BaseURL,
+		Client:   otelhttp.DefaultClient,
+	}
 
 	interceptors := []connect.Interceptor{
 		connectutil.NewOtelInterceptor(),
@@ -39,6 +46,10 @@ func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB) (http.Handler, e
 	))
 	mux.Handle(adminv1connect.NewInvitationServiceHandler(
 		NewInvitationServiceHandler(enforcer, repo),
+		connect.WithInterceptors(interceptors...),
+	))
+	mux.Handle(adminv1connect.NewProblemServiceHandler(
+		NewProblemServiceHandler(enforcer, repo, growiClient),
 		connect.WithInterceptors(interceptors...),
 	))
 
