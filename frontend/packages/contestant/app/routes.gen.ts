@@ -14,6 +14,8 @@ import { Route as rootRoute } from "./routes/~__root";
 import { Route as SignupRouteImport } from "./routes/~signup/~route";
 import { Route as SigninRouteImport } from "./routes/~signin/~route";
 import { Route as IndexRouteImport } from "./routes/~index/~route";
+import { Route as ProblemsCodeRouteImport } from "./routes/~problems.$code/~route";
+import { Route as ProblemsIndexRouteImport } from "./routes/~problems.index/~route";
 
 // Create/Update Routes
 
@@ -32,6 +34,18 @@ const SigninRouteRoute = SigninRouteImport.update({
 const IndexRouteRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
+  getParentRoute: () => rootRoute,
+} as any);
+
+const ProblemsCodeRouteRoute = ProblemsCodeRouteImport.update({
+  id: "/problems/$code",
+  path: "/problems/$code",
+  getParentRoute: () => rootRoute,
+} as any);
+
+const ProblemsIndexRouteRoute = ProblemsIndexRouteImport.update({
+  id: "/problems/",
+  path: "/problems/",
   getParentRoute: () => rootRoute,
 } as any);
 
@@ -60,6 +74,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof SignupRouteImport;
       parentRoute: typeof rootRoute;
     };
+    "/problems/": {
+      id: "/problems/";
+      path: "/problems";
+      fullPath: "/problems";
+      preLoaderRoute: typeof ProblemsIndexRouteImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/problems/$code": {
+      id: "/problems/$code";
+      path: "/problems/$code";
+      fullPath: "/problems/$code";
+      preLoaderRoute: typeof ProblemsCodeRouteImport;
+      parentRoute: typeof rootRoute;
+    };
   }
 }
 
@@ -69,12 +97,16 @@ export interface FileRoutesByFullPath {
   "/": typeof IndexRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
+  "/problems": typeof ProblemsIndexRouteRoute;
+  "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
 
 export interface FileRoutesByTo {
   "/": typeof IndexRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
+  "/problems": typeof ProblemsIndexRouteRoute;
+  "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
 
 export interface FileRoutesById {
@@ -82,14 +114,22 @@ export interface FileRoutesById {
   "/": typeof IndexRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
+  "/problems/": typeof ProblemsIndexRouteRoute;
+  "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/signin" | "/signup";
+  fullPaths: "/" | "/signin" | "/signup" | "/problems" | "/problems/$code";
   fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/signin" | "/signup";
-  id: "__root__" | "/" | "/signin" | "/signup";
+  to: "/" | "/signin" | "/signup" | "/problems" | "/problems/$code";
+  id:
+    | "__root__"
+    | "/"
+    | "/signin"
+    | "/signup"
+    | "/problems/"
+    | "/problems/$code";
   fileRoutesById: FileRoutesById;
 }
 
@@ -97,12 +137,16 @@ export interface RootRouteChildren {
   IndexRouteRoute: typeof IndexRouteRoute;
   SigninRouteRoute: typeof SigninRouteRoute;
   SignupRouteRoute: typeof SignupRouteRoute;
+  ProblemsIndexRouteRoute: typeof ProblemsIndexRouteRoute;
+  ProblemsCodeRouteRoute: typeof ProblemsCodeRouteRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRouteRoute: IndexRouteRoute,
   SigninRouteRoute: SigninRouteRoute,
   SignupRouteRoute: SignupRouteRoute,
+  ProblemsIndexRouteRoute: ProblemsIndexRouteRoute,
+  ProblemsCodeRouteRoute: ProblemsCodeRouteRoute,
 };
 
 export const routeTree = rootRoute
@@ -117,7 +161,9 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/signin",
-        "/signup"
+        "/signup",
+        "/problems/",
+        "/problems/$code"
       ]
     },
     "/": {
@@ -128,6 +174,12 @@ export const routeTree = rootRoute
     },
     "/signup": {
       "filePath": "~signup/~route.tsx"
+    },
+    "/problems/": {
+      "filePath": "~problems.index/~route.tsx"
+    },
+    "/problems/$code": {
+      "filePath": "~problems.$code/~route.tsx"
     }
   }
 }

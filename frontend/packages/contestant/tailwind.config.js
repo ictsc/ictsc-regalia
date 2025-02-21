@@ -13,6 +13,7 @@ export default {
       },
       text: "#505050",
       icon: "#1c1b1f",
+      disabled: "#dcdcdc",
     },
     width: {
       full: "100%",
