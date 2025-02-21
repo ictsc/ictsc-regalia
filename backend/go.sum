@@ -353,12 +353,12 @@ github.com/quic-go/quic-go v0.50.0 h1:3H/ld1pa3CYhkcc20TPIyG1bNsdhn9qZBGN3b9/UyU
 github.com/quic-go/quic-go v0.50.0/go.mod h1:Vim6OmUvlYdwBhXP9ZVrtGmCMWa3wEqhq3NgYrI8b4E=
 github.com/rbcervilla/redisstore/v9 v9.0.0 h1:wOPbBaydbdxzi1gTafDftCI/Z7vnsXw0QDPCuhiMG0g=
 github.com/rbcervilla/redisstore/v9 v9.0.0/go.mod h1:q/acLpoKkTZzIsBYt0R4THDnf8W/BH6GjQYvxDSSfdI=
-github.com/redis/go-redis/extra/rediscmd/v9 v9.7.0 h1:BIx9TNZH/Jsr4l1i7VVxnV0JPiwYj8qyrHyuL0fGZrk=
-github.com/redis/go-redis/extra/rediscmd/v9 v9.7.0/go.mod h1:eTg/YQtGYAZD5r3DlGlJptJ45AHA+/G+2NPn30PKzik=
+github.com/redis/go-redis/extra/rediscmd/v9 v9.7.1 h1:+o7rrBoj54t8fqQSmnwRLdLzp5rps7bW4xiYZp2MBjs=
+github.com/redis/go-redis/extra/rediscmd/v9 v9.7.1/go.mod h1:bWIjbxmrAk9eKGg9LSko3oQefoYGyWV4xzNS55PgL60=
 github.com/redis/go-redis/extra/redisotel/v9 v9.7.0 h1:bQk8xiVFw+3ln4pfELVktpWgYdFpgLLU+quwSoeIof0=
 github.com/redis/go-redis/extra/redisotel/v9 v9.7.0/go.mod h1:0LyN+GHLIJmKtjYRPF7nHyTTMV6E91YngoOopNifQRo=
-github.com/redis/go-redis/v9 v9.7.0 h1:HhLSs+B6O021gwzl+locl0zEDnyNkxMtf/Z3NNBMa9E=
-github.com/redis/go-redis/v9 v9.7.0/go.mod h1:f6zhXITC7JUJIlPEiBOTXxJgPLdZcA93GewI7inzyWw=
+github.com/redis/go-redis/v9 v9.7.1 h1:4LhKRCIduqXqtvCUlaq9c8bdHOkICjDMrr1+Zb3osAc=
+github.com/redis/go-redis/v9 v9.7.1/go.mod h1:f6zhXITC7JUJIlPEiBOTXxJgPLdZcA93GewI7inzyWw=
 github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
 github.com/rogpeppe/go-internal v1.13.1 h1:KvO1DLK/DRN07sQ1LQKScxyZJuNnedQ5/wKSR38lUII=
 github.com/rogpeppe/go-internal v1.13.1/go.mod h1:uMEvuHeurkdAXX61udpOXGD/AzZDWNMNyH2VO9fmH0o=
