@@ -13,6 +13,7 @@ const router = createRouter({
   context: {
     transport,
   },
+  defaultStaleTime: 1000 * 60,
 });
 
 declare module "@tanstack/react-router" {
