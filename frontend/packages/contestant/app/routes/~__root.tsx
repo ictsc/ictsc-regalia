@@ -18,7 +18,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   loader: ({ context: { transport } }) => ({
     viewer: fetchViewer(transport),
   }),
-  staleTime: 1000 * 60, // 1 minute
 });
 
 const TanStackRouterDevtools = import.meta.env.DEV
