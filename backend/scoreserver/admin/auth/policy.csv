@@ -6,3 +6,8 @@ p, role:admin, teams, update
 p, role:admin, teams, delete
 p, role:admin, invitation_codes, list
 p, role:admin, invitation_codes, create
+p, role:admin, problems, list
+p, role:admin, problems, get
+p, role:admin, problems, create
+p, role:admin, problems, update
+p, role:admin, problems, delete

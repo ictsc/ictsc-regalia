@@ -146,6 +146,10 @@ type (
 	problemContent = ProblemContent
 )
 
+func (pc *ProblemContent) PageID() string {
+	return pc.pageID
+}
+
 func (pc *ProblemContent) PagePath() string {
 	return pc.pagePath
 }
