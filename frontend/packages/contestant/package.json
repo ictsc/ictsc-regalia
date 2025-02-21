@@ -55,6 +55,7 @@
     "clsx": "^2.1.1",
     "material-symbols": "^0.28.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-error-boundary": "^5.0.0"
   }
 }

@@ -1,11 +1,12 @@
 import { Suspense, lazy, startTransition, use, useEffect } from "react";
+import { ErrorBoundary, type FallbackProps } from "react-error-boundary";
 import {
   createRootRouteWithContext,
   Outlet,
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
-import type { Transport } from "@connectrpc/connect";
+import { ConnectError, Code, type Transport } from "@connectrpc/connect";
 import { AppShell } from "@app/components/app-shell";
 import { fetchViewer, type User } from "@app/features/viewer";
 
@@ -33,7 +34,11 @@ function Root() {
   return (
     <>
       <AppShell viewer={viewer}>
-        <Outlet />
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Suspense fallback={null}>
+            <Outlet />
+          </Suspense>
+        </ErrorBoundary>
       </AppShell>
       <Suspense>
         <Redirector viewer={viewer} />
@@ -43,6 +48,24 @@ function Root() {
       </Suspense>
     </>
   );
+}
+
+function ErrorFallback(props: FallbackProps) {
+  const error: unknown = props.error;
+  if (error instanceof ConnectError && error.code === Code.Unauthenticated) {
+    return <UnauthorizedFallback {...props} />;
+  }
+  // TODO: エラー画面を表示する
+  return null;
+}
+
+function UnauthorizedFallback({ resetErrorBoundary }: FallbackProps) {
+  // viewer の取得よりも先に認証エラーが発生した場合 ErrorBoundary が反応するが，
+  // 認証エラーは Redirector により処理されるため，適当に再開しつつエラーを無視する
+  useEffect(() => {
+    resetErrorBoundary();
+  }, [resetErrorBoundary]);
+  return null;
 }
 
 function Redirector({ viewer: viewerPromise }: { viewer: Promise<User> }) {
