@@ -18,6 +18,7 @@ type ProblemServiceHandler struct {
 	GetEffect    ProblemGetEffect
 	CreateEffect ProblemCreateEffect
 	UpdateEffect ProblemUpdateEffect
+	DeleteEffect ProblemDeleteEffect
 
 	adminv1connect.UnimplementedProblemServiceHandler
 }
@@ -42,6 +43,7 @@ func NewProblemServiceHandler(
 		GetEffect:    repo,
 		CreateEffect: createEffect,
 		UpdateEffect: createEffect,
+		DeleteEffect: createEffect,
 	}
 }
 
@@ -243,6 +245,35 @@ func (h *ProblemServiceHandler) UpdateProblem(
 	return connect.NewResponse(&adminv1.UpdateProblemResponse{
 		Problem: convertDescriptiveProblem(descriptiveProblem),
 	}), nil
+}
+
+type ProblemDeleteEffect = domain.Tx[domain.ProblemWriter]
+
+func (h *ProblemServiceHandler) DeleteProblem(
+	ctx context.Context,
+	req *connect.Request[adminv1.DeleteProblemRequest],
+) (*connect.Response[adminv1.DeleteProblemResponse], error) {
+	if err := enforce(ctx, h.Enforcer, "problems", "delete"); err != nil {
+		return nil, err
+	}
+
+	code, err := domain.NewProblemCode(req.Msg.GetCode())
+	if err != nil {
+		return nil, err
+	}
+
+	if err := h.DeleteEffect.RunInTx(ctx, func(tx domain.ProblemWriter) error {
+		problem, err := code.Problem(ctx, tx)
+		if err != nil {
+			return err
+		}
+
+		return problem.Delete(ctx, tx)
+	}); err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&adminv1.DeleteProblemResponse{}), nil
 }
 
 func convertProblem(problem *domain.Problem) *adminv1.Problem {
