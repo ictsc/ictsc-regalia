@@ -17,6 +17,7 @@ type ProblemServiceHandler struct {
 	ListEffect   ProblemListEffect
 	GetEffect    ProblemGetEffect
 	CreateEffect ProblemCreateEffect
+	UpdateEffect ProblemUpdateEffect
 
 	adminv1connect.UnimplementedProblemServiceHandler
 }
@@ -28,17 +29,19 @@ func NewProblemServiceHandler(
 	repo *pg.Repository,
 	growiClient *growi.Client,
 ) *ProblemServiceHandler {
+	createEffect := struct {
+		domain.Tx[domain.ProblemWriter]
+		domain.ProblemContentGetter
+	}{
+		Tx:                   pg.Tx(repo, func(rt *pg.RepositoryTx) domain.ProblemWriter { return rt }),
+		ProblemContentGetter: growiClient,
+	}
 	return &ProblemServiceHandler{
-		Enforcer:   enforcer,
-		ListEffect: repo,
-		GetEffect:  repo,
-		CreateEffect: struct {
-			domain.Tx[domain.ProblemWriter]
-			domain.ProblemContentGetter
-		}{
-			Tx:                   pg.Tx(repo, func(rt *pg.RepositoryTx) domain.ProblemWriter { return rt }),
-			ProblemContentGetter: growiClient,
-		},
+		Enforcer:     enforcer,
+		ListEffect:   repo,
+		GetEffect:    repo,
+		CreateEffect: createEffect,
+		UpdateEffect: createEffect,
 	}
 }
 
@@ -168,6 +171,76 @@ func (h *ProblemServiceHandler) CreateProblem(
 	}
 
 	return connect.NewResponse(&adminv1.CreateProblemResponse{
+		Problem: convertDescriptiveProblem(descriptiveProblem),
+	}), nil
+}
+
+type ProblemUpdateEffect = ProblemCreateEffect
+
+func (h *ProblemServiceHandler) UpdateProblem(
+	ctx context.Context,
+	req *connect.Request[adminv1.UpdateProblemRequest],
+) (*connect.Response[adminv1.UpdateProblemResponse], error) {
+	if err := enforce(ctx, h.Enforcer, "problems", "update"); err != nil {
+		return nil, err
+	}
+
+	code, err := domain.NewProblemCode(req.Msg.GetProblem().GetCode())
+	if err != nil {
+		return nil, err
+	}
+
+	rule, penalty := parseRedeployRule(req.Msg.GetProblem().GetRedeployRule())
+
+	var content *domain.ProblemContent
+	if pagePath := req.Msg.GetProblem().GetBody().GetDescriptive().GetPagePath(); pagePath != "" {
+		var err error
+		content, err = domain.FetchProblemContentByPath(ctx, h.CreateEffect, pagePath)
+		if err != nil {
+			return nil, err
+		}
+	} else if pageID := req.Msg.GetProblem().GetBody().GetDescriptive().GetPageId(); pageID != "" {
+		var err error
+		content, err = domain.FetchProblemContentByID(ctx, h.CreateEffect, pageID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	input := domain.UpdateDescriptiveProblemInput{
+		Title:             req.Msg.GetProblem().GetTitle(),
+		MaxScore:          req.Msg.GetProblem().GetMaxScore(),
+		RedeployRule:      rule,
+		PercentagePenalty: penalty,
+		Content:           content,
+	}
+
+	descriptiveProblem, err := domain.RunTx(ctx, h.UpdateEffect, func(tx domain.ProblemWriter) (*domain.DescriptiveProblem, error) {
+		problem, err := code.Problem(ctx, tx)
+		if err != nil {
+			return nil, err
+		}
+		descriptiveProblem, err := problem.DescriptiveProblem(ctx, tx)
+		if err != nil {
+			return nil, err
+		}
+
+		descriptiveProblem, err = descriptiveProblem.Update(input)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := descriptiveProblem.Save(ctx, tx); err != nil {
+			return nil, err
+		}
+
+		return descriptiveProblem, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&adminv1.UpdateProblemResponse{
 		Problem: convertDescriptiveProblem(descriptiveProblem),
 	}), nil
 }
