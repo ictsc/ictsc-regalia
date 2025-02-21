@@ -45,6 +45,10 @@ func New(ctx context.Context, cfg config.ContestantAPI, db *sqlx.DB, rdb redis.U
 		newViewerServiceHandler(repo),
 		connect.WithInterceptors(interceptors...),
 	))
+	mux.Handle(contestantv1connect.NewProblemServiceHandler(
+		newProblemServiceHandler(repo),
+		connect.WithInterceptors(interceptors...),
+	))
 
 	handler := http.Handler(mux)
 	handler = session.NewHandler(sessionStore)(handler)
