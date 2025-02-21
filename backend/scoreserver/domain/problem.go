@@ -13,6 +13,13 @@ import (
 
 type problemID uuid.UUID
 
+func (id problemID) Delete(ctx context.Context, eff ProblemWriter) error {
+	if err := eff.DeleteProblem(ctx, uuid.UUID(id)); err != nil {
+		return WrapAsInternal(err, "failed to delete problem")
+	}
+	return nil
+}
+
 type ProblemCode string
 
 var (
@@ -300,6 +307,7 @@ type (
 	ProblemWriter interface {
 		ProblemReader
 		SaveDescriptiveProblem(ctx context.Context, data *DescriptiveProblemData) error
+		DeleteProblem(ctx context.Context, id uuid.UUID) error
 	}
 )
 

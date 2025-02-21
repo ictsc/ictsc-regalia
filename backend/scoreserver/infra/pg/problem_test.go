@@ -248,3 +248,18 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteProblem(t *testing.T) {
+	t.Parallel()
+
+	id := uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513")
+
+	db := pgtest.SetupDB(t)
+	repo := pg.NewRepository(db)
+
+	if err := repo.RunTx(t.Context(), func(tx *pg.RepositoryTx) error {
+		return tx.DeleteProblem(t.Context(), id)
+	}); err != nil {
+		t.Fatal(err)
+	}
+}

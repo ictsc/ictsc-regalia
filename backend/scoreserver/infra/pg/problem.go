@@ -183,6 +183,13 @@ func (r *RepositoryTx) SaveDescriptiveProblem(ctx context.Context, descriptivePr
 	return nil
 }
 
+func (r *RepositoryTx) DeleteProblem(ctx context.Context, id uuid.UUID) error {
+	if _, err := r.ext.ExecContext(ctx, "DELETE FROM problems WHERE id = $1", id); err != nil {
+		return errors.Wrap(err, "failed to delete problem")
+	}
+	return nil
+}
+
 type (
 	problemRow struct {
 		ID           uuid.UUID   `db:"id"`
