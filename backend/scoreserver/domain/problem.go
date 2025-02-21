@@ -170,6 +170,14 @@ func FetchProblemContentByPath(ctx context.Context, eff ProblemContentGetter, pa
 	return data.parse()
 }
 
+func FetchProblemContentByID(ctx context.Context, eff ProblemContentGetter, id string) (*ProblemContent, error) {
+	data, err := eff.GetProblemContentByID(ctx, id)
+	if err != nil {
+		return nil, WrapAsInternal(err, "failed to fetch problem content by ID")
+	}
+	return data.parse()
+}
+
 type DescriptiveProblem struct {
 	*problem
 	*problemContent
