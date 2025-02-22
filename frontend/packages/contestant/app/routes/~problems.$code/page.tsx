@@ -31,7 +31,7 @@ export function Layout(props: {
     <div
       className={clsx(
         "relative mt-20",
-        "[--span:100%] sm:[--span:calc(50%)] lg:[--span:calc(33.333%)]",
+        "[--span:calc(var(--content-width))] sm:[--span:calc(var(--content-width)/2)] lg:[--span:calc(var(--content-width)/3)]",
       )}
     >
       <div

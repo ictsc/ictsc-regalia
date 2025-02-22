@@ -14,6 +14,7 @@ export const Default = {
         {
           "--header-height": "0",
           "--content-height": "100vh",
+          "--content-width": "100%",
         } as React.CSSProperties
       }
     >
