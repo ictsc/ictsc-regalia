@@ -45,6 +45,7 @@ export default {
                 "unist",
                 "micromark",
                 "vfile",
+                "katex",
               ].some((pkg) => id.includes(pkg))
             ) {
               return "markdown";
