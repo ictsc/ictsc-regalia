@@ -34,6 +34,18 @@ services:
     ports:
       - 127.0.0.1:16686:16686
 
+  prometheus:
+    image: prom/prometheus
+    restart: always
+    ports:
+      - 127.0.0.1:9090:9090
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+      - --web.enable-otlp-receiver
+
 configs:
   otelcol_config:
     content: |
@@ -47,17 +59,23 @@ configs:
         batch:
 
       exporters:
-        otlp:
+        otlp/jaeger:
           endpoint: jaeger:4317
           tls:
             insecure: true
+        otlphttp/prometheus:
+          metrics_endpoint: http://prometheus:9090/api/v1/otlp/v1/metrics
 
       service:
         pipelines:
+          metrics:
+            receivers: [otlp]
+            processors: [batch]
+            exporters: [otlphttp/prometheus]
           traces:
             receivers: [otlp]
             processors: [batch]
-            exporters: [otlp]
+            exporters: [otlp/jaeger]
 
 volumes:
   db:
