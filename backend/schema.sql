@@ -1,3 +1,11 @@
+CREATE TABLE rules (
+	page_path TEXT,
+	markdown TEXT
+);
+COMMENT ON TABLE rules IS 'ルール';
+COMMENT ON COLUMN rules.page_path IS 'Wiki上のページパス';
+COMMENT ON COLUMN rules.markdown IS 'Markdown形式のルール';
+
 CREATE TABLE teams (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code BIGINT NOT NULL UNIQUE,
