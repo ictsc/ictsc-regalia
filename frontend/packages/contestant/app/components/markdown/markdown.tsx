@@ -1,6 +1,9 @@
 import { clsx } from "clsx";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import styles from "./markdown.module.css";
 
 export function Typography(props: {
@@ -14,10 +17,13 @@ export function Typography(props: {
   );
 }
 
-const remarkPlugins = [remarkGfm];
+const remarkPlugins = [remarkGfm, remarkMath];
+const rehypePlugins = [rehypeKatex];
 
 export function Markdown({ children }: { children?: string }) {
   return (
-    <ReactMarkdown remarkPlugins={remarkPlugins}>{children}</ReactMarkdown>
+    <ReactMarkdown remarkPlugins={remarkPlugins} rehypePlugins={rehypePlugins}>
+      {children}
+    </ReactMarkdown>
   );
 }

@@ -40,6 +40,10 @@ func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB) (http.Handler, e
 
 	mux := http.NewServeMux()
 
+	mux.Handle(adminv1connect.NewRuleServiceHandler(
+		newRuleServiceHandler(enforcer, repo, growiClient),
+		connect.WithInterceptors(interceptors...),
+	))
 	mux.Handle(adminv1connect.NewTeamServiceHandler(
 		NewTeamServiceHandler(enforcer, repo),
 		connect.WithInterceptors(interceptors...),

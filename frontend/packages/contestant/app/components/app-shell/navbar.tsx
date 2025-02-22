@@ -31,11 +31,25 @@ export function NavbarView({
           </button>
         )}
       </Button>
-      <NavbarButton
-        showTitle={!collapsed}
-        icon="developer_guide"
-        title="ルール"
-      />
+      <Button as={Fragment}>
+        {(buttonProps) => (
+          <Link
+            to="/rule"
+            title="ルール"
+            className={navbarButtonClassName({
+              collapsed,
+              matched: state.location.pathname?.startsWith("/rule"),
+              ...buttonProps,
+            })}
+          >
+            <NavbarButtonInner
+              collapsed={collapsed}
+              icon="developer_guide"
+              title="ルール"
+            />
+          </Link>
+        )}
+      </Button>
       <NavbarButton
         showTitle={!collapsed}
         icon="brand_awareness"
