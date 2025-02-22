@@ -36,11 +36,14 @@ const (
 	// ContestServiceGetScheduleProcedure is the fully-qualified name of the ContestService's
 	// GetSchedule RPC.
 	ContestServiceGetScheduleProcedure = "/contestant.v1.ContestService/GetSchedule"
+	// ContestServiceGetRuleProcedure is the fully-qualified name of the ContestService's GetRule RPC.
+	ContestServiceGetRuleProcedure = "/contestant.v1.ContestService/GetRule"
 )
 
 // ContestServiceClient is a client for the contestant.v1.ContestService service.
 type ContestServiceClient interface {
 	GetSchedule(context.Context, *connect.Request[v1.GetScheduleRequest]) (*connect.Response[v1.GetScheduleResponse], error)
+	GetRule(context.Context, *connect.Request[v1.GetRuleRequest]) (*connect.Response[v1.GetRuleResponse], error)
 }
 
 // NewContestServiceClient constructs a client for the contestant.v1.ContestService service. By
@@ -60,12 +63,19 @@ func NewContestServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(contestServiceMethods.ByName("GetSchedule")),
 			connect.WithClientOptions(opts...),
 		),
+		getRule: connect.NewClient[v1.GetRuleRequest, v1.GetRuleResponse](
+			httpClient,
+			baseURL+ContestServiceGetRuleProcedure,
+			connect.WithSchema(contestServiceMethods.ByName("GetRule")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // contestServiceClient implements ContestServiceClient.
 type contestServiceClient struct {
 	getSchedule *connect.Client[v1.GetScheduleRequest, v1.GetScheduleResponse]
+	getRule     *connect.Client[v1.GetRuleRequest, v1.GetRuleResponse]
 }
 
 // GetSchedule calls contestant.v1.ContestService.GetSchedule.
@@ -73,9 +83,15 @@ func (c *contestServiceClient) GetSchedule(ctx context.Context, req *connect.Req
 	return c.getSchedule.CallUnary(ctx, req)
 }
 
+// GetRule calls contestant.v1.ContestService.GetRule.
+func (c *contestServiceClient) GetRule(ctx context.Context, req *connect.Request[v1.GetRuleRequest]) (*connect.Response[v1.GetRuleResponse], error) {
+	return c.getRule.CallUnary(ctx, req)
+}
+
 // ContestServiceHandler is an implementation of the contestant.v1.ContestService service.
 type ContestServiceHandler interface {
 	GetSchedule(context.Context, *connect.Request[v1.GetScheduleRequest]) (*connect.Response[v1.GetScheduleResponse], error)
+	GetRule(context.Context, *connect.Request[v1.GetRuleRequest]) (*connect.Response[v1.GetRuleResponse], error)
 }
 
 // NewContestServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -91,10 +107,18 @@ func NewContestServiceHandler(svc ContestServiceHandler, opts ...connect.Handler
 		connect.WithSchema(contestServiceMethods.ByName("GetSchedule")),
 		connect.WithHandlerOptions(opts...),
 	)
+	contestServiceGetRuleHandler := connect.NewUnaryHandler(
+		ContestServiceGetRuleProcedure,
+		svc.GetRule,
+		connect.WithSchema(contestServiceMethods.ByName("GetRule")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/contestant.v1.ContestService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ContestServiceGetScheduleProcedure:
 			contestServiceGetScheduleHandler.ServeHTTP(w, r)
+		case ContestServiceGetRuleProcedure:
+			contestServiceGetRuleHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -106,4 +130,8 @@ type UnimplementedContestServiceHandler struct{}
 
 func (UnimplementedContestServiceHandler) GetSchedule(context.Context, *connect.Request[v1.GetScheduleRequest]) (*connect.Response[v1.GetScheduleResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.ContestService.GetSchedule is not implemented"))
+}
+
+func (UnimplementedContestServiceHandler) GetRule(context.Context, *connect.Request[v1.GetRuleRequest]) (*connect.Response[v1.GetRuleResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.ContestService.GetRule is not implemented"))
 }

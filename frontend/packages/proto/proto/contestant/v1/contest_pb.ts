@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file contestant/v1/contest.proto.
  */
 export const file_contestant_v1_contest: GenFile = /*@__PURE__*/
-  fileDesc("Chtjb250ZXN0YW50L3YxL2NvbnRlc3QucHJvdG8SDWNvbnRlc3RhbnQudjEiwwEKCFNjaGVkdWxlEiMKBXBoYXNlGAEgASgOMhQuY29udGVzdGFudC52MS5QaGFzZRIoCgpuZXh0X3BoYXNlGAIgASgOMhQuY29udGVzdGFudC52MS5QaGFzZRIsCghzdGFydF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLwoGZW5kX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBQgkKB19lbmRfYXQiFAoSR2V0U2NoZWR1bGVSZXF1ZXN0IkAKE0dldFNjaGVkdWxlUmVzcG9uc2USKQoIc2NoZWR1bGUYASABKAsyFy5jb250ZXN0YW50LnYxLlNjaGVkdWxlKngKBVBoYXNlEhUKEVBIQVNFX1VOU1BFQ0lGSUVEEAASGAoUUEhBU0VfT1VUX09GX0NPTlRFU1QQARIUChBQSEFTRV9JTl9DT05URVNUEAISDwoLUEhBU0VfQlJFQUsQAxIXChNQSEFTRV9BRlRFUl9DT05URVNUEAQyZgoOQ29udGVzdFNlcnZpY2USVAoLR2V0U2NoZWR1bGUSIS5jb250ZXN0YW50LnYxLkdldFNjaGVkdWxlUmVxdWVzdBoiLmNvbnRlc3RhbnQudjEuR2V0U2NoZWR1bGVSZXNwb25zZULDAQoRY29tLmNvbnRlc3RhbnQudjFCDENvbnRlc3RQcm90b1ABWktnaXRodWIuY29tL2ljdHNjL2ljdHNjLXJlZ2FsaWEvYmFja2VuZC9wa2cvcHJvdG8vY29udGVzdGFudC92MTtjb250ZXN0YW50djGiAgNDWFiqAg1Db250ZXN0YW50LlYxygINQ29udGVzdGFudFxWMeICGUNvbnRlc3RhbnRcVjFcR1BCTWV0YWRhdGHqAg5Db250ZXN0YW50OjpWMWIGcHJvdG8z", [file_google_protobuf_timestamp]);
+  fileDesc("Chtjb250ZXN0YW50L3YxL2NvbnRlc3QucHJvdG8SDWNvbnRlc3RhbnQudjEiwwEKCFNjaGVkdWxlEiMKBXBoYXNlGAEgASgOMhQuY29udGVzdGFudC52MS5QaGFzZRIoCgpuZXh0X3BoYXNlGAIgASgOMhQuY29udGVzdGFudC52MS5QaGFzZRIsCghzdGFydF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLwoGZW5kX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBQgkKB19lbmRfYXQiGAoEUnVsZRIQCghtYXJrZG93bhgBIAEoCSIUChJHZXRTY2hlZHVsZVJlcXVlc3QiQAoTR2V0U2NoZWR1bGVSZXNwb25zZRIpCghzY2hlZHVsZRgBIAEoCzIXLmNvbnRlc3RhbnQudjEuU2NoZWR1bGUiEAoOR2V0UnVsZVJlcXVlc3QiNAoPR2V0UnVsZVJlc3BvbnNlEiEKBHJ1bGUYASABKAsyEy5jb250ZXN0YW50LnYxLlJ1bGUqeAoFUGhhc2USFQoRUEhBU0VfVU5TUEVDSUZJRUQQABIYChRQSEFTRV9PVVRfT0ZfQ09OVEVTVBABEhQKEFBIQVNFX0lOX0NPTlRFU1QQAhIPCgtQSEFTRV9CUkVBSxADEhcKE1BIQVNFX0FGVEVSX0NPTlRFU1QQBDKwAQoOQ29udGVzdFNlcnZpY2USVAoLR2V0U2NoZWR1bGUSIS5jb250ZXN0YW50LnYxLkdldFNjaGVkdWxlUmVxdWVzdBoiLmNvbnRlc3RhbnQudjEuR2V0U2NoZWR1bGVSZXNwb25zZRJICgdHZXRSdWxlEh0uY29udGVzdGFudC52MS5HZXRSdWxlUmVxdWVzdBoeLmNvbnRlc3RhbnQudjEuR2V0UnVsZVJlc3BvbnNlQsMBChFjb20uY29udGVzdGFudC52MUIMQ29udGVzdFByb3RvUAFaS2dpdGh1Yi5jb20vaWN0c2MvaWN0c2MtcmVnYWxpYS9iYWNrZW5kL3BrZy9wcm90by9jb250ZXN0YW50L3YxO2NvbnRlc3RhbnR2MaICA0NYWKoCDUNvbnRlc3RhbnQuVjHKAg1Db250ZXN0YW50XFYx4gIZQ29udGVzdGFudFxWMVxHUEJNZXRhZGF0YeoCDkNvbnRlc3RhbnQ6OlYxYgZwcm90bzM", [file_google_protobuf_timestamp]);
 
 /**
  * @generated from message contestant.v1.Schedule
@@ -47,6 +47,23 @@ export const ScheduleSchema: GenMessage<Schedule> = /*@__PURE__*/
   messageDesc(file_contestant_v1_contest, 0);
 
 /**
+ * @generated from message contestant.v1.Rule
+ */
+export type Rule = Message<"contestant.v1.Rule"> & {
+  /**
+   * @generated from field: string markdown = 1;
+   */
+  markdown: string;
+};
+
+/**
+ * Describes the message contestant.v1.Rule.
+ * Use `create(RuleSchema)` to create a new message.
+ */
+export const RuleSchema: GenMessage<Rule> = /*@__PURE__*/
+  messageDesc(file_contestant_v1_contest, 1);
+
+/**
  * @generated from message contestant.v1.GetScheduleRequest
  */
 export type GetScheduleRequest = Message<"contestant.v1.GetScheduleRequest"> & {
@@ -57,7 +74,7 @@ export type GetScheduleRequest = Message<"contestant.v1.GetScheduleRequest"> & {
  * Use `create(GetScheduleRequestSchema)` to create a new message.
  */
 export const GetScheduleRequestSchema: GenMessage<GetScheduleRequest> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_contest, 1);
+  messageDesc(file_contestant_v1_contest, 2);
 
 /**
  * @generated from message contestant.v1.GetScheduleResponse
@@ -74,7 +91,37 @@ export type GetScheduleResponse = Message<"contestant.v1.GetScheduleResponse"> &
  * Use `create(GetScheduleResponseSchema)` to create a new message.
  */
 export const GetScheduleResponseSchema: GenMessage<GetScheduleResponse> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_contest, 2);
+  messageDesc(file_contestant_v1_contest, 3);
+
+/**
+ * @generated from message contestant.v1.GetRuleRequest
+ */
+export type GetRuleRequest = Message<"contestant.v1.GetRuleRequest"> & {
+};
+
+/**
+ * Describes the message contestant.v1.GetRuleRequest.
+ * Use `create(GetRuleRequestSchema)` to create a new message.
+ */
+export const GetRuleRequestSchema: GenMessage<GetRuleRequest> = /*@__PURE__*/
+  messageDesc(file_contestant_v1_contest, 4);
+
+/**
+ * @generated from message contestant.v1.GetRuleResponse
+ */
+export type GetRuleResponse = Message<"contestant.v1.GetRuleResponse"> & {
+  /**
+   * @generated from field: contestant.v1.Rule rule = 1;
+   */
+  rule?: Rule;
+};
+
+/**
+ * Describes the message contestant.v1.GetRuleResponse.
+ * Use `create(GetRuleResponseSchema)` to create a new message.
+ */
+export const GetRuleResponseSchema: GenMessage<GetRuleResponse> = /*@__PURE__*/
+  messageDesc(file_contestant_v1_contest, 5);
 
 /**
  * @generated from enum contestant.v1.Phase
@@ -123,6 +170,14 @@ export const ContestService: GenService<{
     methodKind: "unary";
     input: typeof GetScheduleRequestSchema;
     output: typeof GetScheduleResponseSchema;
+  },
+  /**
+   * @generated from rpc contestant.v1.ContestService.GetRule
+   */
+  getRule: {
+    methodKind: "unary";
+    input: typeof GetRuleRequestSchema;
+    output: typeof GetRuleResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_contestant_v1_contest, 0);

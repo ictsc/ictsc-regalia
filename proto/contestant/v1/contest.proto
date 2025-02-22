@@ -21,11 +21,21 @@ message Schedule {
   optional google.protobuf.Timestamp end_at = 4;
 }
 
+message Rule {
+  string markdown = 1;
+}
+
 message GetScheduleRequest {}
 message GetScheduleResponse {
   Schedule schedule = 1;
 }
 
+message GetRuleRequest {}
+message GetRuleResponse {
+  Rule rule = 1;
+}
+
 service ContestService {
   rpc GetSchedule(GetScheduleRequest) returns (GetScheduleResponse);
+  rpc GetRule(GetRuleRequest) returns (GetRuleResponse);
 }
