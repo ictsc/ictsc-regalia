@@ -1,4 +1,6 @@
 # Default policy for the admin role
+p, role:admin, rule, get
+p, role:admin, rule, update
 p, role:admin, teams, list
 p, role:admin, teams, get
 p, role:admin, teams, create
