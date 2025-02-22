@@ -41,7 +41,9 @@ const ProblemsCodeRouteRoute = ProblemsCodeRouteImport.update({
   id: "/problems/$code",
   path: "/problems/$code",
   getParentRoute: () => rootRoute,
-} as any);
+} as any).lazy(() =>
+  import("./routes/~problems.$code/~route.lazy").then((d) => d.Route),
+);
 
 const ProblemsIndexRouteRoute = ProblemsIndexRouteImport.update({
   id: "/problems/",

@@ -49,8 +49,7 @@ export function NavbarView({
             title="問題"
             className={navbarButtonClassName({
               collapsed,
-              matched:
-                state.resolvedLocation?.pathname?.startsWith("/problems"),
+              matched: state.location.pathname?.startsWith("/problems"),
               ...buttonProps,
             })}
           >

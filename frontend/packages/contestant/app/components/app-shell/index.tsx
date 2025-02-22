@@ -9,17 +9,15 @@ type AppShellProps = {
   readonly viewer: Promise<User>;
 };
 
-const initialViewer = Promise.resolve<User | undefined>(undefined);
-
-export function AppShell({ children, viewer }: AppShellProps) {
-  const defferedViewer = use(useDeferredValue(viewer, initialViewer));
+export function AppShell({ children, viewer: viewerPromise }: AppShellProps) {
+  const viewer = use(useDeferredValue(viewerPromise));
   const [collapsed, toggle] = useReducer((o) => !o, false);
 
   return (
     <Layout
-      header={<Header user={viewer} />}
+      header={<Header user={viewerPromise} />}
       navbar={
-        defferedViewer?.type === "contestant" ? (
+        viewer?.type === "contestant" ? (
           <NavbarView collapsed={collapsed} onOpenToggleClick={toggle} />
         ) : null
       }

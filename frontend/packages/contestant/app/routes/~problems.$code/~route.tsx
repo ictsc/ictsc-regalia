@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { fetchProblem } from "@app/features/problem";
 
 export const Route = createFileRoute("/problems/$code")({
-  component: RouteComponent,
+  loader: ({ context: { transport }, params: { code } }) => ({
+    problem: fetchProblem(transport, code),
+  }),
 });
-
-function RouteComponent() {
-  return <div>Hello /problems/$code!</div>;
-}
