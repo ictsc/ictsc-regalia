@@ -3,26 +3,20 @@ package main
 import (
 	"context"
 	"log/slog"
-	"net"
-	"net/http"
 	"os"
 
 	"github.com/cockroachdb/errors"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
-	otelprom "go.opentelemetry.io/otel/exporters/prometheus"
-	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.27.0"
 )
 
 const defaultServiceName = "scoreserver"
@@ -99,11 +93,8 @@ func newResource(ctx context.Context) (*resource.Resource, error) {
 }
 
 const (
-	exporterTypeNone       = "none"
-	exporterTypeConsole    = "console"
-	exporterTypeLogging    = "logging"
-	exporterTypeOTLP       = "otlp"
-	exporterTypePrometheus = "prometheus"
+	exporterTypeNone = "none"
+	exporterTypeOTLP = "otlp"
 
 	otlpProtocolGRPC         = "grpc"
 	otlpProtocolHTTPProtobuf = "http/protobuf"
@@ -130,9 +121,6 @@ func newSpanExporter(ctx context.Context) (trace.SpanExporter, error) {
 	switch expType {
 	case exporterTypeNone:
 		return &noopSpanExporter{}, nil
-	case exporterTypeConsole, exporterTypeLogging:
-		exp, err := stdouttrace.New()
-		return exp, errors.WithStack(err)
 	case exporterTypeOTLP:
 		proto := otlpProtocolHTTPProtobuf
 		if p := os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL"); p != "" {
@@ -165,8 +153,6 @@ func newMericReader(ctx context.Context) (metric.Reader, error) {
 	case exporterTypeNone:
 		// ManualReader は単体では何もしない
 		return metric.NewManualReader(), nil
-	case exporterTypePrometheus:
-		return newPrometheusMetricExporter()
 	case exporterTypeOTLP:
 		proto := otlpProtocolHTTPProtobuf
 		if p := os.Getenv("OTEL_EXPORTER_OTLP_PROTOCOL"); p != "" {
@@ -194,57 +180,4 @@ func newMericReader(ctx context.Context) (metric.Reader, error) {
 	default:
 		return nil, errors.Newf("unsupported metric exporter type: %s", expTyp)
 	}
-}
-
-type prometheusReader struct {
-	otelprom.Exporter
-	s *http.Server
-}
-
-func newPrometheusMetricExporter(opts ...otelprom.Option) (*prometheusReader, error) {
-	registry := prometheus.NewRegistry()
-
-	opts = append(opts, otelprom.WithRegisterer(registry), otelprom.WithoutScopeInfo())
-	exporter, err := otelprom.New(opts...)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create prometheus exporter")
-	}
-
-	host := "localhost"
-	if h, ok := os.LookupEnv("OTEL_EXPORTER_PROMETHEUS_HOST"); ok {
-		host = h
-	}
-	port := "9464"
-	if p, ok := os.LookupEnv("OTEL_EXPORTER_PROMETHEUS_PORT"); ok {
-		port = p
-	}
-	// nolint:gosec
-	srv := &http.Server{
-		Addr: net.JoinHostPort(host, port),
-		Handler: promhttp.HandlerFor(registry, promhttp.HandlerOpts{
-			EnableOpenMetrics: true,
-		}),
-	}
-
-	go func() {
-		slog.Info("Starting prometheus server", "address", srv.Addr)
-		if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
-			slog.Error("Failed to start prometheus server", "error", err)
-		}
-	}()
-
-	return &prometheusReader{
-		Exporter: *exporter,
-		s:        srv,
-	}, nil
-}
-
-func (r *prometheusReader) Shutdown(ctx context.Context) error {
-	if err := r.Exporter.Shutdown(ctx); err != nil {
-		return errors.Wrap(err, "failed to shutdown prometheus exporter")
-	}
-	if err := r.s.Shutdown(ctx); err != nil {
-		return errors.Wrap(err, "failed to shutdown prometheus server")
-	}
-	return nil
 }

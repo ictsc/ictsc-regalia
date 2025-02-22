@@ -16,12 +16,9 @@ export PGSSLMODE=disable
 redis_port="$(jq -r 'select(.Service=="redis").Publishers[] | select(.TargetPort==6379).PublishedPort' <<< "$ps")"
 export REDIS_URL="redis://localhost:$redis_port/0"
 
-export OTEL_METRICS_EXPORTER="${OTEL_METRICS_EXPORTER:-prometheus}"
-
-traces_exporter=otlp
 otlp_port="$(jq -r 'select(.Service=="otelcol").Publishers[] | select(.TargetPort==4317).PublishedPort' <<< "$ps")"
-export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT="${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT:-"http://localhost:$otlp_port"}"
-export OTEL_EXPORTER_OTLP_TRACES_PROTOCOL="${OTEL_EXPORTER_OTLP_TRACES_PROTOCOL:-grpc}"
-export OTEL_TRACES_EXPORTER="${OTEL_TRACES_EXPORTER:-$traces_exporter}"
+export OTEL_EXPORTER_OTLP_ENDPOINT="${OTEL_EXPORTER_OTLP_ENDPOINT:-"http://localhost:$otlp_port"}"
+export OTEL_EXPORTER_OTLP_PROTOCOL="${OTEL_EXPORTER_OTLP_PROTOCOL:-grpc}"
+export OTEL_METRIC_EXPORT_INTERVAL="${OTEL_METRIC_EXPORT_INTERVAL:-5000}"
 
 exec "$@"
