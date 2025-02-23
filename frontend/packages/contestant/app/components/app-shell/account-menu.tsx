@@ -1,4 +1,4 @@
-import { use, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { clsx } from "clsx";
 import {
   Menu,
@@ -12,18 +12,11 @@ import {
   MaterialSymbol,
   type MaterialSymbolType,
 } from "@app/components/material-symbol";
-import { type User } from "@app/features/viewer";
 
-export function AccountMenu({
-  viewer: viewerPromise,
-}: {
-  readonly viewer: Promise<User | undefined>;
+export function AccountMenu(props: {
+  readonly name: string;
+  readonly onSignOut?: () => void;
 }) {
-  const user = use(viewerPromise);
-  return user?.type == "contestant" && <AccountMenuView name={user.name} />;
-}
-
-export function AccountMenuView({ name }: { readonly name: string }) {
   return (
     <Menu>
       <MenuButton
@@ -46,12 +39,14 @@ export function AccountMenuView({ name }: { readonly name: string }) {
           "transition duration-200 ease-out data-[closed]:opacity-0",
         )}
       >
-        <span className="mx-[15px] text-14 text-text">{name}</span>
+        <span className="mx-[15px] text-14 text-text">{props.name}</span>
         <MenuItem>
           <AccountMenuButton icon="settings">アカウント設定</AccountMenuButton>
         </MenuItem>
         <MenuItem>
-          <AccountMenuButton icon="logout">ログアウト</AccountMenuButton>
+          <AccountMenuButton icon="logout" onClick={props.onSignOut}>
+            ログアウト
+          </AccountMenuButton>
         </MenuItem>
       </MenuItems>
     </Menu>

@@ -7,7 +7,7 @@ import {
   type MaterialSymbolType,
 } from "@app/components/material-symbol";
 
-export function NavbarView({
+export function Navbar({
   collapsed = false,
   onOpenToggleClick: handleOpenToggleClick,
 }: {
