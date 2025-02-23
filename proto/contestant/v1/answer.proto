@@ -2,14 +2,28 @@ syntax = "proto3";
 
 package contestant.v1;
 
+import "contestant/v1/problem.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1;contestantv1";
 
+// 解答
 message Answer {
+  uint32 id = 1;
+  AnswerBody body = 2;
+  google.protobuf.Timestamp submitted_at = 3;
+  optional Score score = 4;
+}
+
+message AnswerBody {
+  ProblemType type = 1;
+  oneof body {
+    DescriptiveAnswer descriptive = 2;
+  }
+}
+
+message DescriptiveAnswer {
   string body = 1;
-  google.protobuf.Timestamp submitted_at = 2;
-  optional int64 score = 3;
 }
 
 message ListAnswersRequest {

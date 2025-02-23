@@ -2,16 +2,16 @@ syntax = "proto3";
 
 package admin.v1;
 
+import "admin/v1/team.proto";
+
 option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1";
 
 message Contestant {
   string name = 1;
   string display_name = 2;
-  int64 team_code = 3;
+  Team team = 3;
   Profile profile = 4;
-
-  bool discord_joined = 5;
-  string invitation_code = 6;
+  string discord_id = 5;
 }
 
 message Profile {
