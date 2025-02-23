@@ -89,6 +89,60 @@ func (r *repo) GetUserProfileByID(ctx context.Context, userID uuid.UUID) (*domai
 	}, nil
 }
 
+var _ domain.TeamMemberProfileReader = (*repo)(nil)
+
+var (
+	teamMemberProfileSelectQuery = `
+SELECT
+	` + userColumns.As("u") + `,
+	` + profileColumns.As("p") + `,
+	` + teamColumns.As("t") + `,
+	d.discord_user_id
+FROM users AS u
+INNER JOIN user_profiles AS p ON u.id = p.user_id
+INNER JOIN team_members AS tm ON u.id = tm.user_id
+INNER JOIN teams AS t ON tm.team_id = t.id
+LEFT JOIN discord_users AS d ON u.id = d.user_id`
+	teamMemberProfileSelectQueryByTeamID = teamMemberProfileSelectQuery + "\nWHERE t.id = ?"
+)
+
+func (r *repo) ListTeamMembers(ctx context.Context) ([]*domain.TeamMemberProfileData, error) {
+	return r.listTeamMembers(ctx, teamMemberProfileSelectQuery)
+}
+
+func (r *repo) ListTeamMembersByTeamID(ctx context.Context, teamID uuid.UUID) ([]*domain.TeamMemberProfileData, error) {
+	return r.listTeamMembers(ctx, teamMemberProfileSelectQueryByTeamID, teamID)
+}
+
+func (r *repo) listTeamMembers(ctx context.Context, query string, args ...any) ([]*domain.TeamMemberProfileData, error) {
+	rows, err := r.ext.QueryxContext(ctx, r.ext.Rebind(query), args...)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to list team members")
+	}
+	defer func() { _ = rows.Close() }()
+
+	var members []*domain.TeamMemberProfileData
+
+	for rows.Next() {
+		var row struct {
+			User          userRow       `db:"u"`
+			Profile       profileRow    `db:"p"`
+			Team          teamRow       `db:"t"`
+			DiscordUserID sql.NullInt64 `db:"discord_user_id"`
+		}
+		if err := rows.StructScan(&row); err != nil {
+			return nil, errors.Wrap(err, "failed to scan team member profile")
+		}
+		members = append(members, &domain.TeamMemberProfileData{
+			User:          (*domain.UserData)(&row.User),
+			Profile:       (*domain.ProfileData)(&row.Profile),
+			Team:          (*domain.TeamData)(&row.Team),
+			DiscordUserID: row.DiscordUserID.Int64,
+		})
+	}
+	return members, nil
+}
+
 var _ domain.UserCreator = (*RepositoryTx)(nil)
 
 // CreateUser - ユーザ+プロフィールを作成する
