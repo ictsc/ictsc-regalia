@@ -114,7 +114,9 @@ func Test_PgRepo_CreateUser(t *testing.T) {
 					ID:   uuid.FromStringOrNil("ab072031-3cf8-4795-9902-01e9e7fdf0bc"),
 					Name: "charlie",
 				},
-				DisplayName: "Charlie",
+				Profile: &domain.ProfileData{
+					DisplayName: "Charlie",
+				},
 			}
 
 			if err := repo.RunTx(ctx, func(tx *pg.RepositoryTx) error {
@@ -155,7 +157,9 @@ func Test_PgRepo_CreateUser(t *testing.T) {
 					ID:   uuid.FromStringOrNil("1aacaafb-0f63-4746-be40-3b3511844c73"),
 					Name: "alice",
 				},
-				DisplayName: "Alice",
+				Profile: &domain.ProfileData{
+					DisplayName: "Alice",
+				},
 			}
 
 			err := repo.RunTx(ctx, func(tx *pg.RepositoryTx) error {
@@ -260,7 +264,9 @@ func TestGetUserProfileByID(t *testing.T) {
 					ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
 					Name: "alice",
 				},
-				DisplayName: "Alice",
+				Profile: &domain.ProfileData{
+					DisplayName: "Alice",
+				},
 			},
 		},
 		"not found": {
@@ -281,6 +287,102 @@ func TestGetUserProfileByID(t *testing.T) {
 				return
 			}
 			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestListTeamMembers(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]struct {
+		want []*domain.TeamMemberProfileData
+	}{
+		"all": {
+			want: []*domain.TeamMemberProfileData{
+				{
+					User: &domain.UserData{
+						ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
+						Name: "alice",
+					},
+					Team: &domain.TeamData{
+						ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
+						Code:         1,
+						Name:         "トラブルシューターズ",
+						Organization: "ICTSC Association",
+						MaxMembers:   6,
+					},
+					Profile: &domain.ProfileData{
+						DisplayName: "Alice",
+					},
+					DiscordUserID: 123456789012345678,
+				},
+			},
+		},
+	}
+
+	for name, tt := range cases {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			repo := pg.NewRepository(pgtest.SetupDB(t))
+			actual, err := repo.ListTeamMembers(t.Context())
+			if err != nil {
+				return
+			}
+			slices.SortStableFunc(actual, func(l, r *domain.TeamMemberProfileData) int {
+				return strings.Compare(l.User.Name, r.User.Name)
+			})
+			if diff := cmp.Diff(tt.want, actual); diff != "" {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestListTeamMembersByTeamID(t *testing.T) {
+	t.Parallel()
+
+	cases := map[string]struct {
+		teamID uuid.UUID
+		want   []*domain.TeamMemberProfileData
+	}{
+		"ok": {
+			teamID: uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
+			want: []*domain.TeamMemberProfileData{
+				{
+					User: &domain.UserData{
+						ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
+						Name: "alice",
+					},
+					Team: &domain.TeamData{
+						ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
+						Code:         1,
+						Name:         "トラブルシューターズ",
+						Organization: "ICTSC Association",
+						MaxMembers:   6,
+					},
+					Profile: &domain.ProfileData{
+						DisplayName: "Alice",
+					},
+					DiscordUserID: 123456789012345678,
+				},
+			},
+		},
+	}
+
+	for name, tt := range cases {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			repo := pg.NewRepository(pgtest.SetupDB(t))
+			actual, err := repo.ListTeamMembersByTeamID(t.Context(), tt.teamID)
+			if err != nil {
+				return
+			}
+			slices.SortStableFunc(actual, func(l, r *domain.TeamMemberProfileData) int {
+				return strings.Compare(l.User.Name, r.User.Name)
+			})
+			if diff := cmp.Diff(tt.want, actual); diff != "" {
 				t.Errorf("mismatch (-want +got):\n%s", diff)
 			}
 		})

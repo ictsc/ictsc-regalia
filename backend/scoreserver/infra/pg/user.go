@@ -8,6 +8,7 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/gofrs/uuid/v5"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
+	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 )
@@ -66,37 +67,80 @@ func (r *repo) GetDiscordLinkedUser(ctx context.Context, discordUserID int64) (*
 
 var _ domain.UserProfileReader = (*repo)(nil)
 
-type (
-	userProfileData struct {
-		User        *domain.UserData `db:"-"`
-		DisplayName string           `db:"display_name"`
-	}
-	userProfileDataRow struct {
-		User *userRow `db:"u"`
-		userProfileData
-	}
-)
-
-func (r *userProfileDataRow) data() *domain.UserProfileData {
-	data := r.userProfileData
-	data.User = (*domain.UserData)(r.User)
-	return (*domain.UserProfileData)(&data)
-}
-
 func (r *repo) GetUserProfileByID(ctx context.Context, userID uuid.UUID) (*domain.UserProfileData, error) {
-	var row userProfileDataRow
+	var row struct {
+		User    userRow    `db:"u"`
+		Profile profileRow `db:"p"`
+	}
 	if err := sqlx.GetContext(ctx, r.ext, &row, `
-		SELECT u.id AS "u.id", u.name AS "u.name", display_name
-		FROM user_profiles
-		JOIN users AS u ON u.id = user_id
-		WHERE user_id = $1
-	`, userID); err != nil {
+		SELECT `+userColumns.As("u")+`, `+profileColumns.As("p")+`
+		FROM users AS u
+		INNER JOIN user_profiles AS p ON u.id = p.user_id
+		WHERE u.id = $1`, userID,
+	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, domain.NewNotFoundError("user profile", nil)
 		}
 		return nil, errors.Wrap(err, "failed to get user profile")
 	}
-	return row.data(), nil
+	return &domain.UserProfileData{
+		User:    (*domain.UserData)(&row.User),
+		Profile: (*domain.ProfileData)(&row.Profile),
+	}, nil
+}
+
+var _ domain.TeamMemberProfileReader = (*repo)(nil)
+
+var (
+	teamMemberProfileSelectQuery = `
+SELECT
+	` + userColumns.As("u") + `,
+	` + profileColumns.As("p") + `,
+	` + teamColumns.As("t") + `,
+	d.discord_user_id
+FROM users AS u
+INNER JOIN user_profiles AS p ON u.id = p.user_id
+INNER JOIN team_members AS tm ON u.id = tm.user_id
+INNER JOIN teams AS t ON tm.team_id = t.id
+LEFT JOIN discord_users AS d ON u.id = d.user_id`
+	teamMemberProfileSelectQueryByTeamID = teamMemberProfileSelectQuery + "\nWHERE t.id = ?"
+)
+
+func (r *repo) ListTeamMembers(ctx context.Context) ([]*domain.TeamMemberProfileData, error) {
+	return r.listTeamMembers(ctx, teamMemberProfileSelectQuery)
+}
+
+func (r *repo) ListTeamMembersByTeamID(ctx context.Context, teamID uuid.UUID) ([]*domain.TeamMemberProfileData, error) {
+	return r.listTeamMembers(ctx, teamMemberProfileSelectQueryByTeamID, teamID)
+}
+
+func (r *repo) listTeamMembers(ctx context.Context, query string, args ...any) ([]*domain.TeamMemberProfileData, error) {
+	rows, err := r.ext.QueryxContext(ctx, r.ext.Rebind(query), args...)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to list team members")
+	}
+	defer func() { _ = rows.Close() }()
+
+	var members []*domain.TeamMemberProfileData
+
+	for rows.Next() {
+		var row struct {
+			User          userRow       `db:"u"`
+			Profile       profileRow    `db:"p"`
+			Team          teamRow       `db:"t"`
+			DiscordUserID sql.NullInt64 `db:"discord_user_id"`
+		}
+		if err := rows.StructScan(&row); err != nil {
+			return nil, errors.Wrap(err, "failed to scan team member profile")
+		}
+		members = append(members, &domain.TeamMemberProfileData{
+			User:          (*domain.UserData)(&row.User),
+			Profile:       (*domain.ProfileData)(&row.Profile),
+			Team:          (*domain.TeamData)(&row.Team),
+			DiscordUserID: row.DiscordUserID.Int64,
+		})
+	}
+	return members, nil
 }
 
 var _ domain.UserCreator = (*RepositoryTx)(nil)
@@ -121,7 +165,10 @@ func (r *RepositoryTx) CreateUser(ctx context.Context, profile *domain.UserProfi
 	if _, err := sqlx.NamedExecContext(ctx, r.ext, `
 		INSERT INTO user_profiles (user_id, display_name, created_at, updated_at)
 		VALUES (:user_id, :display_name, NOW(), NOW())`,
-		newUserProfileRow(profile),
+		struct {
+			UserID uuid.UUID `db:"user_id"`
+			profileRow
+		}{profile.User.ID, (profileRow)(*profile.Profile)},
 	); err != nil {
 		return errors.Wrap(err, "failed to insert into user_profiles")
 	}
@@ -137,7 +184,7 @@ func (r *RepositoryTx) LinkDiscordUser(ctx context.Context, userID uuid.UUID, di
 		VALUES ($1, $2, NOW())
 	`, userID, discordUserID); err != nil {
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
-			if pgErr.Code == "23505" {
+			if pgErr.Code == pgerrcode.UniqueViolation {
 				return domain.NewAlreadyExistsError("discord user", nil)
 			}
 		}
@@ -151,15 +198,12 @@ type (
 		ID   uuid.UUID `db:"id"`
 		Name string    `db:"name"`
 	}
-	userProfileRow struct {
-		UserID      uuid.UUID `db:"user_id"`
-		DisplayName string    `db:"display_name"`
+	profileRow struct {
+		DisplayName string `db:"display_name"`
 	}
 )
 
-func newUserProfileRow(profile *domain.UserProfileData) *userProfileRow {
-	return &userProfileRow{
-		UserID:      profile.User.ID,
-		DisplayName: profile.DisplayName,
-	}
-}
+var (
+	userColumns    = columns([]string{"id", "name"})
+	profileColumns = columns([]string{"display_name"})
+)

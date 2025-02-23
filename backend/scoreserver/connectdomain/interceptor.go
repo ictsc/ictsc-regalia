@@ -7,7 +7,6 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/cockroachdb/errors"
-	"go.opentelemetry.io/otel/trace"
 )
 
 func NewErrorInterceptor() connect.UnaryInterceptorFunc {
@@ -29,13 +28,10 @@ func NewLoggingInterceptor() connect.UnaryInterceptorFunc {
 			procedure := req.Spec().Procedure
 			peer := req.Peer()
 
-			span := trace.SpanFromContext(ctx)
 			logger := slog.Default().With(
 				"procedure", procedure,
 				"protocol", peer.Protocol,
 				"peer", peer.Addr,
-				"trace_id", span.SpanContext().TraceID().String(),
-				"span_id", span.SpanContext().SpanID().String(),
 			)
 
 			logger.InfoContext(ctx, "Call started")

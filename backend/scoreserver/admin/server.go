@@ -52,6 +52,10 @@ func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB) (http.Handler, e
 		NewInvitationServiceHandler(enforcer, repo),
 		connect.WithInterceptors(interceptors...),
 	))
+	mux.Handle(adminv1connect.NewContestantServiceHandler(
+		newContestantServiceHandler(enforcer, repo),
+		connect.WithInterceptors(interceptors...),
+	))
 	mux.Handle(adminv1connect.NewProblemServiceHandler(
 		NewProblemServiceHandler(enforcer, repo, growiClient),
 		connect.WithInterceptors(interceptors...),

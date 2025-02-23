@@ -17,10 +17,10 @@ var _ domain.ProblemReader = (*repo)(nil)
 
 var listProblemsQuery = `
 	SELECT
-		` + problemCols.String() + `,
+		` + problemCols.String("p") + `,
 		` + reployPercentagePenaltyCols.As("rpp") + `
-	FROM problems
-	LEFT JOIN redeploy_percentage_penalties AS rpp ON problems.id = rpp.problem_id`
+	FROM problems AS p
+	LEFT JOIN redeploy_percentage_penalties AS rpp ON p.id = rpp.problem_id`
 
 func (r *repo) ListProblems(ctx context.Context) ([]*domain.ProblemData, error) {
 	rows, err := r.ext.QueryxContext(ctx, listProblemsQuery)
@@ -67,7 +67,7 @@ func (r *problemDataRow) data() *domain.ProblemData {
 
 var getDescriptiveProblemQuery = `
 	SELECT
-		` + problemCols.String() + `,
+		` + problemCols.String("p") + `,
 		` + problemContentCols.As("c") + `,
 		` + reployPercentagePenaltyCols.As("rpp") + `
 	FROM problems AS p
