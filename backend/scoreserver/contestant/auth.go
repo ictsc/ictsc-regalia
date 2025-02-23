@@ -93,6 +93,8 @@ func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			otelhttp.WithRouteTag("/auth/callback", http.HandlerFunc(h.handleCallback)))
 		mux.Handle("POST /auth/signup",
 			otelhttp.WithRouteTag("/auth/signup", http.HandlerFunc(h.handleSignUp)))
+		mux.Handle("POST /auth/signout",
+			otelhttp.WithRouteTag("/auth/signout", http.HandlerFunc(h.handleSignOut)))
 		h.handler = mux
 	})
 	h.handler.ServeHTTP(w, r)
@@ -214,6 +216,21 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, oauthSess.NextPath.String(), http.StatusFound)
+}
+
+func (h *AuthHandler) handleSignOut(w http.ResponseWriter, r *http.Request) {
+	if err := session.UserSessionStore.Write(r, w, nil, h.userSessionOption()); err != nil {
+		slog.ErrorContext(r.Context(), "failed to delete user session", "error", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	if err := session.SignUpSessionStore.Write(r, w, nil, h.signUpSessionOption()); err != nil {
+		slog.ErrorContext(r.Context(), "failed to delete signup session", "error", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *AuthHandler) oauth2SessionOption() *sessions.Options {
