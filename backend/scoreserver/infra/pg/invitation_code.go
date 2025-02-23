@@ -25,19 +25,14 @@ type (
 	}
 )
 
-const selectInvitationCode = `
+var invitationCodeColumns = columns([]string{"id", "code", "expires_at", "created_at"})
+
+var selectInvitationCode = `
 SELECT
-	ic.id,
-	ic.code,
-	ic.expires_at,
-	ic.created_at,
-	t.id AS "t.id",
-	t.code AS "t.code",
-	t.name AS "t.name",
-	t.organization AS "t.organization",
-	t.max_members AS "t.max_members"
+	` + invitationCodeColumns.String("ic") + `,
+	` + teamColumns.As("t") + `
 FROM invitation_codes AS ic
-LEFT JOIN teams AS t ON ic.team_id = t.id`
+INNER JOIN teams AS t ON ic.team_id = t.id`
 
 var _ domain.InvitationCodeLister = (*repo)(nil)
 
@@ -46,7 +41,7 @@ func (r *repo) ListInvitationCodes(ctx context.Context, filter domain.Invitation
 	var args []any
 
 	if filter.Code != "" {
-		cond += " AND code = ?"
+		cond += " AND ic.code = ?"
 		args = append(args, filter.Code)
 	}
 
