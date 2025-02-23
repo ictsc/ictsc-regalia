@@ -12,13 +12,24 @@ option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;a
 
 // 解答
 message Answer {
-  string id = 1;
+  uint32 id = 1;
   Team team = 2;
   Contestant author = 3;
   Problem problem = 4;
-  string body = 5;
+  AnswerBody body = 5;
   google.protobuf.Timestamp created_at = 6;
   optional MarkingResult result = 7;
+}
+
+message AnswerBody {
+  ProblemType type = 1;
+  oneof body {
+    DescriptiveAnswer descriptive = 2;
+  }
+}
+
+message DescriptiveAnswer {
+  string body = 1;
 }
 
 // 採点結果
@@ -26,8 +37,19 @@ message MarkingResult {
   Answer answer = 1;
   Admin judge = 2;
   int64 score = 3;
-  string comment = 4;
+  MarkingRationale rationale = 4;
   google.protobuf.Timestamp created_at = 5;
+}
+
+message MarkingRationale {
+  ProblemType type = 1;
+  oneof body {
+    DescriptiveMarkingRationale descriptive = 2;
+  }
+}
+
+message DescriptiveMarkingRationale {
+  string comment = 1;
 }
 
 message ListAnswersRequest {

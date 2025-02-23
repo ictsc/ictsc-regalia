@@ -4,13 +4,15 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
+import type { Team } from "./team_pb";
+import { file_admin_v1_team } from "./team_pb";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file admin/v1/contestant.proto.
  */
 export const file_admin_v1_contestant: GenFile = /*@__PURE__*/
-  fileDesc("ChlhZG1pbi92MS9jb250ZXN0YW50LnByb3RvEghhZG1pbi52MSKYAQoKQ29udGVzdGFudBIMCgRuYW1lGAEgASgJEhQKDGRpc3BsYXlfbmFtZRgCIAEoCRIRCgl0ZWFtX2NvZGUYAyABKAMSIgoHcHJvZmlsZRgEIAEoCzIRLmFkbWluLnYxLlByb2ZpbGUSFgoOZGlzY29yZF9qb2luZWQYBSABKAgSFwoPaW52aXRhdGlvbl9jb2RlGAYgASgJIiQKB1Byb2ZpbGUSGQoRc2VsZl9pbnRyb2R1Y3Rpb24YASABKAkiKwoWTGlzdENvbnRlc3RhbnRzUmVxdWVzdBIRCgl0ZWFtX2NvZGUYASABKAMiRAoXTGlzdENvbnRlc3RhbnRzUmVzcG9uc2USKQoLY29udGVzdGFudHMYASADKAsyFC5hZG1pbi52MS5Db250ZXN0YW50MmsKEUNvbnRlc3RhbnRTZXJ2aWNlElYKD0xpc3RDb250ZXN0YW50cxIgLmFkbWluLnYxLkxpc3RDb250ZXN0YW50c1JlcXVlc3QaIS5hZG1pbi52MS5MaXN0Q29udGVzdGFudHNSZXNwb25zZUKjAQoMY29tLmFkbWluLnYxQg9Db250ZXN0YW50UHJvdG9QAVpBZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2FkbWluL3YxO2FkbWludjGiAgNBWFiqAghBZG1pbi5WMcoCCEFkbWluXFYx4gIUQWRtaW5cVjFcR1BCTWV0YWRhdGHqAglBZG1pbjo6VjFiBnByb3RvMw");
+  fileDesc("ChlhZG1pbi92MS9jb250ZXN0YW50LnByb3RvEghhZG1pbi52MSKGAQoKQ29udGVzdGFudBIMCgRuYW1lGAEgASgJEhQKDGRpc3BsYXlfbmFtZRgCIAEoCRIcCgR0ZWFtGAMgASgLMg4uYWRtaW4udjEuVGVhbRIiCgdwcm9maWxlGAQgASgLMhEuYWRtaW4udjEuUHJvZmlsZRISCgpkaXNjb3JkX2lkGAUgASgJIiQKB1Byb2ZpbGUSGQoRc2VsZl9pbnRyb2R1Y3Rpb24YASABKAkiKwoWTGlzdENvbnRlc3RhbnRzUmVxdWVzdBIRCgl0ZWFtX2NvZGUYASABKAMiRAoXTGlzdENvbnRlc3RhbnRzUmVzcG9uc2USKQoLY29udGVzdGFudHMYASADKAsyFC5hZG1pbi52MS5Db250ZXN0YW50MmsKEUNvbnRlc3RhbnRTZXJ2aWNlElYKD0xpc3RDb250ZXN0YW50cxIgLmFkbWluLnYxLkxpc3RDb250ZXN0YW50c1JlcXVlc3QaIS5hZG1pbi52MS5MaXN0Q29udGVzdGFudHNSZXNwb25zZUKjAQoMY29tLmFkbWluLnYxQg9Db250ZXN0YW50UHJvdG9QAVpBZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2FkbWluL3YxO2FkbWludjGiAgNBWFiqAghBZG1pbi5WMcoCCEFkbWluXFYx4gIUQWRtaW5cVjFcR1BCTWV0YWRhdGHqAglBZG1pbjo6VjFiBnByb3RvMw", [file_admin_v1_team]);
 
 /**
  * @generated from message admin.v1.Contestant
@@ -27,9 +29,9 @@ export type Contestant = Message<"admin.v1.Contestant"> & {
   displayName: string;
 
   /**
-   * @generated from field: int64 team_code = 3;
+   * @generated from field: admin.v1.Team team = 3;
    */
-  teamCode: bigint;
+  team?: Team;
 
   /**
    * @generated from field: admin.v1.Profile profile = 4;
@@ -37,14 +39,9 @@ export type Contestant = Message<"admin.v1.Contestant"> & {
   profile?: Profile;
 
   /**
-   * @generated from field: bool discord_joined = 5;
+   * @generated from field: string discord_id = 5;
    */
-  discordJoined: boolean;
-
-  /**
-   * @generated from field: string invitation_code = 6;
-   */
-  invitationCode: string;
+  discordId: string;
 };
 
 /**

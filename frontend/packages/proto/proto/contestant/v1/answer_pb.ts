@@ -4,6 +4,8 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
+import type { ProblemType, Score } from "./problem_pb";
+import { file_contestant_v1_problem } from "./problem_pb";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
@@ -12,26 +14,33 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file contestant/v1/answer.proto.
  */
 export const file_contestant_v1_answer: GenFile = /*@__PURE__*/
-  fileDesc("Chpjb250ZXN0YW50L3YxL2Fuc3dlci5wcm90bxINY29udGVzdGFudC52MSJmCgZBbnN3ZXISDAoEYm9keRgBIAEoCRIwCgxzdWJtaXR0ZWRfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhIKBXNjb3JlGAMgASgDSACIAQFCCAoGX3Njb3JlIioKEkxpc3RBbnN3ZXJzUmVxdWVzdBIUCgxwcm9ibGVtX2NvZGUYASABKAkiPQoTTGlzdEFuc3dlcnNSZXNwb25zZRImCgdhbnN3ZXJzGAEgAygLMhUuY29udGVzdGFudC52MS5BbnN3ZXIiOQoTU3VibWl0QW5zd2VyUmVxdWVzdBIUCgxwcm9ibGVtX2NvZGUYASABKAkSDAoEYm9keRgCIAEoCSI9ChRTdWJtaXRBbnN3ZXJSZXNwb25zZRIlCgZhbnN3ZXIYASABKAsyFS5jb250ZXN0YW50LnYxLkFuc3dlcjK+AQoNQW5zd2VyU2VydmljZRJUCgtMaXN0QW5zd2VycxIhLmNvbnRlc3RhbnQudjEuTGlzdEFuc3dlcnNSZXF1ZXN0GiIuY29udGVzdGFudC52MS5MaXN0QW5zd2Vyc1Jlc3BvbnNlElcKDFN1Ym1pdEFuc3dlchIiLmNvbnRlc3RhbnQudjEuU3VibWl0QW5zd2VyUmVxdWVzdBojLmNvbnRlc3RhbnQudjEuU3VibWl0QW5zd2VyUmVzcG9uc2VCwgEKEWNvbS5jb250ZXN0YW50LnYxQgtBbnN3ZXJQcm90b1ABWktnaXRodWIuY29tL2ljdHNjL2ljdHNjLXJlZ2FsaWEvYmFja2VuZC9wa2cvcHJvdG8vY29udGVzdGFudC92MTtjb250ZXN0YW50djGiAgNDWFiqAg1Db250ZXN0YW50LlYxygINQ29udGVzdGFudFxWMeICGUNvbnRlc3RhbnRcVjFcR1BCTWV0YWRhdGHqAg5Db250ZXN0YW50OjpWMWIGcHJvdG8z", [file_google_protobuf_timestamp]);
+  fileDesc("Chpjb250ZXN0YW50L3YxL2Fuc3dlci5wcm90bxINY29udGVzdGFudC52MSKjAQoGQW5zd2VyEgoKAmlkGAEgASgNEicKBGJvZHkYAiABKAsyGS5jb250ZXN0YW50LnYxLkFuc3dlckJvZHkSMAoMc3VibWl0dGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIoCgVzY29yZRgEIAEoCzIULmNvbnRlc3RhbnQudjEuU2NvcmVIAIgBAUIICgZfc2NvcmUidwoKQW5zd2VyQm9keRIoCgR0eXBlGAEgASgOMhouY29udGVzdGFudC52MS5Qcm9ibGVtVHlwZRI3CgtkZXNjcmlwdGl2ZRgCIAEoCzIgLmNvbnRlc3RhbnQudjEuRGVzY3JpcHRpdmVBbnN3ZXJIAEIGCgRib2R5IiEKEURlc2NyaXB0aXZlQW5zd2VyEgwKBGJvZHkYASABKAkiKgoSTGlzdEFuc3dlcnNSZXF1ZXN0EhQKDHByb2JsZW1fY29kZRgBIAEoCSI9ChNMaXN0QW5zd2Vyc1Jlc3BvbnNlEiYKB2Fuc3dlcnMYASADKAsyFS5jb250ZXN0YW50LnYxLkFuc3dlciI5ChNTdWJtaXRBbnN3ZXJSZXF1ZXN0EhQKDHByb2JsZW1fY29kZRgBIAEoCRIMCgRib2R5GAIgASgJIj0KFFN1Ym1pdEFuc3dlclJlc3BvbnNlEiUKBmFuc3dlchgBIAEoCzIVLmNvbnRlc3RhbnQudjEuQW5zd2VyMr4BCg1BbnN3ZXJTZXJ2aWNlElQKC0xpc3RBbnN3ZXJzEiEuY29udGVzdGFudC52MS5MaXN0QW5zd2Vyc1JlcXVlc3QaIi5jb250ZXN0YW50LnYxLkxpc3RBbnN3ZXJzUmVzcG9uc2USVwoMU3VibWl0QW5zd2VyEiIuY29udGVzdGFudC52MS5TdWJtaXRBbnN3ZXJSZXF1ZXN0GiMuY29udGVzdGFudC52MS5TdWJtaXRBbnN3ZXJSZXNwb25zZULCAQoRY29tLmNvbnRlc3RhbnQudjFCC0Fuc3dlclByb3RvUAFaS2dpdGh1Yi5jb20vaWN0c2MvaWN0c2MtcmVnYWxpYS9iYWNrZW5kL3BrZy9wcm90by9jb250ZXN0YW50L3YxO2NvbnRlc3RhbnR2MaICA0NYWKoCDUNvbnRlc3RhbnQuVjHKAg1Db250ZXN0YW50XFYx4gIZQ29udGVzdGFudFxWMVxHUEJNZXRhZGF0YeoCDkNvbnRlc3RhbnQ6OlYxYgZwcm90bzM", [file_contestant_v1_problem, file_google_protobuf_timestamp]);
 
 /**
+ * 解答
+ *
  * @generated from message contestant.v1.Answer
  */
 export type Answer = Message<"contestant.v1.Answer"> & {
   /**
-   * @generated from field: string body = 1;
+   * @generated from field: uint32 id = 1;
    */
-  body: string;
+  id: number;
 
   /**
-   * @generated from field: google.protobuf.Timestamp submitted_at = 2;
+   * @generated from field: contestant.v1.AnswerBody body = 2;
+   */
+  body?: AnswerBody;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp submitted_at = 3;
    */
   submittedAt?: Timestamp;
 
   /**
-   * @generated from field: optional int64 score = 3;
+   * @generated from field: optional contestant.v1.Score score = 4;
    */
-  score?: bigint;
+  score?: Score;
 };
 
 /**
@@ -40,6 +49,51 @@ export type Answer = Message<"contestant.v1.Answer"> & {
  */
 export const AnswerSchema: GenMessage<Answer> = /*@__PURE__*/
   messageDesc(file_contestant_v1_answer, 0);
+
+/**
+ * @generated from message contestant.v1.AnswerBody
+ */
+export type AnswerBody = Message<"contestant.v1.AnswerBody"> & {
+  /**
+   * @generated from field: contestant.v1.ProblemType type = 1;
+   */
+  type: ProblemType;
+
+  /**
+   * @generated from oneof contestant.v1.AnswerBody.body
+   */
+  body: {
+    /**
+     * @generated from field: contestant.v1.DescriptiveAnswer descriptive = 2;
+     */
+    value: DescriptiveAnswer;
+    case: "descriptive";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message contestant.v1.AnswerBody.
+ * Use `create(AnswerBodySchema)` to create a new message.
+ */
+export const AnswerBodySchema: GenMessage<AnswerBody> = /*@__PURE__*/
+  messageDesc(file_contestant_v1_answer, 1);
+
+/**
+ * @generated from message contestant.v1.DescriptiveAnswer
+ */
+export type DescriptiveAnswer = Message<"contestant.v1.DescriptiveAnswer"> & {
+  /**
+   * @generated from field: string body = 1;
+   */
+  body: string;
+};
+
+/**
+ * Describes the message contestant.v1.DescriptiveAnswer.
+ * Use `create(DescriptiveAnswerSchema)` to create a new message.
+ */
+export const DescriptiveAnswerSchema: GenMessage<DescriptiveAnswer> = /*@__PURE__*/
+  messageDesc(file_contestant_v1_answer, 2);
 
 /**
  * @generated from message contestant.v1.ListAnswersRequest
@@ -56,7 +110,7 @@ export type ListAnswersRequest = Message<"contestant.v1.ListAnswersRequest"> & {
  * Use `create(ListAnswersRequestSchema)` to create a new message.
  */
 export const ListAnswersRequestSchema: GenMessage<ListAnswersRequest> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_answer, 1);
+  messageDesc(file_contestant_v1_answer, 3);
 
 /**
  * @generated from message contestant.v1.ListAnswersResponse
@@ -73,7 +127,7 @@ export type ListAnswersResponse = Message<"contestant.v1.ListAnswersResponse"> &
  * Use `create(ListAnswersResponseSchema)` to create a new message.
  */
 export const ListAnswersResponseSchema: GenMessage<ListAnswersResponse> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_answer, 2);
+  messageDesc(file_contestant_v1_answer, 4);
 
 /**
  * @generated from message contestant.v1.SubmitAnswerRequest
@@ -95,7 +149,7 @@ export type SubmitAnswerRequest = Message<"contestant.v1.SubmitAnswerRequest"> &
  * Use `create(SubmitAnswerRequestSchema)` to create a new message.
  */
 export const SubmitAnswerRequestSchema: GenMessage<SubmitAnswerRequest> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_answer, 3);
+  messageDesc(file_contestant_v1_answer, 5);
 
 /**
  * @generated from message contestant.v1.SubmitAnswerResponse
@@ -112,7 +166,7 @@ export type SubmitAnswerResponse = Message<"contestant.v1.SubmitAnswerResponse">
  * Use `create(SubmitAnswerResponseSchema)` to create a new message.
  */
 export const SubmitAnswerResponseSchema: GenMessage<SubmitAnswerResponse> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_answer, 4);
+  messageDesc(file_contestant_v1_answer, 6);
 
 /**
  * @generated from service contestant.v1.AnswerService
