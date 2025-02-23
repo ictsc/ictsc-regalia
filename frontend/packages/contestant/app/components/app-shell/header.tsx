@@ -1,27 +1,13 @@
-import { Suspense, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@app/components/logo";
-import { AccountMenu } from "./account-menu";
-import { User } from "@app/features/viewer";
-
-export function Header({ user }: { readonly user: Promise<User | undefined> }) {
-  return (
-    <HeaderView
-      accountMenu={
-        <Suspense>
-          <AccountMenu viewer={user} />
-        </Suspense>
-      }
-    />
-  );
-}
 
 export type HeaderViewProps = {
   readonly contestState?: ReactNode;
   readonly accountMenu?: ReactNode;
 };
 
-export function HeaderView({ contestState, accountMenu }: HeaderViewProps) {
+export function Header({ contestState, accountMenu }: HeaderViewProps) {
   return (
     <div className="flex size-full items-center border-b-[3px] border-primary bg-surface-0">
       <div className="flex-none">

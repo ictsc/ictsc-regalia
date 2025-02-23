@@ -1,24 +1,27 @@
 import { useReducer } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Layout } from "./layout";
-import { HeaderView } from "./header";
-import { NavbarView } from "./navbar";
+import { Header } from "./header";
+import { Navbar } from "./navbar";
 import { ContestStateView } from "./contest-state";
-import { AccountMenuView } from "./account-menu";
+import { AccountMenu } from "./account-menu";
+import { action } from "@storybook/addon-actions";
+
+const signOutAction = action("sign-out");
 
 function AppShell() {
   const [collapsed, toggle] = useReducer((o) => !o, false);
   return (
     <Layout
       header={
-        <HeaderView
+        <Header
           contestState={
             <ContestStateView state="before" restDurationSeconds={73850} />
           }
-          accountMenu={<AccountMenuView name="Alice" />}
+          accountMenu={<AccountMenu name="Alice" onSignOut={signOutAction} />}
         />
       }
-      navbar={<NavbarView collapsed={collapsed} onOpenToggleClick={toggle} />}
+      navbar={<Navbar collapsed={collapsed} onOpenToggleClick={toggle} />}
       navbarCollapsed={collapsed}
     >
       <h1>Main</h1>

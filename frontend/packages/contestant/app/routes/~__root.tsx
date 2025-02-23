@@ -7,7 +7,7 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { ConnectError, Code, type Transport } from "@connectrpc/connect";
-import { AppShell } from "@app/components/app-shell";
+import { AppShell } from "./app-shell";
 import { fetchViewer, type User } from "@app/features/viewer";
 
 interface RouterContext {

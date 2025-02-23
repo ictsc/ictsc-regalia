@@ -51,3 +51,5 @@ export async function fetchViewer(transport: Transport): Promise<User> {
     throw err;
   }
 }
+
+export { useSignOut, type SignOutAction } from "./use-signout";
