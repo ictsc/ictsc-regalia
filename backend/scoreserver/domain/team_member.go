@@ -9,10 +9,15 @@ import (
 )
 
 type (
-	TeamMember = teamMember
-	teamMember struct {
+	TeamMember struct {
 		*user
 		team *team
+	}
+	teamMember        = TeamMember
+	TeamMemberProfile struct {
+		*teamMember
+		profile       *profile
+		discordUserID DiscordUserID
 	}
 )
 
@@ -49,6 +54,48 @@ func (m *teamMember) Team() *Team {
 	return m.team
 }
 
+func ListTeamMembers(ctx context.Context, eff TeamMemberProfileReader) ([]*TeamMemberProfile, error) {
+	list, err := eff.ListTeamMembers(ctx)
+	if err != nil {
+		return nil, WrapAsInternal(err, "failed to list team members")
+	}
+
+	members := make([]*TeamMemberProfile, 0, len(list))
+	for _, tmData := range list {
+		member, err := tmData.parse()
+		if err != nil {
+			return nil, err
+		}
+		members = append(members, member)
+	}
+	return members, nil
+}
+
+func (t *Team) Members(ctx context.Context, eff TeamMemberProfileReader) ([]*TeamMemberProfile, error) {
+	list, err := eff.ListTeamMembersByTeamID(ctx, uuid.UUID(t.teamID))
+	if err != nil {
+		return nil, WrapAsInternal(err, "failed to list team members")
+	}
+
+	members := make([]*TeamMemberProfile, 0, len(list))
+	for _, tmData := range list {
+		member, err := tmData.parse()
+		if err != nil {
+			return nil, err
+		}
+		members = append(members, member)
+	}
+	return members, nil
+}
+
+func (mp *TeamMemberProfile) UserProfile() *UserProfile {
+	return &UserProfile{user: mp.user, profile: mp.profile}
+}
+
+func (mp *TeamMemberProfile) DiscordUserID() DiscordUserID {
+	return mp.discordUserID
+}
+
 var (
 	ErrTeamIsFull = NewInvalidArgumentError("team is full", nil)
 )
@@ -58,9 +105,19 @@ type (
 		User *UserData
 		Team *TeamData
 	}
+	TeamMemberProfileData struct {
+		User          *UserData
+		Team          *TeamData
+		Profile       *ProfileData
+		DiscordUserID int64
+	}
 	TeamMemberGetter interface {
 		GetTeamMemberByID(ctx context.Context, userID uuid.UUID) (*TeamMemberData, error)
 		CountTeamMembers(ctx context.Context, teamID uuid.UUID) (uint, error)
+	}
+	TeamMemberProfileReader interface {
+		ListTeamMembers(ctx context.Context) ([]*TeamMemberProfileData, error)
+		ListTeamMembersByTeamID(ctx context.Context, teamID uuid.UUID) ([]*TeamMemberProfileData, error)
 	}
 	TeamMemberManager interface {
 		TeamMemberGetter
@@ -90,4 +147,27 @@ func (m *teamMember) Data() *TeamMemberData {
 		User: m.user.Data(),
 		Team: m.team.Data(),
 	}
+}
+
+func (d *TeamMemberProfileData) parse() (*TeamMemberProfile, error) {
+	user, err := d.User.parse()
+	if err != nil {
+		return nil, err
+	}
+
+	team, err := d.Team.parse()
+	if err != nil {
+		return nil, err
+	}
+
+	profile, err := d.Profile.parse()
+	if err != nil {
+		return nil, err
+	}
+
+	return &TeamMemberProfile{
+		teamMember:    &teamMember{user: user, team: team},
+		profile:       profile,
+		discordUserID: DiscordUserID(d.DiscordUserID),
+	}, nil
 }
