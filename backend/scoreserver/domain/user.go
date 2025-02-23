@@ -46,7 +46,7 @@ func (p *UserProfile) User() *User {
 }
 
 func (p *UserProfile) DisplayName() string {
-	return p.displayName
+	return p.profile.DisplayName
 }
 
 func CreateUser(ctx context.Context, eff UserCreator, name, displayName string) (*UserProfile, error) {
@@ -56,8 +56,8 @@ func CreateUser(ctx context.Context, eff UserCreator, name, displayName string) 
 	}
 
 	profile, err := (&UserProfileData{
-		User:        &UserData{ID: id, Name: name},
-		DisplayName: displayName,
+		User:    &UserData{ID: id, Name: name},
+		Profile: &ProfileData{DisplayName: displayName},
 	}).parse()
 	if err != nil {
 		return nil, err
@@ -91,7 +91,10 @@ type (
 		ListUsers(ctx context.Context, filter UserListFilter) iter.Seq2[*UserData, error]
 	}
 	UserProfileData struct {
-		User        *UserData
+		User    *UserData
+		Profile *ProfileData
+	}
+	ProfileData struct {
 		DisplayName string
 	}
 	UserCreator interface {
@@ -109,10 +112,14 @@ func (u *User) Data() *UserData {
 	}
 }
 
+func (p *profile) data() *ProfileData {
+	return &ProfileData{DisplayName: p.DisplayName}
+}
+
 func (p *UserProfile) Data() *UserProfileData {
 	return &UserProfileData{
-		User:        p.user.Data(),
-		DisplayName: p.displayName,
+		User:    p.user.Data(),
+		Profile: p.profile.data(),
 	}
 }
 
@@ -123,9 +130,12 @@ type (
 		userID
 		name userName
 	}
+	profile struct {
+		DisplayName string
+	}
 	userProfile struct {
 		*user
-		displayName string
+		*profile
 	}
 )
 
@@ -166,15 +176,15 @@ func (d *UserProfileData) parse() (*UserProfile, error) {
 		errs = append(errs, err)
 	}
 	//nolint:mnd
-	if len(d.DisplayName) > 64 {
+	if len(d.Profile.DisplayName) > 64 {
 		errs = append(errs, errors.Join(ErrInvalidDisplayName, errors.New("display name length must be less than 128")))
 	}
 	if len(errs) > 0 {
 		return nil, errors.Join(errs...)
 	}
 	return &UserProfile{
-		user:        user,
-		displayName: d.DisplayName,
+		user:    user,
+		profile: &profile{DisplayName: d.Profile.DisplayName},
 	}, nil
 }
 

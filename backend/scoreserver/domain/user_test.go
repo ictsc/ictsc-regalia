@@ -157,7 +157,9 @@ func TestCreateUser(t *testing.T) {
 				User: &domain.UserData{
 					Name: "alice",
 				},
-				DisplayName: "Alice",
+				Profile: &domain.ProfileData{
+					DisplayName: "Alice",
+				},
 			},
 		},
 		"invalid name": {

@@ -114,7 +114,9 @@ func Test_PgRepo_CreateUser(t *testing.T) {
 					ID:   uuid.FromStringOrNil("ab072031-3cf8-4795-9902-01e9e7fdf0bc"),
 					Name: "charlie",
 				},
-				DisplayName: "Charlie",
+				Profile: &domain.ProfileData{
+					DisplayName: "Charlie",
+				},
 			}
 
 			if err := repo.RunTx(ctx, func(tx *pg.RepositoryTx) error {
@@ -155,7 +157,9 @@ func Test_PgRepo_CreateUser(t *testing.T) {
 					ID:   uuid.FromStringOrNil("1aacaafb-0f63-4746-be40-3b3511844c73"),
 					Name: "alice",
 				},
-				DisplayName: "Alice",
+				Profile: &domain.ProfileData{
+					DisplayName: "Alice",
+				},
 			}
 
 			err := repo.RunTx(ctx, func(tx *pg.RepositoryTx) error {
@@ -260,7 +264,9 @@ func TestGetUserProfileByID(t *testing.T) {
 					ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
 					Name: "alice",
 				},
-				DisplayName: "Alice",
+				Profile: &domain.ProfileData{
+					DisplayName: "Alice",
+				},
 			},
 		},
 		"not found": {

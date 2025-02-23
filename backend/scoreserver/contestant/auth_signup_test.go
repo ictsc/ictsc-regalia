@@ -38,7 +38,9 @@ func TestSignUpOK(t *testing.T) {
 			User: &domain.UserData{
 				Name: "test",
 			},
-			DisplayName: "Tester",
+			Profile: &domain.ProfileData{
+				DisplayName: "Tester",
+			},
 		},
 		cmpopts.IgnoreFields(domain.UserData{}, "ID"),
 	); diff != "" {
