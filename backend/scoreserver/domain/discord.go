@@ -21,6 +21,10 @@ type (
 	}
 )
 
+func (id DiscordUserID) String() string {
+	return strconv.FormatInt(int64(id), 10)
+}
+
 func (d *DiscordIdentity) ID() DiscordUserID {
 	return d.id
 }
