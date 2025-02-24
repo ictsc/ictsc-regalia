@@ -36,7 +36,7 @@ message DescriptiveAnswer {
 message MarkingResult {
   Answer answer = 1;
   Admin judge = 2;
-  int64 score = 3;
+  uint32 score = 3;
   MarkingRationale rationale = 4;
   google.protobuf.Timestamp created_at = 5;
 }
@@ -54,7 +54,7 @@ message DescriptiveMarkingRationale {
 
 message ListAnswersRequest {
   // 採点が完了した提出を含めるかどうか
-  bool include_scored = 1;
+  bool include_marked = 1;
 }
 message ListAnswersResponse {
   repeated Answer answers = 1;
