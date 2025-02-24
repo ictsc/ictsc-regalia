@@ -1,3 +1,5 @@
+CREATE EXTENSION btree_gist;
+
 CREATE TABLE rules (
 	page_path TEXT,
 	markdown TEXT
@@ -7,13 +9,13 @@ COMMENT ON COLUMN rules.page_path IS 'Wiki上のページパス';
 COMMENT ON COLUMN rules.markdown IS 'Markdown形式のルール';
 
 CREATE TABLE teams (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    code BIGINT NOT NULL UNIQUE,
-    name VARCHAR(255) NOT NULL UNIQUE,
-    organization VARCHAR(255) NOT NULL,
-    max_members INT NOT NULL DEFAULT 1 CHECK (max_members > 0),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	code BIGINT NOT NULL UNIQUE,
+	name VARCHAR(255) NOT NULL UNIQUE,
+	organization VARCHAR(255) NOT NULL,
+	max_members INT NOT NULL DEFAULT 1 CHECK (max_members > 0),
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE teams IS 'チーム';
 COMMENT ON COLUMN teams.id IS 'チーム ID';
@@ -22,11 +24,11 @@ COMMENT ON COLUMN teams.name IS 'チーム名';
 COMMENT ON COLUMN teams.organization IS '所属組織名';
 
 CREATE TABLE invitation_codes (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
-    code VARCHAR(255) NOT NULL UNIQUE,
-    expires_at TIMESTAMPTZ NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+	code VARCHAR(255) NOT NULL UNIQUE,
+	expires_at TIMESTAMP NOT NULL,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE invitation_codes IS '招待コード';
 COMMENT ON COLUMN invitation_codes.id IS '招待コード ID';
@@ -37,7 +39,7 @@ COMMENT ON COLUMN invitation_codes.expires_at IS '有効期限';
 CREATE TABLE users (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	name VARCHAR(32) NOT NULL UNIQUE,
-	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE users IS 'ユーザ';
 COMMENT ON COLUMN users.id IS 'ユーザ ID';
@@ -46,8 +48,8 @@ COMMENT ON COLUMN users.name IS 'ユーザ名';
 CREATE TABLE user_profiles (
 	user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
 	display_name VARCHAR(255) NOT NULL,
-	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE user_profiles IS 'ユーザプロフィール';
 COMMENT ON COLUMN user_profiles.user_id IS 'ユーザ ID';
@@ -56,7 +58,7 @@ COMMENT ON COLUMN user_profiles.display_name IS 'ユーザ表示名';
 CREATE TABLE discord_users (
 	user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
 	discord_user_id BIGINT NOT NULL UNIQUE,
-	linked_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+	linked_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE discord_users IS 'Discord 上のユーザ情報';
 COMMENT ON COLUMN discord_users.discord_user_id IS 'Discord ユーザ ID';
@@ -66,7 +68,7 @@ CREATE TABLE team_members (
 	user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
 	team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
 	invitation_code_id UUID NOT NULL REFERENCES invitation_codes(id) ON DELETE CASCADE,
-	invited_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+	invited_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE team_members IS 'チームメンバ';
 COMMENT ON COLUMN team_members.user_id IS 'ユーザ ID';
@@ -83,8 +85,8 @@ CREATE TABLE problems (
 	title VARCHAR(255) NOT NULL,
 	max_score INT NOT NULL CHECK (max_score > 0),
 	redeploy_rule redeploy_rule NOT NULL,
-	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE problems IS '問題';
 COMMENT ON COLUMN problems.id IS '問題 ID';
@@ -116,3 +118,83 @@ COMMENT ON COLUMN problem_contents.page_id IS 'Wiki上のページ ID';
 COMMENT ON COLUMN problem_contents.page_path IS 'Wiki上のページパス';
 COMMENT ON COLUMN problem_contents.body IS '問題文';
 COMMENT ON COLUMN problem_contents.explanation IS '運営向け解説情報';
+
+CREATE TABLE answers (
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	problem_id UUID NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
+	team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+	number INT NOT NULL CHECK (number > 0),
+	UNIQUE (problem_id, team_id, number),
+	user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	rate_limit_interval INTERVAL NOT NULL DEFAULT INTERVAL '00:20:00'::interval,
+	CONSTRAINT answers_rate_limit EXCLUDE USING gist
+		(problem_id WITH =, team_id WITH =, tsrange(created_at, created_at + rate_limit_interval) WITH &&)
+);
+COMMENT ON TABLE answers IS '回答';
+COMMENT ON COLUMN answers.id IS '回答 ID';
+COMMENT ON COLUMN answers.problem_id IS '回答対象の問題 ID';
+COMMENT ON COLUMN answers.team_id IS '回答したチーム ID';
+COMMENT ON COLUMN answers.number IS '回答番号';
+COMMENT ON COLUMN answers.user_id IS '回答者のユーザ ID';
+COMMENT ON COLUMN answers.created_at IS '回答日時';
+COMMENT ON COLUMN answers.rate_limit_interval IS '次の回答までの最小間隔';
+
+CREATE TABLE descriptive_answers (
+	answer_id UUID PRIMARY KEY REFERENCES answers(id) ON DELETE CASCADE,
+	body TEXT NOT NULL
+);
+COMMENT ON TABLE descriptive_answers IS '記述式回答';
+COMMENT ON COLUMN descriptive_answers.answer_id IS '回答 ID';
+COMMENT ON COLUMN descriptive_answers.body IS '回答内容';
+
+CREATE TABLE answer_penalties (
+	answer_id UUID PRIMARY KEY REFERENCES answers(id) ON DELETE CASCADE,
+	penalty INT NOT NULL CHECK (penalty >= 0),
+	redeploy_count INT NOT NULL CHECK (redeploy_count >= 0)
+);
+COMMENT ON TABLE answer_penalties IS '回答のペナルティ';
+COMMENT ON COLUMN answer_penalties.answer_id IS '回答 ID';
+COMMENT ON COLUMN answer_penalties.penalty IS 'ペナルティ';
+COMMENT ON COLUMN answer_penalties.redeploy_count IS '再展開回数(ペナルティの計算根拠)';
+
+CREATE TABLE marking_results (
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	answer_id UUID NOT NULL REFERENCES answers(id) ON DELETE CASCADE,
+	score INT NOT NULL CHECK (score >= 0),
+	judge_name TEXT NOT NULL,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+COMMENT ON TABLE marking_results IS '採点結果';
+COMMENT ON COLUMN marking_results.id IS '採点結果 ID';
+COMMENT ON COLUMN marking_results.answer_id IS '回答 ID';
+COMMENT ON COLUMN marking_results.score IS '得点';
+COMMENT ON COLUMN marking_results.judge_name IS '採点者名';
+COMMENT ON COLUMN marking_results.created_at IS '採点日時';
+
+CREATE TABLE descriptive_marking_rationale (
+	marking_result_id UUID PRIMARY KEY REFERENCES marking_results(id) ON DELETE CASCADE,
+	rationale TEXT NOT NULL
+);
+COMMENT ON TABLE descriptive_marking_rationale IS '記述式採点の根拠';
+COMMENT ON COLUMN descriptive_marking_rationale.marking_result_id IS '採点結果 ID';
+COMMENT ON COLUMN descriptive_marking_rationale.rationale IS '採点根拠';
+
+CREATE TYPE deployment_status AS ENUM ('QUEUED', 'DEPLOYING', 'COMPLETED', 'FAILED');
+
+CREATE TABLE redeployment_requests (
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+	problem_id UUID NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
+	status deployment_status NOT NULL,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE redeployment_events (
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	request_id UUID NOT NULL REFERENCES redeployment_requests(id) ON DELETE CASCADE,
+	status deployment_status NOT NULL,
+	UNIQUE (request_id, status),
+	message TEXT,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
