@@ -7,5 +7,7 @@ if which psqldef 2>/dev/null; then
 fi
 
 schema_file=$(dirname "$0")/../schema.sql
+view_file=$(dirname "$0")/../view.sql
 
-exec $PSQLDEF --host="${PGHOST:-localhost}" --port="${PGPORT:-5432}" --user="${PGUSER:-ictsc}" "${PGDATABASE:-ictscore}" < "$schema_file" "$@"
+$PSQLDEF --host="${PGHOST:-localhost}" --port="${PGPORT:-5432}" --user="${PGUSER:-ictsc}" --skip-view "${PGDATABASE:-ictscore}" < "$schema_file" "$@"
+psql < "$view_file"
