@@ -132,6 +132,15 @@ function config(opts = {}) {
           "import/default": "off",
           "import/no-named-as-default-member": "off",
           "import/no-unresolved": "off",
+          "no-unused-vars": "off",
+          "@typescript-eslint/no-unused-vars": [
+            "error",
+            {
+              ignoreRestSiblings: true,
+              argsIgnorePattern: "^_",
+              caughtErrors: "all",
+            },
+          ],
         },
       },
     ]),
