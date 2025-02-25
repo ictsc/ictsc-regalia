@@ -44,7 +44,7 @@
   }
   ul,
   ol {
-    @apply pl-24;
+    margin-left: 1em;
   }
 
   hr {
@@ -66,5 +66,17 @@
 
   tr:nth-child(even) {
     @apply bg-surface-1/50;
+  }
+
+  blockquote {
+    @apply border-l-4 border-primary bg-surface-1/50 pl-8;
+  }
+
+  :where(code):not(pre > code) {
+    @apply rounded-4 bg-surface-1 px-4 py-2 font-mono text-14;
+  }
+
+  pre:has(> code) {
+    @apply block overflow-x-auto rounded-4 bg-surface-1/50 py-2 font-mono text-14;
   }
 }
