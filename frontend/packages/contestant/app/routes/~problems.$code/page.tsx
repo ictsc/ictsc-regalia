@@ -14,6 +14,7 @@ import {
 import { clsx } from "clsx";
 import { MaterialSymbol } from "@app/components/material-symbol";
 import { Markdown, Typography } from "@app/components/markdown";
+import { NavbarLayoutContext } from "@app/components/app-shell";
 
 export function ProblemPage(props: { problem: Promise<ProblemDetail> }) {
   const problem = use(props.problem);
@@ -25,6 +26,7 @@ export function Layout(props: {
   content: React.ReactNode;
   sidebar: React.ReactNode;
 }) {
+  const { navbarTransitioning } = use(NavbarLayoutContext);
   const [showSidebar, toggleSidebar] = useReducer((o) => !o, false);
 
   return (
@@ -38,6 +40,7 @@ export function Layout(props: {
         className={clsx(
           "overflow-y-auto px-40 pb-64",
           "w-[--span] lg:w-[calc(var(--span)*2)]",
+          navbarTransitioning && "transition-[width]",
         )}
       >
         {props.content}
@@ -49,6 +52,7 @@ export function Layout(props: {
           !showSidebar &&
             "translate-x-[calc(var(--span)-64px)] sm:translate-x-0",
           "sm:w-[--span] sm:pl-0",
+          navbarTransitioning && "transition-[width]",
         )}
       >
         <Button
