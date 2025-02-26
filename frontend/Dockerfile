@@ -5,8 +5,8 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN npm install -g pnpm
 WORKDIR /app
 RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=pnpm-lock.yaml,target=pnpm-lock.yaml \
-    pnpm fetch
+  --mount=type=bind,source=pnpm-lock.yaml,target=pnpm-lock.yaml \
+  pnpm fetch
 COPY . .
 RUN pnpm install --recursive --offline
 RUN pnpm run --recursive --parallel --aggregate-output build
@@ -18,9 +18,9 @@ server {
     server_name _;
 
     location / {
-        root /var/www/contestant;
+        root /var/www/contestant/;
         index index.html;
-        try_files $uri $uri/index.html /index.html;
+        try_files \$uri \$uri/index.html /index.html;
     }
 
     location = /healthz {
