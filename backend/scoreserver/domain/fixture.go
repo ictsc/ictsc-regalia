@@ -89,6 +89,54 @@ func FixUser1(tb testing.TB, data *UserData) *User {
 	return user
 }
 
+func FixTeamMember1(tb testing.TB, data *TeamMemberData) *TeamMember {
+	tb.Helper()
+
+	var (
+		teamData *TeamData
+		userData *UserData
+	)
+	if data != nil {
+		teamData = data.Team
+		userData = data.User
+	}
+	return &TeamMember{
+		user: FixUser1(tb, userData),
+		team: FixTeam1(tb, teamData),
+	}
+}
+
+func FixDescriptiveProblem1(tb testing.TB, data *DescriptiveProblemData) *DescriptiveProblem {
+	tb.Helper()
+
+	if data != nil {
+		tb.Fatal("additional data is not supported")
+	}
+
+	//nolint:mnd
+	problemData := &DescriptiveProblemData{
+		Problem: &ProblemData{
+			ID:           uuid.FromStringOrNil("24f6aef0-5dcd-4032-825b-d1b19174a6f2"),
+			Code:         "ZZB",
+			ProblemType:  ProblemTypeDescriptive,
+			Title:        "Problem 1",
+			MaxScore:     100,
+			RedeployRule: RedeployRuleUnredeployable,
+		},
+		Content: &ProblemContentData{
+			PageID:      "page1",
+			PagePath:    "/page1",
+			Body:        "This is a problem.",
+			Explanation: "This is an explanation.",
+		},
+	}
+	problem, err := problemData.parse()
+	if err != nil {
+		tb.Fatal(err)
+	}
+	return problem
+}
+
 func must[V any](v V, err error) V {
 	if err != nil {
 		panic(err)
