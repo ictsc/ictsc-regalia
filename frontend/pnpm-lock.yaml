@@ -76,8 +76,8 @@ importers:
         specifier: 2.0.2
         version: 2.0.2(@bufbuild/protobuf@2.2.3)
       '@connectrpc/connect-web':
-        specifier: 2.0.1
-        version: 2.0.1(@bufbuild/protobuf@2.2.3)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.2.3))
+        specifier: 2.0.2
+        version: 2.0.2(@bufbuild/protobuf@2.2.3)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.2.3))
       '@headlessui/react':
         specifier: ^2.1.2
         version: 2.2.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -432,11 +432,11 @@ packages:
   '@bundled-es-modules/tough-cookie@0.1.6':
     resolution: {integrity: sha512-dvMHbL464C0zI+Yqxbz6kZ5TOEp7GLW+pry/RWndAR8MJQAXZ2rPmIs8tziTZjeIyhSNZgZbCePtfSbdWqStJw==}
 
-  '@connectrpc/connect-web@2.0.1':
-    resolution: {integrity: sha512-FmUR9TyuHu/3efr9cYZcqqAccgsswLSm3PQBXGuya5h57AjQWROW6ejL6Fg0d+A9EwsxRmJktefmFszXUMlU9Q==}
+  '@connectrpc/connect-web@2.0.2':
+    resolution: {integrity: sha512-QANMFPiL2o66BdBEctg4TsQLe5ozsBLqcle3dCBp7BwGlNGTY6NnNnqmt+YRnpeMW88GgomJwWNMGCrRD9pRKA==}
     peerDependencies:
       '@bufbuild/protobuf': ^2.2.0
-      '@connectrpc/connect': 2.0.1
+      '@connectrpc/connect': 2.0.2
 
   '@connectrpc/connect@2.0.2':
     resolution: {integrity: sha512-xZuylIUNvNlH52e/4eQsZvY4QZyDJRtEFEDnn/yBrv5Xi5ZZI/p8X+GAHH35ucVaBvv9u7OzHZo8+tEh1EFTxA==}
@@ -4122,7 +4122,7 @@ snapshots:
       '@types/tough-cookie': 4.0.5
       tough-cookie: 4.1.4
 
-  '@connectrpc/connect-web@2.0.1(@bufbuild/protobuf@2.2.3)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.2.3))':
+  '@connectrpc/connect-web@2.0.2(@bufbuild/protobuf@2.2.3)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.2.3))':
     dependencies:
       '@bufbuild/protobuf': 2.2.3
       '@connectrpc/connect': 2.0.2(@bufbuild/protobuf@2.2.3)
