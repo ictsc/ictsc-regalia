@@ -1,11 +1,11 @@
-buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.3-20250121211742-6d880cc6cc8d.1 h1:1v+ez1GRKKKdI1IwDDQqV98lGKo8489+Ekql+prUW6c=
-buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.3-20250121211742-6d880cc6cc8d.1/go.mod h1:MYDFm9IHRP085R5Bis68mLc0mIqp5Q27Uk4o8YXjkAI=
-buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.3-20241127180247-a33202765966.1 h1:cQZXKoQ+eB0kykzfJe80RP3nc+3PWbbBrUBm8XNYAQY=
-buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.3-20241127180247-a33202765966.1/go.mod h1:6VPKM8zbmgf9qsmkmKeH49a36Vtmidw3rG53B5mTenc=
+buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.5-20241023225133-42bdb4b67625.1 h1:HhWmrgqfKRQIPyUPm+YiBK8g/Adm7xCMQF5bHlvQsE4=
+buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.5-20241023225133-42bdb4b67625.1/go.mod h1:LpnZWZGTs6IBCnY9WHAkR9X4/NbpL5nwOXivQdXILTs=
+buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.5-20240717164558-a6c49f84cc0f.1 h1:tsQCDs5lwBkKRw9kTsY2bgJ0AVWkYr5NRdgnE+N2K8I=
+buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.5-20240717164558-a6c49f84cc0f.1/go.mod h1:eOqrCVUfhh7SLo00urDe/XhJHljj0dWMZirS0aX7cmc=
 buf.build/gen/go/bufbuild/registry/connectrpc/go v1.18.1-20250116203702-1c024d64352b.1 h1:1SDs5tEGoWWv2vmKLx2B0Bp+yfhlxiU4DaZUII8+Pvs=
 buf.build/gen/go/bufbuild/registry/connectrpc/go v1.18.1-20250116203702-1c024d64352b.1/go.mod h1:o2AgVM1j3MczvxnMqfZTpiqGwK1VD4JbEagseY0QcjE=
-buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.3-20250116203702-1c024d64352b.1 h1:uof73jXic8OmtR5Y6yOZNrx7fdC+nMeWFuVebuq6mpM=
-buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.3-20250116203702-1c024d64352b.1/go.mod h1:UOdD+CmwdvN3oRHXeZ+WDeIthKVXKo7Dm+2E/233xd0=
+buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.5-20250116203702-1c024d64352b.1 h1:MTNYELBBDEj2ddEwWb/vuAm5PRLyWtZe7CLnc6WZ5qQ=
+buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.5-20250116203702-1c024d64352b.1/go.mod h1:E8bt4dG1/NfuocvVmlDNWIfKoLK0B4AgGq4ubwEGBvo=
 buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.3-20241007202033-cf42259fcbfc.1 h1:NOipq02MS20WQCr6rfAG1o0n2AuQnY4Xg9avLl16csA=
 buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.3-20241007202033-cf42259fcbfc.1/go.mod h1:jceo5esD5zSbflHHGad57RXzBpRrcPaiLrLQRA+Mbec=
 buf.build/go/bufplugin v0.7.0 h1:Tq8FXBVfpMxhl3QR6P/gMQHROg1Ss7WhpyD4QVV61ds=
