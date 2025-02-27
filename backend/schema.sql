@@ -148,16 +148,6 @@ COMMENT ON TABLE descriptive_answers IS '記述式回答';
 COMMENT ON COLUMN descriptive_answers.answer_id IS '回答 ID';
 COMMENT ON COLUMN descriptive_answers.body IS '回答内容';
 
-CREATE TABLE answer_penalties (
-	answer_id UUID PRIMARY KEY REFERENCES answers(id) ON DELETE CASCADE,
-	penalty INT NOT NULL CHECK (penalty >= 0),
-	redeploy_count INT NOT NULL CHECK (redeploy_count >= 0)
-);
-COMMENT ON TABLE answer_penalties IS '回答のペナルティ';
-COMMENT ON COLUMN answer_penalties.answer_id IS '回答 ID';
-COMMENT ON COLUMN answer_penalties.penalty IS 'ペナルティ';
-COMMENT ON COLUMN answer_penalties.redeploy_count IS '再展開回数(ペナルティの計算根拠)';
-
 CREATE TABLE marking_results (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	answer_id UUID NOT NULL REFERENCES answers(id) ON DELETE CASCADE,
