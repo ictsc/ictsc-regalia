@@ -13,6 +13,7 @@ backend/
 │   └── infra/        # インフラストラクチャ層
 ├── scripts/
 │   ├── local-exec    # ローカル実行用スクリプト
+│   ├── kube-exec     # リモート実行用スクリプト
 │   └── migrate       # マイグレーション
 ├── schema.sql        # DB スキーマ
 └── seed.sql          # 開発用 DB 初期データ
@@ -60,7 +61,7 @@ $ ./scripts/local-exec go run ./cmd/scoreserver/ -dev
 
 ### local-exec
 
-PostgreSQL と Redis にアクセスするための環境変数を入れてコマンドを実行します。
+ローカル開発環境の PostgreSQL と Redis にアクセスするための環境変数を入れてコマンドを実行します。
 
 #### 例: psql
 
@@ -69,6 +70,11 @@ PostgreSQL のクライアント psql は PG* 系の環境変数を受け付け�
 ```console
 $ ./scripts/local-exec psql
 ```
+
+### kube-exec
+
+Kubernetes 環境の依存にアクセスするための環境変数を入れてコマンドを起動します。
+kubectl が必要です。
 
 ### migrate
 
