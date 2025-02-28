@@ -1,0 +1,72 @@
+#!/bin/bash
+
+set -eu
+
+# Function to find a random available port
+find_available_port() {
+	local port max_attempts=50 attempt=0
+
+	while [ $attempt -lt $max_attempts ]; do
+		# Generate a random port number in the ephemeral range
+		port=$(( (RANDOM % 16384) + 49152 ))
+
+		# Check if the port is available
+		if ! lsof -i ":$port" &>/dev/null; then
+			echo "$port"
+			return 0
+		fi
+
+		attempt=$((attempt + 1))
+	done
+
+	echo "Error: Could not find an available port after $max_attempts attempts" >&2
+	return 1
+}
+
+cleanup() {
+	if [ -n "${postgres_proxy_pid:-}" ]; then
+		kill "$postgres_proxy_pid"
+	fi
+	if [ -n "${redis_proxy_pid:-}" ]; then
+		kill "$redis_proxy_pid"
+	fi
+}
+
+trap cleanup EXIT
+
+# https://github.com/ictsc/ictsc-drove/blob/80e03618e48d288283dc08d9d3e623e945e50501/manifest/user/postgres/local/postgresql.yaml#L15
+postgres_namespace="scoreserver"
+postgres_secret_name="ictsc.ictsc-cluster.credentials.postgresql.acid.zalan.do"
+postgres_secret="$(kubectl -n "$postgres_namespace" get secret "$postgres_secret_name" -ojsonpath="{.data}")"
+postgres_pod_name="$(kubectl -n "$postgres_namespace" get pods -o jsonpath={.items..metadata.name} -l application=spilo,cluster-name=ictsc-cluster,spilo-role=master)"
+postgres_local_port="$(find_available_port)"
+kubectl -n "$postgres_namespace" port-forward "$postgres_pod_name" "$postgres_local_port":5432 &
+postgres_proxy_pid=$!
+export PGHOST=127.0.0.1
+export PGPORT="$postgres_local_port"
+PGUSER=$(jq -r '.username|@base64d' <<< "$postgres_secret")
+PGPASSWORD=$(jq -r '.password|@base64d' <<< "$postgres_secret")
+export PGUSER PGPASSWORD
+export PGDATABASE=ictscore
+export PGSSLMODE=require
+
+redis_namespace="scoreserver"
+redis_service_name="redis-haproxy"
+redis_local_port="$(find_available_port)"
+kubectl -n "$redis_namespace" port-forward "service/$redis_service_name" "$redis_local_port":6379 &
+redis_proxy_pid=$!
+export REDIS_URL="redis://localhost:$redis_local_port/0"
+
+export OTEL_TRACES_EXPORTER=none
+export OTEL_METRICS_EXPORTER=none
+export OTEL_LOGS_EXPORTER=none
+
+parent_pid=$$
+(
+	while kill -0 $parent_pid 2>/dev/null; do
+		sleep 1
+	done
+	cleanup
+)&
+
+exec "$@"
