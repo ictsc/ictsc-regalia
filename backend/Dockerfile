@@ -49,5 +49,5 @@ RUN adduser --uid ${UID} --disabled-password --gecos '' toolbox
 USER toolbox
 # Copy scripts
 WORKDIR /home/toolbox
-COPY --link schema.sql .
+COPY --link schema.sql view.sql .
 COPY --link scripts ./scripts
