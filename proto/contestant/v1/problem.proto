@@ -24,6 +24,8 @@ message Score {
   uint32 penalty = 2;
   // 最終的な得点
   uint32 score = 3;
+  // 最大得点
+  uint32 max_score = 4;
 }
 
 message Deployment {
