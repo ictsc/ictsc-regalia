@@ -172,8 +172,8 @@ var _ domain.AnswerWriter = (*RepositoryTx)(nil)
 
 var (
 	createAnswerQuery = `
-INSERT INTO answers (id, number, team_id, problem_id, user_id, created_at, rate_limit_interval)
-VALUES ($1, $2, $3, $4, $5, $6, $7)`
+INSERT INTO answers (id, number, team_id, problem_id, user_id, created_at, rate_limit_interval, created_at_range)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, tstzrange($8::timestamptz, $8::timestamptz + $7::interval))`
 	createDescriptiveAnswerQuery = `
 INSERT INTO descriptive_answers (answer_id, body)
 VALUES ($1, $2)`
@@ -191,6 +191,7 @@ func (r *RepositoryTx) CreateAnswer(ctx context.Context, data *domain.AnswerDeta
 		data.Answer.Author.ID,
 		data.Answer.CreatedAt,
 		data.Answer.Interval,
+		data.Answer.CreatedAt,
 	); err != nil {
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
 			if pgErr.Code == pgerrcode.ExclusionViolation && pgErr.ConstraintName == "answers_rate_limit" {
