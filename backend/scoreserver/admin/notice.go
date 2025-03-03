@@ -47,7 +47,10 @@ type NoticeCreateEffect interface {
 	domain.NoticeGetter
 }
 
-func (s *NoticeServiceHandler) ListNotices(ctx context.Context, req *connect.Request[adminv1.ListNoticesRequest]) (*connect.Response[adminv1.ListNoticesResponse], error) {
+func (s *NoticeServiceHandler) ListNotices(
+	ctx context.Context,
+	req *connect.Request[adminv1.ListNoticesRequest],
+) (*connect.Response[adminv1.ListNoticesResponse], error) {
 	if err := enforce(ctx, s.Enforcer, "notices", "list"); err != nil {
 		return nil, err
 	}
@@ -66,7 +69,10 @@ func (s *NoticeServiceHandler) ListNotices(ctx context.Context, req *connect.Req
 	}), nil
 }
 
-func (s *NoticeServiceHandler) SyncNotices(ctx context.Context, req *connect.Request[adminv1.SyncNoticesRequest]) (*connect.Response[adminv1.SyncNoticesResponse], error) {
+func (s *NoticeServiceHandler) SyncNotices(
+	ctx context.Context,
+	req *connect.Request[adminv1.SyncNoticesRequest],
+) (*connect.Response[adminv1.SyncNoticesResponse], error) {
 	if err := enforce(ctx, s.Enforcer, "notices", "create"); err != nil {
 		return nil, err
 	}
