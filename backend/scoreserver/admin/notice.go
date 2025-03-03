@@ -76,7 +76,12 @@ func (s *NoticeServiceHandler) SyncNotices(
 	if err := enforce(ctx, s.Enforcer, "notices", "create"); err != nil {
 		return nil, err
 	}
-	notice, err := domain.FetchNoticeByPath(ctx, s.CreateEffect, req.Msg.Path)
+	path := req.Msg.GetPath()
+	if path == "" {
+		return nil, domain.NewInvalidArgumentError("path is required", nil)
+	}
+
+	notice, err := domain.FetchNoticeByPath(ctx, s.CreateEffect, req.Msg.GetPath())
 	if err != nil {
 		return nil, err
 	}
