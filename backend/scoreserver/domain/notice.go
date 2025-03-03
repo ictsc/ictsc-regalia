@@ -3,7 +3,6 @@ package domain
 import (
 	"bufio"
 	"context"
-	"fmt"
 	"io"
 	"regexp"
 	"strings"
@@ -148,12 +147,12 @@ func parseNotice(r io.Reader, bodyWriter io.Writer, metadata map[string]string) 
 		}
 
 		if _, err := bodyWriter.Write([]byte(line + "\n")); err != nil {
-			return fmt.Errorf("failed to write: %w", err)
+			return WrapAsInternal(err, "failed to write")
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("failed to scan: %w", err)
+		return WrapAsInternal(err, "failed to scan")
 	}
 	return nil
 }
