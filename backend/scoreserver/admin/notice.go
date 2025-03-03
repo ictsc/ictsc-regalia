@@ -86,22 +86,14 @@ func (s *NoticeServiceHandler) SyncNotices(
 		return nil, err
 	}
 
-	if err := domain.SaveNotice(ctx, s.CreateEffect, notice); err != nil {
+	if err := notice.SaveNotice(ctx, s.CreateEffect); err != nil {
 		return nil, err
 	}
-	protoNotice := convertNoticeData(notice)
+	protoNotice := convertNotice(notice)
 
 	return connect.NewResponse(&adminv1.SyncNoticesResponse{
 		Notice: protoNotice,
 	}), nil
-}
-
-func convertNoticeData(notice *domain.NoticeData) *adminv1.Notice {
-	return &adminv1.Notice{
-		Path:     notice.Path,
-		Title:    notice.Title,
-		Markdown: notice.Markdown,
-	}
 }
 
 func convertNotice(notice *domain.Notice) *adminv1.Notice {

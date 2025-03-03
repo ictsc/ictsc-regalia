@@ -17,8 +17,8 @@ type notice struct {
 	path           string
 	title          string
 	markdown       string
-	EffectiveFrom  *time.Time
-	EffectiveUntil *time.Time
+	effectiveFrom  *time.Time
+	effectiveUntil *time.Time
 }
 
 type NoticeData struct {
@@ -28,6 +28,10 @@ type NoticeData struct {
 	Markdown       string
 	EffectiveFrom  *time.Time
 	EffectiveUntil *time.Time
+}
+
+func (n *Notice) ID() uuid.UUID {
+	return n.id
 }
 
 func (n *Notice) Path() string {
@@ -42,6 +46,14 @@ func (n *Notice) Markdown() string {
 	return n.markdown
 }
 
+func (n *Notice) EffectiveFrom() *time.Time {
+	return n.effectiveFrom
+}
+
+func (n *Notice) EffectiveUntil() *time.Time {
+	return n.effectiveUntil
+}
+
 func ListNotices(ctx context.Context, eff NoticeReader) ([]*Notice, error) {
 	data, err := eff.ListNotices(ctx)
 	if err != nil {
@@ -54,8 +66,8 @@ func ListNotices(ctx context.Context, eff NoticeReader) ([]*Notice, error) {
 			path:           d.Path,
 			title:          d.Title,
 			markdown:       d.Markdown,
-			EffectiveFrom:  d.EffectiveFrom,
-			EffectiveUntil: d.EffectiveUntil,
+			effectiveFrom:  d.EffectiveFrom,
+			effectiveUntil: d.EffectiveUntil,
 		}
 		notices = append(notices, notice)
 	}
@@ -69,16 +81,16 @@ type NoticeRawData struct {
 	Title    *string
 }
 
-func SaveNotice(ctx context.Context, eff NoticeWriter, notice *NoticeData) error {
+func (n *Notice) SaveNotice(ctx context.Context, eff NoticeWriter) error {
 	// データを保存
-	if err := eff.SaveNotice(ctx, notice); err != nil {
+	if err := eff.SaveNotice(ctx, n); err != nil {
 		return WrapAsInternal(err, "failed to save notice")
 	}
 
 	return nil
 }
 
-func FetchNoticeByPath(ctx context.Context, eff NoticeGetter, path string) (*NoticeData, error) {
+func FetchNoticeByPath(ctx context.Context, eff NoticeGetter, path string) (*Notice, error) {
 	data, err := eff.GetNoticeByPath(ctx, path)
 	if err != nil {
 		return nil, WrapAsInternal(err, "failed to fetch notice content by path")
@@ -87,7 +99,7 @@ func FetchNoticeByPath(ctx context.Context, eff NoticeGetter, path string) (*Not
 }
 
 // TODO: growiのロジックをどうするか聞く
-func (d *NoticeRawData) parse() (*NoticeData, error) {
+func (d *NoticeRawData) parse() (*Notice, error) {
 	contentReader := strings.NewReader(d.Content)
 	bodyWriter := &strings.Builder{}
 
@@ -115,13 +127,13 @@ func (d *NoticeRawData) parse() (*NoticeData, error) {
 		return nil, WrapAsInternal(err, "failed to generate ID")
 	}
 
-	return &NoticeData{
-		ID:             id,
-		Path:           d.PagePath,
-		Title:          metadata["title"],
-		Markdown:       bodyWriter.String(),
-		EffectiveFrom:  effectiveFrom,
-		EffectiveUntil: effectiveUntil,
+	return &Notice{
+		id:             id,
+		path:           d.PagePath,
+		title:          metadata["title"],
+		markdown:       bodyWriter.String(),
+		effectiveFrom:  effectiveFrom,
+		effectiveUntil: effectiveUntil,
 	}, nil
 }
 
@@ -162,7 +174,7 @@ type (
 		ListNotices(ctx context.Context) ([]*NoticeData, error)
 	}
 	NoticeWriter interface {
-		SaveNotice(ctx context.Context, notice *NoticeData) error
+		SaveNotice(ctx context.Context, notice *Notice) error
 	}
 	NoticeGetter interface {
 		GetNoticeByPath(ctx context.Context, pagePath string) (*NoticeRawData, error)

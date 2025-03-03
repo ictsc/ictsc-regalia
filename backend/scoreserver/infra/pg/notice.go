@@ -67,9 +67,15 @@ var saveNoticeQuery = `
 		effective_until = EXCLUDED.effective_until;
 `
 
-func (r *repo) SaveNotice(ctx context.Context, notice *domain.NoticeData) error {
-	nRow := fromDomain(notice) // domain.NoticeData -> noticeRow に変換
-	if _, err := sqlx.NamedExecContext(ctx, r.ext, saveNoticeQuery, nRow); err != nil {
+func (r *repo) SaveNotice(ctx context.Context, notice *domain.Notice) error {
+	if _, err := sqlx.NamedExecContext(ctx, r.ext, saveNoticeQuery, noticeRow{
+		ID:             notice.ID(),
+		Path:           notice.Path(),
+		Title:          notice.Title(),
+		Markdown:       notice.Markdown(),
+		EffectiveFrom:  notice.EffectiveFrom(),
+		EffectiveUntil: notice.EffectiveUntil(),
+	}); err != nil {
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
 			if pgErr.Code == pgerrcode.UniqueViolation {
 				return domain.NewAlreadyExistsError("notice", nil)
@@ -88,16 +94,5 @@ func (n *noticeRow) toDomain() *domain.NoticeData {
 		Markdown:       n.Markdown,
 		EffectiveFrom:  n.EffectiveFrom,
 		EffectiveUntil: n.EffectiveUntil,
-	}
-}
-
-func fromDomain(notice *domain.NoticeData) *noticeRow {
-	return &noticeRow{
-		Path:           notice.Path,
-		Title:          notice.Title,
-		ID:             notice.ID,
-		Markdown:       notice.Markdown,
-		EffectiveFrom:  notice.EffectiveFrom,
-		EffectiveUntil: notice.EffectiveUntil,
 	}
 }
