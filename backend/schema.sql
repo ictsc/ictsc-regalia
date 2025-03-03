@@ -1,6 +1,4 @@
 CREATE EXTENSION pg_stat_statements;
-CREATE EXTENSION pg_stat_kcache;
-CREATE EXTENSION set_user;
 CREATE EXTENSION btree_gist;
 
 CREATE TABLE rules (
