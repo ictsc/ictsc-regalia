@@ -26,14 +26,14 @@ type (
 	}
 )
 
-// TODO: データを昇順降順などするか聞く
 var listNoticesQuery = `
 	SELECT 
 		id, path, title, markdown, effective_from, effective_until
 	FROM 
 		notices
 	WHERE 
-		effective_from <= NOW() AND effective_until >= NOW();
+		effective_from <= NOW() AND effective_until >= NOW()
+	ORDER BY effective_until DESC;
 	`
 
 func (r *repo) ListNotices(ctx context.Context) ([]*domain.NoticeData, error) {
