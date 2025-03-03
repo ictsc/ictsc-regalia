@@ -33,7 +33,7 @@ LEFT JOIN redeploy_percentage_penalties AS problem_rpp ON problem.id = problem_r
 INNER JOIN users AS author ON a.user_id = author.id`
 
 	listAnswersQuery = answerQueryBase + `
-ORDER BY a.created_at ASC`
+ORDER BY lower(a.created_at_range) ASC`
 	listAnswersByTeamProblemQuery = answerQueryBase + `
 WHERE team.code = $1 AND problem.code = $2
 ORDER BY a.number ASC`
