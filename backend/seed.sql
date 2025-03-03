@@ -59,6 +59,6 @@ INSERT INTO descriptive_answers (answer_id, body) VALUES
 TRUNCATE TABLE notices CASCADE;
 INSERT INTO notices (id, path, title, markdown, effective_from, effective_until) VALUES
 	('c9976fba-6793-4a7b-b058-798be7958317', '/old/notice', 'Old Notice', '過去のお知らせです', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
-	('0cea0d50-96a5-45fb-a5c5-a6d6df140adc', '/current/notice', 'Current Notice', '現在のお知らせです', '2025-02-03 00:00:00+00', '294276-12-31 23:59:59.999999'),
-	('6ca38a12-adff-48f3-8fce-8f189eba38bb', '/current/notice2', 'Current Notice2', '現在のお知らせ2です', '2025-02-03 00:00:00+00', '294276-12-31 23:59:59.999999'),
-	('e2eaf74d-db80-46cc-ad21-321039142629', "/future/notice", "Future Notice", "未来のお知らせです", '294276-12-31 23:59:59.999999', '294276-12-31 23:59:59.999999');
+	('0cea0d50-96a5-45fb-a5c5-a6d6df140adc', '/current/notice', 'Current Notice', '現在のお知らせです', '2025-02-03 00:00:00+00', '2035-03-03T00:00:00Z'),
+	('6ca38a12-adff-48f3-8fce-8f189eba38bb', '/current/notice2', 'Current Notice2', '現在のお知らせ2です', '2025-02-03 00:00:00+00', '2035-03-03T00:00:00Z'),
+	('e2eaf74d-db80-46cc-ad21-321039142629', '/future/notice', 'Future Notice', '未来のお知らせです', '2035-03-03T00:00:00Z', '2035-03-03T00:00:00Z');
