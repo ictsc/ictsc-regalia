@@ -11,7 +11,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 )
 
-type Notice notice
+type Notice = notice
 type notice struct {
 	id             uuid.UUID
 	path           string
