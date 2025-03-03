@@ -129,8 +129,6 @@ CREATE TABLE answers (
 	number INT NOT NULL CHECK (number > 0),
 	UNIQUE (problem_id, team_id, number),
 	user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-	created_at TIMESTAMP NULL,
-	rate_limit_interval INTERVAL NULL,
 	created_at_range TSTZRANGE NOT NULL,
 	CONSTRAINT answers_rate_limit EXCLUDE USING GIST
 		(problem_id WITH =, team_id WITH =, created_at_range WITH &&)
@@ -141,8 +139,7 @@ COMMENT ON COLUMN answers.problem_id IS '回答対象の問題 ID';
 COMMENT ON COLUMN answers.team_id IS '回答したチーム ID';
 COMMENT ON COLUMN answers.number IS '回答番号';
 COMMENT ON COLUMN answers.user_id IS '回答者のユーザ ID';
-COMMENT ON COLUMN answers.created_at IS '回答日時';
-COMMENT ON COLUMN answers.rate_limit_interval IS '次の回答までの最小間隔';
+COMMENT ON COLUMN answers.created_at_range IS '回答日時から次に回答できるまでの期間';
 
 CREATE TABLE descriptive_answers (
 	answer_id UUID PRIMARY KEY REFERENCES answers(id) ON DELETE CASCADE,
