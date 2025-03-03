@@ -129,9 +129,9 @@ CREATE TABLE answers (
 	user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	rate_limit_interval INTERVAL NOT NULL DEFAULT INTERVAL '00:20:00'::interval,
-	created_at_range TSTZRANGE NULL,
+	created_at_range TSTZRANGE NOT NULL,
 	CONSTRAINT answers_rate_limit EXCLUDE USING gist
-		(problem_id WITH =, team_id WITH =, tsrange(created_at, created_at + rate_limit_interval) WITH &&)
+		(problem_id WITH =, team_id WITH =, tsrange(created_at, created_at + rate_limit_interval) WITH &&, created_at_range WITH &&)
 );
 COMMENT ON TABLE answers IS '回答';
 COMMENT ON COLUMN answers.id IS '回答 ID';
