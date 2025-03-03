@@ -106,6 +106,10 @@ func GetAnswerDetail(ctx context.Context, eff AnswerReader, teamCode TeamCode, p
 	return answerDetailData.parse()
 }
 
+func (a *AnswerDetail) Answer() *Answer {
+	return a.answer
+}
+
 func (a *AnswerDetail) Body() *AnswerBody {
 	return a.body
 }
