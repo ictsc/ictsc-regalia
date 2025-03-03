@@ -3,7 +3,6 @@ package domain
 import (
 	"bufio"
 	"context"
-	"fmt"
 	"io"
 	"strings"
 	"time"
@@ -115,6 +114,13 @@ func (d *NoticeRawData) parse() (*Notice, error) {
 		return nil, WrapAsInternal(err, "failed to parse metadata")
 	}
 
+	if metadata.EffectiveFrom.IsZero() {
+		return nil, NewInvalidArgumentError("missing required field: effective_until", nil)
+	}
+	if metadata.EffectiveUntil.IsZero() {
+		return nil, NewInvalidArgumentError("missing required field: effective_until", nil)
+	}
+
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, WrapAsInternal(err, "failed to generate ID")
@@ -159,7 +165,7 @@ func parseNotice(r io.Reader, bodyWriter io.Writer) (*FrontMatter, error) {
 	}
 
 	if frontMatterContent.Len() == 0 {
-		return nil, WrapAsInternal(fmt.Errorf("frontmatter not found"), "failed to parse notice")
+		return nil, NewInvalidArgumentError("frontmatter not found", nil)
 	}
 
 	var frontMatter FrontMatter
