@@ -58,6 +58,10 @@ func TestListAnswers(t *testing.T) {
 				Title:        "問題B",
 				MaxScore:     200,
 				RedeployRule: domain.RedeployRulePercentagePenalty,
+				PercentagePenalty: &domain.RedeployPenaltyPercentage{
+					Threshold:  2,
+					Percentage: 10,
+				},
 			},
 			Author: &domain.UserData{
 				ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
