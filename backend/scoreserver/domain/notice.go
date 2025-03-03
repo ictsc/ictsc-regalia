@@ -3,12 +3,13 @@ package domain
 import (
 	"bufio"
 	"context"
+	"fmt"
 	"io"
-	"regexp"
 	"strings"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"gopkg.in/yaml.v3"
 )
 
 type Notice = notice
@@ -98,28 +99,20 @@ func FetchNoticeByPath(ctx context.Context, eff NoticeGetter, path string) (*Not
 	return data.parse()
 }
 
+type FrontMatter struct {
+	Title          string    `yaml:"title"`
+	EffectiveFrom  time.Time `yaml:"effective_from"`
+	EffectiveUntil time.Time `yaml:"effective_until"`
+}
+
 // TODO: growiのロジックをどうするか聞く
 func (d *NoticeRawData) parse() (*Notice, error) {
 	contentReader := strings.NewReader(d.Content)
 	bodyWriter := &strings.Builder{}
 
-	metadata := make(map[string]string)
-	if err := parseNotice(contentReader, bodyWriter, metadata); err != nil {
-		return nil, err
-	}
-
-	var effectiveFrom, effectiveUntil *time.Time
-	if metadata["effective_from"] != "" {
-		t, err := time.Parse(time.RFC3339, metadata["effective_from"])
-		if err == nil {
-			effectiveFrom = &t
-		}
-	}
-	if metadata["effective_until"] != "" {
-		t, err := time.Parse(time.RFC3339, metadata["effective_until"])
-		if err == nil {
-			effectiveUntil = &t
-		}
+	metadata, err := parseNotice(contentReader, bodyWriter)
+	if err != nil {
+		return nil, WrapAsInternal(err, "failed to parse metadata")
 	}
 
 	id, err := uuid.NewV4()
@@ -130,18 +123,19 @@ func (d *NoticeRawData) parse() (*Notice, error) {
 	return &Notice{
 		id:             id,
 		path:           d.PagePath,
-		title:          metadata["title"],
+		title:          metadata.Title,
 		markdown:       bodyWriter.String(),
-		effectiveFrom:  effectiveFrom,
-		effectiveUntil: effectiveUntil,
+		effectiveFrom:  &metadata.EffectiveFrom,
+		effectiveUntil: &metadata.EffectiveUntil,
 	}, nil
 }
 
-// TODO: growiのロジックをどうするか聞く
-func parseNotice(r io.Reader, bodyWriter io.Writer, metadata map[string]string) error {
+func parseNotice(r io.Reader, bodyWriter io.Writer) (*FrontMatter, error) {
 	scanner := bufio.NewScanner(r)
+	var frontMatterContent strings.Builder
 	inMetadata := false
 	lineno := 0
+
 	for scanner.Scan() {
 		lineno++
 		line := scanner.Text()
@@ -152,21 +146,28 @@ func parseNotice(r io.Reader, bodyWriter io.Writer, metadata map[string]string) 
 		}
 
 		if inMetadata {
-			if match := regexp.MustCompile(`^([^:]+):\s*(.+)$`).FindStringSubmatch(line); match != nil {
-				metadata[strings.TrimSpace(match[1])] = strings.TrimSpace(match[2])
+			frontMatterContent.WriteString(line + "\n")
+		} else {
+			if _, err := bodyWriter.Write([]byte(line + "\n")); err != nil {
+				return nil, WrapAsInternal(err, "failed to write body")
 			}
-			continue
-		}
-
-		if _, err := bodyWriter.Write([]byte(line + "\n")); err != nil {
-			return WrapAsInternal(err, "failed to write")
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		return WrapAsInternal(err, "failed to scan")
+		return nil, WrapAsInternal(err, "failed to scan notice content")
 	}
-	return nil
+
+	if frontMatterContent.Len() == 0 {
+		return nil, WrapAsInternal(fmt.Errorf("frontmatter not found"), "failed to parse notice")
+	}
+
+	var frontMatter FrontMatter
+	if err := yaml.Unmarshal([]byte(frontMatterContent.String()), &frontMatter); err != nil {
+		return nil, WrapAsInternal(err, "failed to parse frontmatter")
+	}
+
+	return &frontMatter, nil
 }
 
 type (
