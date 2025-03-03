@@ -18,7 +18,7 @@ var _ domain.ProblemReader = (*repo)(nil)
 var listProblemsQuery = `
 	SELECT
 		` + problemCols.String("p") + `,
-		` + reployPercentagePenaltyCols.As("rpp") + `
+		` + redeployPercentagePenaltyCols.As("rpp") + `
 	FROM problems AS p
 	LEFT JOIN redeploy_percentage_penalties AS rpp ON p.id = rpp.problem_id`
 
@@ -69,7 +69,7 @@ var getDescriptiveProblemQuery = `
 	SELECT
 		` + problemCols.String("p") + `,
 		` + problemContentCols.As("c") + `,
-		` + reployPercentagePenaltyCols.As("rpp") + `
+		` + redeployPercentagePenaltyCols.As("rpp") + `
 	FROM problems AS p
 	JOIN problem_contents AS c ON p.id = c.problem_id
 	LEFT JOIN redeploy_percentage_penalties AS rpp ON p.id = rpp.problem_id
@@ -216,9 +216,9 @@ type (
 )
 
 var (
-	problemCols                 = columns([]string{"id", "code", "type", "title", "max_score", "redeploy_rule"})
-	reployPercentagePenaltyCols = columns([]string{"threshold", "percentage"})
-	problemContentCols          = columns([]string{"page_id", "page_path", "body", "explanation"})
+	problemCols                   = columns([]string{"id", "code", "type", "title", "max_score", "redeploy_rule"})
+	redeployPercentagePenaltyCols = columns([]string{"threshold", "percentage"})
+	problemContentCols            = columns([]string{"page_id", "page_path", "body", "explanation"})
 )
 
 func (r *problemRow) data() *domain.ProblemData {

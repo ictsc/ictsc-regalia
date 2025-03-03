@@ -45,10 +45,10 @@ INSERT INTO problem_contents (problem_id, page_id, page_path, body, explanation)
 	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'page2', '/page2', '問題Bの本文', '問題Bの解説');
 
 TRUNCATE TABLE answers CASCADE;
-INSERT INTO answers (id, problem_id, team_id, number, user_id, created_at) VALUES
-	('7cedf13e-5325-425e-a5d6-fea5fc127e49', '16643c32-c686-44ba-996b-2fbe43b54513', 'a1de8fe6-26c8-42d7-b494-dea48e409091', 1, '3a4ca027-5e02-4ade-8e2d-eddb39adc235', '2025-02-03 00:00:00+00'),
-	('4bb7a232-e0de-4b6d-b1a3-8e50737d73b2', '16643c32-c686-44ba-996b-2fbe43b54513', 'a1de8fe6-26c8-42d7-b494-dea48e409091', 2, '3a4ca027-5e02-4ade-8e2d-eddb39adc235', '2025-02-03 00:30:00+00'),
-	('abbe9c4e-eef5-40ac-a04e-6d8877b15185', '24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'a1de8fe6-26c8-42d7-b494-dea48e409091', 1, '3a4ca027-5e02-4ade-8e2d-eddb39adc235', '2025-02-03 00:00:00+00');
+INSERT INTO answers (id, problem_id, team_id, number, user_id, created_at, created_at_range) VALUES
+	('7cedf13e-5325-425e-a5d6-fea5fc127e49', '16643c32-c686-44ba-996b-2fbe43b54513', 'a1de8fe6-26c8-42d7-b494-dea48e409091', 1, '3a4ca027-5e02-4ade-8e2d-eddb39adc235', '2025-02-03 00:00:00+00', tstzrange('2025-02-03 00:00:00+00', '2025-02-03 00:20:00+00')),
+	('4bb7a232-e0de-4b6d-b1a3-8e50737d73b2', '16643c32-c686-44ba-996b-2fbe43b54513', 'a1de8fe6-26c8-42d7-b494-dea48e409091', 2, '3a4ca027-5e02-4ade-8e2d-eddb39adc235', '2025-02-03 00:30:00+00', tstzrange('2025-02-03 00:30:00+00', '2025-02-03 00:50:00+00')),
+	('abbe9c4e-eef5-40ac-a04e-6d8877b15185', '24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'a1de8fe6-26c8-42d7-b494-dea48e409091', 1, '3a4ca027-5e02-4ade-8e2d-eddb39adc235', '2025-02-03 00:00:00+00', tstzrange('2025-02-03 00:00:00+00', '2025-02-03 00:20:00+00'));
 
 TRUNCATE TABLE descriptive_answers CASCADE;
 INSERT INTO descriptive_answers (answer_id, body) VALUES

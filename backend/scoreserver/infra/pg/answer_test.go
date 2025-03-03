@@ -58,6 +58,10 @@ func TestListAnswers(t *testing.T) {
 				Title:        "問題B",
 				MaxScore:     200,
 				RedeployRule: domain.RedeployRulePercentagePenalty,
+				PercentagePenalty: &domain.RedeployPenaltyPercentage{
+					Threshold:  2,
+					Percentage: 10,
+				},
 			},
 			Author: &domain.UserData{
 				ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
@@ -379,7 +383,8 @@ func TestCreateAnswer(t *testing.T) {
 						problem_id = '16643c32-c686-44ba-996b-2fbe43b54513' AND
 						user_id = '3a4ca027-5e02-4ade-8e2d-eddb39adc235' AND
 						created_at = '2025-02-03 01:00:00' AND
-						rate_limit_interval = '20m'`,
+						rate_limit_interval = '20m' AND
+						created_at_range = tstzrange('2025-02-03 01:00:00', '2025-02-03 01:20:00')`,
 				"descriptive answer": `
 					SELECT 1 FROM descriptive_answers WHERE
 						answer_id = '1bb8bf23-95e1-438c-b30a-1778383190dc' AND

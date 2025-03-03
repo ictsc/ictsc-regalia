@@ -22,10 +22,12 @@ SELECT
 	` + answerColumns.String("a") + `,
 	` + teamColumns.As("team") + `,
 	` + problemCols.As("problem") + `,
+	` + redeployPercentagePenaltyCols.As("problem_rpp") + `,
 	` + userColumns.As("author") + `
 FROM answers AS a
 INNER JOIN teams AS team ON a.team_id = team.id
 INNER JOIN problems AS problem ON a.problem_id = problem.id
+LEFT JOIN redeploy_percentage_penalties AS problem_rpp ON problem.id = problem_rpp.problem_id
 INNER JOIN users AS author ON a.user_id = author.id`
 
 	listAnswersQuery = answerQueryBase + `
@@ -43,11 +45,13 @@ SELECT
 	` + answerColumns.String("a") + `,
 	` + teamColumns.As("team") + `,
 	` + problemCols.As("problem") + `,
+	` + redeployPercentagePenaltyCols.As("problem_rpp") + `,
 	` + userColumns.As("author") + `,
 	descriptive.body AS "descriptive.body"
 FROM answers AS a
 INNER JOIN teams AS team ON a.team_id = team.id
 INNER JOIN problems AS problem ON a.problem_id = problem.id
+LEFT JOIN redeploy_percentage_penalties AS problem_rpp ON problem.id = problem_rpp.problem_id
 INNER JOIN users AS author ON a.user_id = author.id
 LEFT JOIN descriptive_answers AS descriptive ON a.id = descriptive.answer_id`
 
@@ -132,10 +136,11 @@ type (
 	}
 	answerRow struct {
 		answerDataRow
-		Team              teamRow         `db:"team"`
-		Problem           problemRow      `db:"problem"`
-		User              userRow         `db:"author"`
-		RateLimitInterval pgtype.Interval `db:"rate_limit_interval"`
+		Team                     teamRow                          `db:"team"`
+		Problem                  problemRow                       `db:"problem"`
+		ProblemPercentagePenalty redeployPercentagePenaltyNullRow `db:"problem_rpp"`
+		User                     userRow                          `db:"author"`
+		RateLimitInterval        pgtype.Interval                  `db:"rate_limit_interval"`
 	}
 	answerDetailRow struct {
 		answerRow
@@ -148,6 +153,7 @@ var answerColumns = columns([]string{"id", "number", "created_at", "rate_limit_i
 func (r answerRow) data() *domain.AnswerData {
 	r.answerDataRow.Team = (*domain.TeamData)(&r.Team)
 	r.answerDataRow.Problem = r.Problem.data()
+	r.answerDataRow.Problem.PercentagePenalty = r.ProblemPercentagePenalty.data()
 	r.answerDataRow.Author = (*domain.UserData)(&r.User)
 	r.Interval = time.Microsecond * time.Duration(r.RateLimitInterval.Microseconds)
 	return (*domain.AnswerData)(&r.answerDataRow)
@@ -166,8 +172,8 @@ var _ domain.AnswerWriter = (*RepositoryTx)(nil)
 
 var (
 	createAnswerQuery = `
-INSERT INTO answers (id, number, team_id, problem_id, user_id, created_at, rate_limit_interval)
-VALUES ($1, $2, $3, $4, $5, $6, $7)`
+INSERT INTO answers (id, number, team_id, problem_id, user_id, created_at, rate_limit_interval, created_at_range)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, tstzrange($8::timestamptz, $8::timestamptz + $7::interval))`
 	createDescriptiveAnswerQuery = `
 INSERT INTO descriptive_answers (answer_id, body)
 VALUES ($1, $2)`
@@ -185,6 +191,7 @@ func (r *RepositoryTx) CreateAnswer(ctx context.Context, data *domain.AnswerDeta
 		data.Answer.Author.ID,
 		data.Answer.CreatedAt,
 		data.Answer.Interval,
+		data.Answer.CreatedAt,
 	); err != nil {
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
 			if pgErr.Code == pgerrcode.ExclusionViolation && pgErr.ConstraintName == "answers_rate_limit" {
