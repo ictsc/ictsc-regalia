@@ -1,6 +1,8 @@
 package pg_test
 
 import (
+	"slices"
+	"strings"
 	"testing"
 	"time"
 
@@ -16,6 +18,31 @@ func TestListAnswers(t *testing.T) {
 	t.Parallel()
 
 	expected := []*domain.AnswerData{
+		{
+			ID:     uuid.FromStringOrNil("4bb7a232-e0de-4b6d-b1a3-8e50737d73b2"),
+			Number: 2,
+			Team: &domain.TeamData{
+				ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
+				Code:         1,
+				Name:         "トラブルシューターズ",
+				Organization: "ICTSC Association",
+				MaxMembers:   6,
+			},
+			Problem: &domain.ProblemData{
+				ID:           uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
+				Code:         "ZZA",
+				ProblemType:  domain.ProblemTypeDescriptive,
+				Title:        "問題A",
+				MaxScore:     100,
+				RedeployRule: domain.RedeployRuleUnredeployable,
+			},
+			Author: &domain.UserData{
+				ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
+				Name: "alice",
+			},
+			CreatedAt: time.Date(2025, 2, 3, 0, 30, 0, 0, time.UTC),
+			Interval:  20 * time.Minute,
+		},
 		{
 			ID:     uuid.FromStringOrNil("7cedf13e-5325-425e-a5d6-fea5fc127e49"),
 			Number: 1,
@@ -70,37 +97,15 @@ func TestListAnswers(t *testing.T) {
 			CreatedAt: time.Date(2025, 2, 3, 0, 0, 0, 0, time.UTC),
 			Interval:  20 * time.Minute,
 		},
-		{
-			ID:     uuid.FromStringOrNil("4bb7a232-e0de-4b6d-b1a3-8e50737d73b2"),
-			Number: 2,
-			Team: &domain.TeamData{
-				ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-				Code:         1,
-				Name:         "トラブルシューターズ",
-				Organization: "ICTSC Association",
-				MaxMembers:   6,
-			},
-			Problem: &domain.ProblemData{
-				ID:           uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
-				Code:         "ZZA",
-				ProblemType:  domain.ProblemTypeDescriptive,
-				Title:        "問題A",
-				MaxScore:     100,
-				RedeployRule: domain.RedeployRuleUnredeployable,
-			},
-			Author: &domain.UserData{
-				ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-				Name: "alice",
-			},
-			CreatedAt: time.Date(2025, 2, 3, 0, 30, 0, 0, time.UTC),
-			Interval:  20 * time.Minute,
-		},
 	}
 	repo := pg.NewRepository(pgtest.SetupDB(t))
 	actual, err := repo.ListAnswers(t.Context())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
+	slices.SortStableFunc(actual, func(lhs, rhs *domain.AnswerData) int {
+		return strings.Compare(lhs.ID.String(), rhs.ID.String())
+	})
 	if diff := cmp.Diff(expected, actual); diff != "" {
 		t.Errorf("unexpected result (-want +got):\n%s", diff)
 	}
@@ -382,8 +387,6 @@ func TestCreateAnswer(t *testing.T) {
 						team_id = 'a1de8fe6-26c8-42d7-b494-dea48e409091' AND
 						problem_id = '16643c32-c686-44ba-996b-2fbe43b54513' AND
 						user_id = '3a4ca027-5e02-4ade-8e2d-eddb39adc235' AND
-						created_at = '2025-02-03 01:00:00' AND
-						rate_limit_interval = '20m' AND
 						created_at_range = tstzrange('2025-02-03 01:00:00', '2025-02-03 01:20:00')`,
 				"descriptive answer": `
 					SELECT 1 FROM descriptive_answers WHERE

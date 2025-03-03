@@ -20,6 +20,8 @@ var (
 	answerQueryBase = `
 SELECT
 	` + answerColumns.String("a") + `,
+	lower(a.created_at_range) AS "created_at",
+	upper(a.created_at_range) - lower(a.created_at_range) AS "rate_limit_interval",
 	` + teamColumns.As("team") + `,
 	` + problemCols.As("problem") + `,
 	` + redeployPercentagePenaltyCols.As("problem_rpp") + `,
@@ -31,7 +33,7 @@ LEFT JOIN redeploy_percentage_penalties AS problem_rpp ON problem.id = problem_r
 INNER JOIN users AS author ON a.user_id = author.id`
 
 	listAnswersQuery = answerQueryBase + `
-ORDER BY a.created_at ASC`
+ORDER BY lower(a.created_at_range) ASC`
 	listAnswersByTeamProblemQuery = answerQueryBase + `
 WHERE team.code = $1 AND problem.code = $2
 ORDER BY a.number ASC`
@@ -43,6 +45,8 @@ LIMIT 1`
 	answerDetailQueryBase = `
 SELECT
 	` + answerColumns.String("a") + `,
+	lower(a.created_at_range) AS "created_at",
+	upper(a.created_at_range) - lower(a.created_at_range) AS "rate_limit_interval",
 	` + teamColumns.As("team") + `,
 	` + problemCols.As("problem") + `,
 	` + redeployPercentagePenaltyCols.As("problem_rpp") + `,
@@ -148,7 +152,7 @@ type (
 	}
 )
 
-var answerColumns = columns([]string{"id", "number", "created_at", "rate_limit_interval"})
+var answerColumns = columns([]string{"id", "number"})
 
 func (r answerRow) data() *domain.AnswerData {
 	r.answerDataRow.Team = (*domain.TeamData)(&r.Team)
@@ -172,8 +176,8 @@ var _ domain.AnswerWriter = (*RepositoryTx)(nil)
 
 var (
 	createAnswerQuery = `
-INSERT INTO answers (id, number, team_id, problem_id, user_id, created_at, rate_limit_interval, created_at_range)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, tstzrange($8::timestamptz, $8::timestamptz + $7::interval))`
+INSERT INTO answers (id, number, team_id, problem_id, user_id, created_at_range)
+	VALUES ($1, $2, $3, $4, $5, tstzrange($6::timestamptz, $6::timestamptz + $7::interval))`
 	createDescriptiveAnswerQuery = `
 INSERT INTO descriptive_answers (answer_id, body)
 VALUES ($1, $2)`
@@ -191,7 +195,6 @@ func (r *RepositoryTx) CreateAnswer(ctx context.Context, data *domain.AnswerDeta
 		data.Answer.Author.ID,
 		data.Answer.CreatedAt,
 		data.Answer.Interval,
-		data.Answer.CreatedAt,
 	); err != nil {
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
 			if pgErr.Code == pgerrcode.ExclusionViolation && pgErr.ConstraintName == "answers_rate_limit" {
