@@ -1,4 +1,6 @@
 CREATE EXTENSION pg_stat_statements;
+-- CREATE EXTENSION pg_stat_kcache;
+-- CREATE EXTENSION set_user;
 CREATE EXTENSION btree_gist;
 
 CREATE TABLE rules (
@@ -127,11 +129,11 @@ CREATE TABLE answers (
 	number INT NOT NULL CHECK (number > 0),
 	UNIQUE (problem_id, team_id, number),
 	user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	rate_limit_interval INTERVAL NOT NULL DEFAULT INTERVAL '00:20:00'::interval,
+	created_at TIMESTAMP NULL,
+	rate_limit_interval INTERVAL NULL,
 	created_at_range TSTZRANGE NOT NULL,
-	CONSTRAINT answers_rate_limit EXCLUDE USING gist
-		(problem_id WITH =, team_id WITH =, tsrange(created_at, created_at + rate_limit_interval) WITH &&, created_at_range WITH &&)
+	CONSTRAINT answers_rate_limit EXCLUDE USING GIST
+		(problem_id WITH =, team_id WITH =, created_at_range WITH &&)
 );
 COMMENT ON TABLE answers IS '回答';
 COMMENT ON COLUMN answers.id IS '回答 ID';
