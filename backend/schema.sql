@@ -194,7 +194,7 @@ CREATE TABLE redeployment_events (
 
 CREATE TABLE notices (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	path VARCHAR(255) NOT NULL,
+	path VARCHAR(255) NOT NULL UNIQUE,
 	title VARCHAR(255),
 	markdown TEXT NOT NULL,
 	effective_from TIMESTAMP NOT NULL,
