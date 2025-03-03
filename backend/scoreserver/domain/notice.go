@@ -82,7 +82,6 @@ type NoticeRawData struct {
 }
 
 func (n *Notice) SaveNotice(ctx context.Context, eff NoticeWriter) error {
-	// データを保存
 	if err := eff.SaveNotice(ctx, n); err != nil {
 		return WrapAsInternal(err, "failed to save notice")
 	}
@@ -104,7 +103,6 @@ type FrontMatter struct {
 	EffectiveUntil time.Time `yaml:"effective_until"`
 }
 
-// TODO: growiのロジックをどうするか聞く
 func (d *NoticeRawData) parse() (*Notice, error) {
 	contentReader := strings.NewReader(d.Content)
 	bodyWriter := &strings.Builder{}
