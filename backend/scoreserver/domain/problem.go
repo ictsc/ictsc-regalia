@@ -135,6 +135,10 @@ func (p *Problem) RedeployRule() RedeployRule {
 	return p.redeployRule
 }
 
+func (p *Problem) Redeployable() bool {
+	return p.redeployRule != RedeployRuleUnredeployable
+}
+
 func (p *Problem) PercentagePenalty() *RedeployPenaltyPercentage {
 	if p.redeployRule != RedeployRulePercentagePenalty {
 		return nil

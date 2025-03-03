@@ -4,8 +4,8 @@ import "context"
 
 type (
 	TeamProblem struct {
-		team    *Team
-		problem *Problem
+		*problem
+		team *Team
 	}
 	TeamProblemDetail struct {
 		team          *Team
