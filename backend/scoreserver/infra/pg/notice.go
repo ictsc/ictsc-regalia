@@ -31,7 +31,7 @@ var listNoticesQuery = `
 	SELECT 
 		id, path, title, markdown, effective_from, effective_until
 	FROM 
-		notice
+		notices
 	WHERE 
 		effective_from <= NOW() AND effective_until >= NOW();
 	`
@@ -55,7 +55,7 @@ func (r *repo) ListNotices(ctx context.Context) ([]*domain.NoticeData, error) {
 }
 
 var saveNoticeQuery = `
-	INSERT INTO notice
+	INSERT INTO notices
 		(id, path, title, markdown, effective_from, effective_until)
 	VALUES
 		(:id, :path, :title, :markdown, :effective_from, :effective_until)
@@ -91,13 +91,13 @@ func (n *noticeRow) toDomain() *domain.NoticeData {
 	}
 }
 
-func fromDomain(n *domain.NoticeData) *noticeRow {
+func fromDomain(notice *domain.NoticeData) *noticeRow {
 	return &noticeRow{
-		ID:             n.ID,
-		Path:           n.Path,
-		Title:          n.Title,
-		Markdown:       n.Markdown,
-		EffectiveFrom:  n.EffectiveFrom,
-		EffectiveUntil: n.EffectiveUntil,
+		Path:           notice.Path,
+		Title:          notice.Title,
+		ID:             notice.ID,
+		Markdown:       notice.Markdown,
+		EffectiveFrom:  notice.EffectiveFrom,
+		EffectiveUntil: notice.EffectiveUntil,
 	}
 }
