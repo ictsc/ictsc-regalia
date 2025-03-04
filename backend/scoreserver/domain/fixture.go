@@ -121,6 +121,7 @@ func FixDescriptiveProblem1(tb testing.TB, data *DescriptiveProblemData) *Descri
 			ProblemType:  ProblemTypeDescriptive,
 			Title:        "Problem 1",
 			MaxScore:     100,
+			Category:     "Network",
 			RedeployRule: RedeployRuleUnredeployable,
 		},
 		Content: &ProblemContentData{

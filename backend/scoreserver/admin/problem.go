@@ -158,6 +158,7 @@ func (h *ProblemServiceHandler) CreateProblem(
 		Code:              code,
 		Title:             req.Msg.GetProblem().GetTitle(),
 		MaxScore:          req.Msg.GetProblem().GetMaxScore(),
+		Category:          req.Msg.GetProblem().GetCategory(),
 		RedeployRule:      rule,
 		PercentagePenalty: penalty,
 		Content:           content,
@@ -212,6 +213,7 @@ func (h *ProblemServiceHandler) UpdateProblem(
 	input := domain.UpdateDescriptiveProblemInput{
 		Title:             req.Msg.GetProblem().GetTitle(),
 		MaxScore:          req.Msg.GetProblem().GetMaxScore(),
+		Category:          req.Msg.GetProblem().GetCategory(),
 		RedeployRule:      rule,
 		PercentagePenalty: penalty,
 		Content:           content,
@@ -291,6 +293,7 @@ func convertProblem(problem *domain.Problem) *adminv1.Problem {
 		Code:         string(problem.Code()),
 		Title:        problem.Title(),
 		MaxScore:     problem.MaxScore(),
+		Category:     problem.Category(),
 		RedeployRule: convertRedeployRule(problem),
 		Body: &adminv1.ProblemBody{
 			Type: typ,
