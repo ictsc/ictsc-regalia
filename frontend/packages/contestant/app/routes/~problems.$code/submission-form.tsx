@@ -105,7 +105,6 @@ function SubmissionFormInner({
           className="flex-1 resize-none rounded-12 border border-text p-12"
           required
           placeholder="お世話になっております、チーム◯◯◯です。"
-          disabled={!isAnswerable}
           onInvalid={(e) => {
             e.preventDefault();
             if (!(e.target instanceof HTMLTextAreaElement)) {
