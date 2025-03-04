@@ -42,7 +42,7 @@ jobs:
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies
 
       - name: Lint
-        run: pnpm run --recursive --parallel --aggregate-output lint
+        run: pnpm run ci:lint
 
       - name: Save pnpm cache
         if: always() && steps.pnpm-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
@@ -79,7 +79,7 @@ jobs:
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies
 
       - name: Generate
-        run: pnpm run --recursive --parallel --aggregate-output generate
+        run: pnpm run generate
       - name: Check diff
         run: git diff --name-only --exit-code
 
@@ -118,7 +118,7 @@ jobs:
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies
 
       - name: Test
-        run: pnpm run --recursive --parallel --aggregate-output test
+        run: pnpm run ci:test
 
       - name: Save pnpm cache
         if: always() && steps.pnpm-cache.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main'
