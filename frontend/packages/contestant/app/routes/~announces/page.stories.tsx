@@ -1,25 +1,23 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { NotificationList } from "./page";
+import { AnnounceList } from "./page";
 
 export default {
   title: "pages/announces",
-  component: NotificationList,
-} satisfies Meta<typeof NotificationList>;
+  component: AnnounceList,
+} satisfies Meta<typeof AnnounceList>;
 
-type Story = StoryObj<typeof NotificationList>;
+type Story = StoryObj<typeof AnnounceList>;
 
 export const InContest: Story = {
-  name: "Default",
-  args: {
-    notifications: [
-      { text: '第二報・woaの初期コンフィグの設定間違いについて'},
-      { text: '第二報・woaの初期コンフィグの設定間違いについて'},
-      { text: '第二報・woaの初期コンフィグの設定間違いについて'},
-      { text: '第二報・woaの初期コンフィグの設定間違いについて'},
-      { text: '第二報・woaの初期コンフィグの設定間違いについて'},
-      { text: '第二報・woaの初期コンフィグの設定間違いについて'},
-      { text: '第二報・woaの初期コンフィグの設定間違いについて'},
-      { text: '第二報・woaの初期コンフィグの設定間違いについて'},
-    ],
-  },
+  render: () => (
+    <div>
+      <AnnounceList announce="第二報・woaの初期コンフィグの設定間違いについて" />
+      <AnnounceList announce="第二報・woaの初期コンフィグの設定間違いについて" />
+      <AnnounceList announce="第二報・woaの初期コンフィグの設定間違いについて" />
+      <AnnounceList announce="第二報・woaの初期コンフィグの設定間違いについて" />
+      <AnnounceList announce="第二報・woaの初期コンフィグの設定間違いについて" />
+      <AnnounceList announce="第二報・woaの初期コンフィグの設定間違いについて" />
+      <AnnounceList announce="第二報・woaの初期コンフィグの設定間違いについて" />
+    </div>
+  ),
 };
