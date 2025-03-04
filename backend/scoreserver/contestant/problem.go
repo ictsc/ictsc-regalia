@@ -58,9 +58,12 @@ func (h *ProblemServiceHandler) ListProblems(
 	protoProblems := make([]*contestantv1.Problem, 0, len(problems))
 	for _, problem := range problems {
 		protoProblems = append(protoProblems, &contestantv1.Problem{
-			Code:     string(problem.Problem().Code()),
-			Title:    problem.Problem().Title(),
-			MaxScore: problem.Problem().MaxScore(),
+			Code:     string(problem.Code()),
+			Title:    problem.Title(),
+			MaxScore: problem.MaxScore(),
+			Deployment: &contestantv1.Deployment{
+				Redeployable: problem.Redeployable(),
+			},
 		})
 	}
 
@@ -103,6 +106,9 @@ func (h *ProblemServiceHandler) GetProblem(
 		Code:     string(detail.Code()),
 		Title:    detail.Title(),
 		MaxScore: detail.MaxScore(),
+		Deployment: &contestantv1.Deployment{
+			Redeployable: detail.Redeployable(),
+		},
 		Body: &contestantv1.ProblemBody{
 			Type: contestantv1.ProblemType_PROBLEM_TYPE_DESCRIPTIVE,
 			Body: &contestantv1.ProblemBody_Descriptive{
