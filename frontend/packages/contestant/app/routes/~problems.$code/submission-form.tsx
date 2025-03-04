@@ -1,19 +1,42 @@
-import { useReducer, useId, type ActionDispatch } from "react";
+import { useReducer, useId, type ActionDispatch, useEffect, useState } from "react";
 import { Field, Label, Textarea } from "@headlessui/react";
 import { MaterialSymbol } from "../../components/material-symbol";
+import { clsx } from "clsx";
 
 export function SubmissionForm(props: {
   readonly action: (answer: string) => Promise<"success" | "failure">;
+  readonly submitInterval?: number;
+  readonly lastSubmittedAt?: string;
 }) {
   const [error, dispatchError] = useReducer<FormErrorState, [FormErrorAction]>(
     reduceFormError,
     null,
   );
+  const [isAnswerable, setIsAnswerable] = useState(true);
+
+  useEffect(() => {
+    if (!props.lastSubmittedAt || !props.submitInterval) {
+      setIsAnswerable(true);
+      return;
+    }
+
+    const checkAnswerable = () => {
+      const now = new Date();
+      const lastSubmit = new Date(props.lastSubmittedAt!);
+      const nextSubmitTime = new Date(lastSubmit.getTime() + props.submitInterval! * 1000);
+      setIsAnswerable(now >= nextSubmitTime);
+    };
+    checkAnswerable();
+    const interval = setInterval(checkAnswerable, 1000);
+    return () => clearInterval(interval);
+  }, [props.lastSubmittedAt, props.submitInterval]);
+
   return (
     <form
       className="flex size-full flex-col"
       onReset={() => dispatchError("reset")}
       action={async (data) => {
+        if (!isAnswerable) return;
         const answer = data.get("answer");
         if (typeof answer !== "string") {
           return;
@@ -29,7 +52,11 @@ export function SubmissionForm(props: {
         }
       }}
     >
-      <SubmissionFormInner error={error} dispatchError={dispatchError} />
+      <SubmissionFormInner 
+        error={error} 
+        dispatchError={dispatchError} 
+        isAnswerable={isAnswerable}
+      />
     </form>
   );
 }
@@ -54,9 +81,11 @@ function reduceFormError(
 function SubmissionFormInner({
   error,
   dispatchError,
+  isAnswerable,
 }: {
   error: FormErrorState;
   dispatchError: ActionDispatch<[FormErrorAction]>;
+  isAnswerable: boolean;
 }) {
   const submitLabelID = useId();
   return (
@@ -68,6 +97,7 @@ function SubmissionFormInner({
           className="flex-1 resize-none rounded-12 border border-text p-12"
           required
           placeholder="お世話になっております、チーム◯◯◯です。"
+          disabled={!isAnswerable}
           onInvalid={(e) => {
             e.preventDefault();
             if (!(e.target instanceof HTMLTextAreaElement)) {
@@ -95,7 +125,13 @@ function SubmissionFormInner({
         <button
           aria-labelledby={submitLabelID}
           type="submit"
-          className="flex items-center justify-center self-end rounded-12 bg-surface-2 py-16 pl-24 pr-20 shadow-md transition hover:opacity-80 active:shadow-none"
+          disabled={!isAnswerable}
+          className={clsx(
+            "flex items-center justify-center self-end rounded-12 py-16 pl-24 pr-20 shadow-md transition",
+            isAnswerable 
+              ? "bg-surface-2 hover:opacity-80 active:shadow-none"
+              : "bg-disabled"
+          )}
         >
           <div className="text-16 font-bold">回答する</div>
           <MaterialSymbol icon="send" size={24} />
