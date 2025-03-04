@@ -13,34 +13,45 @@ export const Default: Story = {
       <ProblemItem
         code="ABC"
         title="あいしーてぃーえすしーだよあああああああ"
-        maxScore={200}
-        score={200}
-        rawScore={200}
-        penalty={0}
-        fullScore
-        rawFullScore
+        score={{
+          maxScore: 200,
+          score: 200,
+          rawScore: 200,
+          penalty: 0,
+          fullScore: true,
+          rawFullScore: true,
+        }}
       />
       <ProblemItem
         code="ABC"
         title="あいしーてぃーえすしーだよあああああああ"
-        maxScore={200}
-        score={160}
-        rawScore={200}
-        penalty={-40}
-        rawFullScore
+        score={{
+          maxScore: 200,
+          score: 160,
+          rawScore: 200,
+          penalty: -40,
+          fullScore: false,
+          rawFullScore: true,
+        }}
       />
       <ProblemItem
         code="ABC"
         title="あいしーてぃーえすしーだよあああああああ"
-        maxScore={200}
-        score={100}
-        rawScore={120}
-        penalty={-20}
+        score={{
+          maxScore: 200,
+          score: 100,
+          rawScore: 120,
+          penalty: -20,
+          fullScore: false,
+          rawFullScore: false,
+        }}
       />
       <ProblemItem
         code="ABC"
         title="あいしーてぃーえすしーだよあああああああ"
-        maxScore={200}
+        score={{
+          maxScore: 200,
+        }}
       />
     </div>
   ),

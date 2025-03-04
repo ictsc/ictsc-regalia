@@ -14,12 +14,14 @@ export function ProblemsPage(props: PageProps) {
             <ProblemItem
               code={problem.code}
               title={problem.title}
-              maxScore={problem.maxScore}
-              score={problem.score?.score}
-              rawScore={problem.score?.markedScore}
-              penalty={problem.score?.penalty}
-              fullScore={problem.score?.score === problem.maxScore}
-              rawFullScore={problem.score?.markedScore === problem.maxScore}
+              score={{
+                maxScore: problem.maxScore,
+                score: problem.score?.score,
+                rawScore: problem.score?.markedScore,
+                penalty: problem.score?.penalty,
+                fullScore: problem.score?.score === problem.maxScore,
+                rawFullScore: problem.score?.markedScore === problem.maxScore,
+              }}
             />
           </li>
         ))}
