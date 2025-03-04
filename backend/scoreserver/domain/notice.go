@@ -78,7 +78,6 @@ type NoticeRawData struct {
 	PageID   string
 	PagePath string
 	Content  string
-	Title    *string
 }
 
 func (n *Notice) SaveNotice(ctx context.Context, eff NoticeWriter) error {
