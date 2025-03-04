@@ -1,11 +1,6 @@
-import { createContext, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { clsx } from "clsx";
-
-export const NavbarLayoutContext = createContext<{
-  navbarTransitioning: boolean;
-}>({
-  navbarTransitioning: false,
-});
+import { NavbarLayoutContext } from "./context";
 
 export function Layout({
   children,
@@ -41,10 +36,20 @@ export function Layout({
         <header className="fixed left-0 right-0 top-0 z-10 h-[--header-height] bg-surface-0">
           {header}
         </header>
-        <nav className="fixed bottom-0 left-0 top-[--header-height] w-[--navbar-width] motion-safe:transition-[width]">
+        <nav
+          className={clsx(
+            "fixed bottom-0 left-0 top-[--header-height] w-[--navbar-width]",
+            navbarTransitioning && "motion-safe:transition-[width]",
+          )}
+        >
           {navbar}
         </nav>
-        <main className="fixed bottom-0 right-0 h-[--content-height] w-[--content-width] overflow-y-auto overflow-x-clip motion-safe:transition-[width]">
+        <main
+          className={clsx(
+            "fixed bottom-0 right-0 h-[--content-height] w-[--content-width] overflow-y-auto overflow-x-clip [scroll-gutter:stable]",
+            navbarTransitioning && "motion-safe:transition-[width]",
+          )}
+        >
           {children}
         </main>
       </div>
