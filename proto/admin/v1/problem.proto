@@ -13,10 +13,14 @@ message Problem {
   string title = 2;
   // 最大得点
   uint32 max_score = 3;
+  // 問題カテゴリー
+  string category = 4;
 
-  RedeployRule redeploy_rule = 4;
+  RedeployRule redeploy_rule = 5;
 
-  ProblemBody body = 5;
+  ProblemBody body = 6;
+
+  
 }
 
 enum RedeployRuleType {

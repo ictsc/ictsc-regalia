@@ -87,6 +87,7 @@ CREATE TABLE problems (
 	type problem_type NOT NULL,
 	title VARCHAR(255) NOT NULL,
 	max_score INT NOT NULL CHECK (max_score > 0),
+	category VARCHAR(255) NOT NULL,
 	redeploy_rule redeploy_rule NOT NULL,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -96,6 +97,7 @@ COMMENT ON COLUMN problems.id IS '問題 ID';
 COMMENT ON COLUMN problems.type IS '問題の種別';
 COMMENT ON COLUMN problems.title IS '問題名';
 COMMENT ON COLUMN problems.max_score IS '最大得点';
+COMMENT ON COLUMN problems.category IS '問題のカテゴリー';
 COMMENT ON COLUMN problems.redeploy_rule IS '再展開時のルール';
 
 CREATE TABLE redeploy_percentage_penalties (
