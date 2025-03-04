@@ -6,9 +6,6 @@ type RankingItemProps = {
   teamName: string;
   affiliation: string;
   score?: number;
-  penalty?: number;
-  fullScore?: boolean;
-  rawFullScore?: boolean;
 };
 
 export function RankingItem(props: RankingItemProps) {

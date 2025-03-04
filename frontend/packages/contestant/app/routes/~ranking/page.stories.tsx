@@ -16,9 +16,6 @@ export const Default: Story = {
         affiliation="testTeam"
         score={8888}
         timeStamp={new Date("2025-03-04T12:00:00")}
-        penalty={0}
-        fullScore
-        rawFullScore
       />
       <RankingItem
         rank={2}
@@ -26,9 +23,6 @@ export const Default: Story = {
         affiliation="testTeam"
         score={8888}
         timeStamp={new Date("2025-03-04T12:00:00")}
-        penalty={0}
-        fullScore
-        rawFullScore
       />
       <RankingItem
         rank={3}
@@ -36,9 +30,6 @@ export const Default: Story = {
         affiliation="testTeam"
         score={8888}
         timeStamp={new Date("2025-03-04T12:00:00")}
-        penalty={0}
-        fullScore
-        rawFullScore
       />
       <RankingItem
         rank={4}
@@ -46,9 +37,6 @@ export const Default: Story = {
         affiliation="testTeam"
         score={8888}
         timeStamp={new Date("2025-03-04T12:00:00")}
-        penalty={0}
-        fullScore
-        rawFullScore
       />
       <RankingItem
         rank={5}
@@ -56,9 +44,6 @@ export const Default: Story = {
         affiliation="testTeam"
         score={500}
         timeStamp={new Date("2025-03-04T12:00:00")}
-        penalty={0}
-        fullScore
-        rawFullScore
       />
       <RankingItem
         rank={6}
@@ -66,9 +51,6 @@ export const Default: Story = {
         affiliation="testTeam"
         score={0}
         timeStamp={new Date("2025-03-04T12:00:00")}
-        penalty={0}
-        fullScore
-        rawFullScore
       />
     </div>
   ),
