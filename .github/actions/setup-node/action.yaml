@@ -1,0 +1,37 @@
+name: Setup Node
+description: Setup Node.js environment with repository specific settings.
+runs:
+  using: composite
+  steps:
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: frontend/.node-version
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: "10" # >=10 is required for bootstrapping
+    - name: Get pnpm store path
+      id: pnpm-store
+      shell: bash
+      run: echo "path=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+    - name: Restore pnpm store cache
+      uses: actions/cache/restore@v4
+      id: pnpm-cache
+      with:
+        path: ${{ steps.pnpm-store.outputs.path }}
+        key: pnpm-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+        restore-keys: |
+          pnpm-
+    - name: Install packages
+      shell: bash
+      working-directory: frontend
+      run: pnpm install --frozen-lockfile --strict-peer-dependencies
+    - name: Save pnpm store cache
+      if: >-
+        steps.go-mod-cache.outputs.cache-hit != 'true'
+        && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ steps.pnpm-store.outputs.path }}
+        key: ${{ steps.pnpm-cache.outputs.cache-primary-key }}

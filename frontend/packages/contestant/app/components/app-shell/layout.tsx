@@ -24,13 +24,13 @@ export function Layout({
     <NavbarLayoutContext value={{ navbarTransitioning }}>
       <div
         className={clsx(
-          "grid h-screen w-screen grid-rows-[70px_1fr] duration-75 [--content-height:calc(100vh-70px)] [--header-height:70px] motion-safe:transition-[grid-template-columns]",
-          !navbarEnabled && "grid-cols-[0_1fr] [--content-width:100vw]",
+          "duration-75 [--content-height:calc(100vh-70px)] [--header-height:70px]",
+          !navbarEnabled && "[--content-width:100vw] [--navbar-width:0]",
           navbarEnabled && [
             navbarCollapsed &&
-              "grid-cols-[50px_1fr] [--content-width:calc(100vw-50px)]",
+              "[--content-width:calc(100vw-50px)] [--navbar-width:50px]",
             !navbarCollapsed &&
-              "grid-cols-[220px_1fr] [--content-width:calc(100vw-220px)]",
+              "[--content-width:calc(100vw-220px)] [--navbar-width:220px]",
           ],
         )}
         // React19 からサポートされる
@@ -38,13 +38,13 @@ export function Layout({
         onTransitionStart={() => setNavbarTransitioning(true)}
         onTransitionEnd={() => setNavbarTransitioning(false)}
       >
-        <header className="sticky top-0 col-span-full row-start-1 row-end-2">
+        <header className="fixed left-0 right-0 top-0 z-10 h-[--header-height] bg-surface-0">
           {header}
         </header>
-        <nav className="sticky top-[--header-height] col-start-1 col-end-2 row-start-2 row-end-3 h-[--content-height]">
+        <nav className="fixed bottom-0 left-0 top-[--header-height] w-[--navbar-width] motion-safe:transition-[width]">
           {navbar}
         </nav>
-        <main className="col-start-2 col-end-3 row-start-2 row-end-3 overflow-y-auto overflow-x-clip">
+        <main className="fixed bottom-0 right-0 h-[--content-height] w-[--content-width] overflow-y-auto overflow-x-clip motion-safe:transition-[width]">
           {children}
         </main>
       </div>
