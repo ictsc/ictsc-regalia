@@ -17,8 +17,6 @@ message Problem {
   optional Score score = 5;
   Deployment deployment = 6;
   ProblemBody body = 7;
-
-  
 }
 
 message Score {

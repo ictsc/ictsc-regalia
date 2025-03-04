@@ -19,8 +19,6 @@ message Problem {
   RedeployRule redeploy_rule = 5;
 
   ProblemBody body = 6;
-
-  
 }
 
 enum RedeployRuleType {
