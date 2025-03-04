@@ -137,6 +137,43 @@ func FixDescriptiveProblem1(tb testing.TB, data *DescriptiveProblemData) *Descri
 	return problem
 }
 
+func FixNotice1(tb testing.TB, data *NoticeData) *Notice {
+	tb.Helper()
+
+	if data != nil {
+		tb.Fatal("additional data is not supported")
+	}
+
+	now := time.Now()
+	yesterday := now.Add(-24 * time.Hour) //nolint:mnd //
+	tomorrow := now.Add(24 * time.Hour)   //nolint:mnd // fixture
+
+	noticeData := &NoticeData{
+		ID:             uuid.FromStringOrNil("0cea0d50-96a5-45fb-a5c5-a6d6df140adc"),
+		Path:           "/test",
+		Title:          "テストお知らせ", //nolint:gosmopolitan // fixture
+		Markdown:       "これはサンプルです。\n",
+		EffectiveFrom:  &yesterday,
+		EffectiveUntil: &tomorrow,
+	}
+
+	if data != nil {
+		if !data.ID.IsNil() {
+			noticeData.ID = data.ID
+		}
+		if data.Title != "" {
+			noticeData.Title = data.Title
+		}
+		if data.Markdown != "" {
+			noticeData.Markdown = data.Markdown
+		}
+	}
+
+	notice := noticeData.parse()
+
+	return notice
+}
+
 func must[V any](v V, err error) V {
 	if err != nil {
 		panic(err)

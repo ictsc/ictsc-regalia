@@ -35,6 +35,19 @@ func (c *Client) GetProblemContentByPath(ctx context.Context, pagePath string) (
 	return resp.content(), nil
 }
 
+func (c *Client) GetNoticeByPath(ctx context.Context, pagePath string) (*domain.NoticeRawData, error) {
+	path := &url.URL{Path: "/_api/v3/page"}
+	q := path.Query()
+	q.Set("path", pagePath)
+	path.RawQuery = q.Encode()
+
+	resp, err := get[growiPageResponse](ctx, c, path)
+	if err != nil {
+		return nil, err
+	}
+	return resp.contentNotice(), nil
+}
+
 type (
 	growiPageResponse struct {
 		Page growiPage `json:"page"`
@@ -51,6 +64,14 @@ type (
 
 func (r *growiPageResponse) content() *domain.ProblemContentRawData {
 	return &domain.ProblemContentRawData{
+		PageID:   r.Page.ID,
+		PagePath: r.Page.Path,
+		Content:  r.Page.Revision.Body,
+	}
+}
+
+func (r *growiPageResponse) contentNotice() *domain.NoticeRawData {
+	return &domain.NoticeRawData{
 		PageID:   r.Page.ID,
 		PagePath: r.Page.Path,
 		Content:  r.Page.Revision.Body,

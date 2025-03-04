@@ -189,3 +189,19 @@ CREATE TABLE redeployment_events (
 	message TEXT,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE notices (
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	path VARCHAR(255) NOT NULL UNIQUE,
+	title VARCHAR(255),
+	markdown TEXT NOT NULL,
+	effective_from TIMESTAMP NOT NULL,
+    effective_until TIMESTAMP NOT NULL
+);
+COMMENT ON TABLE notices IS 'お知らせ';
+COMMENT ON COLUMN notices.id IS 'お知らせ ID';
+COMMENT ON COLUMN notices.path IS 'Wiki上のページパス';
+COMMENT ON COLUMN notices.title IS 'タイトル';
+COMMENT ON COLUMN notices.markdown IS '本文';
+COMMENT ON COLUMN notices.effective_from IS '掲示開始時間';
+COMMENT ON COLUMN notices.effective_until IS '掲示終了時間';
