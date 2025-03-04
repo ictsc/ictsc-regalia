@@ -54,6 +54,17 @@ func (n *Notice) EffectiveUntil() *time.Time {
 	return n.effectiveUntil
 }
 
+func (d *NoticeData) parse() (*Notice, error) {
+	return &Notice{
+		id:             d.ID,
+		path:           d.Path,
+		title:          d.Title,
+		markdown:       d.Markdown,
+		effectiveFrom:  d.EffectiveFrom,
+		effectiveUntil: d.EffectiveUntil,
+	}, nil
+}
+
 func ListNotices(ctx context.Context, eff NoticeReader) ([]*Notice, error) {
 	data, err := eff.ListNotices(ctx)
 	if err != nil {
