@@ -154,7 +154,7 @@ CREATE TABLE marking_results (
 	answer_id UUID NOT NULL REFERENCES answers(id) ON DELETE CASCADE,
 	score INT NOT NULL CHECK (score >= 0),
 	judge_name TEXT NOT NULL,
-	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE marking_results IS '採点結果';
 COMMENT ON COLUMN marking_results.id IS '採点結果 ID';
