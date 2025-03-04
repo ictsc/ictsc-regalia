@@ -100,7 +100,7 @@ effective_from: ` + yesterday.Format(time.RFC3339) + `
 				return tt.inNoticeRawData, nil
 			})
 
-			notice, err := domain.FetchNoticeByPath(context.Background(), mockNoticeGetter, "/test")
+			notice, err := domain.FetchNoticeByPath(t.Context(), mockNoticeGetter, "/test")
 
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("expected error %v, got %v", tt.wantErr, err)
