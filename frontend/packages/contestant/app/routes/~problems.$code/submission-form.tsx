@@ -1,4 +1,10 @@
-import { useReducer, useId, type ActionDispatch, useEffect, useState } from "react";
+import {
+  useReducer,
+  useId,
+  type ActionDispatch,
+  useEffect,
+  useState,
+} from "react";
 import { Field, Label, Textarea } from "@headlessui/react";
 import { MaterialSymbol } from "../../components/material-symbol";
 import { clsx } from "clsx";
@@ -23,7 +29,9 @@ export function SubmissionForm(props: {
     const checkAnswerable = () => {
       const now = new Date();
       const lastSubmit = new Date(props.lastSubmittedAt!);
-      const nextSubmitTime = new Date(lastSubmit.getTime() + props.submitInterval! * 1000);
+      const nextSubmitTime = new Date(
+        lastSubmit.getTime() + props.submitInterval! * 1000,
+      );
       setIsAnswerable(now >= nextSubmitTime);
     };
     checkAnswerable();
@@ -52,9 +60,9 @@ export function SubmissionForm(props: {
         }
       }}
     >
-      <SubmissionFormInner 
-        error={error} 
-        dispatchError={dispatchError} 
+      <SubmissionFormInner
+        error={error}
+        dispatchError={dispatchError}
         isAnswerable={isAnswerable}
       />
     </form>
@@ -128,9 +136,9 @@ function SubmissionFormInner({
           disabled={!isAnswerable}
           className={clsx(
             "flex items-center justify-center self-end rounded-12 py-16 pl-24 pr-20 shadow-md transition",
-            isAnswerable 
+            isAnswerable
               ? "bg-surface-2 hover:opacity-80 active:shadow-none"
-              : "bg-disabled"
+              : "bg-disabled",
           )}
         >
           <div className="text-16 font-bold">回答する</div>
