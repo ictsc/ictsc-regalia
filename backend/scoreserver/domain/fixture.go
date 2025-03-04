@@ -151,7 +151,7 @@ func FixNotice1(tb testing.TB, data *NoticeData) *Notice {
 	noticeData := &NoticeData{
 		ID:             uuid.FromStringOrNil("0cea0d50-96a5-45fb-a5c5-a6d6df140adc"),
 		Path:           "/test",
-		Title:          "テストお知らせ", //nolint:mnd // fixture
+		Title:          "テストお知らせ", //nolint:gosmopolitan // fixture
 		Markdown:       "これはサンプルです。\n",
 		EffectiveFrom:  &yesterday,
 		EffectiveUntil: &tomorrow,
