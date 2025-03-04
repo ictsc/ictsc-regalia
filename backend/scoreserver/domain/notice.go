@@ -65,7 +65,7 @@ func (n *Notice) parseToNoticeData() *NoticeData {
 	}
 }
 
-func (d *NoticeData) parse() (*Notice, error) {
+func (d *NoticeData) parse() *Notice {
 	return &Notice{
 		id:             d.ID,
 		path:           d.Path,
@@ -73,7 +73,7 @@ func (d *NoticeData) parse() (*Notice, error) {
 		markdown:       d.Markdown,
 		effectiveFrom:  d.EffectiveFrom,
 		effectiveUntil: d.EffectiveUntil,
-	}, nil
+	}
 }
 
 func ListNotices(ctx context.Context, eff NoticeReader) ([]*Notice, error) {

@@ -145,13 +145,13 @@ func FixNotice1(tb testing.TB, data *NoticeData) *Notice {
 	}
 
 	now := time.Now()
-	yesterday := now.Add(-24 * time.Hour)
-	tomorrow := now.Add(24 * time.Hour)
+	yesterday := now.Add(-24 * time.Hour) //nolint:mnd //
+	tomorrow := now.Add(24 * time.Hour)   //nolint:mnd // fixture
 
 	noticeData := &NoticeData{
 		ID:             uuid.FromStringOrNil("0cea0d50-96a5-45fb-a5c5-a6d6df140adc"),
 		Path:           "/test",
-		Title:          "テストお知らせ",
+		Title:          "テストお知らせ", //nolint:mnd // fixture
 		Markdown:       "これはサンプルです。\n",
 		EffectiveFrom:  &yesterday,
 		EffectiveUntil: &tomorrow,
@@ -169,10 +169,7 @@ func FixNotice1(tb testing.TB, data *NoticeData) *Notice {
 		}
 	}
 
-	notice, err := noticeData.parse()
-	if err != nil {
-		tb.Fatal(err)
-	}
+	notice := noticeData.parse()
 
 	return notice
 }
