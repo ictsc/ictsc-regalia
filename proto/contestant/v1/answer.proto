@@ -3,6 +3,7 @@ syntax = "proto3";
 package contestant.v1;
 
 import "contestant/v1/problem.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1;contestantv1";
@@ -31,6 +32,8 @@ message ListAnswersRequest {
 }
 message ListAnswersResponse {
   repeated Answer answers = 1;
+  google.protobuf.Duration submit_interval = 2;
+  optional google.protobuf.Timestamp last_submitted_at = 3;
 }
 
 message SubmitAnswerRequest {
