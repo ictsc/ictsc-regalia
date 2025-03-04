@@ -103,6 +103,13 @@ type FrontMatter struct {
 	EffectiveUntil time.Time `yaml:"effective_until"`
 }
 
+var (
+	ErrMissingFrontMatter    = NewInvalidArgumentError("frontmatter not found", nil)
+	ErrMissingTitle          = NewInvalidArgumentError("missing required field: title", nil)
+	ErrMissingEffectiveFrom  = NewInvalidArgumentError("missing required field: effective_from", nil)
+	ErrMissingEffectiveUntil = NewInvalidArgumentError("missing required field: effective_until", nil)
+)
+
 func (d *NoticeRawData) parse() (*Notice, error) {
 	contentReader := strings.NewReader(d.Content)
 	bodyWriter := &strings.Builder{}
@@ -112,11 +119,15 @@ func (d *NoticeRawData) parse() (*Notice, error) {
 		return nil, WrapAsInternal(err, "failed to parse metadata")
 	}
 
+	if metadata.Title == "" {
+		return nil, ErrMissingTitle
+	}
+
 	if metadata.EffectiveFrom.IsZero() {
-		return nil, NewInvalidArgumentError("missing required field: effective_until", nil)
+		return nil, ErrMissingEffectiveFrom
 	}
 	if metadata.EffectiveUntil.IsZero() {
-		return nil, NewInvalidArgumentError("missing required field: effective_until", nil)
+		return nil, ErrMissingEffectiveUntil
 	}
 
 	id, err := uuid.NewV4()
@@ -163,7 +174,7 @@ func parseNotice(r io.Reader, bodyWriter io.Writer) (*FrontMatter, error) {
 	}
 
 	if frontMatterContent.Len() == 0 {
-		return nil, NewInvalidArgumentError("frontmatter not found", nil)
+		return nil, ErrMissingFrontMatter
 	}
 
 	var frontMatter FrontMatter
