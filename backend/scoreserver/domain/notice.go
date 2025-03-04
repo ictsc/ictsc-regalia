@@ -82,14 +82,14 @@ func ListNotices(ctx context.Context, eff NoticeReader) ([]*Notice, error) {
 		return nil, WrapAsInternal(err, "failed to get descriptive notices")
 	}
 	notices := make([]*Notice, 0, len(data))
-	for _, d := range data {
+	for _, noticeData := range data {
 		notice := &Notice{
-			id:             d.ID,
-			path:           d.Path,
-			title:          d.Title,
-			markdown:       d.Markdown,
-			effectiveFrom:  d.EffectiveFrom,
-			effectiveUntil: d.EffectiveUntil,
+			id:             noticeData.ID,
+			path:           noticeData.Path,
+			title:          noticeData.Title,
+			markdown:       noticeData.Markdown,
+			effectiveFrom:  noticeData.EffectiveFrom,
+			effectiveUntil: noticeData.EffectiveUntil,
 		}
 		notices = append(notices, notice)
 	}
