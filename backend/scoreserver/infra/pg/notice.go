@@ -27,11 +27,11 @@ type (
 )
 
 var listNoticesQuery = `
-	SELECT 
+	SELECT
 		id, path, title, markdown, effective_from, effective_until
-	FROM 
+	FROM
 		notices
-	WHERE 
+	WHERE
 		effective_from <= NOW() AND effective_until >= NOW()
 	ORDER BY effective_until DESC;
 	`
@@ -67,14 +67,14 @@ var saveNoticeQuery = `
 		effective_until = EXCLUDED.effective_until;
 `
 
-func (r *repo) SaveNotice(ctx context.Context, notice *domain.Notice) error {
+func (r *repo) SaveNotice(ctx context.Context, notice *domain.NoticeData) error {
 	if _, err := sqlx.NamedExecContext(ctx, r.ext, saveNoticeQuery, noticeRow{
-		ID:             notice.ID(),
-		Path:           notice.Path(),
-		Title:          notice.Title(),
-		Markdown:       notice.Markdown(),
-		EffectiveFrom:  notice.EffectiveFrom(),
-		EffectiveUntil: notice.EffectiveUntil(),
+		ID:             notice.ID,
+		Path:           notice.Path,
+		Title:          notice.Title,
+		Markdown:       notice.Markdown,
+		EffectiveFrom:  notice.EffectiveFrom,
+		EffectiveUntil: notice.EffectiveUntil,
 	}); err != nil {
 		if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
 			if pgErr.Code == pgerrcode.UniqueViolation {

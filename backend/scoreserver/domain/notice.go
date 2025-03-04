@@ -54,6 +54,17 @@ func (n *Notice) EffectiveUntil() *time.Time {
 	return n.effectiveUntil
 }
 
+func (n *Notice) parseToNoticeData() *NoticeData {
+	return &NoticeData{
+		ID:             n.id,
+		Path:           n.path,
+		Title:          n.title,
+		Markdown:       n.markdown,
+		EffectiveFrom:  n.effectiveFrom,
+		EffectiveUntil: n.effectiveUntil,
+	}
+}
+
 func (d *NoticeData) parse() (*Notice, error) {
 	return &Notice{
 		id:             d.ID,
@@ -92,7 +103,8 @@ type NoticeRawData struct {
 }
 
 func (n *Notice) SaveNotice(ctx context.Context, eff NoticeWriter) error {
-	if err := eff.SaveNotice(ctx, n); err != nil {
+
+	if err := eff.SaveNotice(ctx, n.parseToNoticeData()); err != nil {
 		return WrapAsInternal(err, "failed to save notice")
 	}
 
@@ -200,7 +212,7 @@ type (
 		ListNotices(ctx context.Context) ([]*NoticeData, error)
 	}
 	NoticeWriter interface {
-		SaveNotice(ctx context.Context, notice *Notice) error
+		SaveNotice(ctx context.Context, notice *NoticeData) error
 	}
 	NoticeGetter interface {
 		GetNoticeByPath(ctx context.Context, pagePath string) (*NoticeRawData, error)
