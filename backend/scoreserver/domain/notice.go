@@ -103,7 +103,6 @@ type NoticeRawData struct {
 }
 
 func (n *Notice) SaveNotice(ctx context.Context, eff NoticeWriter) error {
-
 	if err := eff.SaveNotice(ctx, n.parseToNoticeData()); err != nil {
 		return WrapAsInternal(err, "failed to save notice")
 	}
