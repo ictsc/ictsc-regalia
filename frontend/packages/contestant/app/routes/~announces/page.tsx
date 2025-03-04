@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { Button } from "@headlessui/react";
 import { Link } from "@tanstack/react-router";
-import clsx from "clsx";
+import { clsx } from "clsx";
 
 export type AnnounceProps = {
   announce: string;
