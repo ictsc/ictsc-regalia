@@ -11,6 +11,7 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/contestant/session"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -75,7 +76,11 @@ func (h *AnswerServiceHandler) ListAnswers(
 	}
 
 	protoAnswers := make([]*contestantv1.Answer, 0, len(answers))
+	latestSubmitTime := time.Time{}
 	for _, answer := range answers {
+		if latestSubmitTime == (time.Time{}) || answer.CreatedAt().After(latestSubmitTime) {
+			latestSubmitTime = answer.CreatedAt()
+		}
 		protoAnswer := &contestantv1.Answer{
 			Id:          answer.Number(),
 			SubmittedAt: timestamppb.New(answer.CreatedAt()),
@@ -95,9 +100,15 @@ func (h *AnswerServiceHandler) ListAnswers(
 		protoAnswers = append(protoAnswers, protoAnswer)
 	}
 
-	return connect.NewResponse(&contestantv1.ListAnswersResponse{
-		Answers: protoAnswers,
-	}), nil
+	resp := &contestantv1.ListAnswersResponse{
+		Answers:        protoAnswers,
+		SubmitInterval: durationpb.New(domain.AnswerInterval),
+	}
+	if latestSubmitTime != (time.Time{}) {
+		resp.LastSubmittedAt = timestamppb.New(latestSubmitTime)
+	}
+
+	return connect.NewResponse(resp), nil
 }
 
 type SubmitAnswerEffect interface {

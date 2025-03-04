@@ -35,7 +35,7 @@ type (
 )
 
 const (
-	answerInterval = 20 * time.Minute
+	AnswerInterval = 20 * time.Minute
 )
 
 func ListAnswers(ctx context.Context, eff AnswerReader) ([]*Answer, error) {
@@ -176,7 +176,7 @@ func (tm *TeamMember) submitAnswer(
 			Problem:   problem.Data(),
 			Author:    tm.user.Data(),
 			CreatedAt: now,
-			Interval:  answerInterval,
+			Interval:  AnswerInterval,
 		},
 		Body: body,
 	}).parse()
