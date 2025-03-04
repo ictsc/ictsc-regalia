@@ -1,7 +1,9 @@
 {
   "name": "frontend",
   "scripts": {
-    "generate:proto": "pnpm run --filter proto generate",
+    "generate": "pnpm run --recursive --parallel --aggregate-output generate",
+    "ci:lint": "pnpm run --recursive --parallel --aggregate-output --reporter-hide-prefix lint",
+    "ci:test": "CI=true pnpm run --recursive --parallel --aggregate-output --reporter-hide-prefix test",
     "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
