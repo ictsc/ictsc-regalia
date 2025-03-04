@@ -1,14 +1,17 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Layout, Content, Sidebar } from "./page";
+import { action } from "@storybook/addon-actions";
+import {
+  Page,
+  Content,
+  SubmissionList,
+  SubmissionListItem,
+  EmptySubmissionList,
+  SubmissionForm,
+} from "./page";
 
 export default {
   title: "pages/problem",
-} as Meta;
-
-type Story = StoryObj<typeof Layout>;
-
-export const Default = {
-  render: () => (
+  render: (props) => (
     <div
       style={
         {
@@ -18,12 +21,16 @@ export const Default = {
         } as React.CSSProperties
       }
     >
-      <Layout
-        content={
-          <Content
-            code="AAA"
-            title="Title"
-            body={`
+      <Page {...props} />
+    </div>
+  ),
+  args: {
+    redeployable: false,
+    content: (
+      <Content
+        code="AAA"
+        title="Title"
+        body={`
 ## 概要
 
 あれこれ
@@ -47,10 +54,38 @@ export const Default = {
 | --- | --- | --- | --- |
 | Web | 192.168.0.1 | user | password |
 `}
-          />
-        }
-        sidebar={<Sidebar />}
       />
-    </div>
-  ),
+    ),
+    submissionForm: (
+      <SubmissionForm
+        action={() => {
+          submitAction("submit");
+          return Promise.resolve("success");
+        }}
+      />
+    ),
+    submissionList: (
+      <SubmissionList>
+        {Array.from({ length: 10 }).map((_, i) => (
+          <SubmissionListItem
+            key={i}
+            id={i + 1}
+            submittedAt="2025-02-03T00:00:00Z"
+            score={{ maxScore: 100 }}
+          />
+        ))}
+      </SubmissionList>
+    ),
+  },
+} as Meta<typeof Page>;
+
+type Story = StoryObj<typeof Page>;
+
+const submitAction = action("submit");
+
+export const Default = {} as Story;
+export const Empty = {
+  args: {
+    submissionList: <EmptySubmissionList />,
+  },
 } as Story;
