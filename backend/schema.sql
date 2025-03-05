@@ -195,8 +195,8 @@ CREATE TABLE notices (
 	path VARCHAR(255) NOT NULL UNIQUE,
 	title VARCHAR(255),
 	markdown TEXT NOT NULL,
-	effective_from TIMESTAMP NOT NULL,
-    effective_until TIMESTAMP NOT NULL
+	effective_from TIMESTAMPTZ NOT NULL,
+	effective_until TIMESTAMPTZ NOT NULL
 );
 COMMENT ON TABLE notices IS 'お知らせ';
 COMMENT ON COLUMN notices.id IS 'お知らせ ID';
