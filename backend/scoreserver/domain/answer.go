@@ -272,6 +272,7 @@ func (d *AnswerDetailData) parse() (*AnswerDetail, error) {
 	}
 
 	var body AnswerBody
+	body.problemType = answer.Problem().Type()
 	switch answer.Problem().Type() {
 	case ProblemTypeDescriptive:
 		if d.Body.Descriptive == nil {

@@ -1,6 +1,7 @@
 {
   "name": "frontend",
   "scripts": {
+    "build": "pnpm run --recursive --parallel --aggregate-output build",
     "generate": "pnpm run --recursive --parallel --aggregate-output generate",
     "ci:lint": "pnpm run --recursive --parallel --aggregate-output --reporter-hide-prefix lint",
     "ci:test": "CI=true pnpm run --recursive --parallel --aggregate-output --reporter-hide-prefix test",

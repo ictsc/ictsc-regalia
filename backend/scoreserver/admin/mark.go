@@ -26,6 +26,7 @@ func newMarkServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *MarkSe
 	return &MarkServiceHandler{
 		Enforcer:         enforcer,
 		ListAnswerEffect: repo,
+		GetAnswerEffect:  repo,
 	}
 }
 
