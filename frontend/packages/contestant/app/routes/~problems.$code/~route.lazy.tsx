@@ -13,6 +13,7 @@ function RouteComponent() {
   const { problem, answers, metadata, submitAnswer } = Route.useLoaderData();
 
   const redeployable = useRedeployable(problem);
+  const deferredMetadata = use(useDeferredValue(metadata));
 
   return (
     <View.Page
@@ -33,8 +34,8 @@ function RouteComponent() {
             await router.invalidate();
             return "success";
           }}
-          submitInterval={use(useDeferredValue(metadata)).submitIntervalSeconds}
-          lastSubmittedAt={use(useDeferredValue(metadata)).lastSubmittedAt}
+          submitInterval={deferredMetadata.submitIntervalSeconds}
+          lastSubmittedAt={deferredMetadata.lastSubmittedAt}
         />
       }
       submissionList={
