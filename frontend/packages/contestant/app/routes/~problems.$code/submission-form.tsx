@@ -7,7 +7,6 @@ import {
 } from "react";
 import { Field, Label, Textarea } from "@headlessui/react";
 import { MaterialSymbol } from "../../components/material-symbol";
-import { clsx } from "clsx";
 
 export function SubmissionForm(props: {
   readonly action: (answer: string) => Promise<"success" | "failure">;
@@ -133,12 +132,7 @@ function SubmissionFormInner({
           aria-labelledby={submitLabelID}
           type="submit"
           disabled={!isAnswerable}
-          className={clsx(
-            "flex items-center justify-center self-end rounded-12 py-16 pl-24 pr-20 shadow-md transition",
-            isAnswerable
-              ? "bg-surface-2 hover:opacity-80 active:shadow-none"
-              : "bg-disabled",
-          )}
+          className="flex items-center justify-center self-end rounded-12 bg-surface-2 py-16 pl-24 pr-20 shadow-md transition hover:opacity-80 active:shadow-none disabled:bg-disabled"
         >
           <div className="text-16 font-bold">回答する</div>
           <MaterialSymbol icon="send" size={24} />
