@@ -9,31 +9,24 @@ import { Field, Label, Textarea } from "@headlessui/react";
 import { MaterialSymbol } from "../../components/material-symbol";
 
 interface AnswerableState {
-  isAnswerable: boolean;
-  nextSubmitTime: Date | null;
-  remainingTime: number;
+  remainingSeconds: number;
 }
 
-function formatRemainingTime(remainingSeconds: number): string {
+function formatRemainingTimeParts(remainingSeconds: number) {
   const minutes = Math.floor(remainingSeconds / 60);
   const seconds = remainingSeconds % 60;
-  return `${minutes}分${seconds.toString().padStart(2, '0')}秒`;
+  return { minutes, seconds };
 }
 
-function useAnswerable(lastSubmittedAt?: string, submitInterval?: number): AnswerableState {
-  const [state, setState] = useState<AnswerableState>(() => ({
-    isAnswerable: true,
-    nextSubmitTime: null,
-    remainingTime: 0,
-  }));
+function useAnswerable(
+  lastSubmittedAt?: string, 
+  submitInterval?: number
+): AnswerableState {
+  const [state, setState] = useState<AnswerableState>({ remainingSeconds: 0 });
 
   useEffect(() => {
     if (!lastSubmittedAt || !submitInterval) {
-      setState({
-        isAnswerable: true,
-        nextSubmitTime: null,
-        remainingTime: 0,
-      });
+      setState({ remainingSeconds: 0 });
       return;
     }
 
@@ -41,17 +34,13 @@ function useAnswerable(lastSubmittedAt?: string, submitInterval?: number): Answe
       const now = new Date();
       const lastSubmit = new Date(lastSubmittedAt);
       const nextSubmitTime = new Date(lastSubmit.getTime() + submitInterval * 1000);
-      const isAnswerable = now >= nextSubmitTime;
-      
-      const remainingTime = isAnswerable 
-        ? 0 
-        : Math.max(0, Math.floor((nextSubmitTime.getTime() - now.getTime()) / 1000));
 
-      setState({
-        isAnswerable,
-        nextSubmitTime: isAnswerable ? null : nextSubmitTime,
-        remainingTime,
-      });
+      const diffMs = nextSubmitTime.getTime() - now.getTime();
+      const diffSec = Math.ceil(diffMs / 1000);
+
+      const remainingSeconds = diffSec > 0 ? diffSec : 0;
+
+      setState({ remainingSeconds });
     };
 
     checkAnswerable();
@@ -71,10 +60,11 @@ export function SubmissionForm(props: {
     reduceFormError,
     null,
   );
-  const { isAnswerable, remainingTime } = useAnswerable(
+  const { remainingSeconds } = useAnswerable(
     props.lastSubmittedAt,
     props.submitInterval
   );
+  const isAnswerable = remainingSeconds <= 0;
 
   return (
     <form
@@ -101,7 +91,7 @@ export function SubmissionForm(props: {
         error={error}
         dispatchError={dispatchError}
         isAnswerable={isAnswerable}
-        remainingTime={remainingTime}
+        remainingSeconds={remainingSeconds}
       />
     </form>
   );
@@ -128,14 +118,16 @@ function SubmissionFormInner({
   error,
   dispatchError,
   isAnswerable,
-  remainingTime,
+  remainingSeconds,
 }: {
   error: FormErrorState;
   dispatchError: ActionDispatch<[FormErrorAction]>;
   isAnswerable: boolean;
-  remainingTime: number;
+  remainingSeconds: number;
 }) {
   const submitLabelID = useId();
+  const { minutes, seconds } = formatRemainingTimeParts(remainingSeconds);
+
   return (
     <>
       <Field className="flex flex-1">
@@ -160,23 +152,36 @@ function SubmissionFormInner({
           }}
         />
       </Field>
-      <div className="mt-20 flex items-center justify-end gap-16">
-        {!isAnswerable && (
-          <label
-            id={submitLabelID}
-            className="flex-shrink text-16 font-bold text-primary"
-          >
-            あと{formatRemainingTime(remainingTime)}で回答できます
-          </label>
-        )}
-        {error != null && isAnswerable && (
-          <label
-            id={submitLabelID}
-            className="flex-shrink text-16 font-bold text-primary"
-          >
-            {error}
-          </label>
-        )}
+
+      <div className="mt-20 flex items-center justify-end gap-24">
+          {!isAnswerable && (
+            <label
+              id={submitLabelID}
+              className="flex items-center justify-between w-[160px]"
+            >
+              <span className="text-16 text-black">解答可能まで</span>
+              <div className="flex items-center">
+                <span className="text-primary font-bold text-20 text-right w-[24px]">
+                  {minutes}
+                </span>
+                <span className="text-primary font-bold text-20 mx-2">:</span>
+                <span className="text-primary font-bold text-20 text-right w-[24px]">
+                  {seconds.toString().padStart(2, "0")}
+                </span>
+              </div>
+            </label>
+          )}
+
+          {/* 回答可かつエラーがある場合 */}
+          {isAnswerable && error != null && (
+            <label
+              id={submitLabelID}
+              className="flex-shrink text-16 font-bold text-primary"
+            >
+              {error}
+            </label>
+          )}
+
         <button
           aria-labelledby={submitLabelID}
           type="submit"
