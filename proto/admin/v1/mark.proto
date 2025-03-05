@@ -60,6 +60,15 @@ message ListAnswersResponse {
   repeated Answer answers = 1;
 }
 
+message GetAnswerRequest {
+  uint32 team_code = 1;
+  string problem_code = 2;
+  uint32 id = 3;
+}
+message GetAnswerResponse {
+  Answer answer = 1;
+}
+
 message ListMarkingResultsRequest {}
 message ListMarkingResultsResponse {
   repeated MarkingResult marking_results = 1;
@@ -74,6 +83,7 @@ message CreateMarkingResultResponse {
 
 service MarkService {
   rpc ListAnswers(ListAnswersRequest) returns (ListAnswersResponse);
+  rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
   rpc ListMarkingResults(ListMarkingResultsRequest) returns (ListMarkingResultsResponse);
   rpc CreateMarkingResult(CreateMarkingResultRequest) returns (CreateMarkingResultResponse);
 }

@@ -20,7 +20,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file admin/v1/mark.proto.
  */
 export const file_admin_v1_mark: GenFile = /*@__PURE__*/
-  fileDesc("ChNhZG1pbi92MS9tYXJrLnByb3RvEghhZG1pbi52MSKJAgoGQW5zd2VyEgoKAmlkGAEgASgNEhwKBHRlYW0YAiABKAsyDi5hZG1pbi52MS5UZWFtEiQKBmF1dGhvchgDIAEoCzIULmFkbWluLnYxLkNvbnRlc3RhbnQSIgoHcHJvYmxlbRgEIAEoCzIRLmFkbWluLnYxLlByb2JsZW0SIgoEYm9keRgFIAEoCzIULmFkbWluLnYxLkFuc3dlckJvZHkSLgoKY3JlYXRlZF9hdBgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLAoGcmVzdWx0GAcgASgLMhcuYWRtaW4udjEuTWFya2luZ1Jlc3VsdEgAiAEBQgkKB19yZXN1bHQibQoKQW5zd2VyQm9keRIjCgR0eXBlGAEgASgOMhUuYWRtaW4udjEuUHJvYmxlbVR5cGUSMgoLZGVzY3JpcHRpdmUYAiABKAsyGy5hZG1pbi52MS5EZXNjcmlwdGl2ZUFuc3dlckgAQgYKBGJvZHkiIQoRRGVzY3JpcHRpdmVBbnN3ZXISDAoEYm9keRgBIAEoCSK/AQoNTWFya2luZ1Jlc3VsdBIgCgZhbnN3ZXIYASABKAsyEC5hZG1pbi52MS5BbnN3ZXISHgoFanVkZ2UYAiABKAsyDy5hZG1pbi52MS5BZG1pbhINCgVzY29yZRgDIAEoDRItCglyYXRpb25hbGUYBCABKAsyGi5hZG1pbi52MS5NYXJraW5nUmF0aW9uYWxlEi4KCmNyZWF0ZWRfYXQYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIn0KEE1hcmtpbmdSYXRpb25hbGUSIwoEdHlwZRgBIAEoDjIVLmFkbWluLnYxLlByb2JsZW1UeXBlEjwKC2Rlc2NyaXB0aXZlGAIgASgLMiUuYWRtaW4udjEuRGVzY3JpcHRpdmVNYXJraW5nUmF0aW9uYWxlSABCBgoEYm9keSIuChtEZXNjcmlwdGl2ZU1hcmtpbmdSYXRpb25hbGUSDwoHY29tbWVudBgBIAEoCSIsChJMaXN0QW5zd2Vyc1JlcXVlc3QSFgoOaW5jbHVkZV9tYXJrZWQYASABKAgiOAoTTGlzdEFuc3dlcnNSZXNwb25zZRIhCgdhbnN3ZXJzGAEgAygLMhAuYWRtaW4udjEuQW5zd2VyIhsKGUxpc3RNYXJraW5nUmVzdWx0c1JlcXVlc3QiTgoaTGlzdE1hcmtpbmdSZXN1bHRzUmVzcG9uc2USMAoPbWFya2luZ19yZXN1bHRzGAEgAygLMhcuYWRtaW4udjEuTWFya2luZ1Jlc3VsdCJNChpDcmVhdGVNYXJraW5nUmVzdWx0UmVxdWVzdBIvCg5tYXJraW5nX3Jlc3VsdBgBIAEoCzIXLmFkbWluLnYxLk1hcmtpbmdSZXN1bHQiTgobQ3JlYXRlTWFya2luZ1Jlc3VsdFJlc3BvbnNlEi8KDm1hcmtpbmdfcmVzdWx0GAEgASgLMhcuYWRtaW4udjEuTWFya2luZ1Jlc3VsdDKeAgoLTWFya1NlcnZpY2USSgoLTGlzdEFuc3dlcnMSHC5hZG1pbi52MS5MaXN0QW5zd2Vyc1JlcXVlc3QaHS5hZG1pbi52MS5MaXN0QW5zd2Vyc1Jlc3BvbnNlEl8KEkxpc3RNYXJraW5nUmVzdWx0cxIjLmFkbWluLnYxLkxpc3RNYXJraW5nUmVzdWx0c1JlcXVlc3QaJC5hZG1pbi52MS5MaXN0TWFya2luZ1Jlc3VsdHNSZXNwb25zZRJiChNDcmVhdGVNYXJraW5nUmVzdWx0EiQuYWRtaW4udjEuQ3JlYXRlTWFya2luZ1Jlc3VsdFJlcXVlc3QaJS5hZG1pbi52MS5DcmVhdGVNYXJraW5nUmVzdWx0UmVzcG9uc2VCnQEKDGNvbS5hZG1pbi52MUIJTWFya1Byb3RvUAFaQWdpdGh1Yi5jb20vaWN0c2MvaWN0c2MtcmVnYWxpYS9iYWNrZW5kL3BrZy9wcm90by9hZG1pbi92MTthZG1pbnYxogIDQVhYqgIIQWRtaW4uVjHKAghBZG1pblxWMeICFEFkbWluXFYxXEdQQk1ldGFkYXRh6gIJQWRtaW46OlYxYgZwcm90bzM", [file_admin_v1_actor, file_admin_v1_contestant, file_admin_v1_problem, file_admin_v1_team, file_google_protobuf_timestamp]);
+  fileDesc("ChNhZG1pbi92MS9tYXJrLnByb3RvEghhZG1pbi52MSKJAgoGQW5zd2VyEgoKAmlkGAEgASgNEhwKBHRlYW0YAiABKAsyDi5hZG1pbi52MS5UZWFtEiQKBmF1dGhvchgDIAEoCzIULmFkbWluLnYxLkNvbnRlc3RhbnQSIgoHcHJvYmxlbRgEIAEoCzIRLmFkbWluLnYxLlByb2JsZW0SIgoEYm9keRgFIAEoCzIULmFkbWluLnYxLkFuc3dlckJvZHkSLgoKY3JlYXRlZF9hdBgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLAoGcmVzdWx0GAcgASgLMhcuYWRtaW4udjEuTWFya2luZ1Jlc3VsdEgAiAEBQgkKB19yZXN1bHQibQoKQW5zd2VyQm9keRIjCgR0eXBlGAEgASgOMhUuYWRtaW4udjEuUHJvYmxlbVR5cGUSMgoLZGVzY3JpcHRpdmUYAiABKAsyGy5hZG1pbi52MS5EZXNjcmlwdGl2ZUFuc3dlckgAQgYKBGJvZHkiIQoRRGVzY3JpcHRpdmVBbnN3ZXISDAoEYm9keRgBIAEoCSK/AQoNTWFya2luZ1Jlc3VsdBIgCgZhbnN3ZXIYASABKAsyEC5hZG1pbi52MS5BbnN3ZXISHgoFanVkZ2UYAiABKAsyDy5hZG1pbi52MS5BZG1pbhINCgVzY29yZRgDIAEoDRItCglyYXRpb25hbGUYBCABKAsyGi5hZG1pbi52MS5NYXJraW5nUmF0aW9uYWxlEi4KCmNyZWF0ZWRfYXQYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIn0KEE1hcmtpbmdSYXRpb25hbGUSIwoEdHlwZRgBIAEoDjIVLmFkbWluLnYxLlByb2JsZW1UeXBlEjwKC2Rlc2NyaXB0aXZlGAIgASgLMiUuYWRtaW4udjEuRGVzY3JpcHRpdmVNYXJraW5nUmF0aW9uYWxlSABCBgoEYm9keSIuChtEZXNjcmlwdGl2ZU1hcmtpbmdSYXRpb25hbGUSDwoHY29tbWVudBgBIAEoCSIsChJMaXN0QW5zd2Vyc1JlcXVlc3QSFgoOaW5jbHVkZV9tYXJrZWQYASABKAgiOAoTTGlzdEFuc3dlcnNSZXNwb25zZRIhCgdhbnN3ZXJzGAEgAygLMhAuYWRtaW4udjEuQW5zd2VyIkcKEEdldEFuc3dlclJlcXVlc3QSEQoJdGVhbV9jb2RlGAEgASgNEhQKDHByb2JsZW1fY29kZRgCIAEoCRIKCgJpZBgDIAEoDSI1ChFHZXRBbnN3ZXJSZXNwb25zZRIgCgZhbnN3ZXIYASABKAsyEC5hZG1pbi52MS5BbnN3ZXIiGwoZTGlzdE1hcmtpbmdSZXN1bHRzUmVxdWVzdCJOChpMaXN0TWFya2luZ1Jlc3VsdHNSZXNwb25zZRIwCg9tYXJraW5nX3Jlc3VsdHMYASADKAsyFy5hZG1pbi52MS5NYXJraW5nUmVzdWx0Ik0KGkNyZWF0ZU1hcmtpbmdSZXN1bHRSZXF1ZXN0Ei8KDm1hcmtpbmdfcmVzdWx0GAEgASgLMhcuYWRtaW4udjEuTWFya2luZ1Jlc3VsdCJOChtDcmVhdGVNYXJraW5nUmVzdWx0UmVzcG9uc2USLwoObWFya2luZ19yZXN1bHQYASABKAsyFy5hZG1pbi52MS5NYXJraW5nUmVzdWx0MuQCCgtNYXJrU2VydmljZRJKCgtMaXN0QW5zd2VycxIcLmFkbWluLnYxLkxpc3RBbnN3ZXJzUmVxdWVzdBodLmFkbWluLnYxLkxpc3RBbnN3ZXJzUmVzcG9uc2USRAoJR2V0QW5zd2VyEhouYWRtaW4udjEuR2V0QW5zd2VyUmVxdWVzdBobLmFkbWluLnYxLkdldEFuc3dlclJlc3BvbnNlEl8KEkxpc3RNYXJraW5nUmVzdWx0cxIjLmFkbWluLnYxLkxpc3RNYXJraW5nUmVzdWx0c1JlcXVlc3QaJC5hZG1pbi52MS5MaXN0TWFya2luZ1Jlc3VsdHNSZXNwb25zZRJiChNDcmVhdGVNYXJraW5nUmVzdWx0EiQuYWRtaW4udjEuQ3JlYXRlTWFya2luZ1Jlc3VsdFJlcXVlc3QaJS5hZG1pbi52MS5DcmVhdGVNYXJraW5nUmVzdWx0UmVzcG9uc2VCnQEKDGNvbS5hZG1pbi52MUIJTWFya1Byb3RvUAFaQWdpdGh1Yi5jb20vaWN0c2MvaWN0c2MtcmVnYWxpYS9iYWNrZW5kL3BrZy9wcm90by9hZG1pbi92MTthZG1pbnYxogIDQVhYqgIIQWRtaW4uVjHKAghBZG1pblxWMeICFEFkbWluXFYxXEdQQk1ldGFkYXRh6gIJQWRtaW46OlYxYgZwcm90bzM", [file_admin_v1_actor, file_admin_v1_contestant, file_admin_v1_problem, file_admin_v1_team, file_google_protobuf_timestamp]);
 
 /**
  * 解答
@@ -237,6 +237,50 @@ export const ListAnswersResponseSchema: GenMessage<ListAnswersResponse> = /*@__P
   messageDesc(file_admin_v1_mark, 7);
 
 /**
+ * @generated from message admin.v1.GetAnswerRequest
+ */
+export type GetAnswerRequest = Message<"admin.v1.GetAnswerRequest"> & {
+  /**
+   * @generated from field: uint32 team_code = 1;
+   */
+  teamCode: number;
+
+  /**
+   * @generated from field: string problem_code = 2;
+   */
+  problemCode: string;
+
+  /**
+   * @generated from field: uint32 id = 3;
+   */
+  id: number;
+};
+
+/**
+ * Describes the message admin.v1.GetAnswerRequest.
+ * Use `create(GetAnswerRequestSchema)` to create a new message.
+ */
+export const GetAnswerRequestSchema: GenMessage<GetAnswerRequest> = /*@__PURE__*/
+  messageDesc(file_admin_v1_mark, 8);
+
+/**
+ * @generated from message admin.v1.GetAnswerResponse
+ */
+export type GetAnswerResponse = Message<"admin.v1.GetAnswerResponse"> & {
+  /**
+   * @generated from field: admin.v1.Answer answer = 1;
+   */
+  answer?: Answer;
+};
+
+/**
+ * Describes the message admin.v1.GetAnswerResponse.
+ * Use `create(GetAnswerResponseSchema)` to create a new message.
+ */
+export const GetAnswerResponseSchema: GenMessage<GetAnswerResponse> = /*@__PURE__*/
+  messageDesc(file_admin_v1_mark, 9);
+
+/**
  * @generated from message admin.v1.ListMarkingResultsRequest
  */
 export type ListMarkingResultsRequest = Message<"admin.v1.ListMarkingResultsRequest"> & {
@@ -247,7 +291,7 @@ export type ListMarkingResultsRequest = Message<"admin.v1.ListMarkingResultsRequ
  * Use `create(ListMarkingResultsRequestSchema)` to create a new message.
  */
 export const ListMarkingResultsRequestSchema: GenMessage<ListMarkingResultsRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_mark, 8);
+  messageDesc(file_admin_v1_mark, 10);
 
 /**
  * @generated from message admin.v1.ListMarkingResultsResponse
@@ -264,7 +308,7 @@ export type ListMarkingResultsResponse = Message<"admin.v1.ListMarkingResultsRes
  * Use `create(ListMarkingResultsResponseSchema)` to create a new message.
  */
 export const ListMarkingResultsResponseSchema: GenMessage<ListMarkingResultsResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_mark, 9);
+  messageDesc(file_admin_v1_mark, 11);
 
 /**
  * @generated from message admin.v1.CreateMarkingResultRequest
@@ -281,7 +325,7 @@ export type CreateMarkingResultRequest = Message<"admin.v1.CreateMarkingResultRe
  * Use `create(CreateMarkingResultRequestSchema)` to create a new message.
  */
 export const CreateMarkingResultRequestSchema: GenMessage<CreateMarkingResultRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_mark, 10);
+  messageDesc(file_admin_v1_mark, 12);
 
 /**
  * @generated from message admin.v1.CreateMarkingResultResponse
@@ -298,7 +342,7 @@ export type CreateMarkingResultResponse = Message<"admin.v1.CreateMarkingResultR
  * Use `create(CreateMarkingResultResponseSchema)` to create a new message.
  */
 export const CreateMarkingResultResponseSchema: GenMessage<CreateMarkingResultResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_mark, 11);
+  messageDesc(file_admin_v1_mark, 13);
 
 /**
  * @generated from service admin.v1.MarkService
@@ -311,6 +355,14 @@ export const MarkService: GenService<{
     methodKind: "unary";
     input: typeof ListAnswersRequestSchema;
     output: typeof ListAnswersResponseSchema;
+  },
+  /**
+   * @generated from rpc admin.v1.MarkService.GetAnswer
+   */
+  getAnswer: {
+    methodKind: "unary";
+    input: typeof GetAnswerRequestSchema;
+    output: typeof GetAnswerResponseSchema;
   },
   /**
    * @generated from rpc admin.v1.MarkService.ListMarkingResults
