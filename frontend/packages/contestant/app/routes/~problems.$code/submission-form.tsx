@@ -19,8 +19,8 @@ function formatRemainingTimeParts(remainingSeconds: number) {
 }
 
 function useAnswerable(
-  lastSubmittedAt?: string, 
-  submitInterval?: number
+  lastSubmittedAt?: string,
+  submitInterval?: number,
 ): AnswerableState {
   const [state, setState] = useState<AnswerableState>({ remainingSeconds: 0 });
 
@@ -33,7 +33,9 @@ function useAnswerable(
     const checkAnswerable = () => {
       const now = new Date();
       const lastSubmit = new Date(lastSubmittedAt);
-      const nextSubmitTime = new Date(lastSubmit.getTime() + submitInterval * 1000);
+      const nextSubmitTime = new Date(
+        lastSubmit.getTime() + submitInterval * 1000,
+      );
 
       const diffMs = nextSubmitTime.getTime() - now.getTime();
       const diffSec = Math.ceil(diffMs / 1000);
@@ -62,7 +64,7 @@ export function SubmissionForm(props: {
   );
   const { remainingSeconds } = useAnswerable(
     props.lastSubmittedAt,
-    props.submitInterval
+    props.submitInterval,
   );
   const isAnswerable = remainingSeconds <= 0;
 
@@ -154,33 +156,33 @@ function SubmissionFormInner({
       </Field>
 
       <div className="mt-20 flex items-center justify-end gap-24">
-          {!isAnswerable && (
-            <label
-              id={submitLabelID}
-              className="flex items-center justify-between w-[160px]"
-            >
-              <span className="text-16 text-black">解答可能まで</span>
-              <div className="flex items-center">
-                <span className="text-primary font-bold text-20 text-right w-[24px]">
-                  {minutes}
-                </span>
-                <span className="text-primary font-bold text-20 mx-2">:</span>
-                <span className="text-primary font-bold text-20 text-right w-[24px]">
-                  {seconds.toString().padStart(2, "0")}
-                </span>
-              </div>
-            </label>
-          )}
+        {!isAnswerable && (
+          <label
+            id={submitLabelID}
+            className="flex w-[160px] items-center justify-between"
+          >
+            <span className="text-black text-16">解答可能まで</span>
+            <div className="flex items-center">
+              <span className="w-[24px] text-right text-20 font-bold text-primary">
+                {minutes}
+              </span>
+              <span className="mx-2 text-20 font-bold text-primary">:</span>
+              <span className="w-[24px] text-right text-20 font-bold text-primary">
+                {seconds.toString().padStart(2, "0")}
+              </span>
+            </div>
+          </label>
+        )}
 
-          {/* 回答可かつエラーがある場合 */}
-          {isAnswerable && error != null && (
-            <label
-              id={submitLabelID}
-              className="flex-shrink text-16 font-bold text-primary"
-            >
-              {error}
-            </label>
-          )}
+        {/* 回答可かつエラーがある場合 */}
+        {isAnswerable && error != null && (
+          <label
+            id={submitLabelID}
+            className="flex-shrink text-16 font-bold text-primary"
+          >
+            {error}
+          </label>
+        )}
 
         <button
           aria-labelledby={submitLabelID}
