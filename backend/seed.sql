@@ -52,9 +52,9 @@ INSERT INTO answers (id, problem_id, team_id, number, user_id,  created_at_range
 
 TRUNCATE TABLE descriptive_answers CASCADE;
 INSERT INTO descriptive_answers (answer_id, body) VALUES
-	('7cedf13e-5325-425e-a5d6-fea5fc127e49', '問題Aへのチーム1の回答1'),
-	('4bb7a232-e0de-4b6d-b1a3-8e50737d73b2', '問題Aへのチーム1の回答2'),
-	('abbe9c4e-eef5-40ac-a04e-6d8877b15185', '問題Bへのチーム1の回答1');
+	('7cedf13e-5325-425e-a5d6-fea5fc127e49', '問題Aへのチーム1の解答1'),
+	('4bb7a232-e0de-4b6d-b1a3-8e50737d73b2', '問題Aへのチーム1の解答2'),
+	('abbe9c4e-eef5-40ac-a04e-6d8877b15185', '問題Bへのチーム1の解答1');
 
 TRUNCATE TABLE notices CASCADE;
 INSERT INTO notices (id, path, title, markdown, effective_from, effective_until) VALUES

@@ -45,9 +45,9 @@ function reduceFormError(
     case "reset":
       return null;
     case "missing-answer":
-      return "回答を入力してください";
+      return "解答を入力してください";
     case "failure":
-      return "回答の送信に失敗しました";
+      return "解答の送信に失敗しました";
   }
 }
 
@@ -62,7 +62,7 @@ function SubmissionFormInner({
   return (
     <>
       <Field className="flex flex-1">
-        <Label className="sr-only">回答(必須)</Label>
+        <Label className="sr-only">解答(必須)</Label>
         <Textarea
           name="answer"
           className="flex-1 resize-none rounded-12 border border-text p-12"
@@ -97,7 +97,7 @@ function SubmissionFormInner({
           type="submit"
           className="flex items-center justify-center self-end rounded-12 bg-surface-2 py-16 pl-24 pr-20 shadow-md transition hover:opacity-80 active:shadow-none"
         >
-          <div className="text-16 font-bold">回答する</div>
+          <div className="text-16 font-bold">解答する</div>
           <MaterialSymbol icon="send" size={24} />
         </button>
       </div>

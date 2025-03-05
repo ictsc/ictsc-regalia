@@ -16,7 +16,7 @@ type (
 		problem   *Problem
 		author    *User
 		createdAt time.Time
-		// 次の回答を受付可能にするまでの時間
+		// 次の解答を受付可能にするまでの時間
 		interval time.Duration
 	}
 	answer = Answer
