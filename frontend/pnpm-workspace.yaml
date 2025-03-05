@@ -1,4 +1,5 @@
 packages:
   - packages/contestant
+  - packages/admin
   - packages/proto
   - packages/config

@@ -1,0 +1,51 @@
+{
+  "name": "@ictsc/admin",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest",
+    "lint": "run-p -c lint:*",
+    "lint:tsc": "tsc",
+    "lint:eslint": "eslint --cache --cache-location node_modules/.cache/eslint/ --cache-strategy content .",
+    "lint:prettier": "prettier --cache --check .",
+    "lint-fix": "run-s -c lint-fix:eslint lint-fix:prettier",
+    "lint-fix:eslint": "eslint --fix .",
+    "lint-fix:prettier": "prettier --write ."
+  },
+  "prettier": "@ictsc/config/prettier",
+  "devDependencies": {
+    "@ictsc/config": "workspace:*",
+    "@tanstack/router-plugin": "^1.49.3",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^9.9.1",
+    "globals": "^16.0.0",
+    "npm-run-all2": "^7.0.0",
+    "postcss": "^8.4.41",
+    "postcss-preset-mantine": "^1.17.0",
+    "postcss-simple-vars": "^7.0.1",
+    "prettier": "^3.3.3",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.0.0",
+    "@connectrpc/connect": "2.0.2",
+    "@connectrpc/connect-web": "2.0.2",
+    "@ictsc/proto": "workspace:*",
+    "@mantine/core": "^7.17.1",
+    "@mantine/hooks": "^7.17.1",
+    "@tanstack/react-router": "^1.49.2",
+    "@tanstack/router-devtools": "^1.49.2",
+    "clsx": "^2.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-error-boundary": "^5.0.0",
+    "react-markdown": "^10.0.0",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0"
+  }
+}
