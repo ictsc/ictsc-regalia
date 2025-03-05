@@ -11,12 +11,20 @@ import { MaterialSymbol } from "../../components/material-symbol";
 interface AnswerableState {
   isAnswerable: boolean;
   nextSubmitTime: Date | null;
+  remainingTime: number;
+}
+
+function formatRemainingTime(remainingSeconds: number): string {
+  const minutes = Math.floor(remainingSeconds / 60);
+  const seconds = remainingSeconds % 60;
+  return `${minutes}分${seconds.toString().padStart(2, '0')}秒`;
 }
 
 function useAnswerable(lastSubmittedAt?: string, submitInterval?: number): AnswerableState {
   const [state, setState] = useState<AnswerableState>(() => ({
     isAnswerable: true,
     nextSubmitTime: null,
+    remainingTime: 0,
   }));
 
   useEffect(() => {
@@ -24,6 +32,7 @@ function useAnswerable(lastSubmittedAt?: string, submitInterval?: number): Answe
       setState({
         isAnswerable: true,
         nextSubmitTime: null,
+        remainingTime: 0,
       });
       return;
     }
@@ -33,10 +42,15 @@ function useAnswerable(lastSubmittedAt?: string, submitInterval?: number): Answe
       const lastSubmit = new Date(lastSubmittedAt);
       const nextSubmitTime = new Date(lastSubmit.getTime() + submitInterval * 1000);
       const isAnswerable = now >= nextSubmitTime;
+      
+      const remainingTime = isAnswerable 
+        ? 0 
+        : Math.max(0, Math.floor((nextSubmitTime.getTime() - now.getTime()) / 1000));
 
       setState({
         isAnswerable,
         nextSubmitTime: isAnswerable ? null : nextSubmitTime,
+        remainingTime,
       });
     };
 
@@ -57,7 +71,7 @@ export function SubmissionForm(props: {
     reduceFormError,
     null,
   );
-  const { isAnswerable } = useAnswerable(
+  const { isAnswerable, remainingTime } = useAnswerable(
     props.lastSubmittedAt,
     props.submitInterval
   );
@@ -87,6 +101,7 @@ export function SubmissionForm(props: {
         error={error}
         dispatchError={dispatchError}
         isAnswerable={isAnswerable}
+        remainingTime={remainingTime}
       />
     </form>
   );
@@ -113,10 +128,12 @@ function SubmissionFormInner({
   error,
   dispatchError,
   isAnswerable,
+  remainingTime,
 }: {
   error: FormErrorState;
   dispatchError: ActionDispatch<[FormErrorAction]>;
   isAnswerable: boolean;
+  remainingTime: number;
 }) {
   const submitLabelID = useId();
   return (
@@ -144,7 +161,15 @@ function SubmissionFormInner({
         />
       </Field>
       <div className="mt-20 flex items-center justify-end gap-16">
-        {error != null && (
+        {!isAnswerable && (
+          <label
+            id={submitLabelID}
+            className="flex-shrink text-16 font-bold text-primary"
+          >
+            あと{formatRemainingTime(remainingTime)}で回答できます
+          </label>
+        )}
+        {error != null && isAnswerable && (
           <label
             id={submitLabelID}
             className="flex-shrink text-16 font-bold text-primary"
