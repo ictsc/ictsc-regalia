@@ -8,6 +8,46 @@ import {
 import { Field, Label, Textarea } from "@headlessui/react";
 import { MaterialSymbol } from "../../components/material-symbol";
 
+interface AnswerableState {
+  isAnswerable: boolean;
+  nextSubmitTime: Date | null;
+}
+
+function useAnswerable(lastSubmittedAt?: string, submitInterval?: number): AnswerableState {
+  const [state, setState] = useState<AnswerableState>(() => ({
+    isAnswerable: true,
+    nextSubmitTime: null,
+  }));
+
+  useEffect(() => {
+    if (!lastSubmittedAt || !submitInterval) {
+      setState({
+        isAnswerable: true,
+        nextSubmitTime: null,
+      });
+      return;
+    }
+
+    const checkAnswerable = () => {
+      const now = new Date();
+      const lastSubmit = new Date(lastSubmittedAt);
+      const nextSubmitTime = new Date(lastSubmit.getTime() + submitInterval * 1000);
+      const isAnswerable = now >= nextSubmitTime;
+
+      setState({
+        isAnswerable,
+        nextSubmitTime: isAnswerable ? null : nextSubmitTime,
+      });
+    };
+
+    checkAnswerable();
+    const interval = setInterval(checkAnswerable, 1000);
+    return () => clearInterval(interval);
+  }, [lastSubmittedAt, submitInterval]);
+
+  return state;
+}
+
 export function SubmissionForm(props: {
   readonly action: (answer: string) => Promise<"success" | "failure">;
   readonly submitInterval?: number;
@@ -17,26 +57,10 @@ export function SubmissionForm(props: {
     reduceFormError,
     null,
   );
-  const [isAnswerable, setIsAnswerable] = useState(true);
-
-  useEffect(() => {
-    if (!props.lastSubmittedAt || !props.submitInterval) {
-      setIsAnswerable(true);
-      return;
-    }
-
-    const checkAnswerable = () => {
-      const now = new Date();
-      const lastSubmit = new Date(props.lastSubmittedAt!);
-      const nextSubmitTime = new Date(
-        lastSubmit.getTime() + props.submitInterval! * 1000,
-      );
-      setIsAnswerable(now >= nextSubmitTime);
-    };
-    checkAnswerable();
-    const interval = setInterval(checkAnswerable, 1000);
-    return () => clearInterval(interval);
-  }, [props.lastSubmittedAt, props.submitInterval]);
+  const { isAnswerable } = useAnswerable(
+    props.lastSubmittedAt,
+    props.submitInterval
+  );
 
   return (
     <form
