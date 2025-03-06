@@ -69,4 +69,10 @@ parent_pid=$$
 	cleanup
 )&
 
+until nc -z 127.0.0.1 "$postgres_local_port" 2>/dev/null; do
+  sleep 0.1
+done
+until nc -z 127.0.0.1 "$redis_local_port" 2>/dev/null; do
+  sleep 0.1
+done
 exec "$@"
