@@ -168,7 +168,7 @@ require (
 	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.14 // indirect
-	github.com/tklauser/numcpus v0.9.0 // indirect
+	github.com/tklauser/numcpus v0.10.0 // indirect
 	github.com/vbatts/tar-split v0.12.1 // indirect
 	github.com/wasilibs/go-pgquery v0.0.0-20250219053243-148840c597e6 // indirect
 	github.com/wasilibs/wazero-helpers v0.0.0-20250123031827-cd30c44769bb // indirect
