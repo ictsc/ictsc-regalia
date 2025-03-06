@@ -15,7 +15,7 @@ export const InContest: Story = {
         $typeName: "contestant.v1.Notice" as const,
         title: "hogehoge",
         body: "hogehoge",
-      }))
-    ]
-  }
+      })),
+    ],
+  },
 };
