@@ -126,7 +126,7 @@ func start(option Option) int {
 		idx := slices.IndexFunc(invitationCodes, func(ic *adminv1.InvitationCode) bool {
 			return ic.GetTeamCode() == int64(entry.ID)
 		})
-		if idx > 0 {
+		if idx >= 0 {
 			entry.InvitationCode = invitationCodes[idx].GetCode()
 		} else {
 			code, err := createInvitationCode(ctx, invitationClient, entry, option.InvitationExpires)
