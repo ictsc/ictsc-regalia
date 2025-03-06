@@ -16,12 +16,14 @@ export const Default: Story = {
         code: "ABC",
         title: "問題 ABC",
         maxScore: 200,
+        category: "Network",
       })),
       ...Array.from({ length: 5 }, () => ({
         $typeName: "contestant.v1.Problem" as const,
         code: "ABC",
         title: "問題 ABC",
         maxScore: 200,
+        category: "Server",
         score: {
           $typeName: "contestant.v1.Score" as const,
           score: 100,
@@ -34,6 +36,7 @@ export const Default: Story = {
         code: "ABC",
         title: "問題 ABC",
         maxScore: 200,
+        category: "Network",
         score: {
           $typeName: "contestant.v1.Score" as const,
           score: 160,
@@ -46,6 +49,7 @@ export const Default: Story = {
         code: "ABC",
         title: "問題 ABC",
         maxScore: 200,
+        category: "Server",
         score: {
           $typeName: "contestant.v1.Score" as const,
           score: 200,
