@@ -62,3 +62,8 @@ INSERT INTO notices (id, path, title, markdown, effective_from, effective_until)
 	('0cea0d50-96a5-45fb-a5c5-a6d6df140adc', '/current/notice', 'Current Notice', '現在のお知らせです', '2025-02-03 00:00:00+00', '2035-03-03T00:00:00Z'),
 	('6ca38a12-adff-48f3-8fce-8f189eba38bb', '/current/notice2', 'Current Notice2', '現在のお知らせ2です', '2025-02-03 00:00:00+00', '2035-03-03T00:00:00Z'),
 	('e2eaf74d-db80-46cc-ad21-321039142629', '/future/notice', 'Future Notice', '未来のお知らせです', '2035-03-03T00:00:00Z', '2035-03-03T00:00:00Z');
+
+TRUNCATE TABLE schedules CASCADE;
+INSERT INTO schedules (id, phase, start_at, end_at) VALUES
+    ('8a23ce3f-4506-48e9-bf68-7d2d90592bf1', 'IN_CONTEST', '2025-02-03 00:00:00+00', '2025-02-04 00:00:00+00'),
+    ('4e72d440-dfde-4923-801d-0fd5ee2c0730', 'AFTER_CONTEST', '2025-02-04 00:00:00+00', '2025-02-05 00:00:00+00');
