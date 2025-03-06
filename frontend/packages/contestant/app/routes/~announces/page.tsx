@@ -19,7 +19,7 @@ export function AnnounceList(props: AnnounceProps) {
               to="/"
               title="アナウンス"
               className={clsx(
-                "mb-16 w-[700px] rounded-8 border-text bg-surface-2 py-4 pl-40 text-16 font-bold",
+                "mb-16 w-[700px] rounded-8 border-text bg-surface-2 py-4 px-40 text-16 font-bold",
                 active ? "opacity-50" : "opacity-100",
               )}
             >
