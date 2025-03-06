@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
+
 package contestant.v1;
 
 option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1;contestantv1";
@@ -8,6 +10,8 @@ message Rank {
   int64 rank = 1;
   string team_name = 2;
   int64 score = 3;
+  google.protobuf.Timestamp timestamp = 4;
+  string organization = 5;
 }
 
 message GetRankingRequest {}
