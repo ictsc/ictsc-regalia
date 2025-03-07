@@ -12,6 +12,11 @@ on:
       update-image:
         type: boolean
         default: false
+    secrets:
+      github-app-id:
+        required: false
+      github-app-private-key:
+        required: false
 
 jobs:
   build_and_push:
@@ -66,8 +71,8 @@ jobs:
     steps:
       - uses: actions/create-github-app-token@v1
         with:
-          github-app-id: ${{ secrets.PUSHER_APP_ID }}
-          github-app-private-key: ${{ secrets.PUSHER_PRIVATE_KEY }}
+          github-app-id: ${{ secrets.github-app-id }}
+          github-app-private-key: ${{ secrets.github-app-private-key }}
       - name: Update Manifests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
