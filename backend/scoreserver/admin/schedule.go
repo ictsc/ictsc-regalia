@@ -47,12 +47,8 @@ func (h *ScheduleServiceHandler) GetSchedule(
 	}
 
 	protoSchedules := make([]*adminv1.Schedule, 0, len(schedules))
-	for _, s := range schedules {
-		protoSchedules = append(protoSchedules, &adminv1.Schedule{
-			Phase:   adminv1.Phase(s.Phase()),
-			StartAt: timestamppb.New(s.StartAt()),
-			EndAt:   timestamppb.New(s.EndAt()),
-		})
+	for _, schedule := range schedules {
+		protoSchedules = append(protoSchedules, convertSchedule(schedule))
 	}
 
 	return connect.NewResponse(&adminv1.GetScheduleResponse{
@@ -69,11 +65,11 @@ func (h *ScheduleServiceHandler) UpdateSchedule(
 	}
 
 	schedules := make([]*domain.UpdateScheduleInput, 0, len(req.Msg.GetSchedule()))
-	for _, s := range req.Msg.GetSchedule() {
+	for _, schdule := range req.Msg.GetSchedule() {
 		schedules = append(schedules, &domain.UpdateScheduleInput{
-			Phase:   domain.Phase(s.GetPhase()),
-			StartAt: s.GetStartAt().AsTime(),
-			EndAt:   s.GetEndAt().AsTime(),
+			Phase:   convertProtoPhaseToDomain(schdule.GetPhase()),
+			StartAt: schdule.GetStartAt().AsTime(),
+			EndAt:   schdule.GetEndAt().AsTime(),
 		})
 	}
 	if err := h.UpdateEffect.RunInTx(ctx, func(w domain.ScheduleWriter) error {
@@ -83,4 +79,43 @@ func (h *ScheduleServiceHandler) UpdateSchedule(
 	}
 
 	return connect.NewResponse(&adminv1.UpdateScheduleResponse{}), nil
+}
+
+func convertSchedule(schedule *domain.Schedule) *adminv1.Schedule {
+	var phase adminv1.Phase
+	switch schedule.Phase() {
+	case domain.PhaseOutOfContest:
+		phase = adminv1.Phase_PHASE_OUT_OF_CONTEST
+	case domain.PhaseInContest:
+		phase = adminv1.Phase_PHASE_IN_CONTEST
+	case domain.PhaseBreak:
+		phase = adminv1.Phase_PHASE_BREAK
+	case domain.PhaseAfterContest:
+		phase = adminv1.Phase_PHASE_AFTER_CONTEST
+	case domain.PhaseUnspecified:
+		fallthrough
+	default:
+		phase = adminv1.Phase_PHASE_UNSPECIFIED
+	}
+
+	return &adminv1.Schedule{
+		Phase:   phase,
+		StartAt: timestamppb.New(schedule.StartAt()),
+		EndAt:   timestamppb.New(schedule.EndAt()),
+	}
+}
+
+func convertProtoPhaseToDomain(protoPhase adminv1.Phase) domain.Phase {
+	switch protoPhase {
+	case adminv1.Phase_PHASE_OUT_OF_CONTEST:
+		return domain.PhaseOutOfContest
+	case adminv1.Phase_PHASE_IN_CONTEST:
+		return domain.PhaseInContest
+	case adminv1.Phase_PHASE_BREAK:
+		return domain.PhaseBreak
+	case adminv1.Phase_PHASE_AFTER_CONTEST:
+		return domain.PhaseAfterContest
+	default:
+		return domain.PhaseUnspecified
+	}
 }
