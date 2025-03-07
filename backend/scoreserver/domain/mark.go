@@ -77,7 +77,7 @@ func (d *DescriptiveMarkingRaionale) Comment() string {
 }
 
 func ListAllMarkingResults(ctx context.Context, eff MarkingResultReader) ([]*MarkingResult, error) {
-	markingResultDataList, err := eff.ListMarkingResults()
+	markingResultDataList, err := eff.ListMarkingResults(ctx)
 	if err != nil {
 		return nil, WrapAsInternal(err, "failed to list marking results")
 	}
@@ -145,7 +145,7 @@ type (
 	}
 
 	MarkingResultReader interface {
-		ListMarkingResults() ([]*MarkingResultData, error)
+		ListMarkingResults(ctx context.Context) ([]*MarkingResultData, error)
 	}
 	MarkingResultWriter interface {
 		CreateMarkingResult(ctx context.Context, m *MarkingResultData) error
