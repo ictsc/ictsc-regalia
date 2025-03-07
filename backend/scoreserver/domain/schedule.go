@@ -74,7 +74,7 @@ func SaveSchedule(ctx context.Context, eff ScheduleWriter, input []*UpdateSchedu
 
 type StringPhase string
 
-func (s *StringPhase) String() (Phase, error) {
+func (s *StringPhase) ToPhase() (Phase, error) {
 	switch *s {
 	case "OUT_OF_CONTEST":
 		return PhaseOutOfContest, nil
@@ -113,7 +113,7 @@ type (
 )
 
 func (d *ScheduleData) parse() (*Schedule, error) {
-	phase, err := d.StringPhase.String()
+	phase, err := d.StringPhase.ToPhase()
 	if err != nil {
 		return nil, WrapAsInternal(err, "failed to parse phase")
 	}
