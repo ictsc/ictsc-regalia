@@ -71,8 +71,8 @@ jobs:
     steps:
       - uses: actions/create-github-app-token@v1
         with:
-          github-app-id: ${{ secrets.github-app-id }}
-          github-app-private-key: ${{ secrets.github-app-private-key }}
+          app-id: ${{ secrets.github-app-id }}
+          private-key: ${{ secrets.github-app-private-key }}
       - name: Update Manifests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
