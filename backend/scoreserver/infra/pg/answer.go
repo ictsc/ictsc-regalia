@@ -152,7 +152,16 @@ type (
 	}
 )
 
-var answerColumns = columns([]string{"id", "number"})
+var (
+	answerColumns     = columns([]string{"id", "number"})
+	answerViewColumns = columns([]string{
+		"id", "number", "created_at", "rate_limit_interval",
+		"team.id", "team.code", "team.name", "team.organization", "team.max_members",
+		"problem.id", "problem.code", "problem.type", "problem.title", "problem.max_score", "problem.redeploy_rule",
+		"problem_rpp.threshold", "problem_rpp.percentage",
+		"author.id", "author.name",
+	})
+)
 
 func (r answerRow) data() *domain.AnswerData {
 	r.answerDataRow.Team = (*domain.TeamData)(&r.Team)
