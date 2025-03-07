@@ -110,8 +110,8 @@ function Sidebar(props: {
   return (
     <TabGroup onChange={props.onChange} className="flex flex-1 flex-col">
       <TabList className="flex flex-row gap-4">
-        <SidebarTab>新規回答</SidebarTab>
-        <SidebarTab>回答一覧</SidebarTab>
+        <SidebarTab>新規解答</SidebarTab>
+        <SidebarTab>解答一覧</SidebarTab>
         <SidebarTab disabled={!props.redeployable}>再展開</SidebarTab>
       </TabList>
       <TabPanels className="mt-16 size-full bg-transparent px-8">
@@ -149,7 +149,7 @@ export function SubmissionList(props: { readonly children?: ReactNode }) {
 export function EmptySubmissionList() {
   return (
     <div className="grid size-full place-items-center text-16 font-bold text-text">
-      回答はまだありません！
+      解答はまだありません！
     </div>
   );
 }

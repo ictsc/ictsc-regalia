@@ -305,7 +305,7 @@ func TestGetAnswerDetail(t *testing.T) {
 				},
 				Body: &domain.AnswerBodyData{
 					Descriptive: &domain.DescriptiveAnswerBodyData{
-						Body: "問題Aへのチーム1の回答1",
+						Body: "問題Aへのチーム1の解答1",
 					},
 				},
 			},

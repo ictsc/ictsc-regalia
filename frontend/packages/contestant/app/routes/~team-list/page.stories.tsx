@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import {  TeamList } from "./page";
+import { TeamList } from "./page";
 
 export default {
   title: "pages/team-list",
@@ -13,33 +13,32 @@ export const Default: Story = {
       <TeamList
         teamName="チーム名"
         affiliation="testTeam"
-        userNames={["hoge","huga"]}
+        userNames={["hoge", "huga"]}
       />
       <TeamList
         teamName="チーム名がわからないいいいいいいいいいいいい"
         affiliation="testTeam"
-        userNames={["hoge","huga"]}
-      />
-      <TeamList
-
-        teamName="チーム名がわからないいいいいいいいいいいいい"
-        affiliation="testTeam"
-        userNames={["hoge","huga"]}
+        userNames={["hoge", "huga"]}
       />
       <TeamList
         teamName="チーム名がわからないいいいいいいいいいいいい"
         affiliation="testTeam"
-        userNames={["hoge","huga"]}
+        userNames={["hoge", "huga"]}
       />
       <TeamList
         teamName="チーム名がわからないいいいいいいいいいいいい"
         affiliation="testTeam"
-        userNames={["hoge","huga"]}
+        userNames={["hoge", "huga"]}
       />
       <TeamList
         teamName="チーム名がわからないいいいいいいいいいいいい"
         affiliation="testTeam"
-        userNames={["hoge","huga"]}
+        userNames={["hoge", "huga"]}
+      />
+      <TeamList
+        teamName="チーム名がわからないいいいいいいいいいいいい"
+        affiliation="testTeam"
+        userNames={["hoge", "huga"]}
       />
     </div>
   ),

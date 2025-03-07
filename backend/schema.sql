@@ -133,35 +133,45 @@ CREATE TABLE answers (
 	CONSTRAINT answers_rate_limit EXCLUDE USING GIST
 		(problem_id WITH =, team_id WITH =, created_at_range WITH &&)
 );
-COMMENT ON TABLE answers IS '回答';
-COMMENT ON COLUMN answers.id IS '回答 ID';
-COMMENT ON COLUMN answers.problem_id IS '回答対象の問題 ID';
-COMMENT ON COLUMN answers.team_id IS '回答したチーム ID';
-COMMENT ON COLUMN answers.number IS '回答番号';
-COMMENT ON COLUMN answers.user_id IS '回答者のユーザ ID';
-COMMENT ON COLUMN answers.created_at_range IS '回答日時から次に回答できるまでの期間';
+COMMENT ON TABLE answers IS '解答';
+COMMENT ON COLUMN answers.id IS '解答 ID';
+COMMENT ON COLUMN answers.problem_id IS '解答対象の問題 ID';
+COMMENT ON COLUMN answers.team_id IS '解答したチーム ID';
+COMMENT ON COLUMN answers.number IS '解答番号';
+COMMENT ON COLUMN answers.user_id IS '解答者のユーザ ID';
+COMMENT ON COLUMN answers.created_at_range IS '回答日時から次に解答できるまでの期間';
 
 CREATE TABLE descriptive_answers (
 	answer_id UUID PRIMARY KEY REFERENCES answers(id) ON DELETE CASCADE,
 	body TEXT NOT NULL
 );
-COMMENT ON TABLE descriptive_answers IS '記述式回答';
-COMMENT ON COLUMN descriptive_answers.answer_id IS '回答 ID';
-COMMENT ON COLUMN descriptive_answers.body IS '回答内容';
+COMMENT ON TABLE descriptive_answers IS '記述式解答';
+COMMENT ON COLUMN descriptive_answers.answer_id IS '解答 ID';
+COMMENT ON COLUMN descriptive_answers.body IS '解答内容';
 
 CREATE TABLE marking_results (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	answer_id UUID NOT NULL REFERENCES answers(id) ON DELETE CASCADE,
-	score INT NOT NULL CHECK (score >= 0),
 	judge_name TEXT NOT NULL,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE marking_results IS '採点結果';
 COMMENT ON COLUMN marking_results.id IS '採点結果 ID';
-COMMENT ON COLUMN marking_results.answer_id IS '回答 ID';
-COMMENT ON COLUMN marking_results.score IS '得点';
+COMMENT ON COLUMN marking_results.answer_id IS '解答 ID';
 COMMENT ON COLUMN marking_results.judge_name IS '採点者名';
 COMMENT ON COLUMN marking_results.created_at IS '採点日時';
+
+CREATE TABLE scores (
+	marking_result_id UUID PRIMARY KEY REFERENCES marking_results(id) ON DELETE CASCADE,
+	marked_score INT NOT NULL CHECK (marked_score >= 0),
+	penalty INT NOT NULL CHECK (penalty >= 0) DEFAULT 0,
+	redeploy_count INT NOT NULL CHECK (redeploy_count >= 0) DEFAULT 0
+);
+COMMENT ON TABLE scores IS '採点結果の得点';
+COMMENT ON COLUMN scores.marking_result_id IS '採点結果 ID';
+COMMENT ON COLUMN scores.marked_score IS '採点による得点';
+COMMENT ON COLUMN scores.penalty IS 'ペナルティ';
+COMMENT ON COLUMN scores.redeploy_count IS '再展開回数(ペナルティの計算根拠)';
 
 CREATE TABLE descriptive_marking_rationale (
 	marking_result_id UUID PRIMARY KEY REFERENCES marking_results(id) ON DELETE CASCADE,

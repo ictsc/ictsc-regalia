@@ -16,7 +16,7 @@ type (
 		problem   *Problem
 		author    *User
 		createdAt time.Time
-		// 次の回答を受付可能にするまでの時間
+		// 次の解答を受付可能にするまでの時間
 		interval time.Duration
 	}
 	answer = Answer
@@ -272,6 +272,7 @@ func (d *AnswerDetailData) parse() (*AnswerDetail, error) {
 	}
 
 	var body AnswerBody
+	body.problemType = answer.Problem().Type()
 	switch answer.Problem().Type() {
 	case ProblemTypeDescriptive:
 		if d.Body.Descriptive == nil {
