@@ -11,7 +11,7 @@ import (
 )
 
 type scheduleRow struct {
-	Id      uuid.UUID          `db:"id"`
+	ID      uuid.UUID          `db:"id"`
 	Phase   domain.StringPhase `db:"phase"`
 	StartAt time.Time          `db:"start_at"`
 	EndAt   time.Time          `db:"end_at"`
@@ -30,7 +30,7 @@ func (r *repo) GetSchedule(ctx context.Context) ([]*domain.ScheduleData, error) 
 	schedules := make([]*domain.ScheduleData, 0, len(rows))
 	for _, row := range rows {
 		schedules = append(schedules, &domain.ScheduleData{
-			ID:          row.Id,
+			ID:          row.ID,
 			StringPhase: row.Phase,
 			StartAt:     row.StartAt,
 			EndAt:       row.EndAt,
@@ -51,7 +51,7 @@ func (r *RepositoryTx) SaveSchedule(ctx context.Context, data []*domain.Schedule
 	rows := make([]scheduleRow, 0, len(data))
 	for _, d := range data {
 		rows = append(rows, scheduleRow{
-			Id:      d.ID,
+			ID:      d.ID,
 			Phase:   d.StringPhase,
 			StartAt: d.StartAt,
 			EndAt:   d.EndAt,
