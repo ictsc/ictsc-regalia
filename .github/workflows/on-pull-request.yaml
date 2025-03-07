@@ -10,3 +10,4 @@ jobs:
     with:
       push-ghcr: false
       save-cache: false
+      update-image: false
