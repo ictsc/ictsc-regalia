@@ -210,14 +210,14 @@ CREATE TYPE contest_phase AS ENUM ('UNSPECIFIED', 'OUT_OF_CONTEST', 'IN_CONTEST'
 
 CREATE TABLE schedules (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    start_at TIMESTAMPTZ NOT NULL,
     phase contest_phase NOT NULL,
+    start_at TIMESTAMPTZ NOT NULL,
     end_at TIMESTAMPTZ NOT NULL,
     CHECK (start_at < end_at)
 );
 
 COMMENT ON TABLE schedules IS 'コンテストスケジュール';
 COMMENT ON COLUMN schedules.id IS 'スケジュール ID';
-COMMENT ON COLUMN schedules.start_at IS '開始時刻';
 COMMENT ON COLUMN schedules.phase IS 'フェーズ';
+COMMENT ON COLUMN schedules.start_at IS '開始時刻';
 COMMENT ON COLUMN schedules.end_at IS '終了時刻';
