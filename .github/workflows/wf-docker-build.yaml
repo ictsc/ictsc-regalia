@@ -73,5 +73,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAGS: ${{ needs.build_and_push.outputs.tags }}
         run: |
-          TAG="$(echo $TAGS | grep sha-)"
+          TAG=$(echo "$TAGS" | grep "sha-")
           gh workflow run --repo ictsc/ictsc-regalia-release update-image.yaml -f "tag=$TAG"
