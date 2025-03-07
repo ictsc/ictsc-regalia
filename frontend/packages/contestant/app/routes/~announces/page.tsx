@@ -18,7 +18,6 @@ export function AnnounceList(props: AnnounceProps) {
               <Link
                 key={index}
                 to="/"
-                title="アナウンス"
                 className={clsx(
                   "mb-16 w-[700px] rounded-8 border-text bg-surface-2 px-40 py-4 text-16 font-bold",
                   active ? "opacity-50" : "opacity-100",
