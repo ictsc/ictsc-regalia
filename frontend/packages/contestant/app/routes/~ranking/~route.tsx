@@ -5,17 +5,16 @@ import { RankingPage } from "./page";
 
 export const Route = createFileRoute("/ranking")({
   component: RouteComponent,
-  loader: ({context: {transport} }) => {
+  loader: ({ context: { transport } }) => {
     return {
       ranking: fetchRanking(transport),
     };
   },
 });
 
-function RouteComponent () {
-  const {ranking: rankingPromise} = Route.useLoaderData();
+function RouteComponent() {
+  const { ranking: rankingPromise } = Route.useLoaderData();
   const deferredRankingPromise = useDeferredValue(rankingPromise);
   const ranking = use(deferredRankingPromise);
-  return <RankingPage ranking={ranking}/>
+  return <RankingPage ranking={ranking} />;
 }
-

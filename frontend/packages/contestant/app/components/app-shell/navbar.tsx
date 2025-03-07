@@ -82,10 +82,14 @@ export function Navbar({
               ...buttonProps,
             })}
           >
-            <NavbarButton showTitle={!collapsed} icon="trophy" title="ランキング" />
+            <NavbarButton
+              showTitle={!collapsed}
+              icon="trophy"
+              title="ランキング"
+            />
           </Link>
-          )}
-        </Button>
+        )}
+      </Button>
       <NavbarButton showTitle={!collapsed} icon="groups" title="チーム一覧" />
       {/* <NavbarButton showTitle={!collapsed} icon="chat" title="お問い合わせ" /> */}
     </div>
