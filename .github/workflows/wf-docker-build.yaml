@@ -51,6 +51,7 @@ jobs:
             type=ref,event=pr
             type=sha
       - name: Build and Push Artifacts
+        id: bake
         uses: docker/bake-action@v6
         with:
           source: .
@@ -62,6 +63,9 @@ jobs:
           set: |
             *.cache-from=type=gha
             ${{ inputs.save-cache && '*.cache-to=type=gha,mode=max' || '' }}
+      - run: echo "$BAKE_OUT"
+        env:
+          BAKE_OUT: ${{ steps.bake.outputs.metadata }}
 
   update_image:
     name: Update Image
