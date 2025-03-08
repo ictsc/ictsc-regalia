@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"time"
 
 	"connectrpc.com/connect"
 	adminv1 "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1"
@@ -15,18 +16,22 @@ import (
 type MarkServiceHandler struct {
 	adminv1connect.UnimplementedMarkServiceHandler
 
-	Enforcer         *auth.Enforcer
-	ListAnswerEffect domain.AnswerReader
-	GetAnswerEffect  domain.AnswerReader
+	Enforcer                  *auth.Enforcer
+	ListAnswerEffect          domain.AnswerReader
+	GetAnswerEffect           domain.AnswerReader
+	ListMarkingResultEffect   domain.MarkingResultReader
+	CreateMarkingResultEffect domain.Tx[CreateMarkingResultTxEffect]
 }
 
 var _ adminv1connect.MarkServiceHandler = (*MarkServiceHandler)(nil)
 
 func newMarkServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *MarkServiceHandler {
 	return &MarkServiceHandler{
-		Enforcer:         enforcer,
-		ListAnswerEffect: repo,
-		GetAnswerEffect:  repo,
+		Enforcer:                  enforcer,
+		ListAnswerEffect:          repo,
+		GetAnswerEffect:           repo,
+		ListMarkingResultEffect:   repo,
+		CreateMarkingResultEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) CreateMarkingResultTxEffect { return rt }),
 	}
 }
 
@@ -45,16 +50,7 @@ func (h *MarkServiceHandler) ListAnswers(
 
 	protoAnswers := make([]*adminv1.Answer, 0, len(answers))
 	for _, answer := range answers {
-		protoAnswers = append(protoAnswers, &adminv1.Answer{
-			Id:   answer.Number(),
-			Team: convertTeam(answer.Team()),
-			Author: &adminv1.Contestant{
-				Name: string(answer.Author().Name()),
-				Team: convertTeam(answer.Author().Team()),
-			},
-			Problem:   convertProblem(answer.Problem()),
-			CreatedAt: timestamppb.New(answer.CreatedAt()),
-		})
+		protoAnswers = append(protoAnswers, convertAnswer(answer))
 	}
 
 	return connect.NewResponse(&adminv1.ListAnswersResponse{
@@ -97,16 +93,7 @@ func (h *MarkServiceHandler) GetAnswer(
 	if err != nil {
 		return nil, err
 	}
-	protoAnser := &adminv1.Answer{
-		Id:   answer.Number(),
-		Team: convertTeam(answer.Team()),
-		Author: &adminv1.Contestant{
-			Name: string(answer.Author().Name()),
-			Team: convertTeam(answer.Author().Team()),
-		},
-		Problem:   convertProblem(answer.Problem()),
-		CreatedAt: timestamppb.New(answer.CreatedAt()),
-	}
+	protoAnser := convertAnswer(answer.Answer())
 	switch answer.Problem().Type() {
 	case domain.ProblemTypeDescriptive:
 		desc, err := answer.Body().Descriptive()
@@ -128,4 +115,129 @@ func (h *MarkServiceHandler) GetAnswer(
 	return connect.NewResponse(&adminv1.GetAnswerResponse{
 		Answer: protoAnser,
 	}), nil
+}
+
+func (h *MarkServiceHandler) ListMarkingResults(
+	ctx context.Context,
+	req *connect.Request[adminv1.ListMarkingResultsRequest],
+) (*connect.Response[adminv1.ListMarkingResultsResponse], error) {
+	if err := enforce(ctx, h.Enforcer, "marking_results", "list"); err != nil {
+		return nil, err
+	}
+
+	markingResults, err := domain.ListAllMarkingResults(ctx, h.ListMarkingResultEffect)
+	if err != nil {
+		return nil, err
+	}
+
+	protoMarkingResults := make([]*adminv1.MarkingResult, 0, len(markingResults))
+	for _, markingResult := range markingResults {
+		protoMarkingResults = append(protoMarkingResults, convertMarkingResult(markingResult))
+	}
+
+	return connect.NewResponse(&adminv1.ListMarkingResultsResponse{
+		MarkingResults: protoMarkingResults,
+	}), nil
+}
+
+type CreateMarkingResultTxEffect interface {
+	domain.AnswerReader
+	domain.MarkingResultWriter
+}
+
+func (h *MarkServiceHandler) CreateMarkingResult(
+	ctx context.Context,
+	req *connect.Request[adminv1.CreateMarkingResultRequest],
+) (*connect.Response[adminv1.CreateMarkingResultResponse], error) {
+	if err := enforce(ctx, h.Enforcer, "marking_results", "create"); err != nil {
+		return nil, err
+	}
+
+	viewer := auth.GetViewer(ctx)
+
+	reqAnswer := req.Msg.GetMarkingResult().GetAnswer()
+
+	reqTeamCode := reqAnswer.GetTeam().GetCode()
+	if reqTeamCode == 0 {
+		return nil, domain.NewInvalidArgumentError("team_code is required", nil)
+	}
+	teamCode, err := domain.NewTeamCode(reqTeamCode)
+	if err != nil {
+		return nil, err
+	}
+
+	reqProblemCode := reqAnswer.GetProblem().GetCode()
+	if reqProblemCode == "" {
+		return nil, domain.NewInvalidArgumentError("problem_code is required", nil)
+	}
+	problemCode, err := domain.NewProblemCode(reqProblemCode)
+	if err != nil {
+		return nil, err
+	}
+
+	reqAnswerID := reqAnswer.GetId()
+	if reqAnswerID == 0 {
+		return nil, domain.NewInvalidArgumentError("answer_id is required", nil)
+	}
+
+	reqScore := req.Msg.GetMarkingResult().GetScore()
+	reqDescriptiveComment := req.Msg.GetMarkingResult().GetRationale().GetDescriptive().GetComment()
+
+	now := time.Now()
+
+	markingResult, err := domain.RunTx(ctx, h.CreateMarkingResultEffect, func(eff CreateMarkingResultTxEffect) (*domain.MarkingResult, error) {
+		answerDetail, err := domain.GetAnswerDetail(ctx, eff, teamCode, problemCode, reqAnswerID)
+		if err != nil {
+			return nil, err
+		}
+
+		return answerDetail.Answer().Mark(ctx, eff, now, &domain.MarkInput{
+			Score: reqScore,
+			Judge: viewer.Name,
+
+			Comment: reqDescriptiveComment,
+		})
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&adminv1.CreateMarkingResultResponse{
+		MarkingResult: convertMarkingResult(markingResult),
+	}), nil
+}
+
+func convertAnswer(answer *domain.Answer) *adminv1.Answer {
+	return &adminv1.Answer{
+		Id:        answer.Number(),
+		Team:      convertTeam(answer.Team()),
+		Problem:   convertProblem(answer.Problem()),
+		CreatedAt: timestamppb.New(answer.CreatedAt()),
+	}
+}
+
+func convertMarkingResult(markingResult *domain.MarkingResult) *adminv1.MarkingResult {
+	proto := &adminv1.MarkingResult{
+		Answer:    convertAnswer(markingResult.Answer()),
+		Judge:     &adminv1.Admin{Name: markingResult.Judge()},
+		Score:     markingResult.Score().MarkedScore(),
+		CreatedAt: timestamppb.New(markingResult.CreatedAt()),
+	}
+	rationale := markingResult.Rationale()
+	switch rationale.Type() {
+	case domain.ProblemTypeDescriptive:
+		proto.Rationale = &adminv1.MarkingRationale{
+			Type: adminv1.ProblemType_PROBLEM_TYPE_DESCRIPTIVE,
+			Body: &adminv1.MarkingRationale_Descriptive{
+				Descriptive: &adminv1.DescriptiveMarkingRationale{
+					Comment: rationale.Descriptive().Comment(),
+				},
+			},
+		}
+	case domain.ProblemTypeUnknown:
+		fallthrough
+	default:
+		proto.Rationale = &adminv1.MarkingRationale{Type: adminv1.ProblemType_PROBLEM_TYPE_UNSPECIFIED}
+	}
+	return proto
 }
