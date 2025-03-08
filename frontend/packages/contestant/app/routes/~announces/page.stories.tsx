@@ -9,15 +9,13 @@ export default {
 type Story = StoryObj<typeof AnnounceList>;
 
 export const InContest: Story = {
-  render: () => (
-    <div>
-      <AnnounceList announce="第二報・woaの初期コンフィグの設定間違いについて" />
-      <AnnounceList announce="第二報・woaの初期コンフィグの設定間違いについて" />
-      <AnnounceList announce="第二報・woaの初期コンフィグの設定間違いについて" />
-      <AnnounceList announce="第二報・woaの初期コンフィグの設定間違いについて" />
-      <AnnounceList announce="第二報・woaの初期コンフィグの設定間違いについて" />
-      <AnnounceList announce="第二報・woaの初期コンフィグの設定間違いについて" />
-      <AnnounceList announce="第二報・woaの初期コンフィグの設定間違いについて" />
-    </div>
-  ),
+  args: {
+    announces: [
+      ...Array.from({ length: 10 }, () => ({
+        $typeName: "contestant.v1.Notice" as const,
+        title: "hogehoge",
+        body: "hogehoge",
+      })),
+    ],
+  },
 };
