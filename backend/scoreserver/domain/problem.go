@@ -88,6 +88,7 @@ type (
 		problemType ProblemType
 		title       string
 		maxScore    uint32
+		category    string
 
 		redeployRule      RedeployRule
 		percentagePenalty *RedeployPenaltyPercentage
@@ -125,6 +126,10 @@ func (p *Problem) Title() string {
 
 func (p *Problem) MaxScore() uint32 {
 	return p.maxScore
+}
+
+func (p *Problem) Category() string {
+	return p.category
 }
 
 func (p *Problem) Type() ProblemType {
@@ -206,6 +211,7 @@ type CreateDescriptiveProblemInput struct {
 	Code              ProblemCode
 	Title             string
 	MaxScore          uint32
+	Category          string
 	RedeployRule      RedeployRule
 	PercentagePenalty *RedeployPenaltyPercentage
 	Content           *ProblemContent
@@ -223,6 +229,7 @@ func CreateDescriptiveProblem(input CreateDescriptiveProblemInput) (*Descriptive
 		ProblemType:       ProblemTypeDescriptive,
 		Title:             input.Title,
 		MaxScore:          input.MaxScore,
+		Category:          input.Category,
 		RedeployRule:      input.RedeployRule,
 		PercentagePenalty: input.PercentagePenalty,
 	}).parse()
@@ -241,6 +248,7 @@ type UpdateDescriptiveProblemInput struct {
 	Code              *ProblemCode
 	Title             string
 	MaxScore          uint32
+	Category          string
 	RedeployRule      RedeployRule
 	PercentagePenalty *RedeployPenaltyPercentage
 	Content           *ProblemContent
@@ -260,6 +268,9 @@ func (dp *DescriptiveProblem) Update(input UpdateDescriptiveProblemInput) (*Desc
 		// 最大得点が更新される場合，既に採点が行われているならば，それらの採点結果を適切に再計算するか，更新を拒否するかを決定する必要がある
 		// この操作の必要性が認識され，どのような挙動を取るべきかが明確になるまで，最大得点の更新は許可しない
 		return nil, NewInvalidArgumentError("max score cannot be updated", nil)
+	}
+	if input.Category != "" {
+		data.Problem.Category = input.Category
 	}
 	if input.RedeployRule != RedeployRuleUnknown && input.RedeployRule != data.Problem.RedeployRule {
 		// TODO: 再展開ルールを変更する場合，Undeployable になるならば再展開が既に行われていないことを確認する必要がある
@@ -321,6 +332,7 @@ type ProblemData struct {
 	ProblemType ProblemType
 	Title       string
 	MaxScore    uint32
+	Category    string
 
 	RedeployRule      RedeployRule
 	PercentagePenalty *RedeployPenaltyPercentage
@@ -342,6 +354,10 @@ func (d *ProblemData) parse() (*problem, error) {
 
 	if d.MaxScore == 0 {
 		return nil, NewInvalidArgumentError("max score is required", nil)
+	}
+
+	if d.Category == "" {
+		return nil, NewInvalidArgumentError("category is required", nil)
 	}
 
 	if d.RedeployRule == RedeployRuleUnknown {
@@ -370,6 +386,7 @@ func (d *ProblemData) parse() (*problem, error) {
 		problemType: d.ProblemType,
 		title:       d.Title,
 		maxScore:    d.MaxScore,
+		category:    d.Category,
 
 		redeployRule:      d.RedeployRule,
 		percentagePenalty: percentagePenalty,
@@ -383,6 +400,7 @@ func (p *Problem) Data() *ProblemData {
 		ProblemType: p.problemType,
 		Title:       p.title,
 		MaxScore:    p.maxScore,
+		Category:    p.category,
 
 		RedeployRule:      p.redeployRule,
 		PercentagePenalty: p.PercentagePenalty(),

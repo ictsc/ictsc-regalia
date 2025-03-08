@@ -97,14 +97,15 @@ var _ domain.ProblemWriter = (*RepositoryTx)(nil)
 var (
 	saveProblemQuery = `
 	INSERT INTO problems
-		(id, code, type, title, max_score, redeploy_rule, created_at, updated_at)
+		(id, code, type, title, max_score, category, redeploy_rule, created_at, updated_at)
 	VALUES
-		(:id, :code, :type, :title, :max_score, :redeploy_rule, NOW(), NOW())
+		(:id, :code, :type, :title, :max_score, :category, :redeploy_rule, NOW(), NOW())
 	ON CONFLICT (id) DO UPDATE SET
 		code = EXCLUDED.code,
 		type = EXCLUDED.type,
 		title = EXCLUDED.title,
 		max_score = EXCLUDED.max_score,
+		category = EXCLUDED.category,
 		redeploy_rule = EXCLUDED.redeploy_rule,
 		updated_at = NOW()`
 
@@ -134,6 +135,7 @@ func (r *RepositoryTx) SaveDescriptiveProblem(ctx context.Context, descriptivePr
 			Type:         problemType(problem.ProblemType),
 			Title:        problem.Title,
 			MaxStore:     problem.MaxScore,
+			Category:     problem.Category,
 			RedeployRule: redployRule(problem.RedeployRule),
 		}); err != nil {
 			if pgErr := new(pgconn.PgError); errors.As(err, &pgErr) {
@@ -197,6 +199,7 @@ type (
 		Type         problemType `db:"type"`
 		Title        string      `db:"title"`
 		MaxStore     uint32      `db:"max_score"`
+		Category     string      `db:"category"`
 		RedeployRule redployRule `db:"redeploy_rule"`
 	}
 	redeployPercentagePenaltyRow struct {
@@ -216,7 +219,7 @@ type (
 )
 
 var (
-	problemCols                   = columns([]string{"id", "code", "type", "title", "max_score", "redeploy_rule"})
+	problemCols                   = columns([]string{"id", "code", "type", "title", "max_score", "category", "redeploy_rule"})
 	redeployPercentagePenaltyCols = columns([]string{"threshold", "percentage"})
 	problemContentCols            = columns([]string{"page_id", "page_path", "body", "explanation"})
 )
@@ -228,6 +231,7 @@ func (r *problemRow) data() *domain.ProblemData {
 		ProblemType:  domain.ProblemType(r.Type),
 		Title:        r.Title,
 		MaxScore:     r.MaxStore,
+		Category:     r.Category,
 		RedeployRule: domain.RedeployRule(r.RedeployRule),
 	}
 }

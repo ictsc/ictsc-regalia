@@ -34,6 +34,7 @@ func TestListAnswers(t *testing.T) {
 				ProblemType:  domain.ProblemTypeDescriptive,
 				Title:        "問題A",
 				MaxScore:     100,
+				Category:     "Network",
 				RedeployRule: domain.RedeployRuleUnredeployable,
 			},
 			Author: &domain.UserData{
@@ -59,6 +60,7 @@ func TestListAnswers(t *testing.T) {
 				ProblemType:  domain.ProblemTypeDescriptive,
 				Title:        "問題A",
 				MaxScore:     100,
+				Category:     "Network",
 				RedeployRule: domain.RedeployRuleUnredeployable,
 			},
 			Author: &domain.UserData{
@@ -84,6 +86,7 @@ func TestListAnswers(t *testing.T) {
 				ProblemType:  domain.ProblemTypeDescriptive,
 				Title:        "問題B",
 				MaxScore:     200,
+				Category:     "Server",
 				RedeployRule: domain.RedeployRulePercentagePenalty,
 				PercentagePenalty: &domain.RedeployPenaltyPercentage{
 					Threshold:  2,
@@ -140,6 +143,7 @@ func TestListAnswersByTeamProblem(t *testing.T) {
 						ProblemType:  domain.ProblemTypeDescriptive,
 						Title:        "問題A",
 						MaxScore:     100,
+						Category:     "Network",
 						RedeployRule: domain.RedeployRuleUnredeployable,
 					},
 					Author: &domain.UserData{
@@ -165,6 +169,7 @@ func TestListAnswersByTeamProblem(t *testing.T) {
 						ProblemType:  domain.ProblemTypeDescriptive,
 						Title:        "問題A",
 						MaxScore:     100,
+						Category:     "Network",
 						RedeployRule: domain.RedeployRuleUnredeployable,
 					},
 					Author: &domain.UserData{
@@ -224,6 +229,7 @@ func TestGetLatestAnswersByTeamProblem(t *testing.T) {
 					ProblemType:  domain.ProblemTypeDescriptive,
 					Title:        "問題A",
 					MaxScore:     100,
+					Category:     "Network",
 					RedeployRule: domain.RedeployRuleUnredeployable,
 				},
 				Author: &domain.UserData{
@@ -294,6 +300,7 @@ func TestGetAnswerDetail(t *testing.T) {
 						ProblemType:  domain.ProblemTypeDescriptive,
 						Title:        "問題A",
 						MaxScore:     100,
+						Category:     "Network",
 						RedeployRule: domain.RedeployRuleUnredeployable,
 					},
 					Author: &domain.UserData{
@@ -364,6 +371,7 @@ func TestCreateAnswer(t *testing.T) {
 						ProblemType:  domain.ProblemTypeDescriptive,
 						Title:        "問題A",
 						MaxScore:     100,
+						Category:     "Network",
 						RedeployRule: domain.RedeployRuleUnredeployable,
 					},
 					Author: &domain.UserData{
