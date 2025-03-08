@@ -73,6 +73,9 @@ jobs:
         with:
           app-id: ${{ secrets.github-app-id }}
           private-key: ${{ secrets.github-app-private-key }}
+          owner: ${{ github.repository_owner }}
+          repositories: |
+            ictsc-regalia-release
       - name: Update Manifests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
