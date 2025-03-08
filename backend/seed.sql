@@ -56,6 +56,18 @@ INSERT INTO descriptive_answers (answer_id, body) VALUES
 	('4bb7a232-e0de-4b6d-b1a3-8e50737d73b2', '問題Aへのチーム1の解答2'),
 	('abbe9c4e-eef5-40ac-a04e-6d8877b15185', '問題Bへのチーム1の解答1');
 
+TRUNCATE TABLE marking_results CASCADE;
+INSERT INTO marking_results (id, answer_id, judge_name, created_at) VALUES
+	('862b646a-5fdd-4a77-bb2d-7ef5d4f1d069', '7cedf13e-5325-425e-a5d6-fea5fc127e49', 'judge', '2025-02-03 01:00:00+00');
+
+TRUNCATE TABLE scores CASCADE;
+INSERT INTO scores (marking_result_id, marked_score) VALUES
+	('862b646a-5fdd-4a77-bb2d-7ef5d4f1d069', 80);
+
+TRUNCATE TABLE descriptive_marking_rationales CASCADE;
+INSERT INTO descriptive_marking_rationales (marking_result_id, rationale) VALUES
+	('862b646a-5fdd-4a77-bb2d-7ef5d4f1d069', '問題Aへのチーム1の解答1の採点理由');
+
 TRUNCATE TABLE notices CASCADE;
 INSERT INTO notices (id, path, title, markdown, effective_from, effective_until) VALUES
 	('c9976fba-6793-4a7b-b058-798be7958317', '/old/notice', 'Old Notice', '過去のお知らせです', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),

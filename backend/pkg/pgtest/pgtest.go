@@ -73,6 +73,7 @@ func getContainer(ctx context.Context) *postgres.PostgresContainer {
 const (
 	postgresImage = "postgres:17"
 	schemaFile    = "schema.sql"
+	viewFile	  = "view.sql"
 	seedFile      = "seed.sql"
 )
 
@@ -101,6 +102,7 @@ func startContainer(ctx context.Context) (*postgres.PostgresContainer, error) {
 		postgresImage,
 		postgres.WithInitScripts(
 			filepath.Join(baseDir, schemaFile),
+			filepath.Join(baseDir, viewFile),
 			filepath.Join(baseDir, seedFile),
 		),
 		testcontainers.WithWaitStrategy(
