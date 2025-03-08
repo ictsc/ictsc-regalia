@@ -70,16 +70,16 @@ jobs:
     if: inputs.update-image
     steps:
       - uses: actions/create-github-app-token@v1
+        id: app-token
         with:
           app-id: ${{ secrets.github-app-id }}
           private-key: ${{ secrets.github-app-private-key }}
-          owner: ${{ github.repository_owner }}
           repositories: |
             ictsc-regalia-release
       - name: Update Manifests
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           TAGS: ${{ needs.build_and_push.outputs.tags }}
         run: |
           TAG=$(echo "$TAGS" | grep "sha-")
-          gh workflow run --repo ictsc/ictsc-regalia-release update-image.yaml -f "tag=$TAG"
+          gh workflow run --repo ictsc/ictsc-regalia-release update-image.yaml -f "newTag=$TAG"

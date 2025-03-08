@@ -12,3 +12,6 @@ jobs:
       push-ghcr: true
       save-cache: true
       update-image: true
+    secrets:
+      github-app-id: ${{ secrets.PUSHER_APP_ID }}
+      github-app-private-key: ${{ secrets.PUSHER_PRIVATE_KEY }}
