@@ -73,7 +73,7 @@ func getContainer(ctx context.Context) *postgres.PostgresContainer {
 const (
 	postgresImage = "postgres:17"
 	schemaFile    = "schema.sql"
-	viewFile	  = "view.sql"
+	viewFile      = "view.sql"
 	seedFile      = "seed.sql"
 )
 
