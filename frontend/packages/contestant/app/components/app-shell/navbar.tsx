@@ -71,7 +71,21 @@ export function Navbar({
           </Link>
         )}
       </Button>
-      <NavbarButton showTitle={!collapsed} icon="trophy" title="ランキング" />
+      <Button as={Fragment}>
+        {(buttonProps) => (
+          <Link
+            to="/ranking"
+            title="ランキング"
+            className={navbarButtonClassName({
+              collapsed,
+              matched: state.location.pathname?.startsWith("/ranking"),
+              ...buttonProps,
+            })}
+          >
+            <NavbarButton showTitle={!collapsed} icon="trophy" title="ランキング" />
+          </Link>
+          )}
+        </Button>
       <NavbarButton showTitle={!collapsed} icon="groups" title="チーム一覧" />
       {/* <NavbarButton showTitle={!collapsed} icon="chat" title="お問い合わせ" /> */}
     </div>
