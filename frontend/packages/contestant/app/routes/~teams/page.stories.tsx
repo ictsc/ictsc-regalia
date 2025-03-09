@@ -8,45 +8,43 @@ export default {
 
 type Story = StoryObj;
 
-
 export const Default: Story = {
   args: {
-    teamProfile : [
+    teamProfile: [
       ...Array.from({ length: 1 }, () => ({
         $typeName: "contestant.v1.TeamProfile" as const,
         name: "チーム名がわからない",
         organization: "テスト",
-        members:[
+        members: [
           {
             name: "huge",
             displayName: "ふが",
-            selfIntroduction: "よろしくお願いします！"
+            selfIntroduction: "よろしくお願いします！",
           },
           {
             name: "hoge",
             displayName: "ほげ",
-            selfIntroduction: "がんばります！"
-          }
-        ]
+            selfIntroduction: "がんばります！",
+          },
+        ],
       })),
       ...Array.from({ length: 2 }, () => ({
         $typeName: "contestant.v1.TeamProfile" as const,
         name: "チーム名",
         organization: "testTeam",
-        members:[
+        members: [
           {
             name: "huge",
             displayName: "ふが",
-            selfIntroduction: "よろしくお願いします！"
+            selfIntroduction: "よろしくお願いします！",
           },
           {
             name: "hoge",
             displayName: "ほげ",
-            selfIntroduction: "がんばります！"
-          }
-        ]
-      }))
-    ]
-  }
+            selfIntroduction: "がんばります！",
+          },
+        ],
+      })),
+    ],
+  },
 };
-

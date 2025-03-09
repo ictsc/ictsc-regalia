@@ -83,7 +83,11 @@ export function Navbar({
               ...buttonProps,
             })}
           >
-            <NavbarButton showTitle={!collapsed} icon="groups" title="チーム一覧" />
+            <NavbarButton
+              showTitle={!collapsed}
+              icon="groups"
+              title="チーム一覧"
+            />
           </Link>
         )}
       </Button>

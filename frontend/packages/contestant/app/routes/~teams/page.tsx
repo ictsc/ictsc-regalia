@@ -1,29 +1,38 @@
 import type { TeamProfile } from "@ictsc/proto/contestant/v1";
 import { useState } from "react";
 
-
 type TeamListProps = {
   teamProfile: TeamProfile[];
 };
 
-
 export function TeamsPage(props: TeamListProps) {
+  const [openStates, setOpenStates] = useState<{ [key: number]: boolean }>({});
+
+  const toggleAccordion = (index: number) => {
+    setOpenStates({
+      ...openStates,
+      [index]: !openStates[index],
+    });
+  };
+
   return (
     <>
-    {props.teamProfile.map((team) => {
-       const [isOpen, setIsOpen] = useState(false);
-      return(
-        <div className="flex items-center justify-center gap-x-40 pb-64 pl-8 md:flex-nowrap">
+      {props.teamProfile.map((team, index) => {
+        return (
+          <div
+            key={index}
+            className="flex items-center justify-center gap-x-40 pb-64 pl-8 md:flex-nowrap"
+          >
             <div className="flex w-[90%] min-w-[300px] max-w-[650px] flex-row gap-16 rounded-16 px-20 py-24 shadow-lg md:w-[650px]">
               {/* アコーディオンボタン */}
               <div>
                 <button
                   className="h-[110px] md:h-64"
-                  onClick={() => setIsOpen(!isOpen)}
+                  onClick={() => toggleAccordion(index)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className={`h-[25px] w-[25px] transition-transform ${isOpen ? "rotate-90" : ""}`}
+                    className={`h-[25px] w-[25px] transition-transform ${openStates[index] ? "rotate-90" : ""}`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -62,7 +71,7 @@ export function TeamsPage(props: TeamListProps) {
                   </div>
                 </div>
                 {/* 名前表示 */}
-                {isOpen && (
+                {openStates[index] && (
                   <div className="ml-20 mt-40 md:ml-40">
                     <p className="pb-20">名前</p>
                     {team.members.map((member, index) => (
@@ -74,9 +83,9 @@ export function TeamsPage(props: TeamListProps) {
                 )}
               </div>
             </div>
-        </div>
-      )
-    })}
+          </div>
+        );
+      })}
     </>
   );
 }

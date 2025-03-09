@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { fetchTeams } from "@app/features/teams";
 import { use, useDeferredValue } from "react";
-import {TeamsPage} from "./page"
+import { TeamsPage } from "./page";
 
 export const Route = createFileRoute("/teams")({
   component: RouteComponent,
@@ -13,8 +13,8 @@ export const Route = createFileRoute("/teams")({
 });
 
 function RouteComponent() {
-    const { teams: teamsPromise} = Route.useLoaderData();
-    const deferredTeamsPromise = useDeferredValue(teamsPromise)
-    const teams = use(deferredTeamsPromise)
-    return <TeamsPage teamProfile={teams} />
+  const { teams: teamsPromise } = Route.useLoaderData();
+  const deferredTeamsPromise = useDeferredValue(teamsPromise);
+  const teams = use(deferredTeamsPromise);
+  return <TeamsPage teamProfile={teams} />;
 }
