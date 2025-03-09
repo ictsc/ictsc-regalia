@@ -18,7 +18,7 @@ message Answer {
   Problem problem = 4;
   AnswerBody body = 5;
   google.protobuf.Timestamp created_at = 6;
-  optional MarkingResult result = 7;
+  optional MarkingScore score = 7;
 }
 
 message AnswerBody {
@@ -39,6 +39,13 @@ message MarkingResult {
   uint32 score = 3;
   MarkingRationale rationale = 4;
   google.protobuf.Timestamp created_at = 5;
+}
+
+message MarkingScore {
+  uint32 total = 1;
+  uint32 marked = 2;
+  uint32 penalty = 3;
+  uint32 max = 4;
 }
 
 message MarkingRationale {
