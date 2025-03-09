@@ -34,7 +34,6 @@ message DescriptiveAnswer {
 
 // 採点結果
 message MarkingResult {
-  string id = 6;
   Answer answer = 1;
   Admin judge = 2;
   uint32 score = 3;
