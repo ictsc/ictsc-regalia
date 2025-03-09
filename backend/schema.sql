@@ -173,13 +173,13 @@ COMMENT ON COLUMN scores.marked_score IS '採点による得点';
 COMMENT ON COLUMN scores.penalty IS 'ペナルティ';
 COMMENT ON COLUMN scores.redeploy_count IS '再展開回数(ペナルティの計算根拠)';
 
-CREATE TABLE descriptive_marking_rationale (
+CREATE TABLE descriptive_marking_rationales (
 	marking_result_id UUID PRIMARY KEY REFERENCES marking_results(id) ON DELETE CASCADE,
 	rationale TEXT NOT NULL
 );
-COMMENT ON TABLE descriptive_marking_rationale IS '記述式採点の根拠';
-COMMENT ON COLUMN descriptive_marking_rationale.marking_result_id IS '採点結果 ID';
-COMMENT ON COLUMN descriptive_marking_rationale.rationale IS '採点根拠';
+COMMENT ON TABLE descriptive_marking_rationales IS '記述式採点の根拠';
+COMMENT ON COLUMN descriptive_marking_rationales.marking_result_id IS '採点結果 ID';
+COMMENT ON COLUMN descriptive_marking_rationales.rationale IS '採点根拠';
 
 CREATE TYPE deployment_status AS ENUM ('QUEUED', 'DEPLOYING', 'COMPLETED', 'FAILED');
 
