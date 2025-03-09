@@ -2,8 +2,8 @@
 // @generated from file admin/v1/mark.proto (package admin.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
+import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
+import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
 import type { Admin } from "./actor_pb";
 import { file_admin_v1_actor } from "./actor_pb";
 import type { Contestant } from "./contestant_pb";
@@ -20,7 +20,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file admin/v1/mark.proto.
  */
 export const file_admin_v1_mark: GenFile = /*@__PURE__*/
-  fileDesc("ChNhZG1pbi92MS9tYXJrLnByb3RvEghhZG1pbi52MSKGAgoGQW5zd2VyEgoKAmlkGAEgASgNEhwKBHRlYW0YAiABKAsyDi5hZG1pbi52MS5UZWFtEiQKBmF1dGhvchgDIAEoCzIULmFkbWluLnYxLkNvbnRlc3RhbnQSIgoHcHJvYmxlbRgEIAEoCzIRLmFkbWluLnYxLlByb2JsZW0SIgoEYm9keRgFIAEoCzIULmFkbWluLnYxLkFuc3dlckJvZHkSLgoKY3JlYXRlZF9hdBgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASKgoFc2NvcmUYByABKAsyFi5hZG1pbi52MS5NYXJraW5nU2NvcmVIAIgBAUIICgZfc2NvcmUibQoKQW5zd2VyQm9keRIjCgR0eXBlGAEgASgOMhUuYWRtaW4udjEuUHJvYmxlbVR5cGUSMgoLZGVzY3JpcHRpdmUYAiABKAsyGy5hZG1pbi52MS5EZXNjcmlwdGl2ZUFuc3dlckgAQgYKBGJvZHkiIQoRRGVzY3JpcHRpdmVBbnN3ZXISDAoEYm9keRgBIAEoCSK/AQoNTWFya2luZ1Jlc3VsdBIgCgZhbnN3ZXIYASABKAsyEC5hZG1pbi52MS5BbnN3ZXISHgoFanVkZ2UYAiABKAsyDy5hZG1pbi52MS5BZG1pbhINCgVzY29yZRgDIAEoDRItCglyYXRpb25hbGUYBCABKAsyGi5hZG1pbi52MS5NYXJraW5nUmF0aW9uYWxlEi4KCmNyZWF0ZWRfYXQYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIksKDE1hcmtpbmdTY29yZRINCgV0b3RhbBgBIAEoDRIOCgZtYXJrZWQYAiABKA0SDwoHcGVuYWx0eRgDIAEoDRILCgNtYXgYBCABKA0ifQoQTWFya2luZ1JhdGlvbmFsZRIjCgR0eXBlGAEgASgOMhUuYWRtaW4udjEuUHJvYmxlbVR5cGUSPAoLZGVzY3JpcHRpdmUYAiABKAsyJS5hZG1pbi52MS5EZXNjcmlwdGl2ZU1hcmtpbmdSYXRpb25hbGVIAEIGCgRib2R5Ii4KG0Rlc2NyaXB0aXZlTWFya2luZ1JhdGlvbmFsZRIPCgdjb21tZW50GAEgASgJIiwKEkxpc3RBbnN3ZXJzUmVxdWVzdBIWCg5pbmNsdWRlX21hcmtlZBgBIAEoCCI4ChNMaXN0QW5zd2Vyc1Jlc3BvbnNlEiEKB2Fuc3dlcnMYASADKAsyEC5hZG1pbi52MS5BbnN3ZXIiRwoQR2V0QW5zd2VyUmVxdWVzdBIRCgl0ZWFtX2NvZGUYASABKA0SFAoMcHJvYmxlbV9jb2RlGAIgASgJEgoKAmlkGAMgASgNIjUKEUdldEFuc3dlclJlc3BvbnNlEiAKBmFuc3dlchgBIAEoCzIQLmFkbWluLnYxLkFuc3dlciIbChlMaXN0TWFya2luZ1Jlc3VsdHNSZXF1ZXN0Ik4KGkxpc3RNYXJraW5nUmVzdWx0c1Jlc3BvbnNlEjAKD21hcmtpbmdfcmVzdWx0cxgBIAMoCzIXLmFkbWluLnYxLk1hcmtpbmdSZXN1bHQiTQoaQ3JlYXRlTWFya2luZ1Jlc3VsdFJlcXVlc3QSLwoObWFya2luZ19yZXN1bHQYASABKAsyFy5hZG1pbi52MS5NYXJraW5nUmVzdWx0Ik4KG0NyZWF0ZU1hcmtpbmdSZXN1bHRSZXNwb25zZRIvCg5tYXJraW5nX3Jlc3VsdBgBIAEoCzIXLmFkbWluLnYxLk1hcmtpbmdSZXN1bHQy5AIKC01hcmtTZXJ2aWNlEkoKC0xpc3RBbnN3ZXJzEhwuYWRtaW4udjEuTGlzdEFuc3dlcnNSZXF1ZXN0Gh0uYWRtaW4udjEuTGlzdEFuc3dlcnNSZXNwb25zZRJECglHZXRBbnN3ZXISGi5hZG1pbi52MS5HZXRBbnN3ZXJSZXF1ZXN0GhsuYWRtaW4udjEuR2V0QW5zd2VyUmVzcG9uc2USXwoSTGlzdE1hcmtpbmdSZXN1bHRzEiMuYWRtaW4udjEuTGlzdE1hcmtpbmdSZXN1bHRzUmVxdWVzdBokLmFkbWluLnYxLkxpc3RNYXJraW5nUmVzdWx0c1Jlc3BvbnNlEmIKE0NyZWF0ZU1hcmtpbmdSZXN1bHQSJC5hZG1pbi52MS5DcmVhdGVNYXJraW5nUmVzdWx0UmVxdWVzdBolLmFkbWluLnYxLkNyZWF0ZU1hcmtpbmdSZXN1bHRSZXNwb25zZUKdAQoMY29tLmFkbWluLnYxQglNYXJrUHJvdG9QAVpBZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2FkbWluL3YxO2FkbWludjGiAgNBWFiqAghBZG1pbi5WMcoCCEFkbWluXFYx4gIUQWRtaW5cVjFcR1BCTWV0YWRhdGHqAglBZG1pbjo6VjFiBnByb3RvMw", [file_admin_v1_actor, file_admin_v1_contestant, file_admin_v1_problem, file_admin_v1_team, file_google_protobuf_timestamp]);
+  fileDesc("ChNhZG1pbi92MS9tYXJrLnByb3RvEghhZG1pbi52MSKGAgoGQW5zd2VyEgoKAmlkGAEgASgNEhwKBHRlYW0YAiABKAsyDi5hZG1pbi52MS5UZWFtEiQKBmF1dGhvchgDIAEoCzIULmFkbWluLnYxLkNvbnRlc3RhbnQSIgoHcHJvYmxlbRgEIAEoCzIRLmFkbWluLnYxLlByb2JsZW0SIgoEYm9keRgFIAEoCzIULmFkbWluLnYxLkFuc3dlckJvZHkSLgoKY3JlYXRlZF9hdBgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASKgoFc2NvcmUYByABKAsyFi5hZG1pbi52MS5NYXJraW5nU2NvcmVIAIgBAUIICgZfc2NvcmUibQoKQW5zd2VyQm9keRIjCgR0eXBlGAEgASgOMhUuYWRtaW4udjEuUHJvYmxlbVR5cGUSMgoLZGVzY3JpcHRpdmUYAiABKAsyGy5hZG1pbi52MS5EZXNjcmlwdGl2ZUFuc3dlckgAQgYKBGJvZHkiIQoRRGVzY3JpcHRpdmVBbnN3ZXISDAoEYm9keRgBIAEoCSL2AQoNTWFya2luZ1Jlc3VsdBIgCgZhbnN3ZXIYASABKAsyEC5hZG1pbi52MS5BbnN3ZXISHgoFanVkZ2UYAiABKAsyDy5hZG1pbi52MS5BZG1pbhINCgVzY29yZRgDIAEoDRItCglyYXRpb25hbGUYBCABKAsyGi5hZG1pbi52MS5NYXJraW5nUmF0aW9uYWxlEi4KCmNyZWF0ZWRfYXQYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjUKCnZpc2liaWxpdHkYByABKA4yIS5hZG1pbi52MS5NYXJraW5nUmVzdWx0VmlzaWJpbGl0eSJLCgxNYXJraW5nU2NvcmUSDQoFdG90YWwYASABKA0SDgoGbWFya2VkGAIgASgNEg8KB3BlbmFsdHkYAyABKA0SCwoDbWF4GAQgASgNIn0KEE1hcmtpbmdSYXRpb25hbGUSIwoEdHlwZRgBIAEoDjIVLmFkbWluLnYxLlByb2JsZW1UeXBlEjwKC2Rlc2NyaXB0aXZlGAIgASgLMiUuYWRtaW4udjEuRGVzY3JpcHRpdmVNYXJraW5nUmF0aW9uYWxlSABCBgoEYm9keSIuChtEZXNjcmlwdGl2ZU1hcmtpbmdSYXRpb25hbGUSDwoHY29tbWVudBgBIAEoCSIsChJMaXN0QW5zd2Vyc1JlcXVlc3QSFgoOaW5jbHVkZV9tYXJrZWQYASABKAgiOAoTTGlzdEFuc3dlcnNSZXNwb25zZRIhCgdhbnN3ZXJzGAEgAygLMhAuYWRtaW4udjEuQW5zd2VyIkcKEEdldEFuc3dlclJlcXVlc3QSEQoJdGVhbV9jb2RlGAEgASgNEhQKDHByb2JsZW1fY29kZRgCIAEoCRIKCgJpZBgDIAEoDSI1ChFHZXRBbnN3ZXJSZXNwb25zZRIgCgZhbnN3ZXIYASABKAsyEC5hZG1pbi52MS5BbnN3ZXIiUgoZTGlzdE1hcmtpbmdSZXN1bHRzUmVxdWVzdBI1Cgp2aXNpYmlsaXR5GAEgASgOMiEuYWRtaW4udjEuTWFya2luZ1Jlc3VsdFZpc2liaWxpdHkiTgoaTGlzdE1hcmtpbmdSZXN1bHRzUmVzcG9uc2USMAoPbWFya2luZ19yZXN1bHRzGAEgAygLMhcuYWRtaW4udjEuTWFya2luZ1Jlc3VsdCJNChpDcmVhdGVNYXJraW5nUmVzdWx0UmVxdWVzdBIvCg5tYXJraW5nX3Jlc3VsdBgBIAEoCzIXLmFkbWluLnYxLk1hcmtpbmdSZXN1bHQiTgobQ3JlYXRlTWFya2luZ1Jlc3VsdFJlc3BvbnNlEi8KDm1hcmtpbmdfcmVzdWx0GAEgASgLMhcuYWRtaW4udjEuTWFya2luZ1Jlc3VsdCIoCiZVcGRhdGVNYXJraW5nUmVzdWx0VmlzaWJpbGl0aWVzUmVxdWVzdCIpCidVcGRhdGVNYXJraW5nUmVzdWx0VmlzaWJpbGl0aWVzUmVzcG9uc2UqkQEKF01hcmtpbmdSZXN1bHRWaXNpYmlsaXR5EikKJU1BUktJTkdfUkVTVUxUX1ZJU0lCSUxJVFlfVU5TUEVDSUZJRUQQABIkCiBNQVJLSU5HX1JFU1VMVF9WSVNJQklMSVRZX1BVQkxJQxABEiUKIU1BUktJTkdfUkVTVUxUX1ZJU0lCSUxJVFlfUFJJVkFURRACMu0DCgtNYXJrU2VydmljZRJKCgtMaXN0QW5zd2VycxIcLmFkbWluLnYxLkxpc3RBbnN3ZXJzUmVxdWVzdBodLmFkbWluLnYxLkxpc3RBbnN3ZXJzUmVzcG9uc2USRAoJR2V0QW5zd2VyEhouYWRtaW4udjEuR2V0QW5zd2VyUmVxdWVzdBobLmFkbWluLnYxLkdldEFuc3dlclJlc3BvbnNlEl8KEkxpc3RNYXJraW5nUmVzdWx0cxIjLmFkbWluLnYxLkxpc3RNYXJraW5nUmVzdWx0c1JlcXVlc3QaJC5hZG1pbi52MS5MaXN0TWFya2luZ1Jlc3VsdHNSZXNwb25zZRJiChNDcmVhdGVNYXJraW5nUmVzdWx0EiQuYWRtaW4udjEuQ3JlYXRlTWFya2luZ1Jlc3VsdFJlcXVlc3QaJS5hZG1pbi52MS5DcmVhdGVNYXJraW5nUmVzdWx0UmVzcG9uc2UShgEKH1VwZGF0ZU1hcmtpbmdSZXN1bHRWaXNpYmlsaXRpZXMSMC5hZG1pbi52MS5VcGRhdGVNYXJraW5nUmVzdWx0VmlzaWJpbGl0aWVzUmVxdWVzdBoxLmFkbWluLnYxLlVwZGF0ZU1hcmtpbmdSZXN1bHRWaXNpYmlsaXRpZXNSZXNwb25zZUKdAQoMY29tLmFkbWluLnYxQglNYXJrUHJvdG9QAVpBZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2FkbWluL3YxO2FkbWludjGiAgNBWFiqAghBZG1pbi5WMcoCCEFkbWluXFYx4gIUQWRtaW5cVjFcR1BCTWV0YWRhdGHqAglBZG1pbjo6VjFiBnByb3RvMw", [file_admin_v1_actor, file_admin_v1_contestant, file_admin_v1_problem, file_admin_v1_team, file_google_protobuf_timestamp]);
 
 /**
  * 解答
@@ -146,6 +146,11 @@ export type MarkingResult = Message<"admin.v1.MarkingResult"> & {
    * @generated from field: google.protobuf.Timestamp created_at = 5;
    */
   createdAt?: Timestamp;
+
+  /**
+   * @generated from field: admin.v1.MarkingResultVisibility visibility = 7;
+   */
+  visibility: MarkingResultVisibility;
 };
 
 /**
@@ -316,6 +321,10 @@ export const GetAnswerResponseSchema: GenMessage<GetAnswerResponse> = /*@__PURE_
  * @generated from message admin.v1.ListMarkingResultsRequest
  */
 export type ListMarkingResultsRequest = Message<"admin.v1.ListMarkingResultsRequest"> & {
+  /**
+   * @generated from field: admin.v1.MarkingResultVisibility visibility = 1;
+   */
+  visibility: MarkingResultVisibility;
 };
 
 /**
@@ -377,6 +386,64 @@ export const CreateMarkingResultResponseSchema: GenMessage<CreateMarkingResultRe
   messageDesc(file_admin_v1_mark, 14);
 
 /**
+ * ビジネスロジックに沿って、採点結果の可視性を更新する
+ *
+ * @generated from message admin.v1.UpdateMarkingResultVisibilitiesRequest
+ */
+export type UpdateMarkingResultVisibilitiesRequest = Message<"admin.v1.UpdateMarkingResultVisibilitiesRequest"> & {
+};
+
+/**
+ * Describes the message admin.v1.UpdateMarkingResultVisibilitiesRequest.
+ * Use `create(UpdateMarkingResultVisibilitiesRequestSchema)` to create a new message.
+ */
+export const UpdateMarkingResultVisibilitiesRequestSchema: GenMessage<UpdateMarkingResultVisibilitiesRequest> = /*@__PURE__*/
+  messageDesc(file_admin_v1_mark, 15);
+
+/**
+ * @generated from message admin.v1.UpdateMarkingResultVisibilitiesResponse
+ */
+export type UpdateMarkingResultVisibilitiesResponse = Message<"admin.v1.UpdateMarkingResultVisibilitiesResponse"> & {
+};
+
+/**
+ * Describes the message admin.v1.UpdateMarkingResultVisibilitiesResponse.
+ * Use `create(UpdateMarkingResultVisibilitiesResponseSchema)` to create a new message.
+ */
+export const UpdateMarkingResultVisibilitiesResponseSchema: GenMessage<UpdateMarkingResultVisibilitiesResponse> = /*@__PURE__*/
+  messageDesc(file_admin_v1_mark, 16);
+
+/**
+ * @generated from enum admin.v1.MarkingResultVisibility
+ */
+export enum MarkingResultVisibility {
+  /**
+   * @generated from enum value: MARKING_RESULT_VISIBILITY_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * 参加者に見える
+   *
+   * @generated from enum value: MARKING_RESULT_VISIBILITY_PUBLIC = 1;
+   */
+  PUBLIC = 1,
+
+  /**
+   * 参加者に見えない
+   *
+   * @generated from enum value: MARKING_RESULT_VISIBILITY_PRIVATE = 2;
+   */
+  PRIVATE = 2,
+}
+
+/**
+ * Describes the enum admin.v1.MarkingResultVisibility.
+ */
+export const MarkingResultVisibilitySchema: GenEnum<MarkingResultVisibility> = /*@__PURE__*/
+  enumDesc(file_admin_v1_mark, 0);
+
+/**
  * @generated from service admin.v1.MarkService
  */
 export const MarkService: GenService<{
@@ -411,6 +478,14 @@ export const MarkService: GenService<{
     methodKind: "unary";
     input: typeof CreateMarkingResultRequestSchema;
     output: typeof CreateMarkingResultResponseSchema;
+  },
+  /**
+   * @generated from rpc admin.v1.MarkService.UpdateMarkingResultVisibilities
+   */
+  updateMarkingResultVisibilities: {
+    methodKind: "unary";
+    input: typeof UpdateMarkingResultVisibilitiesRequestSchema;
+    output: typeof UpdateMarkingResultVisibilitiesResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_admin_v1_mark, 0);
