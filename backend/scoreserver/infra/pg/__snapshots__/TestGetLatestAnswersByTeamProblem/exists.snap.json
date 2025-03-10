@@ -14,6 +14,7 @@
     "problem_type": "Descriptive",
     "title": "問題A",
     "max_score": 100,
+    "category": "Network",
     "redeploy_rule": "Unredeployable"
   },
   "author": {

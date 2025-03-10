@@ -17,7 +17,7 @@ CREATE VIEW answer_view AS (
 
 		p.id AS "problem.id", p.code AS "problem.code", p.type AS "problem.type",
 		p.title AS "problem.title", p.max_score AS "problem.max_score",
-		p.redeploy_rule AS "problem.redeploy_rule",
+		p.category AS "problem.category", p.redeploy_rule AS "problem.redeploy_rule",
 		rpp.threshold AS "problem_rpp.threshold", rpp.percentage AS "problem_rpp.percentage",
 
 		u.id AS "author.id", u.name AS "author.name"
