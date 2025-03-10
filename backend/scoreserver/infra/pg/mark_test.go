@@ -33,6 +33,11 @@ func TestCreateMarkingResult(t *testing.T) {
 	db := pgtest.SetupDB(t)
 	repo := pg.NewRepository(db)
 
+	var markCount int
+	if err := db.Get(&markCount, "SELECT COUNT(1) FROM marking_results"); err != nil {
+		t.Fatal(err)
+	}
+
 	if err := repo.RunTx(t.Context(), func(tx *pg.RepositoryTx) error {
 		return tx.CreateMarkingResult(t.Context(), &domain.MarkingResultData{
 			ID:    uuid.FromStringOrNil("53d6a2aa-ebf8-4bd6-98f2-baa9758ae6a6"),
@@ -56,8 +61,8 @@ func TestCreateMarkingResult(t *testing.T) {
 	if err := db.Get(&count, `SELECT COUNT(*) FROM marking_results`); err != nil {
 		t.Fatal(err)
 	}
-	if count != 2 {
-		t.Errorf("unexpected marking_result count: %d", count)
+	if expected := markCount + 1; count != expected {
+		t.Errorf("unexpected marking_result count: %d, expected %d", count, expected)
 	}
 
 	if err := db.Get(&count, `

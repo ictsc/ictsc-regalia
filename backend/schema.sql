@@ -151,10 +151,12 @@ COMMENT ON TABLE descriptive_answers IS '記述式解答';
 COMMENT ON COLUMN descriptive_answers.answer_id IS '解答 ID';
 COMMENT ON COLUMN descriptive_answers.body IS '解答内容';
 
+CREATE TYPE marking_result_visilibity AS ENUM ('PRIVATE', 'PUBLIC');
 CREATE TABLE marking_results (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	answer_id UUID NOT NULL REFERENCES answers(id) ON DELETE CASCADE,
 	judge_name TEXT NOT NULL,
+	visibility marking_result_visilibity NOT NULL DEFAULT 'PRIVATE',
 	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE marking_results IS '採点結果';
@@ -167,7 +169,8 @@ CREATE TABLE scores (
 	marking_result_id UUID PRIMARY KEY REFERENCES marking_results(id) ON DELETE CASCADE,
 	marked_score INT NOT NULL CHECK (marked_score >= 0),
 	penalty INT NOT NULL CHECK (penalty >= 0) DEFAULT 0,
-	redeploy_count INT NOT NULL CHECK (redeploy_count >= 0) DEFAULT 0
+	redeploy_count INT NOT NULL CHECK (redeploy_count >= 0) DEFAULT 0,
+	total_score INT GENERATED ALWAYS AS (GREATEST(0, marked_score - penalty)) STORED
 );
 COMMENT ON TABLE scores IS '採点結果の得点';
 COMMENT ON COLUMN scores.marking_result_id IS '採点結果 ID';

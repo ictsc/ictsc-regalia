@@ -1,7 +1,15 @@
 DROP VIEW IF EXISTS latest_marking_results;
-CREATE VIEW latest_marking_results AS (
-	SELECT DISTINCT ON (answer_id) *
+CREATE VIEW latest_marking_result_ids AS (
+	SELECT DISTINCT ON (answer_id) id, answer_id
 	FROM marking_results
+	ORDER BY answer_id, created_at DESC
+);
+
+DROP VIEW IF EXISTS latest_public_marking_result_ids;
+CREATE VIEW latest_public_marking_result_ids AS (
+	SELECT DISTINCT ON (answer_id) id, answer_id
+	FROM marking_results
+	WHERE visibility = 'PUBLIC'
 	ORDER BY answer_id, created_at DESC
 );
 

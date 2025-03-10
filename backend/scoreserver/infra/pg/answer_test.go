@@ -1,6 +1,7 @@
 package pg_test
 
 import (
+	"context"
 	"slices"
 	"strings"
 	"testing"
@@ -14,11 +15,11 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 )
 
-func TestListAnswers(t *testing.T) {
+func TestListAnswersForAdmin(t *testing.T) {
 	t.Parallel()
 
 	repo := pg.NewRepository(pgtest.SetupDB(t))
-	actual, err := repo.ListAnswers(t.Context())
+	actual, err := repo.ListAnswersForAdmin(t.Context())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -32,10 +33,17 @@ func TestListAnswersByTeamProblem(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
+		viewer      string
 		teamCode    int64
 		problemCode string
 	}{
-		"ok": {
+		"ok/admin": {
+			viewer:      "admin",
+			teamCode:    1,
+			problemCode: "ZZA",
+		},
+		"ok/public": {
+			viewer:      "public",
 			teamCode:    1,
 			problemCode: "ZZA",
 		},
@@ -46,7 +54,18 @@ func TestListAnswersByTeamProblem(t *testing.T) {
 			t.Parallel()
 
 			repo := pg.NewRepository(pgtest.SetupDB(t))
-			actual, err := repo.ListAnswersByTeamProblem(t.Context(), tt.teamCode, tt.problemCode)
+
+			var lister func(context.Context, int64, string) ([]*domain.AnswerData, error)
+			switch tt.viewer {
+			case "admin":
+				lister = repo.ListAnswersByTeamProblemForAdmin
+			case "public":
+				lister = repo.ListAnswersByTeamProblemForPublic
+			default:
+				t.Fatalf("unexpected viewer: %s", tt.viewer)
+			}
+
+			actual, err := lister(t.Context(), tt.teamCode, tt.problemCode)
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
@@ -55,7 +74,7 @@ func TestListAnswersByTeamProblem(t *testing.T) {
 	}
 }
 
-func TestGetLatestAnswersByTeamProblem(t *testing.T) {
+func TestGetLatestAnswersByTeamProblemForPublic(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
@@ -81,7 +100,7 @@ func TestGetLatestAnswersByTeamProblem(t *testing.T) {
 			t.Parallel()
 
 			repo := pg.NewRepository(pgtest.SetupDB(t))
-			actual, err := repo.GetLatestAnswerByTeamProblem(t.Context(), tt.teamID, tt.problemID)
+			actual, err := repo.GetLatestAnswerByTeamProblemForPublic(t.Context(), tt.teamID, tt.problemID)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -93,7 +112,7 @@ func TestGetLatestAnswersByTeamProblem(t *testing.T) {
 	}
 }
 
-func TestGetAnswerDetail(t *testing.T) {
+func TestGetAnswerDetailForAdmin(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
@@ -122,7 +141,7 @@ func TestGetAnswerDetail(t *testing.T) {
 			t.Parallel()
 
 			repo := pg.NewRepository(pgtest.SetupDB(t))
-			actual, err := repo.GetAnswerDetail(t.Context(), tt.teamCode, tt.problemCode, tt.answerNumber)
+			actual, err := repo.GetAnswerDetailForAdmin(t.Context(), tt.teamCode, tt.problemCode, tt.answerNumber)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("unexpected error: %v", err)
 			}

@@ -23,7 +23,10 @@
       "name": "alice"
     },
     "created_at": "2025-02-03T09:00:00+09:00",
-    "interval": 1200000000000
+    "interval": 1200000000000,
+    "score": {
+      "marked_score": 80
+    }
   },
   {
     "id": "4bb7a232-e0de-4b6d-b1a3-8e50737d73b2",
