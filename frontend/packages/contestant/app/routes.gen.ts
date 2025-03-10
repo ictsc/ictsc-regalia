@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from "./routes/~__root";
+import { Route as TeamsRouteImport } from "./routes/~teams/~route";
 import { Route as SignupRouteImport } from "./routes/~signup/~route";
 import { Route as SigninRouteImport } from "./routes/~signin/~route";
 import { Route as RuleRouteImport } from "./routes/~rule/~route";
@@ -20,6 +21,12 @@ import { Route as ProblemsCodeRouteImport } from "./routes/~problems.$code/~rout
 import { Route as ProblemsIndexRouteImport } from "./routes/~problems.index/~route";
 
 // Create/Update Routes
+
+const TeamsRouteRoute = TeamsRouteImport.update({
+  id: "/teams",
+  path: "/teams",
+  getParentRoute: () => rootRoute,
+} as any);
 
 const SignupRouteRoute = SignupRouteImport.update({
   id: "/signup",
@@ -104,6 +111,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof SignupRouteImport;
       parentRoute: typeof rootRoute;
     };
+    "/teams": {
+      id: "/teams";
+      path: "/teams";
+      fullPath: "/teams";
+      preLoaderRoute: typeof TeamsRouteImport;
+      parentRoute: typeof rootRoute;
+    };
     "/problems/": {
       id: "/problems/";
       path: "/problems";
@@ -129,6 +143,7 @@ export interface FileRoutesByFullPath {
   "/rule": typeof RuleRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
+  "/teams": typeof TeamsRouteRoute;
   "/problems": typeof ProblemsIndexRouteRoute;
   "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
@@ -139,6 +154,7 @@ export interface FileRoutesByTo {
   "/rule": typeof RuleRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
+  "/teams": typeof TeamsRouteRoute;
   "/problems": typeof ProblemsIndexRouteRoute;
   "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
@@ -150,6 +166,7 @@ export interface FileRoutesById {
   "/rule": typeof RuleRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
+  "/teams": typeof TeamsRouteRoute;
   "/problems/": typeof ProblemsIndexRouteRoute;
   "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
@@ -162,6 +179,7 @@ export interface FileRouteTypes {
     | "/rule"
     | "/signin"
     | "/signup"
+    | "/teams"
     | "/problems"
     | "/problems/$code";
   fileRoutesByTo: FileRoutesByTo;
@@ -171,6 +189,7 @@ export interface FileRouteTypes {
     | "/rule"
     | "/signin"
     | "/signup"
+    | "/teams"
     | "/problems"
     | "/problems/$code";
   id:
@@ -180,6 +199,7 @@ export interface FileRouteTypes {
     | "/rule"
     | "/signin"
     | "/signup"
+    | "/teams"
     | "/problems/"
     | "/problems/$code";
   fileRoutesById: FileRoutesById;
@@ -191,6 +211,7 @@ export interface RootRouteChildren {
   RuleRouteRoute: typeof RuleRouteRoute;
   SigninRouteRoute: typeof SigninRouteRoute;
   SignupRouteRoute: typeof SignupRouteRoute;
+  TeamsRouteRoute: typeof TeamsRouteRoute;
   ProblemsIndexRouteRoute: typeof ProblemsIndexRouteRoute;
   ProblemsCodeRouteRoute: typeof ProblemsCodeRouteRoute;
 }
@@ -201,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   RuleRouteRoute: RuleRouteRoute,
   SigninRouteRoute: SigninRouteRoute,
   SignupRouteRoute: SignupRouteRoute,
+  TeamsRouteRoute: TeamsRouteRoute,
   ProblemsIndexRouteRoute: ProblemsIndexRouteRoute,
   ProblemsCodeRouteRoute: ProblemsCodeRouteRoute,
 };
@@ -220,6 +242,7 @@ export const routeTree = rootRoute
         "/rule",
         "/signin",
         "/signup",
+        "/teams",
         "/problems/",
         "/problems/$code"
       ]
@@ -238,6 +261,9 @@ export const routeTree = rootRoute
     },
     "/signup": {
       "filePath": "~signup/~route.tsx"
+    },
+    "/teams": {
+      "filePath": "~teams/~route.tsx"
     },
     "/problems/": {
       "filePath": "~problems.index/~route.tsx"
