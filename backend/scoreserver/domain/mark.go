@@ -61,6 +61,10 @@ func (m *Score) Penalty() uint32 {
 	return 0 // 現状は再展開がないので0
 }
 
+func (m *Score) TotalScore() uint32 {
+	return max(0, m.MarkedScore()-m.Penalty())
+}
+
 func (m *MarkingRationale) Type() ProblemType {
 	return m.problemType
 }
