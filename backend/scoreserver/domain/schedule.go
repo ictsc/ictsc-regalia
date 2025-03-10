@@ -60,11 +60,7 @@ func GetSchedule(ctx context.Context, eff ScheduleReader) ([]*Schedule, error) {
 	}
 	schedules := make([]*Schedule, 0, len(scheduleData))
 	for _, data := range scheduleData {
-		schedule, err := data.parse()
-		if err != nil {
-			return nil, WrapAsInternal(err, "failed to parse schedule")
-		}
-		schedules = append(schedules, schedule)
+		schedules = append(schedules, data.parse())
 	}
 	return schedules, nil
 }
@@ -106,22 +102,20 @@ type (
 	}
 )
 
-func (d *ScheduleData) parse() (*Schedule, error) {
+func (d *ScheduleData) parse() *Schedule {
 	return &Schedule{
-			id:      d.ID,
-			phase:   d.Phase,
-			startAt: d.StartAt,
-			endAt:   d.EndAt,
-		},
-		nil
+		id:      d.ID,
+		phase:   d.Phase,
+		startAt: d.StartAt,
+		endAt:   d.EndAt,
+	}
 }
 
-func (s *Schedule) Data() (*ScheduleData, error) {
+func (s *Schedule) Data() *ScheduleData {
 	return &ScheduleData{
-			ID:      s.id,
-			Phase:   s.phase,
-			StartAt: s.startAt,
-			EndAt:   s.endAt,
-		},
-		nil
+		ID:      s.id,
+		Phase:   s.phase,
+		StartAt: s.startAt,
+		EndAt:   s.endAt,
+	}
 }
