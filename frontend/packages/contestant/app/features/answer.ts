@@ -1,10 +1,14 @@
 import { type Transport, createClient } from "@connectrpc/connect";
-import { AnswerService } from "@ictsc/proto/contestant/v1";
+import {
+  AnswerService,
+  type Score as ProtoScore,
+} from "@ictsc/proto/contestant/v1";
 import { timestampDate } from "@bufbuild/protobuf/wkt";
 
 export type Answer = {
   readonly id: number;
   readonly submittedAt: string;
+  readonly score?: ProtoScore;
 };
 
 export type AnswerMetadata = {
@@ -36,6 +40,7 @@ export async function fetchAnswers(
       return {
         id: answer.id,
         submittedAt: submittedAt,
+        score: answer.score,
       };
     }),
     metadata: {

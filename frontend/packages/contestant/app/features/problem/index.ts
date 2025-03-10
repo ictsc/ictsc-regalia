@@ -21,6 +21,7 @@ export async function fetchProblems(transport: Transport): Promise<Problem[]> {
 export type ProblemDetail = {
   code: string;
   title: string;
+  maxScore: number;
   redeployable: boolean;
   body: string;
 };
@@ -41,6 +42,7 @@ export async function fetchProblem(
   return {
     code: problem.code,
     title: problem.title,
+    maxScore: problem.maxScore,
     redeployable: problem.deployment?.redeployable ?? false,
     body,
   };
