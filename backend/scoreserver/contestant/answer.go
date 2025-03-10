@@ -70,7 +70,7 @@ func (h *AnswerServiceHandler) ListAnswers(
 		return nil, err
 	}
 
-	answers, err := domain.ListAnswersByTeamProblem(ctx, h.ListEffect, teamMember.Team().Code(), problemCode)
+	answers, err := domain.ListAnswersByTeamProblemForPublic(ctx, h.ListEffect, teamMember.Team().Code(), problemCode)
 	if err != nil {
 		return nil, err
 	}

@@ -43,7 +43,7 @@ func (h *MarkServiceHandler) ListAnswers(
 		return nil, err
 	}
 
-	answers, err := domain.ListAnswers(ctx, h.ListAnswerEffect)
+	answers, err := domain.ListAnswersForAdmin(ctx, h.ListAnswerEffect)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (h *MarkServiceHandler) GetAnswer(
 		return nil, err
 	}
 
-	answer, err := domain.GetAnswerDetail(ctx, h.GetAnswerEffect, teamCode, problemCode, protoID)
+	answer, err := domain.GetAnswerDetailForAdmin(ctx, h.GetAnswerEffect, teamCode, problemCode, protoID)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func (h *MarkServiceHandler) CreateMarkingResult(
 	now := time.Now()
 
 	markingResult, err := domain.RunTx(ctx, h.CreateMarkingResultEffect, func(eff CreateMarkingResultTxEffect) (*domain.MarkingResult, error) {
-		answerDetail, err := domain.GetAnswerDetail(ctx, eff, teamCode, problemCode, reqAnswerID)
+		answerDetail, err := domain.GetAnswerDetailForAdmin(ctx, eff, teamCode, problemCode, reqAnswerID)
 		if err != nil {
 			return nil, err
 		}
