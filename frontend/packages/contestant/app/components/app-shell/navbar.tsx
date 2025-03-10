@@ -50,11 +50,25 @@ export function Navbar({
           </Link>
         )}
       </Button>
-      <NavbarButton
-        showTitle={!collapsed}
-        icon="brand_awareness"
-        title="アナウンス"
-      />
+      <Button as={Fragment}>
+        {(buttonProps) => (
+          <Link
+            to="/announces"
+            title="アナウンス"
+            className={navbarButtonClassName({
+              collapsed,
+              matched: state.location.pathname?.startsWith("/announces"),
+              ...buttonProps,
+            })}
+          >
+            <NavbarButton
+              showTitle={!collapsed}
+              icon="brand_awareness"
+              title="アナウンス"
+            />
+          </Link>
+        )}
+      </Button>
       {/* <NavbarButton showTitle={!collapsed} icon="lan" title="接続情報" /> */}
       <Button as={Fragment}>
         {(buttonProps) => (

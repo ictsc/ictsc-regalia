@@ -10,9 +10,11 @@ export const Route = createLazyFileRoute("/problems/$code")({
 
 function RouteComponent() {
   const router = useRouter();
-  const { problem, answers, submitAnswer } = Route.useLoaderData();
+  const { problem, answers, metadata, submitAnswer } = Route.useLoaderData();
 
   const redeployable = useRedeployable(problem);
+  const deferredMetadata = use(useDeferredValue(metadata));
+
   return (
     <View.Page
       onTabChange={() => {
@@ -32,6 +34,8 @@ function RouteComponent() {
             await router.invalidate();
             return "success";
           }}
+          submitInterval={deferredMetadata.submitIntervalSeconds}
+          lastSubmittedAt={deferredMetadata.lastSubmittedAt}
         />
       }
       submissionList={

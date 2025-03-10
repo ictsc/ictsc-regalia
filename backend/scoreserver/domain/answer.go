@@ -16,8 +16,9 @@ type (
 		problem   *Problem
 		author    *User
 		createdAt time.Time
-		// 次の回答を受付可能にするまでの時間
+		// 次の解答を受付可能にするまでの時間
 		interval time.Duration
+		score    *Score
 	}
 	answer = Answer
 
@@ -38,30 +39,35 @@ const (
 	AnswerInterval = 20 * time.Minute
 )
 
-func ListAnswers(ctx context.Context, eff AnswerReader) ([]*Answer, error) {
-	answerDataList, err := eff.ListAnswers(ctx)
+func ListAnswersForAdmin(ctx context.Context, eff AnswerReader) ([]*Answer, error) {
+	answerDataList, err := eff.ListAnswersForAdmin(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	answers := make([]*Answer, 0, len(answerDataList))
-	for _, answerData := range answerDataList {
-		answer, err := answerData.parse()
-		if err != nil {
-			return nil, err
-		}
-		answers = append(answers, answer)
+	answers, err := parseAnswerDataList(answerDataList)
+	if err != nil {
+		return nil, err
 	}
 
 	return answers, nil
 }
 
-func ListAnswersByTeamProblem(ctx context.Context, eff AnswerReader, teamCode TeamCode, problemCode ProblemCode) ([]*Answer, error) {
-	answerDataList, err := eff.ListAnswersByTeamProblem(ctx, int64(teamCode), string(problemCode))
+func ListAnswersByTeamProblemForPublic(ctx context.Context, eff AnswerReader, teamCode TeamCode, problemCode ProblemCode) ([]*Answer, error) {
+	answerDataList, err := eff.ListAnswersByTeamProblemForPublic(ctx, int64(teamCode), string(problemCode))
 	if err != nil {
 		return nil, err
 	}
 
+	answers, err := parseAnswerDataList(answerDataList)
+	if err != nil {
+		return nil, err
+	}
+
+	return answers, nil
+}
+
+func parseAnswerDataList(answerDataList []*AnswerData) ([]*Answer, error) {
 	answers := make([]*Answer, 0, len(answerDataList))
 	for _, answerData := range answerDataList {
 		answer, err := answerData.parse()
@@ -70,7 +76,6 @@ func ListAnswersByTeamProblem(ctx context.Context, eff AnswerReader, teamCode Te
 		}
 		answers = append(answers, answer)
 	}
-
 	return answers, nil
 }
 
@@ -97,8 +102,15 @@ func (a *Answer) CreatedAt() time.Time {
 	return a.createdAt
 }
 
-func GetAnswerDetail(ctx context.Context, eff AnswerReader, teamCode TeamCode, problemCode ProblemCode, answerNumber uint32) (*AnswerDetail, error) {
-	answerDetailData, err := eff.GetAnswerDetail(ctx, int64(teamCode), string(problemCode), answerNumber)
+func (a *Answer) Score() *Score {
+	return a.score
+}
+
+func GetAnswerDetailForAdmin(
+	ctx context.Context, eff AnswerReader,
+	teamCode TeamCode, problemCode ProblemCode, answerNumber uint32,
+) (*AnswerDetail, error) {
+	answerDetailData, err := eff.GetAnswerDetailForAdmin(ctx, int64(teamCode), string(problemCode), answerNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +156,7 @@ func (tm *TeamMember) submitAnswer(
 	ctx context.Context, now time.Time, eff AnswerWriter,
 	problem *Problem, body *AnswerBodyData,
 ) (*AnswerDetail, error) {
-	prevAnswerData, err := eff.GetLatestAnswerByTeamProblem(
+	prevAnswerData, err := eff.GetLatestAnswerByTeamProblemForPublic(
 		ctx, uuid.UUID(tm.team.teamID), uuid.UUID(problem.problemID))
 	if err != nil && !errors.Is(err, ErrNotFound) {
 		return nil, errors.Wrap(err, "failed to get latest answer")
@@ -197,31 +209,33 @@ var (
 
 type (
 	AnswerData struct {
-		ID        uuid.UUID
-		Number    uint32
-		Team      *TeamData
-		Problem   *ProblemData
-		Author    *UserData
-		CreatedAt time.Time
-		Interval  time.Duration
+		ID        uuid.UUID     `json:"id"`
+		Number    uint32        `json:"number"`
+		Team      *TeamData     `json:"team"`
+		Problem   *ProblemData  `json:"problem"`
+		Author    *UserData     `json:"author"`
+		CreatedAt time.Time     `json:"created_at"`
+		Interval  time.Duration `json:"interval"`
+		Score     *ScoreData    `json:"score,omitzero"`
 	}
 	AnswerDetailData struct {
-		Answer *AnswerData
-		Body   *AnswerBodyData
+		Answer *AnswerData     `json:"answer"`
+		Body   *AnswerBodyData `json:"body"`
 	}
 	AnswerBodyData struct {
-		Descriptive *DescriptiveAnswerBodyData
+		Descriptive *DescriptiveAnswerBodyData `json:"descriptive,omitzero"`
 	}
 	DescriptiveAnswerBodyData struct {
-		Body string
+		Body string `json:"body"`
 	}
 	AnswerReader interface {
-		ListAnswers(ctx context.Context) ([]*AnswerData, error)
-		ListAnswersByTeamProblem(ctx context.Context, teamCode int64, problemCode string) ([]*AnswerData, error)
-		GetAnswerDetail(ctx context.Context, teamCode int64, problemCode string, answerNumber uint32) (*AnswerDetailData, error)
+		ListAnswersForAdmin(ctx context.Context) ([]*AnswerData, error)
+		ListAnswersByTeamProblemForAdmin(ctx context.Context, teamCode int64, problemCode string) ([]*AnswerData, error)
+		ListAnswersByTeamProblemForPublic(ctx context.Context, teamCode int64, problemCode string) ([]*AnswerData, error)
+		GetAnswerDetailForAdmin(ctx context.Context, teamCode int64, problemCode string, answerNumber uint32) (*AnswerDetailData, error)
 	}
 	AnswerWriter interface {
-		GetLatestAnswerByTeamProblem(ctx context.Context, teamID, problemID uuid.UUID) (*AnswerData, error)
+		GetLatestAnswerByTeamProblemForPublic(ctx context.Context, teamID, problemID uuid.UUID) (*AnswerData, error)
 		CreateAnswer(ctx context.Context, data *AnswerDetailData) error
 	}
 )
@@ -242,6 +256,14 @@ func (d *AnswerData) parse() (*Answer, error) {
 		return nil, err
 	}
 
+	var score *Score
+	if d.Score != nil {
+		score, err = d.Score.parse(problem)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &Answer{
 		id:        d.ID,
 		number:    d.Number,
@@ -250,6 +272,7 @@ func (d *AnswerData) parse() (*Answer, error) {
 		author:    author,
 		createdAt: d.CreatedAt,
 		interval:  d.Interval,
+		score:     score,
 	}, nil
 }
 
@@ -272,6 +295,7 @@ func (d *AnswerDetailData) parse() (*AnswerDetail, error) {
 	}
 
 	var body AnswerBody
+	body.problemType = answer.Problem().Type()
 	switch answer.Problem().Type() {
 	case ProblemTypeDescriptive:
 		if d.Body.Descriptive == nil {

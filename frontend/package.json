@@ -1,6 +1,7 @@
 {
   "name": "frontend",
   "scripts": {
+    "build": "pnpm run --recursive --parallel --aggregate-output build",
     "generate": "pnpm run --recursive --parallel --aggregate-output generate",
     "ci:lint": "pnpm run --recursive --parallel --aggregate-output --reporter-hide-prefix lint",
     "ci:test": "CI=true pnpm run --recursive --parallel --aggregate-output --reporter-hide-prefix test",
@@ -8,10 +9,10 @@
   },
   "devDependencies": {
     "@tsconfig/vite-react": "^3.0.2",
-    "pnpm": "10.5.2",
+    "pnpm": "10.6.2",
     "typescript": "^5.5.4"
   },
-  "packageManager": "pnpm@10.5.2",
+  "packageManager": "pnpm@10.6.2",
   "engines": {
     "node": ">=18"
   }

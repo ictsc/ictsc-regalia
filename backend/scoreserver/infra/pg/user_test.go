@@ -9,6 +9,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/pgtest"
+	"github.com/ictsc/ictsc-regalia/backend/pkg/snaptest"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 	"github.com/jmoiron/sqlx"
@@ -19,21 +20,11 @@ func Test_PgRepo_ListUsers(t *testing.T) {
 
 	cases := map[string]struct {
 		filter domain.UserListFilter
-
-		wants []*domain.UserData
 	}{
-		"all": {
-			wants: []*domain.UserData{
-				{ID: uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"), Name: "alice"},
-				{ID: uuid.FromStringOrNil("c4530ce6-d990-4414-8389-feca26883115"), Name: "bob"},
-			},
-		},
+		"all": {},
 		"filter by name": {
 			filter: domain.UserListFilter{
 				Name: "alice",
-			},
-			wants: []*domain.UserData{
-				{ID: uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"), Name: "alice"},
 			},
 		},
 	}
@@ -51,9 +42,7 @@ func Test_PgRepo_ListUsers(t *testing.T) {
 			slices.SortStableFunc(actual, func(l, r *domain.UserData) int {
 				return strings.Compare(l.Name, r.Name)
 			})
-			if diff := cmp.Diff(tt.wants, actual); diff != "" {
-				t.Errorf("mismatch (-want +got):\n%s", diff)
-			}
+			snaptest.Match(t, actual)
 		})
 	}
 }
@@ -64,15 +53,10 @@ func Test_PgRepo_GetDiscordLinkedUser(t *testing.T) {
 	cases := map[string]struct {
 		discordUserID int64
 
-		want    *domain.UserData
 		wantErr error
 	}{
 		"ok": {
 			discordUserID: 123456789012345678,
-			want: &domain.UserData{
-				ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-				Name: "alice",
-			},
 		},
 		"not found": {
 			discordUserID: 999999999999999999,
@@ -93,10 +77,7 @@ func Test_PgRepo_GetDiscordLinkedUser(t *testing.T) {
 			if err != nil {
 				return
 			}
-
-			if diff := cmp.Diff(tt.want, got); diff != "" {
-				t.Errorf("mismatch (-want +got):\n%s", diff)
-			}
+			snaptest.Match(t, got)
 		})
 	}
 }
@@ -254,20 +235,10 @@ func TestGetUserProfileByID(t *testing.T) {
 	cases := map[string]struct {
 		userID uuid.UUID
 
-		want    *domain.UserProfileData
 		wantErr error
 	}{
 		"ok": {
 			userID: uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-			want: &domain.UserProfileData{
-				User: &domain.UserData{
-					ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-					Name: "alice",
-				},
-				Profile: &domain.ProfileData{
-					DisplayName: "Alice",
-				},
-			},
 		},
 		"not found": {
 			userID:  uuid.FromStringOrNil("00000000-0000-0000-0000-000000000001"),
@@ -286,9 +257,7 @@ func TestGetUserProfileByID(t *testing.T) {
 			if err != nil {
 				return
 			}
-			if diff := cmp.Diff(tt.want, got); diff != "" {
-				t.Errorf("mismatch (-want +got):\n%s", diff)
-			}
+			snaptest.Match(t, got)
 		})
 	}
 }
@@ -296,33 +265,11 @@ func TestGetUserProfileByID(t *testing.T) {
 func TestListTeamMembers(t *testing.T) {
 	t.Parallel()
 
-	cases := map[string]struct {
-		want []*domain.TeamMemberProfileData
-	}{
-		"all": {
-			want: []*domain.TeamMemberProfileData{
-				{
-					User: &domain.UserData{
-						ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-						Name: "alice",
-					},
-					Team: &domain.TeamData{
-						ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-						Code:         1,
-						Name:         "トラブルシューターズ",
-						Organization: "ICTSC Association",
-						MaxMembers:   6,
-					},
-					Profile: &domain.ProfileData{
-						DisplayName: "Alice",
-					},
-					DiscordUserID: 123456789012345678,
-				},
-			},
-		},
+	cases := map[string]struct{}{
+		"all": {},
 	}
 
-	for name, tt := range cases {
+	for name := range cases {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			repo := pg.NewRepository(pgtest.SetupDB(t))
@@ -333,9 +280,7 @@ func TestListTeamMembers(t *testing.T) {
 			slices.SortStableFunc(actual, func(l, r *domain.TeamMemberProfileData) int {
 				return strings.Compare(l.User.Name, r.User.Name)
 			})
-			if diff := cmp.Diff(tt.want, actual); diff != "" {
-				t.Errorf("mismatch (-want +got):\n%s", diff)
-			}
+			snaptest.Match(t, actual)
 		})
 	}
 }
@@ -345,29 +290,9 @@ func TestListTeamMembersByTeamID(t *testing.T) {
 
 	cases := map[string]struct {
 		teamID uuid.UUID
-		want   []*domain.TeamMemberProfileData
 	}{
 		"ok": {
 			teamID: uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-			want: []*domain.TeamMemberProfileData{
-				{
-					User: &domain.UserData{
-						ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-						Name: "alice",
-					},
-					Team: &domain.TeamData{
-						ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-						Code:         1,
-						Name:         "トラブルシューターズ",
-						Organization: "ICTSC Association",
-						MaxMembers:   6,
-					},
-					Profile: &domain.ProfileData{
-						DisplayName: "Alice",
-					},
-					DiscordUserID: 123456789012345678,
-				},
-			},
 		},
 	}
 
@@ -382,9 +307,7 @@ func TestListTeamMembersByTeamID(t *testing.T) {
 			slices.SortStableFunc(actual, func(l, r *domain.TeamMemberProfileData) int {
 				return strings.Compare(l.User.Name, r.User.Name)
 			})
-			if diff := cmp.Diff(tt.want, actual); diff != "" {
-				t.Errorf("mismatch (-want +got):\n%s", diff)
-			}
+			snaptest.Match(t, actual)
 		})
 	}
 }

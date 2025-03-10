@@ -14,77 +14,82 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-var (
-	_ domain.AnswerReader = (*repo)(nil)
+var _ domain.AnswerReader = (*repo)(nil)
 
-	answerQueryBase = `
+func (r *repo) ListAnswersForAdmin(ctx context.Context) ([]*domain.AnswerData, error) {
+	ctx, span := tracer.Start(ctx, "ListAnswersForAdmin")
+	defer span.End()
+	return r.listAnswers(ctx, `
 SELECT
-	` + answerColumns.String("a") + `,
-	lower(a.created_at_range) AS "created_at",
-	upper(a.created_at_range) - lower(a.created_at_range) AS "rate_limit_interval",
-	` + teamColumns.As("team") + `,
-	` + problemCols.As("problem") + `,
-	` + redeployPercentagePenaltyCols.As("problem_rpp") + `,
-	` + userColumns.As("author") + `
-FROM answers AS a
-INNER JOIN teams AS team ON a.team_id = team.id
-INNER JOIN problems AS problem ON a.problem_id = problem.id
-LEFT JOIN redeploy_percentage_penalties AS problem_rpp ON problem.id = problem_rpp.problem_id
-INNER JOIN users AS author ON a.user_id = author.id`
+	`+answerViewColumns.String("answer")+`,
+	`+scoreColumns.As("score")+`
+FROM answer_view AS answer
+LEFT JOIN latest_marking_result_ids AS lm ON lm.answer_id = answer.id
+LEFT JOIN scores AS score ON score.marking_result_id = lm.id
+ORDER BY answer.created_at ASC`)
+}
 
-	listAnswersQuery = answerQueryBase + `
-ORDER BY lower(a.created_at_range) ASC`
-	listAnswersByTeamProblemQuery = answerQueryBase + `
-WHERE team.code = $1 AND problem.code = $2
-ORDER BY a.number ASC`
-	getLatestAnswerByTeamProblemQuery = answerQueryBase + `
-WHERE a.team_id = $1 AND a.problem_id = $2
-ORDER BY a.number DESC
-LIMIT 1`
-
-	answerDetailQueryBase = `
+func (r *repo) ListAnswersByTeamProblemForAdmin(ctx context.Context, teamCode int64, problemCode string) ([]*domain.AnswerData, error) {
+	ctx, span := tracer.Start(ctx, "ListAnswersByTeamProblemForAdmin")
+	defer span.End()
+	return r.listAnswers(ctx, `
 SELECT
-	` + answerColumns.String("a") + `,
-	lower(a.created_at_range) AS "created_at",
-	upper(a.created_at_range) - lower(a.created_at_range) AS "rate_limit_interval",
-	` + teamColumns.As("team") + `,
-	` + problemCols.As("problem") + `,
-	` + redeployPercentagePenaltyCols.As("problem_rpp") + `,
-	` + userColumns.As("author") + `,
+	`+answerViewColumns.String("answer")+`,
+	`+scoreColumns.As("score")+`
+FROM answer_view AS answer
+LEFT JOIN latest_marking_result_ids AS lm ON lm.answer_id = answer.id
+LEFT JOIN scores AS score ON score.marking_result_id = lm.id
+WHERE answer."team.code" = $1 AND answer."problem.code" = $2
+ORDER BY answer.number ASC`,
+		teamCode, problemCode)
+}
+
+func (r *repo) ListAnswersByTeamProblemForPublic(ctx context.Context, teamCode int64, problemCode string) ([]*domain.AnswerData, error) {
+	ctx, span := tracer.Start(ctx, "ListAnswersByTeamProblemForAdmin")
+	defer span.End()
+	return r.listAnswers(ctx, `
+SELECT
+	`+answerViewColumns.String("answer")+`,
+	`+scoreColumns.As("score")+`
+FROM answer_view AS answer
+LEFT JOIN latest_public_marking_result_ids AS lm ON lm.answer_id = answer.id
+LEFT JOIN scores AS score ON score.marking_result_id = lm.id
+WHERE answer."team.code" = $1 AND answer."problem.code" = $2
+ORDER BY answer.number ASC`,
+		teamCode, problemCode)
+}
+
+func (r *repo) GetLatestAnswerByTeamProblemForPublic(ctx context.Context, teamID, problemID uuid.UUID) (*domain.AnswerData, error) {
+	ctx, span := tracer.Start(ctx, "GetLatestAnswerByTeamProblemForPublic")
+	defer span.End()
+	return r.getAnswer(ctx, `
+SELECT
+	`+answerViewColumns.String("answer")+`,
+	`+scoreColumns.As("score")+`
+FROM answer_view AS answer
+LEFT JOIN latest_public_marking_result_ids AS lm ON lm.answer_id = answer.id
+LEFT JOIN scores AS score ON score.marking_result_id = lm.id
+WHERE answer."team.id" = $1 AND answer."problem.id" = $2
+ORDER BY answer.number DESC
+LIMIT 1`, teamID, problemID)
+}
+
+func (r *repo) GetAnswerDetailForAdmin(
+	ctx context.Context, teamCode int64, problemCode string, answerNumber uint32,
+) (*domain.AnswerDetailData, error) {
+	ctx, span := tracer.Start(ctx, "GetAnswerDetailForAdmin")
+	defer span.End()
+	return r.getAnswerDetail(ctx, `
+SELECT
+	`+answerViewColumns.String("answer")+`,
+	`+scoreColumns.As("score")+`,
 	descriptive.body AS "descriptive.body"
-FROM answers AS a
-INNER JOIN teams AS team ON a.team_id = team.id
-INNER JOIN problems AS problem ON a.problem_id = problem.id
-LEFT JOIN redeploy_percentage_penalties AS problem_rpp ON problem.id = problem_rpp.problem_id
-INNER JOIN users AS author ON a.user_id = author.id
-LEFT JOIN descriptive_answers AS descriptive ON a.id = descriptive.answer_id`
-
-	answerDetailQuery = answerDetailQueryBase + `
-WHERE team.code = $1 AND problem.code = $2 AND a.number = $3`
-)
-
-func (r *repo) ListAnswers(ctx context.Context) ([]*domain.AnswerData, error) {
-	ctx, span := tracer.Start(ctx, "ListAnswers")
-	defer span.End()
-	return r.listAnswers(ctx, listAnswersQuery)
-}
-
-func (r *repo) ListAnswersByTeamProblem(ctx context.Context, teamCode int64, problemCode string) ([]*domain.AnswerData, error) {
-	ctx, span := tracer.Start(ctx, "ListAnswersByTeamProblem")
-	defer span.End()
-	return r.listAnswers(ctx, listAnswersByTeamProblemQuery, teamCode, problemCode)
-}
-
-func (r *repo) GetLatestAnswerByTeamProblem(ctx context.Context, teamID, problemID uuid.UUID) (*domain.AnswerData, error) {
-	ctx, span := tracer.Start(ctx, "GetLatestAnswerByTeamProblem")
-	defer span.End()
-	return r.getAnswer(ctx, getLatestAnswerByTeamProblemQuery, teamID, problemID)
-}
-
-func (r *repo) GetAnswerDetail(ctx context.Context, teamCode int64, problemCode string, answerNumber uint32) (*domain.AnswerDetailData, error) {
-	ctx, span := tracer.Start(ctx, "GetAnswerDetail")
-	defer span.End()
-	return r.getAnswerDetail(ctx, answerDetailQuery, teamCode, problemCode, answerNumber)
+FROM answer_view AS answer
+LEFT JOIN latest_marking_result_ids AS lm ON lm.answer_id = answer.id
+LEFT JOIN scores AS score ON score.marking_result_id = lm.id
+LEFT JOIN descriptive_answers AS descriptive ON descriptive.answer_id = answer.id
+WHERE answer."team.code" = $1 AND answer."problem.code" = $2 AND answer.number = $3
+LIMIT 1`, teamCode, problemCode, answerNumber)
 }
 
 func (r *repo) listAnswers(ctx context.Context, query string, args ...any) ([]*domain.AnswerData, error) {
@@ -96,7 +101,7 @@ func (r *repo) listAnswers(ctx context.Context, query string, args ...any) ([]*d
 
 	var answers []*domain.AnswerData
 	for rows.Next() {
-		var row answerRow
+		var row answerWithScoreRow
 		if err := rows.StructScan(&row); err != nil {
 			return nil, errors.Wrap(err, "failed to scan answer")
 		}
@@ -107,7 +112,7 @@ func (r *repo) listAnswers(ctx context.Context, query string, args ...any) ([]*d
 }
 
 func (r *repo) getAnswer(ctx context.Context, query string, args ...any) (*domain.AnswerData, error) {
-	var row answerRow
+	var row answerWithScoreRow
 	if err := sqlx.GetContext(ctx, r.ext, &row, query, args...); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, domain.NewNotFoundError("answer", nil)
@@ -137,6 +142,7 @@ type (
 		Author    *domain.UserData    `db:"-"`
 		CreatedAt time.Time           `db:"created_at"`
 		Interval  time.Duration       `db:"-"`
+		Score     *domain.ScoreData   `db:"-"`
 	}
 	answerRow struct {
 		answerDataRow
@@ -146,13 +152,26 @@ type (
 		User                     userRow                          `db:"author"`
 		RateLimitInterval        pgtype.Interval                  `db:"rate_limit_interval"`
 	}
-	answerDetailRow struct {
+	answerWithScoreRow struct {
 		answerRow
+		MarkedScore sql.Null[uint32] `db:"score.marked_score"`
+	}
+	answerDetailRow struct {
+		answerWithScoreRow
 		DescriptiveAnswerBody sql.Null[string] `db:"descriptive.body"`
 	}
 )
 
-var answerColumns = columns([]string{"id", "number"})
+var (
+	answerViewColumns = columns([]string{
+		"id", "number", "created_at", "rate_limit_interval",
+		"team.id", "team.code", "team.name", "team.organization", "team.max_members",
+		"problem.id", "problem.code", "problem.type", "problem.title", "problem.max_score", "problem.category", "problem.redeploy_rule",
+		"problem_rpp.threshold", "problem_rpp.percentage",
+		"author.id", "author.name",
+	})
+	scoreColumns = columns([]string{"marked_score"})
+)
 
 func (r answerRow) data() *domain.AnswerData {
 	r.answerDataRow.Team = (*domain.TeamData)(&r.Team)
@@ -163,8 +182,16 @@ func (r answerRow) data() *domain.AnswerData {
 	return (*domain.AnswerData)(&r.answerDataRow)
 }
 
-func (r answerDetailRow) data() *domain.AnswerDetailData {
+func (r answerWithScoreRow) data() *domain.AnswerData {
 	answer := r.answerRow.data()
+	if r.MarkedScore.Valid {
+		answer.Score = &domain.ScoreData{MarkedScore: r.MarkedScore.V}
+	}
+	return answer
+}
+
+func (r answerDetailRow) data() *domain.AnswerDetailData {
+	answer := r.answerWithScoreRow.data()
 	body := &domain.AnswerBodyData{}
 	if r.DescriptiveAnswerBody.Valid {
 		body.Descriptive = &domain.DescriptiveAnswerBodyData{Body: r.DescriptiveAnswerBody.V}
