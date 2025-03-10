@@ -55,15 +55,11 @@ func GetSchedule(ctx context.Context, eff ScheduleReader) ([]*Schedule, error) {
 func SaveSchedule(ctx context.Context, eff ScheduleWriter, input []*UpdateScheduleInput) error {
 	data := make([]*ScheduleData, 0, len(input))
 	for _, schedule := range input {
-		phase, err := schedule.Phase.toStringPhase()
-		if err != nil {
-			return WrapAsInternal(err, "failed to convert phase")
-		}
 		data = append(data, &ScheduleData{
-			ID:          uuid.Must(uuid.NewV4()),
-			StringPhase: phase,
-			StartAt:     schedule.StartAt,
-			EndAt:       schedule.EndAt,
+			ID:      uuid.Must(uuid.NewV4()),
+			Phase:   schedule.Phase,
+			StartAt: schedule.StartAt,
+			EndAt:   schedule.EndAt,
 		})
 	}
 	if err := eff.SaveSchedule(ctx, data); err != nil {
@@ -72,31 +68,12 @@ func SaveSchedule(ctx context.Context, eff ScheduleWriter, input []*UpdateSchedu
 	return nil
 }
 
-type StringPhase string
-
-func (s *StringPhase) ToPhase() (Phase, error) {
-	switch *s {
-	case "OUT_OF_CONTEST":
-		return PhaseOutOfContest, nil
-	case "IN_CONTEST":
-		return PhaseInContest, nil
-	case "BREAK":
-		return PhaseBreak, nil
-	case "AFTER_CONTEST":
-		return PhaseAfterContest, nil
-	case "UNSPECIFIED":
-		fallthrough
-	default:
-		return PhaseUnspecified, NewInvalidArgumentError("phase is required", nil)
-	}
-}
-
 type (
 	ScheduleData struct {
-		ID          uuid.UUID
-		StringPhase StringPhase
-		StartAt     time.Time
-		EndAt       time.Time
+		ID      uuid.UUID
+		Phase   Phase
+		StartAt time.Time
+		EndAt   time.Time
 	}
 	UpdateScheduleInput struct {
 		Phase   Phase
@@ -113,13 +90,9 @@ type (
 )
 
 func (d *ScheduleData) parse() (*Schedule, error) {
-	phase, err := d.StringPhase.ToPhase()
-	if err != nil {
-		return nil, WrapAsInternal(err, "failed to parse phase")
-	}
 	return &Schedule{
 			id:      d.ID,
-			phase:   phase,
+			phase:   d.Phase,
 			startAt: d.StartAt,
 			endAt:   d.EndAt,
 		},
@@ -127,32 +100,11 @@ func (d *ScheduleData) parse() (*Schedule, error) {
 }
 
 func (s *Schedule) Data() (*ScheduleData, error) {
-	phase, err := s.phase.toStringPhase()
-	if err != nil {
-		return nil, WrapAsInternal(err, "failed to convert phase")
-	}
 	return &ScheduleData{
-			ID:          s.id,
-			StringPhase: phase,
-			StartAt:     s.startAt,
-			EndAt:       s.endAt,
+			ID:      s.id,
+			Phase:   s.phase,
+			StartAt: s.startAt,
+			EndAt:   s.endAt,
 		},
 		nil
-}
-
-func (p Phase) toStringPhase() (StringPhase, error) {
-	switch p {
-	case PhaseOutOfContest:
-		return "OUT_OF_CONTEST", nil
-	case PhaseInContest:
-		return "IN_CONTEST", nil
-	case PhaseBreak:
-		return "BREAK", nil
-	case PhaseAfterContest:
-		return "AFTER_CONTEST", nil
-	case PhaseUnspecified:
-		fallthrough
-	default:
-		return "", NewInvalidArgumentError("phase is required", nil)
-	}
 }
