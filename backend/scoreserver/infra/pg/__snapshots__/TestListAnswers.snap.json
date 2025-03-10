@@ -15,6 +15,7 @@
       "problem_type": "Descriptive",
       "title": "問題A",
       "max_score": 100,
+      "category": "Network",
       "redeploy_rule": "Unredeployable"
     },
     "author": {
@@ -40,6 +41,7 @@
       "problem_type": "Descriptive",
       "title": "問題A",
       "max_score": 100,
+      "category": "Network",
       "redeploy_rule": "Unredeployable"
     },
     "author": {
@@ -65,6 +67,7 @@
       "problem_type": "Descriptive",
       "title": "問題B",
       "max_score": 200,
+      "category": "Server",
       "redeploy_rule": "PercentagePenalty",
       "percentage_penalty": {
         "Threshold": 2,

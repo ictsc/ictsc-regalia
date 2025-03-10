@@ -87,7 +87,7 @@ CREATE TABLE problems (
 	type problem_type NOT NULL,
 	title VARCHAR(255) NOT NULL,
 	max_score INT NOT NULL CHECK (max_score > 0),
-	category VARCHAR(255) NOT NULL,
+	category TEXT NOT NULL DEFAULT '',
 	redeploy_rule redeploy_rule NOT NULL,
 	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
