@@ -110,12 +110,3 @@ func (d *ScheduleData) parse() *Schedule {
 		endAt:   d.EndAt,
 	}
 }
-
-func (s *Schedule) Data() *ScheduleData {
-	return &ScheduleData{
-		ID:      s.id,
-		Phase:   s.phase,
-		StartAt: s.startAt,
-		EndAt:   s.endAt,
-	}
-}
