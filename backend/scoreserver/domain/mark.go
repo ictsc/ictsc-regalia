@@ -205,7 +205,10 @@ func (s *ScoreData) parse(problem *Problem) (*Score, error) {
 	if s.MarkedScore > problem.MaxScore() {
 		return nil, NewInvalidArgumentError("marked score is over max score", nil)
 	}
-	return &Score{marked: s.MarkedScore}, nil
+	return &Score{
+		max:    problem.maxScore,
+		marked: s.MarkedScore,
+	}, nil
 }
 
 func (r *MarkingRationaleData) parse(problemType ProblemType) *MarkingRationale {
