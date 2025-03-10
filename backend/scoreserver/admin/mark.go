@@ -43,7 +43,7 @@ func (h *MarkServiceHandler) ListAnswers(
 		return nil, err
 	}
 
-	answers, err := domain.ListAnswers(ctx, h.ListAnswerEffect)
+	answers, err := domain.ListAnswersForAdmin(ctx, h.ListAnswerEffect)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (h *MarkServiceHandler) GetAnswer(
 		return nil, err
 	}
 
-	answer, err := domain.GetAnswerDetail(ctx, h.GetAnswerEffect, teamCode, problemCode, protoID)
+	answer, err := domain.GetAnswerDetailForAdmin(ctx, h.GetAnswerEffect, teamCode, problemCode, protoID)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func (h *MarkServiceHandler) CreateMarkingResult(
 	now := time.Now()
 
 	markingResult, err := domain.RunTx(ctx, h.CreateMarkingResultEffect, func(eff CreateMarkingResultTxEffect) (*domain.MarkingResult, error) {
-		answerDetail, err := domain.GetAnswerDetail(ctx, eff, teamCode, problemCode, reqAnswerID)
+		answerDetail, err := domain.GetAnswerDetailForAdmin(ctx, eff, teamCode, problemCode, reqAnswerID)
 		if err != nil {
 			return nil, err
 		}
@@ -208,12 +208,21 @@ func (h *MarkServiceHandler) CreateMarkingResult(
 }
 
 func convertAnswer(answer *domain.Answer) *adminv1.Answer {
-	return &adminv1.Answer{
+	proto := &adminv1.Answer{
 		Id:        answer.Number(),
 		Team:      convertTeam(answer.Team()),
 		Problem:   convertProblem(answer.Problem()),
 		CreatedAt: timestamppb.New(answer.CreatedAt()),
 	}
+	if score := answer.Score(); score != nil {
+		proto.Score = &adminv1.MarkingScore{
+			Total:   score.TotalScore(),
+			Marked:  score.MarkedScore(),
+			Penalty: score.Penalty(),
+			Max:     score.MaxScore(),
+		}
+	}
+	return proto
 }
 
 func convertMarkingResult(markingResult *domain.MarkingResult) *adminv1.MarkingResult {

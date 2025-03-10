@@ -28,7 +28,7 @@ func TestSubmitDescriptiveAnswer(t *testing.T) {
 		"new answer": {
 			at: time.Date(2021, 1, 1, 1, 0, 0, 0, time.UTC),
 			eff: answerWriter{
-				getLatestAnswerByTeamProblemFunc: func(context.Context, uuid.UUID, uuid.UUID) (*domain.AnswerData, error) {
+				getLatestAnswerByTeamProblemForPublicFunc: func(context.Context, uuid.UUID, uuid.UUID) (*domain.AnswerData, error) {
 					return nil, domain.ErrNotFound
 				},
 			},
@@ -55,7 +55,7 @@ func TestSubmitDescriptiveAnswer(t *testing.T) {
 		"additional answer": {
 			at: time.Date(2021, 1, 1, 1, 30, 0, 0, time.UTC),
 			eff: answerWriter{
-				getLatestAnswerByTeamProblemFunc: func(
+				getLatestAnswerByTeamProblemForPublicFunc: func(
 					ctx context.Context, teamID, problemID uuid.UUID,
 				) (*domain.AnswerData, error) {
 					return &domain.AnswerData{
@@ -92,7 +92,7 @@ func TestSubmitDescriptiveAnswer(t *testing.T) {
 		"too early": {
 			at: time.Date(2021, 1, 1, 1, 10, 0, 0, time.UTC),
 			eff: answerWriter{
-				getLatestAnswerByTeamProblemFunc: func(
+				getLatestAnswerByTeamProblemForPublicFunc: func(
 					ctx context.Context, teamID, problemID uuid.UUID,
 				) (*domain.AnswerData, error) {
 					return &domain.AnswerData{
@@ -120,7 +120,7 @@ func TestSubmitDescriptiveAnswer(t *testing.T) {
 
 			var createdAnswer *domain.AnswerDetailData
 			eff := answerWriter{
-				getLatestAnswerByTeamProblemFunc: tt.eff.getLatestAnswerByTeamProblemFunc,
+				getLatestAnswerByTeamProblemForPublicFunc: tt.eff.getLatestAnswerByTeamProblemForPublicFunc,
 				createAnswerFunc: func(ctx context.Context, data *domain.AnswerDetailData) error {
 					if f := tt.eff.createAnswerFunc; f != nil {
 						if err := f(ctx, data); err != nil {
@@ -157,19 +157,22 @@ func TestSubmitDescriptiveAnswer(t *testing.T) {
 }
 
 type (
-	listAnswersFunc                  func(ctx context.Context) ([]*domain.AnswerData, error)
-	listAnswersByTeamProblemFunc     func(ctx context.Context, teamCode int64, problemCode string) ([]*domain.AnswerData, error)
-	getLatestAnswerByTeamProblemFunc func(ctx context.Context, teamID, problemID uuid.UUID) (*domain.AnswerData, error)
-	getAnswerDetailFunc              func(ctx context.Context, teamCode int64, problemCode string, answerNumber uint32) (*domain.AnswerDetailData, error)
-	createAnswerFunc                 func(ctx context.Context, data *domain.AnswerDetailData) error
+	listAnswersForAdminFunc                   func(ctx context.Context) ([]*domain.AnswerData, error)
+	listAnswersByTeamProblemForAdminFunc      func(ctx context.Context, teamCode int64, problemCode string) ([]*domain.AnswerData, error)
+	listAnswersByTeamProblemForPublicFunc     func(ctx context.Context, teamCode int64, problemCode string) ([]*domain.AnswerData, error)
+	getLatestAnswerByTeamProblemForPublicFunc func(ctx context.Context, teamID, problemID uuid.UUID) (*domain.AnswerData, error)
+
+	getAnswerDetailForAdminFunc func(ctx context.Context, teamCode int64, problemCode string, answerNumber uint32) (*domain.AnswerDetailData, error)
+	createAnswerFunc            func(ctx context.Context, data *domain.AnswerDetailData) error
 
 	answerReader struct {
-		listAnswersFunc
-		listAnswersByTeamProblemFunc
-		getAnswerDetailFunc
+		listAnswersForAdminFunc
+		listAnswersByTeamProblemForAdminFunc
+		listAnswersByTeamProblemForPublicFunc
+		getAnswerDetailForAdminFunc
 	}
 	answerWriter struct {
-		getLatestAnswerByTeamProblemFunc
+		getLatestAnswerByTeamProblemForPublicFunc
 		createAnswerFunc
 	}
 )
@@ -179,21 +182,29 @@ var (
 	_ domain.AnswerWriter = answerWriter{}
 )
 
-func (f listAnswersFunc) ListAnswers(ctx context.Context) ([]*domain.AnswerData, error) {
+func (f listAnswersForAdminFunc) ListAnswersForAdmin(ctx context.Context) ([]*domain.AnswerData, error) {
 	return f(ctx)
 }
 
-func (f listAnswersByTeamProblemFunc) ListAnswersByTeamProblem(
+func (f listAnswersByTeamProblemForAdminFunc) ListAnswersByTeamProblemForAdmin(
 	ctx context.Context, teamCode int64, problemCode string,
 ) ([]*domain.AnswerData, error) {
 	return f(ctx, teamCode, problemCode)
 }
 
-func (f getLatestAnswerByTeamProblemFunc) GetLatestAnswerByTeamProblem(ctx context.Context, teamID, problemID uuid.UUID) (*domain.AnswerData, error) {
+func (f listAnswersByTeamProblemForPublicFunc) ListAnswersByTeamProblemForPublic(
+	ctx context.Context, teamCode int64, problemCode string,
+) ([]*domain.AnswerData, error) {
+	return f(ctx, teamCode, problemCode)
+}
+
+func (f getLatestAnswerByTeamProblemForPublicFunc) GetLatestAnswerByTeamProblemForPublic(
+	ctx context.Context, teamID, problemID uuid.UUID,
+) (*domain.AnswerData, error) {
 	return f(ctx, teamID, problemID)
 }
 
-func (f getAnswerDetailFunc) GetAnswerDetail(
+func (f getAnswerDetailForAdminFunc) GetAnswerDetailForAdmin(
 	ctx context.Context,
 	teamCode int64, problemCode string, answerNumber uint32,
 ) (*domain.AnswerDetailData, error) {

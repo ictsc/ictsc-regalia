@@ -6,7 +6,6 @@ import (
 	"github.com/cockroachdb/errors"
 )
 
-//nolint:recvcheck // encoding.TextUnmarshaler のためにポインタにする必要があるが基本的には値型
 type Format int
 
 const (
@@ -33,11 +32,7 @@ func (f Format) MarshalText() ([]byte, error) {
 }
 
 func (f *Format) UnmarshalText(data []byte) error {
-	return f.parse(string(data))
-}
-
-func (f *Format) parse(s string) error {
-	switch strings.ToLower(s) {
+	switch strings.ToLower(string(data)) {
 	case "json":
 		*f = FormatJSON
 	case "console":

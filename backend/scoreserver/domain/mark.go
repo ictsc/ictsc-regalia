@@ -61,6 +61,10 @@ func (m *Score) Penalty() uint32 {
 	return 0 // 現状は再展開がないので0
 }
 
+func (m *Score) TotalScore() uint32 {
+	return max(0, m.MarkedScore()-m.Penalty())
+}
+
 func (m *MarkingRationale) Type() ProblemType {
 	return m.problemType
 }
@@ -130,18 +134,18 @@ func (a *Answer) Mark(ctx context.Context, eff MarkingResultWriter, now time.Tim
 
 type (
 	MarkingResultData struct {
-		ID        uuid.UUID
-		Judge     string
-		Answer    *AnswerData
-		Score     *ScoreData
-		Rationale *MarkingRationaleData
-		CreatedAt time.Time
+		ID        uuid.UUID             `json:"id"`
+		Judge     string                `json:"judge"`
+		Answer    *AnswerData           `json:"answer"`
+		Score     *ScoreData            `json:"score"`
+		Rationale *MarkingRationaleData `json:"rationale"`
+		CreatedAt time.Time             `json:"created_at"`
 	}
 	ScoreData struct {
-		MarkedScore uint32
+		MarkedScore uint32 `json:"marked_score"`
 	}
 	MarkingRationaleData struct {
-		DescriptiveComment string
+		DescriptiveComment string `json:"descriptive_comment,omitempty"`
 	}
 
 	MarkingResultReader interface {

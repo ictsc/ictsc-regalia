@@ -9,6 +9,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/pgtest"
+	"github.com/ictsc/ictsc-regalia/backend/pkg/snaptest"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 	"github.com/jmoiron/sqlx"
@@ -60,34 +61,6 @@ func Test_PgRepo_InvitationCode(t *testing.T) {
 				t.Errorf("differs: (-got +want)\n%s", diff)
 			}
 		},
-		"list": func(t *testing.T, db *sqlx.DB) {
-			repo := pg.NewRepository(db)
-
-			got, err := repo.ListInvitationCodes(t.Context(), domain.InvitationCodeFilter{})
-			if err != nil {
-				t.Fatalf("failed to list invitation codes: %+v", err)
-			}
-			if diff := cmp.Diff(
-				got, []*domain.InvitationCodeData{
-					{
-						ID: uuid.FromStringOrNil("ad3f83d3-65be-4884-8a03-adb11a8127ef"),
-						Team: &domain.TeamData{
-							ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-							Code:         1,
-							Name:         "トラブルシューターズ",
-							Organization: "ICTSC Association",
-							MaxMembers:   6,
-						},
-						Code:      "LHNZXGSF7L59WCG9",
-						ExpiresAt: must(time.Parse(time.RFC3339, "2038-04-03T00:00:00+09:00")),
-						CreatedAt: must(time.Parse(time.RFC3339, "2025-02-02T17:10:00+09:00")),
-					},
-				},
-				cmp.AllowUnexported(domain.InvitationCode{}, domain.Team{}),
-			); diff != "" {
-				t.Errorf("differs: (-got +want)\n%s", diff)
-			}
-		},
 	}
 
 	for name, test := range tests {
@@ -100,31 +73,27 @@ func Test_PgRepo_InvitationCode(t *testing.T) {
 	}
 }
 
+func TestListInvitationCodes(t *testing.T) {
+	t.Parallel()
+
+	repo := pg.NewRepository(pgtest.SetupDB(t))
+	got, err := repo.ListInvitationCodes(t.Context(), domain.InvitationCodeFilter{})
+	if err != nil {
+		t.Fatalf("failed to list invitation codes: %+v", err)
+	}
+	snaptest.Match(t, got)
+}
+
 func TestGetInvitationCode(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
 		code string
 
-		want    *domain.InvitationCodeData
 		wantErr error
 	}{
 		"ok": {
 			code: "LHNZXGSF7L59WCG9",
-
-			want: &domain.InvitationCodeData{
-				ID: uuid.FromStringOrNil("ad3f83d3-65be-4884-8a03-adb11a8127ef"),
-				Team: &domain.TeamData{
-					ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-					Code:         1,
-					Name:         "トラブルシューターズ",
-					Organization: "ICTSC Association",
-					MaxMembers:   6,
-				},
-				Code:      "LHNZXGSF7L59WCG9",
-				ExpiresAt: time.Date(2038, 4, 3, 0, 0, 0, 0, time.FixedZone("JST", 9*60*60)),
-				CreatedAt: time.Date(2025, 2, 2, 17, 10, 0, 0, time.FixedZone("JST", 9*60*60)),
-			},
 		},
 		"not found": {
 			code:    "notfound",
@@ -141,9 +110,10 @@ func TestGetInvitationCode(t *testing.T) {
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("got error %v, want %v", err, tt.wantErr)
 			}
-			if diff := cmp.Diff(got, tt.want); diff != "" {
-				t.Errorf("differs: (-got +want)\n%s", diff)
+			if err != nil {
+				return
 			}
+			snaptest.Match(t, got)
 		})
 	}
 }

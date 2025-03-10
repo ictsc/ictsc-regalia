@@ -15,6 +15,7 @@ import { Route as TeamsRouteImport } from "./routes/~teams/~route";
 import { Route as SignupRouteImport } from "./routes/~signup/~route";
 import { Route as SigninRouteImport } from "./routes/~signin/~route";
 import { Route as RuleRouteImport } from "./routes/~rule/~route";
+import { Route as AnnouncesRouteImport } from "./routes/~announces/~route";
 import { Route as IndexRouteImport } from "./routes/~index/~route";
 import { Route as ProblemsCodeRouteImport } from "./routes/~problems.$code/~route";
 import { Route as ProblemsIndexRouteImport } from "./routes/~problems.index/~route";
@@ -45,6 +46,12 @@ const RuleRouteRoute = RuleRouteImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import("./routes/~rule/~route.lazy").then((d) => d.Route));
 
+const AnnouncesRouteRoute = AnnouncesRouteImport.update({
+  id: "/announces",
+  path: "/announces",
+  getParentRoute: () => rootRoute,
+} as any);
+
 const IndexRouteRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
@@ -74,6 +81,13 @@ declare module "@tanstack/react-router" {
       path: "/";
       fullPath: "/";
       preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/announces": {
+      id: "/announces";
+      path: "/announces";
+      fullPath: "/announces";
+      preLoaderRoute: typeof AnnouncesRouteImport;
       parentRoute: typeof rootRoute;
     };
     "/rule": {
@@ -125,6 +139,7 @@ declare module "@tanstack/react-router" {
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRouteRoute;
+  "/announces": typeof AnnouncesRouteRoute;
   "/rule": typeof RuleRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
@@ -135,6 +150,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   "/": typeof IndexRouteRoute;
+  "/announces": typeof AnnouncesRouteRoute;
   "/rule": typeof RuleRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
@@ -146,6 +162,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute;
   "/": typeof IndexRouteRoute;
+  "/announces": typeof AnnouncesRouteRoute;
   "/rule": typeof RuleRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
@@ -158,6 +175,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
     | "/"
+    | "/announces"
     | "/rule"
     | "/signin"
     | "/signup"
@@ -167,6 +185,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
+    | "/announces"
     | "/rule"
     | "/signin"
     | "/signup"
@@ -176,6 +195,7 @@ export interface FileRouteTypes {
   id:
     | "__root__"
     | "/"
+    | "/announces"
     | "/rule"
     | "/signin"
     | "/signup"
@@ -187,6 +207,7 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRouteRoute: typeof IndexRouteRoute;
+  AnnouncesRouteRoute: typeof AnnouncesRouteRoute;
   RuleRouteRoute: typeof RuleRouteRoute;
   SigninRouteRoute: typeof SigninRouteRoute;
   SignupRouteRoute: typeof SignupRouteRoute;
@@ -197,6 +218,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRouteRoute: IndexRouteRoute,
+  AnnouncesRouteRoute: AnnouncesRouteRoute,
   RuleRouteRoute: RuleRouteRoute,
   SigninRouteRoute: SigninRouteRoute,
   SignupRouteRoute: SignupRouteRoute,
@@ -216,6 +238,7 @@ export const routeTree = rootRoute
       "filePath": "~__root.tsx",
       "children": [
         "/",
+        "/announces",
         "/rule",
         "/signin",
         "/signup",
@@ -226,6 +249,9 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "~index/~route.tsx"
+    },
+    "/announces": {
+      "filePath": "~announces/~route.tsx"
     },
     "/rule": {
       "filePath": "~rule/~route.tsx"
