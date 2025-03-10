@@ -133,7 +133,6 @@ type (
 )
 
 var (
-	answerColumns     = columns([]string{"id", "number"})
 	answerViewColumns = columns([]string{
 		"id", "number", "created_at", "rate_limit_interval",
 		"team.id", "team.code", "team.name", "team.organization", "team.max_members",
