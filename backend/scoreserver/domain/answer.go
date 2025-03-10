@@ -18,6 +18,7 @@ type (
 		createdAt time.Time
 		// 次の解答を受付可能にするまでの時間
 		interval time.Duration
+		score    *Score
 	}
 	answer = Answer
 
@@ -99,6 +100,10 @@ func (a *Answer) Author() *TeamMember {
 
 func (a *Answer) CreatedAt() time.Time {
 	return a.createdAt
+}
+
+func (a *Answer) Score() *Score {
+	return a.score
 }
 
 func GetAnswerDetailForAdmin(
@@ -211,6 +216,7 @@ type (
 		Author    *UserData     `json:"author"`
 		CreatedAt time.Time     `json:"created_at"`
 		Interval  time.Duration `json:"interval"`
+		Score     *ScoreData    `json:"score,omitzero"`
 	}
 	AnswerDetailData struct {
 		Answer *AnswerData     `json:"answer"`
@@ -250,6 +256,14 @@ func (d *AnswerData) parse() (*Answer, error) {
 		return nil, err
 	}
 
+	var score *Score
+	if d.Score != nil {
+		score, err = d.Score.parse(problem)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &Answer{
 		id:        d.ID,
 		number:    d.Number,
@@ -258,6 +272,7 @@ func (d *AnswerData) parse() (*Answer, error) {
 		author:    author,
 		createdAt: d.CreatedAt,
 		interval:  d.Interval,
+		score:     score,
 	}, nil
 }
 
