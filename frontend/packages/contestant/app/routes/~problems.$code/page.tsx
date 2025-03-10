@@ -12,6 +12,8 @@ import { MaterialSymbol } from "../../components/material-symbol";
 import { Markdown, Typography } from "../../components/markdown";
 import { NavbarLayoutContext } from "../../components/app-shell";
 import { Score } from "../../components/score";
+import { DeploymentEvent } from "@app/features/problem/deployment";
+import { DeploymentDetail } from "@app/components/deployment";
 
 export { SubmissionForm } from "./submission-form";
 
@@ -19,6 +21,7 @@ export function Page(props: {
   content: ReactNode;
   submissionForm: ReactNode;
   submissionList: ReactNode;
+  deploymentList: ReactNode;
   redeployable: boolean;
 
   onTabChange?: () => void;
@@ -32,6 +35,7 @@ export function Page(props: {
           redeployable={props.redeployable}
           submissionForm={props.submissionForm}
           submissionList={props.submissionList}
+          deploymentList={props.deploymentList}
         />
       }
     />
@@ -104,6 +108,7 @@ export function Content(props: { code: string; title: string; body: string }) {
 function Sidebar(props: {
   submissionForm: ReactNode;
   submissionList: ReactNode;
+  deploymentList: ReactNode;
   redeployable: boolean;
   onChange?: () => void;
 }) {
@@ -116,9 +121,14 @@ function Sidebar(props: {
       </TabList>
       <TabPanels className="mt-16 size-full bg-transparent px-8">
         <TabPanel className="size-full">{props.submissionForm}</TabPanel>
-        <TabPanel className="size-full rounded-12 bg-disabled py-12">
+        <TabPanel className="size-full rounded-12 bg-surface-1 py-12">
           <div className="size-full overflow-y-auto px-12 [scrollbar-gutter:stable_both-edges]">
             {props.submissionList}
+          </div>
+        </TabPanel>
+        <TabPanel className="size-full rounded-12 bg-surface-1 py-12">
+          <div className="size-full overflow-y-auto px-12 [scrollbar-gutter:stable_both-edges]">
+            {props.deploymentList}
           </div>
         </TabPanel>
       </TabPanels>
@@ -140,16 +150,16 @@ function SidebarTab(props: { disabled?: boolean; children?: ReactNode }) {
   );
 }
 
-export function SubmissionList(props: { readonly children?: ReactNode }) {
+export function ListContainer(props: { readonly children?: ReactNode }) {
   return (
     <ul className="flex size-full flex-col gap-16 py-12">{props.children}</ul>
   );
 }
 
-export function EmptySubmissionList() {
+export function EmptyListContainer(props: { readonly message: string }) {
   return (
     <div className="grid size-full place-items-center text-16 font-bold text-text">
-      解答はまだありません！
+      {props.message}
     </div>
   );
 }
@@ -175,6 +185,43 @@ export function SubmissionListItem(props: {
         <p className="mt-4 text-12"></p>
       </div>
       <Score {...props.score} />
+    </li>
+  );
+}
+
+const deploymentListDateTimeFormatter = new Intl.DateTimeFormat("ja-JP", {
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
+
+export function DeploymentListItem(props: {
+  readonly event: DeploymentEvent;
+  readonly maxRedeployment: number;
+  readonly deploymentDetail: ComponentProps<typeof DeploymentDetail>;
+  readonly isDeploying: boolean;
+  readonly isLatest: boolean;
+}) {
+  return (
+    <li
+      className={clsx(
+        "flex justify-between gap-8 rounded-12 p-16",
+        props.isLatest ? "bg-surface-0" : "bg-disabled",
+      )}
+    >
+      <div className="flex flex-col">
+        <h2 className="text-20 font-bold">
+          {deploymentListDateTimeFormatter.format(
+            new Date(props.event.occuredAt),
+          )}
+        </h2>
+        <h2 className={`text-12 ${props.isDeploying ? "text-primary" : ""}`}>
+          {props.event.type}
+        </h2>
+      </div>
+      <DeploymentDetail {...props.deploymentDetail} />
     </li>
   );
 }

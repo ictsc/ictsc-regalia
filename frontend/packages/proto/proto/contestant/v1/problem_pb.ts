@@ -4,13 +4,15 @@
 
 import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
 import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
+import type { Timestamp } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file contestant/v1/problem.proto.
  */
 export const file_contestant_v1_problem: GenFile = /*@__PURE__*/
-  fileDesc("Chtjb250ZXN0YW50L3YxL3Byb2JsZW0ucHJvdG8SDWNvbnRlc3RhbnQudjEixgEKB1Byb2JsZW0SDAoEY29kZRgBIAEoCRINCgV0aXRsZRgCIAEoCRIRCgltYXhfc2NvcmUYAyABKA0SKAoFc2NvcmUYBCABKAsyFC5jb250ZXN0YW50LnYxLlNjb3JlSACIAQESLQoKZGVwbG95bWVudBgFIAEoCzIZLmNvbnRlc3RhbnQudjEuRGVwbG95bWVudBIoCgRib2R5GAYgASgLMhouY29udGVzdGFudC52MS5Qcm9ibGVtQm9keUIICgZfc2NvcmUiUAoFU2NvcmUSFAoMbWFya2VkX3Njb3JlGAEgASgNEg8KB3BlbmFsdHkYAiABKA0SDQoFc2NvcmUYAyABKA0SEQoJbWF4X3Njb3JlGAQgASgNIlMKCkRlcGxveW1lbnQSLwoGc3RhdHVzGAEgASgOMh8uY29udGVzdGFudC52MS5EZXBsb3ltZW50U3RhdHVzEhQKDHJlZGVwbG95YWJsZRgCIAEoCCJ5CgtQcm9ibGVtQm9keRIoCgR0eXBlGAEgASgOMhouY29udGVzdGFudC52MS5Qcm9ibGVtVHlwZRI4CgtkZXNjcmlwdGl2ZRgCIAEoCzIhLmNvbnRlc3RhbnQudjEuRGVzY3JpcHRpdmVQcm9ibGVtSABCBgoEYm9keSIiChJEZXNjcmlwdGl2ZVByb2JsZW0SDAoEYm9keRgBIAEoCSIVChNMaXN0UHJvYmxlbXNSZXF1ZXN0IkAKFExpc3RQcm9ibGVtc1Jlc3BvbnNlEigKCHByb2JsZW1zGAEgAygLMhYuY29udGVzdGFudC52MS5Qcm9ibGVtIiEKEUdldFByb2JsZW1SZXF1ZXN0EgwKBGNvZGUYASABKAkiPQoSR2V0UHJvYmxlbVJlc3BvbnNlEicKB3Byb2JsZW0YASABKAsyFi5jb250ZXN0YW50LnYxLlByb2JsZW0iHQoNRGVwbG95UmVxdWVzdBIMCgRjb2RlGAEgASgJIhAKDkRlcGxveVJlc3BvbnNlKpQBChBEZXBsb3ltZW50U3RhdHVzEiEKHURFUExPWU1FTlRfU1RBVFVTX1VOU1BFQ0lGSUVEEAASHgoaREVQTE9ZTUVOVF9TVEFUVVNfREVQTE9ZRUQQARIfChtERVBMT1lNRU5UX1NUQVRVU19ERVBMT1lJTkcQAhIcChhERVBMT1lNRU5UX1NUQVRVU19GQUlMRUQQAypJCgtQcm9ibGVtVHlwZRIcChhQUk9CTEVNX1RZUEVfVU5TUEVDSUZJRUQQABIcChhQUk9CTEVNX1RZUEVfREVTQ1JJUFRJVkUQATKDAgoOUHJvYmxlbVNlcnZpY2USVwoMTGlzdFByb2JsZW1zEiIuY29udGVzdGFudC52MS5MaXN0UHJvYmxlbXNSZXF1ZXN0GiMuY29udGVzdGFudC52MS5MaXN0UHJvYmxlbXNSZXNwb25zZRJRCgpHZXRQcm9ibGVtEiAuY29udGVzdGFudC52MS5HZXRQcm9ibGVtUmVxdWVzdBohLmNvbnRlc3RhbnQudjEuR2V0UHJvYmxlbVJlc3BvbnNlEkUKBkRlcGxveRIcLmNvbnRlc3RhbnQudjEuRGVwbG95UmVxdWVzdBodLmNvbnRlc3RhbnQudjEuRGVwbG95UmVzcG9uc2VCwwEKEWNvbS5jb250ZXN0YW50LnYxQgxQcm9ibGVtUHJvdG9QAVpLZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2NvbnRlc3RhbnQvdjE7Y29udGVzdGFudHYxogIDQ1hYqgINQ29udGVzdGFudC5WMcoCDUNvbnRlc3RhbnRcVjHiAhlDb250ZXN0YW50XFYxXEdQQk1ldGFkYXRh6gIOQ29udGVzdGFudDo6VjFiBnByb3RvMw");
+  fileDesc("Chtjb250ZXN0YW50L3YxL3Byb2JsZW0ucHJvdG8SDWNvbnRlc3RhbnQudjEixgEKB1Byb2JsZW0SDAoEY29kZRgBIAEoCRINCgV0aXRsZRgCIAEoCRIRCgltYXhfc2NvcmUYAyABKA0SKAoFc2NvcmUYBCABKAsyFC5jb250ZXN0YW50LnYxLlNjb3JlSACIAQESLQoKZGVwbG95bWVudBgFIAEoCzIZLmNvbnRlc3RhbnQudjEuRGVwbG95bWVudBIoCgRib2R5GAYgASgLMhouY29udGVzdGFudC52MS5Qcm9ibGVtQm9keUIICgZfc2NvcmUiUAoFU2NvcmUSFAoMbWFya2VkX3Njb3JlGAEgASgNEg8KB3BlbmFsdHkYAiABKA0SDQoFc2NvcmUYAyABKA0SEQoJbWF4X3Njb3JlGAQgASgNIlIKCkRlcGxveW1lbnQSLgoGZXZlbnRzGAEgAygLMh4uY29udGVzdGFudC52MS5EZXBsb3ltZW50RXZlbnQSFAoMcmVkZXBsb3lhYmxlGAIgASgIIpQBCg9EZXBsb3ltZW50RXZlbnQSEAoIcmV2aXNpb24YASABKAMSLwoLb2NjdXJyZWRfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEg8KB3BlbmFsdHkYAyABKA0SLQoEdHlwZRgEIAEoDjIfLmNvbnRlc3RhbnQudjEuRGVwbG95bWVudFN0YXR1cyJ5CgtQcm9ibGVtQm9keRIoCgR0eXBlGAEgASgOMhouY29udGVzdGFudC52MS5Qcm9ibGVtVHlwZRI4CgtkZXNjcmlwdGl2ZRgCIAEoCzIhLmNvbnRlc3RhbnQudjEuRGVzY3JpcHRpdmVQcm9ibGVtSABCBgoEYm9keSIiChJEZXNjcmlwdGl2ZVByb2JsZW0SDAoEYm9keRgBIAEoCSIVChNMaXN0UHJvYmxlbXNSZXF1ZXN0IkAKFExpc3RQcm9ibGVtc1Jlc3BvbnNlEigKCHByb2JsZW1zGAEgAygLMhYuY29udGVzdGFudC52MS5Qcm9ibGVtIiEKEUdldFByb2JsZW1SZXF1ZXN0EgwKBGNvZGUYASABKAkiPQoSR2V0UHJvYmxlbVJlc3BvbnNlEicKB3Byb2JsZW0YASABKAsyFi5jb250ZXN0YW50LnYxLlByb2JsZW0iHQoNRGVwbG95UmVxdWVzdBIMCgRjb2RlGAEgASgJIhAKDkRlcGxveVJlc3BvbnNlKpQBChBEZXBsb3ltZW50U3RhdHVzEiEKHURFUExPWU1FTlRfU1RBVFVTX1VOU1BFQ0lGSUVEEAASHgoaREVQTE9ZTUVOVF9TVEFUVVNfREVQTE9ZRUQQARIfChtERVBMT1lNRU5UX1NUQVRVU19ERVBMT1lJTkcQAhIcChhERVBMT1lNRU5UX1NUQVRVU19GQUlMRUQQAypJCgtQcm9ibGVtVHlwZRIcChhQUk9CTEVNX1RZUEVfVU5TUEVDSUZJRUQQABIcChhQUk9CTEVNX1RZUEVfREVTQ1JJUFRJVkUQATKDAgoOUHJvYmxlbVNlcnZpY2USVwoMTGlzdFByb2JsZW1zEiIuY29udGVzdGFudC52MS5MaXN0UHJvYmxlbXNSZXF1ZXN0GiMuY29udGVzdGFudC52MS5MaXN0UHJvYmxlbXNSZXNwb25zZRJRCgpHZXRQcm9ibGVtEiAuY29udGVzdGFudC52MS5HZXRQcm9ibGVtUmVxdWVzdBohLmNvbnRlc3RhbnQudjEuR2V0UHJvYmxlbVJlc3BvbnNlEkUKBkRlcGxveRIcLmNvbnRlc3RhbnQudjEuRGVwbG95UmVxdWVzdBodLmNvbnRlc3RhbnQudjEuRGVwbG95UmVzcG9uc2VCwwEKEWNvbS5jb250ZXN0YW50LnYxQgxQcm9ibGVtUHJvdG9QAVpLZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2NvbnRlc3RhbnQvdjE7Y29udGVzdGFudHYxogIDQ1hYqgINQ29udGVzdGFudC5WMcoCDUNvbnRlc3RhbnRcVjHiAhlDb250ZXN0YW50XFYxXEdQQk1ldGFkYXRh6gIOQ29udGVzdGFudDo6VjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
 
 /**
  * @generated from message contestant.v1.Problem
@@ -105,9 +107,9 @@ export const ScoreSchema: GenMessage<Score> = /*@__PURE__*/
  */
 export type Deployment = Message<"contestant.v1.Deployment"> & {
   /**
-   * @generated from field: contestant.v1.DeploymentStatus status = 1;
+   * @generated from field: repeated contestant.v1.DeploymentEvent events = 1;
    */
-  status: DeploymentStatus;
+  events: DeploymentEvent[];
 
   /**
    * @generated from field: bool redeployable = 2;
@@ -121,6 +123,42 @@ export type Deployment = Message<"contestant.v1.Deployment"> & {
  */
 export const DeploymentSchema: GenMessage<Deployment> = /*@__PURE__*/
   messageDesc(file_contestant_v1_problem, 2);
+
+/**
+ * @generated from message contestant.v1.DeploymentEvent
+ */
+export type DeploymentEvent = Message<"contestant.v1.DeploymentEvent"> & {
+  /**
+   * 何回目のリビジョンの情報か
+   *
+   * @generated from field: int64 revision = 1;
+   */
+  revision: bigint;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp occurred_at = 2;
+   */
+  occurredAt?: Timestamp;
+
+  /**
+   * 展開をした結果の総減点
+   *
+   * @generated from field: uint32 penalty = 3;
+   */
+  penalty: number;
+
+  /**
+   * @generated from field: contestant.v1.DeploymentStatus type = 4;
+   */
+  type: DeploymentStatus;
+};
+
+/**
+ * Describes the message contestant.v1.DeploymentEvent.
+ * Use `create(DeploymentEventSchema)` to create a new message.
+ */
+export const DeploymentEventSchema: GenMessage<DeploymentEvent> = /*@__PURE__*/
+  messageDesc(file_contestant_v1_problem, 3);
 
 /**
  * @generated from message contestant.v1.ProblemBody
@@ -148,7 +186,7 @@ export type ProblemBody = Message<"contestant.v1.ProblemBody"> & {
  * Use `create(ProblemBodySchema)` to create a new message.
  */
 export const ProblemBodySchema: GenMessage<ProblemBody> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 3);
+  messageDesc(file_contestant_v1_problem, 4);
 
 /**
  * @generated from message contestant.v1.DescriptiveProblem
@@ -167,7 +205,7 @@ export type DescriptiveProblem = Message<"contestant.v1.DescriptiveProblem"> & {
  * Use `create(DescriptiveProblemSchema)` to create a new message.
  */
 export const DescriptiveProblemSchema: GenMessage<DescriptiveProblem> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 4);
+  messageDesc(file_contestant_v1_problem, 5);
 
 /**
  * @generated from message contestant.v1.ListProblemsRequest
@@ -180,7 +218,7 @@ export type ListProblemsRequest = Message<"contestant.v1.ListProblemsRequest"> &
  * Use `create(ListProblemsRequestSchema)` to create a new message.
  */
 export const ListProblemsRequestSchema: GenMessage<ListProblemsRequest> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 5);
+  messageDesc(file_contestant_v1_problem, 6);
 
 /**
  * @generated from message contestant.v1.ListProblemsResponse
@@ -197,7 +235,7 @@ export type ListProblemsResponse = Message<"contestant.v1.ListProblemsResponse">
  * Use `create(ListProblemsResponseSchema)` to create a new message.
  */
 export const ListProblemsResponseSchema: GenMessage<ListProblemsResponse> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 6);
+  messageDesc(file_contestant_v1_problem, 7);
 
 /**
  * @generated from message contestant.v1.GetProblemRequest
@@ -214,7 +252,7 @@ export type GetProblemRequest = Message<"contestant.v1.GetProblemRequest"> & {
  * Use `create(GetProblemRequestSchema)` to create a new message.
  */
 export const GetProblemRequestSchema: GenMessage<GetProblemRequest> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 7);
+  messageDesc(file_contestant_v1_problem, 8);
 
 /**
  * @generated from message contestant.v1.GetProblemResponse
@@ -231,7 +269,7 @@ export type GetProblemResponse = Message<"contestant.v1.GetProblemResponse"> & {
  * Use `create(GetProblemResponseSchema)` to create a new message.
  */
 export const GetProblemResponseSchema: GenMessage<GetProblemResponse> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 8);
+  messageDesc(file_contestant_v1_problem, 9);
 
 /**
  * @generated from message contestant.v1.DeployRequest
@@ -248,7 +286,7 @@ export type DeployRequest = Message<"contestant.v1.DeployRequest"> & {
  * Use `create(DeployRequestSchema)` to create a new message.
  */
 export const DeployRequestSchema: GenMessage<DeployRequest> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 9);
+  messageDesc(file_contestant_v1_problem, 10);
 
 /**
  * @generated from message contestant.v1.DeployResponse
@@ -261,7 +299,7 @@ export type DeployResponse = Message<"contestant.v1.DeployResponse"> & {
  * Use `create(DeployResponseSchema)` to create a new message.
  */
 export const DeployResponseSchema: GenMessage<DeployResponse> = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 10);
+  messageDesc(file_contestant_v1_problem, 11);
 
 /**
  * @generated from enum contestant.v1.DeploymentStatus

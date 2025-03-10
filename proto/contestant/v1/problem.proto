@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package contestant.v1;
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1;contestantv1";
 
 message Problem {
@@ -29,8 +31,17 @@ message Score {
 }
 
 message Deployment {
-  DeploymentStatus status = 1;
+  repeated DeploymentEvent events = 1;
   bool redeployable = 2;
+}
+
+message DeploymentEvent {
+  // 何回目のリビジョンの情報か
+  int64 revision = 1;
+  google.protobuf.Timestamp occurred_at = 2;
+  // 展開をした結果の総減点
+  uint32 penalty = 3;
+  DeploymentStatus type = 4;
 }
 
 enum DeploymentStatus {
