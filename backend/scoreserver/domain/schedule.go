@@ -17,6 +17,23 @@ const (
 	PhaseAfterContest
 )
 
+func (p Phase) String() string {
+	switch p {
+	case PhaseOutOfContest:
+		return "OUT_OF_CONTEST"
+	case PhaseInContest:
+		return "IN_CONTEST"
+	case PhaseBreak:
+		return "BREAK"
+	case PhaseAfterContest:
+		return "AFTER_CONTEST"
+	case PhaseUnspecified:
+		fallthrough
+	default:
+		return "UNSPECIFIED"
+	}
+}
+
 type Schedule struct {
 	id      uuid.UUID
 	phase   Phase
