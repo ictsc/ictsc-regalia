@@ -115,6 +115,8 @@ func convertProtoPhaseToDomain(protoPhase adminv1.Phase) domain.Phase {
 		return domain.PhaseBreak
 	case adminv1.Phase_PHASE_AFTER_CONTEST:
 		return domain.PhaseAfterContest
+	case adminv1.Phase_PHASE_UNSPECIFIED:
+		fallthrough
 	default:
 		return domain.PhaseUnspecified
 	}
