@@ -19,48 +19,28 @@ var (
 
 	answerQueryBase = `
 SELECT
-	` + answerColumns.String("a") + `,
-	lower(a.created_at_range) AS "created_at",
-	upper(a.created_at_range) - lower(a.created_at_range) AS "rate_limit_interval",
-	` + teamColumns.As("team") + `,
-	` + problemCols.As("problem") + `,
-	` + redeployPercentagePenaltyCols.As("problem_rpp") + `,
-	` + userColumns.As("author") + `
-FROM answers AS a
-INNER JOIN teams AS team ON a.team_id = team.id
-INNER JOIN problems AS problem ON a.problem_id = problem.id
-LEFT JOIN redeploy_percentage_penalties AS problem_rpp ON problem.id = problem_rpp.problem_id
-INNER JOIN users AS author ON a.user_id = author.id`
+	` + answerViewColumns.String("answer") + `
+FROM answer_view AS answer`
 
 	listAnswersQuery = answerQueryBase + `
-ORDER BY lower(a.created_at_range) ASC`
+ORDER BY answer.created_at ASC`
 	listAnswersByTeamProblemQuery = answerQueryBase + `
-WHERE team.code = $1 AND problem.code = $2
-ORDER BY a.number ASC`
+WHERE answer."team.code" = $1 AND answer."problem.code" = $2
+ORDER BY answer.number ASC`
 	getLatestAnswerByTeamProblemQuery = answerQueryBase + `
-WHERE a.team_id = $1 AND a.problem_id = $2
-ORDER BY a.number DESC
+WHERE answer."team.id" = $1 AND answer."problem.id" = $2
+ORDER BY answer.number DESC
 LIMIT 1`
 
 	answerDetailQueryBase = `
 SELECT
-	` + answerColumns.String("a") + `,
-	lower(a.created_at_range) AS "created_at",
-	upper(a.created_at_range) - lower(a.created_at_range) AS "rate_limit_interval",
-	` + teamColumns.As("team") + `,
-	` + problemCols.As("problem") + `,
-	` + redeployPercentagePenaltyCols.As("problem_rpp") + `,
-	` + userColumns.As("author") + `,
+	` + answerViewColumns.String("answer") + `,
 	descriptive.body AS "descriptive.body"
-FROM answers AS a
-INNER JOIN teams AS team ON a.team_id = team.id
-INNER JOIN problems AS problem ON a.problem_id = problem.id
-LEFT JOIN redeploy_percentage_penalties AS problem_rpp ON problem.id = problem_rpp.problem_id
-INNER JOIN users AS author ON a.user_id = author.id
-LEFT JOIN descriptive_answers AS descriptive ON a.id = descriptive.answer_id`
+FROM answer_view AS answer
+LEFT JOIN descriptive_answers AS descriptive ON answer.id = descriptive.answer_id`
 
 	answerDetailQuery = answerDetailQueryBase + `
-WHERE team.code = $1 AND problem.code = $2 AND a.number = $3`
+WHERE answer."team.code" = $1 AND answer."problem.code" = $2 AND answer.number = $3`
 )
 
 func (r *repo) ListAnswers(ctx context.Context) ([]*domain.AnswerData, error) {
@@ -152,7 +132,15 @@ type (
 	}
 )
 
-var answerColumns = columns([]string{"id", "number"})
+var (
+	answerViewColumns = columns([]string{
+		"id", "number", "created_at", "rate_limit_interval",
+		"team.id", "team.code", "team.name", "team.organization", "team.max_members",
+		"problem.id", "problem.code", "problem.type", "problem.title", "problem.max_score", "problem.redeploy_rule",
+		"problem_rpp.threshold", "problem_rpp.percentage",
+		"author.id", "author.name",
+	})
+)
 
 func (r answerRow) data() *domain.AnswerData {
 	r.answerDataRow.Team = (*domain.TeamData)(&r.Team)

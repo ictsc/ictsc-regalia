@@ -16,3 +16,7 @@ p, role:admin, problems, update
 p, role:admin, problems, delete
 p, role:admin, notices, list
 p, role:admin, notices, create
+p, role:admin, answers, list
+p, role:admin, answers, get
+p, role:admin, marking_results, list
+p, role:admin, marking_results, create

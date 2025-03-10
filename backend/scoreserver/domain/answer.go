@@ -16,7 +16,7 @@ type (
 		problem   *Problem
 		author    *User
 		createdAt time.Time
-		// 次の回答を受付可能にするまでの時間
+		// 次の解答を受付可能にするまでの時間
 		interval time.Duration
 	}
 	answer = Answer
@@ -197,23 +197,23 @@ var (
 
 type (
 	AnswerData struct {
-		ID        uuid.UUID
-		Number    uint32
-		Team      *TeamData
-		Problem   *ProblemData
-		Author    *UserData
-		CreatedAt time.Time
-		Interval  time.Duration
+		ID        uuid.UUID     `json:"id"`
+		Number    uint32        `json:"number"`
+		Team      *TeamData     `json:"team"`
+		Problem   *ProblemData  `json:"problem"`
+		Author    *UserData     `json:"author"`
+		CreatedAt time.Time     `json:"created_at"`
+		Interval  time.Duration `json:"interval"`
 	}
 	AnswerDetailData struct {
-		Answer *AnswerData
-		Body   *AnswerBodyData
+		Answer *AnswerData     `json:"answer"`
+		Body   *AnswerBodyData `json:"body"`
 	}
 	AnswerBodyData struct {
-		Descriptive *DescriptiveAnswerBodyData
+		Descriptive *DescriptiveAnswerBodyData `json:"descriptive,omitzero"`
 	}
 	DescriptiveAnswerBodyData struct {
-		Body string
+		Body string `json:"body"`
 	}
 	AnswerReader interface {
 		ListAnswers(ctx context.Context) ([]*AnswerData, error)
@@ -272,6 +272,7 @@ func (d *AnswerDetailData) parse() (*AnswerDetail, error) {
 	}
 
 	var body AnswerBody
+	body.problemType = answer.Problem().Type()
 	switch answer.Problem().Type() {
 	case ProblemTypeDescriptive:
 		if d.Body.Descriptive == nil {

@@ -3,6 +3,7 @@ package domain
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"regexp"
@@ -49,6 +50,12 @@ const (
 	ProblemTypeDescriptive             // 記述問題
 )
 
+var (
+	_ fmt.Stringer     = ProblemType(0)
+	_ json.Marshaler   = ProblemType(0)
+	_ json.Unmarshaler = (*ProblemType)(nil)
+)
+
 func (pt ProblemType) String() string {
 	switch pt {
 	case ProblemTypeDescriptive:
@@ -58,6 +65,21 @@ func (pt ProblemType) String() string {
 	default:
 		return "Unknown"
 	}
+}
+
+func (pt ProblemType) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + pt.String() + `"`), nil
+}
+
+func (pt *ProblemType) UnmarshalJSON(data []byte) error {
+	s := strings.Trim(string(data), `"`)
+	switch s {
+	case "Descriptive":
+		*pt = ProblemTypeDescriptive
+	default:
+		*pt = ProblemTypeUnknown
+	}
+	return nil
 }
 
 type RedeployRule int
@@ -79,6 +101,23 @@ func (r RedeployRule) String() string {
 	default:
 		return "Unknown"
 	}
+}
+
+func (r RedeployRule) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + r.String() + `"`), nil
+}
+
+func (r *RedeployRule) UnmarshalJSON(data []byte) error {
+	s := strings.Trim(string(data), `"`)
+	switch s {
+	case "Unredeployable":
+		*r = RedeployRuleUnredeployable
+	case "PercentagePenalty":
+		*r = RedeployRulePercentagePenalty
+	default:
+		*r = RedeployRuleUnknown
+	}
+	return nil
 }
 
 type (
@@ -327,15 +366,15 @@ type (
 )
 
 type ProblemData struct {
-	ID          uuid.UUID
-	Code        string
-	ProblemType ProblemType
-	Title       string
-	MaxScore    uint32
-	Category    string
+	ID          uuid.UUID   `json:"id"`
+	Code        string      `json:"code"`
+	ProblemType ProblemType `json:"problem_type"`
+	Title       string      `json:"title"`
+	MaxScore    uint32      `json:"max_score"`
+	Category    string      `json:"category"`
 
-	RedeployRule      RedeployRule
-	PercentagePenalty *RedeployPenaltyPercentage
+	RedeployRule      RedeployRule               `json:"redeploy_rule"`
+	PercentagePenalty *RedeployPenaltyPercentage `json:"percentage_penalty,omitempty"`
 }
 
 func (d *ProblemData) parse() (*problem, error) {
@@ -408,10 +447,10 @@ func (p *Problem) Data() *ProblemData {
 }
 
 type ProblemContentData struct {
-	PageID      string
-	PagePath    string
-	Body        string
-	Explanation string
+	PageID      string `json:"page_id"`
+	PagePath    string `json:"page_path"`
+	Body        string `json:"body"`
+	Explanation string `json:"explanation"`
 }
 
 func (d *ProblemContentData) parse() (*ProblemContent, error) {
@@ -445,8 +484,8 @@ func (pc *ProblemContent) Data() *ProblemContentData {
 }
 
 type DescriptiveProblemData struct {
-	Problem *ProblemData
-	Content *ProblemContentData
+	Problem *ProblemData        `json:"problem"`
+	Content *ProblemContentData `json:"content"`
 }
 
 func (d *DescriptiveProblemData) parse() (*DescriptiveProblem, error) {

@@ -78,8 +78,8 @@ var (
 // ユーザーに関する操作集合
 type (
 	UserData struct {
-		ID   uuid.UUID
-		Name string
+		ID   uuid.UUID `json:"id"`
+		Name string    `json:"name"`
 	}
 	UserListFilter struct {
 		Name string
@@ -91,11 +91,11 @@ type (
 		ListUsers(ctx context.Context, filter UserListFilter) iter.Seq2[*UserData, error]
 	}
 	UserProfileData struct {
-		User    *UserData
-		Profile *ProfileData
+		User    *UserData    `json:"user"`
+		Profile *ProfileData `json:"profile"`
 	}
 	ProfileData struct {
-		DisplayName string
+		DisplayName string `json:"display_name"`
 	}
 	UserCreator interface {
 		CreateUser(ctx context.Context, user *UserProfileData) error

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"net/url"
 	"os"
 
@@ -109,6 +110,15 @@ func newAdminConfig(opts *CLIOption) (*config.AdminAPI, error) {
 }
 
 func newContestantConfig(opts *CLIOption) (*config.ContestantAPI, error) {
+	if baseURL, ok := os.LookupEnv("CONTESTANT_BASE_URL"); ok {
+		url, err := url.Parse(baseURL)
+		if err == nil {
+			opts.ContestantBaseURL = *url
+		} else {
+			slog.Info("CONTESTANT_BASE_URL is invalid. use default value", "error", err)
+		}
+	}
+
 	origin := fmt.Sprintf("%s://%s", opts.ContestantBaseURL.Scheme, opts.ContestantBaseURL.Host)
 
 	var errs []error

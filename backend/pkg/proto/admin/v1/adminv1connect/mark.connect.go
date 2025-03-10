@@ -35,19 +35,26 @@ const (
 const (
 	// MarkServiceListAnswersProcedure is the fully-qualified name of the MarkService's ListAnswers RPC.
 	MarkServiceListAnswersProcedure = "/admin.v1.MarkService/ListAnswers"
+	// MarkServiceGetAnswerProcedure is the fully-qualified name of the MarkService's GetAnswer RPC.
+	MarkServiceGetAnswerProcedure = "/admin.v1.MarkService/GetAnswer"
 	// MarkServiceListMarkingResultsProcedure is the fully-qualified name of the MarkService's
 	// ListMarkingResults RPC.
 	MarkServiceListMarkingResultsProcedure = "/admin.v1.MarkService/ListMarkingResults"
 	// MarkServiceCreateMarkingResultProcedure is the fully-qualified name of the MarkService's
 	// CreateMarkingResult RPC.
 	MarkServiceCreateMarkingResultProcedure = "/admin.v1.MarkService/CreateMarkingResult"
+	// MarkServiceUpdateMarkingResultVisibilitiesProcedure is the fully-qualified name of the
+	// MarkService's UpdateMarkingResultVisibilities RPC.
+	MarkServiceUpdateMarkingResultVisibilitiesProcedure = "/admin.v1.MarkService/UpdateMarkingResultVisibilities"
 )
 
 // MarkServiceClient is a client for the admin.v1.MarkService service.
 type MarkServiceClient interface {
 	ListAnswers(context.Context, *connect.Request[v1.ListAnswersRequest]) (*connect.Response[v1.ListAnswersResponse], error)
+	GetAnswer(context.Context, *connect.Request[v1.GetAnswerRequest]) (*connect.Response[v1.GetAnswerResponse], error)
 	ListMarkingResults(context.Context, *connect.Request[v1.ListMarkingResultsRequest]) (*connect.Response[v1.ListMarkingResultsResponse], error)
 	CreateMarkingResult(context.Context, *connect.Request[v1.CreateMarkingResultRequest]) (*connect.Response[v1.CreateMarkingResultResponse], error)
+	UpdateMarkingResultVisibilities(context.Context, *connect.Request[v1.UpdateMarkingResultVisibilitiesRequest]) (*connect.Response[v1.UpdateMarkingResultVisibilitiesResponse], error)
 }
 
 // NewMarkServiceClient constructs a client for the admin.v1.MarkService service. By default, it
@@ -67,6 +74,12 @@ func NewMarkServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(markServiceMethods.ByName("ListAnswers")),
 			connect.WithClientOptions(opts...),
 		),
+		getAnswer: connect.NewClient[v1.GetAnswerRequest, v1.GetAnswerResponse](
+			httpClient,
+			baseURL+MarkServiceGetAnswerProcedure,
+			connect.WithSchema(markServiceMethods.ByName("GetAnswer")),
+			connect.WithClientOptions(opts...),
+		),
 		listMarkingResults: connect.NewClient[v1.ListMarkingResultsRequest, v1.ListMarkingResultsResponse](
 			httpClient,
 			baseURL+MarkServiceListMarkingResultsProcedure,
@@ -79,19 +92,32 @@ func NewMarkServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(markServiceMethods.ByName("CreateMarkingResult")),
 			connect.WithClientOptions(opts...),
 		),
+		updateMarkingResultVisibilities: connect.NewClient[v1.UpdateMarkingResultVisibilitiesRequest, v1.UpdateMarkingResultVisibilitiesResponse](
+			httpClient,
+			baseURL+MarkServiceUpdateMarkingResultVisibilitiesProcedure,
+			connect.WithSchema(markServiceMethods.ByName("UpdateMarkingResultVisibilities")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // markServiceClient implements MarkServiceClient.
 type markServiceClient struct {
-	listAnswers         *connect.Client[v1.ListAnswersRequest, v1.ListAnswersResponse]
-	listMarkingResults  *connect.Client[v1.ListMarkingResultsRequest, v1.ListMarkingResultsResponse]
-	createMarkingResult *connect.Client[v1.CreateMarkingResultRequest, v1.CreateMarkingResultResponse]
+	listAnswers                     *connect.Client[v1.ListAnswersRequest, v1.ListAnswersResponse]
+	getAnswer                       *connect.Client[v1.GetAnswerRequest, v1.GetAnswerResponse]
+	listMarkingResults              *connect.Client[v1.ListMarkingResultsRequest, v1.ListMarkingResultsResponse]
+	createMarkingResult             *connect.Client[v1.CreateMarkingResultRequest, v1.CreateMarkingResultResponse]
+	updateMarkingResultVisibilities *connect.Client[v1.UpdateMarkingResultVisibilitiesRequest, v1.UpdateMarkingResultVisibilitiesResponse]
 }
 
 // ListAnswers calls admin.v1.MarkService.ListAnswers.
 func (c *markServiceClient) ListAnswers(ctx context.Context, req *connect.Request[v1.ListAnswersRequest]) (*connect.Response[v1.ListAnswersResponse], error) {
 	return c.listAnswers.CallUnary(ctx, req)
+}
+
+// GetAnswer calls admin.v1.MarkService.GetAnswer.
+func (c *markServiceClient) GetAnswer(ctx context.Context, req *connect.Request[v1.GetAnswerRequest]) (*connect.Response[v1.GetAnswerResponse], error) {
+	return c.getAnswer.CallUnary(ctx, req)
 }
 
 // ListMarkingResults calls admin.v1.MarkService.ListMarkingResults.
@@ -104,11 +130,18 @@ func (c *markServiceClient) CreateMarkingResult(ctx context.Context, req *connec
 	return c.createMarkingResult.CallUnary(ctx, req)
 }
 
+// UpdateMarkingResultVisibilities calls admin.v1.MarkService.UpdateMarkingResultVisibilities.
+func (c *markServiceClient) UpdateMarkingResultVisibilities(ctx context.Context, req *connect.Request[v1.UpdateMarkingResultVisibilitiesRequest]) (*connect.Response[v1.UpdateMarkingResultVisibilitiesResponse], error) {
+	return c.updateMarkingResultVisibilities.CallUnary(ctx, req)
+}
+
 // MarkServiceHandler is an implementation of the admin.v1.MarkService service.
 type MarkServiceHandler interface {
 	ListAnswers(context.Context, *connect.Request[v1.ListAnswersRequest]) (*connect.Response[v1.ListAnswersResponse], error)
+	GetAnswer(context.Context, *connect.Request[v1.GetAnswerRequest]) (*connect.Response[v1.GetAnswerResponse], error)
 	ListMarkingResults(context.Context, *connect.Request[v1.ListMarkingResultsRequest]) (*connect.Response[v1.ListMarkingResultsResponse], error)
 	CreateMarkingResult(context.Context, *connect.Request[v1.CreateMarkingResultRequest]) (*connect.Response[v1.CreateMarkingResultResponse], error)
+	UpdateMarkingResultVisibilities(context.Context, *connect.Request[v1.UpdateMarkingResultVisibilitiesRequest]) (*connect.Response[v1.UpdateMarkingResultVisibilitiesResponse], error)
 }
 
 // NewMarkServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -124,6 +157,12 @@ func NewMarkServiceHandler(svc MarkServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(markServiceMethods.ByName("ListAnswers")),
 		connect.WithHandlerOptions(opts...),
 	)
+	markServiceGetAnswerHandler := connect.NewUnaryHandler(
+		MarkServiceGetAnswerProcedure,
+		svc.GetAnswer,
+		connect.WithSchema(markServiceMethods.ByName("GetAnswer")),
+		connect.WithHandlerOptions(opts...),
+	)
 	markServiceListMarkingResultsHandler := connect.NewUnaryHandler(
 		MarkServiceListMarkingResultsProcedure,
 		svc.ListMarkingResults,
@@ -136,14 +175,24 @@ func NewMarkServiceHandler(svc MarkServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(markServiceMethods.ByName("CreateMarkingResult")),
 		connect.WithHandlerOptions(opts...),
 	)
+	markServiceUpdateMarkingResultVisibilitiesHandler := connect.NewUnaryHandler(
+		MarkServiceUpdateMarkingResultVisibilitiesProcedure,
+		svc.UpdateMarkingResultVisibilities,
+		connect.WithSchema(markServiceMethods.ByName("UpdateMarkingResultVisibilities")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/admin.v1.MarkService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case MarkServiceListAnswersProcedure:
 			markServiceListAnswersHandler.ServeHTTP(w, r)
+		case MarkServiceGetAnswerProcedure:
+			markServiceGetAnswerHandler.ServeHTTP(w, r)
 		case MarkServiceListMarkingResultsProcedure:
 			markServiceListMarkingResultsHandler.ServeHTTP(w, r)
 		case MarkServiceCreateMarkingResultProcedure:
 			markServiceCreateMarkingResultHandler.ServeHTTP(w, r)
+		case MarkServiceUpdateMarkingResultVisibilitiesProcedure:
+			markServiceUpdateMarkingResultVisibilitiesHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -157,10 +206,18 @@ func (UnimplementedMarkServiceHandler) ListAnswers(context.Context, *connect.Req
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.MarkService.ListAnswers is not implemented"))
 }
 
+func (UnimplementedMarkServiceHandler) GetAnswer(context.Context, *connect.Request[v1.GetAnswerRequest]) (*connect.Response[v1.GetAnswerResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.MarkService.GetAnswer is not implemented"))
+}
+
 func (UnimplementedMarkServiceHandler) ListMarkingResults(context.Context, *connect.Request[v1.ListMarkingResultsRequest]) (*connect.Response[v1.ListMarkingResultsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.MarkService.ListMarkingResults is not implemented"))
 }
 
 func (UnimplementedMarkServiceHandler) CreateMarkingResult(context.Context, *connect.Request[v1.CreateMarkingResultRequest]) (*connect.Response[v1.CreateMarkingResultResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.MarkService.CreateMarkingResult is not implemented"))
+}
+
+func (UnimplementedMarkServiceHandler) UpdateMarkingResultVisibilities(context.Context, *connect.Request[v1.UpdateMarkingResultVisibilitiesRequest]) (*connect.Response[v1.UpdateMarkingResultVisibilitiesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.MarkService.UpdateMarkingResultVisibilities is not implemented"))
 }

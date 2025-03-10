@@ -149,11 +149,11 @@ func (t *Team) Delete(ctx context.Context, effect TeamDeleter) error {
 // チームの操作のためのインターフェース
 type (
 	TeamData struct {
-		ID           uuid.UUID
-		Code         int64
-		Name         string
-		Organization string
-		MaxMembers   uint
+		ID           uuid.UUID `json:"id"`
+		Code         int64     `json:"code"`
+		Name         string    `json:"name"`
+		Organization string    `json:"organization"`
+		MaxMembers   uint      `json:"max_members"`
 	}
 	TeamsLister interface {
 		ListTeams(ctx context.Context) ([]*TeamData, error)
