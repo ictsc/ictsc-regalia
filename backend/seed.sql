@@ -57,10 +57,10 @@ INSERT INTO descriptive_answers (answer_id, body) VALUES
 	('abbe9c4e-eef5-40ac-a04e-6d8877b15185', '問題Bへのチーム1の解答1');
 
 TRUNCATE TABLE marking_results CASCADE;
-INSERT INTO marking_results (id, answer_id, judge_name, created_at) VALUES
-	('862b646a-5fdd-4a77-bb2d-7ef5d4f1d069', '7cedf13e-5325-425e-a5d6-fea5fc127e49', 'judge', '2025-02-03 01:00:00+00'),
-	('358ebef7-c626-44fa-9a3d-da2d9083fe5e', '7cedf13e-5325-425e-a5d6-fea5fc127e49', 'judge', '2025-02-03 01:30:00+00'),
-	('87cb974d-dedd-4039-a189-b34f3a57e62c', 'abbe9c4e-eef5-40ac-a04e-6d8877b15185', 'judge', '2025-02-03 01:20:00+00');
+INSERT INTO marking_results (id, answer_id, judge_name, visibility, created_at) VALUES
+	('862b646a-5fdd-4a77-bb2d-7ef5d4f1d069', '7cedf13e-5325-425e-a5d6-fea5fc127e49', 'judge', 'PUBLIC',  '2025-02-03 01:00:00+00'),
+	('358ebef7-c626-44fa-9a3d-da2d9083fe5e', '7cedf13e-5325-425e-a5d6-fea5fc127e49', 'judge', 'PRIVATE', '2025-02-03 01:30:00+00'),
+	('87cb974d-dedd-4039-a189-b34f3a57e62c', 'abbe9c4e-eef5-40ac-a04e-6d8877b15185', 'judge', 'PUBLIC',  '2025-02-03 01:20:00+00');
 
 TRUNCATE TABLE scores CASCADE;
 INSERT INTO scores (marking_result_id, marked_score) VALUES
