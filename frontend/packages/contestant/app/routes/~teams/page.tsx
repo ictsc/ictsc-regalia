@@ -16,7 +16,7 @@ export function TeamsPage(props: TeamListProps) {
   };
 
   return (
-    <>
+    <div className="pt-64">
       {props.teamProfile.map((team, index) => {
         return (
           <div
@@ -86,6 +86,6 @@ export function TeamsPage(props: TeamListProps) {
           </div>
         );
       })}
-    </>
+    </div>
   );
 }
