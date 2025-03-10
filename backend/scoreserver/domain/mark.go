@@ -130,18 +130,18 @@ func (a *Answer) Mark(ctx context.Context, eff MarkingResultWriter, now time.Tim
 
 type (
 	MarkingResultData struct {
-		ID        uuid.UUID
-		Judge     string
-		Answer    *AnswerData
-		Score     *ScoreData
-		Rationale *MarkingRationaleData
-		CreatedAt time.Time
+		ID        uuid.UUID             `json:"id"`
+		Judge     string                `json:"judge"`
+		Answer    *AnswerData           `json:"answer"`
+		Score     *ScoreData            `json:"score"`
+		Rationale *MarkingRationaleData `json:"rationale"`
+		CreatedAt time.Time             `json:"created_at"`
 	}
 	ScoreData struct {
-		MarkedScore uint32
+		MarkedScore uint32 `json:"marked_score"`
 	}
 	MarkingRationaleData struct {
-		DescriptiveComment string
+		DescriptiveComment string `json:"descriptive_comment,omitempty"`
 	}
 
 	MarkingResultReader interface {

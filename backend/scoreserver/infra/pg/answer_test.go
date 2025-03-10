@@ -8,8 +8,8 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/gofrs/uuid/v5"
-	"github.com/google/go-cmp/cmp"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/pgtest"
+	"github.com/ictsc/ictsc-regalia/backend/pkg/snaptest"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 )
@@ -17,87 +17,6 @@ import (
 func TestListAnswers(t *testing.T) {
 	t.Parallel()
 
-	expected := []*domain.AnswerData{
-		{
-			ID:     uuid.FromStringOrNil("4bb7a232-e0de-4b6d-b1a3-8e50737d73b2"),
-			Number: 2,
-			Team: &domain.TeamData{
-				ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-				Code:         1,
-				Name:         "トラブルシューターズ",
-				Organization: "ICTSC Association",
-				MaxMembers:   6,
-			},
-			Problem: &domain.ProblemData{
-				ID:           uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
-				Code:         "ZZA",
-				ProblemType:  domain.ProblemTypeDescriptive,
-				Title:        "問題A",
-				MaxScore:     100,
-				RedeployRule: domain.RedeployRuleUnredeployable,
-			},
-			Author: &domain.UserData{
-				ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-				Name: "alice",
-			},
-			CreatedAt: time.Date(2025, 2, 3, 0, 30, 0, 0, time.UTC),
-			Interval:  20 * time.Minute,
-		},
-		{
-			ID:     uuid.FromStringOrNil("7cedf13e-5325-425e-a5d6-fea5fc127e49"),
-			Number: 1,
-			Team: &domain.TeamData{
-				ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-				Code:         1,
-				Name:         "トラブルシューターズ",
-				Organization: "ICTSC Association",
-				MaxMembers:   6,
-			},
-			Problem: &domain.ProblemData{
-				ID:           uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
-				Code:         "ZZA",
-				ProblemType:  domain.ProblemTypeDescriptive,
-				Title:        "問題A",
-				MaxScore:     100,
-				RedeployRule: domain.RedeployRuleUnredeployable,
-			},
-			Author: &domain.UserData{
-				ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-				Name: "alice",
-			},
-			CreatedAt: time.Date(2025, 2, 3, 0, 0, 0, 0, time.UTC),
-			Interval:  20 * time.Minute,
-		},
-		{
-			ID:     uuid.FromStringOrNil("abbe9c4e-eef5-40ac-a04e-6d8877b15185"),
-			Number: 1,
-			Team: &domain.TeamData{
-				ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-				Code:         1,
-				Name:         "トラブルシューターズ",
-				Organization: "ICTSC Association",
-				MaxMembers:   6,
-			},
-			Problem: &domain.ProblemData{
-				ID:           uuid.FromStringOrNil("24f6aef0-5dcd-4032-825b-d1b19174a6f2"),
-				Code:         "ZZB",
-				ProblemType:  domain.ProblemTypeDescriptive,
-				Title:        "問題B",
-				MaxScore:     200,
-				RedeployRule: domain.RedeployRulePercentagePenalty,
-				PercentagePenalty: &domain.RedeployPenaltyPercentage{
-					Threshold:  2,
-					Percentage: 10,
-				},
-			},
-			Author: &domain.UserData{
-				ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-				Name: "alice",
-			},
-			CreatedAt: time.Date(2025, 2, 3, 0, 0, 0, 0, time.UTC),
-			Interval:  20 * time.Minute,
-		},
-	}
 	repo := pg.NewRepository(pgtest.SetupDB(t))
 	actual, err := repo.ListAnswers(t.Context())
 	if err != nil {
@@ -106,9 +25,7 @@ func TestListAnswers(t *testing.T) {
 	slices.SortStableFunc(actual, func(lhs, rhs *domain.AnswerData) int {
 		return strings.Compare(lhs.ID.String(), rhs.ID.String())
 	})
-	if diff := cmp.Diff(expected, actual); diff != "" {
-		t.Errorf("unexpected result (-want +got):\n%s", diff)
-	}
+	snaptest.Match(t, actual)
 }
 
 func TestListAnswersByTeamProblem(t *testing.T) {
@@ -117,64 +34,10 @@ func TestListAnswersByTeamProblem(t *testing.T) {
 	cases := map[string]struct {
 		teamCode    int64
 		problemCode string
-
-		wants []*domain.AnswerData
 	}{
 		"ok": {
 			teamCode:    1,
 			problemCode: "ZZA",
-			wants: []*domain.AnswerData{
-				{
-					ID:     uuid.FromStringOrNil("7cedf13e-5325-425e-a5d6-fea5fc127e49"),
-					Number: 1,
-					Team: &domain.TeamData{
-						ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-						Code:         1,
-						Name:         "トラブルシューターズ",
-						Organization: "ICTSC Association",
-						MaxMembers:   6,
-					},
-					Problem: &domain.ProblemData{
-						ID:           uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
-						Code:         "ZZA",
-						ProblemType:  domain.ProblemTypeDescriptive,
-						Title:        "問題A",
-						MaxScore:     100,
-						RedeployRule: domain.RedeployRuleUnredeployable,
-					},
-					Author: &domain.UserData{
-						ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-						Name: "alice",
-					},
-					CreatedAt: time.Date(2025, 2, 3, 0, 0, 0, 0, time.UTC),
-					Interval:  20 * time.Minute,
-				},
-				{
-					ID:     uuid.FromStringOrNil("4bb7a232-e0de-4b6d-b1a3-8e50737d73b2"),
-					Number: 2,
-					Team: &domain.TeamData{
-						ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-						Code:         1,
-						Name:         "トラブルシューターズ",
-						Organization: "ICTSC Association",
-						MaxMembers:   6,
-					},
-					Problem: &domain.ProblemData{
-						ID:           uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
-						Code:         "ZZA",
-						ProblemType:  domain.ProblemTypeDescriptive,
-						Title:        "問題A",
-						MaxScore:     100,
-						RedeployRule: domain.RedeployRuleUnredeployable,
-					},
-					Author: &domain.UserData{
-						ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-						Name: "alice",
-					},
-					CreatedAt: time.Date(2025, 2, 3, 0, 30, 0, 0, time.UTC),
-					Interval:  20 * time.Minute,
-				},
-			},
 		},
 	}
 
@@ -187,9 +50,7 @@ func TestListAnswersByTeamProblem(t *testing.T) {
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
-			if diff := cmp.Diff(tt.wants, actual); diff != "" {
-				t.Errorf("unexpected result (-want +got):\n%s", diff)
-			}
+			snaptest.Match(t, actual)
 		})
 	}
 }
@@ -202,37 +63,10 @@ func TestGetLatestAnswersByTeamProblem(t *testing.T) {
 		problemID uuid.UUID
 
 		wantErr error
-		wants   *domain.AnswerData
 	}{
 		"exists": {
 			teamID:    uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
 			problemID: uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
-
-			wants: &domain.AnswerData{
-				ID:     uuid.FromStringOrNil("4bb7a232-e0de-4b6d-b1a3-8e50737d73b2"),
-				Number: 2,
-				Team: &domain.TeamData{
-					ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-					Code:         1,
-					Name:         "トラブルシューターズ",
-					Organization: "ICTSC Association",
-					MaxMembers:   6,
-				},
-				Problem: &domain.ProblemData{
-					ID:           uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
-					Code:         "ZZA",
-					ProblemType:  domain.ProblemTypeDescriptive,
-					Title:        "問題A",
-					MaxScore:     100,
-					RedeployRule: domain.RedeployRuleUnredeployable,
-				},
-				Author: &domain.UserData{
-					ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-					Name: "alice",
-				},
-				CreatedAt: time.Date(2025, 2, 3, 0, 30, 0, 0, time.UTC),
-				Interval:  20 * time.Minute,
-			},
 		},
 		"not found": {
 			teamID:    uuid.FromStringOrNil("83027d5e-fa32-41d6-b290-fc38ba337f89"),
@@ -254,9 +88,7 @@ func TestGetLatestAnswersByTeamProblem(t *testing.T) {
 			if err != nil {
 				return
 			}
-			if diff := cmp.Diff(tt.wants, actual); diff != "" {
-				t.Errorf("unexpected result (-want +got):\n%s", diff)
-			}
+			snaptest.Match(t, actual)
 		})
 	}
 }
@@ -270,45 +102,11 @@ func TestGetAnswerDetail(t *testing.T) {
 		answerNumber uint32
 
 		wantErr error
-		wants   *domain.AnswerDetailData
 	}{
 		"ok": {
 			teamCode:     1,
 			problemCode:  "ZZA",
 			answerNumber: 1,
-
-			wants: &domain.AnswerDetailData{
-				Answer: &domain.AnswerData{
-					ID:     uuid.FromStringOrNil("7cedf13e-5325-425e-a5d6-fea5fc127e49"),
-					Number: 1,
-					Team: &domain.TeamData{
-						ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-						Code:         1,
-						Name:         "トラブルシューターズ",
-						Organization: "ICTSC Association",
-						MaxMembers:   6,
-					},
-					Problem: &domain.ProblemData{
-						ID:           uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
-						Code:         "ZZA",
-						ProblemType:  domain.ProblemTypeDescriptive,
-						Title:        "問題A",
-						MaxScore:     100,
-						RedeployRule: domain.RedeployRuleUnredeployable,
-					},
-					Author: &domain.UserData{
-						ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-						Name: "alice",
-					},
-					CreatedAt: time.Date(2025, 2, 3, 0, 0, 0, 0, time.UTC),
-					Interval:  20 * time.Minute,
-				},
-				Body: &domain.AnswerBodyData{
-					Descriptive: &domain.DescriptiveAnswerBodyData{
-						Body: "問題Aへのチーム1の解答1",
-					},
-				},
-			},
 		},
 		"not found": {
 			teamCode:     1,
@@ -331,9 +129,7 @@ func TestGetAnswerDetail(t *testing.T) {
 			if err != nil {
 				return
 			}
-			if diff := cmp.Diff(tt.wants, actual); diff != "" {
-				t.Errorf("unexpected result (-want +got):\n%s", diff)
-			}
+			snaptest.Match(t, actual)
 		})
 	}
 }

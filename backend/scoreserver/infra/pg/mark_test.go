@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/google/go-cmp/cmp"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/pgtest"
+	"github.com/ictsc/ictsc-regalia/backend/pkg/snaptest"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 )
@@ -24,49 +24,7 @@ func TestListMarkingResults(t *testing.T) {
 	slices.SortStableFunc(actual, func(i, j *domain.MarkingResultData) int {
 		return i.CreatedAt.Compare(j.CreatedAt)
 	})
-
-	expected := []*domain.MarkingResultData{
-		{
-			ID:    uuid.FromStringOrNil("862b646a-5fdd-4a77-bb2d-7ef5d4f1d069"),
-			Judge: "judge",
-			Answer: &domain.AnswerData{
-				ID:     uuid.FromStringOrNil("7cedf13e-5325-425e-a5d6-fea5fc127e49"),
-				Number: 1,
-				Team: &domain.TeamData{
-					ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-					Code:         1,
-					Name:         "トラブルシューターズ",
-					Organization: "ICTSC Association",
-					MaxMembers:   6,
-				},
-				Problem: &domain.ProblemData{
-					ID:           uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
-					Code:         "ZZA",
-					ProblemType:  domain.ProblemTypeDescriptive,
-					Title:        "問題A",
-					MaxScore:     100,
-					RedeployRule: domain.RedeployRuleUnredeployable,
-				},
-				Author: &domain.UserData{
-					ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-					Name: "alice",
-				},
-				CreatedAt: time.Date(2025, 2, 3, 0, 0, 0, 0, time.UTC),
-				Interval:  20 * time.Minute,
-			},
-			Score: &domain.ScoreData{
-				MarkedScore: 80,
-			},
-			Rationale: &domain.MarkingRationaleData{
-				DescriptiveComment: "問題Aへのチーム1の解答1の採点理由",
-			},
-			CreatedAt: time.Date(2025, 2, 3, 1, 0, 0, 0, time.UTC),
-		},
-	}
-
-	if diff := cmp.Diff(expected, actual); diff != "" {
-		t.Errorf("(-expected, +actual)\n%s", diff)
-	}
+	snaptest.Match(t, actual)
 }
 
 func TestCreateMarkingResult(t *testing.T) {

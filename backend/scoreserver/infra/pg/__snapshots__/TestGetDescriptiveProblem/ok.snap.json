@@ -1,0 +1,16 @@
+{
+  "problem": {
+    "id": "16643c32-c686-44ba-996b-2fbe43b54513",
+    "code": "ZZA",
+    "problem_type": "Descriptive",
+    "title": "問題A",
+    "max_score": 100,
+    "redeploy_rule": "Unredeployable"
+  },
+  "content": {
+    "page_id": "page1",
+    "page_path": "/page1",
+    "body": "問題Aの本文",
+    "explanation": "問題Aの解説"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "user": {
+    "id": "3a4ca027-5e02-4ade-8e2d-eddb39adc235",
+    "name": "alice"
+  },
+  "team": {
+    "id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+    "code": 1,
+    "name": "トラブルシューターズ",
+    "organization": "ICTSC Association",
+    "max_members": 6
+  }
+}
