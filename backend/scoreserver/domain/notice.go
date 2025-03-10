@@ -22,12 +22,12 @@ type notice struct {
 }
 
 type NoticeData struct {
-	ID             uuid.UUID
-	Path           string
-	Title          string
-	Markdown       string
-	EffectiveFrom  *time.Time
-	EffectiveUntil *time.Time
+	ID             uuid.UUID  `json:"id"`
+	Path           string     `json:"path"`
+	Title          string     `json:"title"`
+	Markdown       string     `json:"markdown"`
+	EffectiveFrom  *time.Time `json:"effective_from"`
+	EffectiveUntil *time.Time `json:"effective_until"`
 }
 
 func (n *Notice) ID() uuid.UUID {

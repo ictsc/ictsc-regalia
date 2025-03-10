@@ -1,19 +1,79 @@
-import { useReducer, useId, type ActionDispatch } from "react";
+import {
+  useReducer,
+  useId,
+  type ActionDispatch,
+  useEffect,
+  useState,
+} from "react";
 import { Field, Label, Textarea } from "@headlessui/react";
 import { MaterialSymbol } from "../../components/material-symbol";
 
+interface AnswerableState {
+  remainingSeconds: number;
+}
+
+function formatRemainingTimeParts(remainingSeconds: number) {
+  const minutes = Math.floor(remainingSeconds / 60);
+  const seconds = remainingSeconds % 60;
+  return { minutes, seconds };
+}
+
+function useAnswerable(
+  lastSubmittedAt?: string,
+  submitInterval?: number,
+): AnswerableState {
+  const [state, setState] = useState<AnswerableState>({ remainingSeconds: 0 });
+
+  useEffect(() => {
+    if (!lastSubmittedAt || !submitInterval) {
+      setState({ remainingSeconds: 0 });
+      return;
+    }
+
+    const checkAnswerable = () => {
+      const now = new Date();
+      const lastSubmit = new Date(lastSubmittedAt);
+      const nextSubmitTime = new Date(
+        lastSubmit.getTime() + submitInterval * 1000,
+      );
+
+      const diffMs = nextSubmitTime.getTime() - now.getTime();
+      const diffSec = Math.ceil(diffMs / 1000);
+
+      const remainingSeconds = diffSec > 0 ? diffSec : 0;
+
+      setState({ remainingSeconds });
+    };
+
+    checkAnswerable();
+    const interval = setInterval(checkAnswerable, 1000);
+    return () => clearInterval(interval);
+  }, [lastSubmittedAt, submitInterval]);
+
+  return state;
+}
+
 export function SubmissionForm(props: {
   readonly action: (answer: string) => Promise<"success" | "failure">;
+  readonly submitInterval?: number;
+  readonly lastSubmittedAt?: string;
 }) {
   const [error, dispatchError] = useReducer<FormErrorState, [FormErrorAction]>(
     reduceFormError,
     null,
   );
+  const { remainingSeconds } = useAnswerable(
+    props.lastSubmittedAt,
+    props.submitInterval,
+  );
+  const isAnswerable = remainingSeconds <= 0;
+
   return (
     <form
       className="flex size-full flex-col"
       onReset={() => dispatchError("reset")}
       action={async (data) => {
+        if (!isAnswerable) return;
         const answer = data.get("answer");
         if (typeof answer !== "string") {
           return;
@@ -29,7 +89,12 @@ export function SubmissionForm(props: {
         }
       }}
     >
-      <SubmissionFormInner error={error} dispatchError={dispatchError} />
+      <SubmissionFormInner
+        error={error}
+        dispatchError={dispatchError}
+        isAnswerable={isAnswerable}
+        remainingSeconds={remainingSeconds}
+      />
     </form>
   );
 }
@@ -54,11 +119,17 @@ function reduceFormError(
 function SubmissionFormInner({
   error,
   dispatchError,
+  isAnswerable,
+  remainingSeconds,
 }: {
   error: FormErrorState;
   dispatchError: ActionDispatch<[FormErrorAction]>;
+  isAnswerable: boolean;
+  remainingSeconds: number;
 }) {
   const submitLabelID = useId();
+  const { minutes, seconds } = formatRemainingTimeParts(remainingSeconds);
+
   return (
     <>
       <Field className="flex flex-1">
@@ -83,8 +154,28 @@ function SubmissionFormInner({
           }}
         />
       </Field>
-      <div className="mt-20 flex items-center justify-end gap-16">
-        {error != null && (
+
+      <div className="mt-20 flex items-center justify-end gap-24">
+        {!isAnswerable && (
+          <label
+            id={submitLabelID}
+            className="flex w-[160px] items-center justify-between"
+          >
+            <span className="text-black text-16">解答可能まで</span>
+            <div className="flex items-center">
+              <span className="w-[24px] text-right text-20 font-bold text-primary">
+                {minutes}
+              </span>
+              <span className="mx-2 text-20 font-bold text-primary">:</span>
+              <span className="w-[24px] text-right text-20 font-bold text-primary">
+                {seconds.toString().padStart(2, "0")}
+              </span>
+            </div>
+          </label>
+        )}
+
+        {/* 回答可かつエラーがある場合 */}
+        {isAnswerable && error != null && (
           <label
             id={submitLabelID}
             className="flex-shrink text-16 font-bold text-primary"
@@ -92,10 +183,12 @@ function SubmissionFormInner({
             {error}
           </label>
         )}
+
         <button
           aria-labelledby={submitLabelID}
           type="submit"
-          className="flex items-center justify-center self-end rounded-12 bg-surface-2 py-16 pl-24 pr-20 shadow-md transition hover:opacity-80 active:shadow-none"
+          disabled={!isAnswerable}
+          className="flex items-center justify-center self-end rounded-12 bg-surface-2 py-16 pl-24 pr-20 shadow-md transition hover:opacity-80 active:shadow-none disabled:bg-disabled"
         >
           <div className="text-16 font-bold">解答する</div>
           <MaterialSymbol icon="send" size={24} />

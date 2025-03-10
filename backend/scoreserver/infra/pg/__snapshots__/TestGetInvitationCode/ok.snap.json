@@ -1,0 +1,13 @@
+{
+  "id": "ad3f83d3-65be-4884-8a03-adb11a8127ef",
+  "team": {
+    "id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+    "code": 1,
+    "name": "トラブルシューターズ",
+    "organization": "ICTSC Association",
+    "max_members": 6
+  },
+  "code": "LHNZXGSF7L59WCG9",
+  "expires_at": "2038-04-03T00:00:00+09:00",
+  "created_at": "2025-02-02T17:10:00+09:00"
+}

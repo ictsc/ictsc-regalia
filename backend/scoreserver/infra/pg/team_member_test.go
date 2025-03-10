@@ -7,6 +7,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/pgtest"
+	"github.com/ictsc/ictsc-regalia/backend/pkg/snaptest"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 	"github.com/jmoiron/sqlx"
@@ -17,24 +18,10 @@ func TestGetTeamMember(t *testing.T) {
 
 	cases := map[string]struct {
 		inUserID uuid.UUID
-		wants    *domain.TeamMemberData
 		wantErr  error
 	}{
 		"ok": {
 			inUserID: uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-			wants: &domain.TeamMemberData{
-				User: &domain.UserData{
-					ID:   uuid.FromStringOrNil("3a4ca027-5e02-4ade-8e2d-eddb39adc235"),
-					Name: "alice",
-				},
-				Team: &domain.TeamData{
-					ID:           uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-					Code:         1,
-					Name:         "トラブルシューターズ",
-					Organization: "ICTSC Association",
-					MaxMembers:   6,
-				},
-			},
 		},
 		"not found": {
 			inUserID:/* bob */ uuid.FromStringOrNil("c4530ce6-d990-4414-8389-feca26883115"),
@@ -59,9 +46,7 @@ func TestGetTeamMember(t *testing.T) {
 				return
 			}
 
-			if diff := cmp.Diff(tt.wants, got); diff != "" {
-				t.Errorf("mismatch (-want +got):\n%s", diff)
-			}
+			snaptest.Match(t, got)
 		})
 	}
 }

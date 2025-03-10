@@ -18,7 +18,7 @@ message Answer {
   Problem problem = 4;
   AnswerBody body = 5;
   google.protobuf.Timestamp created_at = 6;
-  optional MarkingResult result = 7;
+  optional MarkingScore score = 7;
 }
 
 message AnswerBody {
@@ -39,6 +39,22 @@ message MarkingResult {
   uint32 score = 3;
   MarkingRationale rationale = 4;
   google.protobuf.Timestamp created_at = 5;
+  MarkingResultVisibility visibility = 7;
+}
+
+enum MarkingResultVisibility {
+  MARKING_RESULT_VISIBILITY_UNSPECIFIED = 0;
+  // 参加者に見える
+  MARKING_RESULT_VISIBILITY_PUBLIC = 1;
+  // 参加者に見えない
+  MARKING_RESULT_VISIBILITY_PRIVATE = 2;
+}
+
+message MarkingScore {
+  uint32 total = 1;
+  uint32 marked = 2;
+  uint32 penalty = 3;
+  uint32 max = 4;
 }
 
 message MarkingRationale {
@@ -69,7 +85,9 @@ message GetAnswerResponse {
   Answer answer = 1;
 }
 
-message ListMarkingResultsRequest {}
+message ListMarkingResultsRequest {
+  MarkingResultVisibility visibility = 1;
+}
 message ListMarkingResultsResponse {
   repeated MarkingResult marking_results = 1;
 }
@@ -81,9 +99,14 @@ message CreateMarkingResultResponse {
   MarkingResult marking_result = 1;
 }
 
+// ビジネスロジックに沿って、採点結果の可視性を更新する
+message UpdateMarkingResultVisibilitiesRequest {}
+message UpdateMarkingResultVisibilitiesResponse {}
+
 service MarkService {
   rpc ListAnswers(ListAnswersRequest) returns (ListAnswersResponse);
   rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
   rpc ListMarkingResults(ListMarkingResultsRequest) returns (ListMarkingResultsResponse);
   rpc CreateMarkingResult(CreateMarkingResultRequest) returns (CreateMarkingResultResponse);
+  rpc UpdateMarkingResultVisibilities(UpdateMarkingResultVisibilitiesRequest) returns (UpdateMarkingResultVisibilitiesResponse);
 }
