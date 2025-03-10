@@ -251,7 +251,6 @@ func (r *problemContentRow) data() *domain.ProblemContentData {
 	}
 }
 
-//nolint:recvcheck // 値に対して Valuer を実装するため
 type problemType domain.ProblemType
 
 var (
@@ -285,7 +284,6 @@ func (t problemType) Value() (driver.Value, error) {
 	}
 }
 
-//nolint:recvcheck // 値に対して Valuer を実装するため
 type redployRule domain.RedeployRule
 
 var (
