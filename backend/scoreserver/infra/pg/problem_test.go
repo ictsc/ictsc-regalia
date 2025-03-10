@@ -109,6 +109,7 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 					ProblemType:  domain.ProblemTypeDescriptive,
 					Title:        "test",
 					MaxScore:     100,
+					Category:     "Network",
 					RedeployRule: domain.RedeployRuleUnredeployable,
 				},
 				Content: &domain.ProblemContentData{
@@ -124,7 +125,7 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 					id = '3a4d8197-09f4-4bb0-9255-a8b6a943a36c' AND
 					code = 'ZZZ' AND type = 'DESCRIPTIVE' AND
 					title = 'test' AND max_score = 100 AND
-					redeploy_rule = 'UNREDEPLOYABLE'`,
+					category = 'Network' AND redeploy_rule = 'UNREDEPLOYABLE'`,
 				"content": `
 					SELECT 1 FROM problem_contents WHERE
 					problem_id = '3a4d8197-09f4-4bb0-9255-a8b6a943a36c' AND
@@ -140,6 +141,7 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 					ProblemType:  domain.ProblemTypeDescriptive,
 					Title:        "問題Q",
 					MaxScore:     200,
+					Category:     "Server",
 					RedeployRule: domain.RedeployRulePercentagePenalty,
 					PercentagePenalty: &domain.RedeployPenaltyPercentage{
 						Threshold: 2, Percentage: 10,
@@ -158,7 +160,7 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 					id = '16643c32-c686-44ba-996b-2fbe43b54513' AND
 					code = 'ZZQ' AND type = 'DESCRIPTIVE' AND
 					title = '問題Q' AND max_score = 200 AND
-					redeploy_rule = 'PERCENTAGE_PENALTY'`,
+					category = 'Server' AND redeploy_rule = 'PERCENTAGE_PENALTY'`,
 				"content": `
 					SELECT 1 FROM problem_contents WHERE
 					problem_id = '16643c32-c686-44ba-996b-2fbe43b54513' AND

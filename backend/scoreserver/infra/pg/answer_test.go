@@ -160,6 +160,7 @@ func TestCreateAnswer(t *testing.T) {
 						ProblemType:  domain.ProblemTypeDescriptive,
 						Title:        "問題A",
 						MaxScore:     100,
+						Category:     "Network",
 						RedeployRule: domain.RedeployRuleUnredeployable,
 					},
 					Author: &domain.UserData{

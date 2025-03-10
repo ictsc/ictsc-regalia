@@ -61,6 +61,7 @@ func (h *ProblemServiceHandler) ListProblems(
 			Code:     string(problem.Code()),
 			Title:    problem.Title(),
 			MaxScore: problem.MaxScore(),
+			Category: problem.Category(),
 			Deployment: &contestantv1.Deployment{
 				Redeployable: problem.Redeployable(),
 			},
@@ -106,6 +107,7 @@ func (h *ProblemServiceHandler) GetProblem(
 		Code:     string(detail.Code()),
 		Title:    detail.Title(),
 		MaxScore: detail.MaxScore(),
+		Category: detail.Category(),
 		Deployment: &contestantv1.Deployment{
 			Redeployable: detail.Redeployable(),
 		},
