@@ -208,12 +208,21 @@ func (h *MarkServiceHandler) CreateMarkingResult(
 }
 
 func convertAnswer(answer *domain.Answer) *adminv1.Answer {
-	return &adminv1.Answer{
+	proto := &adminv1.Answer{
 		Id:        answer.Number(),
 		Team:      convertTeam(answer.Team()),
 		Problem:   convertProblem(answer.Problem()),
 		CreatedAt: timestamppb.New(answer.CreatedAt()),
 	}
+	if score := answer.Score(); score != nil {
+		proto.Score = &adminv1.MarkingScore{
+			Total:   score.TotalScore(),
+			Marked:  score.MarkedScore(),
+			Penalty: score.Penalty(),
+			Max:     score.MaxScore(),
+		}
+	}
+	return proto
 }
 
 func convertMarkingResult(markingResult *domain.MarkingResult) *adminv1.MarkingResult {
