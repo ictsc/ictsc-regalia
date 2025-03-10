@@ -2,6 +2,7 @@ import { startTransition, Suspense, use, useDeferredValue } from "react";
 import { createLazyFileRoute, useRouter } from "@tanstack/react-router";
 import type { ProblemDetail } from "../../features/problem";
 import type { Answer } from "../../features/answer";
+import { protoScoreToProps } from "../../features/score";
 import * as View from "./page";
 
 export const Route = createLazyFileRoute("/problems/$code")({
@@ -14,6 +15,8 @@ function RouteComponent() {
 
   const redeployable = useRedeployable(problem);
   const deferredMetadata = use(useDeferredValue(metadata));
+
+  const deferredAnswers = useDeferredValue(answers);
 
   return (
     <View.Page
@@ -40,7 +43,11 @@ function RouteComponent() {
       }
       submissionList={
         <Suspense>
-          <SubmissionList answersPromise={answers} />
+          <SubmissionList
+            isPending={deferredAnswers != answers}
+            problemPromise={problem}
+            answersPromise={deferredAnswers}
+          />
         </Suspense>
       }
     />
@@ -57,19 +64,24 @@ function Content(props: { problem: Promise<ProblemDetail> }) {
   return <View.Content {...problem} />;
 }
 
-function SubmissionList(props: { answersPromise: Promise<Answer[]> }) {
-  const answers = use(useDeferredValue(props.answersPromise));
+function SubmissionList(props: {
+  isPending: boolean;
+  problemPromise: Promise<ProblemDetail>;
+  answersPromise: Promise<Answer[]>;
+}) {
+  const problem = use(useDeferredValue(props.problemPromise));
+  const answers = use(props.answersPromise);
   if (answers.length === 0) {
     return <View.EmptySubmissionList />;
   }
   return (
-    <View.SubmissionList>
+    <View.SubmissionList isPending={props.isPending}>
       {answers.map((answer) => (
         <View.SubmissionListItem
           key={answer.id}
           id={answer.id}
           submittedAt={answer.submittedAt}
-          score={{ maxScore: 100 }}
+          score={protoScoreToProps(problem.maxScore, answer?.score)}
         />
       ))}
     </View.SubmissionList>
