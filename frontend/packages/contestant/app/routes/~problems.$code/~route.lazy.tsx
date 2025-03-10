@@ -3,6 +3,7 @@ import { createLazyFileRoute, useRouter } from "@tanstack/react-router";
 import type { ProblemDetail } from "../../features/problem";
 import type { Answer } from "../../features/answer";
 import * as View from "./page";
+import { Deployment } from "@app/features/problem/deployment";
 
 export const Route = createLazyFileRoute("/problems/$code")({
   component: RouteComponent,
@@ -39,13 +40,18 @@ function RouteComponent() {
           <SubmissionList answersPromise={answers} />
         </Suspense>
       }
+      deploymentList={
+        <Suspense>
+          <DeploymentList problem={problem} />
+        </Suspense>
+      }
     />
   );
 }
 
 function useRedeployable(problemPromise: Promise<ProblemDetail>) {
   const problem = use(useDeferredValue(problemPromise));
-  return problem.redeployable;
+  return problem.deployment.redeployable;
 }
 
 function Content(props: { problem: Promise<ProblemDetail> }) {
@@ -56,10 +62,10 @@ function Content(props: { problem: Promise<ProblemDetail> }) {
 function SubmissionList(props: { answersPromise: Promise<Answer[]> }) {
   const answers = use(useDeferredValue(props.answersPromise));
   if (answers.length === 0) {
-    return <View.EmptySubmissionList />;
+    return <View.EmptyListContainer message="解答はまだありません！" />;
   }
   return (
-    <View.SubmissionList>
+    <View.ListContainer>
       {answers.map((answer) => (
         <View.SubmissionListItem
           key={answer.id}
@@ -68,6 +74,35 @@ function SubmissionList(props: { answersPromise: Promise<Answer[]> }) {
           score={{ maxScore: 100 }}
         />
       ))}
-    </View.SubmissionList>
+    </View.ListContainer>
+  );
+}
+
+function DeploymentList(props: { problem: Promise<ProblemDetail> }) {
+  const problem = use(useDeferredValue(props.problem));
+  const deployment: Deployment = problem.deployment;
+
+  if (deployment.events.length === 0) {
+    return <View.EmptyListContainer message="再展開はまだありません" />;
+  }
+  const latestEvent = deployment.events[0];
+  return (
+    <View.ListContainer>
+      {deployment.events.map((event) => (
+        <View.DeploymentListItem
+          key={event.revision}
+          event={event}
+          maxRedeployment={deployment.maxRedeployment}
+          deploymentDetail={{
+            revision: event.revision,
+            remainingRedeploys: deployment.maxRedeployment - event.revision,
+            exceededRedeployLimit: event.revision > deployment.maxRedeployment,
+            totalPenalty: event.totalPenalty,
+          }}
+          isDeploying={event.isDeploying}
+          isLatest={event.revision === latestEvent.revision}
+        />
+      ))}
+    </View.ListContainer>
   );
 }

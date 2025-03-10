@@ -3,10 +3,11 @@ import { action } from "@storybook/addon-actions";
 import {
   Page,
   Content,
-  SubmissionList,
   SubmissionListItem,
-  EmptySubmissionList,
   SubmissionForm,
+  DeploymentListItem,
+  ListContainer,
+  EmptyListContainer,
 } from "./page";
 
 export default {
@@ -25,7 +26,7 @@ export default {
     </div>
   ),
   args: {
-    redeployable: false,
+    redeployable: true,
     content: (
       <Content
         code="AAA"
@@ -65,7 +66,7 @@ export default {
       />
     ),
     submissionList: (
-      <SubmissionList>
+      <ListContainer>
         {Array.from({ length: 10 }).map((_, i) => (
           <SubmissionListItem
             key={i}
@@ -74,8 +75,71 @@ export default {
             score={{ maxScore: 100 }}
           />
         ))}
-      </SubmissionList>
+      </ListContainer>
     ),
+    deploymentList: (() => {
+      return (
+        <ListContainer>
+          <DeploymentListItem
+            key={3}
+            event={{
+              revision: 3,
+              occuredAt: "2021-01-10T12:00:00Z",
+              totalPenalty: -50,
+              type: "展開中",
+              isDeploying: true,
+            }}
+            maxRedeployment={2}
+            deploymentDetail={{
+              revision: 3,
+              remainingRedeploys: -1,
+              exceededRedeployLimit: true,
+              totalPenalty: -30,
+            }}
+            isDeploying={true}
+            isLatest={true}
+          />
+          <DeploymentListItem
+            key={2}
+            event={{
+              revision: 2,
+              occuredAt: "2021-01-10T11:00:00Z",
+              totalPenalty: 0,
+              type: "展開完了",
+              isDeploying: true,
+            }}
+            maxRedeployment={2}
+            deploymentDetail={{
+              revision: 2,
+              remainingRedeploys: 0,
+              exceededRedeployLimit: false,
+              totalPenalty: 0,
+            }}
+            isDeploying={false}
+            isLatest={false}
+          />
+          <DeploymentListItem
+            key={1}
+            event={{
+              revision: 2,
+              occuredAt: "2021-01-10T10:00:00Z",
+              totalPenalty: 0,
+              type: "展開完了",
+              isDeploying: true,
+            }}
+            maxRedeployment={2}
+            deploymentDetail={{
+              revision: 1,
+              remainingRedeploys: 1,
+              exceededRedeployLimit: false,
+              totalPenalty: 0,
+            }}
+            isDeploying={false}
+            isLatest={false}
+          />
+        </ListContainer>
+      );
+    })(),
   },
 } as Meta<typeof Page>;
 
@@ -86,6 +150,6 @@ const submitAction = action("submit");
 export const Default = {} as Story;
 export const Empty = {
   args: {
-    submissionList: <EmptySubmissionList />,
+    submissionList: <EmptyListContainer message={""} />,
   },
 } as Story;
