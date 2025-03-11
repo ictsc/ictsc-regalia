@@ -36,6 +36,7 @@
     "@ictsc/proto": "workspace:*",
     "@mantine/core": "^7.17.1",
     "@mantine/hooks": "^7.17.1",
+    "@mantine/notifications": "^7.17.1",
     "@tanstack/react-router": "^1.49.2",
     "@tanstack/router-devtools": "^1.49.2",
     "clsx": "^2.1.1",

@@ -12,6 +12,10 @@ export PGUSER=ictsc
 export PGPASSWORD=password
 export PGDATABASE=ictscore
 export PGSSLMODE=disable
+export DISCORD_CLIENT_ID=1342118538118430750
+export DISCORD_CLIENT_SECRET=EIrvA0PU-x2VTmpB1mXFta-kQ5yW9q1c
+export GROWI_BASE_URL=https://wiki.ictsc.net/
+export GROWI_API_TOKEN=Ivpy6qoYYEMbQLpDg1OqP0ARDLkIET/qmNkf1RiUn3c=
 
 redis_port="$(jq -r 'select(.Service=="redis").Publishers[] | select(.TargetPort==6379).PublishedPort' <<< "$ps")"
 export REDIS_URL="redis://localhost:$redis_port/0"

@@ -70,7 +70,7 @@ func (h *AnswerServiceHandler) ListAnswers(
 		return nil, err
 	}
 
-	answers, err := domain.ListAnswersByTeamProblem(ctx, h.ListEffect, teamMember.Team().Code(), problemCode)
+	answers, err := domain.ListAnswersByTeamProblemForPublic(ctx, h.ListEffect, teamMember.Team().Code(), problemCode)
 	if err != nil {
 		return nil, err
 	}
@@ -81,23 +81,7 @@ func (h *AnswerServiceHandler) ListAnswers(
 		if latestSubmitTime == (time.Time{}) || answer.CreatedAt().After(latestSubmitTime) {
 			latestSubmitTime = answer.CreatedAt()
 		}
-		protoAnswer := &contestantv1.Answer{
-			Id:          answer.Number(),
-			SubmittedAt: timestamppb.New(answer.CreatedAt()),
-		}
-		switch answer.Problem().Type() {
-		case domain.ProblemTypeDescriptive:
-			protoAnswer.Body = &contestantv1.AnswerBody{
-				Type: contestantv1.ProblemType_PROBLEM_TYPE_DESCRIPTIVE,
-			}
-		case domain.ProblemTypeUnknown:
-			fallthrough
-		default:
-			protoAnswer.Body = &contestantv1.AnswerBody{
-				Type: contestantv1.ProblemType_PROBLEM_TYPE_UNSPECIFIED,
-			}
-		}
-		protoAnswers = append(protoAnswers, protoAnswer)
+		protoAnswers = append(protoAnswers, convertAnswer(answer))
 	}
 
 	resp := &contestantv1.ListAnswersResponse{
@@ -188,6 +172,14 @@ func convertAnswer(answer *domain.Answer) *contestantv1.Answer {
 	default:
 		protoAnswer.Body = &contestantv1.AnswerBody{
 			Type: contestantv1.ProblemType_PROBLEM_TYPE_UNSPECIFIED,
+		}
+	}
+	if score := answer.Score(); score != nil {
+		protoAnswer.Score = &contestantv1.Score{
+			MarkedScore: score.MarkedScore(),
+			Penalty:     score.Penalty(),
+			Score:       score.TotalScore(),
+			MaxScore:    score.MaxScore(),
 		}
 	}
 	return protoAnswer

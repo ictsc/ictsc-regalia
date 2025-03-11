@@ -1,9 +1,11 @@
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { createConnectTransport } from "@connectrpc/connect-web";
 import { MantineProvider } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import { routeTree } from "./routes.gen";
 
 const transport = createConnectTransport({
@@ -30,6 +32,7 @@ if (rootElement != null) {
   root.render(
     <StrictMode>
       <MantineProvider>
+        <Notifications />
         <RouterProvider router={router} />
       </MantineProvider>
     </StrictMode>,

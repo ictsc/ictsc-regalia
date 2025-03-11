@@ -58,11 +58,11 @@ var (
 
 type (
 	InvitationCodeData struct {
-		ID        uuid.UUID
-		Team      *TeamData
-		Code      string
-		ExpiresAt time.Time
-		CreatedAt time.Time
+		ID        uuid.UUID `json:"id"`
+		Team      *TeamData `json:"team"`
+		Code      string    `json:"code"`
+		ExpiresAt time.Time `json:"expires_at"`
+		CreatedAt time.Time `json:"created_at"`
 	}
 	InvitationCodeFilter struct {
 		Code string

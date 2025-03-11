@@ -13,10 +13,12 @@ message Problem {
   string title = 2;
   // 最大得点
   uint32 max_score = 3;
+  // 問題カテゴリー
+  string category = 4;
 
-  optional Score score = 4;
-  Deployment deployment = 5;
-  ProblemBody body = 6;
+  optional Score score = 5;
+  Deployment deployment = 6;
+  ProblemBody body = 7;
 }
 
 message Score {

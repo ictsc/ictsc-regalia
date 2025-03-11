@@ -102,14 +102,14 @@ var (
 
 type (
 	TeamMemberData struct {
-		User *UserData
-		Team *TeamData
+		User *UserData `json:"user"`
+		Team *TeamData `json:"team"`
 	}
 	TeamMemberProfileData struct {
-		User          *UserData
-		Team          *TeamData
-		Profile       *ProfileData
-		DiscordUserID int64
+		User          *UserData    `json:"user"`
+		Team          *TeamData    `json:"team"`
+		Profile       *ProfileData `json:"profile"`
+		DiscordUserID int64        `json:"discord_user_id"`
 	}
 	TeamMemberGetter interface {
 		GetTeamMemberByID(ctx context.Context, userID uuid.UUID) (*TeamMemberData, error)
