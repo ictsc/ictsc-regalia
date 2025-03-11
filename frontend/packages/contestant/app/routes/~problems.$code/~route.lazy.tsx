@@ -2,6 +2,7 @@ import { startTransition, Suspense, use, useDeferredValue } from "react";
 import { createLazyFileRoute, useRouter } from "@tanstack/react-router";
 import type { ProblemDetail } from "../../features/problem";
 import type { Answer } from "../../features/answer";
+import { protoScoreToProps } from "../../features/score";
 import * as View from "./page";
 import { Deployment } from "@app/features/problem/deployment";
 
@@ -11,9 +12,13 @@ export const Route = createLazyFileRoute("/problems/$code")({
 
 function RouteComponent() {
   const router = useRouter();
-  const { problem, answers, submitAnswer } = Route.useLoaderData();
+  const { problem, answers, metadata, submitAnswer } = Route.useLoaderData();
 
   const redeployable = useRedeployable(problem);
+  const deferredMetadata = use(useDeferredValue(metadata));
+
+  const deferredAnswers = useDeferredValue(answers);
+
   const remainRedeployCount = useRemainRedeployCount(problem);
   const latestPenalty = useLatestPenalty(problem);
 
@@ -37,12 +42,18 @@ function RouteComponent() {
             await router.invalidate();
             return "success";
           }}
+          submitInterval={deferredMetadata.submitIntervalSeconds}
+          lastSubmittedAt={deferredMetadata.lastSubmittedAt}
           latestPenalty={latestPenalty}
         />
       }
       submissionList={
         <Suspense>
-          <SubmissionList answersPromise={answers} />
+          <SubmissionList
+            isPending={deferredAnswers != answers}
+            problemPromise={problem}
+            answersPromise={deferredAnswers}
+          />
         </Suspense>
       }
       deploymentList={
@@ -77,19 +88,24 @@ function Content(props: { problem: Promise<ProblemDetail> }) {
   return <View.Content {...problem} />;
 }
 
-function SubmissionList(props: { answersPromise: Promise<Answer[]> }) {
-  const answers = use(useDeferredValue(props.answersPromise));
+function SubmissionList(props: {
+  isPending: boolean;
+  problemPromise: Promise<ProblemDetail>;
+  answersPromise: Promise<Answer[]>;
+}) {
+  const problem = use(useDeferredValue(props.problemPromise));
+  const answers = use(props.answersPromise);
   if (answers.length === 0) {
     return <View.EmptyListContainer message="解答はまだありません！" />;
   }
   return (
-    <View.ListContainer>
+    <View.ListContainer isPending={props.isPending}>
       {answers.map((answer) => (
         <View.SubmissionListItem
           key={answer.id}
           id={answer.id}
           submittedAt={answer.submittedAt}
-          score={{ maxScore: 100 }}
+          score={protoScoreToProps(problem.maxScore, answer?.score)}
         />
       ))}
     </View.ListContainer>

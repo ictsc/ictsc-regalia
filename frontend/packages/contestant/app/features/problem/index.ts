@@ -25,6 +25,7 @@ export type ProblemDetail = {
   code: string;
   title: string;
   deployment: Deployment;
+  maxScore: number;
   body: string;
 };
 
@@ -38,6 +39,8 @@ export async function fetchProblem(
   if (problem == null) {
     throw new ConnectError("Problem not found", Code.NotFound);
   }
+
+  console.log(problem);
 
   const body = problem.body?.body.value?.body;
   if (body == null) {
@@ -75,6 +78,7 @@ export async function fetchProblem(
       // TODO: 実装する
       maxRedeployment: 0,
     },
+    maxScore: problem.maxScore,
     body,
   };
 }

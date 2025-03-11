@@ -1,4 +1,10 @@
-import { type ComponentProps, type ReactNode, use, useReducer } from "react";
+import {
+  type ComponentProps,
+  type ReactNode,
+  Suspense,
+  use,
+  useReducer,
+} from "react";
 import {
   Button,
   Tab,
@@ -6,6 +12,7 @@ import {
   TabList,
   TabPanel,
   TabPanels,
+  Transition,
 } from "@headlessui/react";
 import { clsx } from "clsx";
 import { MaterialSymbol } from "../../components/material-symbol";
@@ -124,22 +131,24 @@ function Sidebar(props: {
         <SidebarTab disabled={!props.redeployable}>再展開</SidebarTab>
       </TabList>
       <TabPanels className="mt-16 size-full bg-transparent px-8">
-        <TabPanel className="size-full">{props.submissionForm}</TabPanel>
-        <TabPanel className="size-full rounded-12 bg-surface-1 py-12">
-          <div className="size-full overflow-y-auto px-12 [scrollbar-gutter:stable_both-edges]">
-            {props.submissionList}
-          </div>
-        </TabPanel>
-        <TabPanel className="size-full">
-          <div className="flex size-full flex-col gap-8">
-            <div className="size-full overflow-y-auto rounded-12 bg-surface-1 px-12 py-12 [scrollbar-gutter:stable_both-edges]">
-              {props.deploymentList}
+        <Suspense>
+          <SidebarTabPanel>{props.submissionForm}</SidebarTabPanel>
+          <SidebarTabPanel className="size-full rounded-12 bg-surface-1 py-12">
+            <div className="size-full overflow-y-auto px-12 [scrollbar-gutter:stable_both-edges]">
+              {props.submissionList}
             </div>
-            {props.remainRedeployCount === 0 && (
-              <NotificationBanner message="次の再展開から減点されます！" />
-            )}
-          </div>
-        </TabPanel>
+          </SidebarTabPanel>
+          <SidebarTabPanel>
+            <div className="flex size-full flex-col gap-8 bg-disabled">
+              <div className="size-full overflow-y-auto rounded-12 bg-surface-1 px-12 py-12 [scrollbar-gutter:stable_both-edges]">
+                {props.deploymentList}
+              </div>
+              {props.remainRedeployCount === 0 && (
+                <NotificationBanner message="次の再展開から減点されます！" />
+              )}
+            </div>
+          </SidebarTabPanel>
+        </Suspense>
       </TabPanels>
     </TabGroup>
   );
@@ -159,9 +168,38 @@ function SidebarTab(props: { disabled?: boolean; children?: ReactNode }) {
   );
 }
 
-export function ListContainer(props: { readonly children?: ReactNode }) {
+function SidebarTabPanel(props: { className?: string; children?: ReactNode }) {
   return (
-    <ul className="flex size-full flex-col gap-16 py-12">{props.children}</ul>
+    <TabPanel className="size-full" unmount={false}>
+      {({ selected }) => (
+        <Transition show={selected}>
+          <div
+            className={clsx(
+              "size-full transition-opacity duration-150 data-[closed]:opacity-0",
+              props.className,
+            )}
+          >
+            {props.children}
+          </div>
+        </Transition>
+      )}
+    </TabPanel>
+  );
+}
+
+export function ListContainer(props: {
+  readonly isPending?: boolean;
+  readonly children?: ReactNode;
+}) {
+  return (
+    <ul
+      className={clsx(
+        "flex size-full flex-col gap-16 py-12",
+        props.isPending && "opacity-75",
+      )}
+    >
+      {props.children}
+    </ul>
   );
 }
 
