@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -34,35 +35,76 @@ func (p Phase) String() string {
 	}
 }
 
-type Schedule struct {
-	id      uuid.UUID
-	phase   Phase
-	startAt time.Time
-	endAt   time.Time
+type (
+	Schedule      []*ScheduleEntry
+	ScheduleEntry struct {
+		id      uuid.UUID
+		phase   Phase
+		startAt time.Time
+		endAt   time.Time
+	}
+)
+
+func (s Schedule) Current(now time.Time) *ScheduleEntry {
+	idx := s.currentIndex(now)
+	if idx < 0 {
+		return s.overTimedSchedule(now)
+	}
+	return s[idx]
 }
 
-func (s *Schedule) Phase() Phase {
+func (s Schedule) Next(now time.Time) *ScheduleEntry {
+	idx := s.currentIndex(now)
+	if idx < 0 || idx == len(s)-1 {
+		return s.overTimedSchedule(now)
+	}
+	return s[idx+1]
+}
+
+func (s Schedule) currentIndex(now time.Time) int {
+	return slices.IndexFunc(s, func(e *ScheduleEntry) bool {
+		// now <@ [startAt, endAt)
+		return (now.Equal(e.startAt) || now.After(e.startAt)) && now.Before(e.endAt)
+	})
+}
+
+func (s Schedule) overTimedSchedule(now time.Time) *ScheduleEntry {
+	var minTime, maxTime time.Time
+	if len(s) > 0 {
+		minTime, maxTime = s[0].startAt, s[len(s)-1].endAt
+	}
+	if now.Before(minTime) {
+		return &ScheduleEntry{phase: PhaseOutOfContest, endAt: minTime}
+	} else {
+		return &ScheduleEntry{phase: PhaseAfterContest, startAt: maxTime}
+	}
+}
+
+func (s *ScheduleEntry) Phase() Phase {
 	return s.phase
 }
 
-func (s *Schedule) StartAt() time.Time {
+func (s *ScheduleEntry) StartAt() time.Time {
 	return s.startAt
 }
 
-func (s *Schedule) EndAt() time.Time {
+func (s *ScheduleEntry) EndAt() time.Time {
 	return s.endAt
 }
 
-func GetSchedule(ctx context.Context, eff ScheduleReader) ([]*Schedule, error) {
+func GetSchedule(ctx context.Context, eff ScheduleReader) (Schedule, error) {
 	scheduleData, err := eff.GetSchedule(ctx)
 	if err != nil {
 		return nil, WrapAsInternal(err, "failed to get schedule")
 	}
-	schedules := make([]*Schedule, 0, len(scheduleData))
+	entries := make([]*ScheduleEntry, 0, len(scheduleData))
 	for _, data := range scheduleData {
-		schedules = append(schedules, data.parse())
+		entries = append(entries, data.parse())
 	}
-	return schedules, nil
+	slices.SortFunc(entries, func(i, j *ScheduleEntry) int {
+		return i.startAt.Compare(j.startAt)
+	})
+	return entries, nil
 }
 
 func SaveSchedule(ctx context.Context, eff ScheduleWriter, input []*UpdateScheduleInput) error {
@@ -102,8 +144,8 @@ type (
 	}
 )
 
-func (d *ScheduleData) parse() *Schedule {
-	return &Schedule{
+func (d *ScheduleData) parse() *ScheduleEntry {
+	return &ScheduleEntry{
 		id:      d.ID,
 		phase:   d.Phase,
 		startAt: d.StartAt,
