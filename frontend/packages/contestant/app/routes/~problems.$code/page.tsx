@@ -124,7 +124,7 @@ function Sidebar(props: {
       <TabPanels className="mt-16 size-full bg-transparent px-8">
         <Suspense>
           <SidebarTabPanel>{props.submissionForm}</SidebarTabPanel>
-          <SidebarTabPanel className="overflow-y-auto rounded-12 bg-disabled py-12">
+          <SidebarTabPanel className="rounded-12 bg-disabled py-12">
             <div className="size-full overflow-y-auto px-12 [scrollbar-gutter:stable_both-edges]">
               {props.submissionList}
             </div>
