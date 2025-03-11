@@ -62,7 +62,9 @@ export default {
         action={() => {
           submitAction("submit");
           return Promise.resolve("success");
-        } } latestPenalty={0}      />
+        }}
+        latestPenalty={0}
+      />
     ),
     submissionList: (
       <ListContainer>
