@@ -14,12 +14,16 @@ function RouteComponent() {
   const { problem, answers, submitAnswer } = Route.useLoaderData();
 
   const redeployable = useRedeployable(problem);
+  const remainRedeployCount = useRemainRedeployCount(problem);
+  const latestPenalty = useLatestPenalty(problem);
+
   return (
     <View.Page
       onTabChange={() => {
         startTransition(() => router.load());
       }}
       redeployable={redeployable}
+      remainRedeployCount={remainRedeployCount}
       content={<Content problem={problem} />}
       submissionForm={
         <View.SubmissionForm
@@ -33,6 +37,7 @@ function RouteComponent() {
             await router.invalidate();
             return "success";
           }}
+          latestPenalty={latestPenalty}
         />
       }
       submissionList={
@@ -52,6 +57,19 @@ function RouteComponent() {
 function useRedeployable(problemPromise: Promise<ProblemDetail>) {
   const problem = use(useDeferredValue(problemPromise));
   return problem.deployment.redeployable;
+}
+
+function useRemainRedeployCount(problemPromise: Promise<ProblemDetail>) {
+  const problem = use(useDeferredValue(problemPromise));
+  return problem.deployment.maxRedeployment - problem.deployment.events.length;
+}
+
+function useLatestPenalty(problemPromise: Promise<ProblemDetail>) {
+  const problem = use(useDeferredValue(problemPromise));
+  if (problem.deployment.events.length === 0) {
+    return 5;
+  }
+  return problem.deployment.events[0].totalPenalty;
 }
 
 function Content(props: { problem: Promise<ProblemDetail> }) {

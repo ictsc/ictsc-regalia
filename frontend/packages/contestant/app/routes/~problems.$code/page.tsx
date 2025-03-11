@@ -14,6 +14,7 @@ import { NavbarLayoutContext } from "../../components/app-shell";
 import { Score } from "../../components/score";
 import { DeploymentEvent } from "@app/features/problem/deployment";
 import { DeploymentDetail } from "@app/components/deployment";
+import { NotificationBanner } from "@app/components/notification-banner";
 
 export { SubmissionForm } from "./submission-form";
 
@@ -23,6 +24,7 @@ export function Page(props: {
   submissionList: ReactNode;
   deploymentList: ReactNode;
   redeployable: boolean;
+  remainRedeployCount: number;
 
   onTabChange?: () => void;
 }) {
@@ -36,6 +38,7 @@ export function Page(props: {
           submissionForm={props.submissionForm}
           submissionList={props.submissionList}
           deploymentList={props.deploymentList}
+          remainRedeployCount={props.remainRedeployCount}
         />
       }
     />
@@ -110,6 +113,7 @@ function Sidebar(props: {
   submissionList: ReactNode;
   deploymentList: ReactNode;
   redeployable: boolean;
+  remainRedeployCount: number;
   onChange?: () => void;
 }) {
   return (
@@ -126,9 +130,14 @@ function Sidebar(props: {
             {props.submissionList}
           </div>
         </TabPanel>
-        <TabPanel className="size-full rounded-12 bg-surface-1 py-12">
-          <div className="size-full overflow-y-auto px-12 [scrollbar-gutter:stable_both-edges]">
-            {props.deploymentList}
+        <TabPanel className="size-full">
+          <div className="flex size-full flex-col gap-8">
+            <div className="size-full overflow-y-auto rounded-12 bg-surface-1 px-12 py-12 [scrollbar-gutter:stable_both-edges]">
+              {props.deploymentList}
+            </div>
+            {props.remainRedeployCount === 0 && (
+              <NotificationBanner message="次の再展開から減点されます！" />
+            )}
           </div>
         </TabPanel>
       </TabPanels>

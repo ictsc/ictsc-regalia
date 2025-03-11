@@ -1,9 +1,11 @@
 import { useReducer, useId, type ActionDispatch } from "react";
 import { Field, Label, Textarea } from "@headlessui/react";
 import { MaterialSymbol } from "../../components/material-symbol";
+import { NotificationBanner } from "@app/components/notification-banner";
 
 export function SubmissionForm(props: {
   readonly action: (answer: string) => Promise<"success" | "failure">;
+  readonly latestPenalty: number;
 }) {
   const [error, dispatchError] = useReducer<FormErrorState, [FormErrorAction]>(
     reduceFormError,
@@ -29,7 +31,11 @@ export function SubmissionForm(props: {
         }
       }}
     >
-      <SubmissionFormInner error={error} dispatchError={dispatchError} />
+      <SubmissionFormInner
+        error={error}
+        dispatchError={dispatchError}
+        latestPenalty={props.latestPenalty}
+      />
     </form>
   );
 }
@@ -54,14 +60,16 @@ function reduceFormError(
 function SubmissionFormInner({
   error,
   dispatchError,
+  latestPenalty,
 }: {
   error: FormErrorState;
   dispatchError: ActionDispatch<[FormErrorAction]>;
+  latestPenalty: number;
 }) {
   const submitLabelID = useId();
   return (
     <>
-      <Field className="flex flex-1">
+      <Field className="flex flex-1 flex-col gap-8">
         <Label className="sr-only">解答(必須)</Label>
         <Textarea
           name="answer"
@@ -82,6 +90,11 @@ function SubmissionFormInner({
             }
           }}
         />
+        {latestPenalty > 0 && (
+          <NotificationBanner
+            message={`減点: -${latestPenalty} （展開回数オーバー）`}
+          />
+        )}
       </Field>
       <div className="mt-20 flex items-center justify-end gap-16">
         {error != null && (
