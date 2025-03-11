@@ -40,9 +40,9 @@ export function AccountMenu(props: {
         )}
       >
         <span className="mx-[15px] text-14 text-text">{props.name}</span>
-        <MenuItem>
+        {/* <MenuItem>
           <AccountMenuButton icon="settings">アカウント設定</AccountMenuButton>
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem>
           <AccountMenuButton icon="logout" onClick={props.onSignOut}>
             ログアウト
