@@ -48,7 +48,7 @@ func (h *ScheduleServiceHandler) GetSchedule(
 
 	protoSchedules := make([]*adminv1.Schedule, 0, len(schedules))
 	for _, schedule := range schedules {
-		protoSchedules = append(protoSchedules, convertSchedule(schedule))
+		protoSchedules = append(protoSchedules, convertScheduleEntry(schedule))
 	}
 
 	return connect.NewResponse(&adminv1.GetScheduleResponse{
@@ -81,7 +81,7 @@ func (h *ScheduleServiceHandler) UpdateSchedule(
 	return connect.NewResponse(&adminv1.UpdateScheduleResponse{}), nil
 }
 
-func convertSchedule(schedule *domain.Schedule) *adminv1.Schedule {
+func convertScheduleEntry(schedule *domain.ScheduleEntry) *adminv1.Schedule {
 	var phase adminv1.Phase
 	switch schedule.Phase() {
 	case domain.PhaseOutOfContest:
