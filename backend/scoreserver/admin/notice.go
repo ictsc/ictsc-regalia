@@ -56,7 +56,6 @@ func (s *NoticeServiceHandler) ListNotices(
 
 func convertNotice(notice *domain.Notice) *adminv1.Notice {
 	return &adminv1.Notice{
-		Path:     notice.Path(),
 		Title:    notice.Title(),
 		Markdown: notice.Markdown(),
 	}

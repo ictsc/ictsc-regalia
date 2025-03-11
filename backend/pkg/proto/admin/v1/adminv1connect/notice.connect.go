@@ -36,15 +36,15 @@ const (
 	// NoticeServiceListNoticesProcedure is the fully-qualified name of the NoticeService's ListNotices
 	// RPC.
 	NoticeServiceListNoticesProcedure = "/admin.v1.NoticeService/ListNotices"
-	// NoticeServiceSyncNoticesProcedure is the fully-qualified name of the NoticeService's SyncNotices
-	// RPC.
-	NoticeServiceSyncNoticesProcedure = "/admin.v1.NoticeService/SyncNotices"
+	// NoticeServiceUpdateNoticesProcedure is the fully-qualified name of the NoticeService's
+	// UpdateNotices RPC.
+	NoticeServiceUpdateNoticesProcedure = "/admin.v1.NoticeService/UpdateNotices"
 )
 
 // NoticeServiceClient is a client for the admin.v1.NoticeService service.
 type NoticeServiceClient interface {
 	ListNotices(context.Context, *connect.Request[v1.ListNoticesRequest]) (*connect.Response[v1.ListNoticesResponse], error)
-	SyncNotices(context.Context, *connect.Request[v1.SyncNoticesRequest]) (*connect.Response[v1.SyncNoticesResponse], error)
+	UpdateNotices(context.Context, *connect.Request[v1.UpdateNoticesRequest]) (*connect.Response[v1.UpdateNoticesResponse], error)
 }
 
 // NewNoticeServiceClient constructs a client for the admin.v1.NoticeService service. By default, it
@@ -64,10 +64,10 @@ func NewNoticeServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(noticeServiceMethods.ByName("ListNotices")),
 			connect.WithClientOptions(opts...),
 		),
-		syncNotices: connect.NewClient[v1.SyncNoticesRequest, v1.SyncNoticesResponse](
+		updateNotices: connect.NewClient[v1.UpdateNoticesRequest, v1.UpdateNoticesResponse](
 			httpClient,
-			baseURL+NoticeServiceSyncNoticesProcedure,
-			connect.WithSchema(noticeServiceMethods.ByName("SyncNotices")),
+			baseURL+NoticeServiceUpdateNoticesProcedure,
+			connect.WithSchema(noticeServiceMethods.ByName("UpdateNotices")),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -75,8 +75,8 @@ func NewNoticeServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 
 // noticeServiceClient implements NoticeServiceClient.
 type noticeServiceClient struct {
-	listNotices *connect.Client[v1.ListNoticesRequest, v1.ListNoticesResponse]
-	syncNotices *connect.Client[v1.SyncNoticesRequest, v1.SyncNoticesResponse]
+	listNotices   *connect.Client[v1.ListNoticesRequest, v1.ListNoticesResponse]
+	updateNotices *connect.Client[v1.UpdateNoticesRequest, v1.UpdateNoticesResponse]
 }
 
 // ListNotices calls admin.v1.NoticeService.ListNotices.
@@ -84,15 +84,15 @@ func (c *noticeServiceClient) ListNotices(ctx context.Context, req *connect.Requ
 	return c.listNotices.CallUnary(ctx, req)
 }
 
-// SyncNotices calls admin.v1.NoticeService.SyncNotices.
-func (c *noticeServiceClient) SyncNotices(ctx context.Context, req *connect.Request[v1.SyncNoticesRequest]) (*connect.Response[v1.SyncNoticesResponse], error) {
-	return c.syncNotices.CallUnary(ctx, req)
+// UpdateNotices calls admin.v1.NoticeService.UpdateNotices.
+func (c *noticeServiceClient) UpdateNotices(ctx context.Context, req *connect.Request[v1.UpdateNoticesRequest]) (*connect.Response[v1.UpdateNoticesResponse], error) {
+	return c.updateNotices.CallUnary(ctx, req)
 }
 
 // NoticeServiceHandler is an implementation of the admin.v1.NoticeService service.
 type NoticeServiceHandler interface {
 	ListNotices(context.Context, *connect.Request[v1.ListNoticesRequest]) (*connect.Response[v1.ListNoticesResponse], error)
-	SyncNotices(context.Context, *connect.Request[v1.SyncNoticesRequest]) (*connect.Response[v1.SyncNoticesResponse], error)
+	UpdateNotices(context.Context, *connect.Request[v1.UpdateNoticesRequest]) (*connect.Response[v1.UpdateNoticesResponse], error)
 }
 
 // NewNoticeServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -108,18 +108,18 @@ func NewNoticeServiceHandler(svc NoticeServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(noticeServiceMethods.ByName("ListNotices")),
 		connect.WithHandlerOptions(opts...),
 	)
-	noticeServiceSyncNoticesHandler := connect.NewUnaryHandler(
-		NoticeServiceSyncNoticesProcedure,
-		svc.SyncNotices,
-		connect.WithSchema(noticeServiceMethods.ByName("SyncNotices")),
+	noticeServiceUpdateNoticesHandler := connect.NewUnaryHandler(
+		NoticeServiceUpdateNoticesProcedure,
+		svc.UpdateNotices,
+		connect.WithSchema(noticeServiceMethods.ByName("UpdateNotices")),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/admin.v1.NoticeService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case NoticeServiceListNoticesProcedure:
 			noticeServiceListNoticesHandler.ServeHTTP(w, r)
-		case NoticeServiceSyncNoticesProcedure:
-			noticeServiceSyncNoticesHandler.ServeHTTP(w, r)
+		case NoticeServiceUpdateNoticesProcedure:
+			noticeServiceUpdateNoticesHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -133,6 +133,6 @@ func (UnimplementedNoticeServiceHandler) ListNotices(context.Context, *connect.R
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.NoticeService.ListNotices is not implemented"))
 }
 
-func (UnimplementedNoticeServiceHandler) SyncNotices(context.Context, *connect.Request[v1.SyncNoticesRequest]) (*connect.Response[v1.SyncNoticesResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.NoticeService.SyncNotices is not implemented"))
+func (UnimplementedNoticeServiceHandler) UpdateNotices(context.Context, *connect.Request[v1.UpdateNoticesRequest]) (*connect.Response[v1.UpdateNoticesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.NoticeService.UpdateNotices is not implemented"))
 }
