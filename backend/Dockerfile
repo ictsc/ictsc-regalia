@@ -3,8 +3,7 @@ FROM --platform=$BUILDPLATFORM golang AS builder
 ENV GOTOOLCHAIN=auto
 ENV CGO_ENABLED=0
 WORKDIR /src
-RUN --mount=type=cache,target=/go/pkg/mod/,sharing=locked \
-    --mount=type=bind,source=go.mod,target=go.mod \
+RUN --mount=type=bind,source=go.mod,target=go.mod \
     --mount=type=bind,source=go.sum,target=go.sum \
     go mod download
 ARG TARGETOS
@@ -12,18 +11,19 @@ ARG TARGETARCH
 ENV GOOS=$TARGETOS
 ENV GOARCH=$TARGETARCH
 
-# --- score server ---
+# --- backend ---
 FROM --platform=$BUILDPLATFORM builder AS scoreserver-builder
-RUN --mount=type=cache,target=/go/pkg/mod/ \
-    --mount=type=cache,target=/root/.cache/go-build,sharing=locked \
+RUN --mount=type=cache,target=/root/.cache/go-build,sharing=locked \
     --mount=type=bind,source=.,target=. \
     go build -o /scoreserver -ldflags "-s -w" -trimpath ./cmd/scoreserver
 
-FROM gcr.io/distroless/static-debian12:nonroot AS scoreserver
+FROM gcr.io/distroless/static-debian12:nonroot AS backend
 WORKDIR /app
 EXPOSE 8080 8081
 COPY --from=scoreserver-builder --chown=nonroot:nonroot /scoreserver /
 ENTRYPOINT ["/scoreserver"]
+# Backward compatibility
+FROM backend AS scoreserver
 
 # -- toolbox ---
 FROM debian:12-slim AS toolbox
