@@ -57,7 +57,7 @@ func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB) (http.Handler, e
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(adminv1connect.NewProblemServiceHandler(
-		NewProblemServiceHandler(enforcer, repo, growiClient),
+		NewProblemServiceHandler(enforcer, repo),
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(adminv1connect.NewNoticeServiceHandler(

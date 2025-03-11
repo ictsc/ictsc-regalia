@@ -193,20 +193,23 @@ func (p *Problem) PercentagePenalty() *RedeployPenaltyPercentage {
 
 type (
 	ProblemContent struct {
-		pageID      string
-		pagePath    string
 		body        string
 		explanation string
 	}
 	problemContent = ProblemContent
 )
 
-func (pc *ProblemContent) PageID() string {
-	return pc.pageID
-}
-
-func (pc *ProblemContent) PagePath() string {
-	return pc.pagePath
+func NewProblemContent(body, explanation string) (*ProblemContent, error) {
+	if body == "" {
+		return nil, NewInvalidArgumentError("body is required", nil)
+	}
+	if explanation == "" {
+		return nil, NewInvalidArgumentError("explanation is required", nil)
+	}
+	return &ProblemContent{
+		body:        body,
+		explanation: explanation,
+	}, nil
 }
 
 func (pc *ProblemContent) Body() string {
@@ -290,7 +293,8 @@ type UpdateDescriptiveProblemInput struct {
 	Category          string
 	RedeployRule      RedeployRule
 	PercentagePenalty *RedeployPenaltyPercentage
-	Content           *ProblemContent
+	Body              string
+	Explanation       string
 }
 
 func (dp *DescriptiveProblem) Update(input UpdateDescriptiveProblemInput) (*DescriptiveProblem, error) {
@@ -322,8 +326,11 @@ func (dp *DescriptiveProblem) Update(input UpdateDescriptiveProblemInput) (*Desc
 		// この操作は問題難易度による微調整として必要性が高いため，優先度が高いが，現状は採点ロジックが未実装であるため，許可しない
 		return nil, NewInvalidArgumentError("percentage penalty cannot be updated", nil)
 	}
-	if input.Content != nil {
-		data.Content = input.Content.Data()
+	if input.Body != "" {
+		data.Content.Body = input.Body
+	}
+	if input.Explanation != "" {
+		data.Content.Explanation = input.Explanation
 	}
 
 	return data.parse()
@@ -467,8 +474,6 @@ func (d *ProblemContentData) parse() (*ProblemContent, error) {
 		return nil, NewInvalidArgumentError("explanation is required", nil)
 	}
 	return &ProblemContent{
-		pageID:      d.PageID,
-		pagePath:    d.PagePath,
 		body:        d.Body,
 		explanation: d.Explanation,
 	}, nil
@@ -476,8 +481,6 @@ func (d *ProblemContentData) parse() (*ProblemContent, error) {
 
 func (pc *ProblemContent) Data() *ProblemContentData {
 	return &ProblemContentData{
-		PageID:      pc.pageID,
-		PagePath:    pc.pagePath,
 		Body:        pc.body,
 		Explanation: pc.explanation,
 	}
