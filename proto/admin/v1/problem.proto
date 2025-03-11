@@ -50,10 +50,6 @@ enum ProblemType {
 }
 
 message DescriptiveProblem {
-  // Growi のページのパス
-  string page_path = 1;
-  // Growi のページID
-  string page_id = 2;
   // Markdown 形式の問題文
   string problem_markdown = 3;
   // Markdown 形式の解説文

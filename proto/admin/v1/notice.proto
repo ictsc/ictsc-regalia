@@ -2,12 +2,15 @@ syntax = "proto3";
 
 package admin.v1;
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1";
 
 message Notice {
-  string path = 1;
+  string slug = 1;
   string title = 2;
   string markdown = 3;
+  google.protobuf.Timestamp effective_from = 4;
 }
 
 message ListNoticesRequest {}
@@ -15,14 +18,12 @@ message ListNoticesResponse {
   repeated Notice notices = 1;
 }
 
-message SyncNoticesRequest {
-  string path = 1;
+message UpdateNoticesRequest {
+  repeated Notice notices = 1;
 }
-message SyncNoticesResponse {
-  Notice notice = 1;
-}
+message UpdateNoticesResponse {}
 
 service NoticeService {
   rpc ListNotices(ListNoticesRequest) returns (ListNoticesResponse);
-  rpc SyncNotices(SyncNoticesRequest) returns (SyncNoticesResponse);
+  rpc UpdateNotices(UpdateNoticesRequest) returns (UpdateNoticesResponse);
 }
