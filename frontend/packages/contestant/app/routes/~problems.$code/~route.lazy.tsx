@@ -78,7 +78,7 @@ function useRemainRedeployCount(problemPromise: Promise<ProblemDetail>) {
 function useLatestPenalty(problemPromise: Promise<ProblemDetail>) {
   const problem = use(useDeferredValue(problemPromise));
   if (problem.deployment.events.length === 0) {
-    return 5;
+    return 0;
   }
   return problem.deployment.events[0].totalPenalty;
 }
