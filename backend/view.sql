@@ -1,11 +1,11 @@
-DROP VIEW IF EXISTS latest_marking_results;
+DROP VIEW IF EXISTS latest_marking_result_ids CASCADE;
 CREATE VIEW latest_marking_result_ids AS (
 	SELECT DISTINCT ON (answer_id) id, answer_id
 	FROM marking_results
 	ORDER BY answer_id, created_at DESC
 );
 
-DROP VIEW IF EXISTS latest_public_marking_result_ids;
+DROP VIEW IF EXISTS latest_public_marking_result_ids CASCADE;
 CREATE VIEW latest_public_marking_result_ids AS (
 	SELECT DISTINCT ON (answer_id) id, answer_id
 	FROM marking_results
@@ -13,7 +13,7 @@ CREATE VIEW latest_public_marking_result_ids AS (
 	ORDER BY answer_id, created_at DESC
 );
 
-DROP VIEW IF EXISTS team_problem_scores;
+DROP VIEW IF EXISTS team_problem_scores CASCADE;
 CREATE VIEW team_problem_scores AS (
 	SELECT
 		DISTINCT ON (a.team_id, a.problem_id)

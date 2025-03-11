@@ -21,7 +21,6 @@ type (
 		Address netip.AddrPort
 		Authn   AdminAuthn
 		Authz   AdminAuthz
-		Growi   Growi
 	}
 	AdminAuthn struct {
 		Issuers []Issuer `yaml:"issuers"`
@@ -37,10 +36,6 @@ type (
 	}
 	AdminAuthz struct {
 		Policy string
-	}
-	Growi struct {
-		BaseURL *url.URL
-		Token   string
 	}
 )
 

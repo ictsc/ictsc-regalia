@@ -82,29 +82,11 @@ func newAdminConfig(opts *CLIOption) (*config.AdminAPI, error) {
 		adminAuthPolicy = string(data)
 	}
 
-	growiBase := os.Getenv("GROWI_BASE_URL")
-	if growiBase == "" {
-		return nil, errors.New("GROWI_BASE_URL is not set")
-	}
-	growiBaseURL, err := url.Parse(growiBase)
-	if err != nil {
-		return nil, errors.Wrap(err, "invalid GROWI_BASE_URL")
-	}
-
-	growiAPIToken := os.Getenv("GROWI_API_TOKEN")
-	if growiAPIToken == "" {
-		return nil, errors.New("GROWI_API_TOKEN is not set")
-	}
-
 	return &config.AdminAPI{
 		Address: opts.AdminHTTPAddr,
 		Authn:   adminAuthnConfig,
 		Authz: config.AdminAuthz{
 			Policy: adminAuthPolicy,
-		},
-		Growi: config.Growi{
-			BaseURL: growiBaseURL,
-			Token:   growiAPIToken,
 		},
 	}, nil
 }

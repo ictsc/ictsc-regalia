@@ -5,27 +5,18 @@ import (
 )
 
 type Rule struct {
-	pagePath string
 	markdown string
 }
 
-func (r *Rule) PagePath() string {
-	return r.pagePath
+func NewRule(markdown string) (*Rule, error) {
+	if markdown == "" {
+		return nil, NewInvalidArgumentError("markdown is required", nil)
+	}
+	return &Rule{markdown: markdown}, nil
 }
 
 func (r *Rule) Markdown() string {
 	return r.markdown
-}
-
-func FetchRule(ctx context.Context, eff ProblemContentGetter, pagePath string) (*Rule, error) {
-	content, err := eff.GetProblemContentByPath(ctx, pagePath)
-	if err != nil {
-		return nil, WrapAsInternal(err, "failed to fetch rule")
-	}
-	return &Rule{
-		pagePath: content.PagePath,
-		markdown: content.Content,
-	}, nil
 }
 
 func GetRule(ctx context.Context, eff RuleReader) (*Rule, error) {
@@ -45,7 +36,6 @@ func (r *Rule) Save(ctx context.Context, eff RuleWriter) error {
 
 type (
 	RuleData struct {
-		PagePath string
 		Markdown string
 	}
 	RuleReader interface {
@@ -59,14 +49,12 @@ type (
 
 func (r *RuleData) parse() *Rule {
 	return &Rule{
-		pagePath: r.PagePath,
 		markdown: r.Markdown,
 	}
 }
 
 func (r *Rule) Data() *RuleData {
 	return &RuleData{
-		PagePath: r.pagePath,
 		Markdown: r.markdown,
 	}
 }
