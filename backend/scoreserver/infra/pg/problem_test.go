@@ -113,8 +113,6 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 					RedeployRule: domain.RedeployRuleUnredeployable,
 				},
 				Content: &domain.ProblemContentData{
-					PageID:      "page99",
-					PagePath:    "/page99",
 					Body:        "test",
 					Explanation: "test",
 				},
@@ -129,7 +127,6 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 				"content": `
 					SELECT 1 FROM problem_contents WHERE
 					problem_id = '3a4d8197-09f4-4bb0-9255-a8b6a943a36c' AND
-					page_id = 'page99' AND page_path = '/page99' AND
 					body = 'test' AND explanation = 'test'`,
 			},
 		},
@@ -148,8 +145,6 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 					},
 				},
 				Content: &domain.ProblemContentData{
-					PageID:      "pageQ",
-					PagePath:    "/pageQ",
 					Body:        "body",
 					Explanation: "explanation",
 				},
@@ -164,7 +159,6 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 				"content": `
 					SELECT 1 FROM problem_contents WHERE
 					problem_id = '16643c32-c686-44ba-996b-2fbe43b54513' AND
-					page_id = 'pageQ' AND page_path = '/pageQ' AND
 					body = 'body' AND explanation = 'explanation'`,
 				"redeploy_rule": `
 					SELECT 1 FROM redeploy_percentage_penalties WHERE

@@ -1,11 +1,9 @@
 package domain
 
 import (
-	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"regexp"
 	"strings"
 
@@ -220,22 +218,6 @@ func (pc *ProblemContent) Explanation() string {
 	return pc.explanation
 }
 
-func FetchProblemContentByPath(ctx context.Context, eff ProblemContentGetter, path string) (*ProblemContent, error) {
-	data, err := eff.GetProblemContentByPath(ctx, path)
-	if err != nil {
-		return nil, WrapAsInternal(err, "failed to fetch problem content by path")
-	}
-	return data.parse()
-}
-
-func FetchProblemContentByID(ctx context.Context, eff ProblemContentGetter, id string) (*ProblemContent, error) {
-	data, err := eff.GetProblemContentByID(ctx, id)
-	if err != nil {
-		return nil, WrapAsInternal(err, "failed to fetch problem content by ID")
-	}
-	return data.parse()
-}
-
 type DescriptiveProblem struct {
 	*problem
 	*problemContent
@@ -361,10 +343,6 @@ type (
 		GetProblemByCode(ctx context.Context, code string) (*ProblemData, error)
 		GetDescriptiveProblem(ctx context.Context, id uuid.UUID) (*DescriptiveProblemData, error)
 	}
-	ProblemContentGetter interface {
-		GetProblemContentByID(ctx context.Context, pageID string) (*ProblemContentRawData, error)
-		GetProblemContentByPath(ctx context.Context, pagePath string) (*ProblemContentRawData, error)
-	}
 	ProblemWriter interface {
 		ProblemReader
 		SaveDescriptiveProblem(ctx context.Context, data *DescriptiveProblemData) error
@@ -454,19 +432,11 @@ func (p *Problem) Data() *ProblemData {
 }
 
 type ProblemContentData struct {
-	PageID      string `json:"page_id"`
-	PagePath    string `json:"page_path"`
 	Body        string `json:"body"`
 	Explanation string `json:"explanation"`
 }
 
 func (d *ProblemContentData) parse() (*ProblemContent, error) {
-	if d.PageID == "" {
-		return nil, NewInvalidArgumentError("page ID is required", nil)
-	}
-	if d.PagePath == "" {
-		return nil, NewInvalidArgumentError("page path is required", nil)
-	}
 	if d.Body == "" {
 		return nil, NewInvalidArgumentError("body is required", nil)
 	}
@@ -517,83 +487,4 @@ func (dp *DescriptiveProblem) Data() *DescriptiveProblemData {
 		Problem: dp.problem.Data(),
 		Content: dp.problemContent.Data(),
 	}
-}
-
-type ProblemContentRawData struct {
-	PageID   string
-	PagePath string
-	Content  string
-}
-
-func (d *ProblemContentRawData) parse() (*ProblemContent, error) {
-	contentReader := strings.NewReader(d.Content)
-	bodyWriter := &strings.Builder{}
-	explanationWriter := &strings.Builder{}
-	if err := parseProblemMarkdown(contentReader, bodyWriter, explanationWriter); err != nil {
-		return nil, err
-	}
-	return (&ProblemContentData{
-		PageID:      d.PageID,
-		PagePath:    d.PagePath,
-		Body:        bodyWriter.String(),
-		Explanation: explanationWriter.String(),
-	}).parse()
-}
-
-var (
-	problemSectionSplitRegexp = regexp.MustCompile(`^\s*#\s+-+(BEGIN|END)\s+([^-]+)-+\s*$`)
-)
-
-//nolint:gosmopolitan // 問題フォーマットがこうなっているのでどうしようもない
-const (
-	problemSectionIdea        = "問題アイディア"
-	problemSectionBody        = "出題時の問題フォーマット"
-	problemSectionExplanation = "出題時の問題情報(運営用)"
-)
-
-func parseProblemMarkdown(r io.Reader, bodyWriter io.Writer, explanationWriter io.Writer) error {
-	scanner := bufio.NewScanner(r)
-	w := io.Discard
-	section := ""
-	lineno := 0
-	for scanner.Scan() {
-		lineno++
-		line := scanner.Text()
-		if match := problemSectionSplitRegexp.FindStringSubmatch(line); match != nil {
-			switch match[1] {
-			case "BEGIN":
-				if section != "" {
-					return NewInvalidArgumentError(
-						fmt.Sprintf("unexpected section begin (section: %s, line: %d)", section, lineno), nil)
-				}
-				section = match[2]
-				switch section {
-				case problemSectionIdea:
-					w = io.Discard
-				case problemSectionBody:
-					w = bodyWriter
-				case problemSectionExplanation:
-					w = explanationWriter
-				default:
-					return NewInvalidArgumentError(
-						fmt.Sprintf("unknown section (section: %s, line: %d)", section, lineno), nil)
-				}
-			case "END":
-				if section != match[2] {
-					return NewInvalidArgumentError(
-						fmt.Sprintf("unmatched section (section: %s, line: %d)", section, lineno), nil)
-				}
-				section = ""
-				w = io.Discard
-			}
-		} else {
-			if _, err := w.Write([]byte(line + "\n")); err != nil {
-				return WrapAsInternal(err, "failed to write")
-			}
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		return WrapAsInternal(err, "failed to scan")
-	}
-	return nil
 }
