@@ -8,33 +8,6 @@ import (
 	"github.com/gofrs/uuid/v5"
 )
 
-type Phase int32
-
-const (
-	PhaseUnspecified Phase = iota
-	PhaseOutOfContest
-	PhaseInContest
-	PhaseBreak
-	PhaseAfterContest
-)
-
-func (p Phase) String() string {
-	switch p {
-	case PhaseOutOfContest:
-		return "OUT_OF_CONTEST"
-	case PhaseInContest:
-		return "IN_CONTEST"
-	case PhaseBreak:
-		return "BREAK"
-	case PhaseAfterContest:
-		return "AFTER_CONTEST"
-	case PhaseUnspecified:
-		fallthrough
-	default:
-		return "UNSPECIFIED"
-	}
-}
-
 type (
 	Schedule      []*ScheduleEntry
 	ScheduleEntry struct {
@@ -46,37 +19,44 @@ type (
 )
 
 func (s Schedule) Current(now time.Time) *ScheduleEntry {
-	idx := s.currentIndex(now)
-	if idx < 0 {
-		return s.overTimedSchedule(now)
-	}
-	return s[idx]
+	entry, _ := s.getEntry(now)
+	return entry
 }
 
 func (s Schedule) Next(now time.Time) *ScheduleEntry {
-	idx := s.currentIndex(now)
-	if idx < 0 || idx == len(s)-1 {
-		return s.overTimedSchedule(now)
+	entry, idx := s.getEntry(now)
+	if idx+1 < len(s) {
+		return s[idx+1]
 	}
-	return s[idx+1]
+	return entry
 }
 
-func (s Schedule) currentIndex(now time.Time) int {
-	return slices.IndexFunc(s, func(e *ScheduleEntry) bool {
+func (s Schedule) getEntry(now time.Time) (*ScheduleEntry, int) {
+	if len(s) == 0 {
+		return &ScheduleEntry{phase: PhaseOutOfContest}, 0
+	}
+	idx := slices.IndexFunc(s, func(entry *ScheduleEntry) bool {
 		// now <@ [startAt, endAt)
-		return (now.Equal(e.startAt) || now.After(e.startAt)) && now.Before(e.endAt)
+		var lowerBound, upperBound bool
+		if entry.startAt.IsZero() {
+			lowerBound = true
+		} else {
+			lowerBound = now.Equal(entry.startAt) || now.After(entry.startAt)
+		}
+		if entry.endAt.IsZero() {
+			upperBound = true
+		} else {
+			upperBound = now.Before(entry.endAt)
+		}
+		return lowerBound && upperBound
 	})
-}
-
-func (s Schedule) overTimedSchedule(now time.Time) *ScheduleEntry {
-	var minTime, maxTime time.Time
-	if len(s) > 0 {
-		minTime, maxTime = s[0].startAt, s[len(s)-1].endAt
+	if idx >= 0 {
+		return s[idx], idx
 	}
-	if now.Before(minTime) {
-		return &ScheduleEntry{phase: PhaseOutOfContest, endAt: minTime}
+	if now.Before(s[0].startAt) {
+		return &ScheduleEntry{phase: PhaseOutOfContest, endAt: s[0].startAt}, -1
 	} else {
-		return &ScheduleEntry{phase: PhaseAfterContest, startAt: maxTime}
+		return &ScheduleEntry{phase: PhaseAfterContest, startAt: s[len(s)-1].endAt}, len(s)
 	}
 }
 
