@@ -11,3 +11,4 @@ jobs:
     with:
       push-ghcr: true
       save-cache: true
+      update-image: true
