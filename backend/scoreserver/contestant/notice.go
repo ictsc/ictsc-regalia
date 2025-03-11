@@ -2,6 +2,7 @@ package contestant
 
 import (
 	"context"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/cockroachdb/errors"
@@ -41,7 +42,7 @@ func (h *NoticeServiceHandler) ListNotices(
 		return nil, err
 	}
 
-	notices, err := domain.ListNotices(ctx, h.ListEffect)
+	notices, err := domain.ListEffectiveNotices(ctx, time.Now(), h.ListEffect)
 	if err != nil {
 		return nil, err
 	}
@@ -49,6 +50,7 @@ func (h *NoticeServiceHandler) ListNotices(
 	protoNotices := make([]*contestantv1.Notice, 0, len(notices))
 	for _, notice := range notices {
 		protoNotices = append(protoNotices, &contestantv1.Notice{
+			Slug:  notice.Slug(),
 			Title: notice.Title(),
 			Body:  notice.Markdown(),
 		})

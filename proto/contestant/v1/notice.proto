@@ -7,6 +7,7 @@ option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant
 message Notice {
   string title = 1;
   string body = 2;
+  string slug = 3;
 }
 
 message ListNoticesRequest {}
