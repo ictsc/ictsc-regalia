@@ -12,8 +12,26 @@ type (
 		effectiveFrom time.Time
 		markdown      string
 	}
-	Notices []*Notice
+	Notices      []*Notice
+	NoticesInput = []*NoticeData
 )
+
+func NewNotices(input NoticesInput) (Notices, error) {
+	notices := make([]*Notice, 0, len(input))
+	slugSet := make(map[string]struct{}, len(input))
+	for _, inputItem := range input {
+		notice, err := inputItem.parse()
+		if err != nil {
+			return nil, err
+		}
+		if _, ok := slugSet[notice.slug]; ok {
+			return nil, NewInvalidArgumentError("duplicated slug", nil)
+		}
+		slugSet[notice.slug] = struct{}{}
+		notices = append(notices, notice)
+	}
+	return notices, nil
+}
 
 type NoticeData struct {
 	Slug          string    `json:"slug"`
