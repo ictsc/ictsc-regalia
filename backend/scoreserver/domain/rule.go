@@ -19,16 +19,6 @@ func (r *Rule) Markdown() string {
 	return r.markdown
 }
 
-func FetchRule(ctx context.Context, eff ProblemContentGetter, pagePath string) (*Rule, error) {
-	content, err := eff.GetProblemContentByPath(ctx, pagePath)
-	if err != nil {
-		return nil, WrapAsInternal(err, "failed to fetch rule")
-	}
-	return &Rule{
-		markdown: content.Content,
-	}, nil
-}
-
 func GetRule(ctx context.Context, eff RuleReader) (*Rule, error) {
 	data, err := eff.GetRule(ctx)
 	if err != nil {
