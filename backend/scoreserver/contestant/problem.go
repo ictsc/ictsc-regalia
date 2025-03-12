@@ -15,14 +15,17 @@ import (
 type ProblemServiceHandler struct {
 	contestantv1connect.UnimplementedProblemServiceHandler
 
+	Enforcer *ScheduleEnforcer
+
 	ListEffect ProblemListEffect
 	GetEffect  ProblemGetEffect
 }
 
 var _ contestantv1connect.ProblemServiceHandler = (*ProblemServiceHandler)(nil)
 
-func newProblemServiceHandler(repo *pg.Repository) *ProblemServiceHandler {
+func newProblemServiceHandler(enforcer *ScheduleEnforcer, repo *pg.Repository) *ProblemServiceHandler {
 	return &ProblemServiceHandler{
+		Enforcer: enforcer,
 		ListEffect: repo,
 		GetEffect:  repo,
 	}
@@ -42,6 +45,9 @@ func (h *ProblemServiceHandler) ListProblems(
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
+		return nil, err
+	}
+	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
 		return nil, err
 	}
 
@@ -84,6 +90,9 @@ func (h *ProblemServiceHandler) GetProblem(
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
+		return nil, err
+	}
+	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
 		return nil, err
 	}
 

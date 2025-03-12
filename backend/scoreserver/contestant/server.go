@@ -38,6 +38,8 @@ func New(
 	sessionStore.KeyPrefix("contestant-session:")
 	rateLimiter := ratelimiter.NewRedisRateLimiter(rdb, "contestant-rate-limiter:")
 
+	enforcer := &ScheduleEnforcer{ScheduleReader: scheduler}
+
 	interceptors := []connect.Interceptor{
 		connectutil.NewOtelInterceptor(),
 		connectdomain.NewErrorInterceptor(),
@@ -61,15 +63,15 @@ func New(
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(contestantv1connect.NewProblemServiceHandler(
-		newProblemServiceHandler(repo),
+		newProblemServiceHandler(enforcer, repo),
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(contestantv1connect.NewAnswerServiceHandler(
-		newAnswerServiceHandler(repo),
+		newAnswerServiceHandler(enforcer, repo),
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(contestantv1connect.NewNoticeServiceHandler(
-		newNoticeServiceHandler(repo),
+		newNoticeServiceHandler(enforcer, repo),
 		connect.WithInterceptors(interceptors...),
 	))
 
