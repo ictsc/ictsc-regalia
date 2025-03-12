@@ -340,6 +340,7 @@ func (dp *DescriptiveProblem) Save(ctx context.Context, eff ProblemWriter) error
 type (
 	ProblemReader interface {
 		ListProblems(ctx context.Context) ([]*ProblemData, error)
+		ListProblemsScoreByTeamID(ctx context.Context, teamID uuid.UUID) ([]*TeamProblemScoreData, error)
 		GetProblemByCode(ctx context.Context, code string) (*ProblemData, error)
 		GetDescriptiveProblem(ctx context.Context, id uuid.UUID) (*DescriptiveProblemData, error)
 	}
