@@ -1,8 +1,7 @@
 import { clsx } from "clsx";
 import type { Rank } from "@ictsc/proto/contestant/v1";
 import { Fragment } from "react";
-import {timestampFromDate } from "@bufbuild/protobuf/wkt";
-
+import { timestampDate } from "@bufbuild/protobuf/wkt";
 type RankingProps = {
   ranking: Rank[];
 };
@@ -46,7 +45,9 @@ export function RankingPage(props: RankingProps) {
                       ranking.timestamp == null && "px-12",
                     )}
                   >
-                   {ranking.timestamp? String(ranking.timestamp) : '-'}
+                    {ranking.timestamp
+                      ? timestampDate(ranking.timestamp).toString()
+                      : "-"}
                   </span>
                 </div>
               </div>
