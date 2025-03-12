@@ -9,12 +9,13 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type NoticeServiceHandler struct {
 	Enforcer     *auth.Enforcer
 	ListEffect   domain.NoticeReader
-	CreateEffect domain.Tx[domain.NoticeWriter]
+	UpdateEffect domain.Tx[domain.NoticeWriter]
 
 	adminv1connect.UnimplementedNoticeServiceHandler
 }
@@ -28,7 +29,7 @@ func NewNoticeServicehandler(
 	return &NoticeServiceHandler{
 		Enforcer:     enforcer,
 		ListEffect:   repo,
-		CreateEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) domain.NoticeWriter { return rt }),
+		UpdateEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) domain.NoticeWriter { return rt }),
 	}
 }
 
@@ -46,7 +47,12 @@ func (s *NoticeServiceHandler) ListNotices(
 
 	protoNotices := make([]*adminv1.Notice, 0, len(notices))
 	for _, notice := range notices {
-		protoNotices = append(protoNotices, convertNotice(notice))
+		protoNotices = append(protoNotices, &adminv1.Notice{
+			Slug:          notice.Slug(),
+			Title:         notice.Title(),
+			Markdown:      notice.Markdown(),
+			EffectiveFrom: timestamppb.New(notice.EffectiveFrom()),
+		})
 	}
 
 	return connect.NewResponse(&adminv1.ListNoticesResponse{
@@ -54,9 +60,34 @@ func (s *NoticeServiceHandler) ListNotices(
 	}), nil
 }
 
-func convertNotice(notice *domain.Notice) *adminv1.Notice {
-	return &adminv1.Notice{
-		Title:    notice.Title(),
-		Markdown: notice.Markdown(),
+func (s *NoticeServiceHandler) UpdateNotices(
+	ctx context.Context,
+	req *connect.Request[adminv1.UpdateNoticesRequest],
+) (*connect.Response[adminv1.UpdateNoticesResponse], error) {
+	if err := enforce(ctx, s.Enforcer, "notices", "create"); err != nil {
+		return nil, err
 	}
+
+	protoNotices := req.Msg.GetNotices()
+	input := make(domain.NoticesInput, 0, len(protoNotices))
+	for _, protoNotice := range protoNotices {
+		input = append(input, &domain.NoticeData{
+			Slug:          protoNotice.GetSlug(),
+			Title:         protoNotice.GetTitle(),
+			Markdown:      protoNotice.GetMarkdown(),
+			EffectiveFrom: protoNotice.GetEffectiveFrom().AsTime(),
+		})
+	}
+	notices, err := domain.NewNotices(input)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.UpdateEffect.RunInTx(ctx, func(eff domain.NoticeWriter) error {
+		return notices.Save(ctx, eff)
+	}); err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&adminv1.UpdateNoticesResponse{}), nil
 }
