@@ -18,6 +18,7 @@ import { Route as ProblemsImport } from "./routes/~problems";
 import { Route as AnnouncesImport } from "./routes/~announces";
 import { Route as IndexRouteImport } from "./routes/~index/~route";
 import { Route as ProblemsCodeRouteImport } from "./routes/~problems.$code/~route";
+import { Route as AnnouncesSlugRouteImport } from "./routes/~announces.$slug/~route";
 import { Route as ProblemsIndexRouteImport } from "./routes/~problems.index/~route";
 import { Route as AnnouncesIndexRouteImport } from "./routes/~announces.index/~route";
 
@@ -65,6 +66,14 @@ const ProblemsCodeRouteRoute = ProblemsCodeRouteImport.update({
   getParentRoute: () => ProblemsRoute,
 } as any).lazy(() =>
   import("./routes/~problems.$code/~route.lazy").then((d) => d.Route),
+);
+
+const AnnouncesSlugRouteRoute = AnnouncesSlugRouteImport.update({
+  id: "/$slug",
+  path: "/$slug",
+  getParentRoute: () => AnnouncesRoute,
+} as any).lazy(() =>
+  import("./routes/~announces.$slug/~route.lazy").then((d) => d.Route),
 );
 
 const ProblemsIndexRouteRoute = ProblemsIndexRouteImport.update({
@@ -139,6 +148,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof ProblemsIndexRouteImport;
       parentRoute: typeof ProblemsImport;
     };
+    "/announces/$slug": {
+      id: "/announces/$slug";
+      path: "/$slug";
+      fullPath: "/announces/$slug";
+      preLoaderRoute: typeof AnnouncesSlugRouteImport;
+      parentRoute: typeof AnnouncesImport;
+    };
     "/problems/$code": {
       id: "/problems/$code";
       path: "/$code";
@@ -153,10 +169,12 @@ declare module "@tanstack/react-router" {
 
 interface AnnouncesRouteChildren {
   AnnouncesIndexRouteRoute: typeof AnnouncesIndexRouteRoute;
+  AnnouncesSlugRouteRoute: typeof AnnouncesSlugRouteRoute;
 }
 
 const AnnouncesRouteChildren: AnnouncesRouteChildren = {
   AnnouncesIndexRouteRoute: AnnouncesIndexRouteRoute,
+  AnnouncesSlugRouteRoute: AnnouncesSlugRouteRoute,
 };
 
 const AnnouncesRouteWithChildren = AnnouncesRoute._addFileChildren(
@@ -186,6 +204,7 @@ export interface FileRoutesByFullPath {
   "/signup": typeof SignupRouteRoute;
   "/announces/": typeof AnnouncesIndexRouteRoute;
   "/problems/": typeof ProblemsIndexRouteRoute;
+  "/announces/$slug": typeof AnnouncesSlugRouteRoute;
   "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
 
@@ -196,6 +215,7 @@ export interface FileRoutesByTo {
   "/signup": typeof SignupRouteRoute;
   "/announces": typeof AnnouncesIndexRouteRoute;
   "/problems": typeof ProblemsIndexRouteRoute;
+  "/announces/$slug": typeof AnnouncesSlugRouteRoute;
   "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
 
@@ -209,6 +229,7 @@ export interface FileRoutesById {
   "/signup": typeof SignupRouteRoute;
   "/announces/": typeof AnnouncesIndexRouteRoute;
   "/problems/": typeof ProblemsIndexRouteRoute;
+  "/announces/$slug": typeof AnnouncesSlugRouteRoute;
   "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
 
@@ -223,6 +244,7 @@ export interface FileRouteTypes {
     | "/signup"
     | "/announces/"
     | "/problems/"
+    | "/announces/$slug"
     | "/problems/$code";
   fileRoutesByTo: FileRoutesByTo;
   to:
@@ -232,6 +254,7 @@ export interface FileRouteTypes {
     | "/signup"
     | "/announces"
     | "/problems"
+    | "/announces/$slug"
     | "/problems/$code";
   id:
     | "__root__"
@@ -243,6 +266,7 @@ export interface FileRouteTypes {
     | "/signup"
     | "/announces/"
     | "/problems/"
+    | "/announces/$slug"
     | "/problems/$code";
   fileRoutesById: FileRoutesById;
 }
@@ -289,7 +313,8 @@ export const routeTree = rootRoute
     "/announces": {
       "filePath": "~announces.tsx",
       "children": [
-        "/announces/"
+        "/announces/",
+        "/announces/$slug"
       ]
     },
     "/problems": {
@@ -315,6 +340,10 @@ export const routeTree = rootRoute
     "/problems/": {
       "filePath": "~problems.index/~route.tsx",
       "parent": "/problems"
+    },
+    "/announces/$slug": {
+      "filePath": "~announces.$slug/~route.tsx",
+      "parent": "/announces"
     },
     "/problems/$code": {
       "filePath": "~problems.$code/~route.tsx",
