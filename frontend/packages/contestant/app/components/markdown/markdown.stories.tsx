@@ -88,10 +88,40 @@ export const CodeAndTables: Story = {
     <Typography>
       <Markdown>
         {`
-\`\`\`javascript
-function hello() {
-  console.log("Hello, World!");
+問題文がここに入る  
+hogehoge  
+## こんな感じ
+diff  
+\`\`\`diff
+- echo "Hello, World!"
++ echo "Hello, New World!"
+\`\`\`
+shellscript  
+\`\`\`shellscript
+echo "Hello, World!"
+mkdir -p /tmp/hello
+cd /tmp/hello
+\`\`\`
+shellsession  
+\`\`\`shellsession
+user@problem-nle-vm:~$ ls -la
+total 32
+drwxr-x--- 4 user user 4096 Mar 15 16:10 .
+drwxr-xr-x 5 root root 4096 Feb 22 04:49 ..
+user@problem-nle-vm:~$ sudo chmod 644 memo.txt
+\`\`\`
+hcl
+\`\`\`hcl
+io_mode = "async"
+
+service "http" "web_proxy" {
+  listen_addr = "127.0.0.1:8080"
+  
+  process "main" {
+    command = ["/usr/local/bin/awesome-app", "server"]
+  }
 }
+
 \`\`\`
 
 | 列1 | 列2 | 列3 |
