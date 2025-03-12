@@ -66,10 +66,10 @@ func NewLoggingInterceptor() connect.UnaryInterceptorFunc {
 func serverCodeToLevel(code connect.Code) slog.Level {
 	switch code {
 	case 0, connect.CodeNotFound, connect.CodeCanceled, connect.CodeAlreadyExists,
-		connect.CodeInvalidArgument, connect.CodeUnauthenticated:
+		connect.CodeInvalidArgument, connect.CodeUnauthenticated, connect.CodePermissionDenied,
+		connect.CodeFailedPrecondition:
 		return slog.LevelInfo
-	case connect.CodeDeadlineExceeded, connect.CodePermissionDenied, connect.CodeResourceExhausted,
-		connect.CodeFailedPrecondition, connect.CodeAborted,
+	case connect.CodeDeadlineExceeded, connect.CodeResourceExhausted, connect.CodeAborted,
 		connect.CodeOutOfRange, connect.CodeUnavailable:
 		return slog.LevelWarn
 	case connect.CodeUnknown, connect.CodeUnimplemented,
