@@ -18,14 +18,18 @@ import (
 type AnswerServiceHandler struct {
 	contestantv1connect.UnimplementedAnswerServiceHandler
 
+	Enforcer *ScheduleEnforcer
+
 	ListEffect   ListAnswersEffect
 	SubmitEffect SubmitAnswerEffect
 }
 
 var _ contestantv1connect.AnswerServiceHandler = (*AnswerServiceHandler)(nil)
 
-func newAnswerServiceHandler(repo *pg.Repository) *AnswerServiceHandler {
+func newAnswerServiceHandler(enforcer *ScheduleEnforcer, repo *pg.Repository) *AnswerServiceHandler {
 	return &AnswerServiceHandler{
+		Enforcer: enforcer,
+
 		ListEffect: repo,
 		SubmitEffect: struct {
 			domain.TeamMemberGetter
@@ -53,6 +57,9 @@ func (h *AnswerServiceHandler) ListAnswers(
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
+		return nil, err
+	}
+	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
 		return nil, err
 	}
 
@@ -110,6 +117,9 @@ func (h *AnswerServiceHandler) SubmitAnswer(
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
+		return nil, err
+	}
+	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
 		return nil, err
 	}
 
