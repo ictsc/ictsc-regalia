@@ -125,8 +125,6 @@ func FixDescriptiveProblem1(tb testing.TB, data *DescriptiveProblemData) *Descri
 			RedeployRule: RedeployRuleUnredeployable,
 		},
 		Content: &ProblemContentData{
-			PageID:      "page1",
-			PagePath:    "/page1",
 			Body:        "This is a problem.",
 			Explanation: "This is an explanation.",
 		},

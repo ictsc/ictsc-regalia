@@ -4,11 +4,10 @@ CREATE EXTENSION pg_stat_statements;
 CREATE EXTENSION btree_gist;
 
 CREATE TABLE rules (
-	page_path TEXT,
-	markdown TEXT
+	page_path TEXT, -- Deprecated: いずれ消す
+	markdown TEXT NOT NULL
 );
 COMMENT ON TABLE rules IS 'ルール';
-COMMENT ON COLUMN rules.page_path IS 'Wiki上のページパス';
 COMMENT ON COLUMN rules.markdown IS 'Markdown形式のルール';
 
 CREATE TABLE teams (
@@ -112,15 +111,13 @@ COMMENT ON COLUMN redeploy_percentage_penalties.percentage IS '再展開一回�
 
 CREATE TABLE problem_contents (
 	problem_id UUID PRIMARY KEY REFERENCES problems(id) ON DELETE CASCADE,
-	page_id VARCHAR(255) NOT NULL,
-	page_path VARCHAR(255) NOT NULL,
+	page_id VARCHAR(255) NULL, -- Deprecated
+	page_path VARCHAR(255) NULL, -- Deprecated
 	body TEXT NOT NULL,
 	explanation TEXT NOT NULL
 );
 COMMENT ON TABLE problem_contents IS '問題の内容';
 COMMENT ON COLUMN problem_contents.problem_id IS '問題 ID';
-COMMENT ON COLUMN problem_contents.page_id IS 'Wiki上のページ ID';
-COMMENT ON COLUMN problem_contents.page_path IS 'Wiki上のページパス';
 COMMENT ON COLUMN problem_contents.body IS '問題文';
 COMMENT ON COLUMN problem_contents.explanation IS '運営向け解説情報';
 
@@ -207,16 +204,31 @@ CREATE TABLE redeployment_events (
 
 CREATE TABLE notices (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	path VARCHAR(255) NOT NULL UNIQUE,
+	path VARCHAR(255), -- Deprecated
 	title VARCHAR(255),
 	markdown TEXT NOT NULL,
 	effective_from TIMESTAMPTZ NOT NULL,
-	effective_until TIMESTAMPTZ NOT NULL
+	effective_until TIMESTAMPTZ -- Deprecated?
 );
 COMMENT ON TABLE notices IS 'お知らせ';
 COMMENT ON COLUMN notices.id IS 'お知らせ ID';
-COMMENT ON COLUMN notices.path IS 'Wiki上のページパス';
 COMMENT ON COLUMN notices.title IS 'タイトル';
 COMMENT ON COLUMN notices.markdown IS '本文';
 COMMENT ON COLUMN notices.effective_from IS '掲示開始時間';
 COMMENT ON COLUMN notices.effective_until IS '掲示終了時間';
+
+CREATE TYPE contest_phase AS ENUM ('UNSPECIFIED', 'OUT_OF_CONTEST', 'IN_CONTEST', 'BREAK', 'AFTER_CONTEST');
+
+CREATE TABLE schedules (
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    phase contest_phase NOT NULL,
+    start_at TIMESTAMPTZ NOT NULL,
+    end_at TIMESTAMPTZ NOT NULL,
+    CONSTRAINT schedules_start_end CHECK (start_at < end_at)
+);
+
+COMMENT ON TABLE schedules IS 'コンテストスケジュール';
+COMMENT ON COLUMN schedules.id IS 'スケジュール ID';
+COMMENT ON COLUMN schedules.phase IS 'フェーズ';
+COMMENT ON COLUMN schedules.start_at IS '開始時刻';
+COMMENT ON COLUMN schedules.end_at IS '終了時刻';

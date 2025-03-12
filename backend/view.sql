@@ -1,16 +1,28 @@
-DROP VIEW IF EXISTS latest_marking_results;
+DROP VIEW IF EXISTS latest_marking_result_ids CASCADE;
 CREATE VIEW latest_marking_result_ids AS (
 	SELECT DISTINCT ON (answer_id) id, answer_id
 	FROM marking_results
 	ORDER BY answer_id, created_at DESC
 );
 
-DROP VIEW IF EXISTS latest_public_marking_result_ids;
+DROP VIEW IF EXISTS latest_public_marking_result_ids CASCADE;
 CREATE VIEW latest_public_marking_result_ids AS (
 	SELECT DISTINCT ON (answer_id) id, answer_id
 	FROM marking_results
 	WHERE visibility = 'PUBLIC'
 	ORDER BY answer_id, created_at DESC
+);
+
+DROP VIEW IF EXISTS team_problem_scores CASCADE;
+CREATE VIEW team_problem_scores AS (
+	SELECT
+		DISTINCT ON (a.team_id, a.problem_id)
+		a.team_id, a.problem_id, lower(a.created_at_range) AS "created_at",
+		s.marked_score, s.penalty, s.total_score
+	FROM answers AS a
+	LEFT JOIN latest_public_marking_result_ids AS lm ON a.id = lm.answer_id
+	LEFT JOIN scores AS s ON s.marking_result_id=lm.id
+	ORDER BY a.team_id, a.problem_id, s.total_score DESC
 );
 
 DROP VIEW IF EXISTS answer_view CASCADE;

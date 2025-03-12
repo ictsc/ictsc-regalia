@@ -1,5 +1,6 @@
 import type { Problem } from "@ictsc/proto/contestant/v1";
 import { ProblemItem } from "./problem-item";
+import { protoScoreToProps } from "../../features/score";
 
 type PageProps = {
   problems: Problem[];
@@ -14,14 +15,7 @@ export function ProblemsPage(props: PageProps) {
             <ProblemItem
               code={problem.code}
               title={problem.title}
-              score={{
-                maxScore: problem.maxScore,
-                score: problem.score?.score,
-                rawScore: problem.score?.markedScore,
-                penalty: problem.score?.penalty,
-                fullScore: problem.score?.score === problem.maxScore,
-                rawFullScore: problem.score?.markedScore === problem.maxScore,
-              }}
+              score={protoScoreToProps(problem.maxScore, problem.score)}
             />
           </li>
         ))}

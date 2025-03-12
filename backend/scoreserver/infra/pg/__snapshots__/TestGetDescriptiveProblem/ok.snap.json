@@ -9,8 +9,6 @@
     "redeploy_rule": "Unredeployable"
   },
   "content": {
-    "page_id": "page1",
-    "page_path": "/page1",
     "body": "問題Aの本文",
     "explanation": "問題Aの解説"
   }

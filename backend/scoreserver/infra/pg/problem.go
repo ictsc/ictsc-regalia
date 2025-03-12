@@ -172,8 +172,6 @@ func (r *RepositoryTx) SaveDescriptiveProblem(ctx context.Context, descriptivePr
 			}{
 				ProblemID: descriptiveProblem.Problem.ID,
 				problemContentRow: problemContentRow{
-					PageID:      content.PageID,
-					PagePath:    content.PagePath,
 					Body:        content.Body,
 					Explanation: content.Explanation,
 				},
@@ -221,7 +219,7 @@ type (
 var (
 	problemCols                   = columns([]string{"id", "code", "type", "title", "max_score", "category", "redeploy_rule"})
 	redeployPercentagePenaltyCols = columns([]string{"threshold", "percentage"})
-	problemContentCols            = columns([]string{"page_id", "page_path", "body", "explanation"})
+	problemContentCols            = columns([]string{"body", "explanation"})
 )
 
 func (r *problemRow) data() *domain.ProblemData {
@@ -248,8 +246,6 @@ func (r *redeployPercentagePenaltyNullRow) data() *domain.RedeployPenaltyPercent
 
 func (r *problemContentRow) data() *domain.ProblemContentData {
 	return &domain.ProblemContentData{
-		PageID:      r.PageID,
-		PagePath:    r.PagePath,
 		Body:        r.Body,
 		Explanation: r.Explanation,
 	}
@@ -259,7 +255,7 @@ type problemType domain.ProblemType
 
 var (
 	_ sql.Scanner   = (*problemType)(nil)
-	_ driver.Valuer = problemType(0)
+	_ driver.Valuer = problemType(domain.ProblemTypeUnknown)
 )
 
 func (t *problemType) Scan(src any) error {
