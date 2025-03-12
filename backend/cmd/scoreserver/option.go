@@ -9,6 +9,7 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/slogutil"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 )
 
 type CLIOption struct {
@@ -24,6 +25,12 @@ type CLIOption struct {
 
 	ContestantHTTPAddr netip.AddrPort
 	ContestantBaseURL  url.URL
+
+	UseFakeSchedule       bool
+	FakeSchedulePhase     domain.Phase
+	FakeScheduleNextPhase domain.Phase
+	FakeScheduleStartAt   time.Time
+	FakeScheduleEndAt     time.Time
 }
 
 // NewOption creates a new CLIOption combined with the given flag.FlagSet.
@@ -45,6 +52,12 @@ func NewOption(fs *flag.FlagSet) *CLIOption {
 	fs.TextVar(&opt.ContestantHTTPAddr, "contestant.http-addr", netip.MustParseAddrPort("127.0.0.1:8080"), "Contestant HTTP server address")
 	fs.TextVar((*urlValue)(&opt.ContestantBaseURL), "contestant.base-url",
 		(*urlValue)(&url.URL{Scheme: "http", Host: "localhost:8080"}), "Contestant base URL")
+
+	fs.BoolVar(&opt.UseFakeSchedule, "fake.schedule", false, "Use fake schedule")
+	fs.TextVar(&opt.FakeSchedulePhase, "fake.schedule.phase", domain.PhaseInContest, "Fake schedule current phase")
+	fs.TextVar(&opt.FakeScheduleNextPhase, "fake.schedule.next-phase", domain.PhaseBreak, "Fake schedule next phase")
+	fs.TextVar(&opt.FakeScheduleStartAt, "fake.schedule.start-at", time.Now(), "Fake schedule start time")
+	fs.TextVar(&opt.FakeScheduleEndAt, "fake.schedule.end-at", time.Now().Add(2*time.Hour), "Fake schedule end time")
 
 	fs.BoolFunc("v", "Verbose logging", func(string) error {
 		opt.LogLevel = slog.LevelDebug
