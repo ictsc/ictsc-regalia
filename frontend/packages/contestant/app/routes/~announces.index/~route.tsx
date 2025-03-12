@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AnnounceList } from "./page";
 import { use, useDeferredValue } from "react";
 
-export const Route = createFileRoute("/announces")({
+export const Route = createFileRoute("/announces/")({
   component: RouteComponent,
   loader: ({ context: { transport } }) => {
     return {
