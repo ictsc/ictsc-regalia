@@ -23,10 +23,10 @@ type ContestServiceHandler struct {
 
 var _ contestantv1connect.ContestServiceHandler = (*ContestServiceHandler)(nil)
 
-func newContestServiceHandler(repo *pg.Repository) *ContestServiceHandler {
+func newContestServiceHandler(repo *pg.Repository, scheduleReader domain.ScheduleReader) *ContestServiceHandler {
 	return &ContestServiceHandler{
 		GetRuleEffect:     repo,
-		GetScheduleEffect: repo,
+		GetScheduleEffect: scheduleReader,
 	}
 }
 

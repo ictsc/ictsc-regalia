@@ -11,13 +11,14 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/connectdomain"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
 
-func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB) (http.Handler, error) {
+func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB, scheduleReader domain.ScheduleReader) (http.Handler, error) {
 	enforcer, err := auth.NewEnforcer(cfg.Authz)
 	if err != nil {
 		return nil, err
@@ -62,7 +63,7 @@ func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB) (http.Handler, e
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(adminv1connect.NewScheduleServiceHandler(
-		newScheduleServiceHandler(enforcer, repo),
+		newScheduleServiceHandler(enforcer, repo, scheduleReader),
 		connect.WithInterceptors(interceptors...),
 	))
 

@@ -22,10 +22,10 @@ type ScheduleServiceHandler struct {
 
 var _ adminv1connect.ScheduleServiceHandler = (*ScheduleServiceHandler)(nil)
 
-func newScheduleServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *ScheduleServiceHandler {
+func newScheduleServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository, scheduleReader domain.ScheduleReader) *ScheduleServiceHandler {
 	return &ScheduleServiceHandler{
 		Enforcer:     enforcer,
-		GetEffect:    repo,
+		GetEffect:    scheduleReader,
 		UpdateEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) domain.ScheduleWriter { return rt }),
 	}
 }
@@ -98,11 +98,17 @@ func convertScheduleEntry(schedule *domain.ScheduleEntry) *adminv1.Schedule {
 		phase = adminv1.Phase_PHASE_UNSPECIFIED
 	}
 
-	return &adminv1.Schedule{
-		Phase:   phase,
-		StartAt: timestamppb.New(schedule.StartAt()),
-		EndAt:   timestamppb.New(schedule.EndAt()),
+	proto := &adminv1.Schedule{
+		Phase: phase,
 	}
+	if !schedule.StartAt().IsZero() {
+		proto.StartAt = timestamppb.New(schedule.StartAt())
+	}
+	if !schedule.EndAt().IsZero() {
+		proto.EndAt = timestamppb.New(schedule.EndAt())
+	}
+
+	return proto
 }
 
 func convertProtoPhaseToDomain(protoPhase adminv1.Phase) domain.Phase {
