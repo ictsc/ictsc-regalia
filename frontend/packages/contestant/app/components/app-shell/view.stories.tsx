@@ -21,7 +21,14 @@ function AppShell() {
           accountMenu={<AccountMenu name="Alice" onSignOut={signOutAction} />}
         />
       }
-      navbar={<Navbar collapsed={collapsed} onOpenToggleClick={toggle} />}
+      navbar={
+        <Navbar
+          canViewProblems
+          canViewAnnounces
+          collapsed={collapsed}
+          onOpenToggleClick={toggle}
+        />
+      }
       navbarCollapsed={collapsed}
     >
       <h1>Main</h1>

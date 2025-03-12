@@ -5,8 +5,10 @@ import {
   useDeferredValue,
   useReducer,
 } from "react";
-import { useSignOut, type User } from "@app/features/viewer";
-import { Layout, Header, Navbar, AccountMenu } from "@app/components/app-shell";
+import { useSignOut, type User } from "../features/viewer";
+import { useSchedule } from "../features/schedule";
+import { Layout, Header, Navbar, AccountMenu } from "../components/app-shell";
+import { Phase } from "@ictsc/proto/contestant/v1";
 
 export function AppShell({
   children,
@@ -16,6 +18,7 @@ export function AppShell({
   readonly viewer: Promise<User>;
 }) {
   const viewer = use(useDeferredValue(viewerPromise));
+  const [schedule] = useSchedule();
   const [collapsed, toggle] = useReducer((o) => !o, false);
   const signOutAction = useSignOut();
 
@@ -37,7 +40,12 @@ export function AppShell({
       }
       navbar={
         viewer?.type === "contestant" ? (
-          <Navbar collapsed={collapsed} onOpenToggleClick={toggle} />
+          <Navbar
+            canViewProblems={schedule?.phase === Phase.IN_CONTEST}
+            canViewAnnounces={schedule?.phase === Phase.IN_CONTEST}
+            collapsed={collapsed}
+            onOpenToggleClick={toggle}
+          />
         ) : null
       }
       navbarCollapsed={collapsed}
