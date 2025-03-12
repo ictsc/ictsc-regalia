@@ -1,18 +1,20 @@
 [
   {
-    "id": "0cea0d50-96a5-45fb-a5c5-a6d6df140adc",
-    "path": "/current/notice",
-    "title": "Current Notice",
-    "markdown": "現在のお知らせです",
-    "effective_from": "2025-02-03T09:00:00+09:00",
-    "effective_until": "2035-03-03T09:00:00+09:00"
+    "slug": "future-notice",
+    "title": "Future Notice",
+    "effective_from": "2035-03-03T09:00:00+09:00",
+    "markdown": "未来のお知らせです"
   },
   {
-    "id": "6ca38a12-adff-48f3-8fce-8f189eba38bb",
-    "path": "/current/notice2",
-    "title": "Current Notice2",
-    "markdown": "現在のお知らせ2です",
+    "slug": "current-notice",
+    "title": "Current Notice",
     "effective_from": "2025-02-03T09:00:00+09:00",
-    "effective_until": "2035-03-03T09:00:00+09:00"
+    "markdown": "現在のお知らせです"
+  },
+  {
+    "slug": "current-notice2",
+    "title": "Current Notice2",
+    "effective_from": "2025-02-03T09:00:00+09:00",
+    "markdown": "現在のお知らせ2です"
   }
 ]

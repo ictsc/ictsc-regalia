@@ -125,8 +125,6 @@ func FixDescriptiveProblem1(tb testing.TB, data *DescriptiveProblemData) *Descri
 			RedeployRule: RedeployRuleUnredeployable,
 		},
 		Content: &ProblemContentData{
-			PageID:      "page1",
-			PagePath:    "/page1",
 			Body:        "This is a problem.",
 			Explanation: "This is an explanation.",
 		},
@@ -147,20 +145,17 @@ func FixNotice1(tb testing.TB, data *NoticeData) *Notice {
 
 	now := time.Now()
 	yesterday := now.Add(-24 * time.Hour) //nolint:mnd //
-	tomorrow := now.Add(24 * time.Hour)   //nolint:mnd // fixture
 
 	noticeData := &NoticeData{
-		ID:             uuid.FromStringOrNil("0cea0d50-96a5-45fb-a5c5-a6d6df140adc"),
-		Path:           "/test",
-		Title:          "テストお知らせ", //nolint:gosmopolitan // fixture
-		Markdown:       "これはサンプルです。\n",
-		EffectiveFrom:  &yesterday,
-		EffectiveUntil: &tomorrow,
+		Slug:          "test-notice",
+		Title:         "テストお知らせ", //nolint:gosmopolitan // fixture
+		Markdown:      "これはサンプルです。\n",
+		EffectiveFrom: yesterday,
 	}
 
 	if data != nil {
-		if !data.ID.IsNil() {
-			noticeData.ID = data.ID
+		if data.Slug != "" {
+			noticeData.Slug = data.Slug
 		}
 		if data.Title != "" {
 			noticeData.Title = data.Title
@@ -168,9 +163,15 @@ func FixNotice1(tb testing.TB, data *NoticeData) *Notice {
 		if data.Markdown != "" {
 			noticeData.Markdown = data.Markdown
 		}
+		if !data.EffectiveFrom.IsZero() {
+			noticeData.EffectiveFrom = data.EffectiveFrom
+		}
 	}
 
-	notice := noticeData.parse()
+	notice, err := noticeData.parse()
+	if err != nil {
+		tb.Fatal(err)
+	}
 
 	return notice
 }

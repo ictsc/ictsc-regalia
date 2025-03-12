@@ -17,11 +17,12 @@ target "backend" {
   context = "./backend"
   matrix = {
     image = [
+      "backend",
       "scoreserver",
       "toolbox"
     ]
   }
-  name = "backend-${image}"
+  name = "${image}"
   tags = make_tags(target.docker-metadata-action.tags, "${image}")
   target = "${image}"
 }
@@ -32,7 +33,7 @@ target "frontend" {
   matrix = {
     image = ["frontend"]
   }
-  name = "frontend-${image}"
+  name = "${image}"
   tags = make_tags(target.docker-metadata-action.tags, "${image}")
   target = "${image}"
 }

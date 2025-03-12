@@ -1,0 +1,14 @@
+[
+  {
+    "slug": "changed/notice",
+    "title": "Changed Notice",
+    "effective_from": "2035-03-03T09:00:00+09:00",
+    "markdown": "変更済みのお知らせです"
+  },
+  {
+    "slug": "test",
+    "title": "testお知らせです",
+    "effective_from": "2025-02-03T09:00:00+09:00",
+    "markdown": "これはサンプルです。"
+  }
+]

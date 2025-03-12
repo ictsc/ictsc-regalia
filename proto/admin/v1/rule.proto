@@ -5,7 +5,6 @@ package admin.v1;
 option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1";
 
 message Rule {
-  string page_path = 1;
   string markdown = 2;
 }
 

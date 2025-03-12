@@ -13,6 +13,7 @@ export const InContest: Story = {
     announces: [
       ...Array.from({ length: 10 }, () => ({
         $typeName: "contestant.v1.Notice" as const,
+        slug: "hogehoge",
         title: "hogehoge",
         body: "hogehoge",
       })),

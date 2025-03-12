@@ -8,14 +8,14 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
-	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/growi"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type NoticeServiceHandler struct {
 	Enforcer     *auth.Enforcer
-	ListEffect   NoticeListEffect
-	CreateEffect NoticeCreateEffect
+	ListEffect   domain.NoticeReader
+	UpdateEffect domain.Tx[domain.NoticeWriter]
 
 	adminv1connect.UnimplementedNoticeServiceHandler
 }
@@ -25,26 +25,12 @@ var _ adminv1connect.NoticeServiceHandler = (*NoticeServiceHandler)(nil)
 func NewNoticeServicehandler(
 	enforcer *auth.Enforcer,
 	repo *pg.Repository,
-	growiClient *growi.Client,
 ) *NoticeServiceHandler {
-	createEffect := struct {
-		domain.NoticeWriter
-		domain.NoticeGetter
-	}{
-		NoticeWriter: repo,
-		NoticeGetter: growiClient,
-	}
 	return &NoticeServiceHandler{
 		Enforcer:     enforcer,
 		ListEffect:   repo,
-		CreateEffect: createEffect,
+		UpdateEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) domain.NoticeWriter { return rt }),
 	}
-}
-
-type NoticeListEffect = domain.NoticeReader
-type NoticeCreateEffect interface {
-	domain.NoticeWriter
-	domain.NoticeGetter
 }
 
 func (s *NoticeServiceHandler) ListNotices(
@@ -61,7 +47,12 @@ func (s *NoticeServiceHandler) ListNotices(
 
 	protoNotices := make([]*adminv1.Notice, 0, len(notices))
 	for _, notice := range notices {
-		protoNotices = append(protoNotices, convertNotice(notice))
+		protoNotices = append(protoNotices, &adminv1.Notice{
+			Slug:          notice.Slug(),
+			Title:         notice.Title(),
+			Markdown:      notice.Markdown(),
+			EffectiveFrom: timestamppb.New(notice.EffectiveFrom()),
+		})
 	}
 
 	return connect.NewResponse(&adminv1.ListNoticesResponse{
@@ -69,37 +60,34 @@ func (s *NoticeServiceHandler) ListNotices(
 	}), nil
 }
 
-func (s *NoticeServiceHandler) SyncNotices(
+func (s *NoticeServiceHandler) UpdateNotices(
 	ctx context.Context,
-	req *connect.Request[adminv1.SyncNoticesRequest],
-) (*connect.Response[adminv1.SyncNoticesResponse], error) {
+	req *connect.Request[adminv1.UpdateNoticesRequest],
+) (*connect.Response[adminv1.UpdateNoticesResponse], error) {
 	if err := enforce(ctx, s.Enforcer, "notices", "create"); err != nil {
 		return nil, err
 	}
-	path := req.Msg.GetPath()
-	if path == "" {
-		return nil, domain.NewInvalidArgumentError("path is required", nil)
-	}
 
-	notice, err := domain.FetchNoticeByPath(ctx, s.CreateEffect, req.Msg.GetPath())
+	protoNotices := req.Msg.GetNotices()
+	input := make(domain.NoticesInput, 0, len(protoNotices))
+	for _, protoNotice := range protoNotices {
+		input = append(input, &domain.NoticeData{
+			Slug:          protoNotice.GetSlug(),
+			Title:         protoNotice.GetTitle(),
+			Markdown:      protoNotice.GetMarkdown(),
+			EffectiveFrom: protoNotice.GetEffectiveFrom().AsTime(),
+		})
+	}
+	notices, err := domain.NewNotices(input)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := notice.SaveNotice(ctx, s.CreateEffect); err != nil {
+	if err := s.UpdateEffect.RunInTx(ctx, func(eff domain.NoticeWriter) error {
+		return notices.Save(ctx, eff)
+	}); err != nil {
 		return nil, err
 	}
-	protoNotice := convertNotice(notice)
 
-	return connect.NewResponse(&adminv1.SyncNoticesResponse{
-		Notice: protoNotice,
-	}), nil
-}
-
-func convertNotice(notice *domain.Notice) *adminv1.Notice {
-	return &adminv1.Notice{
-		Path:     notice.Path(),
-		Title:    notice.Title(),
-		Markdown: notice.Markdown(),
-	}
+	return connect.NewResponse(&adminv1.UpdateNoticesResponse{}), nil
 }

@@ -4,12 +4,10 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
-	"github.com/cockroachdb/errors"
 	adminv1 "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
-	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/growi"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 )
 
@@ -23,17 +21,11 @@ type RuleServiceHandler struct {
 
 var _ adminv1connect.RuleServiceHandler = (*RuleServiceHandler)(nil)
 
-func newRuleServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository, growiClient *growi.Client) *RuleServiceHandler {
+func newRuleServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *RuleServiceHandler {
 	return &RuleServiceHandler{
-		Enforcer:  enforcer,
-		GetEffect: repo,
-		UpdateEffect: struct {
-			domain.ProblemContentGetter
-			domain.Tx[domain.RuleWriter]
-		}{
-			ProblemContentGetter: growiClient,
-			Tx:                   pg.Tx(repo, func(rt *pg.RepositoryTx) domain.RuleWriter { return rt }),
-		},
+		Enforcer:     enforcer,
+		GetEffect:    repo,
+		UpdateEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) domain.RuleWriter { return rt }),
 	}
 }
 
@@ -55,14 +47,12 @@ func (h *RuleServiceHandler) GetRule(
 	}
 	return connect.NewResponse(&adminv1.GetRuleResponse{
 		Rule: &adminv1.Rule{
-			PagePath: rule.PagePath(),
 			Markdown: rule.Markdown(),
 		},
 	}), nil
 }
 
 type RuleUpdateEffect interface {
-	domain.ProblemContentGetter
 	domain.Tx[domain.RuleWriter]
 }
 
@@ -74,12 +64,7 @@ func (h *RuleServiceHandler) UpdateRule(
 		return nil, err
 	}
 
-	pagePath := req.Msg.GetRule().GetPagePath()
-	if pagePath == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("page_path is required"))
-	}
-
-	rule, err := domain.FetchRule(ctx, h.UpdateEffect, pagePath)
+	rule, err := domain.NewRule(req.Msg.GetRule().GetMarkdown())
 	if err != nil {
 		return nil, err
 	}

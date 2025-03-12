@@ -8,7 +8,6 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
-	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/growi"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 )
 
@@ -28,15 +27,8 @@ var _ adminv1connect.ProblemServiceHandler = (*ProblemServiceHandler)(nil)
 func NewProblemServiceHandler(
 	enforcer *auth.Enforcer,
 	repo *pg.Repository,
-	growiClient *growi.Client,
 ) *ProblemServiceHandler {
-	createEffect := struct {
-		domain.Tx[domain.ProblemWriter]
-		domain.ProblemContentGetter
-	}{
-		Tx:                   pg.Tx(repo, func(rt *pg.RepositoryTx) domain.ProblemWriter { return rt }),
-		ProblemContentGetter: growiClient,
-	}
+	createEffect := pg.Tx(repo, func(rt *pg.RepositoryTx) domain.ProblemWriter { return rt })
 	return &ProblemServiceHandler{
 		Enforcer:     enforcer,
 		ListEffect:   repo,
@@ -116,7 +108,6 @@ func (h *ProblemServiceHandler) GetProblem(
 
 type ProblemCreateEffect interface {
 	domain.Tx[domain.ProblemWriter]
-	domain.ProblemContentGetter
 }
 
 func (h *ProblemServiceHandler) CreateProblem(
@@ -136,21 +127,12 @@ func (h *ProblemServiceHandler) CreateProblem(
 		return nil, domain.NewInvalidArgumentError("only descriptive problem is supported", nil)
 	}
 
-	var content *domain.ProblemContent
-	if pagePath := req.Msg.GetProblem().GetBody().GetDescriptive().GetPagePath(); pagePath != "" {
-		var err error
-		content, err = domain.FetchProblemContentByPath(ctx, h.CreateEffect, pagePath)
-		if err != nil {
-			return nil, err
-		}
-	} else if pageID := req.Msg.GetProblem().GetBody().GetDescriptive().GetPageId(); pageID != "" {
-		var err error
-		content, err = domain.FetchProblemContentByID(ctx, h.CreateEffect, pageID)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		return nil, domain.NewInvalidArgumentError("pageId or pagePath is required", nil)
+	content, err := domain.NewProblemContent(
+		req.Msg.GetProblem().GetBody().GetDescriptive().GetProblemMarkdown(),
+		req.Msg.GetProblem().GetBody().GetDescriptive().GetExplanationMarkdown(),
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	rule, penalty := parseRedeployRule(req.Msg.GetProblem().GetRedeployRule())
@@ -195,28 +177,14 @@ func (h *ProblemServiceHandler) UpdateProblem(
 
 	rule, penalty := parseRedeployRule(req.Msg.GetProblem().GetRedeployRule())
 
-	var content *domain.ProblemContent
-	if pagePath := req.Msg.GetProblem().GetBody().GetDescriptive().GetPagePath(); pagePath != "" {
-		var err error
-		content, err = domain.FetchProblemContentByPath(ctx, h.CreateEffect, pagePath)
-		if err != nil {
-			return nil, err
-		}
-	} else if pageID := req.Msg.GetProblem().GetBody().GetDescriptive().GetPageId(); pageID != "" {
-		var err error
-		content, err = domain.FetchProblemContentByID(ctx, h.CreateEffect, pageID)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	input := domain.UpdateDescriptiveProblemInput{
 		Title:             req.Msg.GetProblem().GetTitle(),
 		MaxScore:          req.Msg.GetProblem().GetMaxScore(),
 		Category:          req.Msg.GetProblem().GetCategory(),
 		RedeployRule:      rule,
 		PercentagePenalty: penalty,
-		Content:           content,
+		Body:              req.Msg.GetProblem().GetBody().GetDescriptive().GetProblemMarkdown(),
+		Explanation:       req.Msg.GetProblem().GetBody().GetDescriptive().GetExplanationMarkdown(),
 	}
 
 	descriptiveProblem, err := domain.RunTx(ctx, h.UpdateEffect, func(tx domain.ProblemWriter) (*domain.DescriptiveProblem, error) {
@@ -305,8 +273,6 @@ func convertDescriptiveProblem(problem *domain.DescriptiveProblem) *adminv1.Prob
 	proto := convertProblem(problem.Problem())
 	proto.Body.Body = &adminv1.ProblemBody_Descriptive{
 		Descriptive: &adminv1.DescriptiveProblem{
-			PageId:              problem.PageID(),
-			PagePath:            problem.PagePath(),
 			ProblemMarkdown:     problem.Body(),
 			ExplanationMarkdown: problem.Explanation(),
 		},
