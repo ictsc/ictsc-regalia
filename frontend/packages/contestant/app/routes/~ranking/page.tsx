@@ -46,7 +46,7 @@ export function RankingPage(props: RankingProps) {
                       ranking.timestamp == null && "px-12",
                     )}
                   >
-                   {ranking.timestamp ? new Date(timestampFromDate(ranking.timestamp)).toLocaleString() : '-'}
+                   {ranking.timestamp? String(ranking.timestamp) : '-'}
                   </span>
                 </div>
               </div>

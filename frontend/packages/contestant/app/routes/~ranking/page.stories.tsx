@@ -16,7 +16,7 @@ export const Default: Story = {
         rank: 1,
         teamName: "チーム名なまえがわからない",
         score: 8888,
-        TimeStamp: "2025-03-04T12:00:00",
+        timestamp: "2025/03/04-12:00:00",
         organization: "testTeam",
       })),
       ...Array.from({ length: 4 }, () => ({
@@ -24,7 +24,7 @@ export const Default: Story = {
         rank: 2,
         teamName: "チーム名なまえがわからない",
         score: 8888,
-        TimeStamp: "2025-03-04T12:00:00",
+        timestamp: "2025/03/04-12:00:00",
         organization: "testTeam",
       })),
     ],

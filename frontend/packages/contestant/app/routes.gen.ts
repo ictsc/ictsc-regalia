@@ -14,6 +14,7 @@ import { Route as rootRoute } from "./routes/~__root";
 import { Route as SignupRouteImport } from "./routes/~signup/~route";
 import { Route as SigninRouteImport } from "./routes/~signin/~route";
 import { Route as RuleRouteImport } from "./routes/~rule/~route";
+import { Route as RankingRouteImport } from "./routes/~ranking/~route";
 import { Route as AnnouncesRouteImport } from "./routes/~announces/~route";
 import { Route as IndexRouteImport } from "./routes/~index/~route";
 import { Route as ProblemsCodeRouteImport } from "./routes/~problems.$code/~route";
@@ -38,6 +39,12 @@ const RuleRouteRoute = RuleRouteImport.update({
   path: "/rule",
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import("./routes/~rule/~route.lazy").then((d) => d.Route));
+
+const RankingRouteRoute = RankingRouteImport.update({
+  id: "/ranking",
+  path: "/ranking",
+  getParentRoute: () => rootRoute,
+} as any);
 
 const AnnouncesRouteRoute = AnnouncesRouteImport.update({
   id: "/announces",
@@ -83,6 +90,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AnnouncesRouteImport;
       parentRoute: typeof rootRoute;
     };
+    "/ranking": {
+      id: "/ranking";
+      path: "/ranking";
+      fullPath: "/ranking";
+      preLoaderRoute: typeof RankingRouteImport;
+      parentRoute: typeof rootRoute;
+    };
     "/rule": {
       id: "/rule";
       path: "/rule";
@@ -125,8 +139,8 @@ declare module "@tanstack/react-router" {
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRouteRoute;
-  "/ranking": typeof RankingRouteRoute;
   "/announces": typeof AnnouncesRouteRoute;
+  "/ranking": typeof RankingRouteRoute;
   "/rule": typeof RuleRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
@@ -136,8 +150,8 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   "/": typeof IndexRouteRoute;
-  "/ranking": typeof RankingRouteRoute;
   "/announces": typeof AnnouncesRouteRoute;
+  "/ranking": typeof RankingRouteRoute;
   "/rule": typeof RuleRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
@@ -148,8 +162,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute;
   "/": typeof IndexRouteRoute;
-  "/ranking": typeof RankingRouteRoute;
   "/announces": typeof AnnouncesRouteRoute;
+  "/ranking": typeof RankingRouteRoute;
   "/rule": typeof RuleRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
@@ -161,8 +175,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
     | "/"
-    | "/ranking"
     | "/announces"
+    | "/ranking"
     | "/rule"
     | "/signin"
     | "/signup"
@@ -171,8 +185,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
-    | "/ranking"
     | "/announces"
+    | "/ranking"
     | "/rule"
     | "/signin"
     | "/signup"
@@ -181,8 +195,8 @@ export interface FileRouteTypes {
   id:
     | "__root__"
     | "/"
-    | "/ranking"
     | "/announces"
+    | "/ranking"
     | "/rule"
     | "/signin"
     | "/signup"
@@ -193,8 +207,8 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRouteRoute: typeof IndexRouteRoute;
-  RankingRouteRoute: typeof RankingRouteRoute;
   AnnouncesRouteRoute: typeof AnnouncesRouteRoute;
+  RankingRouteRoute: typeof RankingRouteRoute;
   RuleRouteRoute: typeof RuleRouteRoute;
   SigninRouteRoute: typeof SigninRouteRoute;
   SignupRouteRoute: typeof SignupRouteRoute;
@@ -204,8 +218,8 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRouteRoute: IndexRouteRoute,
-  RankingRouteRoute: RankingRouteRoute,
   AnnouncesRouteRoute: AnnouncesRouteRoute,
+  RankingRouteRoute: RankingRouteRoute,
   RuleRouteRoute: RuleRouteRoute,
   SigninRouteRoute: SigninRouteRoute,
   SignupRouteRoute: SignupRouteRoute,
@@ -224,8 +238,8 @@ export const routeTree = rootRoute
       "filePath": "~__root.tsx",
       "children": [
         "/",
-        "/ranking",
         "/announces",
+        "/ranking",
         "/rule",
         "/signin",
         "/signup",
@@ -236,10 +250,11 @@ export const routeTree = rootRoute
     "/": {
       "filePath": "~index/~route.tsx"
     },
-    "/ranking": {
-      "filePath": "~ranking/~route.tsx"
     "/announces": {
       "filePath": "~announces/~route.tsx"
+    },
+    "/ranking": {
+      "filePath": "~ranking/~route.tsx"
     },
     "/rule": {
       "filePath": "~rule/~route.tsx"
