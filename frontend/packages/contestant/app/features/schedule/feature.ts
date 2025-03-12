@@ -16,7 +16,7 @@ export function endAt(schedule: Schedule): Date | null {
 
 export function isInContest(schedule: Schedule | null): boolean {
   const phase = schedule?.phase ?? Phase.UNSPECIFIED;
-  return phase === Phase.IN_CONTEST
+  return phase === Phase.IN_CONTEST;
 }
 
 export async function fetchSchedule(

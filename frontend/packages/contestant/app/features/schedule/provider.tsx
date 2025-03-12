@@ -20,7 +20,10 @@ export function ScheduleProvider(props: {
     data: props.initialData,
     base: props.initialData,
   });
-  const promise = promiseState.base === props.initialData ? promiseState.data : props.initialData;
+  const promise =
+    promiseState.base === props.initialData
+      ? promiseState.data
+      : props.initialData;
   const [isPending, startTransision] = useTransition();
 
   return (

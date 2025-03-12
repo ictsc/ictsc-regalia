@@ -82,7 +82,7 @@ function PermissionFallback({ resetErrorBoundary }: FallbackProps) {
     resetErrorBoundary();
     startTransition(() => navigate({ to: "/" }));
   }, [resetErrorBoundary, navigate]);
-  return null
+  return null;
 }
 
 function Redirector({ viewer: viewerPromise }: { viewer: Promise<User> }) {
