@@ -33,7 +33,7 @@ func (r *RepositoryTx) SaveRule(ctx context.Context, data *domain.RuleData) erro
 		return errors.Wrap(err, "failed to delete rule")
 	}
 	if _, err := sqlx.NamedExecContext(ctx, r.ext, `
-		INSERT INTO rules (markdown) VALUES (:page_path, :markdown)
+		INSERT INTO rules (markdown) VALUES (:markdown)
 	`, (*ruleRow)(data)); err != nil {
 		return errors.Wrap(err, "failed to insert rule")
 	}
