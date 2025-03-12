@@ -22,10 +22,10 @@ type ScheduleServiceHandler struct {
 
 var _ adminv1connect.ScheduleServiceHandler = (*ScheduleServiceHandler)(nil)
 
-func newScheduleServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *ScheduleServiceHandler {
+func newScheduleServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository, scheduleReader domain.ScheduleReader) *ScheduleServiceHandler {
 	return &ScheduleServiceHandler{
 		Enforcer:     enforcer,
-		GetEffect:    repo,
+		GetEffect:    scheduleReader,
 		UpdateEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) domain.ScheduleWriter { return rt }),
 	}
 }
@@ -48,7 +48,7 @@ func (h *ScheduleServiceHandler) GetSchedule(
 
 	protoSchedules := make([]*adminv1.Schedule, 0, len(schedules))
 	for _, schedule := range schedules {
-		protoSchedules = append(protoSchedules, convertSchedule(schedule))
+		protoSchedules = append(protoSchedules, convertScheduleEntry(schedule))
 	}
 
 	return connect.NewResponse(&adminv1.GetScheduleResponse{
@@ -81,7 +81,7 @@ func (h *ScheduleServiceHandler) UpdateSchedule(
 	return connect.NewResponse(&adminv1.UpdateScheduleResponse{}), nil
 }
 
-func convertSchedule(schedule *domain.Schedule) *adminv1.Schedule {
+func convertScheduleEntry(schedule *domain.ScheduleEntry) *adminv1.Schedule {
 	var phase adminv1.Phase
 	switch schedule.Phase() {
 	case domain.PhaseOutOfContest:
@@ -98,11 +98,17 @@ func convertSchedule(schedule *domain.Schedule) *adminv1.Schedule {
 		phase = adminv1.Phase_PHASE_UNSPECIFIED
 	}
 
-	return &adminv1.Schedule{
-		Phase:   phase,
-		StartAt: timestamppb.New(schedule.StartAt()),
-		EndAt:   timestamppb.New(schedule.EndAt()),
+	proto := &adminv1.Schedule{
+		Phase: phase,
 	}
+	if !schedule.StartAt().IsZero() {
+		proto.StartAt = timestamppb.New(schedule.StartAt())
+	}
+	if !schedule.EndAt().IsZero() {
+		proto.EndAt = timestamppb.New(schedule.EndAt())
+	}
+
+	return proto
 }
 
 func convertProtoPhaseToDomain(protoPhase adminv1.Phase) domain.Phase {

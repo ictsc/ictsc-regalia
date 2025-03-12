@@ -3,7 +3,9 @@ package config
 import (
 	"net/netip"
 	"net/url"
+	"time"
 
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/jackc/pgx/v5"
 	"github.com/redis/go-redis/v9"
 )
@@ -12,8 +14,9 @@ type Config struct {
 	AdminAPI      AdminAPI
 	ContestantAPI ContestantAPI
 
-	PgConfig pgx.ConnConfig
-	Redis    redis.Options
+	PgConfig     pgx.ConnConfig
+	Redis        redis.Options
+	FakeSchedule *FakeSchedule
 }
 
 type (
@@ -51,3 +54,10 @@ type (
 		DiscordClientSecret string
 	}
 )
+
+type FakeSchedule struct {
+	Phase     domain.Phase
+	NextPhase domain.Phase
+	StartAt   time.Time
+	EndAt     time.Time
+}

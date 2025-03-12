@@ -13,6 +13,7 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/connectdomain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/contestant/session"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 	"github.com/jmoiron/sqlx"
 	"github.com/rbcervilla/redisstore/v9"
@@ -22,7 +23,13 @@ import (
 	"golang.org/x/net/http2/h2c"
 )
 
-func New(ctx context.Context, cfg config.ContestantAPI, db *sqlx.DB, rdb redis.UniversalClient) (http.Handler, error) {
+func New(
+	ctx context.Context,
+	cfg config.ContestantAPI,
+	db *sqlx.DB,
+	rdb redis.UniversalClient,
+	scheduler domain.ScheduleReader,
+) (http.Handler, error) {
 	repo := pg.NewRepository(db)
 	sessionStore, err := redisstore.NewRedisStore(ctx, rdb)
 	if err != nil {
@@ -50,7 +57,7 @@ func New(ctx context.Context, cfg config.ContestantAPI, db *sqlx.DB, rdb redis.U
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(contestantv1connect.NewContestServiceHandler(
-		newContestServiceHandler(repo),
+		newContestServiceHandler(repo, scheduler),
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(contestantv1connect.NewProblemServiceHandler(
