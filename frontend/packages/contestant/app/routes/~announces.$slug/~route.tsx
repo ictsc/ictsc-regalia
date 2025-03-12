@@ -5,4 +5,3 @@ export const Route = createFileRoute("/announces/$slug")({
     return { slug };
   },
 });
-
