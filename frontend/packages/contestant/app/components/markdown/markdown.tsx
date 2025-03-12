@@ -21,15 +21,12 @@ export function Typography(props: {
 
 const remarkPlugins = [remarkGfm, remarkMath];
 const rehypePlugins = [rehypeKatex];
-const highlighter =  createHighlighter({
+const highlighter = createHighlighter({
   themes: ["dark-plus"],
-  langs: ["diff","shellscript","shellsession", "hcl"],
+  langs: ["diff", "shellscript", "shellsession", "hcl"],
 });
 
-export function CodeBlock(props: {
-  text: string;
-  lang: string;
-}){
+export function CodeBlock(props: { text: string; lang: string }) {
   const text = props.text;
   const htmlText = use(highlighter).codeToHtml(text, {
     theme: "dark-plus",
@@ -37,7 +34,7 @@ export function CodeBlock(props: {
   });
   return (
     <div className="">
-    <div dangerouslySetInnerHTML={{ __html: htmlText }} />
+      <div dangerouslySetInnerHTML={{ __html: htmlText }} />
     </div>
   );
 }
@@ -65,10 +62,8 @@ const markdownComponents: Components = {
     if (typeof text !== "string") {
       return text;
     }
-    return (
-      <CodeBlock text={text} lang={lang} />
-    );
-  }
+    return <CodeBlock text={text} lang={lang} />;
+  },
 };
 
 export function Markdown({ children }: { children?: string }) {
