@@ -10,9 +10,9 @@ export type HeaderViewProps = {
 export function Header({ contestState, accountMenu }: HeaderViewProps) {
   return (
     <div className="flex size-full items-center border-b-[3px] border-primary bg-surface-0">
-      <div className="flex-none">
+      <div className="ml-16 flex-none">
         <Link to="/">
-          <Logo height={60} />
+          <Logo height={50} />
         </Link>
       </div>
       <div className="ml-auto flex h-full items-center">
