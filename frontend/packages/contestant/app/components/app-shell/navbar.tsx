@@ -85,6 +85,25 @@ export function Navbar(props: {
           </Link>
         )}
       </Button>
+      <Button as={Fragment}>
+        {(buttonProps) => (
+          <Link
+            to="/teams"
+            title="チーム一覧"
+            className={navbarButtonClassName({
+              collapsed,
+              matched: state.location.pathname?.startsWith("/teams"),
+              ...buttonProps,
+            })}
+          >
+            <NavbarButtonInner
+              collapsed={collapsed}
+              icon="groups"
+              title="チーム一覧"
+            />
+          </Link>
+        )}
+      </Button>
       {/* <Button as={Fragment}>
         {(buttonProps) => (
           <Link
