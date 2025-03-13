@@ -75,6 +75,21 @@ func ListDeployments(ctx context.Context, eff DeploymentReader) ([]*Deployment, 
 	return results, nil
 }
 
+func (tp *TeamProblem) Deployments(ctx context.Context, eff DeploymentReader) ([]*Deployment, error) {
+	list, err := ListDeployments(ctx, eff)
+	if err != nil {
+		return nil, err
+	}
+
+	forTeam := make([]*Deployment, 0, len(list))
+	for _, d := range list {
+		if d.TeamCode() == tp.Team().Code() && d.ProblemCode() == tp.Problem().Code() {
+			forTeam = append(forTeam, d)
+		}
+	}
+	return forTeam, nil
+}
+
 func (tp *TeamProblem) latestDeployment(ctx context.Context, eff DeploymentReader) (*Deployment, error) {
 	list, err := ListDeployments(ctx, eff)
 	if err != nil {

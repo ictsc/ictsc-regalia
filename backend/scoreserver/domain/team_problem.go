@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"slices"
 
 	"github.com/gofrs/uuid/v5"
 )
@@ -10,18 +11,12 @@ type (
 	TeamProblem struct {
 		*problem
 		team  *Team
-		score *TeamProblemScore
+		score *Score
 	}
 	TeamProblemDetail struct {
 		team          *Team
 		problemDetail *DescriptiveProblem
-	}
-	TeamProblemScore struct {
-		problemID   uuid.UUID
-		markedScore uint32
-		penalty     uint32
-		totalScore  uint32
-		maxScore    uint32
+		score         *Score
 	}
 	TeamProblemScoreData struct {
 		ProblemID   uuid.UUID `db:"problem_id"`
@@ -33,23 +28,34 @@ type (
 )
 
 func (t *Team) Problems(ctx context.Context, eff ProblemReader) ([]*TeamProblem, error) {
-	ps, err := ListProblems(ctx, eff)
+	problems, err := ListProblems(ctx, eff)
 	if err != nil {
 		return nil, err
 	}
-	scoreData, err := t.listProblemsScore(ctx, eff)
+
+	scores, err := t.listProblemsScore(ctx, eff)
 	if err != nil {
 		return nil, err
 	}
-	scoreMap := make(map[uuid.UUID]*TeamProblemScore, len(scoreData))
-	for _, s := range scoreData {
-		scoreMap[s.ProblemID] = s.parse()
+
+	teamProblems := make([]*TeamProblem, 0, len(problems))
+	for _, problem := range problems {
+		teamProblem := &TeamProblem{team: t, problem: problem}
+
+		idx := slices.IndexFunc(scores, func(score *TeamProblemScoreData) bool {
+			return score.ProblemID == uuid.UUID(problem.problemID)
+		})
+		if idx >= 0 {
+			score, err := scores[idx].parse(problem)
+			if err != nil {
+				return nil, err
+			}
+			teamProblem.score = score
+		}
+
+		teamProblems = append(teamProblems, teamProblem)
 	}
-	tps := make([]*TeamProblem, 0, len(ps))
-	for _, p := range ps {
-		tps = append(tps, &TeamProblem{team: t, problem: p, score: scoreMap[uuid.UUID(p.problemID)]})
-	}
-	return tps, nil
+	return teamProblems, nil
 }
 
 func (t *Team) listProblemsScore(ctx context.Context, eff ProblemReader) ([]*TeamProblemScoreData, error) {
@@ -72,34 +78,17 @@ func (tp *TeamProblem) ProblemID() uuid.UUID {
 	return uuid.UUID(tp.problemID)
 }
 
-func (tp *TeamProblem) Score() *TeamProblemScore {
+func (tp *TeamProblem) Score() *Score {
 	return tp.score
 }
 
-func (tp *TeamProblemScore) MarkedScore() uint32 {
-	return tp.markedScore
-}
-
-func (tp *TeamProblemScore) Penalty() uint32 {
-	return tp.penalty
-}
-
-func (tp *TeamProblemScore) TotalScore() uint32 {
-	return tp.totalScore
-}
-
-func (tp *TeamProblemScore) MaxScore() uint32 {
-	return tp.maxScore
-}
-
-func (tp *TeamProblemScoreData) parse() *TeamProblemScore {
-	return &TeamProblemScore{
-		problemID:   tp.ProblemID,
-		markedScore: tp.MarkedScore,
-		penalty:     tp.Penalty,
-		totalScore:  tp.TotalScore,
-		maxScore:    tp.MaxScore,
+func (tp *TeamProblemScoreData) parse(problem *Problem) (*Score, error) {
+	if tp.ProblemID != uuid.UUID(problem.problemID) {
+		return nil, NewInvalidArgumentError("problem_id does not match", nil)
 	}
+	return (&ScoreData{
+		MarkedScore: tp.MarkedScore,
+	}).parse(problem)
 }
 
 func (tp *TeamProblem) Details(ctx context.Context, eff ProblemReader) (*TeamProblemDetail, error) {
@@ -130,6 +119,14 @@ func (t *Team) ProblemDetailByCode(ctx context.Context, eff ProblemReader, code 
 
 func (tp *TeamProblemDetail) Team() *Team {
 	return tp.team
+}
+
+func (tp *TeamProblemDetail) TeamProblem() *TeamProblem {
+	return &TeamProblem{
+		team:    tp.team,
+		problem: tp.problemDetail.problem,
+		score:   tp.score,
+	}
 }
 
 func (tp *TeamProblemDetail) ProblemDetail() *DescriptiveProblem {

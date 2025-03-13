@@ -44,7 +44,7 @@ func TestListProblemsScoreByTeamID(t *testing.T) {
 	}
 
 	// maxScore フィールドは比較対象から除外する
-	opts := cmpopts.IgnoreFields(domain.TeamProblemScore{}, "maxScore")
+	opts := cmpopts.IgnoreFields(domain.Score{}, "max")
 
 	if diff := cmp.Diff(expected, actual, opts); diff != "" {
 		t.Errorf("ListProblemsScoreByTeamID mismatch (-want +got):\n%s", diff)
