@@ -30,7 +30,10 @@ export async function fetchDeployments(
   return items;
 }
 
-export async function deploy(transport: Transport, code: string): Promise<void> {
+export async function deploy(
+  transport: Transport,
+  code: string,
+): Promise<void> {
   const client = createClient(ProblemService, transport);
   await client.deploy({ code });
 }

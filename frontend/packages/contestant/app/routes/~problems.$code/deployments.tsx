@@ -1,6 +1,6 @@
 import { Button } from "@headlessui/react";
 import { clsx } from "clsx";
-import { type ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import { type Deployment as DeploymentType } from "../../features/deployment";
 import { DeploymentStatus } from "@ictsc/proto/contestant/v1";
 
@@ -9,7 +9,9 @@ export function Deployments(props: {
   canRedeploy: boolean;
   isRedeploying: boolean;
   redeploy: () => void;
+  error?: ReactNode;
 }) {
+  const buttonID = useId();
   return (
     <div className="flex size-full flex-col gap-16">
       <div className="size-full rounded-12 bg-surface-1 py-12">
@@ -17,8 +19,14 @@ export function Deployments(props: {
           {props.list}
         </div>
       </div>
-      <div className="flex justify-end">
+      <div className="flex items-center justify-end gap-16">
+        {props.error != null && (
+          <label htmlFor={buttonID} className="text-14 text-primary">
+            {props.error}
+          </label>
+        )}
         <Button
+          id={buttonID}
           className={clsx(
             "grid place-items-center rounded-12 bg-surface-2 px-24 py-16 shadow-md transition",
             "data-[disabled]:bg-disabled data-[hover]:opacity-80 data-[active]:shadow-none",

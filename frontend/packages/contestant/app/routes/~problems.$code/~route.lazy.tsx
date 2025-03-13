@@ -2,9 +2,9 @@ import {
   startTransition,
   Suspense,
   use,
+  useActionState,
   useDeferredValue,
   useOptimistic,
-  useTransition,
 } from "react";
 import { createLazyFileRoute, useRouter } from "@tanstack/react-router";
 import type { ProblemDetail } from "../../features/problem";
@@ -20,7 +20,7 @@ export const Route = createLazyFileRoute("/problems/$code")({
 
 function RouteComponent() {
   const router = useRouter();
-  const { problem, answers, metadata, submitAnswer, deployments } =
+  const { problem, answers, metadata, submitAnswer, deployments, deploy } =
     Route.useLoaderData();
 
   const redeployable = useRedeployable(problem);
@@ -67,6 +67,7 @@ function RouteComponent() {
           <Deployments
             isPending={deferredDeployments !== deployments}
             deployments={deferredDeployments}
+            deploy={deploy}
           />
         </Suspense>
       }
@@ -117,16 +118,18 @@ function SubmissionList(props: {
 function Deployments(props: {
   deployments: Promise<Deployment[]>;
   isPending: boolean;
+  deploy: () => Promise<void>;
 }) {
+  const router = useRouter();
   const [deployments, optimisticSetDeployments] = useOptimistic(
     use(props.deployments) as (Deployment & { isPending?: boolean })[],
   );
   const canRedeploy =
     (deployments?.[0].status ?? DeploymentStatus.DEPLOYED) ===
     DeploymentStatus.DEPLOYED;
-  const [isRedeploying, startTransition] = useTransition();
-  const redeploy = () => {
-    startTransition(async () => {
+
+  const [lastResult, action, isActionPending] = useActionState(
+    async (_prev: unknown, _action: "redeploy") => {
       optimisticSetDeployments((ds) => [
         {
           isPending: true,
@@ -139,15 +142,24 @@ function Deployments(props: {
         },
         ...ds,
       ]);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    });
-  };
+      try {
+        await props.deploy();
+      } catch (e) {
+        console.error(e);
+        return "再展開に失敗しました";
+      }
+      await router.invalidate();
+      return null;
+    },
+    null,
+  );
 
   return (
     <View.Deployments
       canRedeploy={canRedeploy}
-      isRedeploying={isRedeploying}
-      redeploy={redeploy}
+      isRedeploying={isActionPending}
+      redeploy={() => startTransition(() => action("redeploy"))}
+      error={lastResult}
       list={
         deployments.length === 0 ? (
           <View.EmptyDeploymentList />

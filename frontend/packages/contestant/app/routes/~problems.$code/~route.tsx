@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { fetchProblem } from "../../features/problem";
 import { fetchAnswers, submitAnswer } from "../../features/answer";
-import { fetchDeployments } from "../../features/deployment";
+import { deploy, fetchDeployments } from "../../features/deployment";
 
 export const Route = createFileRoute("/problems/$code")({
   loader: ({ context: { transport }, params: { code } }) => {
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/problems/$code")({
       metadata,
       submitAnswer: (body: string) => submitAnswer(transport, code, body),
       deployments,
+      deploy: () => deploy(transport, code),
     };
   },
 });
