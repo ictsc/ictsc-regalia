@@ -1,6 +1,6 @@
-import pathToLogo from "@assets/ictsc.png";
+import pathToLogo from "@assets/ictsc2024.png";
 
-const RATIO = 1000 / 327;
+const RATIO = 1000 / 267;
 
 export type LogoProps = {
   readonly className?: string;
