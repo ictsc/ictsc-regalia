@@ -1,0 +1,115 @@
+import { Button } from "@headlessui/react";
+import { clsx } from "clsx";
+import { type ReactNode } from "react";
+import { type Deployment as DeploymentType } from "../../features/deployment";
+import { DeploymentStatus } from "@ictsc/proto/contestant/v1";
+
+export function Deployments(props: {
+  list: ReactNode;
+  canRedeploy: boolean;
+  isRedeploying: boolean;
+  redeploy: () => void;
+}) {
+  return (
+    <div className="flex size-full flex-col gap-16">
+      <div className="size-full rounded-12 bg-surface-1 py-12">
+        <div className="size-full overflow-y-auto px-12 [scrollbar-gutter:stable_both-edges]">
+          {props.list}
+        </div>
+      </div>
+      <div className="flex justify-end">
+        <Button
+          className={clsx(
+            "grid place-items-center rounded-12 bg-surface-2 px-24 py-16 shadow-md transition",
+            "data-[disabled]:bg-disabled data-[hover]:opacity-80 data-[active]:shadow-none",
+          )}
+          disabled={!props.canRedeploy || props.isRedeploying}
+          onClick={props.redeploy}
+        >
+          <span className="text-16 font-bold">再展開する</span>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export function EmptyDeploymentList() {
+  return (
+    <div className="grid size-full place-items-center text-16 font-bold text-text">
+      <h1>まだ再展開されていません</h1>
+    </div>
+  );
+}
+
+export function DeploymentList(props: {
+  isPending: boolean;
+  children?: ReactNode;
+}) {
+  return (
+    <ul
+      className={clsx(
+        "flex size-full flex-col gap-16",
+        props.isPending && "opacity-75",
+      )}
+    >
+      {props.children}
+    </ul>
+  );
+}
+
+const deploymentDateTimeFormatter = new Intl.DateTimeFormat("ja-JP", {
+  dateStyle: "short",
+  timeStyle: "short",
+});
+
+export function DeploymentItem(
+  props: DeploymentType & { isPending?: boolean },
+) {
+  const { status } = props;
+  return (
+    <li
+      className={clsx(
+        "flex justify-between gap-8 rounded-12 p-16",
+        status !== DeploymentStatus.DEPLOYED ? "bg-surface-0" : "bg-disabled",
+        props.isPending && "opacity-75",
+      )}
+    >
+      <div className="flex flex-col">
+        <h2 className="text-20 font-bold">
+          {deploymentDateTimeFormatter.format(new Date(props.requestedAt))}
+        </h2>
+        <h3
+          className={clsx(
+            "text-12",
+            status !== DeploymentStatus.DEPLOYED && "text-primary",
+          )}
+        >
+          {
+            {
+              [DeploymentStatus.UNSPECIFIED]: null,
+              [DeploymentStatus.DEPLOYED]: "展開完了",
+              [DeploymentStatus.DEPLOYING]: "展開中",
+              [DeploymentStatus.FAILED]: "展開失敗",
+            }[status]
+          }
+        </h3>
+      </div>
+      <div className="flex flex-col">
+        <p className="flex items-baseline justify-end gap-4 border-b border-text pb-4 font-bold">
+          <span className="text-24">{props.revision}</span>
+          <span className="text-14">回目</span>
+        </p>
+        <div className="grid grid-cols-[repeat(2,minmax(24px,auto))] grid-rows-2 place-items-end gap-4 text-14 font-bold">
+          <p>残り許容回数</p>
+          <p className={clsx(props.thresholdExceeded && "text-primary")}>
+            {props.allowedDeploymentCount}
+          </p>
+          <p>総減点</p>
+          <p className={clsx(props.thresholdExceeded && "text-primary")}>
+            {props.penalty}
+          </p>
+        </div>
+      </div>
+    </li>
+  );
+}
