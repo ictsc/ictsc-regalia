@@ -189,8 +189,8 @@ CREATE TABLE redeployment_requests (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
 	problem_id UUID NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
-	status deployment_status NOT NULL,
-	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+	revision INT NOT NULL CHECK (revision > 0) DEFAULT 1,
+	UNIQUE (team_id, problem_id, revision)
 );
 
 CREATE TABLE redeployment_events (
