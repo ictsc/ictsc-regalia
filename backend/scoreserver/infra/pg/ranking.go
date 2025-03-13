@@ -14,6 +14,7 @@ var getRankingQuery = `
 			total_score,
 			created_at
 		FROM team_problem_scores
+		WHERE total_score > 0
 	)
 	SELECT
 		t.name AS team_name,
@@ -40,7 +41,6 @@ func (r *repo) GetRanking(ctx context.Context) ([]*domain.RankingData, error) {
 		}
 		ranking = append(ranking, &rank)
 	}
-
 	for i, rd := range ranking {
 		rd.Rank = int64(i + 1)
 	}
