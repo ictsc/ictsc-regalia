@@ -138,6 +138,9 @@ func (h *ProblemServiceHandler) ListDeployments(
 		}
 		return nil, err
 	}
+	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
+		return nil, err
+	}
 
 	protoCode := req.Msg.GetCode()
 	if protoCode == "" {
