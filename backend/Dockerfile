@@ -22,8 +22,17 @@ WORKDIR /app
 EXPOSE 8080 8081
 COPY --from=scoreserver-builder --chown=nonroot:nonroot /scoreserver /
 ENTRYPOINT ["/scoreserver"]
-# Backward compatibility
-FROM backend AS scoreserver
+
+# --- batch ---
+FROM --platform=$BUILDPLATFORM builder AS batch-builder
+RUN --mount=type=cache,target=/root/.cache/go-build,sharing=locked \
+    --mount=type=bind,source=.,target=. \
+    go build -o /batch -ldflags "-s -w" -trimpath ./cmd/batch
+
+FROM gcr.io/distroless/static-debian12:nonroot AS batch
+WORKDIR /app
+COPY --from=batch-builder --chown=nonroot:nonroot /batch /
+ENTRYPOINT ["/batch"]
 
 # -- toolbox ---
 FROM debian:12-slim AS toolbox
