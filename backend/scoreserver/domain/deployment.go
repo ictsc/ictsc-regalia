@@ -5,6 +5,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gofrs/uuid/v5"
 )
 
@@ -137,19 +138,20 @@ func (d *Deployment) UpdateStatus(ctx context.Context, eff DeploymentWriter, sta
 }
 
 func (tp *TeamProblem) Deploy(ctx context.Context, eff DeploymentWriter, occurredAt time.Time) (*Deployment, error) {
-	latestDeploy, err := tp.latestDeployment(ctx, eff)
-	if err != nil {
+	revision := uint32(1)
+	if latestDeploy, err := tp.latestDeployment(ctx, eff); err == nil {
+		if latestDeploy.Status() != DeploymentStatusCompleted {
+			return nil, NewInvalidArgumentError("the latest deployment is not completed", nil) // InvaidArgument ではない気もする
+		}
+		revision = latestDeploy.Revision() + 1
+	} else if !errors.Is(err, ErrNotFound) {
 		return nil, err
-	}
-	if latestDeploy.Status() != DeploymentStatusCompleted {
-		return nil, NewInvalidArgumentError("the latest deployment is not completed", nil) // InvaidArgument ではない気もする
 	}
 
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, WrapAsInternal(err, "failed to generate UUID")
 	}
-	revision := latestDeploy.Revision() + 1
 	if err := eff.CreateDeployment(ctx, &CreateDeploymentInput{
 		ID:         id,
 		TeamID:     uuid.UUID(tp.Team().teamID),
