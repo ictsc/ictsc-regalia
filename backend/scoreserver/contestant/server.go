@@ -74,6 +74,10 @@ func New(
 		newNoticeServiceHandler(enforcer, repo),
 		connect.WithInterceptors(interceptors...),
 	))
+	mux.Handle(contestantv1connect.NewRankingServiceHandler(
+		newRankingServiceHandler(repo),
+		connect.WithInterceptors(interceptors...),
+	))
 
 	handler := http.Handler(mux)
 	handler = session.NewHandler(sessionStore)(handler)

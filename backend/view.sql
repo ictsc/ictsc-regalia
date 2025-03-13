@@ -15,10 +15,13 @@ CREATE VIEW latest_public_marking_result_ids AS (
 
 DROP VIEW IF EXISTS team_problem_scores CASCADE;
 CREATE VIEW team_problem_scores AS (
-	SELECT
-		DISTINCT ON (a.team_id, a.problem_id)
-		a.team_id, a.problem_id, lower(a.created_at_range) AS "created_at",
-		s.marked_score, s.penalty, s.total_score
+	SELECT DISTINCT ON (a.team_id, a.problem_id)
+		a.team_id,
+		a.problem_id,
+		lower(a.created_at_range) AS "created_at",
+		s.marked_score,
+		s.penalty,
+		s.total_score
 	FROM answers AS a
 	INNER JOIN latest_public_marking_result_ids AS lm ON a.id = lm.answer_id
 	LEFT JOIN scores AS s ON s.marking_result_id=lm.id
