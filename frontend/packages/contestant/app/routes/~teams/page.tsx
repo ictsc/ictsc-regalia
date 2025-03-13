@@ -1,5 +1,7 @@
-import type { TeamProfile } from "@ictsc/proto/contestant/v1";
 import { useState } from "react";
+import { clsx } from "clsx";
+import type { TeamProfile } from "@ictsc/proto/contestant/v1";
+import { MaterialSymbol } from "../../components/material-symbol";
 
 type TeamListProps = {
   teamProfile: TeamProfile[];
@@ -30,20 +32,14 @@ export function TeamsPage(props: TeamListProps) {
                   className="h-[110px] md:h-64"
                   onClick={() => toggleAccordion(index)}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={`h-[25px] w-[25px] transition-transform ${openStates[index] ? "rotate-90" : ""}`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
+                  <MaterialSymbol
+                    icon="arrow_forward_ios"
+                    size={24}
+                    className={clsx(
+                      "transition-transform",
+                      openStates[index] && "rotate-90",
+                    )}
+                  />
                 </button>
               </div>
               {/* アコーディオンボタン以外の表示要素 */}
