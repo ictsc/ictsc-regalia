@@ -1,9 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { timestampFromDate } from "@bufbuild/protobuf/wkt";
 import { RankingPage } from "./page";
-
-const date = new Date("2025-03-04T12:00:00Z");
-const timestamp = timestampFromDate(date);
 
 export default {
   title: "pages/ranking",
@@ -16,20 +12,18 @@ export const Default: Story = {
   args: {
     ranking: [
       ...Array.from({ length: 2 }, () => ({
-        $typeName: "contestant.v1.Rank" as const,
-        rank: 1n,
+        rank: 1,
         teamName: "チーム名なまえがわからない",
-        score: 8888n,
-        timestamp: timestamp,
         organization: "testTeam",
+        score: 8888,
+        lastEffectiveSubmitAt: "2025-03-04T12:00:00Z",
       })),
       ...Array.from({ length: 4 }, () => ({
-        $typeName: "contestant.v1.Rank" as const,
-        rank: 2n,
+        rank: 2,
         teamName: "チーム名なまえがわからない",
-        score: 8888n,
-        timestamp: timestamp,
         organization: "testTeam",
+        score: 8888,
+        lastEffectiveSubmitAt: "2025-03-04T12:00:00Z",
       })),
     ],
   },

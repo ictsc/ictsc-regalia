@@ -211,9 +211,9 @@ const ProblemsRouteWithChildren = ProblemsRoute._addFileChildren(
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRouteRoute;
-  "/ranking": typeof RankingRouteRoute;
   "/announces": typeof AnnouncesRouteWithChildren;
   "/problems": typeof ProblemsRouteWithChildren;
+  "/ranking": typeof RankingRouteRoute;
   "/rule": typeof RuleRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
@@ -225,8 +225,8 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   "/": typeof IndexRouteRoute;
-  "/rule": typeof RuleRouteRoute;
   "/ranking": typeof RankingRouteRoute;
+  "/rule": typeof RuleRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
   "/announces": typeof AnnouncesIndexRouteRoute;
@@ -239,8 +239,8 @@ export interface FileRoutesById {
   __root__: typeof rootRoute;
   "/": typeof IndexRouteRoute;
   "/announces": typeof AnnouncesRouteWithChildren;
-  "/ranking": typeof RankingRouteRoute;
   "/problems": typeof ProblemsRouteWithChildren;
+  "/ranking": typeof RankingRouteRoute;
   "/rule": typeof RuleRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
@@ -255,8 +255,8 @@ export interface FileRouteTypes {
   fullPaths:
     | "/"
     | "/announces"
-    | "/ranking"
     | "/problems"
+    | "/ranking"
     | "/rule"
     | "/signin"
     | "/signup"
@@ -267,8 +267,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
-    | "/rule"
     | "/ranking"
+    | "/rule"
     | "/signin"
     | "/signup"
     | "/announces"
@@ -279,8 +279,8 @@ export interface FileRouteTypes {
     | "__root__"
     | "/"
     | "/announces"
-    | "/ranking"
     | "/problems"
+    | "/ranking"
     | "/rule"
     | "/signin"
     | "/signup"
@@ -293,9 +293,9 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRouteRoute: typeof IndexRouteRoute;
-  RankingRouteRoute: typeof RankingRouteRoute;
   AnnouncesRoute: typeof AnnouncesRouteWithChildren;
   ProblemsRoute: typeof ProblemsRouteWithChildren;
+  RankingRouteRoute: typeof RankingRouteRoute;
   RuleRouteRoute: typeof RuleRouteRoute;
   SigninRouteRoute: typeof SigninRouteRoute;
   SignupRouteRoute: typeof SignupRouteRoute;
@@ -303,9 +303,9 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRouteRoute: IndexRouteRoute,
-  RankingRouteRoute: RankingRouteRoute,
   AnnouncesRoute: AnnouncesRouteWithChildren,
   ProblemsRoute: ProblemsRouteWithChildren,
+  RankingRouteRoute: RankingRouteRoute,
   RuleRouteRoute: RuleRouteRoute,
   SigninRouteRoute: SigninRouteRoute,
   SignupRouteRoute: SignupRouteRoute,
@@ -323,8 +323,8 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/announces",
-        "/ranking",
         "/problems",
+        "/ranking",
         "/rule",
         "/signin",
         "/signup"
