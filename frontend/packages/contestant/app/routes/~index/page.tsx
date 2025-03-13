@@ -3,6 +3,7 @@ import { differenceInDays, formatDuration, intervalToDuration } from "date-fns";
 import { Phase } from "@ictsc/proto/contestant/v1";
 import { Logo } from "../../components/logo";
 import { MaterialSymbol } from "../../components/material-symbol";
+import { Title } from "../../components/title";
 
 export type IndexPageProps = {
   readonly phase: Phase;
@@ -36,28 +37,31 @@ export function Timer(props: {
   const days = differenceInDays(props.endMs, nowMs);
   const dur = intervalToDuration({ start: nowMs, end: props.endMs });
   return (
-    <p
-      className="flex w-[5em] items-baseline justify-end"
-      title={formatDuration(dur)}
-    >
-      {days > 0 ? (
-        `${days}日`
-      ) : (
-        <>
-          <span className="w-[1.5em] text-center">
-            {`${dur.hours ?? 0}`.padStart(2, "0")}
-          </span>
-          <span className="">:</span>
-          <span className="w-[1.5em] text-center">
-            {`${dur.minutes ?? 0}`.padStart(2, "0")}
-          </span>
-          <span className="">:</span>
-          <span className="w-[1.5em] text-center">
-            {`${dur.seconds ?? 0}`.padStart(2, "0")}
-          </span>
-        </>
-      )}
-    </p>
+    <>
+      <Title />
+      <p
+        className="flex w-[5em] items-baseline justify-end"
+        title={formatDuration(dur)}
+      >
+        {days > 0 ? (
+          `${days}日`
+        ) : (
+          <>
+            <span className="w-[1.5em] text-center">
+              {`${dur.hours ?? 0}`.padStart(2, "0")}
+            </span>
+            <span className="">:</span>
+            <span className="w-[1.5em] text-center">
+              {`${dur.minutes ?? 0}`.padStart(2, "0")}
+            </span>
+            <span className="">:</span>
+            <span className="w-[1.5em] text-center">
+              {`${dur.seconds ?? 0}`.padStart(2, "0")}
+            </span>
+          </>
+        )}
+      </p>
+    </>
   );
 }
 

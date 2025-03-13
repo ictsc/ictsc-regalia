@@ -2,8 +2,9 @@ import { type ReactNode, type HTMLInputAutoCompleteAttribute } from "react";
 import { useFormStatus } from "react-dom";
 import { clsx } from "clsx";
 import { Field, Label, Description, Input } from "@headlessui/react";
-import { MaterialSymbol } from "@app/components/material-symbol";
-import type { SignUpResponse } from "@app/features/viewer/signup";
+import { MaterialSymbol } from "../../components/material-symbol";
+import { Title } from "../../components/title";
+import type { SignUpResponse } from "../../features/viewer/signup";
 
 export function SignUpPage(
   props: {
@@ -17,86 +18,89 @@ export function SignUpPage(
   } & SignUpResponse,
 ) {
   return (
-    <div className="grid h-full items-center justify-center">
-      <form
-        className="w-96 flex flex-col rounded-16 p-64 shadow-lg"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const form = e.target as HTMLFormElement;
-          const formData = new FormData(form);
-          props.submit({
-            invitationCode: formData.get("invitation_code") as string,
-            name: formData.get("screen_name") as string,
-            displayName: formData.get("display_name") as string,
-          });
-        }}
-      >
-        <h2 className="text-24 font-bold">アカウント登録</h2>
-        <div className="mt-16 grid grid-cols-2 gap-20">
-          <TextField
-            name="invitation_code"
-            className="col-span-2"
-            label="招待コード"
-            placeholder="(メールをご確認ください)"
-            ignoreCompletion
-            errorMessage={
-              props.invitationCodeError != null
-                ? {
-                    required: "未入力です",
-                    invalid: "無効なコードです",
-                    team_full: "チームが満員です",
-                  }[props.invitationCodeError]
-                : undefined
-            }
-          />
-          <TextField
-            name="screen_name"
-            autoComplete="username"
-            label="ID"
-            placeholder="ictsc_taro"
-            defaultValue={props.defaultName}
-            errorMessage={
-              props.nameError != null
-                ? {
-                    required: "未入力です",
-                    invalid: "内容に誤りがあります",
-                    duplicate: "既に使われています",
-                  }[props.nameError]
-                : undefined
-            }
-          />
-          <TextField
-            name="display_name"
-            autoComplete="name"
-            label="表示名"
-            placeholder="ICTSC太郎"
-            defaultValue={props.defaultDisplayName}
-            errorMessage={
-              props.displayNameError != null
-                ? {
-                    required: "未入力です",
-                    invalid: "内容に誤りがあります",
-                  }[props.displayNameError]
-                : undefined
-            }
-          />
-        </div>
-        <div className="mt-64 flex items-center justify-end gap-24">
-          {props.error && (
-            <p className="text-16 font-bold text-primary">
-              {
-                {
-                  rate_limit: "リクエストが多すぎます",
-                  invalid: "正しく入力されていない項目があります",
-                  unknown: "エラーが発生しました",
-                }[props.error]
+    <>
+      <Title>アカウント登録</Title>
+      <div className="grid h-full items-center justify-center">
+        <form
+          className="w-96 flex flex-col rounded-16 p-64 shadow-lg"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const form = e.target as HTMLFormElement;
+            const formData = new FormData(form);
+            props.submit({
+              invitationCode: formData.get("invitation_code") as string,
+              name: formData.get("screen_name") as string,
+              displayName: formData.get("display_name") as string,
+            });
+          }}
+        >
+          <h2 className="text-24 font-bold">アカウント登録</h2>
+          <div className="mt-16 grid grid-cols-2 gap-20">
+            <TextField
+              name="invitation_code"
+              className="col-span-2"
+              label="招待コード"
+              placeholder="(メールをご確認ください)"
+              ignoreCompletion
+              errorMessage={
+                props.invitationCodeError != null
+                  ? {
+                      required: "未入力です",
+                      invalid: "無効なコードです",
+                      team_full: "チームが満員です",
+                    }[props.invitationCodeError]
+                  : undefined
               }
-            </p>
-          )}
-          <Submit />
-        </div>
-      </form>
-    </div>
+            />
+            <TextField
+              name="screen_name"
+              autoComplete="username"
+              label="ID"
+              placeholder="ictsc_taro"
+              defaultValue={props.defaultName}
+              errorMessage={
+                props.nameError != null
+                  ? {
+                      required: "未入力です",
+                      invalid: "内容に誤りがあります",
+                      duplicate: "既に使われています",
+                    }[props.nameError]
+                  : undefined
+              }
+            />
+            <TextField
+              name="display_name"
+              autoComplete="name"
+              label="表示名"
+              placeholder="ICTSC太郎"
+              defaultValue={props.defaultDisplayName}
+              errorMessage={
+                props.displayNameError != null
+                  ? {
+                      required: "未入力です",
+                      invalid: "内容に誤りがあります",
+                    }[props.displayNameError]
+                  : undefined
+              }
+            />
+          </div>
+          <div className="mt-64 flex items-center justify-end gap-24">
+            {props.error && (
+              <p className="text-16 font-bold text-primary">
+                {
+                  {
+                    rate_limit: "リクエストが多すぎます",
+                    invalid: "正しく入力されていない項目があります",
+                    unknown: "エラーが発生しました",
+                  }[props.error]
+                }
+              </p>
+            )}
+            <Submit />
+          </div>
+        </form>
+      </div>
+    </>
   );
 }
 

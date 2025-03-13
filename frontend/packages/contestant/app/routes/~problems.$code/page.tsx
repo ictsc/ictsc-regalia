@@ -12,6 +12,7 @@ import { clsx } from "clsx";
 import { MaterialSymbol } from "../../components/material-symbol";
 import { Markdown, Typography } from "../../components/markdown";
 import { NavbarLayoutContext } from "../../components/app-shell";
+import { Title } from "../../components/title";
 
 export { SubmissionForm } from "./submission-form";
 export {
@@ -106,12 +107,15 @@ function Layout(props: { content: React.ReactNode; sidebar: React.ReactNode }) {
 
 export function Content(props: { code: string; title: string; body: string }) {
   return (
-    <Typography className="flex-1">
-      <h1>
-        {props.code}: {props.title}
-      </h1>
-      <Markdown>{props.body}</Markdown>
-    </Typography>
+    <>
+      <Title>{`${props.code}:${props.title}`}</Title>
+      <Typography className="flex-1">
+        <h1>
+          {props.code}: {props.title}
+        </h1>
+        <Markdown>{props.body}</Markdown>
+      </Typography>
+    </>
   );
 }
 

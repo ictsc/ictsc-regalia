@@ -1,6 +1,7 @@
-import { Logo } from "@app/components/logo";
 import { Button, type ButtonProps } from "@headlessui/react";
-import clydeIcon from "@assets/icon_clyde_white_RGB.svg";
+import clydeIcon from "../../../assets/icon_clyde_white_RGB.svg";
+import { Logo } from "../../components/logo";
+import { Title } from "../../components/title";
 
 type Props = {
   signInURL: string;
@@ -8,10 +9,13 @@ type Props = {
 
 export function SignInPage({ signInURL }: Props) {
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-[90px]">
-      <Logo width={500} />
-      <DiscordLoginButton href={signInURL} />
-    </div>
+    <>
+      <Title>ログイン</Title>
+      <div className="flex h-full flex-col items-center justify-center gap-[90px]">
+        <Logo width={500} />
+        <DiscordLoginButton href={signInURL} />
+      </div>
+    </>
   );
 }
 
