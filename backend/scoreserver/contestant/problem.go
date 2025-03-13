@@ -63,21 +63,7 @@ func (h *ProblemServiceHandler) ListProblems(
 
 	protoProblems := make([]*contestantv1.Problem, 0, len(problems))
 	for _, problem := range problems {
-		protoProblems = append(protoProblems, &contestantv1.Problem{
-			Code:     string(problem.Code()),
-			Title:    problem.Title(),
-			MaxScore: problem.MaxScore(),
-			Category: problem.Category(),
-			Score: &contestantv1.Score{
-				MarkedScore: problem.Score().MarkedScore(),
-				Penalty:     problem.Score().Penalty(),
-				Score:       problem.Score().TotalScore(),
-				MaxScore:    problem.MaxScore(),
-			},
-			Deployment: &contestantv1.Deployment{
-				Redeployable: problem.Redeployable(),
-			},
-		})
+		protoProblems = append(protoProblems, convertTeamProblem(problem))
 	}
 
 	return connect.NewResponse(&contestantv1.ListProblemsResponse{
@@ -118,24 +104,41 @@ func (h *ProblemServiceHandler) GetProblem(
 	}
 	detail := tp.ProblemDetail()
 
-	proto := &contestantv1.Problem{
-		Code:     string(detail.Code()),
-		Title:    detail.Title(),
-		MaxScore: detail.MaxScore(),
-		Category: detail.Category(),
-		Deployment: &contestantv1.Deployment{
-			Redeployable: detail.Redeployable(),
-		},
-		Body: &contestantv1.ProblemBody{
-			Type: contestantv1.ProblemType_PROBLEM_TYPE_DESCRIPTIVE,
-			Body: &contestantv1.ProblemBody_Descriptive{
-				Descriptive: &contestantv1.DescriptiveProblem{
-					Body: detail.Body(),
-				},
+	proto := convertTeamProblem(tp.TeamProblem())
+	proto.Body = &contestantv1.ProblemBody{
+		Type: contestantv1.ProblemType_PROBLEM_TYPE_DESCRIPTIVE,
+		Body: &contestantv1.ProblemBody_Descriptive{
+			Descriptive: &contestantv1.DescriptiveProblem{
+				Body: detail.Body(),
 			},
 		},
 	}
+
 	return connect.NewResponse(&contestantv1.GetProblemResponse{
 		Problem: proto,
 	}), nil
+}
+
+func convertTeamProblem(problem *domain.TeamProblem) *contestantv1.Problem {
+	proto := &contestantv1.Problem{
+		Code:     string(problem.Code()),
+		Title:    problem.Title(),
+		MaxScore: problem.MaxScore(),
+		Category: problem.Category(),
+		Deployment: &contestantv1.Deployment{
+			Redeployable: problem.Redeployable(),
+		},
+	}
+	if score := problem.Score(); score != nil {
+		proto.Score = &contestantv1.Score{
+			MarkedScore: score.MarkedScore(),
+			Penalty:     score.Penalty(),
+			Score:       score.TotalScore(),
+			MaxScore:    score.MaxScore(),
+		}
+	}
+	if problem.RedeployRule() == domain.RedeployRulePercentagePenalty {
+		proto.Deployment.PenaltyThreashold = problem.PercentagePenalty().Threshold
+	}
+	return proto
 }
