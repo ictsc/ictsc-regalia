@@ -2,6 +2,7 @@ package contestant
 
 import (
 	"context"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/cockroachdb/errors"
@@ -21,6 +22,7 @@ type ProblemServiceHandler struct {
 	ListProblemsEffect    ProblemListEffect
 	GetProblemEffect      ProblemGetEffect
 	ListDeploymentsEffect DeploymentsListEffect
+	DeployEffect          DeployEffect
 }
 
 var _ contestantv1connect.ProblemServiceHandler = (*ProblemServiceHandler)(nil)
@@ -31,6 +33,15 @@ func newProblemServiceHandler(enforcer *ScheduleEnforcer, repo *pg.Repository) *
 		ListProblemsEffect:    repo,
 		GetProblemEffect:      repo,
 		ListDeploymentsEffect: repo,
+		DeployEffect: struct {
+			domain.TeamMemberGetter
+			domain.ProblemReader
+			domain.Tx[domain.DeploymentWriter]
+		}{
+			TeamMemberGetter: repo,
+			ProblemReader:    repo,
+			Tx:               pg.Tx(repo, func(rt *pg.RepositoryTx) domain.DeploymentWriter { return rt }),
+		},
 	}
 }
 
@@ -158,29 +169,79 @@ func (h *ProblemServiceHandler) ListDeployments(
 		return nil, err
 	}
 
-	teamProblem, err := teamMember.Team().ProblemDetailByCode(ctx, h.ListDeploymentsEffect, code)
+	teamProblem, err := teamMember.Team().ProblemByCode(ctx, h.ListDeploymentsEffect, code)
 	if err != nil {
 		return nil, err
 	}
 
-	deployments, err := teamProblem.TeamProblem().Deployments(ctx, h.ListDeploymentsEffect)
+	deployments, err := teamProblem.Deployments(ctx, h.ListDeploymentsEffect)
 	if err != nil {
 		return nil, err
 	}
 
 	protoDeployments := make([]*contestantv1.DeploymentRequest, 0, len(deployments))
 	for _, deployment := range deployments {
-		protoDeployments = append(protoDeployments, &contestantv1.DeploymentRequest{
-			Revision:            deployment.Revision(),
-			Status:              convertDeploymentStatus(deployment.Status()),
-			RequestedAt:         timestamppb.New(deployment.CreatedAt()),
-			AllowedRequestCount: teamProblem.TeamProblem().RemainingDeployments(deployment.Revision()),
-			Penalty:             teamProblem.TeamProblem().Penalty(deployment.Revision()),
-		})
+		protoDeployments = append(protoDeployments, convertDeployment(teamProblem.Problem(), deployment))
 	}
 
 	return connect.NewResponse(&contestantv1.ListDeploymentsResponse{
 		Deployments: protoDeployments,
+	}), nil
+}
+
+type DeployEffect interface {
+	domain.TeamMemberGetter
+	domain.ProblemReader
+	domain.Tx[domain.DeploymentWriter]
+}
+
+func (h *ProblemServiceHandler) Deploy(
+	ctx context.Context,
+	req *connect.Request[contestantv1.DeployRequest],
+) (*connect.Response[contestantv1.DeployResponse], error) {
+	userSess, err := session.UserSessionStore.Get(ctx)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
+		}
+		return nil, err
+	}
+	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
+		return nil, err
+	}
+
+	protoCode := req.Msg.GetCode()
+	if protoCode == "" {
+		return nil, domain.NewInvalidArgumentError("code is required", nil)
+	}
+
+	teamMember, err := domain.UserID(userSess.UserID).TeamMember(ctx, h.DeployEffect)
+	if err != nil {
+		return nil, err
+	}
+
+	code, err := domain.NewProblemCode(protoCode)
+	if err != nil {
+		return nil, err
+	}
+
+	teamProblem, err := teamMember.Team().ProblemByCode(ctx, h.DeployEffect, code)
+	if err != nil {
+		return nil, err
+	}
+
+	now := time.Now()
+	deployment, err := domain.RunTx(ctx, h.DeployEffect,
+		func(eff domain.DeploymentWriter) (*domain.Deployment, error) {
+			return teamProblem.Deploy(ctx, eff, now)
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&contestantv1.DeployResponse{
+		Deployment: convertDeployment(teamProblem.Problem(), deployment),
 	}), nil
 }
 
@@ -206,6 +267,16 @@ func convertTeamProblem(problem *domain.TeamProblem) *contestantv1.Problem {
 		proto.Deployment.PenaltyThreashold = problem.PercentagePenalty().Threshold
 	}
 	return proto
+}
+
+func convertDeployment(problem *domain.Problem, deployment *domain.Deployment) *contestantv1.DeploymentRequest {
+	return &contestantv1.DeploymentRequest{
+		Revision:            deployment.Revision(),
+		Status:              convertDeploymentStatus(deployment.Status()),
+		RequestedAt:         timestamppb.New(deployment.CreatedAt()),
+		AllowedRequestCount: problem.RemainingDeployments(deployment.Revision()),
+		Penalty:             problem.Penalty(deployment.Revision()),
+	}
 }
 
 func convertDeploymentStatus(status domain.DeploymentStatus) contestantv1.DeploymentStatus {

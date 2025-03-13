@@ -117,6 +117,17 @@ func (t *Team) ProblemDetailByCode(ctx context.Context, eff ProblemReader, code 
 	}, nil
 }
 
+func (t *Team) ProblemByCode(ctx context.Context, eff ProblemReader, code ProblemCode) (*TeamProblem, error) {
+	problem, err := code.Problem(ctx, eff)
+	if err != nil {
+		return nil, err
+	}
+	return &TeamProblem{
+		team:    t,
+		problem: problem,
+	}, nil
+}
+
 func (tp *TeamProblemDetail) Team() *Team {
 	return tp.team
 }

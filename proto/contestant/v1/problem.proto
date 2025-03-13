@@ -96,7 +96,9 @@ message ListDeploymentsResponse {
 message DeployRequest {
   string code = 1;
 }
-message DeployResponse {}
+message DeployResponse {
+  DeploymentRequest deployment = 1;
+}
 
 service ProblemService {
   rpc ListProblems(ListProblemsRequest) returns (ListProblemsResponse);
