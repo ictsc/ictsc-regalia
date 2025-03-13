@@ -4,13 +4,15 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
+import type { Timestamp } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file contestant/v1/ranking.proto.
  */
 export const file_contestant_v1_ranking: GenFile = /*@__PURE__*/
-  fileDesc("Chtjb250ZXN0YW50L3YxL3JhbmtpbmcucHJvdG8SDWNvbnRlc3RhbnQudjEiNgoEUmFuaxIMCgRyYW5rGAEgASgDEhEKCXRlYW1fbmFtZRgCIAEoCRINCgVzY29yZRgDIAEoAyITChFHZXRSYW5raW5nUmVxdWVzdCI6ChJHZXRSYW5raW5nUmVzcG9uc2USJAoHcmFua2luZxgBIAMoCzITLmNvbnRlc3RhbnQudjEuUmFuazJjCg5SYW5raW5nU2VydmljZRJRCgpHZXRSYW5raW5nEiAuY29udGVzdGFudC52MS5HZXRSYW5raW5nUmVxdWVzdBohLmNvbnRlc3RhbnQudjEuR2V0UmFua2luZ1Jlc3BvbnNlQsMBChFjb20uY29udGVzdGFudC52MUIMUmFua2luZ1Byb3RvUAFaS2dpdGh1Yi5jb20vaWN0c2MvaWN0c2MtcmVnYWxpYS9iYWNrZW5kL3BrZy9wcm90by9jb250ZXN0YW50L3YxO2NvbnRlc3RhbnR2MaICA0NYWKoCDUNvbnRlc3RhbnQuVjHKAg1Db250ZXN0YW50XFYx4gIZQ29udGVzdGFudFxWMVxHUEJNZXRhZGF0YeoCDkNvbnRlc3RhbnQ6OlYxYgZwcm90bzM");
+  fileDesc("Chtjb250ZXN0YW50L3YxL3JhbmtpbmcucHJvdG8SDWNvbnRlc3RhbnQudjEiewoEUmFuaxIMCgRyYW5rGAEgASgDEhEKCXRlYW1fbmFtZRgCIAEoCRINCgVzY29yZRgDIAEoAxItCgl0aW1lc3RhbXAYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhQKDG9yZ2FuaXphdGlvbhgFIAEoCSITChFHZXRSYW5raW5nUmVxdWVzdCI6ChJHZXRSYW5raW5nUmVzcG9uc2USJAoHcmFua2luZxgBIAMoCzITLmNvbnRlc3RhbnQudjEuUmFuazJjCg5SYW5raW5nU2VydmljZRJRCgpHZXRSYW5raW5nEiAuY29udGVzdGFudC52MS5HZXRSYW5raW5nUmVxdWVzdBohLmNvbnRlc3RhbnQudjEuR2V0UmFua2luZ1Jlc3BvbnNlQsMBChFjb20uY29udGVzdGFudC52MUIMUmFua2luZ1Byb3RvUAFaS2dpdGh1Yi5jb20vaWN0c2MvaWN0c2MtcmVnYWxpYS9iYWNrZW5kL3BrZy9wcm90by9jb250ZXN0YW50L3YxO2NvbnRlc3RhbnR2MaICA0NYWKoCDUNvbnRlc3RhbnQuVjHKAg1Db250ZXN0YW50XFYx4gIZQ29udGVzdGFudFxWMVxHUEJNZXRhZGF0YeoCDkNvbnRlc3RhbnQ6OlYxYgZwcm90bzM", [file_google_protobuf_timestamp]);
 
 /**
  * @generated from message contestant.v1.Rank
@@ -30,6 +32,16 @@ export type Rank = Message<"contestant.v1.Rank"> & {
    * @generated from field: int64 score = 3;
    */
   score: bigint;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp timestamp = 4;
+   */
+  timestamp?: Timestamp;
+
+  /**
+   * @generated from field: string organization = 5;
+   */
+  organization: string;
 };
 
 /**
