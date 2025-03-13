@@ -41,8 +41,5 @@ func (r *repo) GetRanking(ctx context.Context) ([]*domain.RankingData, error) {
 		}
 		ranking = append(ranking, &rank)
 	}
-	for i, rd := range ranking {
-		rd.Rank = int64(i + 1)
-	}
 	return ranking, nil
 }

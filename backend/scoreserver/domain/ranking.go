@@ -13,7 +13,6 @@ type (
 		submittedAt time.Time
 	}
 	RankingData struct {
-		Rank        int64     `db:"rank"`
 		TeamName    string    `db:"team_name"`
 		Score       int64     `db:"score"`
 		SubmittedAt time.Time `db:"submitted_at"`
@@ -38,7 +37,6 @@ func (r *Ranking) SubmittedAt() time.Time {
 
 func (r *RankingData) parse() *Ranking {
 	return &Ranking{
-		rank:        r.Rank,
 		teamName:    r.TeamName,
 		score:       r.Score,
 		submittedAt: r.SubmittedAt,
@@ -54,7 +52,25 @@ func GetRanking(ctx context.Context, eff RankingGetter) ([]*Ranking, error) {
 	for _, rank := range rankingData {
 		ranking = append(ranking, rank.parse())
 	}
+	AssignRanking(ranking)
+
 	return ranking, nil
+}
+
+func AssignRanking(rankings []*Ranking) {
+	var currentRank int64 = 0
+	var prevScore int64
+	var prevSubmittedAt time.Time
+
+	for i, r := range rankings {
+		if i == 0 || r.score != prevScore || !r.submittedAt.Equal(prevSubmittedAt) {
+			currentRank = int64(i + 1)
+		}
+		r.rank = currentRank
+
+		prevScore = r.score
+		prevSubmittedAt = r.submittedAt
+	}
 }
 
 type (
