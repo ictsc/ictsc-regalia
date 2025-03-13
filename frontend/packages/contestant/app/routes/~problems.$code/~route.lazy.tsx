@@ -125,28 +125,32 @@ function Deployments(props: {
     use(props.deployments) as (Deployment & { isPending?: boolean })[],
   );
   const canRedeploy =
-    (deployments?.[0].status ?? DeploymentStatus.DEPLOYED) ===
+    (deployments?.[0]?.status ?? DeploymentStatus.DEPLOYED) ===
     DeploymentStatus.DEPLOYED;
 
   const [lastResult, action, isActionPending] = useActionState(
     async (_prev: unknown, _action: "redeploy") => {
-      optimisticSetDeployments((ds) => [
-        {
-          isPending: true,
-          revision: ds.length + 1,
-          status: DeploymentStatus.DEPLOYING,
-          requestedAt: new Date().toISOString(),
-          allowedDeploymentCount: (ds?.[0].allowedDeploymentCount ?? 1) - 1,
-          thresholdExceeded: ds?.[0].thresholdExceeded ?? false,
-          penalty: ds?.[0].penalty ?? 0,
-        },
-        ...ds,
-      ]);
+      const timer = setTimeout(() => {
+        optimisticSetDeployments((ds) => [
+          {
+            isPending: true,
+            revision: ds.length + 1,
+            status: DeploymentStatus.DEPLOYING,
+            requestedAt: new Date().toISOString(),
+            allowedDeploymentCount: (ds?.[0]?.allowedDeploymentCount ?? 1) - 1,
+            thresholdExceeded: ds?.[0]?.thresholdExceeded ?? false,
+            penalty: ds?.[0]?.penalty ?? 0,
+          },
+          ...ds,
+        ]);
+      }, 200);
       try {
         await props.deploy();
       } catch (e) {
         console.error(e);
         return "再展開に失敗しました";
+      } finally {
+        clearTimeout(timer);
       }
       await router.invalidate();
       return null;
