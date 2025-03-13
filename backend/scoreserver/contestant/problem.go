@@ -27,9 +27,10 @@ var _ contestantv1connect.ProblemServiceHandler = (*ProblemServiceHandler)(nil)
 
 func newProblemServiceHandler(enforcer *ScheduleEnforcer, repo *pg.Repository) *ProblemServiceHandler {
 	return &ProblemServiceHandler{
-		Enforcer:           enforcer,
-		ListProblemsEffect: repo,
-		GetProblemEffect:   repo,
+		Enforcer:              enforcer,
+		ListProblemsEffect:    repo,
+		GetProblemEffect:      repo,
+		ListDeploymentsEffect: repo,
 	}
 }
 
