@@ -25,7 +25,7 @@ var _ contestantv1connect.ProblemServiceHandler = (*ProblemServiceHandler)(nil)
 
 func newProblemServiceHandler(enforcer *ScheduleEnforcer, repo *pg.Repository) *ProblemServiceHandler {
 	return &ProblemServiceHandler{
-		Enforcer: enforcer,
+		Enforcer:   enforcer,
 		ListEffect: repo,
 		GetEffect:  repo,
 	}
@@ -68,6 +68,12 @@ func (h *ProblemServiceHandler) ListProblems(
 			Title:    problem.Title(),
 			MaxScore: problem.MaxScore(),
 			Category: problem.Category(),
+			Score: &contestantv1.Score{
+				MarkedScore: problem.Score().MarkedScore(),
+				Penalty:     problem.Score().Penalty(),
+				Score:       problem.Score().TotalScore(),
+				MaxScore:    problem.MaxScore(),
+			},
 			Deployment: &contestantv1.Deployment{
 				Redeployable: problem.Redeployable(),
 			},
