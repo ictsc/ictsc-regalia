@@ -8,6 +8,7 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1/contestantv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type RankingServiceHandler struct {
@@ -38,9 +39,10 @@ func (r *RankingServiceHandler) GetRanking(
 	ranking := make([]*contestantv1.Rank, 0, len(rankingData))
 	for _, rank := range rankingData {
 		ranking = append(ranking, &contestantv1.Rank{
-			Rank:     rank.Rank(),
-			TeamName: rank.TeamName(),
-			Score:    rank.Score(),
+			Rank:        rank.Rank(),
+			TeamName:    rank.TeamName(),
+			Score:       rank.Score(),
+			SubmittedAt: timestamppb.New(rank.SubmittedAt()),
 		})
 	}
 
