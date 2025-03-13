@@ -29,3 +29,8 @@ export async function fetchDeployments(
   items.sort((a, b) => b.revision - a.revision);
   return items;
 }
+
+export async function deploy(transport: Transport, code: string): Promise<void> {
+  const client = createClient(ProblemService, transport);
+  await client.deploy({ code });
+}
