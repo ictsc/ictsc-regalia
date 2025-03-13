@@ -96,7 +96,8 @@ export function Navbar(props: {
               ...buttonProps,
             })}
           >
-            <NavbarButtonInner collapsed={collapsed} 
+            <NavbarButtonInner
+              collapsed={collapsed}
               icon="groups"
               title="チーム一覧"
             />
