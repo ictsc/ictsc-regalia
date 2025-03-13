@@ -35,8 +35,7 @@ func (r *RankingServiceHandler) GetRanking(
 		return nil, err
 	}
 
-	ranking := make([]*contestantv1.Rank, len(rankingData))
-
+	ranking := make([]*contestantv1.Rank, 0, len(rankingData))
 	for _, rank := range rankingData {
 		ranking = append(ranking, &contestantv1.Rank{
 			Rank:     rank.Rank(),
