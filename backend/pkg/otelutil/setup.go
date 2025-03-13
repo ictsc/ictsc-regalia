@@ -1,4 +1,4 @@
-package main
+package otelutil
 
 import (
 	"context"
@@ -19,10 +19,9 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.27.0"
 )
 
-const defaultServiceName = "scoreserver"
-
+// Setup sets up OpenTelemetry with the specified service name.
 // nolint:nonamedreturns
-func setupOpenTelemetry(ctx context.Context) (shutdown func(context.Context) error, err error) {
+func Setup(ctx context.Context, serviceName string) (shutdown func(context.Context) error, err error) {
 	var shutdownFns []func(context.Context) error
 	shutdownFn := func(ctx context.Context) error {
 		errs := make([]error, 0, len(shutdownFns))
@@ -37,7 +36,7 @@ func setupOpenTelemetry(ctx context.Context) (shutdown func(context.Context) err
 		}
 	}()
 
-	res, err := newResource(ctx)
+	res, err := newResource(ctx, serviceName)
 	if err != nil {
 		return nil, err
 	}
@@ -82,10 +81,10 @@ func setupOpenTelemetry(ctx context.Context) (shutdown func(context.Context) err
 	return shutdownFn, nil
 }
 
-func newResource(ctx context.Context) (*resource.Resource, error) {
+func newResource(ctx context.Context, serviceName string) (*resource.Resource, error) {
 	res, err := resource.New(
 		ctx,
-		resource.WithAttributes(semconv.ServiceName(defaultServiceName)),
+		resource.WithAttributes(semconv.ServiceName(serviceName)),
 		resource.WithFromEnv(),
 		resource.WithTelemetrySDK(),
 	)

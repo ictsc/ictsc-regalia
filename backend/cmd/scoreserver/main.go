@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/ictsc/ictsc-regalia/backend/pkg/otelutil"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/slogutil"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver"
 	"golang.org/x/sys/unix"
@@ -24,9 +25,11 @@ func start(opts *CLIOption) int {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, unix.SIGTERM)
 	defer stop()
 
-	slog.SetDefault(slog.New(slogutil.NewHandler(os.Stdout, opts.LogFormat, opts.LogLevel)))
+	slog.SetDefault(
+		slog.New(slogutil.NewHandler(os.Stdout, opts.LogFormat, opts.LogLevel)),
+	)
 
-	shutdownOTel, err := setupOpenTelemetry(ctx)
+	shutdownOTel, err := otelutil.Setup(ctx, "scoreserver-backend")
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to setup OpenTelemetry", "error", err)
 		return 1
