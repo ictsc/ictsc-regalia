@@ -90,6 +90,20 @@ func (tp *TeamProblem) Deployments(ctx context.Context, eff DeploymentReader) ([
 	return forTeam, nil
 }
 
+func (tp *TeamProblem) DeploymentByRevision(ctx context.Context, eff DeploymentReader, revision uint32) (*Deployment, error) {
+	list, err := tp.Deployments(ctx, eff)
+	if err != nil {
+		return nil, err
+	}
+	idx := slices.IndexFunc(list, func(d *Deployment) bool {
+		return d.Revision() == revision
+	})
+	if idx < 0 {
+		return nil, NewNotFoundError("deployment not found", nil)
+	}
+	return list[idx], nil
+}
+
 func (tp *TeamProblem) latestDeployment(ctx context.Context, eff DeploymentReader) (*Deployment, error) {
 	list, err := ListDeployments(ctx, eff)
 	if err != nil {
@@ -127,8 +141,8 @@ func (tp *TeamProblem) Deploy(ctx context.Context, eff DeploymentWriter, occurre
 	if err != nil {
 		return nil, err
 	}
-	if !latestDeploy.Status().IsFinished() {
-		return nil, NewInvalidArgumentError("the latest deployment is not finished", nil) // InvaidArgument ではない気もする
+	if latestDeploy.Status() != DeploymentStatusCompleted {
+		return nil, NewInvalidArgumentError("the latest deployment is not completed", nil) // InvaidArgument ではない気もする
 	}
 
 	id, err := uuid.NewV4()
