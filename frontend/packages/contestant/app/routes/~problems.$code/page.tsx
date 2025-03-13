@@ -1,10 +1,4 @@
-import {
-  type ComponentProps,
-  type ReactNode,
-  Suspense,
-  use,
-  useReducer,
-} from "react";
+import { type ReactNode, Suspense, use, useReducer } from "react";
 import {
   Button,
   Tab,
@@ -18,14 +12,26 @@ import { clsx } from "clsx";
 import { MaterialSymbol } from "../../components/material-symbol";
 import { Markdown, Typography } from "../../components/markdown";
 import { NavbarLayoutContext } from "../../components/app-shell";
-import { Score } from "../../components/score";
 
 export { SubmissionForm } from "./submission-form";
+export {
+  SubmissionListContainer,
+  SubmissionList,
+  SubmissionListItem,
+  EmptySubmissionList,
+} from "./submission-list";
+export {
+  Deployments,
+  EmptyDeploymentList,
+  DeploymentList,
+  DeploymentItem,
+} from "./deployments";
 
 export function Page(props: {
   content: ReactNode;
   submissionForm: ReactNode;
   submissionList: ReactNode;
+  deploymentList: ReactNode;
   redeployable: boolean;
 
   onTabChange?: () => void;
@@ -39,6 +45,7 @@ export function Page(props: {
           redeployable={props.redeployable}
           submissionForm={props.submissionForm}
           submissionList={props.submissionList}
+          deploymentList={props.deploymentList}
         />
       }
     />
@@ -111,6 +118,7 @@ export function Content(props: { code: string; title: string; body: string }) {
 function Sidebar(props: {
   submissionForm: ReactNode;
   submissionList: ReactNode;
+  deploymentList: ReactNode;
   redeployable: boolean;
   onChange?: () => void;
 }) {
@@ -124,11 +132,8 @@ function Sidebar(props: {
       <TabPanels className="mt-16 size-full bg-transparent px-8">
         <Suspense>
           <SidebarTabPanel>{props.submissionForm}</SidebarTabPanel>
-          <SidebarTabPanel className="rounded-12 bg-disabled py-12">
-            <div className="size-full overflow-y-auto px-12 [scrollbar-gutter:stable_both-edges]">
-              {props.submissionList}
-            </div>
-          </SidebarTabPanel>
+          <SidebarTabPanel>{props.submissionList}</SidebarTabPanel>
+          <SidebarTabPanel>{props.deploymentList}</SidebarTabPanel>
         </Suspense>
       </TabPanels>
     </TabGroup>
@@ -165,54 +170,5 @@ function SidebarTabPanel(props: { className?: string; children?: ReactNode }) {
         </Transition>
       )}
     </TabPanel>
-  );
-}
-
-export function SubmissionList(props: {
-  readonly isPending?: boolean;
-  readonly children?: ReactNode;
-}) {
-  return (
-    <ul
-      className={clsx(
-        "flex size-full flex-col gap-16 py-12",
-        props.isPending && "opacity-75",
-      )}
-    >
-      {props.children}
-    </ul>
-  );
-}
-
-export function EmptySubmissionList() {
-  return (
-    <div className="grid size-full place-items-center text-16 font-bold text-text">
-      解答はまだありません！
-    </div>
-  );
-}
-
-const submissionListDateTimeFormatter = new Intl.DateTimeFormat("ja-JP", {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
-
-export function SubmissionListItem(props: {
-  readonly id: number;
-  readonly submittedAt: string;
-  readonly score: ComponentProps<typeof Score>;
-}) {
-  return (
-    <li className="flex justify-between gap-8 rounded-12 bg-surface-0 p-16">
-      <div className="flex flex-col">
-        <h2 className="text-20 font-bold text-[#000]">#{props.id}</h2>
-        <h3 className="text-12">
-          提出:{" "}
-          {submissionListDateTimeFormatter.format(new Date(props.submittedAt))}
-        </h3>
-        <p className="mt-4 text-12"></p>
-      </div>
-      <Score {...props.score} />
-    </li>
   );
 }

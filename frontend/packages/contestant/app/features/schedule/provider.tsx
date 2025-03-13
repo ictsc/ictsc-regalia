@@ -2,6 +2,7 @@ import { isAfter } from "date-fns";
 import {
   Suspense,
   use,
+  useDeferredValue,
   useEffect,
   useState,
   useTransition,
@@ -16,15 +17,18 @@ export function ScheduleProvider(props: {
   readonly loadData: () => Promise<Schedule | null>;
   readonly children?: ReactNode;
 }) {
+  const deferredInitialData = useDeferredValue(props.initialData);
+
   const [promiseState, setPromise] = useState({
     data: props.initialData,
     base: props.initialData,
   });
-  const promise =
+  const [isStatePending, startTransision] = useTransition();
+
+  const [promise, isPending] =
     promiseState.base === props.initialData
-      ? promiseState.data
-      : props.initialData;
-  const [isPending, startTransision] = useTransition();
+      ? [promiseState.data, isStatePending]
+      : [deferredInitialData, deferredInitialData !== props.initialData];
 
   return (
     <>
