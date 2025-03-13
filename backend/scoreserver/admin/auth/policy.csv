@@ -22,3 +22,4 @@ p, role:admin, schedules, get
 p, role:admin, schedules, update
 p, role:admin, marking_results, list
 p, role:admin, marking_results, create
+p, role:admin, deployments, list
