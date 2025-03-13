@@ -2,6 +2,7 @@ package contestant
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 
 	"connectrpc.com/connect"
@@ -18,6 +19,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/rbcervilla/redisstore/v9"
 	"github.com/redis/go-redis/v9"
+	sloghttp "github.com/samber/slog-http"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
@@ -48,7 +50,15 @@ func New(
 
 	mux := http.NewServeMux()
 
-	mux.Handle("/auth/", otelhttp.NewHandler(newAuthHandler(cfg.Auth, repo, rateLimiter), "auth"))
+	var authHandler http.Handler = newAuthHandler(cfg.Auth, repo, rateLimiter)
+	authHandler = sloghttp.Recovery(authHandler)
+	authHandler = sloghttp.NewWithConfig(slog.Default(), sloghttp.Config{
+		WithRequestID: false,
+		WithTraceID:   true,
+		WithSpanID:    true,
+	})(authHandler)
+	authHandler = otelhttp.NewHandler(authHandler, "auth")
+	mux.Handle("/auth/", authHandler)
 
 	mux.Handle(contestantv1connect.NewViewerServiceHandler(
 		newViewerServiceHandler(repo),
