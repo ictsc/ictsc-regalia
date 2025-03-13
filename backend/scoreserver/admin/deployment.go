@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"time"
 
 	"connectrpc.com/connect"
 	adminv1 "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1"
@@ -15,8 +16,9 @@ import (
 type DeploymentServiceHandler struct {
 	adminv1connect.UnimplementedDeploymentServiceHandler
 
-	Enforcer   *auth.Enforcer
-	ListEffect domain.DeploymentReader
+	Enforcer     *auth.Enforcer
+	ListEffect   domain.DeploymentReader
+	UpdateEffect DeploymentStatusUpdateEffect
 }
 
 var _ adminv1connect.DeploymentServiceHandler = (*DeploymentServiceHandler)(nil)
@@ -25,6 +27,17 @@ func newDeploymentServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *
 	return &DeploymentServiceHandler{
 		Enforcer:   enforcer,
 		ListEffect: repo,
+		UpdateEffect: struct {
+			domain.TeamGetter
+			domain.ProblemReader
+			domain.DeploymentReader
+			domain.Tx[domain.DeploymentWriter]
+		}{
+			TeamGetter:       repo,
+			ProblemReader:    repo,
+			DeploymentReader: repo,
+			Tx:               pg.Tx(repo, func(rt *pg.RepositoryTx) domain.DeploymentWriter { return rt }),
+		},
 	}
 }
 
@@ -64,6 +77,71 @@ func (h *DeploymentServiceHandler) ListDeployments(
 	}), nil
 }
 
+type DeploymentStatusUpdateEffect interface {
+	domain.TeamGetter
+	domain.ProblemReader
+	domain.DeploymentReader
+	domain.Tx[domain.DeploymentWriter]
+}
+
+func (h *DeploymentServiceHandler) UpdateDeploymentStatus(
+	ctx context.Context,
+	req *connect.Request[adminv1.UpdateDeploymentStatusRequest],
+) (*connect.Response[adminv1.UpdateDeploymentStatusResponse], error) {
+	if err := enforce(ctx, h.Enforcer, "deployments", "update"); err != nil {
+		return nil, err
+	}
+
+	reqTeamCode := req.Msg.GetTeamCode()
+	if reqTeamCode == 0 {
+		return nil, domain.NewInvalidArgumentError("team_code is required", nil)
+	}
+	teamCode, err := domain.NewTeamCode(reqTeamCode)
+	if err != nil {
+		return nil, err
+	}
+
+	reqProblemCode := req.Msg.GetProblemCode()
+	if reqProblemCode == "" {
+		return nil, domain.NewInvalidArgumentError("problem_code is required", nil)
+	}
+	problemCode, err := domain.NewProblemCode(reqProblemCode)
+	if err != nil {
+		return nil, err
+	}
+
+	reqRevision := req.Msg.GetRevision()
+	if reqRevision == 0 {
+		return nil, domain.NewInvalidArgumentError("revision is required", nil)
+	}
+
+	status := parseDeploymentStatus(req.Msg.GetStatus())
+
+	team, err := teamCode.Team(ctx, h.UpdateEffect)
+	if err != nil {
+		return nil, err
+	}
+
+	teamProblem, err := team.ProblemByCode(ctx, h.UpdateEffect, problemCode)
+	if err != nil {
+		return nil, err
+	}
+
+	deployment, err := teamProblem.DeploymentByRevision(ctx, h.UpdateEffect, reqRevision)
+	if err != nil {
+		return nil, err
+	}
+
+	now := time.Now()
+	if err := h.UpdateEffect.RunInTx(ctx, func(eff domain.DeploymentWriter) error {
+		return deployment.UpdateStatus(ctx, eff, status, now)
+	}); err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&adminv1.UpdateDeploymentStatusResponse{}), nil
+}
+
 func convertDeploymentStatus(status domain.DeploymentStatus) adminv1.DeploymentEventType {
 	switch status {
 	case domain.DeploymentStatusQueued:
@@ -78,5 +156,22 @@ func convertDeploymentStatus(status domain.DeploymentStatus) adminv1.DeploymentE
 		fallthrough
 	default:
 		return adminv1.DeploymentEventType_DEPLOYMENT_EVENT_TYPE_UNSPECIFIED
+	}
+}
+
+func parseDeploymentStatus(status adminv1.DeploymentEventType) domain.DeploymentStatus {
+	switch status {
+	case adminv1.DeploymentEventType_DEPLOYMENT_EVENT_TYPE_QUEUED:
+		return domain.DeploymentStatusQueued
+	case adminv1.DeploymentEventType_DEPLOYMENT_EVENT_TYPE_CREATING:
+		return domain.DeploymentStatusCreating
+	case adminv1.DeploymentEventType_DEPLOYMENT_EVENT_TYPE_FINISHED:
+		return domain.DeploymentStatusCompleted
+	case adminv1.DeploymentEventType_DEPLOYMENT_EVENT_TYPE_ERROR:
+		return domain.DeploymentStatusFailed
+	case adminv1.DeploymentEventType_DEPLOYMENT_EVENT_TYPE_UNSPECIFIED:
+		fallthrough
+	default:
+		return domain.DeploymentStatusUnknown
 	}
 }
