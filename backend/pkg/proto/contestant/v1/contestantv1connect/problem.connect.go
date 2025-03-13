@@ -39,6 +39,9 @@ const (
 	// ProblemServiceGetProblemProcedure is the fully-qualified name of the ProblemService's GetProblem
 	// RPC.
 	ProblemServiceGetProblemProcedure = "/contestant.v1.ProblemService/GetProblem"
+	// ProblemServiceListDeploymentsProcedure is the fully-qualified name of the ProblemService's
+	// ListDeployments RPC.
+	ProblemServiceListDeploymentsProcedure = "/contestant.v1.ProblemService/ListDeployments"
 	// ProblemServiceDeployProcedure is the fully-qualified name of the ProblemService's Deploy RPC.
 	ProblemServiceDeployProcedure = "/contestant.v1.ProblemService/Deploy"
 )
@@ -47,6 +50,7 @@ const (
 type ProblemServiceClient interface {
 	ListProblems(context.Context, *connect.Request[v1.ListProblemsRequest]) (*connect.Response[v1.ListProblemsResponse], error)
 	GetProblem(context.Context, *connect.Request[v1.GetProblemRequest]) (*connect.Response[v1.GetProblemResponse], error)
+	ListDeployments(context.Context, *connect.Request[v1.ListDeploymentsRequest]) (*connect.Response[v1.ListDeploymentsResponse], error)
 	Deploy(context.Context, *connect.Request[v1.DeployRequest]) (*connect.Response[v1.DeployResponse], error)
 }
 
@@ -73,6 +77,12 @@ func NewProblemServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(problemServiceMethods.ByName("GetProblem")),
 			connect.WithClientOptions(opts...),
 		),
+		listDeployments: connect.NewClient[v1.ListDeploymentsRequest, v1.ListDeploymentsResponse](
+			httpClient,
+			baseURL+ProblemServiceListDeploymentsProcedure,
+			connect.WithSchema(problemServiceMethods.ByName("ListDeployments")),
+			connect.WithClientOptions(opts...),
+		),
 		deploy: connect.NewClient[v1.DeployRequest, v1.DeployResponse](
 			httpClient,
 			baseURL+ProblemServiceDeployProcedure,
@@ -84,9 +94,10 @@ func NewProblemServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 
 // problemServiceClient implements ProblemServiceClient.
 type problemServiceClient struct {
-	listProblems *connect.Client[v1.ListProblemsRequest, v1.ListProblemsResponse]
-	getProblem   *connect.Client[v1.GetProblemRequest, v1.GetProblemResponse]
-	deploy       *connect.Client[v1.DeployRequest, v1.DeployResponse]
+	listProblems    *connect.Client[v1.ListProblemsRequest, v1.ListProblemsResponse]
+	getProblem      *connect.Client[v1.GetProblemRequest, v1.GetProblemResponse]
+	listDeployments *connect.Client[v1.ListDeploymentsRequest, v1.ListDeploymentsResponse]
+	deploy          *connect.Client[v1.DeployRequest, v1.DeployResponse]
 }
 
 // ListProblems calls contestant.v1.ProblemService.ListProblems.
@@ -99,6 +110,11 @@ func (c *problemServiceClient) GetProblem(ctx context.Context, req *connect.Requ
 	return c.getProblem.CallUnary(ctx, req)
 }
 
+// ListDeployments calls contestant.v1.ProblemService.ListDeployments.
+func (c *problemServiceClient) ListDeployments(ctx context.Context, req *connect.Request[v1.ListDeploymentsRequest]) (*connect.Response[v1.ListDeploymentsResponse], error) {
+	return c.listDeployments.CallUnary(ctx, req)
+}
+
 // Deploy calls contestant.v1.ProblemService.Deploy.
 func (c *problemServiceClient) Deploy(ctx context.Context, req *connect.Request[v1.DeployRequest]) (*connect.Response[v1.DeployResponse], error) {
 	return c.deploy.CallUnary(ctx, req)
@@ -108,6 +124,7 @@ func (c *problemServiceClient) Deploy(ctx context.Context, req *connect.Request[
 type ProblemServiceHandler interface {
 	ListProblems(context.Context, *connect.Request[v1.ListProblemsRequest]) (*connect.Response[v1.ListProblemsResponse], error)
 	GetProblem(context.Context, *connect.Request[v1.GetProblemRequest]) (*connect.Response[v1.GetProblemResponse], error)
+	ListDeployments(context.Context, *connect.Request[v1.ListDeploymentsRequest]) (*connect.Response[v1.ListDeploymentsResponse], error)
 	Deploy(context.Context, *connect.Request[v1.DeployRequest]) (*connect.Response[v1.DeployResponse], error)
 }
 
@@ -130,6 +147,12 @@ func NewProblemServiceHandler(svc ProblemServiceHandler, opts ...connect.Handler
 		connect.WithSchema(problemServiceMethods.ByName("GetProblem")),
 		connect.WithHandlerOptions(opts...),
 	)
+	problemServiceListDeploymentsHandler := connect.NewUnaryHandler(
+		ProblemServiceListDeploymentsProcedure,
+		svc.ListDeployments,
+		connect.WithSchema(problemServiceMethods.ByName("ListDeployments")),
+		connect.WithHandlerOptions(opts...),
+	)
 	problemServiceDeployHandler := connect.NewUnaryHandler(
 		ProblemServiceDeployProcedure,
 		svc.Deploy,
@@ -142,6 +165,8 @@ func NewProblemServiceHandler(svc ProblemServiceHandler, opts ...connect.Handler
 			problemServiceListProblemsHandler.ServeHTTP(w, r)
 		case ProblemServiceGetProblemProcedure:
 			problemServiceGetProblemHandler.ServeHTTP(w, r)
+		case ProblemServiceListDeploymentsProcedure:
+			problemServiceListDeploymentsHandler.ServeHTTP(w, r)
 		case ProblemServiceDeployProcedure:
 			problemServiceDeployHandler.ServeHTTP(w, r)
 		default:
@@ -159,6 +184,10 @@ func (UnimplementedProblemServiceHandler) ListProblems(context.Context, *connect
 
 func (UnimplementedProblemServiceHandler) GetProblem(context.Context, *connect.Request[v1.GetProblemRequest]) (*connect.Response[v1.GetProblemResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.ProblemService.GetProblem is not implemented"))
+}
+
+func (UnimplementedProblemServiceHandler) ListDeployments(context.Context, *connect.Request[v1.ListDeploymentsRequest]) (*connect.Response[v1.ListDeploymentsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.ProblemService.ListDeployments is not implemented"))
 }
 
 func (UnimplementedProblemServiceHandler) Deploy(context.Context, *connect.Request[v1.DeployRequest]) (*connect.Response[v1.DeployResponse], error) {

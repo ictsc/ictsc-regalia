@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package contestant.v1;
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1;contestantv1";
 
 message Problem {
@@ -33,6 +35,15 @@ message Score {
 message Deployment {
   DeploymentStatus status = 1;
   bool redeployable = 2;
+  uint32 penalty_threashold = 3;
+}
+
+message DeploymentRequest {
+  uint32 revision = 1;
+  DeploymentStatus status = 2;
+  google.protobuf.Timestamp requested_at = 3;
+  uint32 penalty = 4;
+  int32 allowed_request_count = 5; // 残り許容再展開回数
 }
 
 enum DeploymentStatus {
@@ -74,6 +85,14 @@ message GetProblemResponse {
   Problem problem = 1;
 }
 
+message ListDeploymentsRequest {
+  string code = 1;
+}
+
+message ListDeploymentsResponse {
+  repeated DeploymentRequest deployments = 1;
+}
+
 message DeployRequest {
   string code = 1;
 }
@@ -82,5 +101,6 @@ message DeployResponse {}
 service ProblemService {
   rpc ListProblems(ListProblemsRequest) returns (ListProblemsResponse);
   rpc GetProblem(GetProblemRequest) returns (GetProblemResponse);
+  rpc ListDeployments(ListDeploymentsRequest) returns (ListDeploymentsResponse);
   rpc Deploy(DeployRequest) returns (DeployResponse);
 }
