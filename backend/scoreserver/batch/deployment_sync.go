@@ -34,7 +34,10 @@ func NewDeploymentSync(
 
 func (d *DeploymentSync) Run(ctx context.Context) error {
 	slog.InfoContext(ctx, "Start sync deployments")
+
 	ticker := time.NewTicker(d.period)
+	defer ticker.Stop()
+
 	for {
 		if err := d.sync(ctx); err != nil {
 			slog.ErrorContext(ctx, "failed to sync deployments", "error", err)
