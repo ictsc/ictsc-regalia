@@ -36,6 +36,9 @@ const (
 	// DeploymentServiceListDeploymentsProcedure is the fully-qualified name of the DeploymentService's
 	// ListDeployments RPC.
 	DeploymentServiceListDeploymentsProcedure = "/admin.v1.DeploymentService/ListDeployments"
+	// DeploymentServiceUpdateDeploymentStatusProcedure is the fully-qualified name of the
+	// DeploymentService's UpdateDeploymentStatus RPC.
+	DeploymentServiceUpdateDeploymentStatusProcedure = "/admin.v1.DeploymentService/UpdateDeploymentStatus"
 	// DeploymentServiceSyncDeploymentProcedure is the fully-qualified name of the DeploymentService's
 	// SyncDeployment RPC.
 	DeploymentServiceSyncDeploymentProcedure = "/admin.v1.DeploymentService/SyncDeployment"
@@ -47,6 +50,7 @@ const (
 // DeploymentServiceClient is a client for the admin.v1.DeploymentService service.
 type DeploymentServiceClient interface {
 	ListDeployments(context.Context, *connect.Request[v1.ListDeploymentsRequest]) (*connect.Response[v1.ListDeploymentsResponse], error)
+	UpdateDeploymentStatus(context.Context, *connect.Request[v1.UpdateDeploymentStatusRequest]) (*connect.Response[v1.UpdateDeploymentStatusResponse], error)
 	SyncDeployment(context.Context, *connect.Request[v1.SyncDeploymentRequest]) (*connect.Response[v1.SyncDeploymentResponse], error)
 	Deploy(context.Context, *connect.Request[v1.DeployRequest]) (*connect.Response[v1.DeployResponse], error)
 }
@@ -68,6 +72,12 @@ func NewDeploymentServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithSchema(deploymentServiceMethods.ByName("ListDeployments")),
 			connect.WithClientOptions(opts...),
 		),
+		updateDeploymentStatus: connect.NewClient[v1.UpdateDeploymentStatusRequest, v1.UpdateDeploymentStatusResponse](
+			httpClient,
+			baseURL+DeploymentServiceUpdateDeploymentStatusProcedure,
+			connect.WithSchema(deploymentServiceMethods.ByName("UpdateDeploymentStatus")),
+			connect.WithClientOptions(opts...),
+		),
 		syncDeployment: connect.NewClient[v1.SyncDeploymentRequest, v1.SyncDeploymentResponse](
 			httpClient,
 			baseURL+DeploymentServiceSyncDeploymentProcedure,
@@ -85,14 +95,20 @@ func NewDeploymentServiceClient(httpClient connect.HTTPClient, baseURL string, o
 
 // deploymentServiceClient implements DeploymentServiceClient.
 type deploymentServiceClient struct {
-	listDeployments *connect.Client[v1.ListDeploymentsRequest, v1.ListDeploymentsResponse]
-	syncDeployment  *connect.Client[v1.SyncDeploymentRequest, v1.SyncDeploymentResponse]
-	deploy          *connect.Client[v1.DeployRequest, v1.DeployResponse]
+	listDeployments        *connect.Client[v1.ListDeploymentsRequest, v1.ListDeploymentsResponse]
+	updateDeploymentStatus *connect.Client[v1.UpdateDeploymentStatusRequest, v1.UpdateDeploymentStatusResponse]
+	syncDeployment         *connect.Client[v1.SyncDeploymentRequest, v1.SyncDeploymentResponse]
+	deploy                 *connect.Client[v1.DeployRequest, v1.DeployResponse]
 }
 
 // ListDeployments calls admin.v1.DeploymentService.ListDeployments.
 func (c *deploymentServiceClient) ListDeployments(ctx context.Context, req *connect.Request[v1.ListDeploymentsRequest]) (*connect.Response[v1.ListDeploymentsResponse], error) {
 	return c.listDeployments.CallUnary(ctx, req)
+}
+
+// UpdateDeploymentStatus calls admin.v1.DeploymentService.UpdateDeploymentStatus.
+func (c *deploymentServiceClient) UpdateDeploymentStatus(ctx context.Context, req *connect.Request[v1.UpdateDeploymentStatusRequest]) (*connect.Response[v1.UpdateDeploymentStatusResponse], error) {
+	return c.updateDeploymentStatus.CallUnary(ctx, req)
 }
 
 // SyncDeployment calls admin.v1.DeploymentService.SyncDeployment.
@@ -108,6 +124,7 @@ func (c *deploymentServiceClient) Deploy(ctx context.Context, req *connect.Reque
 // DeploymentServiceHandler is an implementation of the admin.v1.DeploymentService service.
 type DeploymentServiceHandler interface {
 	ListDeployments(context.Context, *connect.Request[v1.ListDeploymentsRequest]) (*connect.Response[v1.ListDeploymentsResponse], error)
+	UpdateDeploymentStatus(context.Context, *connect.Request[v1.UpdateDeploymentStatusRequest]) (*connect.Response[v1.UpdateDeploymentStatusResponse], error)
 	SyncDeployment(context.Context, *connect.Request[v1.SyncDeploymentRequest]) (*connect.Response[v1.SyncDeploymentResponse], error)
 	Deploy(context.Context, *connect.Request[v1.DeployRequest]) (*connect.Response[v1.DeployResponse], error)
 }
@@ -123,6 +140,12 @@ func NewDeploymentServiceHandler(svc DeploymentServiceHandler, opts ...connect.H
 		DeploymentServiceListDeploymentsProcedure,
 		svc.ListDeployments,
 		connect.WithSchema(deploymentServiceMethods.ByName("ListDeployments")),
+		connect.WithHandlerOptions(opts...),
+	)
+	deploymentServiceUpdateDeploymentStatusHandler := connect.NewUnaryHandler(
+		DeploymentServiceUpdateDeploymentStatusProcedure,
+		svc.UpdateDeploymentStatus,
+		connect.WithSchema(deploymentServiceMethods.ByName("UpdateDeploymentStatus")),
 		connect.WithHandlerOptions(opts...),
 	)
 	deploymentServiceSyncDeploymentHandler := connect.NewUnaryHandler(
@@ -141,6 +164,8 @@ func NewDeploymentServiceHandler(svc DeploymentServiceHandler, opts ...connect.H
 		switch r.URL.Path {
 		case DeploymentServiceListDeploymentsProcedure:
 			deploymentServiceListDeploymentsHandler.ServeHTTP(w, r)
+		case DeploymentServiceUpdateDeploymentStatusProcedure:
+			deploymentServiceUpdateDeploymentStatusHandler.ServeHTTP(w, r)
 		case DeploymentServiceSyncDeploymentProcedure:
 			deploymentServiceSyncDeploymentHandler.ServeHTTP(w, r)
 		case DeploymentServiceDeployProcedure:
@@ -156,6 +181,10 @@ type UnimplementedDeploymentServiceHandler struct{}
 
 func (UnimplementedDeploymentServiceHandler) ListDeployments(context.Context, *connect.Request[v1.ListDeploymentsRequest]) (*connect.Response[v1.ListDeploymentsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.DeploymentService.ListDeployments is not implemented"))
+}
+
+func (UnimplementedDeploymentServiceHandler) UpdateDeploymentStatus(context.Context, *connect.Request[v1.UpdateDeploymentStatusRequest]) (*connect.Response[v1.UpdateDeploymentStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.DeploymentService.UpdateDeploymentStatus is not implemented"))
 }
 
 func (UnimplementedDeploymentServiceHandler) SyncDeployment(context.Context, *connect.Request[v1.SyncDeploymentRequest]) (*connect.Response[v1.SyncDeploymentResponse], error) {

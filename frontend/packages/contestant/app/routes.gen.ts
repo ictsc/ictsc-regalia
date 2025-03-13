@@ -15,10 +15,13 @@ import { Route as SignupRouteImport } from "./routes/~signup/~route";
 import { Route as SigninRouteImport } from "./routes/~signin/~route";
 import { Route as RuleRouteImport } from "./routes/~rule/~route";
 import { Route as RankingRouteImport } from "./routes/~ranking/~route";
-import { Route as AnnouncesRouteImport } from "./routes/~announces/~route";
+import { Route as ProblemsImport } from "./routes/~problems";
+import { Route as AnnouncesImport } from "./routes/~announces";
 import { Route as IndexRouteImport } from "./routes/~index/~route";
 import { Route as ProblemsCodeRouteImport } from "./routes/~problems.$code/~route";
+import { Route as AnnouncesSlugRouteImport } from "./routes/~announces.$slug/~route";
 import { Route as ProblemsIndexRouteImport } from "./routes/~problems.index/~route";
+import { Route as AnnouncesIndexRouteImport } from "./routes/~announces.index/~route";
 
 // Create/Update Routes
 
@@ -46,7 +49,13 @@ const RankingRouteRoute = RankingRouteImport.update({
   getParentRoute: () => rootRoute,
 } as any);
 
-const AnnouncesRouteRoute = AnnouncesRouteImport.update({
+const ProblemsRoute = ProblemsImport.update({
+  id: "/problems",
+  path: "/problems",
+  getParentRoute: () => rootRoute,
+} as any);
+
+const AnnouncesRoute = AnnouncesImport.update({
   id: "/announces",
   path: "/announces",
   getParentRoute: () => rootRoute,
@@ -59,17 +68,31 @@ const IndexRouteRoute = IndexRouteImport.update({
 } as any);
 
 const ProblemsCodeRouteRoute = ProblemsCodeRouteImport.update({
-  id: "/problems/$code",
-  path: "/problems/$code",
-  getParentRoute: () => rootRoute,
+  id: "/$code",
+  path: "/$code",
+  getParentRoute: () => ProblemsRoute,
 } as any).lazy(() =>
   import("./routes/~problems.$code/~route.lazy").then((d) => d.Route),
 );
 
+const AnnouncesSlugRouteRoute = AnnouncesSlugRouteImport.update({
+  id: "/$slug",
+  path: "/$slug",
+  getParentRoute: () => AnnouncesRoute,
+} as any).lazy(() =>
+  import("./routes/~announces.$slug/~route.lazy").then((d) => d.Route),
+);
+
 const ProblemsIndexRouteRoute = ProblemsIndexRouteImport.update({
-  id: "/problems/",
-  path: "/problems/",
-  getParentRoute: () => rootRoute,
+  id: "/",
+  path: "/",
+  getParentRoute: () => ProblemsRoute,
+} as any);
+
+const AnnouncesIndexRouteRoute = AnnouncesIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => AnnouncesRoute,
 } as any);
 
 // Populate the FileRoutesByPath interface
@@ -87,7 +110,14 @@ declare module "@tanstack/react-router" {
       id: "/announces";
       path: "/announces";
       fullPath: "/announces";
-      preLoaderRoute: typeof AnnouncesRouteImport;
+      preLoaderRoute: typeof AnnouncesImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/problems": {
+      id: "/problems";
+      path: "/problems";
+      fullPath: "/problems";
+      preLoaderRoute: typeof ProblemsImport;
       parentRoute: typeof rootRoute;
     };
     "/ranking": {
@@ -118,56 +148,105 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof SignupRouteImport;
       parentRoute: typeof rootRoute;
     };
+    "/announces/": {
+      id: "/announces/";
+      path: "/";
+      fullPath: "/announces/";
+      preLoaderRoute: typeof AnnouncesIndexRouteImport;
+      parentRoute: typeof AnnouncesImport;
+    };
     "/problems/": {
       id: "/problems/";
-      path: "/problems";
-      fullPath: "/problems";
+      path: "/";
+      fullPath: "/problems/";
       preLoaderRoute: typeof ProblemsIndexRouteImport;
-      parentRoute: typeof rootRoute;
+      parentRoute: typeof ProblemsImport;
+    };
+    "/announces/$slug": {
+      id: "/announces/$slug";
+      path: "/$slug";
+      fullPath: "/announces/$slug";
+      preLoaderRoute: typeof AnnouncesSlugRouteImport;
+      parentRoute: typeof AnnouncesImport;
     };
     "/problems/$code": {
       id: "/problems/$code";
-      path: "/problems/$code";
+      path: "/$code";
       fullPath: "/problems/$code";
       preLoaderRoute: typeof ProblemsCodeRouteImport;
-      parentRoute: typeof rootRoute;
+      parentRoute: typeof ProblemsImport;
     };
   }
 }
 
 // Create and export the route tree
 
+interface AnnouncesRouteChildren {
+  AnnouncesIndexRouteRoute: typeof AnnouncesIndexRouteRoute;
+  AnnouncesSlugRouteRoute: typeof AnnouncesSlugRouteRoute;
+}
+
+const AnnouncesRouteChildren: AnnouncesRouteChildren = {
+  AnnouncesIndexRouteRoute: AnnouncesIndexRouteRoute,
+  AnnouncesSlugRouteRoute: AnnouncesSlugRouteRoute,
+};
+
+const AnnouncesRouteWithChildren = AnnouncesRoute._addFileChildren(
+  AnnouncesRouteChildren,
+);
+
+interface ProblemsRouteChildren {
+  ProblemsIndexRouteRoute: typeof ProblemsIndexRouteRoute;
+  ProblemsCodeRouteRoute: typeof ProblemsCodeRouteRoute;
+}
+
+const ProblemsRouteChildren: ProblemsRouteChildren = {
+  ProblemsIndexRouteRoute: ProblemsIndexRouteRoute,
+  ProblemsCodeRouteRoute: ProblemsCodeRouteRoute,
+};
+
+const ProblemsRouteWithChildren = ProblemsRoute._addFileChildren(
+  ProblemsRouteChildren,
+);
+
 export interface FileRoutesByFullPath {
   "/": typeof IndexRouteRoute;
-  "/announces": typeof AnnouncesRouteRoute;
   "/ranking": typeof RankingRouteRoute;
+  "/announces": typeof AnnouncesRouteWithChildren;
+  "/problems": typeof ProblemsRouteWithChildren;
   "/rule": typeof RuleRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
-  "/problems": typeof ProblemsIndexRouteRoute;
+  "/announces/": typeof AnnouncesIndexRouteRoute;
+  "/problems/": typeof ProblemsIndexRouteRoute;
+  "/announces/$slug": typeof AnnouncesSlugRouteRoute;
   "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
 
 export interface FileRoutesByTo {
   "/": typeof IndexRouteRoute;
-  "/announces": typeof AnnouncesRouteRoute;
-  "/ranking": typeof RankingRouteRoute;
   "/rule": typeof RuleRouteRoute;
+  "/ranking": typeof RankingRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
+  "/announces": typeof AnnouncesIndexRouteRoute;
   "/problems": typeof ProblemsIndexRouteRoute;
+  "/announces/$slug": typeof AnnouncesSlugRouteRoute;
   "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute;
   "/": typeof IndexRouteRoute;
-  "/announces": typeof AnnouncesRouteRoute;
+  "/announces": typeof AnnouncesRouteWithChildren;
   "/ranking": typeof RankingRouteRoute;
+  "/problems": typeof ProblemsRouteWithChildren;
   "/rule": typeof RuleRouteRoute;
   "/signin": typeof SigninRouteRoute;
   "/signup": typeof SignupRouteRoute;
+  "/announces/": typeof AnnouncesIndexRouteRoute;
   "/problems/": typeof ProblemsIndexRouteRoute;
+  "/announces/$slug": typeof AnnouncesSlugRouteRoute;
   "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
 
@@ -177,54 +256,59 @@ export interface FileRouteTypes {
     | "/"
     | "/announces"
     | "/ranking"
+    | "/problems"
     | "/rule"
     | "/signin"
     | "/signup"
-    | "/problems"
+    | "/announces/"
+    | "/problems/"
+    | "/announces/$slug"
     | "/problems/$code";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
-    | "/announces"
-    | "/ranking"
     | "/rule"
+    |"/ranking"
     | "/signin"
     | "/signup"
+    | "/announces"
     | "/problems"
+    | "/announces/$slug"
     | "/problems/$code";
   id:
     | "__root__"
     | "/"
     | "/announces"
     | "/ranking"
+    | "/problems"
     | "/rule"
     | "/signin"
     | "/signup"
+    | "/announces/"
     | "/problems/"
+    | "/announces/$slug"
     | "/problems/$code";
   fileRoutesById: FileRoutesById;
 }
 
 export interface RootRouteChildren {
   IndexRouteRoute: typeof IndexRouteRoute;
-  AnnouncesRouteRoute: typeof AnnouncesRouteRoute;
   RankingRouteRoute: typeof RankingRouteRoute;
+  AnnouncesRoute: typeof AnnouncesRouteWithChildren;
+  ProblemsRoute: typeof ProblemsRouteWithChildren;
   RuleRouteRoute: typeof RuleRouteRoute;
   SigninRouteRoute: typeof SigninRouteRoute;
   SignupRouteRoute: typeof SignupRouteRoute;
-  ProblemsIndexRouteRoute: typeof ProblemsIndexRouteRoute;
-  ProblemsCodeRouteRoute: typeof ProblemsCodeRouteRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRouteRoute: IndexRouteRoute,
-  AnnouncesRouteRoute: AnnouncesRouteRoute,
   RankingRouteRoute: RankingRouteRoute,
+  AnnouncesRoute: AnnouncesRouteWithChildren,
+  ProblemsRoute: ProblemsRouteWithChildren,
   RuleRouteRoute: RuleRouteRoute,
   SigninRouteRoute: SigninRouteRoute,
   SignupRouteRoute: SignupRouteRoute,
-  ProblemsIndexRouteRoute: ProblemsIndexRouteRoute,
-  ProblemsCodeRouteRoute: ProblemsCodeRouteRoute,
 };
 
 export const routeTree = rootRoute
@@ -240,18 +324,28 @@ export const routeTree = rootRoute
         "/",
         "/announces",
         "/ranking",
+        "/problems",
         "/rule",
         "/signin",
-        "/signup",
-        "/problems/",
-        "/problems/$code"
+        "/signup"
       ]
     },
     "/": {
       "filePath": "~index/~route.tsx"
     },
     "/announces": {
-      "filePath": "~announces/~route.tsx"
+      "filePath": "~announces.tsx",
+      "children": [
+        "/announces/",
+        "/announces/$slug"
+      ]
+    },
+    "/problems": {
+      "filePath": "~problems.tsx",
+      "children": [
+        "/problems/",
+        "/problems/$code"
+      ]
     },
     "/ranking": {
       "filePath": "~ranking/~route.tsx"
@@ -265,11 +359,21 @@ export const routeTree = rootRoute
     "/signup": {
       "filePath": "~signup/~route.tsx"
     },
+    "/announces/": {
+      "filePath": "~announces.index/~route.tsx",
+      "parent": "/announces"
+    },
     "/problems/": {
-      "filePath": "~problems.index/~route.tsx"
+      "filePath": "~problems.index/~route.tsx",
+      "parent": "/problems"
+    },
+    "/announces/$slug": {
+      "filePath": "~announces.$slug/~route.tsx",
+      "parent": "/announces"
     },
     "/problems/$code": {
-      "filePath": "~problems.$code/~route.tsx"
+      "filePath": "~problems.$code/~route.tsx",
+      "parent": "/problems"
     }
   }
 }

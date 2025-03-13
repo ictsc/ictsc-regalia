@@ -5,15 +5,15 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   MaterialSymbol,
   type MaterialSymbolType,
-} from "@app/components/material-symbol";
+} from "../../components/material-symbol";
 
-export function Navbar({
-  collapsed = false,
-  onOpenToggleClick: handleOpenToggleClick,
-}: {
+export function Navbar(props: {
   readonly collapsed: boolean;
+  readonly canViewProblems: boolean;
+  readonly canViewAnnounces: boolean;
   readonly onOpenToggleClick?: () => void;
 }) {
+  const { collapsed } = props;
   const state = useRouterState();
   return (
     <div className="flex size-full flex-col items-start gap-4 bg-surface-1 text-text">
@@ -21,7 +21,7 @@ export function Navbar({
         {(buttonProps) => (
           <button
             title={collapsed ? "開く" : "閉じる"}
-            onClick={handleOpenToggleClick}
+            onClick={props.onOpenToggleClick}
             className={navbarButtonClassName({
               collapsed: true,
               ...buttonProps,
@@ -50,19 +50,19 @@ export function Navbar({
           </Link>
         )}
       </Button>
-      <Button as={Fragment}>
+      <Button as={Fragment} disabled={!props.canViewAnnounces}>
         {(buttonProps) => (
           <Link
             to="/announces"
-            title="アナウンス"
+            title={props.canViewAnnounces ? "アナウンス" : "開催期間外です"}
             className={navbarButtonClassName({
               collapsed,
               matched: state.location.pathname?.startsWith("/announces"),
               ...buttonProps,
             })}
           >
-            <NavbarButton
-              showTitle={!collapsed}
+            <NavbarButtonInner
+              collapsed={collapsed}
               icon="brand_awareness"
               title="アナウンス"
             />
@@ -70,11 +70,11 @@ export function Navbar({
         )}
       </Button>
       {/* <NavbarButton showTitle={!collapsed} icon="lan" title="接続情報" /> */}
-      <Button as={Fragment}>
+      <Button as={Fragment} disabled={!props.canViewProblems}>
         {(buttonProps) => (
           <Link
             to="/problems"
-            title="問題"
+            title={props.canViewProblems ? "問題" : "開催期間外です"}
             className={navbarButtonClassName({
               collapsed,
               matched: state.location.pathname?.startsWith("/problems"),
@@ -96,15 +96,15 @@ export function Navbar({
               ...buttonProps,
             })}
           >
-            <NavbarButton
-              showTitle={!collapsed}
+            <NavbarButtonInner
+              collapsed={collapsed}
               icon="trophy"
               title="ランキング"
             />
           </Link>
         )}
       </Button>
-      <NavbarButton showTitle={!collapsed} icon="groups" title="チーム一覧" />
+      <NavbarButtonInner collapsed={collapsed} icon="groups" title="チーム一覧" />
       {/* <NavbarButton showTitle={!collapsed} icon="chat" title="お問い合わせ" /> */}
     </div>
   );
@@ -114,16 +114,19 @@ function navbarButtonClassName({
   collapsed,
   hover,
   active,
+  disabled = false,
   matched = false,
 }: {
   collapsed: boolean;
   hover: boolean;
   active: boolean;
+  disabled?: boolean;
   matched?: boolean;
 }): string {
   return clsx(
-    "flex flex-row items-center rounded-[10px] bg-surface-1 text-text transition",
+    "flex flex-row items-center rounded-[10px] bg-surface-1 transition",
     !collapsed && "w-full",
+    disabled ? "cursor-not-allowed opacity-75" : "text-text",
     (hover || matched) && "bg-surface-2",
     active && "opacity-75",
   );
@@ -145,28 +148,5 @@ function NavbarButtonInner(props: {
         </span>
       )}
     </>
-  );
-}
-
-function NavbarButton({
-  icon,
-  showTitle = true,
-  title,
-}: {
-  icon: MaterialSymbolType;
-  showTitle?: boolean;
-  title: string;
-}) {
-  return (
-    <Button as={Fragment}>
-      {(props) => (
-        <button
-          title={title}
-          className={navbarButtonClassName({ collapsed: !showTitle, ...props })}
-        >
-          <NavbarButtonInner collapsed={!showTitle} icon={icon} title={title} />
-        </button>
-      )}
-    </Button>
   );
 }

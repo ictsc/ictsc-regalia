@@ -8,7 +8,8 @@ import {
 } from "@tanstack/react-router";
 import { ConnectError, Code, type Transport } from "@connectrpc/connect";
 import { AppShell } from "./app-shell";
-import { fetchViewer, type User } from "@app/features/viewer";
+import { fetchViewer, type User } from "../features/viewer";
+import { fetchSchedule, ScheduleProvider } from "../features/schedule";
 
 interface RouterContext {
   transport: Transport;
@@ -18,6 +19,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   component: Root,
   loader: ({ context: { transport } }) => ({
     viewer: fetchViewer(transport),
+    schedule: fetchSchedule(transport),
+    loadSchedule: () => fetchSchedule(transport),
   }),
 });
 
@@ -30,16 +33,18 @@ const TanStackRouterDevtools = import.meta.env.DEV
   : () => null;
 
 function Root() {
-  const { viewer } = Route.useLoaderData();
+  const { viewer, schedule, loadSchedule } = Route.useLoaderData();
   return (
     <>
-      <AppShell viewer={viewer}>
-        <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <Suspense fallback={null}>
-            <Outlet />
-          </Suspense>
-        </ErrorBoundary>
-      </AppShell>
+      <ScheduleProvider initialData={schedule} loadData={loadSchedule}>
+        <AppShell viewer={viewer}>
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <Suspense fallback={null}>
+              <Outlet />
+            </Suspense>
+          </ErrorBoundary>
+        </AppShell>
+      </ScheduleProvider>
       <Suspense>
         <Redirector viewer={viewer} />
       </Suspense>
@@ -55,6 +60,9 @@ function ErrorFallback(props: FallbackProps) {
   if (error instanceof ConnectError && error.code === Code.Unauthenticated) {
     return <UnauthorizedFallback {...props} />;
   }
+  if (error instanceof ConnectError && error.code === Code.PermissionDenied) {
+    return <PermissionFallback {...props} />;
+  }
   // TODO: エラー画面を表示する
   return null;
 }
@@ -65,6 +73,15 @@ function UnauthorizedFallback({ resetErrorBoundary }: FallbackProps) {
   useEffect(() => {
     resetErrorBoundary();
   }, [resetErrorBoundary]);
+  return null;
+}
+
+function PermissionFallback({ resetErrorBoundary }: FallbackProps) {
+  const navigate = useNavigate();
+  useEffect(() => {
+    resetErrorBoundary();
+    startTransition(() => navigate({ to: "/" }));
+  }, [resetErrorBoundary, navigate]);
   return null;
 }
 

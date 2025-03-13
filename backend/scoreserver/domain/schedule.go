@@ -27,6 +27,8 @@ func (s Schedule) Next(now time.Time) *ScheduleEntry {
 	entry, idx := s.getEntry(now)
 	if idx+1 < len(s) {
 		return s[idx+1]
+	} else if idx+1 == len(s) {
+		return &ScheduleEntry{phase: PhaseAfterContest, startAt: s[idx].endAt}
 	}
 	return entry
 }
