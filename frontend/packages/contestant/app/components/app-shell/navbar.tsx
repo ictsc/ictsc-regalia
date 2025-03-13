@@ -104,7 +104,11 @@ export function Navbar(props: {
           </Link>
         )}
       </Button>
-      <NavbarButtonInner collapsed={collapsed} icon="groups" title="チーム一覧" />
+      <NavbarButtonInner
+        collapsed={collapsed}
+        icon="groups"
+        title="チーム一覧"
+      />
       {/* <NavbarButton showTitle={!collapsed} icon="chat" title="お問い合わせ" /> */}
     </div>
   );

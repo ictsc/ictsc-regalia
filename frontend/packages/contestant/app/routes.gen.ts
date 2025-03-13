@@ -268,7 +268,7 @@ export interface FileRouteTypes {
   to:
     | "/"
     | "/rule"
-    |"/ranking"
+    | "/ranking"
     | "/signin"
     | "/signup"
     | "/announces"
