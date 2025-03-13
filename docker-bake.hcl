@@ -18,7 +18,7 @@ target "backend" {
   matrix = {
     image = [
       "backend",
-      "scoreserver",
+      "batch",
       "toolbox"
     ]
   }
