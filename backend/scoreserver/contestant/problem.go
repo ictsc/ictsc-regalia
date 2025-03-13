@@ -27,9 +27,10 @@ var _ contestantv1connect.ProblemServiceHandler = (*ProblemServiceHandler)(nil)
 
 func newProblemServiceHandler(enforcer *ScheduleEnforcer, repo *pg.Repository) *ProblemServiceHandler {
 	return &ProblemServiceHandler{
-		Enforcer:           enforcer,
-		ListProblemsEffect: repo,
-		GetProblemEffect:   repo,
+		Enforcer:              enforcer,
+		ListProblemsEffect:    repo,
+		GetProblemEffect:      repo,
+		ListDeploymentsEffect: repo,
 	}
 }
 
@@ -136,6 +137,9 @@ func (h *ProblemServiceHandler) ListDeployments(
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
+		return nil, err
+	}
+	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
 		return nil, err
 	}
 
