@@ -8,6 +8,7 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/jackc/pgx/v5"
 	"github.com/redis/go-redis/v9"
+	"golang.org/x/oauth2"
 )
 
 type Config struct {
@@ -18,6 +19,26 @@ type Config struct {
 	Redis        redis.Options
 	FakeSchedule *FakeSchedule
 }
+
+type (
+	Batch struct {
+		APIURL         string
+		APITokenSource oauth2.TokenSource
+
+		DeploymentSync DeploySync
+	}
+	DeploySync struct {
+		Period time.Duration
+		SState SState
+	}
+	SState struct {
+		URL                string
+		CA                 string
+		InsecureSkipVerify bool
+		User               string
+		Password           string
+	}
+)
 
 type (
 	AdminAPI struct {
