@@ -20,7 +20,7 @@ CREATE VIEW team_problem_scores AS (
 		a.team_id, a.problem_id, lower(a.created_at_range) AS "created_at",
 		s.marked_score, s.penalty, s.total_score
 	FROM answers AS a
-	LEFT JOIN latest_public_marking_result_ids AS lm ON a.id = lm.answer_id
+	INNER JOIN latest_public_marking_result_ids AS lm ON a.id = lm.answer_id
 	LEFT JOIN scores AS s ON s.marking_result_id=lm.id
 	ORDER BY a.team_id, a.problem_id, s.total_score DESC
 );

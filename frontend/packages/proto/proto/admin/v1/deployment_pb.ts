@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file admin/v1/deployment.proto.
  */
 export const file_admin_v1_deployment: GenFile = /*@__PURE__*/
-  fileDesc("ChlhZG1pbi92MS9kZXBsb3ltZW50LnByb3RvEghhZG1pbi52MSKnAQoKRGVwbG95bWVudBIRCgl0ZWFtX2NvZGUYASABKAMSFAoMcHJvYmxlbV9jb2RlGAIgASgJEhAKCHJldmlzaW9uGAMgASgDEjMKDGxhdGVzdF9ldmVudBgEIAEoDjIdLmFkbWluLnYxLkRlcGxveW1lbnRFdmVudFR5cGUSKQoGZXZlbnRzGAUgAygLMhkuYWRtaW4udjEuRGVwbG95bWVudEV2ZW50Im8KD0RlcGxveW1lbnRFdmVudBIvCgtvY2N1cnJlZF9hdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASKwoEdHlwZRgCIAEoDjIdLmFkbWluLnYxLkRlcGxveW1lbnRFdmVudFR5cGUiQQoWTGlzdERlcGxveW1lbnRzUmVxdWVzdBIRCgl0ZWFtX2NvZGUYASABKAMSFAoMcHJvYmxlbV9jb2RlGAIgASgJIkQKF0xpc3REZXBsb3ltZW50c1Jlc3BvbnNlEikKC2RlcGxveW1lbnRzGAEgAygLMhQuYWRtaW4udjEuRGVwbG95bWVudCJAChVTeW5jRGVwbG95bWVudFJlcXVlc3QSEQoJdGVhbV9jb2RlGAEgASgDEhQKDHByb2JsZW1fY29kZRgCIAEoCSIYChZTeW5jRGVwbG95bWVudFJlc3BvbnNlIjgKDURlcGxveVJlcXVlc3QSEQoJdGVhbV9jb2RlGAEgASgDEhQKDHByb2JsZW1fY29kZRgCIAEoCSI6Cg5EZXBsb3lSZXNwb25zZRIoCgpkZXBsb3ltZW50GAEgASgLMhQuYWRtaW4udjEuRGVwbG95bWVudCrHAQoTRGVwbG95bWVudEV2ZW50VHlwZRIlCiFERVBMT1lNRU5UX0VWRU5UX1RZUEVfVU5TUEVDSUZJRUQQABIgChxERVBMT1lNRU5UX0VWRU5UX1RZUEVfUVVFVUVEEAESIgoeREVQTE9ZTUVOVF9FVkVOVF9UWVBFX0NSRUFUSU5HEAISIgoeREVQTE9ZTUVOVF9FVkVOVF9UWVBFX0ZJTklTSEVEEAMSHwobREVQTE9ZTUVOVF9FVkVOVF9UWVBFX0VSUk9SEAQy/QEKEURlcGxveW1lbnRTZXJ2aWNlElYKD0xpc3REZXBsb3ltZW50cxIgLmFkbWluLnYxLkxpc3REZXBsb3ltZW50c1JlcXVlc3QaIS5hZG1pbi52MS5MaXN0RGVwbG95bWVudHNSZXNwb25zZRJTCg5TeW5jRGVwbG95bWVudBIfLmFkbWluLnYxLlN5bmNEZXBsb3ltZW50UmVxdWVzdBogLmFkbWluLnYxLlN5bmNEZXBsb3ltZW50UmVzcG9uc2USOwoGRGVwbG95EhcuYWRtaW4udjEuRGVwbG95UmVxdWVzdBoYLmFkbWluLnYxLkRlcGxveVJlc3BvbnNlQqMBCgxjb20uYWRtaW4udjFCD0RlcGxveW1lbnRQcm90b1ABWkFnaXRodWIuY29tL2ljdHNjL2ljdHNjLXJlZ2FsaWEvYmFja2VuZC9wa2cvcHJvdG8vYWRtaW4vdjE7YWRtaW52MaICA0FYWKoCCEFkbWluLlYxygIIQWRtaW5cVjHiAhRBZG1pblxWMVxHUEJNZXRhZGF0YeoCCUFkbWluOjpWMWIGcHJvdG8z", [file_google_protobuf_timestamp]);
+  fileDesc("ChlhZG1pbi92MS9kZXBsb3ltZW50LnByb3RvEghhZG1pbi52MSKnAQoKRGVwbG95bWVudBIRCgl0ZWFtX2NvZGUYASABKAMSFAoMcHJvYmxlbV9jb2RlGAIgASgJEhAKCHJldmlzaW9uGAMgASgDEjMKDGxhdGVzdF9ldmVudBgEIAEoDjIdLmFkbWluLnYxLkRlcGxveW1lbnRFdmVudFR5cGUSKQoGZXZlbnRzGAUgAygLMhkuYWRtaW4udjEuRGVwbG95bWVudEV2ZW50Im8KD0RlcGxveW1lbnRFdmVudBIvCgtvY2N1cnJlZF9hdBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASKwoEdHlwZRgCIAEoDjIdLmFkbWluLnYxLkRlcGxveW1lbnRFdmVudFR5cGUiQQoWTGlzdERlcGxveW1lbnRzUmVxdWVzdBIRCgl0ZWFtX2NvZGUYASABKAMSFAoMcHJvYmxlbV9jb2RlGAIgASgJIkQKF0xpc3REZXBsb3ltZW50c1Jlc3BvbnNlEikKC2RlcGxveW1lbnRzGAEgAygLMhQuYWRtaW4udjEuRGVwbG95bWVudCKJAQodVXBkYXRlRGVwbG95bWVudFN0YXR1c1JlcXVlc3QSEQoJdGVhbV9jb2RlGAEgASgDEhQKDHByb2JsZW1fY29kZRgCIAEoCRIQCghyZXZpc2lvbhgDIAEoDRItCgZzdGF0dXMYBCABKA4yHS5hZG1pbi52MS5EZXBsb3ltZW50RXZlbnRUeXBlIiAKHlVwZGF0ZURlcGxveW1lbnRTdGF0dXNSZXNwb25zZSJAChVTeW5jRGVwbG95bWVudFJlcXVlc3QSEQoJdGVhbV9jb2RlGAEgASgDEhQKDHByb2JsZW1fY29kZRgCIAEoCSIYChZTeW5jRGVwbG95bWVudFJlc3BvbnNlIjgKDURlcGxveVJlcXVlc3QSEQoJdGVhbV9jb2RlGAEgASgDEhQKDHByb2JsZW1fY29kZRgCIAEoCSI6Cg5EZXBsb3lSZXNwb25zZRIoCgpkZXBsb3ltZW50GAEgASgLMhQuYWRtaW4udjEuRGVwbG95bWVudCrHAQoTRGVwbG95bWVudEV2ZW50VHlwZRIlCiFERVBMT1lNRU5UX0VWRU5UX1RZUEVfVU5TUEVDSUZJRUQQABIgChxERVBMT1lNRU5UX0VWRU5UX1RZUEVfUVVFVUVEEAESIgoeREVQTE9ZTUVOVF9FVkVOVF9UWVBFX0NSRUFUSU5HEAISIgoeREVQTE9ZTUVOVF9FVkVOVF9UWVBFX0ZJTklTSEVEEAMSHwobREVQTE9ZTUVOVF9FVkVOVF9UWVBFX0VSUk9SEAQy6gIKEURlcGxveW1lbnRTZXJ2aWNlElYKD0xpc3REZXBsb3ltZW50cxIgLmFkbWluLnYxLkxpc3REZXBsb3ltZW50c1JlcXVlc3QaIS5hZG1pbi52MS5MaXN0RGVwbG95bWVudHNSZXNwb25zZRJrChZVcGRhdGVEZXBsb3ltZW50U3RhdHVzEicuYWRtaW4udjEuVXBkYXRlRGVwbG95bWVudFN0YXR1c1JlcXVlc3QaKC5hZG1pbi52MS5VcGRhdGVEZXBsb3ltZW50U3RhdHVzUmVzcG9uc2USUwoOU3luY0RlcGxveW1lbnQSHy5hZG1pbi52MS5TeW5jRGVwbG95bWVudFJlcXVlc3QaIC5hZG1pbi52MS5TeW5jRGVwbG95bWVudFJlc3BvbnNlEjsKBkRlcGxveRIXLmFkbWluLnYxLkRlcGxveVJlcXVlc3QaGC5hZG1pbi52MS5EZXBsb3lSZXNwb25zZUKjAQoMY29tLmFkbWluLnYxQg9EZXBsb3ltZW50UHJvdG9QAVpBZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2FkbWluL3YxO2FkbWludjGiAgNBWFiqAghBZG1pbi5WMcoCCEFkbWluXFYx4gIUQWRtaW5cVjFcR1BCTWV0YWRhdGHqAglBZG1pbjo6VjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
 
 /**
  * 問題の展開状態
@@ -127,6 +127,51 @@ export const ListDeploymentsResponseSchema: GenMessage<ListDeploymentsResponse> 
   messageDesc(file_admin_v1_deployment, 3);
 
 /**
+ * @generated from message admin.v1.UpdateDeploymentStatusRequest
+ */
+export type UpdateDeploymentStatusRequest = Message<"admin.v1.UpdateDeploymentStatusRequest"> & {
+  /**
+   * @generated from field: int64 team_code = 1;
+   */
+  teamCode: bigint;
+
+  /**
+   * @generated from field: string problem_code = 2;
+   */
+  problemCode: string;
+
+  /**
+   * @generated from field: uint32 revision = 3;
+   */
+  revision: number;
+
+  /**
+   * @generated from field: admin.v1.DeploymentEventType status = 4;
+   */
+  status: DeploymentEventType;
+};
+
+/**
+ * Describes the message admin.v1.UpdateDeploymentStatusRequest.
+ * Use `create(UpdateDeploymentStatusRequestSchema)` to create a new message.
+ */
+export const UpdateDeploymentStatusRequestSchema: GenMessage<UpdateDeploymentStatusRequest> = /*@__PURE__*/
+  messageDesc(file_admin_v1_deployment, 4);
+
+/**
+ * @generated from message admin.v1.UpdateDeploymentStatusResponse
+ */
+export type UpdateDeploymentStatusResponse = Message<"admin.v1.UpdateDeploymentStatusResponse"> & {
+};
+
+/**
+ * Describes the message admin.v1.UpdateDeploymentStatusResponse.
+ * Use `create(UpdateDeploymentStatusResponseSchema)` to create a new message.
+ */
+export const UpdateDeploymentStatusResponseSchema: GenMessage<UpdateDeploymentStatusResponse> = /*@__PURE__*/
+  messageDesc(file_admin_v1_deployment, 5);
+
+/**
  * @generated from message admin.v1.SyncDeploymentRequest
  */
 export type SyncDeploymentRequest = Message<"admin.v1.SyncDeploymentRequest"> & {
@@ -146,7 +191,7 @@ export type SyncDeploymentRequest = Message<"admin.v1.SyncDeploymentRequest"> & 
  * Use `create(SyncDeploymentRequestSchema)` to create a new message.
  */
 export const SyncDeploymentRequestSchema: GenMessage<SyncDeploymentRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_deployment, 4);
+  messageDesc(file_admin_v1_deployment, 6);
 
 /**
  * @generated from message admin.v1.SyncDeploymentResponse
@@ -159,7 +204,7 @@ export type SyncDeploymentResponse = Message<"admin.v1.SyncDeploymentResponse"> 
  * Use `create(SyncDeploymentResponseSchema)` to create a new message.
  */
 export const SyncDeploymentResponseSchema: GenMessage<SyncDeploymentResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_deployment, 5);
+  messageDesc(file_admin_v1_deployment, 7);
 
 /**
  * @generated from message admin.v1.DeployRequest
@@ -181,7 +226,7 @@ export type DeployRequest = Message<"admin.v1.DeployRequest"> & {
  * Use `create(DeployRequestSchema)` to create a new message.
  */
 export const DeployRequestSchema: GenMessage<DeployRequest> = /*@__PURE__*/
-  messageDesc(file_admin_v1_deployment, 6);
+  messageDesc(file_admin_v1_deployment, 8);
 
 /**
  * @generated from message admin.v1.DeployResponse
@@ -198,7 +243,7 @@ export type DeployResponse = Message<"admin.v1.DeployResponse"> & {
  * Use `create(DeployResponseSchema)` to create a new message.
  */
 export const DeployResponseSchema: GenMessage<DeployResponse> = /*@__PURE__*/
-  messageDesc(file_admin_v1_deployment, 7);
+  messageDesc(file_admin_v1_deployment, 9);
 
 /**
  * @generated from enum admin.v1.DeploymentEventType
@@ -247,6 +292,14 @@ export const DeploymentService: GenService<{
     methodKind: "unary";
     input: typeof ListDeploymentsRequestSchema;
     output: typeof ListDeploymentsResponseSchema;
+  },
+  /**
+   * @generated from rpc admin.v1.DeploymentService.UpdateDeploymentStatus
+   */
+  updateDeploymentStatus: {
+    methodKind: "unary";
+    input: typeof UpdateDeploymentStatusRequestSchema;
+    output: typeof UpdateDeploymentStatusResponseSchema;
   },
   /**
    * @generated from rpc admin.v1.DeploymentService.SyncDeployment

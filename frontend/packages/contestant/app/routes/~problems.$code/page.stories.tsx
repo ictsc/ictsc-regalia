@@ -76,6 +76,7 @@ export default {
         ))}
       </SubmissionList>
     ),
+    deploymentList: null,
   },
 } as Meta<typeof Page>;
 

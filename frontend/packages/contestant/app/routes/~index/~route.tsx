@@ -1,6 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { IndexPage } from "./page";
+import { IndexPage, Timer } from "./page";
+import { useSchedule } from "@app/features/schedule";
+import { Phase } from "@ictsc/proto/contestant/v1";
+import { timestampMs } from "@bufbuild/protobuf/wkt";
 
 export const Route = createFileRoute("/")({
-  component: IndexPage,
+  component: Page,
 });
+
+function Page() {
+  const [schedule] = useSchedule();
+  return (
+    <IndexPage
+      phase={schedule?.phase ?? Phase.UNSPECIFIED}
+      nextPhase={schedule?.nextPhase}
+      timer={
+        <Timer
+          endMs={schedule?.endAt != null ? timestampMs(schedule.endAt) : 0}
+        />
+      }
+    />
+  );
+}

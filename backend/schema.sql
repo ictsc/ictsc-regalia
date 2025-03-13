@@ -189,8 +189,8 @@ CREATE TABLE redeployment_requests (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
 	problem_id UUID NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
-	status deployment_status NOT NULL,
-	created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+	revision INT NOT NULL CHECK (revision > 0) DEFAULT 1,
+	UNIQUE (team_id, problem_id, revision)
 );
 
 CREATE TABLE redeployment_events (
@@ -203,19 +203,18 @@ CREATE TABLE redeployment_events (
 );
 
 CREATE TABLE notices (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	slug VARCHAR(255) PRIMARY KEY,
 	path VARCHAR(255), -- Deprecated
-	title VARCHAR(255),
+	title VARCHAR(255) NOT NULL,
 	markdown TEXT NOT NULL,
 	effective_from TIMESTAMPTZ NOT NULL,
-	effective_until TIMESTAMPTZ -- Deprecated?
+	effective_until TIMESTAMPTZ -- Deprecated
 );
 COMMENT ON TABLE notices IS 'お知らせ';
-COMMENT ON COLUMN notices.id IS 'お知らせ ID';
+COMMENT ON COLUMN notices.slug IS '名前';
 COMMENT ON COLUMN notices.title IS 'タイトル';
 COMMENT ON COLUMN notices.markdown IS '本文';
 COMMENT ON COLUMN notices.effective_from IS '掲示開始時間';
-COMMENT ON COLUMN notices.effective_until IS '掲示終了時間';
 
 CREATE TYPE contest_phase AS ENUM ('UNSPECIFIED', 'OUT_OF_CONTEST', 'IN_CONTEST', 'BREAK', 'AFTER_CONTEST');
 

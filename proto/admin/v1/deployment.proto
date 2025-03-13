@@ -43,6 +43,15 @@ message ListDeploymentsResponse {
   repeated Deployment deployments = 1;
 }
 
+message UpdateDeploymentStatusRequest {
+  int64 team_code = 1;
+  string problem_code = 2;
+  uint32 revision = 3;
+  DeploymentEventType status = 4;
+}
+
+message UpdateDeploymentStatusResponse {}
+
 message SyncDeploymentRequest {
   int64 team_code = 1;
   string problem_code = 2;
@@ -59,6 +68,7 @@ message DeployResponse {
 
 service DeploymentService {
   rpc ListDeployments(ListDeploymentsRequest) returns (ListDeploymentsResponse);
+  rpc UpdateDeploymentStatus(UpdateDeploymentStatusRequest) returns (UpdateDeploymentStatusResponse);
   rpc SyncDeployment(SyncDeploymentRequest) returns (SyncDeploymentResponse);
   rpc Deploy(DeployRequest) returns (DeployResponse);
 }

@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file contestant/v1/notice.proto.
  */
 export const file_contestant_v1_notice: GenFile = /*@__PURE__*/
-  fileDesc("Chpjb250ZXN0YW50L3YxL25vdGljZS5wcm90bxINY29udGVzdGFudC52MSIlCgZOb3RpY2USDQoFdGl0bGUYASABKAkSDAoEYm9keRgCIAEoCSIUChJMaXN0Tm90aWNlc1JlcXVlc3QiPQoTTGlzdE5vdGljZXNSZXNwb25zZRImCgdub3RpY2VzGAEgAygLMhUuY29udGVzdGFudC52MS5Ob3RpY2UyZQoNTm90aWNlU2VydmljZRJUCgtMaXN0Tm90aWNlcxIhLmNvbnRlc3RhbnQudjEuTGlzdE5vdGljZXNSZXF1ZXN0GiIuY29udGVzdGFudC52MS5MaXN0Tm90aWNlc1Jlc3BvbnNlQsIBChFjb20uY29udGVzdGFudC52MUILTm90aWNlUHJvdG9QAVpLZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2NvbnRlc3RhbnQvdjE7Y29udGVzdGFudHYxogIDQ1hYqgINQ29udGVzdGFudC5WMcoCDUNvbnRlc3RhbnRcVjHiAhlDb250ZXN0YW50XFYxXEdQQk1ldGFkYXRh6gIOQ29udGVzdGFudDo6VjFiBnByb3RvMw");
+  fileDesc("Chpjb250ZXN0YW50L3YxL25vdGljZS5wcm90bxINY29udGVzdGFudC52MSIzCgZOb3RpY2USDQoFdGl0bGUYASABKAkSDAoEYm9keRgCIAEoCRIMCgRzbHVnGAMgASgJIhQKEkxpc3ROb3RpY2VzUmVxdWVzdCI9ChNMaXN0Tm90aWNlc1Jlc3BvbnNlEiYKB25vdGljZXMYASADKAsyFS5jb250ZXN0YW50LnYxLk5vdGljZTJlCg1Ob3RpY2VTZXJ2aWNlElQKC0xpc3ROb3RpY2VzEiEuY29udGVzdGFudC52MS5MaXN0Tm90aWNlc1JlcXVlc3QaIi5jb250ZXN0YW50LnYxLkxpc3ROb3RpY2VzUmVzcG9uc2VCwgEKEWNvbS5jb250ZXN0YW50LnYxQgtOb3RpY2VQcm90b1ABWktnaXRodWIuY29tL2ljdHNjL2ljdHNjLXJlZ2FsaWEvYmFja2VuZC9wa2cvcHJvdG8vY29udGVzdGFudC92MTtjb250ZXN0YW50djGiAgNDWFiqAg1Db250ZXN0YW50LlYxygINQ29udGVzdGFudFxWMeICGUNvbnRlc3RhbnRcVjFcR1BCTWV0YWRhdGHqAg5Db250ZXN0YW50OjpWMWIGcHJvdG8z");
 
 /**
  * @generated from message contestant.v1.Notice
@@ -25,6 +25,11 @@ export type Notice = Message<"contestant.v1.Notice"> & {
    * @generated from field: string body = 2;
    */
   body: string;
+
+  /**
+   * @generated from field: string slug = 3;
+   */
+  slug: string;
 };
 
 /**

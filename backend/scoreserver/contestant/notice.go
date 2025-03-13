@@ -2,6 +2,7 @@ package contestant
 
 import (
 	"context"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/cockroachdb/errors"
@@ -15,13 +16,16 @@ import (
 type NoticeServiceHandler struct {
 	contestantv1connect.UnimplementedNoticeServiceHandler
 
+	Enforcer *ScheduleEnforcer
+
 	ListEffect NoticeListEffect
 }
 
 var _ contestantv1connect.NoticeServiceHandler = (*NoticeServiceHandler)(nil)
 
-func newNoticeServiceHandler(repo *pg.Repository) *NoticeServiceHandler {
+func newNoticeServiceHandler(enforcer *ScheduleEnforcer, repo *pg.Repository) *NoticeServiceHandler {
 	return &NoticeServiceHandler{
+		Enforcer:   enforcer,
 		ListEffect: repo,
 	}
 }
@@ -40,8 +44,11 @@ func (h *NoticeServiceHandler) ListNotices(
 		}
 		return nil, err
 	}
+	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
+		return nil, err
+	}
 
-	notices, err := domain.ListNotices(ctx, h.ListEffect)
+	notices, err := domain.ListEffectiveNotices(ctx, time.Now(), h.ListEffect)
 	if err != nil {
 		return nil, err
 	}
@@ -49,6 +56,7 @@ func (h *NoticeServiceHandler) ListNotices(
 	protoNotices := make([]*contestantv1.Notice, 0, len(notices))
 	for _, notice := range notices {
 		protoNotices = append(protoNotices, &contestantv1.Notice{
+			Slug:  notice.Slug(),
 			Title: notice.Title(),
 			Body:  notice.Markdown(),
 		})
