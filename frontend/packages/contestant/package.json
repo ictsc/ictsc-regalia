@@ -28,6 +28,7 @@
     "@storybook/react-vite": "^8.2.9",
     "@storybook/test": "^8.2.9",
     "@tanstack/router-plugin": "^1.49.3",
+    "@types/hast": "^3.0.4",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.1",
@@ -51,6 +52,9 @@
     "@connectrpc/connect-web": "2.0.2",
     "@headlessui/react": "^2.1.2",
     "@ictsc/proto": "workspace:*",
+    "@shikijs/langs": "^3.2.1",
+    "@shikijs/rehype": "^3.2.1",
+    "@shikijs/themes": "^3.2.1",
     "@tanstack/react-router": "^1.49.2",
     "@tanstack/router-devtools": "^1.49.2",
     "clsx": "^2.1.1",
@@ -62,7 +66,12 @@
     "react-error-boundary": "^5.0.0",
     "react-markdown": "^10.0.0",
     "rehype-katex": "^7.0.1",
+    "rehype-react": "^8.0.0",
     "remark-gfm": "^4.0.1",
-    "remark-math": "^6.0.0"
+    "remark-math": "^6.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.1",
+    "shiki": "^3.2.1",
+    "unified": "^11.0.5"
   }
 }

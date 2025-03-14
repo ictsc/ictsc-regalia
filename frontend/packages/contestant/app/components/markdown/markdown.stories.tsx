@@ -88,9 +88,9 @@ export const CodeAndTables: Story = {
     <Typography>
       <Markdown>
         {`
-\`\`\`javascript
-function hello() {
-  console.log("Hello, World!");
+\`\`\`hcl
+resource "aws_s3_bucket" "bucket" {
+  bucket = "my-bucket"
 }
 \`\`\`
 

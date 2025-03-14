@@ -3,6 +3,7 @@ import type { UserConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
+// import { visualizer } from "rollup-plugin-visualizer"
 
 const isTest = process.env.NODE_ENV === "test";
 
@@ -32,25 +33,13 @@ export default {
   ],
   build: {
     rollupOptions: {
+      plugins: [
+        // visualizer({ open: true }),
+      ],
       output: {
         manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (
-              [
-                "markdown",
-                "remark",
-                "unified",
-                "mdast",
-                "hast",
-                "unist",
-                "micromark",
-                "vfile",
-                "katex",
-              ].some((pkg) => id.includes(pkg))
-            ) {
-              return "markdown";
-            }
-            return "vendor";
+          if (id.includes("node_modules") && id.includes("react")) {
+            return "react";
           }
         },
       },
