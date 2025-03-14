@@ -8,7 +8,7 @@ import rehypeShiki from "@shikijs/rehype/core";
 import rehypeReact from "rehype-react";
 import production from "react/jsx-runtime";
 import { createHighlighterCore } from "shiki/core";
-import { createOnigurumaEngine } from "shiki/engine/oniguruma";
+import { createJavaScriptRegexEngine} from "shiki/engine/javascript";
 import { ReactNode } from "react";
 
 const highlighterPromise = createHighlighterCore({
@@ -20,7 +20,7 @@ const highlighterPromise = createHighlighterCore({
     import("@shikijs/langs/hcl"),
     import("@shikijs/langs/sql"),
   ],
-  engine: createOnigurumaEngine(import("shiki/wasm")),
+  engine: createJavaScriptRegexEngine(),
 });
 
 export async function renderMarkdown(content: string): Promise<ReactNode> {
