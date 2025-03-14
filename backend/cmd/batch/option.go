@@ -13,12 +13,13 @@ type CLIOption struct {
 	LogFormat      slogutil.Format
 	LogLevel       slog.Level
 
-	APIURL         string
-	APITokenFile   string
+	APIURL       string
+	APITokenFile string
 
 	DeploymentSyncPeriod time.Duration
+	ScoreUpdatePeriod    time.Duration
 
-	SStateCAFile string
+	SStateCAFile        string
 	SStateTLSSkipVerify bool
 }
 
@@ -34,6 +35,7 @@ func NewOption(fs *flag.FlagSet) *CLIOption {
 	fs.StringVar(&opt.APITokenFile, "api-token-file", "", "API token file")
 
 	fs.DurationVar(&opt.DeploymentSyncPeriod, "deployment-sync-period", 15*time.Second, "Deployment sync period")
+	fs.DurationVar(&opt.ScoreUpdatePeriod, "score-update-period", time.Minute, "Score update period")
 
 	fs.StringVar(&opt.SStateCAFile, "sstate-ca-file", "", "SState CA file")
 	fs.BoolVar(&opt.SStateTLSSkipVerify, "sstate-tls-skip-verify", false, "SState TLS skip verify")

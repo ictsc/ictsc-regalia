@@ -16,6 +16,7 @@ import (
 
 type Batch struct {
 	deploymentSync *DeploymentSync
+	scoreUpdate    *ScoreUpdate
 }
 
 func NewBatch(cfg config.Batch) (*Batch, error) {
@@ -38,6 +39,11 @@ func NewBatch(cfg config.Batch) (*Batch, error) {
 		cfg.APIURL,
 		connectOpts...,
 	)
+	markClient := adminv1connect.NewMarkServiceClient(
+		apiClient,
+		cfg.APIURL,
+		connectOpts...,
+	)
 
 	sstateClient, err := sstate.NewSStateClient(cfg.DeploymentSync.SState)
 	if err != nil {
@@ -45,9 +51,11 @@ func NewBatch(cfg config.Batch) (*Batch, error) {
 	}
 
 	deploymentSync := NewDeploymentSync(cfg.DeploymentSync, deploymentClient, sstateClient)
+	scoreUpdate := NewScoreUpdate(cfg.ScoreUpdate, markClient)
 
 	return &Batch{
 		deploymentSync: deploymentSync,
+		scoreUpdate: scoreUpdate,
 	}, nil
 }
 
@@ -61,6 +69,14 @@ func (b *Batch) Run(ctx context.Context) error {
 		defer wg.Done()
 		if err := b.deploymentSync.Run(ctx); err != nil {
 			cancel(errors.Wrap(err, "failed to start sync deployments"))
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := b.scoreUpdate.Run(ctx); err != nil {
+			cancel(errors.Wrap(err, "failed to start update scores"))
 		}
 	}()
 
