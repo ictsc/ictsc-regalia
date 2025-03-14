@@ -281,9 +281,6 @@ importers:
       globals:
         specifier: ^16.0.0
         version: 16.0.0
-      light-plus:
-        specifier: link:@shikijs/themes/light-plus
-        version: link:@shikijs/themes/light-plus
       msw:
         specifier: ^2.4.6
         version: 2.7.3(@types/node@22.13.10)(typescript@5.8.2)
