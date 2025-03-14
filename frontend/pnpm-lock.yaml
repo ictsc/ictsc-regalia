@@ -181,6 +181,15 @@ importers:
       '@ictsc/proto':
         specifier: workspace:*
         version: link:../proto
+      '@shikijs/langs':
+        specifier: ^3.2.1
+        version: 3.2.1
+      '@shikijs/rehype':
+        specifier: ^3.2.1
+        version: 3.2.1
+      '@shikijs/themes':
+        specifier: ^3.2.1
+        version: 3.2.1
       '@tanstack/react-router':
         specifier: ^1.49.2
         version: 1.114.17(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -214,25 +223,31 @@ importers:
       rehype-katex:
         specifier: ^7.0.1
         version: 7.0.1
+      rehype-stringify:
+        specifier: ^10.0.1
+        version: 10.0.1
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
       remark-math:
         specifier: ^6.0.0
         version: 6.0.0
+      remark-parse:
+        specifier: ^11.0.0
+        version: 11.0.0
+      remark-rehype:
+        specifier: ^11.1.1
+        version: 11.1.1
+      shiki:
+        specifier: ^3.2.1
+        version: 3.2.1
+      unified:
+        specifier: ^11.0.5
+        version: 11.0.5
     devDependencies:
       '@ictsc/config':
         specifier: workspace:*
         version: link:../config
-      '@shikijs/langs':
-        specifier: ^3.2.1
-        version: 3.2.1
-      '@shikijs/rehype':
-        specifier: ^3.2.1
-        version: 3.2.1
-      '@shikijs/themes':
-        specifier: ^3.2.1
-        version: 3.2.1
       '@storybook/addon-actions':
         specifier: ^8.5.6
         version: 8.6.4(storybook@8.6.4(prettier@3.5.3))
@@ -293,30 +308,15 @@ importers:
       prettier:
         specifier: ^3.3.3
         version: 3.5.3
-      rehype-stringify:
-        specifier: ^10.0.1
-        version: 10.0.1
-      remark-parse:
-        specifier: ^11.0.0
-        version: 11.0.0
-      remark-rehype:
-        specifier: ^11.1.1
-        version: 11.1.1
       rollup-plugin-visualizer:
         specifier: ^5.14.0
         version: 5.14.0(rollup@4.34.9)
-      shiki:
-        specifier: ^3.2.1
-        version: 3.2.1
       storybook:
         specifier: ^8.2.9
         version: 8.6.4(prettier@3.5.3)
       tailwindcss:
         specifier: ^3.4.10
         version: 3.4.17
-      unified:
-        specifier: ^11.0.5
-        version: 11.0.5
       vite:
         specifier: ^6.0.0
         version: 6.2.1(@types/node@22.13.10)(jiti@1.21.7)(sugarss@4.0.1(postcss@8.5.3))(tsx@4.19.3)(yaml@2.6.1)

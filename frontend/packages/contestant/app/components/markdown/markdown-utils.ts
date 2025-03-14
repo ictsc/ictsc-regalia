@@ -5,7 +5,7 @@ import remarkMath from "remark-math";
 import remarkRehype from "remark-rehype";
 import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
-import rehypeShikiFromHighlighter from "@shikijs/rehype/core";
+import rehypeShiki from "@shikijs/rehype/core";
 import { createHighlighterCore } from "shiki/core";
 import { createOnigurumaEngine } from "shiki/engine/oniguruma";
 
@@ -30,11 +30,8 @@ export async function markdownToHtml(content: string): Promise<string> {
     .use(remarkMath)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeKatex)
-    .use(rehypeShikiFromHighlighter, highlighter as never, {
-      themes: {
-        light: "light-plus",
-        dark: "light-plus",
-      },
+    .use(rehypeShiki, highlighter as never, {
+      theme: "light-plus",
     })
     .use(rehypeStringify, { allowDangerousHtml: true })
     .process(content);
