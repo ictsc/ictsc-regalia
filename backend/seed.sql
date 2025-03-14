@@ -81,6 +81,13 @@ INSERT INTO answer_scores (answer_id, visibility, marking_result_id) VALUES
 	('abbe9c4e-eef5-40ac-a04e-6d8877b15185', 'PRIVATE', '87cb974d-dedd-4039-a189-b34f3a57e62c'),
 	('abbe9c4e-eef5-40ac-a04e-6d8877b15185', 'PUBLIC', '87cb974d-dedd-4039-a189-b34f3a57e62c');
 
+TRUNCATE TABLE problem_scores CASCADE;
+INSERT INTO problem_scores (team_id, problem_id, visibility, marking_result_id, updated_at) VALUES
+	('a1de8fe6-26c8-42d7-b494-dea48e409091', '16643c32-c686-44ba-996b-2fbe43b54513', 'PRIVATE', '358ebef7-c626-44fa-9a3d-da2d9083fe5e', '2025-02-03 00:00:00+00'),
+	('a1de8fe6-26c8-42d7-b494-dea48e409091', '16643c32-c686-44ba-996b-2fbe43b54513', 'PUBLIC', '862b646a-5fdd-4a77-bb2d-7ef5d4f1d069', '2025-02-03 00:00:00+00'),
+	('a1de8fe6-26c8-42d7-b494-dea48e409091', '24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'PRIVATE', '87cb974d-dedd-4039-a189-b34f3a57e62c', '2025-02-03 00:10:00+00'),
+	('a1de8fe6-26c8-42d7-b494-dea48e409091', '24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'PUBLIC', '87cb974d-dedd-4039-a189-b34f3a57e62c', '2025-02-03 00:10:00+00');
+
 TRUNCATE TABLE notices CASCADE;
 INSERT INTO notices (slug, title, markdown, effective_from) VALUES
 	('current-notice', 'Current Notice', '現在のお知らせです', '2025-02-03 00:00:00+00'),

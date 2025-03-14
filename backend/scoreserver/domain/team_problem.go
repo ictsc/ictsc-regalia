@@ -2,9 +2,9 @@ package domain
 
 import (
 	"context"
-	"log/slog"
 	"slices"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gofrs/uuid/v5"
 )
 
@@ -19,49 +19,75 @@ type (
 		problemDetail *DescriptiveProblem
 		score         *Score
 	}
-	TeamProblemScoreData struct {
-		ProblemID   uuid.UUID `db:"problem_id"`
-		MarkedScore uint32    `db:"marked_score"`
-		Penalty     uint32    `db:"penalty"`
-		TotalScore  uint32    `db:"total_score"`
-		MaxScore    uint32    `db:"max_score"`
-	}
 )
 
-type TeamProblemReader interface {
+type TeamProblemLister interface {
 	TeamsLister
 	ProblemReader
+	TeamProblemScoreReader
 }
 
-func ListTeamProblems(ctx context.Context, eff TeamProblemReader) ([]*TeamProblem, error) {
+func ListTeamProblemsForAdmin(ctx context.Context, eff TeamProblemLister) ([]*TeamProblem, error) {
+	return listTeamProblems(ctx, false, eff)
+}
+
+func listTeamProblems(ctx context.Context, isPublic bool, eff TeamProblemLister) ([]*TeamProblem, error) {
 	teams, err := ListTeams(ctx, eff)
 	if err != nil {
 		return nil, err
 	}
-	slog.DebugContext(ctx, "teams listed", "count", len(teams))
 
-	teamProblems := make([]*TeamProblem, 0)
-	for _, team := range teams {
-		tps, err := team.Problems(ctx, eff)
-		if err != nil {
-			return nil, err
-		}
-		slog.DebugContext(ctx, "problems listed", "team", team.Code(), "count", len(tps))
-		teamProblems = append(teamProblems, tps...)
-	}
-
-	return teamProblems, nil
-}
-
-func (t *Team) Problems(ctx context.Context, eff ProblemReader) ([]*TeamProblem, error) {
 	problems, err := ListProblems(ctx, eff)
 	if err != nil {
 		return nil, err
 	}
 
-	scores, err := t.listProblemsScore(ctx, eff)
+	scores, err := eff.ListTeamProblemScores(ctx, isPublic)
+	if err != nil {
+		return nil, WrapAsInternal(err, "failed to list scores")
+	}
+
+	teamProblems := make([]*TeamProblem, 0)
+	for _, team := range teams {
+		for _, problem := range problems {
+			teamProblem := &TeamProblem{team: team, problem: problem}
+
+			idx := slices.IndexFunc(scores, func(score *TeamProblemScoreData) bool {
+				return score.TeamID == uuid.UUID(team.teamID) && score.ProblemID == uuid.UUID(problem.problemID)
+			})
+			if idx >= 0 {
+				score, err := scores[idx].Score.parse(problem)
+				if err != nil {
+					return nil, err
+				}
+				teamProblem.score = score
+			}
+
+			teamProblems = append(teamProblems, teamProblem)
+		}
+	}
+
+	return teamProblems, nil
+}
+
+type TeamProblemReader interface {
+	ProblemReader
+	TeamProblemScoreReader
+}
+
+func (t *Team) ProblemsForPublic(ctx context.Context, eff TeamProblemReader) ([]*TeamProblem, error) {
+	return t.problems(ctx, true, eff)
+}
+
+func (t *Team) problems(ctx context.Context, isPublic bool, eff TeamProblemReader) ([]*TeamProblem, error) {
+	problems, err := ListProblems(ctx, eff)
 	if err != nil {
 		return nil, err
+	}
+
+	scores, err := eff.ListTeamProblemScoresByTeamID(ctx, isPublic, uuid.UUID(t.teamID))
+	if err != nil {
+		return nil, WrapAsInternal(err, "failed to list scores")
 	}
 
 	teamProblems := make([]*TeamProblem, 0, len(problems))
@@ -72,7 +98,7 @@ func (t *Team) Problems(ctx context.Context, eff ProblemReader) ([]*TeamProblem,
 			return score.ProblemID == uuid.UUID(problem.problemID)
 		})
 		if idx >= 0 {
-			score, err := scores[idx].parse(problem)
+			score, err := scores[idx].Score.parse(problem)
 			if err != nil {
 				return nil, err
 			}
@@ -82,14 +108,6 @@ func (t *Team) Problems(ctx context.Context, eff ProblemReader) ([]*TeamProblem,
 		teamProblems = append(teamProblems, teamProblem)
 	}
 	return teamProblems, nil
-}
-
-func (t *Team) listProblemsScore(ctx context.Context, eff ProblemReader) ([]*TeamProblemScoreData, error) {
-	score, err := eff.ListProblemsScoreByTeamID(ctx, uuid.UUID(t.teamID))
-	if err != nil {
-		return nil, err
-	}
-	return score, nil
 }
 
 func (tp *TeamProblem) Team() *Team {
@@ -108,15 +126,6 @@ func (tp *TeamProblem) Score() *Score {
 	return tp.score
 }
 
-func (tp *TeamProblemScoreData) parse(problem *Problem) (*Score, error) {
-	if tp.ProblemID != uuid.UUID(problem.problemID) {
-		return nil, NewInvalidArgumentError("problem_id does not match", nil)
-	}
-	return (&ScoreData{
-		MarkedScore: tp.MarkedScore,
-	}).parse(problem)
-}
-
 func (tp *TeamProblem) Details(ctx context.Context, eff ProblemReader) (*TeamProblemDetail, error) {
 	detail, err := tp.problem.DescriptiveProblem(ctx, eff)
 	if err != nil {
@@ -125,33 +134,71 @@ func (tp *TeamProblem) Details(ctx context.Context, eff ProblemReader) (*TeamPro
 	return &TeamProblemDetail{
 		team:          tp.team,
 		problemDetail: detail,
+		score:         tp.score,
 	}, nil
 }
 
-func (t *Team) ProblemDetailByCode(ctx context.Context, eff ProblemReader, code ProblemCode) (*TeamProblemDetail, error) {
+func (t *Team) ProblemDetailByCodeForPublic(ctx context.Context, eff TeamProblemReader, code ProblemCode) (*TeamProblemDetail, error) {
 	problem, err := code.Problem(ctx, eff)
 	if err != nil {
 		return nil, err
 	}
+
 	detail, err := problem.DescriptiveProblem(ctx, eff)
 	if err != nil {
 		return nil, err
 	}
-	return &TeamProblemDetail{
-		team:          t,
-		problemDetail: detail,
-	}, nil
+
+	teamProblem := &TeamProblemDetail{team: t, problemDetail: detail}
+
+	if scoreData, err := eff.GetTeamProblemScore(
+		ctx, true, uuid.UUID(t.teamID), uuid.UUID(problem.problemID),
+	); err == nil {
+		score, err := scoreData.parse(problem)
+		if err != nil {
+			return nil, err
+		}
+		teamProblem.score = score
+	} else if !errors.Is(err, ErrNotFound) {
+		return nil, WrapAsInternal(err, "failed to get score")
+	}
+
+	return teamProblem, nil
 }
 
-func (t *Team) ProblemByCode(ctx context.Context, eff ProblemReader, code ProblemCode) (*TeamProblem, error) {
+func (t *Team) ProblemByCodeForPublic(
+	ctx context.Context, eff TeamProblemReader, code ProblemCode,
+) (*TeamProblem, error) {
+	return t.problemByCode(ctx, eff, true, code)
+}
+
+func (t *Team) ProblemByCodeForAdmin(
+	ctx context.Context, eff TeamProblemReader, code ProblemCode,
+) (*TeamProblem, error) {
+	return t.problemByCode(ctx, eff, false, code)
+}
+
+func (t *Team) problemByCode(ctx context.Context, eff TeamProblemReader, isPublic bool, code ProblemCode) (*TeamProblem, error) {
 	problem, err := code.Problem(ctx, eff)
 	if err != nil {
 		return nil, err
 	}
-	return &TeamProblem{
-		team:    t,
-		problem: problem,
-	}, nil
+
+	teamProblem := &TeamProblem{team: t, problem: problem}
+
+	if scoreData, err := eff.GetTeamProblemScore(
+		ctx, isPublic, uuid.UUID(t.teamID), uuid.UUID(problem.problemID),
+	); err == nil {
+		score, err := scoreData.parse(problem)
+		if err != nil {
+			return nil, err
+		}
+		teamProblem.score = score
+	} else if !errors.Is(err, ErrNotFound) {
+		return nil, WrapAsInternal(err, "failed to get score")
+	}
+
+	return teamProblem, nil
 }
 
 func (tp *TeamProblemDetail) Team() *Team {
@@ -169,3 +216,16 @@ func (tp *TeamProblemDetail) TeamProblem() *TeamProblem {
 func (tp *TeamProblemDetail) ProblemDetail() *DescriptiveProblem {
 	return tp.problemDetail
 }
+
+type (
+	TeamProblemScoreData struct {
+		TeamID    uuid.UUID `json:"team_id"`
+		ProblemID uuid.UUID `json:"problem_id"`
+		Score     ScoreData `json:"score"`
+	}
+	TeamProblemScoreReader interface {
+		GetTeamProblemScore(ctx context.Context, isPublic bool, teamID, problemID uuid.UUID) (*ScoreData, error)
+		ListTeamProblemScoresByTeamID(ctx context.Context, isPublic bool, teamID uuid.UUID) ([]*TeamProblemScoreData, error)
+		ListTeamProblemScores(ctx context.Context, isPublic bool) ([]*TeamProblemScoreData, error)
+	}
+)

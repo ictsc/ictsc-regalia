@@ -15,7 +15,7 @@ type UpdateScoreEffect interface {
 	domain.DeploymentReader
 	domain.AnswerReader
 	domain.UpdateAnswerScoreEffect
-	domain.TeamProblemReader
+	domain.TeamProblemLister
 	domain.UpdateProblemScoreEffect
 }
 
@@ -49,7 +49,7 @@ func UpdateScore(
 		domain.ScoreWriter
 
 		domain.AnswerReader
-		domain.TeamProblemReader
+		domain.TeamProblemLister
 	}{
 		MarkingResultReader:         cachedMarkReader,
 		DeploymentReader:            cachedDeployReader,
@@ -57,7 +57,7 @@ func UpdateScore(
 		ScoreWriter:                 eff,
 
 		AnswerReader:      eff,
-		TeamProblemReader: eff,
+		TeamProblemLister: eff,
 	}
 	return updateScore(ctx, innerEff, now)
 }
@@ -86,7 +86,7 @@ func updateScore(ctx context.Context, eff UpdateScoreEffect, now time.Time) (*Up
 	}
 
 	slog.InfoContext(ctx, "Update problem scores")
-	teamProblems, err := domain.ListTeamProblems(ctx, eff)
+	teamProblems, err := domain.ListTeamProblemsForAdmin(ctx, eff)
 	if err != nil {
 		return nil, err
 	}

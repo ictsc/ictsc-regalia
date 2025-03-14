@@ -35,19 +35,19 @@ func newProblemServiceHandler(enforcer *ScheduleEnforcer, repo *pg.Repository) *
 		ListDeploymentsEffect: repo,
 		DeployEffect: struct {
 			domain.TeamMemberGetter
-			domain.ProblemReader
+			domain.TeamProblemReader
 			domain.Tx[domain.DeploymentWriter]
 		}{
-			TeamMemberGetter: repo,
-			ProblemReader:    repo,
-			Tx:               pg.Tx(repo, func(rt *pg.RepositoryTx) domain.DeploymentWriter { return rt }),
+			TeamMemberGetter:  repo,
+			TeamProblemReader: repo,
+			Tx:                pg.Tx(repo, func(rt *pg.RepositoryTx) domain.DeploymentWriter { return rt }),
 		},
 	}
 }
 
 type ProblemListEffect interface {
 	domain.TeamMemberGetter
-	domain.ProblemReader
+	domain.TeamProblemReader
 }
 
 func (h *ProblemServiceHandler) ListProblems(
@@ -70,7 +70,7 @@ func (h *ProblemServiceHandler) ListProblems(
 		return nil, err
 	}
 
-	problems, err := teamMember.Team().Problems(ctx, h.ListProblemsEffect)
+	problems, err := teamMember.Team().ProblemsForPublic(ctx, h.ListProblemsEffect)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (h *ProblemServiceHandler) GetProblem(
 		return nil, err
 	}
 
-	teamProblem, err := teamMember.Team().ProblemDetailByCode(ctx, h.GetProblemEffect, code)
+	teamProblem, err := teamMember.Team().ProblemDetailByCodeForPublic(ctx, h.GetProblemEffect, code)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (h *ProblemServiceHandler) GetProblem(
 
 type DeploymentsListEffect interface {
 	domain.TeamMemberGetter
-	domain.ProblemReader
+	domain.TeamProblemReader
 	domain.DeploymentReader
 }
 
@@ -169,7 +169,7 @@ func (h *ProblemServiceHandler) ListDeployments(
 		return nil, err
 	}
 
-	teamProblem, err := teamMember.Team().ProblemByCode(ctx, h.ListDeploymentsEffect, code)
+	teamProblem, err := teamMember.Team().ProblemByCodeForPublic(ctx, h.ListDeploymentsEffect, code)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +191,7 @@ func (h *ProblemServiceHandler) ListDeployments(
 
 type DeployEffect interface {
 	domain.TeamMemberGetter
-	domain.ProblemReader
+	domain.TeamProblemReader
 	domain.Tx[domain.DeploymentWriter]
 }
 
@@ -225,7 +225,7 @@ func (h *ProblemServiceHandler) Deploy(
 		return nil, err
 	}
 
-	teamProblem, err := teamMember.Team().ProblemByCode(ctx, h.DeployEffect, code)
+	teamProblem, err := teamMember.Team().ProblemByCodeForPublic(ctx, h.DeployEffect, code)
 	if err != nil {
 		return nil, err
 	}
