@@ -4,13 +4,15 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import remarkRehype from "remark-rehype";
 import rehypeKatex from "rehype-katex";
-import rehypeStringify from "rehype-stringify";
 import rehypeShiki from "@shikijs/rehype/core";
+import rehypeReact from "rehype-react";
+import production from "react/jsx-runtime";
 import { createHighlighterCore } from "shiki/core";
 import { createOnigurumaEngine } from "shiki/engine/oniguruma";
+import { ReactNode } from "react";
 
 const highlighterPromise = createHighlighterCore({
-  themes: [import("@shikijs/themes/light-plus")],
+  themes: [import("@shikijs/themes/material-theme-lighter")],
   langs: [
     import("@shikijs/langs/diff"),
     import("@shikijs/langs/shellscript"),
@@ -21,19 +23,21 @@ const highlighterPromise = createHighlighterCore({
   engine: createOnigurumaEngine(import("shiki/wasm")),
 });
 
-export async function markdownToHtml(content: string): Promise<string> {
+export async function renderMarkdown(content: string): Promise<ReactNode> {
   const highlighter = await highlighterPromise;
 
+  /* eslint-disable */
   const file = await unified()
-    .use(remarkParse)
+    .use(remarkParse, { fragment: true })
     .use(remarkGfm)
     .use(remarkMath)
-    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(remarkRehype)
     .use(rehypeKatex)
-    .use(rehypeShiki, highlighter as never, {
-      theme: "light-plus",
+    .use(rehypeShiki, highlighter as any, {
+      theme: "material-theme-lighter",
     })
-    .use(rehypeStringify, { allowDangerousHtml: true })
+    .use(rehypeReact, production)
     .process(content);
-  return file.toString();
+  return file.result;
+  /* eslint-enable */
 }

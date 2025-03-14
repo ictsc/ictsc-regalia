@@ -1,7 +1,7 @@
 import { use, useMemo } from "react";
 import { clsx } from "clsx";
 import styles from "./markdown.module.css";
-import { markdownToHtml } from "./markdown-utils";
+import { renderMarkdown } from "./markdown-utils";
 
 export function Typography(props: {
   className?: string;
@@ -15,12 +15,6 @@ export function Typography(props: {
 }
 
 export function Markdown({ children }: { children?: string }) {
-  const htmlPromise = useMemo(() => markdownToHtml(children ?? ""), [children]);
-  const html = use(htmlPromise);
-  return (
-    <div
-      className={clsx(styles.content)}
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  );
+  const nodePromise = useMemo(() => renderMarkdown(children ?? ""), [children]);
+  return use(nodePromise);
 }
