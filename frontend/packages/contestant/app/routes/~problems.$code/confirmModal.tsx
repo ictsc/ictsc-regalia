@@ -73,16 +73,19 @@ export function ConfirmModal({
                 </div>
                 <div className="my-12">
                   <p className="text-16 text-text">{message}</p>
-                  <p className="text-16 text-text"> 
-                    残り許容回数: 
-                    <span className={clsx(
-                    "text-16 pl-4 font-bold",
-                    allowedDeploymentCount <= 0 ? "text-primary": "text-text",
-                    )}>
+                  <p className="text-16 text-text">
+                    残り許容回数:
+                    <span
+                      className={clsx(
+                        "pl-4 text-16 font-bold",
+                        allowedDeploymentCount <= 0
+                          ? "text-primary"
+                          : "text-text",
+                      )}
+                    >
                       {allowedDeploymentCount}
                     </span>
                   </p>
-                  
                 </div>
 
                 <div className="mt-4 flex justify-end gap-8">

@@ -10,7 +10,12 @@ type Story = StoryObj;
 export const Default: Story = {
   render: () => (
     <div className="grid grid-cols-2 gap-64">
-      <ConfirmModal isOpen={true} onConfirm={() => {}} onCansel={() => {}} allowedDeploymentCount={1} />
+      <ConfirmModal
+        isOpen={true}
+        onConfirm={() => {}}
+        onCansel={() => {}}
+        allowedDeploymentCount={1}
+      />
     </div>
   ),
 };
@@ -18,7 +23,12 @@ export const Default: Story = {
 export const NoMoreLeft: Story = {
   render: () => (
     <div className="grid grid-cols-2 gap-64">
-      <ConfirmModal isOpen={true} onConfirm={() => {}} onCansel={() => {}} allowedDeploymentCount={0} />
+      <ConfirmModal
+        isOpen={true}
+        onConfirm={() => {}}
+        onCansel={() => {}}
+        allowedDeploymentCount={0}
+      />
     </div>
   ),
 };
