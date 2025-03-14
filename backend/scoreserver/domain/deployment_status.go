@@ -27,9 +27,9 @@ func (d DeploymentStatus) Next() []DeploymentStatus {
 		return []DeploymentStatus{DeploymentStatusCreating}
 	case DeploymentStatusCreating:
 		return []DeploymentStatus{DeploymentStatusCompleted, DeploymentStatusFailed}
-	case DeploymentStatusCompleted:
-		fallthrough
 	case DeploymentStatusFailed:
+		return []DeploymentStatus{DeploymentStatusCompleted}
+	case DeploymentStatusCompleted:
 		fallthrough
 	case DeploymentStatusUnknown:
 		fallthrough
