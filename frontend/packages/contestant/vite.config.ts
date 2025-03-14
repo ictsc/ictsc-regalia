@@ -41,8 +41,8 @@ export default {
           if (id.includes("node_modules") && id.includes("react")) {
             return "react";
           }
-        }
-      }
+        },
+      },
     },
   },
 } satisfies UserConfig;
