@@ -57,7 +57,10 @@ func NewOtelInterceptor() connect.Interceptor {
 		serverResponseSizeMetric = noop.Int64Histogram{}
 	}
 
-	traceInterceptor, err := otelconnect.NewInterceptor(otelconnect.WithoutMetrics())
+	traceInterceptor, err := otelconnect.NewInterceptor(
+		otelconnect.WithoutMetrics(),
+		otelconnect.WithTrustRemote(),
+	)
 	if err != nil {
 		otel.Handle(err)
 		traceInterceptor = nil
