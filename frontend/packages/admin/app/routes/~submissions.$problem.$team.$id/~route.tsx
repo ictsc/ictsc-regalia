@@ -27,7 +27,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { Markdown } from "../../markdown/markdown";
+import { Markdown } from "../../components/markdown/markdown";
 
 export const Route = createFileRoute("/submissions/$problem/$team/$id")({
   component: RouteComponent,
