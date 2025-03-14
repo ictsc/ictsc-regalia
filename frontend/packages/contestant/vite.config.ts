@@ -3,6 +3,7 @@ import type { UserConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
+// import { visualizer } from "rollup-plugin-visualizer"
 
 const isTest = process.env.NODE_ENV === "test";
 
@@ -30,4 +31,18 @@ export default {
     tsconfigPaths(),
     react(),
   ],
+  build: {
+    rollupOptions: {
+      plugins: [
+        // visualizer({ open: true }),
+      ],
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules") && id.includes("react")) {
+            return "react";
+          }
+        }
+      }
+    },
+  },
 } satisfies UserConfig;
