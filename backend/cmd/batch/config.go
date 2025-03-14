@@ -13,9 +13,7 @@ import (
 func newConfig(opts *CLIOption) (*config.Batch, error) {
 	var tokenSource oauth2.TokenSource
 	if opts.APITokenFile != "" {
-		tokenSource = oauth2.ReuseTokenSourceWithExpiry(
-			nil, &fileTokenSource{Path: opts.APITokenFile}, time.Second,
-		)
+		tokenSource = oauth2.ReuseTokenSource(nil, &fileTokenSource{Path: opts.APITokenFile})
 	} else if token := os.Getenv("ICTSCORE_TOKEN"); token != "" {
 		tokenSource = oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 	}
@@ -68,11 +66,13 @@ type fileTokenSource struct {
 
 var _ oauth2.TokenSource = (*fileTokenSource)(nil)
 
+const tokenExpiry = 5 * time.Second
+
 func (f *fileTokenSource) Token() (*oauth2.Token, error) {
 	data, err := os.ReadFile(f.Path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read token file")
 	}
 	token := strings.TrimSpace(string(data))
-	return &oauth2.Token{AccessToken: token}, nil
+	return &oauth2.Token{AccessToken: token, Expiry: time.Now().Add(tokenExpiry)}, nil
 }
