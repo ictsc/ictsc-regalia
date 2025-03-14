@@ -197,12 +197,12 @@ func (p *Problem) RemainingDeployments(revision uint32) int32 {
 	return int32(int64(threshold) - int64(revision)) //nolint:gosec // uint32 - uint32 なので int32 に収まる
 }
 
-func (p *Problem) Penalty(depoymentCount uint32) uint32 {
+func (p *Problem) Penalty(deploymentCount uint32) uint32 {
 	if p.redeployRule != RedeployRulePercentagePenalty {
 		return 0
 	}
-	penalty := (p.maxScore * p.percentagePenalty.Percentage) / 100           //nolint:mnd
-	return penalty * uint32(max(0, -p.RemainingDeployments(depoymentCount))) //nolint:gosec
+	penalty := (p.maxScore * p.percentagePenalty.Percentage) / 100            //nolint:mnd
+	return penalty * uint32(max(0, -p.RemainingDeployments(deploymentCount))) //nolint:gosec
 }
 
 type (
