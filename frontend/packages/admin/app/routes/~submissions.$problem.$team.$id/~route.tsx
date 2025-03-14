@@ -27,7 +27,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import ReactMarkdown from "react-markdown";
+import { Markdown } from "../../markdown/markdown";
 
 export const Route = createFileRoute("/submissions/$problem/$team/$id")({
   component: RouteComponent,
@@ -123,13 +123,13 @@ function RouteComponent() {
       <Grid.Col span={10}>
         <article>
           <Title>解答</Title>
-          <ReactMarkdown>{answer?.body?.body.value?.body ?? ""}</ReactMarkdown>
+          <Markdown>{answer?.body?.body.value?.body ?? ""}</Markdown>
         </article>
         <article>
           <Title>問題解説</Title>
-          <ReactMarkdown>
+          <Markdown>
             {problem?.body?.body.value?.explanationMarkdown ?? ""}
-          </ReactMarkdown>
+          </Markdown>
         </article>
         <MarkForm
           maxScore={answer?.problem?.maxScore ?? 0}
