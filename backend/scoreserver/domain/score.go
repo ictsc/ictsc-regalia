@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"github.com/cockroachdb/errors"
@@ -9,9 +10,10 @@ import (
 )
 
 type Score struct {
-	max     uint32
-	marked  uint32
-	penalty uint32
+	markingResultID uuid.UUID
+	max             uint32
+	marked          uint32
+	penalty         uint32
 }
 
 func (s *Score) MarkedScore() uint32 {
@@ -28,6 +30,20 @@ func (s *Score) Penalty() uint32 {
 
 func (s *Score) TotalScore() uint32 {
 	return max(0, s.MarkedScore()-s.Penalty())
+}
+
+func (s *Score) MarkingResult(ctx context.Context, eff MarkingResultReader) (*MarkingResult, error) {
+	marks, err := ListAllMarkingResults(ctx, eff)
+	if err != nil {
+		return nil, err
+	}
+	idx := slices.IndexFunc(marks, func(m *MarkingResult) bool {
+		return m.id == s.markingResultID
+	})
+	if idx < 0 {
+		return nil, NewNotFoundError("marking result", nil)
+	}
+	return marks[idx], nil
 }
 
 type UpdateAnswerScoreEffect interface {
@@ -80,8 +96,9 @@ func (a *Answer) updatePrivateScore(ctx context.Context, eff UpdateAnswerScoreEf
 
 type (
 	ScoreData struct {
-		MarkedScore uint32 `json:"marked_score"`
-		Penalty     uint32 `json:"penalty"`
+		MarkingResultID uuid.UUID `json:"marking_result_id"`
+		MarkedScore     uint32    `json:"marked_score"`
+		Penalty         uint32    `json:"penalty"`
 	}
 
 	UpdateAnswerScoreInput struct {
@@ -96,8 +113,9 @@ type (
 
 func (s *Score) Data() *ScoreData {
 	return &ScoreData{
-		MarkedScore: s.marked,
-		Penalty:     s.penalty,
+		MarkingResultID: s.markingResultID,
+		MarkedScore:     s.marked,
+		Penalty:         s.penalty,
 	}
 }
 
@@ -106,8 +124,9 @@ func (s *ScoreData) parse(problem *Problem) (*Score, error) {
 		return nil, NewInvalidArgumentError("marked score is over max score", nil)
 	}
 	return &Score{
-		max:     problem.maxScore,
-		marked:  s.MarkedScore,
-		penalty: s.Penalty,
+		markingResultID: s.MarkingResultID,
+		max:             problem.maxScore,
+		marked:          s.MarkedScore,
+		penalty:         s.Penalty,
 	}, nil
 }

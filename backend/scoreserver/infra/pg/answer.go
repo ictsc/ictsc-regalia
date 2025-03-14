@@ -178,8 +178,9 @@ type (
 	}
 	answerWithScoreRow struct {
 		answerRow
-		MarkedScore sql.Null[uint32] `db:"score.marked_score"`
-		Penalty     sql.Null[uint32] `db:"score.penalty"`
+		MarkingResultID sql.Null[uuid.UUID] `db:"score.marking_result_id"`
+		MarkedScore     sql.Null[uint32]    `db:"score.marked_score"`
+		Penalty         sql.Null[uint32]    `db:"score.penalty"`
 	}
 	answerDetailRow struct {
 		answerWithScoreRow
@@ -195,7 +196,7 @@ var (
 		"problem_rpp.threshold", "problem_rpp.percentage",
 		"author.id", "author.name",
 	})
-	scoreColumns = columns([]string{"marked_score", "penalty"})
+	scoreColumns = columns([]string{"marking_result_id", "marked_score", "penalty"})
 )
 
 func (r answerRow) data() *domain.AnswerData {
@@ -209,10 +210,11 @@ func (r answerRow) data() *domain.AnswerData {
 
 func (r answerWithScoreRow) data() *domain.AnswerData {
 	answer := r.answerRow.data()
-	if r.MarkedScore.Valid && r.Penalty.Valid {
+	if r.MarkingResultID.Valid && r.MarkedScore.Valid && r.Penalty.Valid {
 		answer.Score = &domain.ScoreData{
-			MarkedScore: r.MarkedScore.V,
-			Penalty:     r.Penalty.V,
+			MarkingResultID: r.MarkingResultID.V,
+			MarkedScore:     r.MarkedScore.V,
+			Penalty:         r.Penalty.V,
 		}
 	}
 	return answer
