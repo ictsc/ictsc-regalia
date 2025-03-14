@@ -30,30 +30,4 @@ export default {
     tsconfigPaths(),
     react(),
   ],
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (
-              [
-                "markdown",
-                "remark",
-                "unified",
-                "mdast",
-                "hast",
-                "unist",
-                "micromark",
-                "vfile",
-                "katex",
-              ].some((pkg) => id.includes(pkg))
-            ) {
-              return "markdown";
-            }
-            return "vendor";
-          }
-        },
-      },
-    },
-  },
 } satisfies UserConfig;
