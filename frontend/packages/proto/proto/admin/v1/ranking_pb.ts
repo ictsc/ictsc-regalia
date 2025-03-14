@@ -8,13 +8,15 @@ import type { Problem } from "./problem_pb";
 import { file_admin_v1_problem } from "./problem_pb";
 import type { Team } from "./team_pb";
 import { file_admin_v1_team } from "./team_pb";
+import type { Timestamp } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file admin/v1/ranking.proto.
  */
 export const file_admin_v1_ranking: GenFile = /*@__PURE__*/
-  fileDesc("ChZhZG1pbi92MS9yYW5raW5nLnByb3RvEghhZG1pbi52MSJ/CgVTY29yZRIcCgR0ZWFtGAEgASgLMg4uYWRtaW4udjEuVGVhbRIiCgdwcm9ibGVtGAIgASgLMhEuYWRtaW4udjEuUHJvYmxlbRIUCgxtYXJrZWRfc2NvcmUYAyABKAMSDwoHcGVuYWx0eRgEIAEoAxINCgVzY29yZRgFIAEoAyJFCghUZWFtUmFuaxIcCgR0ZWFtGAEgASgLMg4uYWRtaW4udjEuVGVhbRIMCgRyYW5rGAIgASgDEg0KBXNjb3JlGAMgASgDIhIKEExpc3RTY29yZVJlcXVlc3QiNAoRTGlzdFNjb3JlUmVzcG9uc2USHwoGc2NvcmVzGAEgAygLMg8uYWRtaW4udjEuU2NvcmUiEwoRR2V0UmFua2luZ1JlcXVlc3QiOQoSR2V0UmFua2luZ1Jlc3BvbnNlEiMKB3JhbmtpbmcYASADKAsyEi5hZG1pbi52MS5UZWFtUmFuazKfAQoOUmFua2luZ1NlcnZpY2USRAoJTGlzdFNjb3JlEhouYWRtaW4udjEuTGlzdFNjb3JlUmVxdWVzdBobLmFkbWluLnYxLkxpc3RTY29yZVJlc3BvbnNlEkcKCkdldFJhbmtpbmcSGy5hZG1pbi52MS5HZXRSYW5raW5nUmVxdWVzdBocLmFkbWluLnYxLkdldFJhbmtpbmdSZXNwb25zZUKgAQoMY29tLmFkbWluLnYxQgxSYW5raW5nUHJvdG9QAVpBZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2FkbWluL3YxO2FkbWludjGiAgNBWFiqAghBZG1pbi5WMcoCCEFkbWluXFYx4gIUQWRtaW5cVjFcR1BCTWV0YWRhdGHqAglBZG1pbjo6VjFiBnByb3RvMw", [file_admin_v1_problem, file_admin_v1_team]);
+  fileDesc("ChZhZG1pbi92MS9yYW5raW5nLnByb3RvEghhZG1pbi52MSJ/CgVTY29yZRIcCgR0ZWFtGAEgASgLMg4uYWRtaW4udjEuVGVhbRIiCgdwcm9ibGVtGAIgASgLMhEuYWRtaW4udjEuUHJvYmxlbRIUCgxtYXJrZWRfc2NvcmUYAyABKAMSDwoHcGVuYWx0eRgEIAEoAxINCgVzY29yZRgFIAEoAyKHAQoIVGVhbVJhbmsSHAoEdGVhbRgBIAEoCzIOLmFkbWluLnYxLlRlYW0SDAoEcmFuaxgCIAEoAxINCgVzY29yZRgDIAEoAxJAChxsYXN0X2VmZmVjdGl2ZV9zdWJtaXNzaW9uX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCISChBMaXN0U2NvcmVSZXF1ZXN0IjQKEUxpc3RTY29yZVJlc3BvbnNlEh8KBnNjb3JlcxgBIAMoCzIPLmFkbWluLnYxLlNjb3JlIhMKEUdldFJhbmtpbmdSZXF1ZXN0IjkKEkdldFJhbmtpbmdSZXNwb25zZRIjCgdyYW5raW5nGAEgAygLMhIuYWRtaW4udjEuVGVhbVJhbmsynwEKDlJhbmtpbmdTZXJ2aWNlEkQKCUxpc3RTY29yZRIaLmFkbWluLnYxLkxpc3RTY29yZVJlcXVlc3QaGy5hZG1pbi52MS5MaXN0U2NvcmVSZXNwb25zZRJHCgpHZXRSYW5raW5nEhsuYWRtaW4udjEuR2V0UmFua2luZ1JlcXVlc3QaHC5hZG1pbi52MS5HZXRSYW5raW5nUmVzcG9uc2VCoAEKDGNvbS5hZG1pbi52MUIMUmFua2luZ1Byb3RvUAFaQWdpdGh1Yi5jb20vaWN0c2MvaWN0c2MtcmVnYWxpYS9iYWNrZW5kL3BrZy9wcm90by9hZG1pbi92MTthZG1pbnYxogIDQVhYqgIIQWRtaW4uVjHKAghBZG1pblxWMeICFEFkbWluXFYxXEdQQk1ldGFkYXRh6gIJQWRtaW46OlYxYgZwcm90bzM", [file_admin_v1_problem, file_admin_v1_team, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message admin.v1.Score
@@ -77,6 +79,11 @@ export type TeamRank = Message<"admin.v1.TeamRank"> & {
    * @generated from field: int64 score = 3;
    */
   score: bigint;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp last_effective_submission_at = 4;
+   */
+  lastEffectiveSubmissionAt?: Timestamp;
 };
 
 /**

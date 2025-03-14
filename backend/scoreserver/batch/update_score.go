@@ -33,6 +33,7 @@ func (s *ScoreUpdate) Run(ctx context.Context) error {
 	defer ticker.Stop()
 
 	for {
+		slog.InfoContext(ctx, "Update scores")
 		if _, err := s.markClient.UpdateScores(
 			ctx, connect.NewRequest(&adminv1.UpdateScoresRequest{}),
 		); err != nil {

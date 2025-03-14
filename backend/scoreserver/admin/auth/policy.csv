@@ -24,4 +24,5 @@ p, role:admin, marking_results, list
 p, role:admin, marking_results, create
 p, role:admin, deployments, list
 p, role:admin, deployments, update
+p, role:admin, scores, list
 p, role:admin, scores, update
