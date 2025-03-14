@@ -63,6 +63,7 @@ func getRanking(ctx context.Context, eff RankingEffect, isPublic bool) (Ranking,
 	return ranking, nil
 }
 
+//nolint:cyclop
 func (r Ranking) sort() {
 	slices.SortStableFunc(r, func(lhs, rhs *TeamRank) int {
 		// Descending order
@@ -89,7 +90,10 @@ func (r Ranking) sort() {
 		rank uint32 = 0
 	)
 	for _, teamRank := range r {
-		if prev == nil || prev.totalScore != teamRank.totalScore || prev.updateSubmitAt != teamRank.updateSubmitAt {
+		if prev == nil ||
+			prev.totalScore != teamRank.totalScore ||
+			(prev.updateSubmitAt == nil) != (teamRank.updateSubmitAt == nil) ||
+			(prev.updateSubmitAt != nil && *prev.updateSubmitAt != *teamRank.updateSubmitAt) {
 			rank++
 		}
 		teamRank.rank = rank
