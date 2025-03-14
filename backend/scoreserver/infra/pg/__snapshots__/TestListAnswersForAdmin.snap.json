@@ -73,8 +73,8 @@
       "category": "Server",
       "redeploy_rule": "PercentagePenalty",
       "percentage_penalty": {
-        "Threshold": 2,
-        "Percentage": 10
+        "threshold": 1,
+        "percentage": 10
       }
     },
     "author": {

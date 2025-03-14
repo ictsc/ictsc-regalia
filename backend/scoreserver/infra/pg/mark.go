@@ -18,6 +18,7 @@ var (
 	listMarkingResultsQuery = `
 SELECT
 	mr.id, mr.judge_name, mr.created_at,
+	(mr.visibility = 'PUBLIC') AS "is_public",
 	` + answerViewColumns.As("answer") + `,
 	score.marked_score AS "score.marked_score",
 	dr.rationale AS "rationale.descriptive_comment"
@@ -36,6 +37,7 @@ type (
 		Score     *domain.ScoreData            `db:"-"`
 		Rationale *domain.MarkingRationaleData `db:"-"`
 		CreatedAt time.Time                    `db:"created_at"`
+		IsPublic  bool                         `db:"is_public"`
 	}
 	scoreRow struct {
 		MarkedScore uint32 `db:"marked_score"`

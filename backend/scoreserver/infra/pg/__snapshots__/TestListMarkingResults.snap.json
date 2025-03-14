@@ -34,7 +34,8 @@
     "rationale": {
       "descriptive_comment": "comment"
     },
-    "created_at": "2025-02-03T10:00:00+09:00"
+    "created_at": "2025-02-03T10:00:00+09:00",
+    "is_public": true
   },
   {
     "id": "87cb974d-dedd-4039-a189-b34f3a57e62c",
@@ -58,8 +59,8 @@
         "category": "Server",
         "redeploy_rule": "PercentagePenalty",
         "percentage_penalty": {
-          "Threshold": 2,
-          "Percentage": 10
+          "threshold": 1,
+          "percentage": 10
         }
       },
       "author": {
@@ -75,7 +76,8 @@
     "rationale": {
       "descriptive_comment": "comment3"
     },
-    "created_at": "2025-02-03T10:20:00+09:00"
+    "created_at": "2025-02-03T10:20:00+09:00",
+    "is_public": true
   },
   {
     "id": "358ebef7-c626-44fa-9a3d-da2d9083fe5e",
@@ -112,6 +114,7 @@
     "rationale": {
       "descriptive_comment": "comment2"
     },
-    "created_at": "2025-02-03T10:30:00+09:00"
+    "created_at": "2025-02-03T10:30:00+09:00",
+    "is_public": false
   }
 ]

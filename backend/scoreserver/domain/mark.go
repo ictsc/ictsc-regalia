@@ -15,6 +15,7 @@ type (
 		rationale *MarkingRationale
 		judge     string
 		createdAt time.Time
+		isPublic  bool
 	}
 	Score struct {
 		max    uint32
@@ -47,6 +48,10 @@ func (m *MarkingResult) Rationale() *MarkingRationale {
 
 func (m *MarkingResult) CreatedAt() time.Time {
 	return m.createdAt
+}
+
+func (m *MarkingResult) IsPublic() bool {
+	return m.isPublic
 }
 
 func (m *Score) MarkedScore() uint32 {
@@ -97,6 +102,10 @@ func ListAllMarkingResults(ctx context.Context, eff MarkingResultReader) ([]*Mar
 	return markingResults, nil
 }
 
+func MakeMarkingResultPublic(ctx context.Context, eff MarkingResultWriter, now time.Time) error {
+	return nil
+}
+
 type MarkInput struct {
 	Score uint32
 	Judge string
@@ -140,6 +149,7 @@ type (
 		Score     *ScoreData            `json:"score"`
 		Rationale *MarkingRationaleData `json:"rationale"`
 		CreatedAt time.Time             `json:"created_at"`
+		IsPublic  bool                  `json:"is_public"`
 	}
 	ScoreData struct {
 		MarkedScore uint32 `json:"marked_score"`

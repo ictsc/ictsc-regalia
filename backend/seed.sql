@@ -37,7 +37,7 @@ INSERT INTO problems (id, code, type, title, max_score, category, redeploy_rule,
 
 TRUNCATE TABLE redeploy_percentage_penalties CASCADE;
 INSERT INTO redeploy_percentage_penalties (problem_id, threshold, percentage) VALUES
-	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 2, 10);
+	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 1, 10);
 
 TRUNCATE TABLE problem_contents CASCADE;
 INSERT INTO problem_contents (problem_id, page_id, page_path, body, explanation) VALUES

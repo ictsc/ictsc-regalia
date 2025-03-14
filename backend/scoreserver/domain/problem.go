@@ -131,8 +131,8 @@ type (
 		percentagePenalty *RedeployPenaltyPercentage
 	}
 	RedeployPenaltyPercentage struct {
-		Threshold  uint32
-		Percentage uint32
+		Threshold  uint32 `json:"threshold"`
+		Percentage uint32 `json:"percentage"`
 	}
 	problem = Problem
 )
