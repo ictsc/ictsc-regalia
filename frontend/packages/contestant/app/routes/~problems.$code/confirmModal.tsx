@@ -8,7 +8,7 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import { MaterialSymbol } from "@app/components/material-symbol";
-import clsx from "clsx";
+import { clsx } from "clsx";
 
 interface ConfirmModalProps {
   isOpen: boolean;
