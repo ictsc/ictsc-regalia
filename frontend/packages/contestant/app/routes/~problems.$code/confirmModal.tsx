@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, ReactNode } from "react";
 import {
   Dialog,
   DialogBackdrop,
@@ -8,28 +8,25 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import { MaterialSymbol } from "@app/components/material-symbol";
-import { clsx } from "clsx";
 
 interface ConfirmModalProps {
   isOpen: boolean;
   onConfirm: () => void;
   onCansel: () => void;
-  allowedDeploymentCount: number;
-  title?: string;
-  message?: string;
-  confirmText?: string;
-  cancelText?: string;
+  title: string;
+  confirmText: string;
+  cancelText: string;
+  children?: ReactNode;
 }
 
 export function ConfirmModal({
   isOpen,
   onConfirm,
   onCansel,
-  allowedDeploymentCount,
-  title = "再展開の確認",
-  message = "本当にこの問題を再展開しますか？",
-  confirmText = "再展開する",
-  cancelText = "キャンセル",
+  title,
+  confirmText,
+  cancelText,
+  children,
 }: ConfirmModalProps) {
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -71,22 +68,7 @@ export function ConfirmModal({
                     {title}
                   </DialogTitle>
                 </div>
-                <div className="my-12">
-                  <p className="text-16 text-text">{message}</p>
-                  <p className="text-16 text-text">
-                    残り許容回数:
-                    <span
-                      className={clsx(
-                        "pl-4 text-16 font-bold",
-                        allowedDeploymentCount <= 0
-                          ? "text-primary"
-                          : "text-text",
-                      )}
-                    >
-                      {allowedDeploymentCount}
-                    </span>
-                  </p>
-                </div>
+                {children}
 
                 <div className="mt-4 flex justify-end gap-8">
                   <button
