@@ -45,16 +45,23 @@ export function SubmissionListItem(props: {
   readonly id: number;
   readonly submittedAt: string;
   readonly score: ComponentProps<typeof Score>;
+  readonly downloadAnswer: () => void;
 }) {
   return (
     <li className="flex justify-between gap-8 rounded-12 bg-surface-0 p-16">
-      <div className="flex flex-col">
-        <h2 className="text-20 font-bold text-[#000]">#{props.id}</h2>
-        <h3 className="text-12">
-          提出:{" "}
-          {submissionListDateTimeFormatter.format(new Date(props.submittedAt))}
-        </h3>
-        <p className="mt-4 text-12"></p>
+      <div className="flex flex-col justify-between">
+        <div>
+          <h2 className="text-20 font-bold text-[#000]">#{props.id}</h2>
+          <h3 className="text-12">
+            提出:{" "}
+            {submissionListDateTimeFormatter.format(
+              new Date(props.submittedAt),
+            )}
+          </h3>
+        </div>
+        <a href="#" className="text-8" onClick={props.downloadAnswer}>
+          ダウンロード
+        </a>
       </div>
       <Score {...props.score} />
     </li>
