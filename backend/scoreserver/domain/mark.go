@@ -81,8 +81,68 @@ func ListAllMarkingResults(ctx context.Context, eff MarkingResultReader) ([]*Mar
 	return markingResults, nil
 }
 
-func MakeMarkingResultPublic(ctx context.Context, eff MarkingResultWriter, now time.Time) error {
+type MarkingResultUpdatePenaltyEffect interface {
+	MarkingResultPenaltyUpdator
+	DeploymentReader
+}
+
+func (m *MarkingResult) UpdatePenalty(ctx context.Context, eff MarkingResultUpdatePenaltyEffect) error {
+	deploymentRevision, err := m.Answer().TeamProblem().
+		FinishedDeploymentCountAt(ctx, eff, m.Answer().CreatedAt())
+	if err != nil {
+		return err
+	}
+	penalty := m.Answer().Problem().Penalty(uint32(deploymentRevision)) //nolint:gosec
+	if m.Score().Penalty() != penalty {
+		if err := eff.UpdatePenalty(ctx, m.id, penalty); err != nil {
+			return WrapAsInternal(err, "failed to update penalty")
+		}
+		m.Score().penalty = penalty
+	}
 	return nil
+}
+
+func (a *Answer) latestMarkingResult(ctx context.Context, eff MarkingResultReader) (*MarkingResult, error) {
+	results, err := ListAllMarkingResults(ctx, eff)
+	if err != nil {
+		return nil, err
+	}
+	var latest *MarkingResult
+	for _, result := range results {
+		if result.Answer().id != a.id {
+			continue
+		}
+		if latest == nil || result.CreatedAt().After(latest.CreatedAt()) {
+			latest = result
+		}
+	}
+	if latest == nil {
+		return nil, NewNotFoundError("marking result for answer", nil)
+	}
+	return latest, nil
+}
+
+func (a *Answer) latestPublicMarkingResult(ctx context.Context, eff MarkingResultReader, now time.Time) (*MarkingResult, error) {
+	results, err := ListAllMarkingResults(ctx, eff)
+	if err != nil {
+		return nil, err
+	}
+	var latest *MarkingResult
+	for _, result := range results {
+		if result.Answer().id != a.id {
+			continue
+		}
+		if !result.IsPublic(now) {
+			continue
+		}
+		if latest == nil || result.CreatedAt().After(latest.CreatedAt()) {
+			latest = result
+		}
+	}
+	if latest == nil {
+		return nil, NewNotFoundError("marking result for answer", nil)
+	}
+	return latest, nil
 }
 
 type MarkInput struct {
@@ -136,8 +196,12 @@ type (
 	MarkingResultReader interface {
 		ListMarkingResults(ctx context.Context) ([]*MarkingResultData, error)
 	}
+	MarkingResultPenaltyUpdator interface {
+		UpdatePenalty(ctx context.Context, id uuid.UUID, penalty uint32) error
+	}
 	MarkingResultWriter interface {
 		CreateMarkingResult(ctx context.Context, m *MarkingResultData) error
+		MarkingResultPenaltyUpdator
 	}
 )
 

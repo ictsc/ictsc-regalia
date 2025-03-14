@@ -47,6 +47,14 @@ func (d *Deployment) CreatedAt() time.Time {
 	return d.events[0].occurredAt
 }
 
+func (d *Deployment) FinishedAt() time.Time {
+	last := d.events[len(d.events)-1]
+	if last.Status().IsFinished() {
+		return last.OccurredAt()
+	}
+	return time.Time{}
+}
+
 func (d *Deployment) Events() []*DeploymentEvent {
 	return d.events
 }
@@ -59,7 +67,9 @@ func (e *DeploymentEvent) OccurredAt() time.Time {
 	return e.occurredAt
 }
 
-func ListDeployments(ctx context.Context, eff DeploymentReader) ([]*Deployment, error) {
+type AllDeployments []*Deployment
+
+func ListDeployments(ctx context.Context, eff DeploymentReader) (AllDeployments, error) {
 	deployments, err := eff.ListDeployments(ctx)
 	if err != nil {
 		return nil, err
@@ -89,6 +99,24 @@ func (tp *TeamProblem) Deployments(ctx context.Context, eff DeploymentReader) ([
 		}
 	}
 	return forTeam, nil
+}
+
+func (tp *TeamProblem) FinishedDeploymentCountAt(ctx context.Context, eff DeploymentReader, timeAt time.Time) (int, error) {
+	list, err := tp.Deployments(ctx, eff)
+	if err != nil {
+		return 0, err
+	}
+
+	count := 0
+	for _, d := range list {
+		if !d.Status().IsFinished() {
+			continue
+		}
+		if d.FinishedAt().Before(timeAt) {
+			count++
+		}
+	}
+	return count, nil
 }
 
 func (tp *TeamProblem) DeploymentByRevision(ctx context.Context, eff DeploymentReader, revision uint32) (*Deployment, error) {
