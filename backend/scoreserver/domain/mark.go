@@ -15,11 +15,6 @@ type (
 		rationale *MarkingRationale
 		judge     string
 		createdAt time.Time
-		isPublic  bool
-	}
-	Score struct {
-		max    uint32
-		marked uint32
 	}
 	MarkingRationale struct {
 		problemType ProblemType
@@ -50,24 +45,8 @@ func (m *MarkingResult) CreatedAt() time.Time {
 	return m.createdAt
 }
 
-func (m *MarkingResult) IsPublic() bool {
-	return m.isPublic
-}
-
-func (m *Score) MarkedScore() uint32 {
-	return m.marked
-}
-
-func (m *Score) MaxScore() uint32 {
-	return m.max
-}
-
-func (m *Score) Penalty() uint32 {
-	return 0 // 現状は再展開がないので0
-}
-
-func (m *Score) TotalScore() uint32 {
-	return max(0, m.MarkedScore()-m.Penalty())
+func (m *MarkingResult) IsPublic(now time.Time) bool {
+	return now.After(m.answer.createdAt.Add(AnswerInterval))
 }
 
 func (m *MarkingRationale) Type() ProblemType {
@@ -149,10 +128,6 @@ type (
 		Score     *ScoreData            `json:"score"`
 		Rationale *MarkingRationaleData `json:"rationale"`
 		CreatedAt time.Time             `json:"created_at"`
-		IsPublic  bool                  `json:"is_public"`
-	}
-	ScoreData struct {
-		MarkedScore uint32 `json:"marked_score"`
 	}
 	MarkingRationaleData struct {
 		DescriptiveComment string `json:"descriptive_comment,omitempty"`
@@ -208,16 +183,6 @@ func (m *MarkingResultData) parse() (*MarkingResult, error) {
 		score:     score,
 		rationale: rationale,
 		createdAt: m.CreatedAt,
-	}, nil
-}
-
-func (s *ScoreData) parse(problem *Problem) (*Score, error) {
-	if s.MarkedScore > problem.MaxScore() {
-		return nil, NewInvalidArgumentError("marked score is over max score", nil)
-	}
-	return &Score{
-		max:    problem.maxScore,
-		marked: s.MarkedScore,
 	}, nil
 }
 

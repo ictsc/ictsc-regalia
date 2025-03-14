@@ -18,9 +18,9 @@ var (
 	listMarkingResultsQuery = `
 SELECT
 	mr.id, mr.judge_name, mr.created_at,
-	(mr.visibility = 'PUBLIC') AS "is_public",
 	` + answerViewColumns.As("answer") + `,
 	score.marked_score AS "score.marked_score",
+	score.penalty AS "score.penalty",
 	dr.rationale AS "rationale.descriptive_comment"
 FROM marking_results AS mr
 INNER JOIN answer_view AS answer ON mr.answer_id = answer.id
@@ -37,10 +37,10 @@ type (
 		Score     *domain.ScoreData            `db:"-"`
 		Rationale *domain.MarkingRationaleData `db:"-"`
 		CreatedAt time.Time                    `db:"created_at"`
-		IsPublic  bool                         `db:"is_public"`
 	}
 	scoreRow struct {
 		MarkedScore uint32 `db:"marked_score"`
+		Penalty     uint32 `db:"penalty"`
 	}
 	rationaleRow struct {
 		DescriptiveComment sql.NullString `db:"descriptive_comment"`
