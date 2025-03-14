@@ -59,7 +59,6 @@
     "@tanstack/router-devtools": "^1.49.2",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "katex": "^0.16.21",
     "material-symbols": "^0.29.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
