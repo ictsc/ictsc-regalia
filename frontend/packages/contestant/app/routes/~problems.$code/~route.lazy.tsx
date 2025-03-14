@@ -63,6 +63,7 @@ function RouteComponent() {
         <Deployments
           isPending={deferredDeployments !== deployments}
           deployments={deferredDeployments}
+          problemPromise={problem}
           deploy={deploy}
         />
       }
@@ -109,6 +110,7 @@ function SubmissionList(props: {
 
 function Deployments(props: {
   deployments: Promise<Deployment[]>;
+  problemPromise: Promise<ProblemDetail>;
   isPending: boolean;
   deploy: () => Promise<void>;
 }) {
@@ -119,6 +121,8 @@ function Deployments(props: {
   const canRedeploy =
     (deployments?.[0]?.status ?? DeploymentStatus.DEPLOYED) ===
     DeploymentStatus.DEPLOYED;
+  const problem = use(useDeferredValue(props.problemPromise));
+  const allowedDeploymentCount = problem.penaltyThreashold - deployments.length;
 
   const [lastResult, action, isActionPending] = useActionState(
     async (_prev: unknown, _action: "redeploy") => {
@@ -155,6 +159,7 @@ function Deployments(props: {
       canRedeploy={canRedeploy}
       isRedeploying={isActionPending}
       redeploy={() => startTransition(() => action("redeploy"))}
+      allowedDeploymentCount={allowedDeploymentCount}
       error={lastResult}
       list={
         deployments.length === 0 ? (

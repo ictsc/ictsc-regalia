@@ -23,6 +23,7 @@ export type ProblemDetail = {
   title: string;
   maxScore: number;
   redeployable: boolean;
+  penaltyThreashold: number;
   body: string;
 };
 
@@ -44,6 +45,7 @@ export async function fetchProblem(
     title: problem.title,
     maxScore: problem.maxScore,
     redeployable: problem.deployment?.redeployable ?? false,
+    penaltyThreashold: problem.deployment?.penaltyThreashold ?? 0,
     body,
   };
 }
