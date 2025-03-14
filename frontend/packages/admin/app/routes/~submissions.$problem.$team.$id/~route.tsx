@@ -162,6 +162,15 @@ function MarkForm(props: {
       const score = Number(formData.get("score"));
       const comment = formData.get("comment") as string;
 
+      if (isNaN(score) || score < 0 || score > props.maxScore) {
+        notifications.show({
+          color: "red",
+          title: "得点が不正です",
+          message: `0~${props.maxScore}の範囲で入力してください`,
+        });
+        return;
+      }
+
       switch (formData.get("intent")) {
         case "confirm":
           dialogControl.open();
@@ -195,7 +204,7 @@ function MarkForm(props: {
         required
         disabled={isSending}
         min={0}
-        max={100}
+        max={props.maxScore}
         defaultValue={lastResult?.score}
       />
       <Textarea
