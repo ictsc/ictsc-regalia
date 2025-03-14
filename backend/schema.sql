@@ -123,7 +123,7 @@ COMMENT ON COLUMN problem_contents.explanation IS '運営向け解説情報';
 
 CREATE TABLE answers (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	problem_id UUID NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
+	problem_id UUID NOT NULL REFERENCES problems(id) ON DELETE RESTRICT,
 	team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
 	number INT NOT NULL CHECK (number > 0),
 	UNIQUE (problem_id, team_id, number),
