@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file contestant/v1/answer.proto.
  */
 export const file_contestant_v1_answer: GenFile = /*@__PURE__*/
-  fileDesc("Chpjb250ZXN0YW50L3YxL2Fuc3dlci5wcm90bxINY29udGVzdGFudC52MSKjAQoGQW5zd2VyEgoKAmlkGAEgASgNEicKBGJvZHkYAiABKAsyGS5jb250ZXN0YW50LnYxLkFuc3dlckJvZHkSMAoMc3VibWl0dGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIoCgVzY29yZRgEIAEoCzIULmNvbnRlc3RhbnQudjEuU2NvcmVIAIgBAUIICgZfc2NvcmUidwoKQW5zd2VyQm9keRIoCgR0eXBlGAEgASgOMhouY29udGVzdGFudC52MS5Qcm9ibGVtVHlwZRI3CgtkZXNjcmlwdGl2ZRgCIAEoCzIgLmNvbnRlc3RhbnQudjEuRGVzY3JpcHRpdmVBbnN3ZXJIAEIGCgRib2R5IiEKEURlc2NyaXB0aXZlQW5zd2VyEgwKBGJvZHkYASABKAkiKgoSTGlzdEFuc3dlcnNSZXF1ZXN0EhQKDHByb2JsZW1fY29kZRgBIAEoCSLDAQoTTGlzdEFuc3dlcnNSZXNwb25zZRImCgdhbnN3ZXJzGAEgAygLMhUuY29udGVzdGFudC52MS5BbnN3ZXISMgoPc3VibWl0X2ludGVydmFsGAIgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEjoKEWxhc3Rfc3VibWl0dGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBQhQKEl9sYXN0X3N1Ym1pdHRlZF9hdCI5ChNTdWJtaXRBbnN3ZXJSZXF1ZXN0EhQKDHByb2JsZW1fY29kZRgBIAEoCRIMCgRib2R5GAIgASgJIj0KFFN1Ym1pdEFuc3dlclJlc3BvbnNlEiUKBmFuc3dlchgBIAEoCzIVLmNvbnRlc3RhbnQudjEuQW5zd2VyMr4BCg1BbnN3ZXJTZXJ2aWNlElQKC0xpc3RBbnN3ZXJzEiEuY29udGVzdGFudC52MS5MaXN0QW5zd2Vyc1JlcXVlc3QaIi5jb250ZXN0YW50LnYxLkxpc3RBbnN3ZXJzUmVzcG9uc2USVwoMU3VibWl0QW5zd2VyEiIuY29udGVzdGFudC52MS5TdWJtaXRBbnN3ZXJSZXF1ZXN0GiMuY29udGVzdGFudC52MS5TdWJtaXRBbnN3ZXJSZXNwb25zZULCAQoRY29tLmNvbnRlc3RhbnQudjFCC0Fuc3dlclByb3RvUAFaS2dpdGh1Yi5jb20vaWN0c2MvaWN0c2MtcmVnYWxpYS9iYWNrZW5kL3BrZy9wcm90by9jb250ZXN0YW50L3YxO2NvbnRlc3RhbnR2MaICA0NYWKoCDUNvbnRlc3RhbnQuVjHKAg1Db250ZXN0YW50XFYx4gIZQ29udGVzdGFudFxWMVxHUEJNZXRhZGF0YeoCDkNvbnRlc3RhbnQ6OlYxYgZwcm90bzM", [file_contestant_v1_problem, file_google_protobuf_duration, file_google_protobuf_timestamp]);
+  fileDesc("Chpjb250ZXN0YW50L3YxL2Fuc3dlci5wcm90bxINY29udGVzdGFudC52MSKjAQoGQW5zd2VyEgoKAmlkGAEgASgNEicKBGJvZHkYAiABKAsyGS5jb250ZXN0YW50LnYxLkFuc3dlckJvZHkSMAoMc3VibWl0dGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIoCgVzY29yZRgEIAEoCzIULmNvbnRlc3RhbnQudjEuU2NvcmVIAIgBAUIICgZfc2NvcmUidwoKQW5zd2VyQm9keRIoCgR0eXBlGAEgASgOMhouY29udGVzdGFudC52MS5Qcm9ibGVtVHlwZRI3CgtkZXNjcmlwdGl2ZRgCIAEoCzIgLmNvbnRlc3RhbnQudjEuRGVzY3JpcHRpdmVBbnN3ZXJIAEIGCgRib2R5IiEKEURlc2NyaXB0aXZlQW5zd2VyEgwKBGJvZHkYASABKAkiKgoSTGlzdEFuc3dlcnNSZXF1ZXN0EhQKDHByb2JsZW1fY29kZRgBIAEoCSLDAQoTTGlzdEFuc3dlcnNSZXNwb25zZRImCgdhbnN3ZXJzGAEgAygLMhUuY29udGVzdGFudC52MS5BbnN3ZXISMgoPc3VibWl0X2ludGVydmFsGAIgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEjoKEWxhc3Rfc3VibWl0dGVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBQhQKEl9sYXN0X3N1Ym1pdHRlZF9hdCI5ChNTdWJtaXRBbnN3ZXJSZXF1ZXN0EhQKDHByb2JsZW1fY29kZRgBIAEoCRIMCgRib2R5GAIgASgJIj0KFFN1Ym1pdEFuc3dlclJlc3BvbnNlEiUKBmFuc3dlchgBIAEoCzIVLmNvbnRlc3RhbnQudjEuQW5zd2VyIjQKEEdldEFuc3dlclJlcXVlc3QSFAoMcHJvYmxlbV9jb2RlGAEgASgJEgoKAmlkGAIgASgNIjoKEUdldEFuc3dlclJlc3BvbnNlEiUKBmFuc3dlchgBIAEoCzIVLmNvbnRlc3RhbnQudjEuQW5zd2VyMo4CCg1BbnN3ZXJTZXJ2aWNlElQKC0xpc3RBbnN3ZXJzEiEuY29udGVzdGFudC52MS5MaXN0QW5zd2Vyc1JlcXVlc3QaIi5jb250ZXN0YW50LnYxLkxpc3RBbnN3ZXJzUmVzcG9uc2USVwoMU3VibWl0QW5zd2VyEiIuY29udGVzdGFudC52MS5TdWJtaXRBbnN3ZXJSZXF1ZXN0GiMuY29udGVzdGFudC52MS5TdWJtaXRBbnN3ZXJSZXNwb25zZRJOCglHZXRBbnN3ZXISHy5jb250ZXN0YW50LnYxLkdldEFuc3dlclJlcXVlc3QaIC5jb250ZXN0YW50LnYxLkdldEFuc3dlclJlc3BvbnNlQsIBChFjb20uY29udGVzdGFudC52MUILQW5zd2VyUHJvdG9QAVpLZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2NvbnRlc3RhbnQvdjE7Y29udGVzdGFudHYxogIDQ1hYqgINQ29udGVzdGFudC5WMcoCDUNvbnRlc3RhbnRcVjHiAhlDb250ZXN0YW50XFYxXEdQQk1ldGFkYXRh6gIOQ29udGVzdGFudDo6VjFiBnByb3RvMw", [file_contestant_v1_problem, file_google_protobuf_duration, file_google_protobuf_timestamp]);
 
 /**
  * 解答
@@ -179,6 +179,45 @@ export const SubmitAnswerResponseSchema: GenMessage<SubmitAnswerResponse> = /*@_
   messageDesc(file_contestant_v1_answer, 6);
 
 /**
+ * @generated from message contestant.v1.GetAnswerRequest
+ */
+export type GetAnswerRequest = Message<"contestant.v1.GetAnswerRequest"> & {
+  /**
+   * @generated from field: string problem_code = 1;
+   */
+  problemCode: string;
+
+  /**
+   * @generated from field: uint32 id = 2;
+   */
+  id: number;
+};
+
+/**
+ * Describes the message contestant.v1.GetAnswerRequest.
+ * Use `create(GetAnswerRequestSchema)` to create a new message.
+ */
+export const GetAnswerRequestSchema: GenMessage<GetAnswerRequest> = /*@__PURE__*/
+  messageDesc(file_contestant_v1_answer, 7);
+
+/**
+ * @generated from message contestant.v1.GetAnswerResponse
+ */
+export type GetAnswerResponse = Message<"contestant.v1.GetAnswerResponse"> & {
+  /**
+   * @generated from field: contestant.v1.Answer answer = 1;
+   */
+  answer?: Answer;
+};
+
+/**
+ * Describes the message contestant.v1.GetAnswerResponse.
+ * Use `create(GetAnswerResponseSchema)` to create a new message.
+ */
+export const GetAnswerResponseSchema: GenMessage<GetAnswerResponse> = /*@__PURE__*/
+  messageDesc(file_contestant_v1_answer, 8);
+
+/**
  * @generated from service contestant.v1.AnswerService
  */
 export const AnswerService: GenService<{
@@ -197,6 +236,14 @@ export const AnswerService: GenService<{
     methodKind: "unary";
     input: typeof SubmitAnswerRequestSchema;
     output: typeof SubmitAnswerResponseSchema;
+  },
+  /**
+   * @generated from rpc contestant.v1.AnswerService.GetAnswer
+   */
+  getAnswer: {
+    methodKind: "unary";
+    input: typeof GetAnswerRequestSchema;
+    output: typeof GetAnswerResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_contestant_v1_answer, 0);

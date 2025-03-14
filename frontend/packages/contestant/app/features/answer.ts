@@ -54,6 +54,27 @@ export async function fetchAnswers(
   };
 }
 
+type FetchAnswerResult = {
+  readonly answerBody: string;
+  readonly submittedAtString: string;
+};
+
+export async function fetchAnswer(
+  transport: Transport,
+  problemCode: string,
+  answerNumber: number,
+): Promise<FetchAnswerResult> {
+  const client = createClient(AnswerService, transport);
+  const { answer } = await client.getAnswer({ problemCode, id: answerNumber });
+  const submittedAtString = answer?.submittedAt
+    ? timestampDate(answer.submittedAt).toISOString()
+    : "";
+  return {
+    answerBody: answer?.body?.body.value?.body ?? "",
+    submittedAtString,
+  };
+}
+
 export async function submitAnswer(
   transport: Transport,
   problemCode: string,

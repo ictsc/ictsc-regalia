@@ -72,6 +72,7 @@ export default {
             id={i + 1}
             submittedAt="2025-02-03T00:00:00Z"
             score={{ maxScore: 100 }}
+            downloadAnswer={() => {}}
           />
         ))}
       </SubmissionList>

@@ -106,6 +106,18 @@ func (a *Answer) Score() *Score {
 	return a.score
 }
 
+func GetAnswerDetailForPublic(
+	ctx context.Context, eff AnswerReader,
+	teamCode TeamCode, problemCode ProblemCode, answerNumber uint32,
+) (*AnswerDetail, error) {
+	answerDetailData, err := eff.GetAnswerDetailForPublic(ctx, int64(teamCode), string(problemCode), answerNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	return answerDetailData.parse()
+}
+
 func GetAnswerDetailForAdmin(
 	ctx context.Context, eff AnswerReader,
 	teamCode TeamCode, problemCode ProblemCode, answerNumber uint32,
@@ -233,6 +245,7 @@ type (
 		ListAnswersByTeamProblemForAdmin(ctx context.Context, teamCode int64, problemCode string) ([]*AnswerData, error)
 		ListAnswersByTeamProblemForPublic(ctx context.Context, teamCode int64, problemCode string) ([]*AnswerData, error)
 		GetAnswerDetailForAdmin(ctx context.Context, teamCode int64, problemCode string, answerNumber uint32) (*AnswerDetailData, error)
+		GetAnswerDetailForPublic(ctx context.Context, teamCode int64, problemCode string, answerNumber uint32) (*AnswerDetailData, error)
 	}
 	AnswerWriter interface {
 		GetLatestAnswerByTeamProblemForPublic(ctx context.Context, teamID, problemID uuid.UUID) (*AnswerData, error)

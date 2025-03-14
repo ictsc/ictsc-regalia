@@ -19,8 +19,15 @@ export const Route = createLazyFileRoute("/problems/$code")({
 
 function RouteComponent() {
   const router = useRouter();
-  const { problem, answers, metadata, submitAnswer, deployments, deploy } =
-    Route.useLoaderData();
+  const {
+    problem,
+    answers,
+    metadata,
+    submitAnswer,
+    deployments,
+    deploy,
+    fetchAnswer,
+  } = Route.useLoaderData();
 
   const redeployable = useRedeployable(problem);
   const deferredMetadata = use(useDeferredValue(metadata));
@@ -57,6 +64,7 @@ function RouteComponent() {
           isPending={deferredAnswers !== answers}
           problemPromise={problem}
           answersPromise={deferredAnswers}
+          fetchAnswer={fetchAnswer}
         />
       }
       deploymentList={
@@ -85,9 +93,46 @@ function SubmissionList(props: {
   isPending: boolean;
   problemPromise: Promise<ProblemDetail>;
   answersPromise: Promise<Answer[]>;
+  fetchAnswer: (
+    num: number,
+  ) => Promise<{ answerBody: string; submittedAtString: string }>;
 }) {
   const problem = use(useDeferredValue(props.problemPromise));
   const answers = use(props.answersPromise);
+
+  const formatDate = (date: Date) => {
+    const pad = (num: number) => num.toString().padStart(2, "0");
+
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hour = pad(date.getHours());
+    const minute = pad(date.getMinutes());
+    const second = pad(date.getSeconds());
+
+    return `${year}-${month}-${day}-${hour}-${minute}-${second}`;
+  };
+
+  const downloadFile = (filename: string, content: string) => {
+    const blob = new Blob([content], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const downloadAnswer = async (num: number) => {
+    const { answerBody, submittedAtString } = await props.fetchAnswer(num);
+    const submittedAt = new Date(submittedAtString);
+    const submittedAtFormattedString = formatDate(submittedAt);
+    const filename = `${problem.code}-${submittedAtFormattedString}.md`;
+
+    downloadFile(filename, answerBody);
+  };
+
   return (
     <View.SubmissionListContainer>
       {answers.length === 0 ? (
@@ -100,6 +145,9 @@ function SubmissionList(props: {
               id={answer.id}
               submittedAt={answer.submittedAt}
               score={protoScoreToProps(problem.maxScore, answer?.score)}
+              downloadAnswer={() =>
+                startTransition(() => downloadAnswer(answer.id))
+              }
             />
           ))}
         </View.SubmissionList>
