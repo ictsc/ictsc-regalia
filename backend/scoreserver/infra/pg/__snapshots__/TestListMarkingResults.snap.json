@@ -29,7 +29,8 @@
       "interval": 1200000000000
     },
     "score": {
-      "marked_score": 80
+      "marked_score": 80,
+      "penalty": 0
     },
     "rationale": {
       "descriptive_comment": "comment"
@@ -58,8 +59,8 @@
         "category": "Server",
         "redeploy_rule": "PercentagePenalty",
         "percentage_penalty": {
-          "Threshold": 2,
-          "Percentage": 10
+          "threshold": 1,
+          "percentage": 10
         }
       },
       "author": {
@@ -70,7 +71,8 @@
       "interval": 1200000000000
     },
     "score": {
-      "marked_score": 80
+      "marked_score": 80,
+      "penalty": 0
     },
     "rationale": {
       "descriptive_comment": "comment3"
@@ -107,7 +109,8 @@
       "interval": 1200000000000
     },
     "score": {
-      "marked_score": 70
+      "marked_score": 70,
+      "penalty": 0
     },
     "rationale": {
       "descriptive_comment": "comment2"

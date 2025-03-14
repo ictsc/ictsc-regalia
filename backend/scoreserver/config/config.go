@@ -26,6 +26,7 @@ type (
 		APITokenSource oauth2.TokenSource
 
 		DeploymentSync DeploySync
+		ScoreUpdate    ScoreUpdate
 	}
 	DeploySync struct {
 		Period time.Duration
@@ -37,6 +38,9 @@ type (
 		InsecureSkipVerify bool
 		User               string
 		Password           string
+	}
+	ScoreUpdate struct {
+		Period time.Duration
 	}
 )
 

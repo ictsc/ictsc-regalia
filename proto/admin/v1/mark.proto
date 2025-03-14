@@ -103,10 +103,14 @@ message CreateMarkingResultResponse {
 message UpdateMarkingResultVisibilitiesRequest {}
 message UpdateMarkingResultVisibilitiesResponse {}
 
+message UpdateScoresRequest {}
+message UpdateScoresResponse {}
+
 service MarkService {
   rpc ListAnswers(ListAnswersRequest) returns (ListAnswersResponse);
   rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
   rpc ListMarkingResults(ListMarkingResultsRequest) returns (ListMarkingResultsResponse);
   rpc CreateMarkingResult(CreateMarkingResultRequest) returns (CreateMarkingResultResponse);
   rpc UpdateMarkingResultVisibilities(UpdateMarkingResultVisibilitiesRequest) returns (UpdateMarkingResultVisibilitiesResponse);
+  rpc UpdateScores(UpdateScoresRequest) returns (UpdateScoresResponse);
 }

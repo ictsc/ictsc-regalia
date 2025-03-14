@@ -91,6 +91,13 @@ func (a *Answer) Problem() *Problem {
 	return a.problem
 }
 
+func (a *Answer) TeamProblem() *TeamProblem {
+	return &TeamProblem{
+		team:    a.team,
+		problem: a.problem,
+	}
+}
+
 func (a *Answer) Author() *TeamMember {
 	return &TeamMember{
 		user: a.author,

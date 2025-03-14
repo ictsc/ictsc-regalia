@@ -8,6 +8,8 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/gofrs/uuid/v5"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -20,6 +22,7 @@ SELECT
 	mr.id, mr.judge_name, mr.created_at,
 	` + answerViewColumns.As("answer") + `,
 	score.marked_score AS "score.marked_score",
+	score.penalty AS "score.penalty",
 	dr.rationale AS "rationale.descriptive_comment"
 FROM marking_results AS mr
 INNER JOIN answer_view AS answer ON mr.answer_id = answer.id
@@ -39,6 +42,7 @@ type (
 	}
 	scoreRow struct {
 		MarkedScore uint32 `db:"marked_score"`
+		Penalty     uint32 `db:"penalty"`
 	}
 	rationaleRow struct {
 		DescriptiveComment sql.NullString `db:"descriptive_comment"`
@@ -84,6 +88,8 @@ func (r *repo) ListMarkingResults(ctx context.Context) ([]*domain.MarkingResultD
 	return markingResults, nil
 }
 
+var _ domain.MarkingResultWriter = (*RepositoryTx)(nil)
+
 func (r *RepositoryTx) CreateMarkingResult(ctx context.Context, data *domain.MarkingResultData) error {
 	ctx, span := tracer.Start(ctx, "CreateMarkingResult")
 	defer span.End()
@@ -117,5 +123,22 @@ func (r *RepositoryTx) CreateMarkingResult(ctx context.Context, data *domain.Mar
 		}
 	}
 
+	return nil
+}
+
+func (r *repo) UpdatePenalty(ctx context.Context, id uuid.UUID, penalty uint32) error {
+	ctx, span := tracer.Start(ctx, "UpdatePenalty", trace.WithAttributes(
+		attribute.String("marking_result_id", id.String()),
+		attribute.Int64("penalty", int64(penalty)),
+	))
+	defer span.End()
+
+	if _, err := r.ext.ExecContext(
+		ctx,
+		"UPDATE scores SET penalty = $1 WHERE marking_result_id = $2",
+		penalty, id,
+	); err != nil {
+		return errors.Wrap(err, "failed to update penalty")
+	}
 	return nil
 }

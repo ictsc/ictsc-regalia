@@ -16,10 +16,6 @@ type (
 		judge     string
 		createdAt time.Time
 	}
-	Score struct {
-		max    uint32
-		marked uint32
-	}
 	MarkingRationale struct {
 		problemType ProblemType
 		descriptive *DescriptiveMarkingRaionale
@@ -49,20 +45,8 @@ func (m *MarkingResult) CreatedAt() time.Time {
 	return m.createdAt
 }
 
-func (m *Score) MarkedScore() uint32 {
-	return m.marked
-}
-
-func (m *Score) MaxScore() uint32 {
-	return m.max
-}
-
-func (m *Score) Penalty() uint32 {
-	return 0 // 現状は再展開がないので0
-}
-
-func (m *Score) TotalScore() uint32 {
-	return max(0, m.MarkedScore()-m.Penalty())
+func (m *MarkingResult) IsPublic(now time.Time) bool {
+	return now.After(m.answer.createdAt.Add(AnswerInterval))
 }
 
 func (m *MarkingRationale) Type() ProblemType {
@@ -95,6 +79,70 @@ func ListAllMarkingResults(ctx context.Context, eff MarkingResultReader) ([]*Mar
 		markingResults = append(markingResults, markingResult)
 	}
 	return markingResults, nil
+}
+
+type MarkingResultUpdatePenaltyEffect interface {
+	MarkingResultPenaltyUpdator
+	DeploymentReader
+}
+
+func (m *MarkingResult) UpdatePenalty(ctx context.Context, eff MarkingResultUpdatePenaltyEffect) error {
+	deploymentRevision, err := m.Answer().TeamProblem().
+		FinishedDeploymentCountAt(ctx, eff, m.Answer().CreatedAt())
+	if err != nil {
+		return err
+	}
+	penalty := m.Answer().Problem().Penalty(uint32(deploymentRevision)) //nolint:gosec
+	if m.Score().Penalty() != penalty {
+		if err := eff.UpdatePenalty(ctx, m.id, penalty); err != nil {
+			return WrapAsInternal(err, "failed to update penalty")
+		}
+		m.Score().penalty = penalty
+	}
+	return nil
+}
+
+func (a *Answer) latestMarkingResult(ctx context.Context, eff MarkingResultReader) (*MarkingResult, error) {
+	results, err := ListAllMarkingResults(ctx, eff)
+	if err != nil {
+		return nil, err
+	}
+	var latest *MarkingResult
+	for _, result := range results {
+		if result.Answer().id != a.id {
+			continue
+		}
+		if latest == nil || result.CreatedAt().After(latest.CreatedAt()) {
+			latest = result
+		}
+	}
+	if latest == nil {
+		return nil, NewNotFoundError("marking result for answer", nil)
+	}
+	return latest, nil
+}
+
+func (a *Answer) latestPublicMarkingResult(ctx context.Context, eff MarkingResultReader, now time.Time) (*MarkingResult, error) {
+	results, err := ListAllMarkingResults(ctx, eff)
+	if err != nil {
+		return nil, err
+	}
+	var latest *MarkingResult
+	for _, result := range results {
+		if result.Answer().id != a.id {
+			continue
+		}
+		if !result.IsPublic(now) {
+			continue
+		}
+		if latest == nil || result.CreatedAt().After(latest.CreatedAt()) {
+			latest = result
+		}
+	}
+	if latest == nil {
+		return nil, NewNotFoundError("marking result for answer", nil)
+	}
+	return latest, nil
 }
 
 type MarkInput struct {
@@ -141,9 +189,6 @@ type (
 		Rationale *MarkingRationaleData `json:"rationale"`
 		CreatedAt time.Time             `json:"created_at"`
 	}
-	ScoreData struct {
-		MarkedScore uint32 `json:"marked_score"`
-	}
 	MarkingRationaleData struct {
 		DescriptiveComment string `json:"descriptive_comment,omitempty"`
 	}
@@ -151,8 +196,12 @@ type (
 	MarkingResultReader interface {
 		ListMarkingResults(ctx context.Context) ([]*MarkingResultData, error)
 	}
+	MarkingResultPenaltyUpdator interface {
+		UpdatePenalty(ctx context.Context, id uuid.UUID, penalty uint32) error
+	}
 	MarkingResultWriter interface {
 		CreateMarkingResult(ctx context.Context, m *MarkingResultData) error
+		MarkingResultPenaltyUpdator
 	}
 )
 
@@ -198,16 +247,6 @@ func (m *MarkingResultData) parse() (*MarkingResult, error) {
 		score:     score,
 		rationale: rationale,
 		createdAt: m.CreatedAt,
-	}, nil
-}
-
-func (s *ScoreData) parse(problem *Problem) (*Score, error) {
-	if s.MarkedScore > problem.MaxScore() {
-		return nil, NewInvalidArgumentError("marked score is over max score", nil)
-	}
-	return &Score{
-		max:    problem.maxScore,
-		marked: s.MarkedScore,
 	}, nil
 }
 

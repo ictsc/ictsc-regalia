@@ -57,6 +57,9 @@ func newConfig(opts *CLIOption) (*config.Batch, error) {
 				Password:           sstatePassword,
 			},
 		},
+		ScoreUpdate: config.ScoreUpdate{
+			Period: opts.ScoreUpdatePeriod,
+		},
 	}, nil
 }
 

@@ -25,7 +25,8 @@
     "created_at": "2025-02-03T09:00:00+09:00",
     "interval": 1200000000000,
     "score": {
-      "marked_score": 70
+      "marked_score": 70,
+      "penalty": 0
     }
   },
   {
