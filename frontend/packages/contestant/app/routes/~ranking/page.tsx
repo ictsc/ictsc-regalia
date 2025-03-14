@@ -81,7 +81,7 @@ export function RankingPage(props: RankingProps) {
                   </span>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row w-full min-w-[300px] max-w-[650px] sm:items-center justify-center gap-16 rounded-16 px-20 py-24 shadow-lg">
+              <div className="flex w-full min-w-[300px] max-w-[650px] flex-col justify-center gap-16 rounded-16 px-20 py-24 shadow-lg sm:flex-row sm:items-center">
                 <div className="flex flex-1 flex-col justify-self-center overflow-hidden">
                   <p className="text-14">チーム名</p>
                   <p
