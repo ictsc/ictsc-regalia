@@ -94,6 +94,92 @@ func (a *Answer) updatePrivateScore(ctx context.Context, eff UpdateAnswerScoreEf
 	return nil
 }
 
+type UpdateProblemScoreEffect interface {
+	AnswerReader
+	MarkingResultReader
+	ScoreWriter
+}
+
+func (tp *TeamProblem) UpdateScore(ctx context.Context, eff UpdateProblemScoreEffect) error {
+	var errs []error
+	if err := tp.updatePrivateScore(ctx, eff); err != nil {
+		errs = append(errs, err)
+	}
+	if err := tp.updatePublicScore(ctx, eff); err != nil {
+		errs = append(errs, err)
+	}
+	return errors.Join(errs...)
+}
+
+func (tp *TeamProblem) updatePrivateScore(ctx context.Context, eff UpdateProblemScoreEffect) error {
+	answers, err := tp.answersForAdmin(ctx, eff)
+	if err != nil {
+		return err
+	}
+
+	updates, err := tp.problemUpdate(answers)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			return nil
+		}
+		return err
+	}
+
+	if err := eff.UpdatePrivateProblemScore(ctx, updates); err != nil {
+		return WrapAsInternal(err, "failed to update problem score")
+	}
+
+	return nil
+}
+
+func (tp *TeamProblem) updatePublicScore(ctx context.Context, eff UpdateProblemScoreEffect) error {
+	answers, err := tp.answersForPublic(ctx, eff)
+	if err != nil {
+		return err
+	}
+
+	updates, err := tp.problemUpdate(answers)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			return nil
+		}
+		return err
+	}
+
+	if err := eff.UpdatePublicProblemScore(ctx, updates); err != nil {
+		return WrapAsInternal(err, "failed to update problem score")
+	}
+
+	return nil
+}
+
+func (tp *TeamProblem) problemUpdate(answers []*Answer) (*UpdateProblemScoreInput, error) {
+	slices.SortFunc(answers, func(a, b *Answer) int {
+		return a.CreatedAt().Compare(b.CreatedAt())
+	})
+
+	var scoredAnswer *Answer
+	for _, answer := range answers {
+		score := answer.Score()
+		if score == nil {
+			continue // non-scored answer
+		}
+		if scoredAnswer == nil || answer.Score().TotalScore() > scoredAnswer.Score().TotalScore() {
+			scoredAnswer = answer
+		}
+	}
+	if scoredAnswer == nil {
+		return nil, NewNotFoundError("scored answer", nil)
+	}
+
+	return &UpdateProblemScoreInput{
+		TeamID:          uuid.UUID(tp.Team().teamID),
+		ProblemID:       uuid.UUID(tp.problemID),
+		MarkingResultID: scoredAnswer.Score().markingResultID,
+		UpdateSubmitAt:  scoredAnswer.CreatedAt(),
+	}, nil
+}
+
 type (
 	ScoreData struct {
 		MarkingResultID uuid.UUID `json:"marking_result_id"`
@@ -105,9 +191,17 @@ type (
 		AnswerID        uuid.UUID
 		MarkingResultID uuid.UUID
 	}
+	UpdateProblemScoreInput struct {
+		TeamID          uuid.UUID
+		ProblemID       uuid.UUID
+		MarkingResultID uuid.UUID
+		UpdateSubmitAt  time.Time
+	}
 	ScoreWriter interface {
 		UpdatePrivateAnswerScore(ctx context.Context, input *UpdateAnswerScoreInput) error
 		UpdatePublicAnswerScore(ctx context.Context, input *UpdateAnswerScoreInput) error
+		UpdatePrivateProblemScore(ctx context.Context, input *UpdateProblemScoreInput) error
+		UpdatePublicProblemScore(ctx context.Context, input *UpdateProblemScoreInput) error
 	}
 )
 

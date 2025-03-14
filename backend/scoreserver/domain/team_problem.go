@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"log/slog"
 	"slices"
 
 	"github.com/gofrs/uuid/v5"
@@ -26,6 +27,31 @@ type (
 		MaxScore    uint32    `db:"max_score"`
 	}
 )
+
+type TeamProblemReader interface {
+	TeamsLister
+	ProblemReader
+}
+
+func ListTeamProblems(ctx context.Context, eff TeamProblemReader) ([]*TeamProblem, error) {
+	teams, err := ListTeams(ctx, eff)
+	if err != nil {
+		return nil, err
+	}
+	slog.DebugContext(ctx, "teams listed", "count", len(teams))
+
+	teamProblems := make([]*TeamProblem, 0)
+	for _, team := range teams {
+		tps, err := team.Problems(ctx, eff)
+		if err != nil {
+			return nil, err
+		}
+		slog.DebugContext(ctx, "problems listed", "team", team.Code(), "count", len(tps))
+		teamProblems = append(teamProblems, tps...)
+	}
+
+	return teamProblems, nil
+}
 
 func (t *Team) Problems(ctx context.Context, eff ProblemReader) ([]*TeamProblem, error) {
 	problems, err := ListProblems(ctx, eff)

@@ -15,6 +15,8 @@ type UpdateScoreEffect interface {
 	domain.DeploymentReader
 	domain.AnswerReader
 	domain.UpdateAnswerScoreEffect
+	domain.TeamProblemReader
+	domain.UpdateProblemScoreEffect
 }
 
 func newUpdateScoreEffect(repo *pg.Repository) UpdateScoreEffect {
@@ -47,13 +49,15 @@ func UpdateScore(
 		domain.ScoreWriter
 
 		domain.AnswerReader
+		domain.TeamProblemReader
 	}{
 		MarkingResultReader:         cachedMarkReader,
 		DeploymentReader:            cachedDeployReader,
 		MarkingResultPenaltyUpdator: eff,
 		ScoreWriter:                 eff,
 
-		AnswerReader: eff,
+		AnswerReader:      eff,
+		TeamProblemReader: eff,
 	}
 	return updateScore(ctx, innerEff, now)
 }
@@ -77,6 +81,18 @@ func updateScore(ctx context.Context, eff UpdateScoreEffect, now time.Time) (*Up
 	}
 	for _, answer := range answers {
 		if err := answer.UpdateScore(ctx, eff, now); err != nil {
+			return nil, err
+		}
+	}
+
+	slog.InfoContext(ctx, "Update problem scores")
+	teamProblems, err := domain.ListTeamProblems(ctx, eff)
+	if err != nil {
+		return nil, err
+	}
+	slog.DebugContext(ctx, "Update team problems", "count", len(teamProblems))
+	for _, teamProblem := range teamProblems {
+		if err := teamProblem.UpdateScore(ctx, eff); err != nil {
 			return nil, err
 		}
 	}
