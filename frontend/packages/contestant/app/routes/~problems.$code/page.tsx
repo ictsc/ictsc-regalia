@@ -1,4 +1,11 @@
-import { type ReactNode, Suspense, use, useReducer } from "react";
+import {
+  type ReactNode,
+  startTransition,
+  Suspense,
+  use,
+  useReducer,
+  useState,
+} from "react";
 import {
   Button,
   Tab,
@@ -126,8 +133,19 @@ function Sidebar(props: {
   redeployable: boolean;
   onChange?: () => void;
 }) {
+  const [tabIndex, setTabIndex] = useState(0);
+  const onChange = (index: number) => {
+    startTransition(() => {
+      setTabIndex(index);
+      if (props.onChange) props.onChange();
+    });
+  };
   return (
-    <TabGroup onChange={props.onChange} className="flex flex-1 flex-col">
+    <TabGroup
+      tabIndex={tabIndex}
+      onChange={onChange}
+      className="flex flex-1 flex-col"
+    >
       <TabList className="flex flex-row gap-4">
         <SidebarTab>新規解答</SidebarTab>
         <SidebarTab>解答一覧</SidebarTab>

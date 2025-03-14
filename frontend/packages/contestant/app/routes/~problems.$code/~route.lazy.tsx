@@ -1,18 +1,17 @@
 import {
   startTransition,
-  Suspense,
   use,
   useActionState,
   useDeferredValue,
   useOptimistic,
 } from "react";
 import { createLazyFileRoute, useRouter } from "@tanstack/react-router";
+import { DeploymentStatus } from "@ictsc/proto/contestant/v1";
 import type { ProblemDetail } from "../../features/problem";
 import type { Answer } from "../../features/answer";
 import { protoScoreToProps } from "../../features/score";
+import type { Deployment } from "../../features/deployment";
 import * as View from "./page";
-import { Deployment } from "@app/features/deployment";
-import { DeploymentStatus } from "@ictsc/proto/contestant/v1";
 
 export const Route = createLazyFileRoute("/problems/$code")({
   component: RouteComponent,
@@ -54,22 +53,18 @@ function RouteComponent() {
         />
       }
       submissionList={
-        <Suspense>
-          <SubmissionList
-            isPending={deferredAnswers !== answers}
-            problemPromise={problem}
-            answersPromise={deferredAnswers}
-          />
-        </Suspense>
+        <SubmissionList
+          isPending={deferredAnswers !== answers}
+          problemPromise={problem}
+          answersPromise={deferredAnswers}
+        />
       }
       deploymentList={
-        <Suspense>
-          <Deployments
-            isPending={deferredDeployments !== deployments}
-            deployments={deferredDeployments}
-            deploy={deploy}
-          />
-        </Suspense>
+        <Deployments
+          isPending={deferredDeployments !== deployments}
+          deployments={deferredDeployments}
+          deploy={deploy}
+        />
       }
     />
   );
@@ -92,9 +87,6 @@ function SubmissionList(props: {
 }) {
   const problem = use(useDeferredValue(props.problemPromise));
   const answers = use(props.answersPromise);
-  if (answers.length === 0) {
-    return <View.EmptySubmissionList />;
-  }
   return (
     <View.SubmissionListContainer>
       {answers.length === 0 ? (
