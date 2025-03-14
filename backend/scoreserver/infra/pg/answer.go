@@ -74,6 +74,24 @@ ORDER BY answer.number DESC
 LIMIT 1`, teamID, problemID)
 }
 
+func (r *repo) GetAnswerDetailForPublic(
+	ctx context.Context, teamCode int64, problemCode string, answerNumber uint32,
+) (*domain.AnswerDetailData, error) {
+	ctx, span := tracer.Start(ctx, "GetAnswerDetailForPublic")
+	defer span.End()
+	return r.getAnswerDetail(ctx, `
+SELECT
+	`+answerViewColumns.String("answer")+`,
+	`+scoreColumns.As("score")+`,
+	descriptive.body AS "descriptive.body"
+FROM answer_view AS answer
+LEFT JOIN latest_public_marking_result_ids AS lm ON lm.answer_id = answer.id
+LEFT JOIN scores AS score ON score.marking_result_id = lm.id
+LEFT JOIN descriptive_answers AS descriptive ON descriptive.answer_id = answer.id
+WHERE answer."team.code" = $1 AND answer."problem.code" = $2 AND answer.number = $3
+LIMIT 1`, teamCode, problemCode, answerNumber)
+}
+
 func (r *repo) GetAnswerDetailForAdmin(
 	ctx context.Context, teamCode int64, problemCode string, answerNumber uint32,
 ) (*domain.AnswerDetailData, error) {

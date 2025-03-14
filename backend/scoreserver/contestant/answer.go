@@ -21,6 +21,7 @@ type AnswerServiceHandler struct {
 	Enforcer *ScheduleEnforcer
 
 	ListEffect   ListAnswersEffect
+	GetEffect    GetAnswerEffect
 	SubmitEffect SubmitAnswerEffect
 }
 
@@ -31,6 +32,7 @@ func newAnswerServiceHandler(enforcer *ScheduleEnforcer, repo *pg.Repository) *A
 		Enforcer: enforcer,
 
 		ListEffect: repo,
+		GetEffect:  repo,
 		SubmitEffect: struct {
 			domain.TeamMemberGetter
 			domain.ProblemReader
@@ -97,6 +99,57 @@ func (h *AnswerServiceHandler) ListAnswers(
 	}
 	if latestSubmitTime != (time.Time{}) {
 		resp.LastSubmittedAt = timestamppb.New(latestSubmitTime)
+	}
+
+	return connect.NewResponse(resp), nil
+}
+
+type GetAnswerEffect interface {
+	domain.TeamMemberGetter
+	domain.AnswerReader
+}
+
+func (h *AnswerServiceHandler) GetAnswer(
+	ctx context.Context,
+	req *connect.Request[contestantv1.GetAnswerRequest],
+) (*connect.Response[contestantv1.GetAnswerResponse], error) {
+	userSess, err := session.UserSessionStore.Get(ctx)
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
+		}
+		return nil, err
+	}
+	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
+		return nil, err
+	}
+
+	teamMember, err := domain.UserID(userSess.UserID).TeamMember(ctx, h.ListEffect)
+	if err != nil {
+		return nil, err
+	}
+
+	protoProblemCode := req.Msg.GetProblemCode()
+	if protoProblemCode == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("problem_code is required"))
+	}
+	problemCode, err := domain.NewProblemCode(protoProblemCode)
+	if err != nil {
+		return nil, err
+	}
+
+	answerDetail, err := domain.GetAnswerDetailForPublic(ctx, h.ListEffect, teamMember.Team().Code(), problemCode, req.Msg.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	protoAnswer, err := convertAnswerDetail(answerDetail)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &contestantv1.GetAnswerResponse{
+		Answer: protoAnswer,
 	}
 
 	return connect.NewResponse(resp), nil

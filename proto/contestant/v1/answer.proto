@@ -44,7 +44,16 @@ message SubmitAnswerResponse {
   Answer answer = 1;
 }
 
+message GetAnswerRequest {
+  string problem_code = 1;
+  uint32 id = 2;
+}
+message GetAnswerResponse {
+  Answer answer = 1;
+}
+
 service AnswerService {
   rpc ListAnswers(ListAnswersRequest) returns (ListAnswersResponse);
   rpc SubmitAnswer(SubmitAnswerRequest) returns (SubmitAnswerResponse);
+  rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
 }

@@ -162,13 +162,15 @@ type (
 	listAnswersByTeamProblemForPublicFunc     func(ctx context.Context, teamCode int64, problemCode string) ([]*domain.AnswerData, error)
 	getLatestAnswerByTeamProblemForPublicFunc func(ctx context.Context, teamID, problemID uuid.UUID) (*domain.AnswerData, error)
 
-	getAnswerDetailForAdminFunc func(ctx context.Context, teamCode int64, problemCode string, answerNumber uint32) (*domain.AnswerDetailData, error)
-	createAnswerFunc            func(ctx context.Context, data *domain.AnswerDetailData) error
+	getAnswerDetailForAdminFunc  func(ctx context.Context, teamCode int64, problemCode string, answerNumber uint32) (*domain.AnswerDetailData, error)
+	getAnswerDetailForPublicFunc func(ctx context.Context, teamCode int64, problemCode string, answerNumber uint32) (*domain.AnswerDetailData, error)
+	createAnswerFunc             func(ctx context.Context, data *domain.AnswerDetailData) error
 
 	answerReader struct {
 		listAnswersForAdminFunc
 		listAnswersByTeamProblemForAdminFunc
 		listAnswersByTeamProblemForPublicFunc
+		getAnswerDetailForPublicFunc
 		getAnswerDetailForAdminFunc
 	}
 	answerWriter struct {
@@ -202,6 +204,13 @@ func (f getLatestAnswerByTeamProblemForPublicFunc) GetLatestAnswerByTeamProblemF
 	ctx context.Context, teamID, problemID uuid.UUID,
 ) (*domain.AnswerData, error) {
 	return f(ctx, teamID, problemID)
+}
+
+func (f getAnswerDetailForPublicFunc) GetAnswerDetailForPublic(
+	ctx context.Context,
+	teamCode int64, problemCode string, answerNumber uint32,
+) (*domain.AnswerDetailData, error) {
+	return f(ctx, teamCode, problemCode, answerNumber)
 }
 
 func (f getAnswerDetailForAdminFunc) GetAnswerDetailForAdmin(

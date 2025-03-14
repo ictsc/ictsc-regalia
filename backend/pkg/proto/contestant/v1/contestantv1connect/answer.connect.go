@@ -39,12 +39,15 @@ const (
 	// AnswerServiceSubmitAnswerProcedure is the fully-qualified name of the AnswerService's
 	// SubmitAnswer RPC.
 	AnswerServiceSubmitAnswerProcedure = "/contestant.v1.AnswerService/SubmitAnswer"
+	// AnswerServiceGetAnswerProcedure is the fully-qualified name of the AnswerService's GetAnswer RPC.
+	AnswerServiceGetAnswerProcedure = "/contestant.v1.AnswerService/GetAnswer"
 )
 
 // AnswerServiceClient is a client for the contestant.v1.AnswerService service.
 type AnswerServiceClient interface {
 	ListAnswers(context.Context, *connect.Request[v1.ListAnswersRequest]) (*connect.Response[v1.ListAnswersResponse], error)
 	SubmitAnswer(context.Context, *connect.Request[v1.SubmitAnswerRequest]) (*connect.Response[v1.SubmitAnswerResponse], error)
+	GetAnswer(context.Context, *connect.Request[v1.GetAnswerRequest]) (*connect.Response[v1.GetAnswerResponse], error)
 }
 
 // NewAnswerServiceClient constructs a client for the contestant.v1.AnswerService service. By
@@ -70,6 +73,12 @@ func NewAnswerServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(answerServiceMethods.ByName("SubmitAnswer")),
 			connect.WithClientOptions(opts...),
 		),
+		getAnswer: connect.NewClient[v1.GetAnswerRequest, v1.GetAnswerResponse](
+			httpClient,
+			baseURL+AnswerServiceGetAnswerProcedure,
+			connect.WithSchema(answerServiceMethods.ByName("GetAnswer")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -77,6 +86,7 @@ func NewAnswerServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 type answerServiceClient struct {
 	listAnswers  *connect.Client[v1.ListAnswersRequest, v1.ListAnswersResponse]
 	submitAnswer *connect.Client[v1.SubmitAnswerRequest, v1.SubmitAnswerResponse]
+	getAnswer    *connect.Client[v1.GetAnswerRequest, v1.GetAnswerResponse]
 }
 
 // ListAnswers calls contestant.v1.AnswerService.ListAnswers.
@@ -89,10 +99,16 @@ func (c *answerServiceClient) SubmitAnswer(ctx context.Context, req *connect.Req
 	return c.submitAnswer.CallUnary(ctx, req)
 }
 
+// GetAnswer calls contestant.v1.AnswerService.GetAnswer.
+func (c *answerServiceClient) GetAnswer(ctx context.Context, req *connect.Request[v1.GetAnswerRequest]) (*connect.Response[v1.GetAnswerResponse], error) {
+	return c.getAnswer.CallUnary(ctx, req)
+}
+
 // AnswerServiceHandler is an implementation of the contestant.v1.AnswerService service.
 type AnswerServiceHandler interface {
 	ListAnswers(context.Context, *connect.Request[v1.ListAnswersRequest]) (*connect.Response[v1.ListAnswersResponse], error)
 	SubmitAnswer(context.Context, *connect.Request[v1.SubmitAnswerRequest]) (*connect.Response[v1.SubmitAnswerResponse], error)
+	GetAnswer(context.Context, *connect.Request[v1.GetAnswerRequest]) (*connect.Response[v1.GetAnswerResponse], error)
 }
 
 // NewAnswerServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -114,12 +130,20 @@ func NewAnswerServiceHandler(svc AnswerServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(answerServiceMethods.ByName("SubmitAnswer")),
 		connect.WithHandlerOptions(opts...),
 	)
+	answerServiceGetAnswerHandler := connect.NewUnaryHandler(
+		AnswerServiceGetAnswerProcedure,
+		svc.GetAnswer,
+		connect.WithSchema(answerServiceMethods.ByName("GetAnswer")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/contestant.v1.AnswerService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AnswerServiceListAnswersProcedure:
 			answerServiceListAnswersHandler.ServeHTTP(w, r)
 		case AnswerServiceSubmitAnswerProcedure:
 			answerServiceSubmitAnswerHandler.ServeHTTP(w, r)
+		case AnswerServiceGetAnswerProcedure:
+			answerServiceGetAnswerHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -135,4 +159,8 @@ func (UnimplementedAnswerServiceHandler) ListAnswers(context.Context, *connect.R
 
 func (UnimplementedAnswerServiceHandler) SubmitAnswer(context.Context, *connect.Request[v1.SubmitAnswerRequest]) (*connect.Response[v1.SubmitAnswerResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.AnswerService.SubmitAnswer is not implemented"))
+}
+
+func (UnimplementedAnswerServiceHandler) GetAnswer(context.Context, *connect.Request[v1.GetAnswerRequest]) (*connect.Response[v1.GetAnswerResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.AnswerService.GetAnswer is not implemented"))
 }
