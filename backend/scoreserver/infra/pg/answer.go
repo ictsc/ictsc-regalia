@@ -24,8 +24,9 @@ SELECT
 	`+answerViewColumns.String("answer")+`,
 	`+scoreColumns.As("score")+`
 FROM answer_view AS answer
-LEFT JOIN latest_marking_result_ids AS lm ON lm.answer_id = answer.id
-LEFT JOIN scores AS score ON score.marking_result_id = lm.id
+LEFT JOIN answer_scores AS answer_score
+	ON answer_score.answer_id = answer.id AND answer_score.visibility = 'PRIVATE'
+LEFT JOIN scores AS score ON score.marking_result_id = answer_score.marking_result_id
 ORDER BY answer.created_at ASC`)
 }
 
@@ -37,8 +38,9 @@ SELECT
 	`+answerViewColumns.String("answer")+`,
 	`+scoreColumns.As("score")+`
 FROM answer_view AS answer
-LEFT JOIN latest_marking_result_ids AS lm ON lm.answer_id = answer.id
-LEFT JOIN scores AS score ON score.marking_result_id = lm.id
+LEFT JOIN answer_scores AS answer_score
+	ON answer_score.answer_id = answer.id AND answer_score.visibility = 'PRIVATE'
+LEFT JOIN scores AS score ON score.marking_result_id = answer_score.marking_result_id
 WHERE answer."team.code" = $1 AND answer."problem.code" = $2
 ORDER BY answer.number ASC`,
 		teamCode, problemCode)
@@ -52,8 +54,9 @@ SELECT
 	`+answerViewColumns.String("answer")+`,
 	`+scoreColumns.As("score")+`
 FROM answer_view AS answer
-LEFT JOIN latest_public_marking_result_ids AS lm ON lm.answer_id = answer.id
-LEFT JOIN scores AS score ON score.marking_result_id = lm.id
+LEFT JOIN answer_scores AS answer_score
+	ON answer_score.answer_id = answer.id AND answer_score.visibility = 'PUBLIC'
+LEFT JOIN scores AS score ON score.marking_result_id = answer_score.marking_result_id
 WHERE answer."team.code" = $1 AND answer."problem.code" = $2
 ORDER BY answer.number ASC`,
 		teamCode, problemCode)
@@ -67,8 +70,9 @@ SELECT
 	`+answerViewColumns.String("answer")+`,
 	`+scoreColumns.As("score")+`
 FROM answer_view AS answer
-LEFT JOIN latest_public_marking_result_ids AS lm ON lm.answer_id = answer.id
-LEFT JOIN scores AS score ON score.marking_result_id = lm.id
+LEFT JOIN answer_scores AS answer_score
+	ON answer_score.answer_id = answer.id AND answer_score.visibility = 'PUBLIC'
+LEFT JOIN scores AS score ON score.marking_result_id = answer_score.marking_result_id
 WHERE answer."team.id" = $1 AND answer."problem.id" = $2
 ORDER BY answer.number DESC
 LIMIT 1`, teamID, problemID)
@@ -103,8 +107,9 @@ SELECT
 	`+scoreColumns.As("score")+`,
 	descriptive.body AS "descriptive.body"
 FROM answer_view AS answer
-LEFT JOIN latest_marking_result_ids AS lm ON lm.answer_id = answer.id
-LEFT JOIN scores AS score ON score.marking_result_id = lm.id
+LEFT JOIN answer_scores AS answer_score
+	ON answer_score.answer_id = answer.id AND answer_score.visibility = 'PRIVATE'
+LEFT JOIN scores AS score ON score.marking_result_id = answer_score.marking_result_id
 LEFT JOIN descriptive_answers AS descriptive ON descriptive.answer_id = answer.id
 WHERE answer."team.code" = $1 AND answer."problem.code" = $2 AND answer.number = $3
 LIMIT 1`, teamCode, problemCode, answerNumber)
@@ -173,6 +178,7 @@ type (
 	answerWithScoreRow struct {
 		answerRow
 		MarkedScore sql.Null[uint32] `db:"score.marked_score"`
+		Penalty     sql.Null[uint32] `db:"score.penalty"`
 	}
 	answerDetailRow struct {
 		answerWithScoreRow
@@ -188,7 +194,7 @@ var (
 		"problem_rpp.threshold", "problem_rpp.percentage",
 		"author.id", "author.name",
 	})
-	scoreColumns = columns([]string{"marked_score"})
+	scoreColumns = columns([]string{"marked_score", "penalty"})
 )
 
 func (r answerRow) data() *domain.AnswerData {
@@ -202,8 +208,11 @@ func (r answerRow) data() *domain.AnswerData {
 
 func (r answerWithScoreRow) data() *domain.AnswerData {
 	answer := r.answerRow.data()
-	if r.MarkedScore.Valid {
-		answer.Score = &domain.ScoreData{MarkedScore: r.MarkedScore.V}
+	if r.MarkedScore.Valid && r.Penalty.Valid {
+		answer.Score = &domain.ScoreData{
+			MarkedScore: r.MarkedScore.V,
+			Penalty:     r.Penalty.V,
+		}
 	}
 	return answer
 }

@@ -62,17 +62,24 @@ INSERT INTO marking_results (id, answer_id, judge_name, visibility, created_at) 
 	('358ebef7-c626-44fa-9a3d-da2d9083fe5e', '7cedf13e-5325-425e-a5d6-fea5fc127e49', 'judge', 'PRIVATE', '2025-02-03 01:30:00+00'),
 	('87cb974d-dedd-4039-a189-b34f3a57e62c', 'abbe9c4e-eef5-40ac-a04e-6d8877b15185', 'judge', 'PUBLIC',  '2025-02-03 01:20:00+00');
 
+TRUNCATE TABLE descriptive_marking_rationales CASCADE;
+INSERT INTO descriptive_marking_rationales (marking_result_id, rationale) VALUES
+	('862b646a-5fdd-4a77-bb2d-7ef5d4f1d069', 'comment'),
+	('358ebef7-c626-44fa-9a3d-da2d9083fe5e', 'comment2'),
+	('87cb974d-dedd-4039-a189-b34f3a57e62c', 'comment3');
+
 TRUNCATE TABLE scores CASCADE;
 INSERT INTO scores (marking_result_id, marked_score) VALUES
 	('862b646a-5fdd-4a77-bb2d-7ef5d4f1d069', 80),
 	('358ebef7-c626-44fa-9a3d-da2d9083fe5e', 70),
 	('87cb974d-dedd-4039-a189-b34f3a57e62c', 80);
 
-TRUNCATE TABLE descriptive_marking_rationales CASCADE;
-INSERT INTO descriptive_marking_rationales (marking_result_id, rationale) VALUES
-	('862b646a-5fdd-4a77-bb2d-7ef5d4f1d069', 'comment'),
-	('358ebef7-c626-44fa-9a3d-da2d9083fe5e', 'comment2'),
-	('87cb974d-dedd-4039-a189-b34f3a57e62c', 'comment3');
+TRUNCATE TABLE answer_scores CASCADE;
+INSERT INTO answer_scores (answer_id, visibility, marking_result_id) VALUES
+	('7cedf13e-5325-425e-a5d6-fea5fc127e49', 'PRIVATE', '358ebef7-c626-44fa-9a3d-da2d9083fe5e'),
+	('7cedf13e-5325-425e-a5d6-fea5fc127e49', 'PUBLIC', '862b646a-5fdd-4a77-bb2d-7ef5d4f1d069'),
+	('abbe9c4e-eef5-40ac-a04e-6d8877b15185', 'PRIVATE', '87cb974d-dedd-4039-a189-b34f3a57e62c'),
+	('abbe9c4e-eef5-40ac-a04e-6d8877b15185', 'PUBLIC', '87cb974d-dedd-4039-a189-b34f3a57e62c');
 
 TRUNCATE TABLE notices CASCADE;
 INSERT INTO notices (slug, title, markdown, effective_from) VALUES

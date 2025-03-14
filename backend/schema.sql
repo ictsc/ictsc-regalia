@@ -175,6 +175,28 @@ COMMENT ON COLUMN scores.marked_score IS '採点による得点';
 COMMENT ON COLUMN scores.penalty IS 'ペナルティ';
 COMMENT ON COLUMN scores.redeploy_count IS '再展開回数(ペナルティの計算根拠)';
 
+CREATE TABLE answer_scores (
+	answer_id UUID NOT NULL REFERENCES answers(id) ON DELETE CASCADE,
+	visibility marking_result_visilibity NOT NULL DEFAULT 'PRIVATE',
+	PRIMARY KEY (answer_id, visibility),
+	marking_result_id UUID NOT NULL REFERENCES marking_results(id) ON DELETE CASCADE
+);
+
+CREATE TABLE problem_scores (
+	team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+	problem_id UUID NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
+	visibility marking_result_visilibity NOT NULL DEFAULT 'PRIVATE',
+	PRIMARY KEY (team_id, problem_id, visibility),
+	marking_result_id UUID NOT NULL REFERENCES marking_results(id) ON DELETE CASCADE,
+	updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE team_scores (
+	team_id UUID PRIMARY KEY REFERENCES teams(id) ON DELETE CASCADE,
+	total_score INT NOT NULL CHECK (total_score >= 0) DEFAULT 0,
+	updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE descriptive_marking_rationales (
 	marking_result_id UUID PRIMARY KEY REFERENCES marking_results(id) ON DELETE CASCADE,
 	rationale TEXT NOT NULL
