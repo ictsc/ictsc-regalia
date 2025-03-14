@@ -4,9 +4,11 @@ import {
   type ActionDispatch,
   useEffect,
   useState,
+  useRef,
 } from "react";
 import { Field, Label, Textarea } from "@headlessui/react";
 import { MaterialSymbol } from "../../components/material-symbol";
+import { ConfirmModal } from "./confirmModal";
 
 interface AnswerableState {
   remainingSeconds: number;
@@ -62,32 +64,52 @@ export function SubmissionForm(props: {
     reduceFormError,
     null,
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const pendingAnswerRef = useRef<string | null>(null);
   const { remainingSeconds } = useAnswerable(
     props.lastSubmittedAt,
     props.submitInterval,
   );
   const isAnswerable = remainingSeconds <= 0;
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!isAnswerable) return;
+    const formData = new FormData(e.currentTarget);
+    const answer = formData.get("answer");
+    if (typeof answer !== "string" || answer.trim() === "") {
+      dispatchError("missing-answer");
+      return;
+    }
+    pendingAnswerRef.current = answer;
+    setIsModalOpen(true);
+  };
+
+  const handleConfirm = async () => {
+    setIsModalOpen(false);
+    if (pendingAnswerRef.current === null) return;
+    const result = await props.action(pendingAnswerRef.current);
+    switch (result) {
+      case "success":
+        dispatchError("reset");
+        break;
+      case "failure":
+        dispatchError("failure");
+        break;
+    }
+    pendingAnswerRef.current = null; // 送信後にクリア
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    pendingAnswerRef.current = null;
+  };
+
   return (
     <form
       className="flex size-full flex-col"
       onReset={() => dispatchError("reset")}
-      action={async (data) => {
-        if (!isAnswerable) return;
-        const answer = data.get("answer");
-        if (typeof answer !== "string") {
-          return;
-        }
-        const result = await props.action(answer);
-        switch (result) {
-          case "success":
-            dispatchError("reset");
-            break;
-          case "failure":
-            dispatchError("failure");
-            break;
-        }
-      }}
+      onSubmit={handleSubmit}
     >
       <SubmissionFormInner
         error={error}
@@ -95,6 +117,20 @@ export function SubmissionForm(props: {
         isAnswerable={isAnswerable}
         remainingSeconds={remainingSeconds}
       />
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onConfirm={() => {
+          void handleConfirm();
+        }}
+        onCansel={handleCancel}
+        title="解答の確認"
+        confirmText="送信する"
+        cancelText="キャンセル"
+      >
+        <div className="my-12">
+          <p className="text-16 text-text">本当に解答を送信しますか？</p>
+        </div>
+      </ConfirmModal>
     </form>
   );
 }
