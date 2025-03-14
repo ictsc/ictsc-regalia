@@ -11,7 +11,7 @@ export function ProblemsPage(props: PageProps) {
   return (
     <>
       <Title>問題一覧</Title>
-      <div className="mx-16 mt-64 flex justify-center">
+      <div className="mx-16 my-64 flex justify-center">
         <ul className="grid grid-flow-row grid-cols-1 gap-x-40 gap-y-24 lg:grid-cols-2">
           {props.problems.map((problem) => (
             <li key={problem.code}>
