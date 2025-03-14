@@ -45,7 +45,7 @@ ORDER BY answer.number ASC`,
 }
 
 func (r *repo) ListAnswersByTeamProblemForPublic(ctx context.Context, teamCode int64, problemCode string) ([]*domain.AnswerData, error) {
-	ctx, span := tracer.Start(ctx, "ListAnswersByTeamProblemForAdmin")
+	ctx, span := tracer.Start(ctx, "ListAnswersByTeamProblemForPublic")
 	defer span.End()
 	return r.listAnswers(ctx, `
 SELECT
