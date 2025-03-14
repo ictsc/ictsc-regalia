@@ -21,6 +21,7 @@ type MarkServiceHandler struct {
 	GetAnswerEffect           domain.AnswerReader
 	ListMarkingResultEffect   domain.MarkingResultReader
 	CreateMarkingResultEffect domain.Tx[CreateMarkingResultTxEffect]
+	UpdateScoreEffect         UpdateScoreEffect
 }
 
 var _ adminv1connect.MarkServiceHandler = (*MarkServiceHandler)(nil)
@@ -32,6 +33,7 @@ func newMarkServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *MarkSe
 		GetAnswerEffect:           repo,
 		ListMarkingResultEffect:   repo,
 		CreateMarkingResultEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) CreateMarkingResultTxEffect { return rt }),
+		UpdateScoreEffect:         newUpdateScoreEffect(repo),
 	}
 }
 
@@ -202,9 +204,28 @@ func (h *MarkServiceHandler) CreateMarkingResult(
 		return nil, err
 	}
 
+	if _, err := UpdateScore(ctx, h.UpdateScoreEffect, now); err != nil {
+		return nil, err
+	}
+
 	return connect.NewResponse(&adminv1.CreateMarkingResultResponse{
 		MarkingResult: convertMarkingResult(markingResult),
 	}), nil
+}
+
+func (h *MarkServiceHandler) UpdateScores(
+	ctx context.Context,
+	req *connect.Request[adminv1.UpdateScoresRequest],
+) (*connect.Response[adminv1.UpdateScoresResponse], error) {
+	if err := enforce(ctx, h.Enforcer, "scores", "update"); err != nil {
+		return nil, err
+	}
+
+	if _, err := UpdateScore(ctx, h.UpdateScoreEffect, time.Now()); err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&adminv1.UpdateScoresResponse{}), nil
 }
 
 func convertAnswer(answer *domain.Answer) *adminv1.Answer {
