@@ -67,6 +67,25 @@ func ListAnswersByTeamProblemForPublic(ctx context.Context, eff AnswerReader, te
 	return answers, nil
 }
 
+func (tp *TeamProblem) answersForPublic(ctx context.Context, eff AnswerReader) ([]*Answer, error) {
+	return ListAnswersByTeamProblemForPublic(ctx, eff, tp.team.Code(), tp.problem.Code())
+}
+
+func (tp *TeamProblem) answersForAdmin(ctx context.Context, eff AnswerReader) ([]*Answer, error) {
+	answerDataList, err := eff.ListAnswersByTeamProblemForAdmin(ctx,
+		int64(tp.team.Code()), string(tp.problem.Code()))
+	if err != nil {
+		return nil, err
+	}
+
+	answers, err := parseAnswerDataList(answerDataList)
+	if err != nil {
+		return nil, err
+	}
+
+	return answers, nil
+}
+
 func parseAnswerDataList(answerDataList []*AnswerData) ([]*Answer, error) {
 	answers := make([]*Answer, 0, len(answerDataList))
 	for _, answerData := range answerDataList {

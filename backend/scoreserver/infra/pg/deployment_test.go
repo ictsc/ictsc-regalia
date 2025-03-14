@@ -1,12 +1,12 @@
 package pg_test
 
 import (
+	"slices"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/pgtest"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/snaptest"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
@@ -23,11 +23,11 @@ func TestListDeployments(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	snaptest.Match(t, deployments,
-		cmpopts.SortSlices(func(a, b *domain.DeploymentData) int {
-			return strings.Compare(a.ID.String(), b.ID.String())
-		}),
-	)
+	slices.SortStableFunc(deployments, func(i, j *domain.DeploymentData) int {
+		return strings.Compare(i.ID.String(), j.ID.String())
+	})
+
+	snaptest.Match(t, deployments)
 }
 
 func TestCreateDeployment(t *testing.T) {

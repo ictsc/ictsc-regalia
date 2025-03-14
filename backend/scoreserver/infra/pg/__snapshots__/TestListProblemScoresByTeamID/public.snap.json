@@ -1,0 +1,20 @@
+[
+  {
+    "team_id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+    "problem_id": "16643c32-c686-44ba-996b-2fbe43b54513",
+    "score": {
+      "marking_result_id": "862b646a-5fdd-4a77-bb2d-7ef5d4f1d069",
+      "marked_score": 80,
+      "penalty": 0
+    }
+  },
+  {
+    "team_id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+    "problem_id": "24f6aef0-5dcd-4032-825b-d1b19174a6f2",
+    "score": {
+      "marking_result_id": "87cb974d-dedd-4039-a189-b34f3a57e62c",
+      "marked_score": 80,
+      "penalty": 0
+    }
+  }
+]

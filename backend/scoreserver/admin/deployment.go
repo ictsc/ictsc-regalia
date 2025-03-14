@@ -29,14 +29,14 @@ func newDeploymentServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *
 		ListEffect: repo,
 		UpdateEffect: struct {
 			domain.TeamGetter
-			domain.ProblemReader
+			domain.TeamProblemReader
 			domain.DeploymentReader
 			domain.Tx[domain.DeploymentWriter]
 		}{
-			TeamGetter:       repo,
-			ProblemReader:    repo,
-			DeploymentReader: repo,
-			Tx:               pg.Tx(repo, func(rt *pg.RepositoryTx) domain.DeploymentWriter { return rt }),
+			TeamGetter:        repo,
+			TeamProblemReader: repo,
+			DeploymentReader:  repo,
+			Tx:                pg.Tx(repo, func(rt *pg.RepositoryTx) domain.DeploymentWriter { return rt }),
 		},
 	}
 }
@@ -79,7 +79,7 @@ func (h *DeploymentServiceHandler) ListDeployments(
 
 type DeploymentStatusUpdateEffect interface {
 	domain.TeamGetter
-	domain.ProblemReader
+	domain.TeamProblemReader
 	domain.DeploymentReader
 	domain.Tx[domain.DeploymentWriter]
 }
@@ -122,7 +122,7 @@ func (h *DeploymentServiceHandler) UpdateDeploymentStatus(
 		return nil, err
 	}
 
-	teamProblem, err := team.ProblemByCode(ctx, h.UpdateEffect, problemCode)
+	teamProblem, err := team.ProblemByCodeForAdmin(ctx, h.UpdateEffect, problemCode)
 	if err != nil {
 		return nil, err
 	}

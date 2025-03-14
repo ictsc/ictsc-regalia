@@ -41,8 +41,9 @@ type (
 		CreatedAt time.Time                    `db:"created_at"`
 	}
 	scoreRow struct {
-		MarkedScore uint32 `db:"marked_score"`
-		Penalty     uint32 `db:"penalty"`
+		MarkingResultID uuid.UUID `db:"-"`
+		MarkedScore     uint32    `db:"marked_score"`
+		Penalty         uint32    `db:"penalty"`
 	}
 	rationaleRow struct {
 		DescriptiveComment sql.NullString `db:"descriptive_comment"`
@@ -58,6 +59,7 @@ type (
 func (r *markingResultRow) data() *domain.MarkingResultData {
 	r.markingResultDataRow.Answer = r.Answer.data()
 	r.markingResultDataRow.Score = (*domain.ScoreData)(&r.Score)
+	r.markingResultDataRow.Score.MarkingResultID = r.ID
 	r.markingResultDataRow.Rationale = r.Rationale.data()
 	return (*domain.MarkingResultData)(&r.markingResultDataRow)
 }
