@@ -3,7 +3,6 @@ import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import remarkRehype from "remark-rehype";
-import rehypeKatex from "rehype-katex";
 import rehypeShiki from "@shikijs/rehype/core";
 import rehypeReact from "rehype-react";
 import production from "react/jsx-runtime";
@@ -32,7 +31,6 @@ export async function renderMarkdown(content: string): Promise<ReactNode> {
     .use(remarkGfm)
     .use(remarkMath)
     .use(remarkRehype)
-    .use(rehypeKatex)
     .use(rehypeShiki, highlighter as any, {
       theme: "material-theme-lighter",
     })
