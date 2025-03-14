@@ -60,8 +60,27 @@ export function Deployments(props: {
         isOpen={isModalOpen}
         onConfirm={handleConfirm}
         onCansel={handleCancel}
-        allowedDeploymentCount={props.allowedDeploymentCount}
-      />
+        title="再展開の確認"
+        confirmText="再展開する"
+        cancelText="キャンセル"
+      >
+        <div className="my-12">
+          <p className="text-16 text-text">本当にこの問題を再展開しますか？</p>
+          <p className="text-16 text-text">
+            残り許容回数:
+            <span
+              className={clsx(
+                "pl-4 text-16 font-bold",
+                props.allowedDeploymentCount <= 0
+                  ? "text-primary"
+                  : "text-text",
+              )}
+            >
+              {props.allowedDeploymentCount}
+            </span>
+          </p>
+        </div>
+      </ConfirmModal>
     </>
   );
 }

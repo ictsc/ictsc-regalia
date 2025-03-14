@@ -7,28 +7,34 @@ export default {
 
 type Story = StoryObj;
 
-export const Default: Story = {
+export const SubmitDeployment: Story = {
   render: () => (
-    <div className="grid grid-cols-2 gap-64">
-      <ConfirmModal
-        isOpen={true}
-        onConfirm={() => {}}
-        onCansel={() => {}}
-        allowedDeploymentCount={1}
-      />
-    </div>
+    <ConfirmModal
+      isOpen={true}
+      onConfirm={() => {}}
+      onCansel={() => {}}
+      title="再展開の確認"
+      confirmText="再展開する"
+      cancelText="キャンセル"
+    >
+      <span>ここに本文を書く</span>
+    </ConfirmModal>
   ),
 };
 
-export const NoMoreLeft: Story = {
+export const SubmitAnswer: Story = {
   render: () => (
-    <div className="grid grid-cols-2 gap-64">
-      <ConfirmModal
-        isOpen={true}
-        onConfirm={() => {}}
-        onCansel={() => {}}
-        allowedDeploymentCount={0}
-      />
-    </div>
+    <ConfirmModal
+      isOpen={true}
+      onConfirm={() => {}}
+      onCansel={() => {}}
+      title="解答の確認"
+      confirmText="送信する"
+      cancelText="キャンセル"
+    >
+      <div className="my-12">
+          <p className="text-16 text-text">本当にこの問題を提出しますか？</p>
+        </div>
+    </ConfirmModal>
   ),
 };
