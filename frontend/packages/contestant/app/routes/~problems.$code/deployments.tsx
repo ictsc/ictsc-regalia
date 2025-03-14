@@ -1,43 +1,68 @@
 import { Button } from "@headlessui/react";
 import { clsx } from "clsx";
-import { useId, type ReactNode } from "react";
+import { useState, useId, type ReactNode } from "react";
 import { type Deployment as DeploymentType } from "../../features/deployment";
 import { DeploymentStatus } from "@ictsc/proto/contestant/v1";
+import { ConfirmModal } from "./confirmModal";
 
 export function Deployments(props: {
   list: ReactNode;
   canRedeploy: boolean;
   isRedeploying: boolean;
+  allowedDeploymentCount: number;
   redeploy: () => void;
   error?: ReactNode;
 }) {
   const buttonID = useId();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleRedeployClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleConfirm = () => {
+    setIsModalOpen(false);
+    props.redeploy();
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
   return (
-    <div className="flex size-full flex-col gap-16">
-      <div className="size-full rounded-12 bg-surface-1 py-12">
-        <div className="size-full overflow-y-auto px-12 [scrollbar-gutter:stable_both-edges]">
-          {props.list}
+    <>
+      <div className="flex size-full flex-col gap-16">
+        <div className="size-full rounded-12 bg-surface-1 py-12">
+          <div className="size-full overflow-y-auto px-12 [scrollbar-gutter:stable_both-edges]">
+            {props.list}
+          </div>
+        </div>
+        <div className="flex items-center justify-end gap-16">
+          {props.error != null && (
+            <label htmlFor={buttonID} className="text-14 text-primary">
+              {props.error}
+            </label>
+          )}
+          <Button
+            id={buttonID}
+            className={clsx(
+              "grid place-items-center rounded-12 bg-surface-2 px-24 py-16 shadow-md transition",
+              "data-[disabled]:bg-disabled data-[hover]:opacity-80 data-[active]:shadow-none",
+            )}
+            disabled={!props.canRedeploy || props.isRedeploying}
+            onClick={handleRedeployClick}
+          >
+            <span className="text-16 font-bold">再展開する</span>
+          </Button>
         </div>
       </div>
-      <div className="flex items-center justify-end gap-16">
-        {props.error != null && (
-          <label htmlFor={buttonID} className="text-14 text-primary">
-            {props.error}
-          </label>
-        )}
-        <Button
-          id={buttonID}
-          className={clsx(
-            "grid place-items-center rounded-12 bg-surface-2 px-24 py-16 shadow-md transition",
-            "data-[disabled]:bg-disabled data-[hover]:opacity-80 data-[active]:shadow-none",
-          )}
-          disabled={!props.canRedeploy || props.isRedeploying}
-          onClick={props.redeploy}
-        >
-          <span className="text-16 font-bold">再展開する</span>
-        </Button>
-      </div>
-    </div>
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onConfirm={handleConfirm}
+        onCansel={handleCancel}
+        allowedDeploymentCount={props.allowedDeploymentCount}
+      />
+    </>
   );
 }
 
