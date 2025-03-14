@@ -33,8 +33,8 @@ export const SubmitAnswer: Story = {
       cancelText="キャンセル"
     >
       <div className="my-12">
-          <p className="text-16 text-text">本当にこの問題を提出しますか？</p>
-        </div>
+        <p className="text-16 text-text">本当にこの問題を提出しますか？</p>
+      </div>
     </ConfirmModal>
   ),
 };
