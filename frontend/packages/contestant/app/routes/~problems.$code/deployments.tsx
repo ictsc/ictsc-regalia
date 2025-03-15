@@ -59,7 +59,7 @@ export function Deployments(props: {
       <ConfirmModal
         isOpen={isModalOpen}
         onConfirm={handleConfirm}
-        onCansel={handleCancel}
+        onCancel={handleCancel}
         title="再展開の確認"
         confirmText="再展開する"
         cancelText="キャンセル"

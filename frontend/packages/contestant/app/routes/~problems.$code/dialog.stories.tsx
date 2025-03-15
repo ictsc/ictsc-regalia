@@ -12,7 +12,7 @@ export const SubmitDeployment: Story = {
     <ConfirmModal
       isOpen={true}
       onConfirm={() => {}}
-      onCansel={() => {}}
+      onCancel={() => {}}
       title="再展開の確認"
       confirmText="再展開する"
       cancelText="キャンセル"
@@ -27,7 +27,7 @@ export const SubmitAnswer: Story = {
     <ConfirmModal
       isOpen={true}
       onConfirm={() => {}}
-      onCansel={() => {}}
+      onCancel={() => {}}
       title="解答の確認"
       confirmText="送信する"
       cancelText="キャンセル"
