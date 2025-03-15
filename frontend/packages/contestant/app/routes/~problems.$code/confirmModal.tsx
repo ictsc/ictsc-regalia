@@ -1,5 +1,6 @@
 import { Fragment, ReactNode } from "react";
 import {
+  Button,
   Dialog,
   DialogBackdrop,
   DialogPanel,
@@ -11,8 +12,14 @@ import { MaterialSymbol } from "@app/components/material-symbol";
 
 interface ConfirmModalProps {
   isOpen: boolean;
-  onConfirm: () => void;
-  onCansel: () => void;
+
+  onConfirm?: () => void;
+  formId?: string;
+  confirmType?: "button" | "submit";
+  confirmName?: string;
+  confirmValue?: string;
+
+  onCancel: () => void;
   title: string;
   confirmText: string;
   cancelText: string;
@@ -22,15 +29,16 @@ interface ConfirmModalProps {
 export function ConfirmModal({
   isOpen,
   onConfirm,
-  onCansel,
+  onCancel,
   title,
   confirmText,
   cancelText,
   children,
+  ...props
 }: ConfirmModalProps) {
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={onCansel}>
+      <Dialog as="div" className="relative z-50" onClose={onCancel}>
         <DialogBackdrop
           transition
           className="fixed inset-0 bg-disabled/30 duration-300 ease-out data-[closed]:opacity-0"
@@ -71,21 +79,25 @@ export function ConfirmModal({
                 {children}
 
                 <div className="mt-4 flex justify-end gap-8">
-                  <button
+                  <Button
                     className="inline-flex justify-center rounded-[6px] border border-text bg-surface-0 px-8 py-2 text-16 font-medium text-text transition hover:bg-surface-1"
-                    onClick={onCansel}
+                    onClick={onCancel}
                   >
                     <div className="py-4">{cancelText}</div>
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     className="inline-flex justify-center rounded-[6px] border border-transparent bg-surface-2 px-8 py-2 text-16 font-medium text-text transition hover:opacity-80"
+                    form={props.formId}
+                    type={props.confirmType}
+                    name={props.confirmName}
+                    value={props.confirmValue}
                     onClick={() => {
-                      onConfirm();
-                      onCansel();
+                      onConfirm?.();
+                      onCancel();
                     }}
                   >
                     <div className="py-4">{confirmText}</div>
-                  </button>
+                  </Button>
                 </div>
               </DialogPanel>
             </TransitionChild>
