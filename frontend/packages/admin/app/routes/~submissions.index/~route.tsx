@@ -82,7 +82,6 @@ function RouteComponent() {
   const items = useAnswers(answersResp.answers ?? []);
 
   const teamOptions = useMemo(() => {
-    console.log(teamsResp);
     return teamsResp.teams.map((team: Team) => ({
       label: team.name,
       value: team.name,
