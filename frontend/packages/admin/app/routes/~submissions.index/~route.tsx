@@ -256,6 +256,7 @@ function AnswerTable(props: { readonly answers: readonly AnswerItem[] }) {
         <Table.Tr>
           <Table.Th>問題</Table.Th>
           <Table.Th>チーム</Table.Th>
+          <Table.Th>チーム番号</Table.Th>
           <Table.Th>解答ID</Table.Th>
           <Table.Th>提出時刻</Table.Th>
           <Table.Th>点数</Table.Th>
@@ -273,6 +274,9 @@ function AnswerTable(props: { readonly answers: readonly AnswerItem[] }) {
               <Text size="sm" maw="10em" lineClamp={1} title={item.teamName}>
                 {item.teamName}
               </Text>
+            </Table.Td>
+            <Table.Td>
+              <Text size="sm">{item.teamCode}</Text>
             </Table.Td>
             <Table.Td>{item.answerNumber}</Table.Td>
             <Table.Td>
