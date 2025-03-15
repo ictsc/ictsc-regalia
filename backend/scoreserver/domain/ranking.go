@@ -1,7 +1,9 @@
 package domain
 
 import (
+	"cmp"
 	"context"
+	"log"
 	"slices"
 	"time"
 
@@ -67,9 +69,9 @@ func getRanking(ctx context.Context, eff RankingEffect, isPublic bool) (Ranking,
 func (r Ranking) sort() {
 	slices.SortStableFunc(r, func(lhs, rhs *TeamRank) int {
 		// Descending order
-		totalScoreCmp := rhs.totalScore - lhs.totalScore
+		totalScoreCmp := cmp.Compare(rhs.totalScore, lhs.totalScore)
 		if totalScoreCmp != 0 {
-			return int(totalScoreCmp)
+			return totalScoreCmp
 		}
 
 		// updateSubmitAt が nil のとき無限大として扱う
@@ -84,6 +86,7 @@ func (r Ranking) sort() {
 			return lhs.updateSubmitAt.Compare(*rhs.updateSubmitAt)
 		}
 	})
+	log.Println(r)
 
 	var (
 		prev *TeamRank
