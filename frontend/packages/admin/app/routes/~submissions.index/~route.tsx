@@ -83,7 +83,7 @@ function RouteComponent() {
 
   const teamOptions = useMemo(() => {
     return teamsResp.teams.map((team: Team) => ({
-      label: team.name,
+      label: `${team.code}: ${team.name}`,
       value: team.name,
     }));
   }, [teamsResp]);
@@ -231,7 +231,7 @@ function AnswerTable(props: { readonly answers: readonly AnswerItem[] }) {
             </Table.Td>
             <Table.Td>
               <Text size="sm" maw="10em" lineClamp={1} title={item.teamName}>
-                {item.teamName}
+                {item.teamCode}: {item.teamName}
               </Text>
             </Table.Td>
             <Table.Td>{item.answerNumber}</Table.Td>
