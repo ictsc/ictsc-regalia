@@ -1,13 +1,13 @@
 buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.4-20250121211742-6d880cc6cc8d.1 h1:p5SFT60M93aMQhOz81VH3kPg8t1pp/Litae/1eSxie4=
 buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.4-20250121211742-6d880cc6cc8d.1/go.mod h1:umI0o7WWHv8lCbLjYUMzfjHKjyaIt2D89sIj1D9fqy0=
-buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.4-20241127180247-a33202765966.1 h1:yeaeyw0RQUe009ebxBQ3TsqBPptiNEGsiS10t+8Htuo=
-buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.4-20241127180247-a33202765966.1/go.mod h1:novQBstnxcGpfKf8qGRATqn1anQKwMJIbH5Q581jibU=
+buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.5-20240717164558-a6c49f84cc0f.1 h1:tsQCDs5lwBkKRw9kTsY2bgJ0AVWkYr5NRdgnE+N2K8I=
+buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.5-20240717164558-a6c49f84cc0f.1/go.mod h1:eOqrCVUfhh7SLo00urDe/XhJHljj0dWMZirS0aX7cmc=
 buf.build/gen/go/bufbuild/registry/connectrpc/go v1.18.1-20250116203702-1c024d64352b.1 h1:1SDs5tEGoWWv2vmKLx2B0Bp+yfhlxiU4DaZUII8+Pvs=
 buf.build/gen/go/bufbuild/registry/connectrpc/go v1.18.1-20250116203702-1c024d64352b.1/go.mod h1:o2AgVM1j3MczvxnMqfZTpiqGwK1VD4JbEagseY0QcjE=
 buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.4-20250116203702-1c024d64352b.1 h1:uKJgSNHvwQUZ6+0dSnx9MtkZ+h/ORbkKym0rlzIjUSI=
 buf.build/gen/go/bufbuild/registry/protocolbuffers/go v1.36.4-20250116203702-1c024d64352b.1/go.mod h1:Ua59W2s7uwPS5sGNgW08QewjBaPnUxOdpkWsuDvJ36Q=
-buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.4-20241007202033-cf42259fcbfc.1 h1:XmYgi9W/9oST2ZrfT3ucGWkzD9+Vd0ls9yhyZ8ae0KQ=
-buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.4-20241007202033-cf42259fcbfc.1/go.mod h1:cxFpqWIC80Wm8YNo1038ocBmrF84uQ0IfL0uVdAu9ZY=
+buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.5-20241007202033-cf42259fcbfc.1 h1:2157vH+X1BHEl3aH6/EWPXGaSvKjvv3d8hPRWDUR1sU=
+buf.build/gen/go/pluginrpc/pluginrpc/protocolbuffers/go v1.36.5-20241007202033-cf42259fcbfc.1/go.mod h1:3wPktavk2X7PTwmS1Ccu8L52E2BuooyRFNtyxXwJGDI=
 buf.build/go/bufplugin v0.7.0 h1:Tq8FXBVfpMxhl3QR6P/gMQHROg1Ss7WhpyD4QVV61ds=
 buf.build/go/bufplugin v0.7.0/go.mod h1:LuQzv36Ezu2zQIQUtwg4WJJFe58tXn1anL1IosAh6ik=
 buf.build/go/protoyaml v0.3.1 h1:ucyzE7DRnjX+mQ6AH4JzN0Kg50ByHHu+yrSKbgQn2D4=
