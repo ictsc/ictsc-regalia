@@ -5,19 +5,31 @@ import {
   useDeferredValue,
   useEffect,
   useMemo,
+  useState,
 } from "react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createClient } from "@connectrpc/connect";
 import { timestampMs } from "@bufbuild/protobuf/wkt";
-import { MarkService, type Answer } from "@ictsc/proto/admin/v1";
-import { Center, Table, Text } from "@mantine/core";
+import {
+  MarkService,
+  ProblemService,
+  TeamService,
+  type Answer,
+  type Problem,
+  type Team,
+} from "@ictsc/proto/admin/v1";
+import { Center, Table, Text, Button, MultiSelect } from "@mantine/core";
 
 export const Route = createFileRoute("/submissions/")({
   component: RouteComponent,
   loader: ({ context: { transport } }) => {
-    const client = createClient(MarkService, transport);
+    const markClient = createClient(MarkService, transport);
+    const teamClient = createClient(TeamService, transport);
+    const problemClient = createClient(ProblemService, transport);
     return {
-      answers: client.listAnswers({}),
+      answers: markClient.listAnswers({}),
+      teams: teamClient.listTeams({}),
+      problems: problemClient.listProblems({}),
     };
   },
 });
@@ -28,23 +40,91 @@ const submitTimeFormatter = new Intl.DateTimeFormat("ja-JP", {
 });
 
 function RouteComponent() {
-  const { answers: answersPromise } = Route.useLoaderData();
+  const {
+    answers: answersPromise,
+    teams: teamsPromise,
+    problems: problemPromise,
+  } = Route.useLoaderData();
   const deferredAnswersPromise = useDeferredValue(answersPromise);
-
+  const deferredTeamsPromise = useDeferredValue(teamsPromise);
+  const deferredProblemsPromise = useDeferredValue(problemPromise);
   const router = useRouter();
+
+  const [selectedProblemCodes, setSelectedProblemCodes] = usePersistentState<
+    string[]
+  >("selectedProblemCodes", []);
+  const [selectedTeamNames, setSelectedTeamNames] = usePersistentState<
+    string[]
+  >("selectedTeamNames", []);
+  const [filterRecent, setFilterRecent] = usePersistentState<boolean>(
+    "filterRecent",
+    false,
+  );
+  const [showPerfect, setShowPerfect] = usePersistentState<boolean>(
+    "showPerfect",
+    true,
+  );
+  const [showUnscored, setShowUnscored] = usePersistentState<boolean>(
+    "showUnscored",
+    false,
+  );
+
   useEffect(() => {
     const timer = setInterval(() => {
       startTransition(() => router.invalidate());
     }, 60 * 1000);
     return () => clearInterval(timer);
-  });
+  }, [router]);
 
   const answersResp = use(deferredAnswersPromise);
+  const teamsResp = use(deferredTeamsPromise);
+  const problemsResp = use(deferredProblemsPromise);
   const items = useAnswers(answersResp.answers ?? []);
+
+  const teamOptions = useMemo(() => {
+    console.log(teamsResp);
+    return teamsResp.teams.map((team: Team) => ({
+      label: team.name,
+      value: team.name,
+    }));
+  }, [teamsResp]);
+
+  const problemOptions = useMemo(() => {
+    return problemsResp.problems.map((problem: Problem) => ({
+      label: `${problem.code}: ${problem.title}`,
+      value: String(problem.code),
+    }));
+  }, [problemsResp]);
+
+  const filteredItems = filterAnswers(
+    items,
+    selectedProblemCodes,
+    selectedTeamNames,
+    filterRecent,
+    showPerfect,
+    showUnscored,
+  );
+
   return (
-    <Center>
-      <AnswerTable answers={items} />
-    </Center>
+    <>
+      <FilterBar
+        selectedProblemCodes={selectedProblemCodes}
+        onSelectedProblemCodesChange={setSelectedProblemCodes}
+        selectedTeamNames={selectedTeamNames}
+        onSelectedTeamNamesChange={setSelectedTeamNames}
+        filterRecent={filterRecent}
+        onToggleFilterRecent={() => setFilterRecent((prev) => !prev)}
+        showPerfect={showPerfect}
+        onToggleShowPerfect={() => setShowPerfect((prev) => !prev)}
+        showUnscored={showUnscored}
+        onToggleShowUnscored={() => setShowUnscored((prev) => !prev)}
+        problemOptions={problemOptions}
+        teamOptions={teamOptions}
+      />
+      <Center>
+        <AnswerTable answers={filteredItems} />
+      </Center>
+    </>
   );
 }
 
@@ -63,6 +143,29 @@ type AnswerItem = {
     readonly max: number;
   };
 };
+
+function usePersistentState<T>(
+  key: string,
+  initialValue: T,
+): [T, React.Dispatch<React.SetStateAction<T>>] {
+  const [state, setState] = useState<T>(() => {
+    const stored = localStorage.getItem(key);
+    if (stored !== null) {
+      try {
+        return JSON.parse(stored) as T;
+      } catch {
+        return initialValue;
+      }
+    }
+    return initialValue;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(state));
+  }, [key, state]);
+
+  return [state, setState];
+}
 
 function useAnswers(answers: readonly Answer[]): AnswerItem[] {
   const rawItems = useMemo(() => {
@@ -99,7 +202,6 @@ function useAnswers(answers: readonly Answer[]): AnswerItem[] {
         unscoredItems.push(item);
       }
     }
-    // 点数が付いていないものは提出時刻が早い順，付いているものは提出時刻が遅い順(最近採点された可能性が高い)に並べる
     unscoredItems.sort((a, b) => a.submitTimeMs - b.submitTimeMs);
     scoredItems.sort((a, b) => b.submitTimeMs - a.submitTimeMs);
     return [...unscoredItems, ...scoredItems];
@@ -175,5 +277,93 @@ function AnswerTr(props: {
     >
       {props.children}
     </Table.Tr>
+  );
+}
+
+function filterAnswers(
+  items: AnswerItem[],
+  selectedProblemCodes: string[],
+  selectedTeamNames: string[],
+  filterRecent: boolean,
+  showPerfect: boolean,
+  showUnscored: boolean,
+): AnswerItem[] {
+  let filtered = items;
+  if (selectedProblemCodes.length > 0) {
+    filtered = filtered.filter((item) =>
+      selectedProblemCodes.includes(item.problemCode),
+    );
+  }
+  if (selectedTeamNames.length > 0) {
+    filtered = filtered.filter((item) =>
+      selectedTeamNames.includes(item.teamName),
+    );
+  }
+  if (filterRecent) {
+    const twentyMinutesAgo = Date.now() - 20 * 60 * 1000;
+    filtered = filtered.filter((item) => item.submitTimeMs >= twentyMinutesAgo);
+  }
+  if (!showPerfect) {
+    filtered = filtered.filter(
+      (item) => !(item.score && item.score.total === item.score.max),
+    );
+  }
+  if (showUnscored) {
+    filtered = filtered.filter((item) => item.score == null);
+  }
+  return filtered;
+}
+
+function FilterBar(props: {
+  selectedProblemCodes: string[];
+  onSelectedProblemCodesChange: (value: string[]) => void;
+  selectedTeamNames: string[];
+  onSelectedTeamNamesChange: (value: string[]) => void;
+  filterRecent: boolean;
+  onToggleFilterRecent: () => void;
+  showPerfect: boolean;
+  onToggleShowPerfect: () => void;
+  showUnscored: boolean;
+  onToggleShowUnscored: () => void;
+  problemOptions: { label: string; value: string }[];
+  teamOptions: { label: string; value: string }[];
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+        marginBottom: "24px",
+      }}
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        <MultiSelect
+          placeholder="問題検索"
+          data={props.problemOptions}
+          searchable
+          value={props.selectedProblemCodes}
+          onChange={props.onSelectedProblemCodesChange}
+        />
+        <MultiSelect
+          placeholder="チーム検索"
+          data={props.teamOptions}
+          searchable
+          value={props.selectedTeamNames}
+          onChange={props.onSelectedTeamNamesChange}
+        />
+      </div>
+      <div style={{ display: "flex", gap: "32px" }}>
+        <Button onClick={props.onToggleFilterRecent}>
+          {props.filterRecent ? "直近20分以外も表示" : "直近20分のみ表示"}
+        </Button>
+        <Button onClick={props.onToggleShowPerfect}>
+          {props.showPerfect ? "満点解答を非表示" : "満点解答を表示"}
+        </Button>
+        <Button onClick={props.onToggleShowUnscored}>
+          {props.showUnscored ? "全採点解答表示" : "未採点のみ表示"}
+        </Button>
+      </div>
+    </div>
   );
 }
