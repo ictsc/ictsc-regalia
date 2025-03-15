@@ -1,12 +1,3 @@
-import {
-  ReactNode,
-  startTransition,
-  use,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createClient } from "@connectrpc/connect";
 import { timestampMs } from "@bufbuild/protobuf/wkt";
@@ -17,19 +8,82 @@ import {
   type Answer,
   type Problem,
   type Team,
+  type ListTeamsResponse,
+  type ListProblemsResponse,
 } from "@ictsc/proto/admin/v1";
 import { Center, Table, Text, Button, MultiSelect } from "@mantine/core";
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useDeferredValue,
+  startTransition,
+  use,
+  ReactNode,
+} from "react";
+
+interface LoaderData {
+  answers: Promise<{ answers: Answer[] }>;
+  teams: { label: string; value: string }[];
+  problems: { label: string; value: string }[];
+}
 
 export const Route = createFileRoute("/submissions/")({
   component: RouteComponent,
-  loader: ({ context: { transport } }) => {
+  loader: async ({ context: { transport } }): Promise<LoaderData> => {
     const markClient = createClient(MarkService, transport);
     const teamClient = createClient(TeamService, transport);
     const problemClient = createClient(ProblemService, transport);
+
+    let teamsData: { label: string; value: string }[] | null = null;
+    try {
+      const cachedTeams = localStorage.getItem("teamsCache");
+      if (cachedTeams) {
+        teamsData = JSON.parse(cachedTeams) as {
+          label: string;
+          value: string;
+        }[];
+      }
+    } catch (e) {
+      console.error(e);
+      teamsData = null;
+    }
+    let problemData: { label: string; value: string }[] | null = null;
+    try {
+      const cachedProblems = localStorage.getItem("problemsCache");
+      if (cachedProblems) {
+        problemData = JSON.parse(cachedProblems) as {
+          label: string;
+          value: string;
+        }[];
+      }
+    } catch (e) {
+      console.error(e);
+      problemData = null;
+    }
+
+    if (!teamsData) {
+      const teamsResp: ListTeamsResponse = await teamClient.listTeams({});
+      teamsData = teamsResp.teams.map((team: Team) => ({
+        label: `${team.name} (${team.code})`,
+        value: team.name,
+      }));
+      localStorage.setItem("teamsCache", JSON.stringify(teamsData));
+    }
+    if (!problemData) {
+      const problemsResp: ListProblemsResponse =
+        await problemClient.listProblems({});
+      problemData = problemsResp.problems.map((problem: Problem) => ({
+        label: `${problem.code}: ${problem.title}`,
+        value: String(problem.code),
+      }));
+      localStorage.setItem("problemsCache", JSON.stringify(problemData));
+    }
+
     return {
       answers: markClient.listAnswers({}),
-      teams: teamClient.listTeams({}),
-      problems: problemClient.listProblems({}),
+      teams: teamsData,
+      problems: problemData,
     };
   },
 });
@@ -42,12 +96,11 @@ const submitTimeFormatter = new Intl.DateTimeFormat("ja-JP", {
 function RouteComponent() {
   const {
     answers: answersPromise,
-    teams: teamsPromise,
-    problems: problemPromise,
+    teams: teamsData,
+    problems: problemsData,
   } = Route.useLoaderData();
   const deferredAnswersPromise = useDeferredValue(answersPromise);
-  const deferredTeamsPromise = useDeferredValue(teamsPromise);
-  const deferredProblemsPromise = useDeferredValue(problemPromise);
+
   const router = useRouter();
 
   const [selectedProblemCodes, setSelectedProblemCodes] = usePersistentState<
@@ -77,23 +130,7 @@ function RouteComponent() {
   }, [router]);
 
   const answersResp = use(deferredAnswersPromise);
-  const teamsResp = use(deferredTeamsPromise);
-  const problemsResp = use(deferredProblemsPromise);
   const items = useAnswers(answersResp.answers ?? []);
-
-  const teamOptions = useMemo(() => {
-    return teamsResp.teams.map((team: Team) => ({
-      label: team.name,
-      value: team.name,
-    }));
-  }, [teamsResp]);
-
-  const problemOptions = useMemo(() => {
-    return problemsResp.problems.map((problem: Problem) => ({
-      label: `${problem.code}: ${problem.title}`,
-      value: String(problem.code),
-    }));
-  }, [problemsResp]);
 
   const filteredItems = filterAnswers(
     items,
@@ -103,6 +140,9 @@ function RouteComponent() {
     showPerfect,
     showUnscored,
   );
+
+  const teamOptions = teamsData;
+  const problemOptions = problemsData;
 
   return (
     <>
@@ -192,8 +232,8 @@ function useAnswers(answers: readonly Answer[]): AnswerItem[] {
   }, [answers]);
 
   const items = useMemo(() => {
-    const scoredItems = [],
-      unscoredItems = [];
+    const scoredItems: AnswerItem[] = [],
+      unscoredItems: AnswerItem[] = [];
     for (const item of rawItems) {
       if (item.score != null) {
         scoredItems.push(item);
@@ -216,6 +256,7 @@ function AnswerTable(props: { readonly answers: readonly AnswerItem[] }) {
         <Table.Tr>
           <Table.Th>問題</Table.Th>
           <Table.Th>チーム</Table.Th>
+          <Table.Th>チーム番号</Table.Th>
           <Table.Th>解答ID</Table.Th>
           <Table.Th>提出時刻</Table.Th>
           <Table.Th>点数</Table.Th>
@@ -233,6 +274,9 @@ function AnswerTable(props: { readonly answers: readonly AnswerItem[] }) {
               <Text size="sm" maw="10em" lineClamp={1} title={item.teamName}>
                 {item.teamName}
               </Text>
+            </Table.Td>
+            <Table.Td>
+              <Text size="sm">{item.teamCode}</Text>
             </Table.Td>
             <Table.Td>{item.answerNumber}</Table.Td>
             <Table.Td>
