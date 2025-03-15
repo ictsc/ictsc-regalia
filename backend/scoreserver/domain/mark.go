@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -88,12 +89,13 @@ type MarkingResultUpdatePenaltyEffect interface {
 
 func (m *MarkingResult) UpdatePenalty(ctx context.Context, eff MarkingResultUpdatePenaltyEffect) error {
 	deploymentRevision, err := m.Answer().TeamProblem().
-		FinishedDeploymentCountAt(ctx, eff, m.Answer().CreatedAt())
+		DeploymentCountAt(ctx, eff, m.Answer().CreatedAt())
 	if err != nil {
 		return err
 	}
 	penalty := m.Answer().Problem().Penalty(uint32(deploymentRevision)) //nolint:gosec
 	if m.Score().Penalty() != penalty {
+		slog.InfoContext(ctx, "Update penalty", "answer", m.Answer().id, "prev", m.Score().Penalty(), "next", penalty)
 		if err := eff.UpdatePenalty(ctx, m.id, penalty); err != nil {
 			return WrapAsInternal(err, "failed to update penalty")
 		}
