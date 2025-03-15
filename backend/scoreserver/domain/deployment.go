@@ -131,17 +131,23 @@ func (tp *TeamProblem) DeploymentByRevision(ctx context.Context, eff DeploymentR
 }
 
 func (tp *TeamProblem) latestDeployment(ctx context.Context, eff DeploymentReader) (*Deployment, error) {
-	list, err := ListDeployments(ctx, eff)
+	deployments, err := ListDeployments(ctx, eff)
 	if err != nil {
 		return nil, err
 	}
-	idx := slices.IndexFunc(list, func(d *Deployment) bool {
-		return d.TeamCode() == tp.Team().Code() && d.ProblemCode() == tp.Problem().Code()
-	})
-	if idx < 0 {
+
+	var latest *Deployment
+	for _, deploy := range deployments {
+		if deploy.TeamCode() == tp.Team().Code() && deploy.ProblemCode() == tp.Problem().Code() {
+			if latest == nil || deploy.Revision() > latest.Revision() {
+				latest = deploy
+			}
+		}
+	}
+	if latest == nil {
 		return nil, NewNotFoundError("deployment not found", nil)
 	}
-	return list[idx], nil
+	return latest, nil
 }
 
 func (d *Deployment) UpdateStatus(ctx context.Context, eff DeploymentWriter, status DeploymentStatus, occurredAt time.Time) error {
