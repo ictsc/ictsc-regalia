@@ -65,7 +65,7 @@ export const Route = createFileRoute("/submissions/")({
     if (!teamsData) {
       const teamsResp: ListTeamsResponse = await teamClient.listTeams({});
       teamsData = teamsResp.teams.map((team: Team) => ({
-        label: team.name,
+        label: `${team.name} (${team.code})`,
         value: team.name,
       }));
       localStorage.setItem("teamsCache", JSON.stringify(teamsData));
