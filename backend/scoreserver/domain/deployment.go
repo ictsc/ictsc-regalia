@@ -101,7 +101,7 @@ func (tp *TeamProblem) Deployments(ctx context.Context, eff DeploymentReader) ([
 	return forTeam, nil
 }
 
-func (tp *TeamProblem) FinishedDeploymentCountAt(ctx context.Context, eff DeploymentReader, timeAt time.Time) (int, error) {
+func (tp *TeamProblem) DeploymentCountAt(ctx context.Context, eff DeploymentReader, timeAt time.Time) (int, error) {
 	list, err := tp.Deployments(ctx, eff)
 	if err != nil {
 		return 0, err
@@ -109,10 +109,7 @@ func (tp *TeamProblem) FinishedDeploymentCountAt(ctx context.Context, eff Deploy
 
 	count := 0
 	for _, d := range list {
-		if !d.Status().IsFinished() {
-			continue
-		}
-		if d.FinishedAt().Before(timeAt) {
+		if d.CreatedAt().Before(timeAt) {
 			count++
 		}
 	}
