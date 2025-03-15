@@ -100,6 +100,7 @@ function RouteComponent() {
     problems: problemsData,
   } = Route.useLoaderData();
   const deferredAnswersPromise = useDeferredValue(answersPromise);
+
   const router = useRouter();
 
   const [selectedProblemCodes, setSelectedProblemCodes] = usePersistentState<
