@@ -29,7 +29,7 @@ func (s *Score) Penalty() uint32 {
 }
 
 func (s *Score) TotalScore() uint32 {
-	return max(0, s.MarkedScore()-s.Penalty())
+	return uint32(max(0, int64(s.MarkedScore())-int64(s.Penalty()))) //nolint:gosec
 }
 
 func (s *Score) MarkingResult(ctx context.Context, eff MarkingResultReader) (*MarkingResult, error) {
