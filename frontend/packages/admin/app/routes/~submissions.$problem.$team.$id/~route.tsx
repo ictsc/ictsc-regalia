@@ -27,7 +27,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import ReactMarkdown from "react-markdown";
+import { Markdown } from "../../components/markdown/markdown";
 
 export const Route = createFileRoute("/submissions/$problem/$team/$id")({
   component: RouteComponent,
@@ -123,13 +123,13 @@ function RouteComponent() {
       <Grid.Col span={10}>
         <article>
           <Title>解答</Title>
-          <ReactMarkdown>{answer?.body?.body.value?.body ?? ""}</ReactMarkdown>
+          <Markdown>{answer?.body?.body.value?.body ?? ""}</Markdown>
         </article>
         <article>
           <Title>問題解説</Title>
-          <ReactMarkdown>
+          <Markdown>
             {problem?.body?.body.value?.explanationMarkdown ?? ""}
-          </ReactMarkdown>
+          </Markdown>
         </article>
         <MarkForm
           maxScore={answer?.problem?.maxScore ?? 0}
@@ -161,6 +161,15 @@ function MarkForm(props: {
     async (_prev: unknown, formData: FormData) => {
       const score = Number(formData.get("score"));
       const comment = formData.get("comment") as string;
+
+      if (isNaN(score) || score < 0 || score > props.maxScore) {
+        notifications.show({
+          color: "red",
+          title: "得点が不正です",
+          message: `0~${props.maxScore}の範囲で入力してください`,
+        });
+        return;
+      }
 
       switch (formData.get("intent")) {
         case "confirm":
@@ -195,7 +204,7 @@ function MarkForm(props: {
         required
         disabled={isSending}
         min={0}
-        max={100}
+        max={props.maxScore}
         defaultValue={lastResult?.score}
       />
       <Textarea

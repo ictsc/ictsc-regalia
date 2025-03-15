@@ -70,6 +70,10 @@ func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB, scheduleReader d
 		newDeploymentServiceHandler(enforcer, repo),
 		connect.WithInterceptors(interceptors...),
 	))
+	mux.Handle(adminv1connect.NewRankingServiceHandler(
+		newRankingServiceHandler(enforcer, repo),
+		connect.WithInterceptors(interceptors...),
+	))
 
 	checker := grpchealth.NewStaticChecker("admin.v1.TeamService")
 	mux.Handle(grpchealth.NewHandler(checker))

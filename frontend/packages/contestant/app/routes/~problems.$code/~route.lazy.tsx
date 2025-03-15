@@ -30,10 +30,8 @@ function RouteComponent() {
   } = Route.useLoaderData();
 
   const redeployable = useRedeployable(problem);
-  const deferredMetadata = use(useDeferredValue(metadata));
-
+  const deferredMetadata = useDeferredValue(metadata);
   const deferredAnswers = useDeferredValue(answers);
-
   const deferredDeployments = useDeferredValue(deployments);
 
   return (
@@ -44,19 +42,10 @@ function RouteComponent() {
       redeployable={redeployable}
       content={<Content problem={problem} />}
       submissionForm={
-        <View.SubmissionForm
-          action={async (body) => {
-            try {
-              await submitAnswer(body);
-            } catch (e) {
-              console.error(e);
-              return "failure";
-            }
-            await router.invalidate();
-            return "success";
-          }}
-          submitInterval={deferredMetadata.submitIntervalSeconds}
-          lastSubmittedAt={deferredMetadata.lastSubmittedAt}
+        <SubmissionForm
+          submitAnswer={submitAnswer}
+          problemPromise={problem}
+          metatataPromise={deferredMetadata}
         />
       }
       submissionList={
@@ -82,6 +71,36 @@ function RouteComponent() {
 function useRedeployable(problemPromise: Promise<ProblemDetail>) {
   const problem = use(useDeferredValue(problemPromise));
   return problem.redeployable;
+}
+
+function SubmissionForm(props: {
+  submitAnswer: (body: string) => Promise<void>;
+  problemPromise: Promise<ProblemDetail>;
+  metatataPromise: Promise<{
+    submitIntervalSeconds: number;
+    lastSubmittedAt: string;
+  }>;
+}) {
+  const router = useRouter();
+  const problem = use(props.problemPromise);
+  const metadata = use(props.metatataPromise);
+  return (
+    <View.SubmissionForm
+      action={async (body) => {
+        try {
+          await props.submitAnswer(body);
+        } catch (e) {
+          console.error(e);
+          return "failure";
+        }
+        await router.invalidate();
+        return "success";
+      }}
+      submitInterval={metadata.submitIntervalSeconds}
+      lastSubmittedAt={metadata.lastSubmittedAt}
+      storageKey={`/problems/${problem.code}`}
+    />
+  );
 }
 
 function Content(props: { problem: Promise<ProblemDetail> }) {
