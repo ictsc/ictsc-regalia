@@ -23,6 +23,7 @@ interface ConfirmModalProps {
   title: string;
   confirmText: string;
   cancelText: string;
+  dialogClassName?: string;
   children?: ReactNode;
 }
 
@@ -33,6 +34,7 @@ export function ConfirmModal({
   title,
   confirmText,
   cancelText,
+  dialogClassName,
   children,
   ...props
 }: ConfirmModalProps) {
@@ -66,7 +68,7 @@ export function ConfirmModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <DialogPanel className="w-full max-w-md transform rounded-8 bg-surface-0 p-16 text-left align-middle shadow-xl transition-all">
+              <DialogPanel className={dialogClassName}>
                 <div className="mb-4 flex items-center gap-4 text-primary">
                   <MaterialSymbol icon="error" size={24} fill />
                   <DialogTitle

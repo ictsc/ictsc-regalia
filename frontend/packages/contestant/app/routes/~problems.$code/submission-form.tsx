@@ -2,6 +2,7 @@ import { useId, useEffect, useState, useActionState } from "react";
 import { Button, Field, Label, Textarea } from "@headlessui/react";
 import { MaterialSymbol } from "../../components/material-symbol";
 import { ConfirmModal } from "./confirmModal";
+import { Markdown, Typography } from "@app/components/markdown";
 
 interface AnswerableState {
   remainingSeconds: number;
@@ -163,9 +164,13 @@ export function SubmissionForm(props: {
         title="解答の確認"
         confirmText="送信する"
         cancelText="キャンセル"
+        dialogClassName="w-full max-w-[1024px] transform rounded-8 bg-surface-0 p-16 text-left align-middle shadow-xl transition-all"
       >
-        <div className="my-12">
-          <p className="text-16 text-text">本当に解答を送信しますか？</p>
+        <div className="my-12]">
+          <p className="mb-24 text-16 text-text">本当に解答を送信しますか？</p>
+          <Typography>
+            <Markdown>{lastResult?.answer}</Markdown>
+          </Typography>
         </div>
       </ConfirmModal>
     </form>

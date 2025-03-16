@@ -63,6 +63,7 @@ export function Deployments(props: {
         title="再展開の確認"
         confirmText="再展開する"
         cancelText="キャンセル"
+        dialogClassName="w-full max-w-md transform rounded-8 bg-surface-0 p-16 text-left align-middle shadow-xl transition-all"
       >
         <div className="my-12">
           <p className="text-16 text-text">本当にこの問題を再展開しますか？</p>
