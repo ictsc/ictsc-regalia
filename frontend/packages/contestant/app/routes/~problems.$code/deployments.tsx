@@ -85,10 +85,16 @@ export function Deployments(props: {
   );
 }
 
-export function EmptyDeploymentList() {
+export function EmptyDeploymentList(props: { allowedDeploymentCount: number }) {
   return (
-    <div className="grid size-full place-items-center text-16 font-bold text-text">
-      <h1>まだ再展開されていません</h1>
+    <div className="grid size-full place-items-center text-16 text-text">
+      <p className="flex flex-col items-center gap-8">
+        <h1 className="font-bold">まだ再展開されていません</h1>
+        <h2>
+          許容回数:
+          <span className="ms-4 font-bold">{props.allowedDeploymentCount}</span>
+        </h2>
+      </p>
     </div>
   );
 }
