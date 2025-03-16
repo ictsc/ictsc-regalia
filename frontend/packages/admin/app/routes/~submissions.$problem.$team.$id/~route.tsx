@@ -98,6 +98,7 @@ function RouteComponent() {
   const deferredMarkingResults = useDeferredValue(markingResultsPromise);
   const problem = use(deferredProblemPromise);
   const answer = use(deferredAnswerPromise);
+  const answerString = answer?.body?.body.value?.body ?? "";
   const markingResults = use(deferredMarkingResults);
 
   const router = useRouter();
@@ -123,7 +124,13 @@ function RouteComponent() {
       <Grid.Col span={10}>
         <article>
           <Title>解答</Title>
-          <Markdown>{answer?.body?.body.value?.body ?? ""}</Markdown>
+          <Markdown>{answerString}</Markdown>
+        </article>
+        <article>
+          <details>
+            <summary>プレーンテキスト版</summary>
+            <pre>{answerString}</pre>
+          </details>
         </article>
         <article>
           <Title>問題解説</Title>
