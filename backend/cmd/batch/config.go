@@ -47,7 +47,7 @@ func newConfig(opts *CLIOption) (*config.Batch, error) {
 		APIURL:         opts.APIURL,
 		APITokenSource: tokenSource,
 
-		DeploymentSync: config.DeploySync{
+		DeploymentSync: &config.DeploySync{
 			Period: opts.DeploymentSyncPeriod,
 			SState: config.SState{
 				URL:                sstateURL,
@@ -57,7 +57,7 @@ func newConfig(opts *CLIOption) (*config.Batch, error) {
 				Password:           sstatePassword,
 			},
 		},
-		ScoreUpdate: config.ScoreUpdate{
+		ScoreUpdate: &config.ScoreUpdate{
 			Period: opts.ScoreUpdatePeriod,
 		},
 	}, nil
