@@ -230,7 +230,9 @@ function Deployments(props: {
       error={lastResult}
       list={
         deployments.length === 0 ? (
-          <View.EmptyDeploymentList />
+          <View.EmptyDeploymentList
+            allowedDeploymentCount={allowedDeploymentCount}
+          />
         ) : (
           <View.DeploymentList isPending={props.isPending}>
             {deployments.map((deployment) => (
