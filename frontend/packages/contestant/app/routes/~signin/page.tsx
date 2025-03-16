@@ -11,7 +11,7 @@ export function SignInPage({ signInURL }: Props) {
   return (
     <>
       <Title>ログイン</Title>
-      <div className="flex h-full flex-col items-center justify-center gap-[90px]">
+      <div className="mx-40 flex h-full flex-col items-center justify-center gap-[90px]">
         <Logo width={500} />
         <DiscordLoginButton href={signInURL} />
       </div>

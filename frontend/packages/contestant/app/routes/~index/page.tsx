@@ -79,7 +79,7 @@ function InContest(props: IndexPageProps) {
       break;
   }
   return (
-    <div className="flex h-full flex-col items-center justify-center">
+    <div className="mx-40 flex h-full flex-col items-center justify-center">
       <Logo width={500} />
       <span className="mt-16 text-16 underline">
         左のサイドメニューからタブを選択してください
@@ -125,7 +125,7 @@ function OutOfContest(props: IndexPageProps) {
       break;
   }
   return (
-    <div className="flex h-full flex-col items-center justify-center">
+    <div className="mx-40 flex h-full flex-col items-center justify-center">
       <h1 className="text-48 font-bold underline">{title}</h1>
       <div className="mt-40 flex items-center">
         <MaterialSymbol icon="schedule" size={48} className="text-icon" />
@@ -137,7 +137,7 @@ function OutOfContest(props: IndexPageProps) {
 
 function EndOfContest() {
   return (
-    <div className="flex h-full flex-col items-center justify-center">
+    <div className="mx-40 flex h-full flex-col items-center justify-center">
       <h1 className="text-48 font-bold underline">競技は終了しました</h1>
     </div>
   );
