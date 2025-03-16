@@ -46,7 +46,7 @@ export function Layout({
         </nav>
         <main
           className={clsx(
-            "fixed top-[--header-height] bottom-0 right-0 h-[--content-height] w-[--content-width] overflow-y-auto overflow-x-clip [scroll-gutter:stable]",
+            "fixed bottom-0 right-0 top-[--header-height] h-[--content-height] w-[--content-width] overflow-y-auto overflow-x-clip [scroll-gutter:stable]",
             navbarTransitioning && "motion-safe:transition-[width]",
           )}
         >
