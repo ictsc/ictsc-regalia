@@ -34,28 +34,32 @@ func NewBatch(cfg config.Batch) (*Batch, error) {
 		connect.WithGRPC(),
 	}
 
-	deploymentClient := adminv1connect.NewDeploymentServiceClient(
-		apiClient,
-		cfg.APIURL,
-		connectOpts...,
-	)
-	markClient := adminv1connect.NewMarkServiceClient(
-		apiClient,
-		cfg.APIURL,
-		connectOpts...,
-	)
+	deploymentClient := adminv1connect.NewDeploymentServiceClient(apiClient, cfg.APIURL, connectOpts...)
+	markClient := adminv1connect.NewMarkServiceClient(apiClient, cfg.APIURL, connectOpts...)
+	rankingClient := adminv1connect.NewRankingServiceClient(apiClient, cfg.APIURL, connectOpts...)
 
 	sstateClient, err := sstate.NewSStateClient(cfg.DeploymentSync.SState)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create sstate client")
 	}
 
-	deploymentSync := NewDeploymentSync(cfg.DeploymentSync, deploymentClient, sstateClient)
-	scoreUpdate := NewScoreUpdate(cfg.ScoreUpdate, markClient)
+	var deploymentSync *DeploymentSync
+	if cfg.DeploymentSync != nil {
+		deploymentSync = NewDeploymentSync(*cfg.DeploymentSync, deploymentClient, sstateClient)
+	}
+
+	var scoreUpdate *ScoreUpdate
+	if cfg.ScoreUpdate != nil {
+		scoreUpdate = NewScoreUpdate(*cfg.ScoreUpdate, markClient)
+	}
+
+	if err := setupInstrumentation(rankingClient); err != nil {
+		return nil, errors.Wrap(err, "failed to setup instrumentation")
+	}
 
 	return &Batch{
 		deploymentSync: deploymentSync,
-		scoreUpdate: scoreUpdate,
+		scoreUpdate:    scoreUpdate,
 	}, nil
 }
 
@@ -64,21 +68,25 @@ func (b *Batch) Run(ctx context.Context) error {
 	ctx, cancel := context.WithCancelCause(ctx)
 	defer cancel(nil)
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := b.deploymentSync.Run(ctx); err != nil {
-			cancel(errors.Wrap(err, "failed to start sync deployments"))
-		}
-	}()
+	if b.deploymentSync != nil {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if err := b.deploymentSync.Run(ctx); err != nil {
+				cancel(errors.Wrap(err, "failed to start sync deployments"))
+			}
+		}()
+	}
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := b.scoreUpdate.Run(ctx); err != nil {
-			cancel(errors.Wrap(err, "failed to start update scores"))
-		}
-	}()
+	if b.scoreUpdate != nil {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if err := b.scoreUpdate.Run(ctx); err != nil {
+				cancel(errors.Wrap(err, "failed to start update scores"))
+			}
+		}()
+	}
 
 	wg.Wait()
 	if errors.Is(ctx.Err(), context.Canceled) {

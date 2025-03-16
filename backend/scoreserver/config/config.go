@@ -25,8 +25,8 @@ type (
 		APIURL         string
 		APITokenSource oauth2.TokenSource
 
-		DeploymentSync DeploySync
-		ScoreUpdate    ScoreUpdate
+		DeploymentSync *DeploySync
+		ScoreUpdate    *ScoreUpdate
 	}
 	DeploySync struct {
 		Period time.Duration
