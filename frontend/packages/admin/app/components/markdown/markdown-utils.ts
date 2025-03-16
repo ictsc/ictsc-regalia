@@ -6,6 +6,7 @@ import remarkRehype from "remark-rehype";
 import rehypeKatex from "rehype-katex";
 import rehypeShiki from "@shikijs/rehype/core";
 import rehypeReact from "rehype-react";
+import remarkBreaks from "remark-breaks";
 import production from "react/jsx-runtime";
 import { createHighlighterCore } from "shiki/core";
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
@@ -28,6 +29,7 @@ export async function renderMarkdown(content: string): Promise<ReactNode> {
 
   /* eslint-disable */
   const file = await unified()
+    .use(remarkBreaks)
     .use(remarkParse, { fragment: true })
     .use(remarkGfm)
     .use(remarkMath)
