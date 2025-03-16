@@ -1,4 +1,4 @@
-import { useId, useEffect, useState, useActionState } from "react";
+import { useId, useEffect, useState, useActionState, Suspense } from "react";
 import { Button, Field, Label, Textarea } from "@headlessui/react";
 import { MaterialSymbol } from "../../components/material-symbol";
 import { ConfirmModal } from "./confirmModal";
@@ -154,25 +154,29 @@ export function SubmissionForm(props: {
           <MaterialSymbol icon="send" size={24} />
         </Button>
       </div>
-      <ConfirmModal
-        isOpen={isModalOpen}
-        formId={formId}
-        confirmType="submit"
-        confirmName="intent"
-        confirmValue="submit"
-        onCancel={() => setIsModalOpen(false)}
-        title="解答の確認"
-        confirmText="送信する"
-        cancelText="キャンセル"
-        dialogClassName="w-full max-w-[1024px] transform rounded-8 bg-surface-0 p-16 text-left align-middle shadow-xl transition-all"
-      >
-        <div className="my-12]">
-          <p className="mb-24 text-16 text-text">本当に解答を送信しますか？</p>
-          <Typography>
-            <Markdown>{lastResult?.answer}</Markdown>
-          </Typography>
-        </div>
-      </ConfirmModal>
+      <Suspense>
+        <ConfirmModal
+          isOpen={isModalOpen}
+          formId={formId}
+          confirmType="submit"
+          confirmName="intent"
+          confirmValue="submit"
+          onCancel={() => setIsModalOpen(false)}
+          title="解答の確認"
+          confirmText="送信する"
+          cancelText="キャンセル"
+          dialogClassName="w-full max-w-[1024px] transform rounded-8 bg-surface-0 p-16 text-left align-middle shadow-xl transition-all"
+        >
+          <div className="my-12]">
+            <p className="mb-24 text-16 text-text">
+              本当に解答を送信しますか？
+            </p>
+            <Typography>
+              <Markdown>{lastResult?.answer}</Markdown>
+            </Typography>
+          </div>
+        </ConfirmModal>
+      </Suspense>
     </form>
   );
 }
