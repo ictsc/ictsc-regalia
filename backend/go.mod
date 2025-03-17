@@ -98,7 +98,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/cel-go v0.24.1 // indirect
 	github.com/google/go-containerregistry v0.20.3 // indirect
-	github.com/google/pprof v0.0.0-20250315033105-103756e64e1d // indirect
+	github.com/google/pprof v0.0.0-20250317173921-a4b03ec1a45e // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
