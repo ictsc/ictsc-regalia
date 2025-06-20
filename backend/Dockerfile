@@ -44,9 +44,9 @@ RUN --mount=type=cache,target=/var/lib/apt/ \
       postgresql-client
 ARG TARGETOS
 ARG TARGETARCH
-RUN --mount=type=bind,source=go.mod,target=go.mod \
+RUN --mount=type=bind,source=tools/go.mod,target=go.mod \
 <<-EOS
-SQLDEF_VERSION="$(grep github.com/sqldef/sqldef go.mod | cut -d" " -f2 | head -n1)"
+SQLDEF_VERSION="$(grep 'github.com/sqldef/sqldef v' go.mod | cut -d" " -f2 | head -n1)"
 curl -fsSL -o psqldef.tar.gz "https://github.com/sqldef/sqldef/releases/download/${SQLDEF_VERSION}/psqldef_${TARGETOS}_${TARGETARCH}.tar.gz"
 tar -xf psqldef.tar.gz -C /usr/local/bin
 rm psqldef.tar.gz
