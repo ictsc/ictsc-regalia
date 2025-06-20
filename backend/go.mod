@@ -11,7 +11,7 @@ require (
 	github.com/XSAM/otelsql v0.37.0
 	github.com/bwmarrin/discordgo v0.28.1
 	github.com/casbin/casbin/v2 v2.104.0
-	github.com/cockroachdb/errors v1.11.3
+	github.com/cockroachdb/errors v1.12.0
 	github.com/coreos/go-oidc/v3 v3.13.0
 	github.com/docker/go-connections v0.5.0
 	github.com/go-slog/otelslog v0.3.0
@@ -41,7 +41,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.35.0
 	go.opentelemetry.io/otel/sdk/metric v1.35.0
 	go.opentelemetry.io/otel/trace v1.35.0
-	golang.org/x/net v0.37.0
+	golang.org/x/net v0.38.0
 	golang.org/x/oauth2 v0.28.0
 	golang.org/x/sys v0.31.0
 	google.golang.org/protobuf v1.36.5
