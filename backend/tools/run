@@ -1,0 +1,9 @@
+#!/bin/bash
+#: vim ft=sh :
+tool="$(cd "$(dirname "$0")" && go tool -n "$1")"
+if [ ! -e "$tool" ]; then
+	# https://github.com/golang/go/issues/72824
+	tool="$(cd "$(dirname "$0")" && go tool -n "$1")"
+fi
+shift
+exec "$tool" "$@"
