@@ -19,15 +19,41 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Run golangci-lint
-        uses: reviewdog/action-golangci-lint@v2
+      - name: Setup Go
+        uses: ./.github/actions/setup-go
+      - name: Restore Build Cache
+        id: golangci-lint-build-cache
+        uses: actions/cache/restore@v4
         with:
-          go_version_file: backend/go.mod
-          workdir: backend
-          level: warning
-          fail_on_error: true # deprecated
-          filter_mode: nofilter
-          golangci_lint_flags: --timeout=10m
+          path: ~/.cache/go-build
+          key: golangci-lint-build-${{ hashFiles('backend/tools/go.sum') }}
+          restore-keys: golangci-lint-build-
+      - name: Restore golangci-lint cache
+        id: golangci-lint-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.cache/golangci-lint
+          key: golangci-lint-cache-${{ hashFiles('backend/**/*.go') }}
+          restore-keys: golangci-lint-cache-
+      - name: Run golangci-lint
+        run: ./tools/run github.com/golangci/golangci-lint/cmd/golangci-lint run --timeout=10m --path-prefix=backend --issues-exit-code=0
+        working-directory: backend
+      - name: Save Build Cache
+        uses: actions/cache/save@v4
+        if: >-
+          always() && steps.golangci-lint-build-cache.outputs.cache-hit != 'true'
+          && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        with:
+          path: ~/.cache/go-build
+          key: ${{ steps.golangci-lint-build-cache.outputs.cache-primary-key }}
+      - name: Save golangci-lint cache
+        uses: actions/cache/save@v4
+        if: >-
+          always() && steps.golangci-lint-cache.outputs.cache-hit != 'true'
+          && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        with:
+          path: ~/.cache/golangci-lint
+          key: ${{ steps.golangci-lint-cache.outputs.cache-primary-key }}
   generation:
     name: Generation
     runs-on: ubuntu-latest
@@ -41,7 +67,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/.cache/go-build
-          key: go-generate-${{ hashFiles('backend/go.sum') }}
+          key: go-generate-${{ hashFiles('backend/tools/go.sum') }}
           restore-keys: go-generate-
       - name: Go Generate
         run: go generate -x ./...
@@ -126,7 +152,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/.cache/go-build
-          key: sqldef-cache-${{ hashFiles('backend/go.sum') }}
+          key: sqldef-cache-${{ hashFiles('backend/tools/go.sum') }}
           restore-keys: sqldef-cache-
 
       - name: Run Migration
