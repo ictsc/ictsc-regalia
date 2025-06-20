@@ -5,9 +5,9 @@ clean: true
 inputs:
   - directory: ../proto
 plugins:
-  - local: ["go", "tool", "google.golang.org/protobuf/cmd/protoc-gen-go"]
+  - local: ["./tools/run", "google.golang.org/protobuf/cmd/protoc-gen-go"]
     out: pkg/proto
     opt: paths=source_relative
-  - local: ["go", "tool", "connectrpc.com/connect/cmd/protoc-gen-connect-go"]
+  - local: ["./tools/run", "connectrpc.com/connect/cmd/protoc-gen-connect-go"]
     out: pkg/proto
     opt: paths=source_relative
