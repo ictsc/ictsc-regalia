@@ -19,13 +19,12 @@ jobs:
           github_token: ${{ secrets.github_token }}
           locale: US
           exclude: |
-            **/Dockerfile
-            **/*.svg
-            frontend/**/package.json
-            frontend/**/pnpm-lock.yaml
-            frontend/**/node_modules
-            frontend/packages/proto
-            backend/.golangci.yaml
-            backend/**/go.mod
-            backend/**/go.sum
-            backend/pkg/proto
+            Dockerfile
+            *.svg
+            ./frontend/packages/proto
+            package.json
+            pnpm-lock.yaml
+            ./backend/pkg/proto
+            ./backend/.golangci.yaml
+            **/go.mod
+            **/go.sum
