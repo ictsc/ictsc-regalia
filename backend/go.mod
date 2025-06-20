@@ -27,9 +27,9 @@ require (
 	github.com/redis/go-redis/v9 v9.7.3
 	github.com/samber/slog-formatter v1.2.0
 	github.com/samber/slog-http v1.6.0
-	github.com/testcontainers/testcontainers-go v0.35.0
-	github.com/testcontainers/testcontainers-go/modules/postgres v0.35.0
-	github.com/testcontainers/testcontainers-go/modules/redis v0.35.0
+	github.com/testcontainers/testcontainers-go v0.37.0
+	github.com/testcontainers/testcontainers-go/modules/postgres v0.37.0
+	github.com/testcontainers/testcontainers-go/modules/redis v0.37.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.60.0
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.60.0
 	go.opentelemetry.io/otel v1.35.0
@@ -41,9 +41,9 @@ require (
 	go.opentelemetry.io/otel/sdk v1.35.0
 	go.opentelemetry.io/otel/sdk/metric v1.35.0
 	go.opentelemetry.io/otel/trace v1.35.0
-	golang.org/x/net v0.37.0
+	golang.org/x/net v0.38.0
 	golang.org/x/oauth2 v0.28.0
-	golang.org/x/sys v0.31.0
+	golang.org/x/sys v0.32.0
 	google.golang.org/protobuf v1.36.5
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -67,6 +67,7 @@ require (
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/docker v28.0.2+incompatible // indirect
 	github.com/docker/go-units v0.5.0 // indirect
+	github.com/ebitengine/purego v0.8.2 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/getsentry/sentry-go v0.31.1 // indirect
 	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
@@ -85,7 +86,8 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20250317134145-8bc96cf8fc35 // indirect
-	github.com/magiconair/properties v1.8.9 // indirect
+	github.com/magiconair/properties v1.8.10 // indirect
+	github.com/mdelapenya/tlscert v0.2.0 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/patternmatcher v0.6.0 // indirect
 	github.com/moby/sys/sequential v0.6.0 // indirect
@@ -102,8 +104,7 @@ require (
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/samber/lo v1.49.1 // indirect
 	github.com/samber/slog-multi v1.4.0 // indirect
-	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
-	github.com/shoenig/go-m1cpu v0.1.6 // indirect
+	github.com/shirou/gopsutil/v4 v4.25.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.15 // indirect
@@ -112,9 +113,9 @@ require (
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.35.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.5.0 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
-	golang.org/x/sync v0.12.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
+	golang.org/x/sync v0.13.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250313205543-e70fdf4c4cb4 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250313205543-e70fdf4c4cb4 // indirect
