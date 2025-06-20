@@ -13,7 +13,7 @@ runs:
       id: go-mod-cache
       with:
         path: ~/go/pkg/mod
-        key: go-mod-${{ hashFiles('backend/go.sum') }}
+        key: go-mod-${{ hashFiles('backend/go.sum', 'backend/tools/go.sum') }}
         restore-keys: |
           go-mod-
     - name: Clean large module cache
@@ -31,6 +31,11 @@ runs:
       if: steps.go-mod-cache.outputs.cache-hit != 'true'
       run: go mod download
       working-directory: backend
+      shell: bash
+    - name: Download Go Tools
+      if: steps.go-mod-cache.outputs.cache-hit != 'true'
+      run: go mod download
+      working-directory: backend/tools
       shell: bash
     - name: Save Module Cache
       if: >-
