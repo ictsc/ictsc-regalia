@@ -110,7 +110,7 @@ require (
 	github.com/golangci/go-printf-func-name v0.1.0 // indirect
 	github.com/golangci/gofmt v0.0.0-20250413222143-f2e10e00591b // indirect
 	github.com/golangci/golangci-lint v1.64.8 // indirect
-	github.com/golangci/misspell v0.6.0 // indirect
+	github.com/golangci/misspell v0.7.0 // indirect
 	github.com/golangci/plugin-module-register v0.1.1 // indirect
 	github.com/golangci/revgrep v0.8.0 // indirect
 	github.com/golangci/unconvert v0.0.0-20240309020433-c5143eacb3ed // indirect
