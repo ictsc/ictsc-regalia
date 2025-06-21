@@ -17,6 +17,7 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/log"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"golang.org/x/oauth2"
 )
@@ -275,7 +276,7 @@ func setupDex(tb testing.TB, _ dexConfig) string {
 			},
 			ExposedPorts: []string{dexWebHTTPPort, "5558/tcp"},
 		},
-		Logger:  testcontainers.TestLogger(tb),
+		Logger:  log.TestLogger(tb),
 		Started: true,
 	})
 	if err != nil {
@@ -295,7 +296,7 @@ func setupDex(tb testing.TB, _ dexConfig) string {
 
 	issuer := "http://" + net.JoinHostPort(host, httpPort.Port())
 	if err := ctr.CopyToContainer(
-		ctx, []byte(fmt.Sprintf(dexConfigYAML, issuer)), "/etc/dex/dex.yaml", int64(fs.ModePerm),
+		ctx, fmt.Appendf(nil, dexConfigYAML, issuer), "/etc/dex/dex.yaml", int64(fs.ModePerm),
 	); err != nil {
 		tb.Fatalf("Failed to copy config: %v", err)
 	}
