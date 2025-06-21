@@ -12,7 +12,7 @@ require (
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/casbin/casbin/v2 v2.104.0
 	github.com/cockroachdb/errors v1.12.0
-	github.com/coreos/go-oidc/v3 v3.13.0
+	github.com/coreos/go-oidc/v3 v3.14.1
 	github.com/docker/go-connections v0.5.0
 	github.com/go-slog/otelslog v0.3.0
 	github.com/gofrs/uuid/v5 v5.3.2
