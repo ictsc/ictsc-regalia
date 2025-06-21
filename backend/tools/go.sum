@@ -32,8 +32,8 @@ github.com/Abirdcfly/dupword v0.1.6 h1:qeL6u0442RPRe3mcaLcbaCi2/Y/hOcdtw6DE9odjz
 github.com/Abirdcfly/dupword v0.1.6/go.mod h1:s+BFMuL/I4YSiFv29snqyjwzDp4b65W2Kvy+PKzZ6cw=
 github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6 h1:He8afgbRMd7mFxO99hRNu+6tazq8nFF9lIwo9JFroBk=
 github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6/go.mod h1:8o94RPi1/7XTJvwPpRSzSUedZrtlirdB3r9Z20bi2f8=
-github.com/Antonboom/errname v1.0.0 h1:oJOOWR07vS1kRusl6YRSlat7HFnb3mSfMl6sDMRoTBA=
-github.com/Antonboom/errname v1.0.0/go.mod h1:gMOBFzK/vrTiXN9Oh+HFs+e6Ndl0eTFbtsRTSRdXyGI=
+github.com/Antonboom/errname v1.1.0 h1:A+ucvdpMwlo/myWrkHEUEBWc/xuXdud23S8tmTb/oAE=
+github.com/Antonboom/errname v1.1.0/go.mod h1:O1NMrzgUcVBGIfi3xlVuvX8Q/VP/73sseCaAppfjqZw=
 github.com/Antonboom/nilnil v1.1.0 h1:jGxJxjgYS3VUUtOTNk8Z1icwT5ESpLH/426fjmQG+ng=
 github.com/Antonboom/nilnil v1.1.0/go.mod h1:b7sAlogQjFa1wV8jUW3o4PMzDVFLbTux+xnQdvzdcIE=
 github.com/Antonboom/testifylint v1.5.2 h1:4s3Xhuv5AvdIgbd8wOOEeo0uZG7PbDKQyKY5lGoQazk=
