@@ -8,7 +8,7 @@ require (
 	connectrpc.com/grpchealth v1.4.0
 	connectrpc.com/otelconnect v0.7.2
 	github.com/DATA-DOG/go-txdb v0.2.1
-	github.com/XSAM/otelsql v0.37.0
+	github.com/XSAM/otelsql v0.39.0
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/casbin/casbin/v2 v2.107.0
 	github.com/cockroachdb/errors v1.12.0
