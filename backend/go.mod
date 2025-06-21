@@ -26,7 +26,7 @@ require (
 	github.com/redis/go-redis/extra/redisotel/v9 v9.10.0
 	github.com/redis/go-redis/v9 v9.10.0
 	github.com/samber/slog-formatter v1.2.0
-	github.com/samber/slog-http v1.6.0
+	github.com/samber/slog-http v1.7.0
 	github.com/testcontainers/testcontainers-go v0.37.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.37.0
 	github.com/testcontainers/testcontainers-go/modules/redis v0.37.0
