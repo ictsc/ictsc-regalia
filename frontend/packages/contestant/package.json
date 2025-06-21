@@ -60,7 +60,7 @@
     "@tanstack/router-devtools": "^1.49.2",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "material-symbols": "^0.29.0",
+    "material-symbols": "^0.31.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-error-boundary": "^5.0.0",
