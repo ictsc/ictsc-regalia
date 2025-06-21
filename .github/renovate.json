@@ -4,7 +4,7 @@
     "config:recommended"
   ],
   "prHourlyLimit": 0,
-  "prConcurrentLimit": 0,
+  "prConcurrentLimit": 20,
   "platformAutomerge": true,
   "labels": [
     "dependencies"
@@ -77,9 +77,9 @@
     {
       "customType": "regex",
       "description": "Go tool dependencies",
-      "fileMatch": [
-        ".+\\.ya?ml$",
-        "(^|/)Dockerfile$"
+      "managerFilePatterns": [
+        "/.+\\.ya?ml$/",
+        "/(^|/)Dockerfile$/"
       ],
       "matchStrings": [
         "go install (?<depName>((?:[^@c]|c(?:[^m]|m(?:[^d]))))+?)@(?<currentValue>.+)\n",
