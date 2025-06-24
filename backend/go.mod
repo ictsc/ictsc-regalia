@@ -23,8 +23,8 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/phsym/console-slog v0.3.1
 	github.com/rbcervilla/redisstore/v9 v9.0.0
-	github.com/redis/go-redis/extra/redisotel/v9 v9.10.0
-	github.com/redis/go-redis/v9 v9.10.0
+	github.com/redis/go-redis/extra/redisotel/v9 v9.11.0
+	github.com/redis/go-redis/v9 v9.11.0
 	github.com/samber/slog-formatter v1.2.0
 	github.com/samber/slog-http v1.7.0
 	github.com/testcontainers/testcontainers-go v0.37.0
@@ -104,7 +104,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
-	github.com/redis/go-redis/extra/rediscmd/v9 v9.10.0 // indirect
+	github.com/redis/go-redis/extra/rediscmd/v9 v9.11.0 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/samber/lo v1.51.0 // indirect
 	github.com/samber/slog-common v0.19.0 // indirect
