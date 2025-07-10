@@ -8,7 +8,7 @@
     "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
-    "@tsconfig/vite-react": "^3.0.2",
+    "@tsconfig/vite-react": "^6.0.0",
     "pnpm": "10.13.1",
     "typescript": "^5.5.4"
   },
