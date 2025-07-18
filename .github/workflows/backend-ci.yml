@@ -36,7 +36,7 @@ jobs:
           key: golangci-lint-cache-${{ hashFiles('backend/**/*.go') }}
           restore-keys: golangci-lint-cache-
       - name: Run golangci-lint
-        run: ./tools/run github.com/golangci/golangci-lint/cmd/golangci-lint run --timeout=10m --path-prefix=backend --issues-exit-code=0
+        run: ./tools/run github.com/golangci/golangci-lint/v2/cmd/golangci-lint run --timeout=10m --path-prefix=backend --issues-exit-code=0
         working-directory: backend
       - name: Save Build Cache
         uses: actions/cache/save@v4
