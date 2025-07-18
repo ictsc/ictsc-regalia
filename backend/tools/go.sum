@@ -445,8 +445,8 @@ github.com/securego/gosec/v2 v2.22.5 h1:ySws9uwOeE42DsG54v2moaJfh7r08Ev7SAYJuoMD
 github.com/securego/gosec/v2 v2.22.5/go.mod h1:AWfgrFsVewk5LKobsPWlygCHt8K91boVPyL6GUZG5NY=
 github.com/segmentio/asm v1.2.0 h1:9BQrFxC+YOHJlTlHGkTrFWf59nbL3XnCoFLTwDCI7ys=
 github.com/segmentio/asm v1.2.0/go.mod h1:BqMnlJP91P8d+4ibuonYZw9mfnzI9HfxselHZr5aAcs=
-github.com/segmentio/encoding v0.5.1 h1:LhmgXA5/alniiqfc4cYYrxF6DbUQ3m8MVz4/LQIU1mg=
-github.com/segmentio/encoding v0.5.1/go.mod h1:HS1ZKa3kSN32ZHVZ7ZLPLXWvOVIiZtyJnO1gPH1sKt0=
+github.com/segmentio/encoding v0.5.2 h1:7jXThoErfS4duwPrgkzLo6kBxCPfXEuD/WaU3hFj0wc=
+github.com/segmentio/encoding v0.5.2/go.mod h1:HS1ZKa3kSN32ZHVZ7ZLPLXWvOVIiZtyJnO1gPH1sKt0=
 github.com/shurcooL/go v0.0.0-20180423040247-9e1955d9fb6e/go.mod h1:TDJrrUr11Vxrven61rcy3hJMUqaf/CLWYhHNPmT14Lk=
 github.com/shurcooL/go-goon v0.0.0-20170922171312-37c2f522c041/go.mod h1:N5mDOmsrJOB+vfqUK+7DmDyjhSLIIBnXo9lvZJj3MWQ=
 github.com/sirupsen/logrus v1.9.3 h1:dueUQJ1C2q9oE3F7wvmSGAaVtTmUizReu6fjN8uqzbQ=
