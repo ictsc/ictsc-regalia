@@ -16,9 +16,9 @@ linters:
     - unparam
 
 formatters:
-  disable:
-    - gci
-    - gofumpt
+  enable:
+    - goimports
+    - gofmt
 
 issues:
   exclude-use-default: false
