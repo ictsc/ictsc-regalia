@@ -1,20 +1,24 @@
+version: 2
+
 linters:
   enable-all: true
   disable:
-    - tenv # deprecated
-    - wsl
+    - wsl # replaced with wsl_v5 in v2
     - nlreturn
     - depguard
     - dogsled
-    - gci
     - godot
     - nolintlint
     - gochecknoglobals
     - ireturn
-    - gofumpt
     - tagliatelle
     - funlen
     - unparam
+
+formatters:
+  enable:
+    - goimports
+    - gofmt
 
 issues:
   exclude-use-default: false
