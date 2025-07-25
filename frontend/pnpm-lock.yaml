@@ -24,11 +24,11 @@ importers:
         specifier: ^2.0.0
         version: 2.6.2
       '@connectrpc/connect':
-        specifier: 2.0.2
-        version: 2.0.2(@bufbuild/protobuf@2.6.2)
+        specifier: 2.0.3
+        version: 2.0.3(@bufbuild/protobuf@2.6.2)
       '@connectrpc/connect-web':
         specifier: 2.0.2
-        version: 2.0.2(@bufbuild/protobuf@2.6.2)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.2))
+        version: 2.0.2(@bufbuild/protobuf@2.6.2)(@connectrpc/connect@2.0.3(@bufbuild/protobuf@2.6.2))
       '@ictsc/proto':
         specifier: workspace:*
         version: link:../proto
@@ -200,11 +200,11 @@ importers:
         specifier: ^2.0.0
         version: 2.6.2
       '@connectrpc/connect':
-        specifier: 2.0.2
-        version: 2.0.2(@bufbuild/protobuf@2.6.2)
+        specifier: 2.0.3
+        version: 2.0.3(@bufbuild/protobuf@2.6.2)
       '@connectrpc/connect-web':
         specifier: 2.0.2
-        version: 2.0.2(@bufbuild/protobuf@2.6.2)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.2))
+        version: 2.0.2(@bufbuild/protobuf@2.6.2)(@connectrpc/connect@2.0.3(@bufbuild/protobuf@2.6.2))
       '@headlessui/react':
         specifier: ^2.1.2
         version: 2.2.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -652,8 +652,8 @@ packages:
       '@bufbuild/protobuf': ^2.2.0
       '@connectrpc/connect': 2.0.2
 
-  '@connectrpc/connect@2.0.2':
-    resolution: {integrity: sha512-xZuylIUNvNlH52e/4eQsZvY4QZyDJRtEFEDnn/yBrv5Xi5ZZI/p8X+GAHH35ucVaBvv9u7OzHZo8+tEh1EFTxA==}
+  '@connectrpc/connect@2.0.3':
+    resolution: {integrity: sha512-jAbVMHVtDCydGt2P20VpmLjbLtERqSV0RMSyQF3k2zhK8pzQ2QaCAcyVhufClqrOAFZUKL5BqVYtttaxvhmRgg==}
     peerDependencies:
       '@bufbuild/protobuf': ^2.2.0
 
@@ -4899,12 +4899,12 @@ snapshots:
       '@types/tough-cookie': 4.0.5
       tough-cookie: 4.1.4
 
-  '@connectrpc/connect-web@2.0.2(@bufbuild/protobuf@2.6.2)(@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.2))':
+  '@connectrpc/connect-web@2.0.2(@bufbuild/protobuf@2.6.2)(@connectrpc/connect@2.0.3(@bufbuild/protobuf@2.6.2))':
     dependencies:
       '@bufbuild/protobuf': 2.6.2
-      '@connectrpc/connect': 2.0.2(@bufbuild/protobuf@2.6.2)
+      '@connectrpc/connect': 2.0.3(@bufbuild/protobuf@2.6.2)
 
-  '@connectrpc/connect@2.0.2(@bufbuild/protobuf@2.6.2)':
+  '@connectrpc/connect@2.0.3(@bufbuild/protobuf@2.6.2)':
     dependencies:
       '@bufbuild/protobuf': 2.6.2
 
