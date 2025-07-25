@@ -27,8 +27,8 @@ importers:
         specifier: 2.0.3
         version: 2.0.3(@bufbuild/protobuf@2.6.2)
       '@connectrpc/connect-web':
-        specifier: 2.0.2
-        version: 2.0.2(@bufbuild/protobuf@2.6.2)(@connectrpc/connect@2.0.3(@bufbuild/protobuf@2.6.2))
+        specifier: 2.0.3
+        version: 2.0.3(@bufbuild/protobuf@2.6.2)(@connectrpc/connect@2.0.3(@bufbuild/protobuf@2.6.2))
       '@ictsc/proto':
         specifier: workspace:*
         version: link:../proto
@@ -203,8 +203,8 @@ importers:
         specifier: 2.0.3
         version: 2.0.3(@bufbuild/protobuf@2.6.2)
       '@connectrpc/connect-web':
-        specifier: 2.0.2
-        version: 2.0.2(@bufbuild/protobuf@2.6.2)(@connectrpc/connect@2.0.3(@bufbuild/protobuf@2.6.2))
+        specifier: 2.0.3
+        version: 2.0.3(@bufbuild/protobuf@2.6.2)(@connectrpc/connect@2.0.3(@bufbuild/protobuf@2.6.2))
       '@headlessui/react':
         specifier: ^2.1.2
         version: 2.2.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -646,11 +646,11 @@ packages:
   '@bundled-es-modules/tough-cookie@0.1.6':
     resolution: {integrity: sha512-dvMHbL464C0zI+Yqxbz6kZ5TOEp7GLW+pry/RWndAR8MJQAXZ2rPmIs8tziTZjeIyhSNZgZbCePtfSbdWqStJw==}
 
-  '@connectrpc/connect-web@2.0.2':
-    resolution: {integrity: sha512-QANMFPiL2o66BdBEctg4TsQLe5ozsBLqcle3dCBp7BwGlNGTY6NnNnqmt+YRnpeMW88GgomJwWNMGCrRD9pRKA==}
+  '@connectrpc/connect-web@2.0.3':
+    resolution: {integrity: sha512-w4LZ2Ci+NW/kcMoHnoczJgyGTmxuv/MQ+tTm2UNL40HimXKWYCAna/fV0AbHRnTiteiwEBpeSCaxF34MetzhAw==}
     peerDependencies:
       '@bufbuild/protobuf': ^2.2.0
-      '@connectrpc/connect': 2.0.2
+      '@connectrpc/connect': 2.0.3
 
   '@connectrpc/connect@2.0.3':
     resolution: {integrity: sha512-jAbVMHVtDCydGt2P20VpmLjbLtERqSV0RMSyQF3k2zhK8pzQ2QaCAcyVhufClqrOAFZUKL5BqVYtttaxvhmRgg==}
@@ -4899,7 +4899,7 @@ snapshots:
       '@types/tough-cookie': 4.0.5
       tough-cookie: 4.1.4
 
-  '@connectrpc/connect-web@2.0.2(@bufbuild/protobuf@2.6.2)(@connectrpc/connect@2.0.3(@bufbuild/protobuf@2.6.2))':
+  '@connectrpc/connect-web@2.0.3(@bufbuild/protobuf@2.6.2)(@connectrpc/connect@2.0.3(@bufbuild/protobuf@2.6.2))':
     dependencies:
       '@bufbuild/protobuf': 2.6.2
       '@connectrpc/connect': 2.0.3(@bufbuild/protobuf@2.6.2)
