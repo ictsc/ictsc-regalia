@@ -21,7 +21,7 @@
     "@tanstack/router-plugin": "^1.49.3",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@vitejs/plugin-react": "^5.0.0",
     "core": "link:@shikijs/rehype/core",
     "eslint": "^9.9.1",
     "globals": "^16.0.0",
