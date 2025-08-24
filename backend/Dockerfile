@@ -35,7 +35,7 @@ COPY --from=batch-builder --chown=nonroot:nonroot /batch /
 ENTRYPOINT ["/batch"]
 
 # -- toolbox ---
-FROM debian:12-slim AS toolbox
+FROM debian:13-slim AS toolbox
 # Install tools
 RUN --mount=type=cache,target=/var/lib/apt/ \
     --mount=type=cache,target=/var/cache/apt/ \
