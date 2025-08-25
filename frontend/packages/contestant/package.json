@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.0.0",
-    "@connectrpc/connect": "2.0.4",
+    "@connectrpc/connect": "2.1.0",
     "@connectrpc/connect-web": "2.0.4",
     "@headlessui/react": "^2.1.2",
     "@ictsc/proto": "workspace:*",
