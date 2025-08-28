@@ -95,7 +95,7 @@ importers:
         version: 19.1.8(@types/react@19.1.12)
       '@vitejs/plugin-react':
         specifier: ^5.0.0
-        version: 5.0.1(vite@7.1.3(@types/node@22.18.0)(jiti@1.21.7)(sugarss@5.0.0(postcss@8.5.6))(tsx@4.20.5)(yaml@2.6.1))
+        version: 5.0.2(vite@7.1.3(@types/node@22.18.0)(jiti@1.21.7)(sugarss@5.0.0(postcss@8.5.6))(tsx@4.20.5)(yaml@2.6.1))
       core:
         specifier: link:@shikijs/rehype/core
         version: link:@shikijs/rehype/core
@@ -316,7 +316,7 @@ importers:
         version: 19.1.8(@types/react@19.1.12)
       '@vitejs/plugin-react':
         specifier: ^5.0.0
-        version: 5.0.1(vite@7.1.3(@types/node@22.18.0)(jiti@1.21.7)(sugarss@5.0.0(postcss@8.5.6))(tsx@4.20.5)(yaml@2.6.1))
+        version: 5.0.2(vite@7.1.3(@types/node@22.18.0)(jiti@1.21.7)(sugarss@5.0.0(postcss@8.5.6))(tsx@4.20.5)(yaml@2.6.1))
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.21(postcss@8.5.6)
@@ -1092,8 +1092,8 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
-  '@rolldown/pluginutils@1.0.0-beta.32':
-    resolution: {integrity: sha512-QReCdvxiUZAPkvp1xpAg62IeNzykOFA6syH2CnClif4YmALN1XKpB39XneL80008UbtMShthSVDKmrx05N1q/g==}
+  '@rolldown/pluginutils@1.0.0-beta.34':
+    resolution: {integrity: sha512-LyAREkZHP5pMom7c24meKmJCdhf2hEyvam2q0unr3or9ydwDL+DJ8chTF6Av/RFPb3rH8UFBdMzO5MxTZW97oA==}
 
   '@rollup/pluginutils@5.2.0':
     resolution: {integrity: sha512-qWJ2ZTbmumwiLFomfzTyt5Kng4hwPi9rwCYN4SHb6eaRU1KNO4ccxINHr/VhH4GgPlt1XfSTLX2LBTme8ne4Zw==}
@@ -1820,8 +1820,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@vitejs/plugin-react@5.0.1':
-    resolution: {integrity: sha512-DE4UNaBXwtVoDJ0ccBdLVjFTWL70NRuWNCxEieTI3lrq9ORB9aOCQEKstwDXBl87NvFdbqh/p7eINGyj0BthJA==}
+  '@vitejs/plugin-react@5.0.2':
+    resolution: {integrity: sha512-tmyFgixPZCx2+e6VO9TNITWcCQl8+Nl/E8YbAyPVv85QCc7/A3JrdfG2A8gIzvVhWuzMOVrFW1aReaNxrI6tbw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
@@ -2061,8 +2061,8 @@ packages:
   caniuse-lite@1.0.30001702:
     resolution: {integrity: sha512-LoPe/D7zioC0REI5W73PeR1e1MLCipRGq/VkovJnd6Df+QVqT+vT33OXCp8QUd7kA7RZrHWxb1B36OQKI/0gOA==}
 
-  caniuse-lite@1.0.30001735:
-    resolution: {integrity: sha512-EV/laoX7Wq2J9TQlyIXRxTJqIw4sxfXS4OYgudGxBYRuTv0q7AM6yMEpU/Vo1I94thg9U6EZ2NfZx9GJq83u7w==}
+  caniuse-lite@1.0.30001737:
+    resolution: {integrity: sha512-BiloLiXtQNrY5UyF0+1nSJLXUENuhka2pzy2Fx5pGxqavdrxSCW4U6Pn/PoG3Efspi2frRbHpBV2XsrPE6EDlw==}
 
   ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
@@ -2264,8 +2264,8 @@ packages:
   electron-to-chromium@1.5.113:
     resolution: {integrity: sha512-wjT2O4hX+wdWPJ76gWSkMhcHAV2PTMX+QetUCPYEdCIe+cxmgzzSSiGRCKW8nuh4mwKZlpv0xvoW7OF2X+wmHg==}
 
-  electron-to-chromium@1.5.205:
-    resolution: {integrity: sha512-gBtbT7IgOHu7CwdtIiXwbNRD1l6oG6GAyanmwMCLVqaoGy92Jfe1dSHLiSj8xUEZNxOTIVlXuaAalMMD+S4y0w==}
+  electron-to-chromium@1.5.211:
+    resolution: {integrity: sha512-IGBvimJkotaLzFnwIVgW9/UD/AOJ2tByUmeOrtqBfACSbAw5b1G0XpvdaieKyc7ULmbwXVx+4e4Be8pOPBrYkw==}
 
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
@@ -4453,8 +4453,8 @@ snapshots:
 
   '@ampproject/remapping@2.3.0':
     dependencies:
-      '@jridgewell/gen-mapping': 0.3.8
-      '@jridgewell/trace-mapping': 0.3.25
+      '@jridgewell/gen-mapping': 0.3.13
+      '@jridgewell/trace-mapping': 0.3.30
 
   '@babel/code-frame@7.26.2':
     dependencies:
@@ -5159,7 +5159,7 @@ snapshots:
     dependencies:
       react: 19.1.1
 
-  '@rolldown/pluginutils@1.0.0-beta.32': {}
+  '@rolldown/pluginutils@1.0.0-beta.34': {}
 
   '@rollup/pluginutils@5.2.0(rollup@4.46.3)':
     dependencies:
@@ -5951,12 +5951,12 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.10.1':
     optional: true
 
-  '@vitejs/plugin-react@5.0.1(vite@7.1.3(@types/node@22.18.0)(jiti@1.21.7)(sugarss@5.0.0(postcss@8.5.6))(tsx@4.20.5)(yaml@2.6.1))':
+  '@vitejs/plugin-react@5.0.2(vite@7.1.3(@types/node@22.18.0)(jiti@1.21.7)(sugarss@5.0.0(postcss@8.5.6))(tsx@4.20.5)(yaml@2.6.1))':
     dependencies:
       '@babel/core': 7.28.3
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.3)
       '@babel/plugin-transform-react-jsx-source': 7.27.1(@babel/core@7.28.3)
-      '@rolldown/pluginutils': 1.0.0-beta.32
+      '@rolldown/pluginutils': 1.0.0-beta.34
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
       vite: 7.1.3(@types/node@22.18.0)(jiti@1.21.7)(sugarss@5.0.0(postcss@8.5.6))(tsx@4.20.5)(yaml@2.6.1)
@@ -6218,8 +6218,8 @@ snapshots:
 
   browserslist@4.25.3:
     dependencies:
-      caniuse-lite: 1.0.30001735
-      electron-to-chromium: 1.5.205
+      caniuse-lite: 1.0.30001737
+      electron-to-chromium: 1.5.211
       node-releases: 2.0.19
       update-browserslist-db: 1.1.3(browserslist@4.25.3)
 
@@ -6253,7 +6253,7 @@ snapshots:
 
   caniuse-lite@1.0.30001702: {}
 
-  caniuse-lite@1.0.30001735: {}
+  caniuse-lite@1.0.30001737: {}
 
   ccount@2.0.1: {}
 
@@ -6432,7 +6432,7 @@ snapshots:
 
   electron-to-chromium@1.5.113: {}
 
-  electron-to-chromium@1.5.205: {}
+  electron-to-chromium@1.5.211: {}
 
   emoji-regex@8.0.0: {}
 
