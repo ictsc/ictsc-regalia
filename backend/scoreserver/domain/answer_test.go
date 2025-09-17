@@ -43,7 +43,7 @@ func TestSubmitDescriptiveAnswer(t *testing.T) {
 					Problem:   domain.FixDescriptiveProblem1(t, nil).Problem().Data(),
 					Author:    domain.FixUser1(t, nil).Data(),
 					CreatedAt: time.Date(2021, 1, 1, 1, 0, 0, 0, time.UTC),
-					Interval:  20 * time.Minute,
+					Interval:  1 * time.Millisecond,
 				},
 				Body: &domain.AnswerBodyData{
 					Descriptive: &domain.DescriptiveAnswerBodyData{
@@ -80,7 +80,7 @@ func TestSubmitDescriptiveAnswer(t *testing.T) {
 					Problem:   domain.FixDescriptiveProblem1(t, nil).Problem().Data(),
 					Author:    domain.FixUser1(t, nil).Data(),
 					CreatedAt: time.Date(2021, 1, 1, 1, 30, 0, 0, time.UTC),
-					Interval:  20 * time.Minute,
+					Interval:  1 * time.Millisecond,
 				},
 				Body: &domain.AnswerBodyData{
 					Descriptive: &domain.DescriptiveAnswerBodyData{
