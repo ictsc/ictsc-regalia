@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ### Building
-- **Run scoreserver**: `./scripts/local-exec go run ./cmd/scoreserver/ -dev` (starts with local DB/Redis)
+- **Run scoreserver**: `./scripts/local-exec go run ./cmd/scoreserver/ -dev -contestant.base-url=http://localhost:3000/api -fake.schedule` (starts with local DB/Redis)
 - **Build binary**: `go build ./cmd/scoreserver/`
 
 ### Testing
@@ -15,6 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Linting
 - **Lint check**: `golangci-lint run`
+- **Format code**: `golangci-lint fmt`
 - Configuration: `.golangci.yaml`
 
 ### Database
@@ -30,7 +31,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture Overview
 
-This is a Go backend for a CTF scoring server using Connect RPC (gRPC-Web compatible).
+This is a Go backend for a ICTSC scoring server using Connect RPC (gRPC-Web compatible).
 
 ### Core Structure
 - **cmd/**: Entry points
@@ -46,7 +47,7 @@ This is a Go backend for a CTF scoring server using Connect RPC (gRPC-Web compat
   - `infra/`: Infrastructure implementations
     - `pg/`: PostgreSQL repositories
     - `discord/`: Discord OAuth integration
-    - `sstate/`: Redis session state
+    - `sstate/`: Problem deployment state management
   - `config/`: Configuration management
   - `batch/`: Batch job implementations
 
@@ -57,7 +58,7 @@ This is a Go backend for a CTF scoring server using Connect RPC (gRPC-Web compat
 ### Key Design Patterns
 - **Repository Pattern**: Domain models have corresponding repositories in `infra/pg/`
 - **Connect RPC**: API uses Connect protocol (gRPC-Web compatible) with protobuf
-- **Session Management**: Redis-based sessions via `sstate` package
+- **Problem State Management**: Problem deployment state via `sstate` package
 - **Transactions**: Uses `domain.Tx` interface for database transactions
 - **Testing**: Tests use Testcontainers for isolated PostgreSQL instances
 
@@ -70,5 +71,5 @@ This is a Go backend for a CTF scoring server using Connect RPC (gRPC-Web compat
 - **API**: Connect RPC (protobuf-based)
 - **Database**: PostgreSQL with pgx driver
 - **Session Store**: Redis
-- **Observability**: OpenTelemetry (traces via Jaeger)
+- **Observability**: OpenTelemetry (traces)
 - **Testing**: Testcontainers for integration tests

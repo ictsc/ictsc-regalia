@@ -34,7 +34,7 @@ Run from `packages/proto/`:
 
 ## Architecture Overview
 
-This is a React frontend monorepo for the ICTSC CTF platform using pnpm workspaces.
+This is a React frontend monorepo for the ICTSC platform using pnpm workspaces.
 
 ### Package Structure
 - **packages/contestant/**: Competition participant dashboard
