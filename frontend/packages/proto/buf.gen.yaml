@@ -8,6 +8,6 @@ inputs:
   - directory: ../../../proto
 plugins:
   - local: protoc-gen-es
-    opt: target=ts
+    opt: target=js+dts
     out: proto
     include_imports: true
