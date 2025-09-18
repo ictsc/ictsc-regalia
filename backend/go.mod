@@ -8,7 +8,7 @@ require (
 	connectrpc.com/grpchealth v1.4.0
 	connectrpc.com/otelconnect v0.8.0
 	github.com/DATA-DOG/go-txdb v0.2.1
-	github.com/XSAM/otelsql v0.39.0
+	github.com/XSAM/otelsql v0.40.0
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/casbin/casbin/v2 v2.126.0
 	github.com/cockroachdb/errors v1.12.0
@@ -38,8 +38,8 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.37.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.37.0
 	go.opentelemetry.io/otel/metric v1.38.0
-	go.opentelemetry.io/otel/sdk v1.37.0
-	go.opentelemetry.io/otel/sdk/metric v1.37.0
+	go.opentelemetry.io/otel/sdk v1.38.0
+	go.opentelemetry.io/otel/sdk/metric v1.38.0
 	go.opentelemetry.io/otel/trace v1.38.0
 	golang.org/x/net v0.44.0
 	golang.org/x/oauth2 v0.30.0
