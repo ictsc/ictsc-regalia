@@ -69,9 +69,8 @@ type (
 
 type (
 	ContestantAPI struct {
-		Address        netip.AddrPort
-		Auth           ContestantAuth
-		AllowedOrigins []string
+		Address netip.AddrPort
+		Auth    ContestantAuth
 	}
 	ContestantAuth struct {
 		BaseURL             *url.URL
