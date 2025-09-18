@@ -54,7 +54,7 @@ chmod +x /usr/local/bin/psqldef
 EOS
 # Add a user
 ARG UID=1000
-RUN adduser --uid ${UID} --disabled-password --gecos '' toolbox
+RUN useradd -u "${UID}" -m -s /bin/bash -c "" -p "!" toolbox
 USER toolbox
 # Copy scripts
 WORKDIR /home/toolbox
