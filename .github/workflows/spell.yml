@@ -23,7 +23,7 @@ jobs:
             *.svg
             ./frontend/packages/proto
             package.json
-            pnpm-lock.yaml
+            ./frontend/pnpm-lock.yaml
             ./backend/pkg/proto
             ./backend/.golangci.yaml
             **/go.mod
