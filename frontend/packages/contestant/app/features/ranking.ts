@@ -1,6 +1,9 @@
 import { type Transport, createClient } from "@connectrpc/connect";
 
-import { Rank as ProtoRank, RankingService } from "@ictsc/proto/contestant/v1";
+import {
+  type Rank as ProtoRank,
+  RankingService,
+} from "@ictsc/proto/contestant/v1";
 
 export type Rank = ProtoRank;
 
