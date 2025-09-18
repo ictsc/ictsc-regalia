@@ -22,10 +22,14 @@ for (const [key, def] of Object.entries(packageJSON.exports)) {
   for (const protoFile of files) {
     const filePath = path.join(protoPath, key, protoFile);
     const exportPath = path.relative(path.dirname(targetPath), filePath);
-    result += `export * from "${exportPath}";\n`;
+    if (filePath.endsWith(".js")) {
+      result += `export * from "${exportPath}";\n`;
+    } else if (filePath.endsWith(".d.ts")) {
+      result += `export type * from "${exportPath}";\n`;
+    }
   }
 
   await fs.mkdir(path.dirname(targetPath), { recursive: true });
-  console.log(path.relative(packagePath, targetPath))
+  console.log(path.relative(packagePath, targetPath));
   await fs.writeFile(targetPath, result, {});
 }
