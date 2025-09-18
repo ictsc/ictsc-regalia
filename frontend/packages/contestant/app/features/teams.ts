@@ -1,4 +1,4 @@
-import { createClient, Transport } from "@connectrpc/connect";
+import { createClient, type Transport } from "@connectrpc/connect";
 import {
   ProfileService,
   type TeamProfile as ProtoTeamProfile,

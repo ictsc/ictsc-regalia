@@ -11,7 +11,7 @@ import {
 import {
   type ConnectRouter,
   type MethodImpl,
-  ServiceImpl,
+  type ServiceImpl,
   createConnectRouter,
 } from "@connectrpc/connect";
 import type { DescMethod, DescService } from "@bufbuild/protobuf";

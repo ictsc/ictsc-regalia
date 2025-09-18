@@ -9,7 +9,7 @@ import rehypeReact from "rehype-react";
 import production from "react/jsx-runtime";
 import { createHighlighterCore } from "shiki/core";
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 
 const highlighterPromise = createHighlighterCore({
   themes: [import("@shikijs/themes/material-theme-lighter")],
