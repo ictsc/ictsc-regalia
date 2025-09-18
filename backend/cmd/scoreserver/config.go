@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log/slog"
 	"net/url"
 	"os"
@@ -112,8 +111,6 @@ func newContestantConfig(opts *CLIOption) (*config.ContestantAPI, error) {
 		}
 	}
 
-	origin := fmt.Sprintf("%s://%s", opts.ContestantBaseURL.Scheme, opts.ContestantBaseURL.Host)
-
 	var errs []error
 	discordClientID := os.Getenv("DISCORD_CLIENT_ID")
 	if discordClientID == "" {
@@ -129,8 +126,7 @@ func newContestantConfig(opts *CLIOption) (*config.ContestantAPI, error) {
 	}
 
 	return &config.ContestantAPI{
-		Address:        opts.ContestantHTTPAddr,
-		AllowedOrigins: []string{origin},
+		Address: opts.ContestantHTTPAddr,
 		Auth: config.ContestantAuth{
 			BaseURL:             &opts.ContestantBaseURL,
 			DiscordClientID:     discordClientID,

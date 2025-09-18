@@ -8,7 +8,6 @@ import (
 	"connectrpc.com/connect"
 	"github.com/cockroachdb/errors"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/connectutil"
-	"github.com/ictsc/ictsc-regalia/backend/pkg/httputil"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1/contestantv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/ratelimiter"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
@@ -91,7 +90,7 @@ func New(
 
 	handler := http.Handler(mux)
 	handler = session.NewHandler(sessionStore)(handler)
-	handler = httputil.CSRFMiddleware(cfg.AllowedOrigins)(handler)
+	handler = http.NewCrossOriginProtection().Handler(handler)
 	handler = h2c.NewHandler(handler, &http2.Server{})
 
 	return handler, nil
