@@ -8,220 +8,84 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from "./routes/~__root";
+import { Route as TeamsRouteRouteImport } from "./routes/~teams/~route";
+import { Route as SignupRouteRouteImport } from "./routes/~signup/~route";
+import { Route as SigninRouteRouteImport } from "./routes/~signin/~route";
+import { Route as RuleRouteRouteImport } from "./routes/~rule/~route";
+import { Route as RankingRouteRouteImport } from "./routes/~ranking/~route";
+import { Route as ProblemsRouteImport } from "./routes/~problems";
+import { Route as AnnouncesRouteImport } from "./routes/~announces";
+import { Route as IndexRouteRouteImport } from "./routes/~index/~route";
+import { Route as ProblemsCodeRouteRouteImport } from "./routes/~problems.$code/~route";
+import { Route as AnnouncesSlugRouteRouteImport } from "./routes/~announces.$slug/~route";
+import { Route as ProblemsIndexRouteRouteImport } from "./routes/~problems.index/~route";
+import { Route as AnnouncesIndexRouteRouteImport } from "./routes/~announces.index/~route";
 
-import { Route as rootRoute } from "./routes/~__root";
-import { Route as TeamsRouteImport } from "./routes/~teams/~route";
-import { Route as SignupRouteImport } from "./routes/~signup/~route";
-import { Route as SigninRouteImport } from "./routes/~signin/~route";
-import { Route as RuleRouteImport } from "./routes/~rule/~route";
-import { Route as RankingRouteImport } from "./routes/~ranking/~route";
-import { Route as ProblemsImport } from "./routes/~problems";
-import { Route as AnnouncesImport } from "./routes/~announces";
-import { Route as IndexRouteImport } from "./routes/~index/~route";
-import { Route as ProblemsCodeRouteImport } from "./routes/~problems.$code/~route";
-import { Route as AnnouncesSlugRouteImport } from "./routes/~announces.$slug/~route";
-import { Route as ProblemsIndexRouteImport } from "./routes/~problems.index/~route";
-import { Route as AnnouncesIndexRouteImport } from "./routes/~announces.index/~route";
-
-// Create/Update Routes
-
-const TeamsRouteRoute = TeamsRouteImport.update({
+const TeamsRouteRoute = TeamsRouteRouteImport.update({
   id: "/teams",
   path: "/teams",
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any);
-
-const SignupRouteRoute = SignupRouteImport.update({
+const SignupRouteRoute = SignupRouteRouteImport.update({
   id: "/signup",
   path: "/signup",
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any);
-
-const SigninRouteRoute = SigninRouteImport.update({
+const SigninRouteRoute = SigninRouteRouteImport.update({
   id: "/signin",
   path: "/signin",
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any);
-
-const RuleRouteRoute = RuleRouteImport.update({
+const RuleRouteRoute = RuleRouteRouteImport.update({
   id: "/rule",
   path: "/rule",
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import("./routes/~rule/~route.lazy").then((d) => d.Route));
-
-const RankingRouteRoute = RankingRouteImport.update({
+const RankingRouteRoute = RankingRouteRouteImport.update({
   id: "/ranking",
   path: "/ranking",
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any);
-
-const ProblemsRoute = ProblemsImport.update({
+const ProblemsRoute = ProblemsRouteImport.update({
   id: "/problems",
   path: "/problems",
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any);
-
-const AnnouncesRoute = AnnouncesImport.update({
+const AnnouncesRoute = AnnouncesRouteImport.update({
   id: "/announces",
   path: "/announces",
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any);
-
-const IndexRouteRoute = IndexRouteImport.update({
+const IndexRouteRoute = IndexRouteRouteImport.update({
   id: "/",
   path: "/",
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any);
-
-const ProblemsCodeRouteRoute = ProblemsCodeRouteImport.update({
+const ProblemsCodeRouteRoute = ProblemsCodeRouteRouteImport.update({
   id: "/$code",
   path: "/$code",
   getParentRoute: () => ProblemsRoute,
 } as any).lazy(() =>
   import("./routes/~problems.$code/~route.lazy").then((d) => d.Route),
 );
-
-const AnnouncesSlugRouteRoute = AnnouncesSlugRouteImport.update({
+const AnnouncesSlugRouteRoute = AnnouncesSlugRouteRouteImport.update({
   id: "/$slug",
   path: "/$slug",
   getParentRoute: () => AnnouncesRoute,
 } as any).lazy(() =>
   import("./routes/~announces.$slug/~route.lazy").then((d) => d.Route),
 );
-
-const ProblemsIndexRouteRoute = ProblemsIndexRouteImport.update({
+const ProblemsIndexRouteRoute = ProblemsIndexRouteRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => ProblemsRoute,
 } as any);
-
-const AnnouncesIndexRouteRoute = AnnouncesIndexRouteImport.update({
+const AnnouncesIndexRouteRoute = AnnouncesIndexRouteRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => AnnouncesRoute,
 } as any);
-
-// Populate the FileRoutesByPath interface
-
-declare module "@tanstack/react-router" {
-  interface FileRoutesByPath {
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/announces": {
-      id: "/announces";
-      path: "/announces";
-      fullPath: "/announces";
-      preLoaderRoute: typeof AnnouncesImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/problems": {
-      id: "/problems";
-      path: "/problems";
-      fullPath: "/problems";
-      preLoaderRoute: typeof ProblemsImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/ranking": {
-      id: "/ranking";
-      path: "/ranking";
-      fullPath: "/ranking";
-      preLoaderRoute: typeof RankingRouteImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/rule": {
-      id: "/rule";
-      path: "/rule";
-      fullPath: "/rule";
-      preLoaderRoute: typeof RuleRouteImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/signin": {
-      id: "/signin";
-      path: "/signin";
-      fullPath: "/signin";
-      preLoaderRoute: typeof SigninRouteImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/signup": {
-      id: "/signup";
-      path: "/signup";
-      fullPath: "/signup";
-      preLoaderRoute: typeof SignupRouteImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/teams": {
-      id: "/teams";
-      path: "/teams";
-      fullPath: "/teams";
-      preLoaderRoute: typeof TeamsRouteImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/announces/": {
-      id: "/announces/";
-      path: "/";
-      fullPath: "/announces/";
-      preLoaderRoute: typeof AnnouncesIndexRouteImport;
-      parentRoute: typeof AnnouncesImport;
-    };
-    "/problems/": {
-      id: "/problems/";
-      path: "/";
-      fullPath: "/problems/";
-      preLoaderRoute: typeof ProblemsIndexRouteImport;
-      parentRoute: typeof ProblemsImport;
-    };
-    "/announces/$slug": {
-      id: "/announces/$slug";
-      path: "/$slug";
-      fullPath: "/announces/$slug";
-      preLoaderRoute: typeof AnnouncesSlugRouteImport;
-      parentRoute: typeof AnnouncesImport;
-    };
-    "/problems/$code": {
-      id: "/problems/$code";
-      path: "/$code";
-      fullPath: "/problems/$code";
-      preLoaderRoute: typeof ProblemsCodeRouteImport;
-      parentRoute: typeof ProblemsImport;
-    };
-  }
-}
-
-// Create and export the route tree
-
-interface AnnouncesRouteChildren {
-  AnnouncesIndexRouteRoute: typeof AnnouncesIndexRouteRoute;
-  AnnouncesSlugRouteRoute: typeof AnnouncesSlugRouteRoute;
-}
-
-const AnnouncesRouteChildren: AnnouncesRouteChildren = {
-  AnnouncesIndexRouteRoute: AnnouncesIndexRouteRoute,
-  AnnouncesSlugRouteRoute: AnnouncesSlugRouteRoute,
-};
-
-const AnnouncesRouteWithChildren = AnnouncesRoute._addFileChildren(
-  AnnouncesRouteChildren,
-);
-
-interface ProblemsRouteChildren {
-  ProblemsIndexRouteRoute: typeof ProblemsIndexRouteRoute;
-  ProblemsCodeRouteRoute: typeof ProblemsCodeRouteRoute;
-}
-
-const ProblemsRouteChildren: ProblemsRouteChildren = {
-  ProblemsIndexRouteRoute: ProblemsIndexRouteRoute,
-  ProblemsCodeRouteRoute: ProblemsCodeRouteRoute,
-};
-
-const ProblemsRouteWithChildren = ProblemsRoute._addFileChildren(
-  ProblemsRouteChildren,
-);
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRouteRoute;
@@ -237,7 +101,6 @@ export interface FileRoutesByFullPath {
   "/announces/$slug": typeof AnnouncesSlugRouteRoute;
   "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
-
 export interface FileRoutesByTo {
   "/": typeof IndexRouteRoute;
   "/ranking": typeof RankingRouteRoute;
@@ -250,9 +113,8 @@ export interface FileRoutesByTo {
   "/announces/$slug": typeof AnnouncesSlugRouteRoute;
   "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute;
+  __root__: typeof rootRouteImport;
   "/": typeof IndexRouteRoute;
   "/announces": typeof AnnouncesRouteWithChildren;
   "/problems": typeof ProblemsRouteWithChildren;
@@ -266,7 +128,6 @@ export interface FileRoutesById {
   "/announces/$slug": typeof AnnouncesSlugRouteRoute;
   "/problems/$code": typeof ProblemsCodeRouteRoute;
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
@@ -310,7 +171,6 @@ export interface FileRouteTypes {
     | "/problems/$code";
   fileRoutesById: FileRoutesById;
 }
-
 export interface RootRouteChildren {
   IndexRouteRoute: typeof IndexRouteRoute;
   AnnouncesRoute: typeof AnnouncesRouteWithChildren;
@@ -322,6 +182,123 @@ export interface RootRouteChildren {
   TeamsRouteRoute: typeof TeamsRouteRoute;
 }
 
+declare module "@tanstack/react-router" {
+  interface FileRoutesByPath {
+    "/teams": {
+      id: "/teams";
+      path: "/teams";
+      fullPath: "/teams";
+      preLoaderRoute: typeof TeamsRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/signup": {
+      id: "/signup";
+      path: "/signup";
+      fullPath: "/signup";
+      preLoaderRoute: typeof SignupRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/signin": {
+      id: "/signin";
+      path: "/signin";
+      fullPath: "/signin";
+      preLoaderRoute: typeof SigninRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/rule": {
+      id: "/rule";
+      path: "/rule";
+      fullPath: "/rule";
+      preLoaderRoute: typeof RuleRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/ranking": {
+      id: "/ranking";
+      path: "/ranking";
+      fullPath: "/ranking";
+      preLoaderRoute: typeof RankingRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/problems": {
+      id: "/problems";
+      path: "/problems";
+      fullPath: "/problems";
+      preLoaderRoute: typeof ProblemsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/announces": {
+      id: "/announces";
+      path: "/announces";
+      fullPath: "/announces";
+      preLoaderRoute: typeof AnnouncesRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/problems/$code": {
+      id: "/problems/$code";
+      path: "/$code";
+      fullPath: "/problems/$code";
+      preLoaderRoute: typeof ProblemsCodeRouteRouteImport;
+      parentRoute: typeof ProblemsRoute;
+    };
+    "/announces/$slug": {
+      id: "/announces/$slug";
+      path: "/$slug";
+      fullPath: "/announces/$slug";
+      preLoaderRoute: typeof AnnouncesSlugRouteRouteImport;
+      parentRoute: typeof AnnouncesRoute;
+    };
+    "/problems/": {
+      id: "/problems/";
+      path: "/";
+      fullPath: "/problems/";
+      preLoaderRoute: typeof ProblemsIndexRouteRouteImport;
+      parentRoute: typeof ProblemsRoute;
+    };
+    "/announces/": {
+      id: "/announces/";
+      path: "/";
+      fullPath: "/announces/";
+      preLoaderRoute: typeof AnnouncesIndexRouteRouteImport;
+      parentRoute: typeof AnnouncesRoute;
+    };
+  }
+}
+
+interface AnnouncesRouteChildren {
+  AnnouncesIndexRouteRoute: typeof AnnouncesIndexRouteRoute;
+  AnnouncesSlugRouteRoute: typeof AnnouncesSlugRouteRoute;
+}
+
+const AnnouncesRouteChildren: AnnouncesRouteChildren = {
+  AnnouncesIndexRouteRoute: AnnouncesIndexRouteRoute,
+  AnnouncesSlugRouteRoute: AnnouncesSlugRouteRoute,
+};
+
+const AnnouncesRouteWithChildren = AnnouncesRoute._addFileChildren(
+  AnnouncesRouteChildren,
+);
+
+interface ProblemsRouteChildren {
+  ProblemsIndexRouteRoute: typeof ProblemsIndexRouteRoute;
+  ProblemsCodeRouteRoute: typeof ProblemsCodeRouteRoute;
+}
+
+const ProblemsRouteChildren: ProblemsRouteChildren = {
+  ProblemsIndexRouteRoute: ProblemsIndexRouteRoute,
+  ProblemsCodeRouteRoute: ProblemsCodeRouteRoute,
+};
+
+const ProblemsRouteWithChildren = ProblemsRoute._addFileChildren(
+  ProblemsRouteChildren,
+);
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRouteRoute: IndexRouteRoute,
   AnnouncesRoute: AnnouncesRouteWithChildren,
@@ -332,75 +309,6 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRouteRoute: SignupRouteRoute,
   TeamsRouteRoute: TeamsRouteRoute,
 };
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>();
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "~__root.tsx",
-      "children": [
-        "/",
-        "/announces",
-        "/problems",
-        "/ranking",
-        "/rule",
-        "/signin",
-        "/signup",
-        "/teams"
-      ]
-    },
-    "/": {
-      "filePath": "~index/~route.tsx"
-    },
-    "/announces": {
-      "filePath": "~announces.tsx",
-      "children": [
-        "/announces/",
-        "/announces/$slug"
-      ]
-    },
-    "/problems": {
-      "filePath": "~problems.tsx",
-      "children": [
-        "/problems/",
-        "/problems/$code"
-      ]
-    },
-    "/ranking": {
-      "filePath": "~ranking/~route.tsx"
-    },
-    "/rule": {
-      "filePath": "~rule/~route.tsx"
-    },
-    "/signin": {
-      "filePath": "~signin/~route.tsx"
-    },
-    "/signup": {
-      "filePath": "~signup/~route.tsx"
-    },
-    "/teams": {
-      "filePath": "~teams/~route.tsx"
-    },
-    "/announces/": {
-      "filePath": "~announces.index/~route.tsx",
-      "parent": "/announces"
-    },
-    "/problems/": {
-      "filePath": "~problems.index/~route.tsx",
-      "parent": "/problems"
-    },
-    "/announces/$slug": {
-      "filePath": "~announces.$slug/~route.tsx",
-      "parent": "/announces"
-    },
-    "/problems/$code": {
-      "filePath": "~problems.$code/~route.tsx",
-      "parent": "/problems"
-    }
-  }
-}
-ROUTE_MANIFEST_END */
