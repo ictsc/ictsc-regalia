@@ -1,11 +1,11 @@
 import { useReducer } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { action } from "storybook/actions";
 import { Layout } from "./layout";
 import { Header } from "./header";
 import { Navbar } from "./navbar";
 import { ContestStateView } from "./contest-state";
 import { AccountMenu } from "./account-menu";
-import { action } from "@storybook/addon-actions";
 
 const signOutAction = action("sign-out");
 
