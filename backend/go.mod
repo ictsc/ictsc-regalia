@@ -6,7 +6,7 @@ toolchain go1.25.2
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.9-20250912141014-52f32327d4b0.1
-	connectrpc.com/connect v1.19.0
+	connectrpc.com/connect v1.19.1
 	connectrpc.com/grpchealth v1.4.0
 	connectrpc.com/otelconnect v0.8.0
 	github.com/DATA-DOG/go-txdb v0.2.1
