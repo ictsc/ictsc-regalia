@@ -12,8 +12,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.1
       pnpm:
-        specifier: 10.18.1
-        version: 10.18.1
+        specifier: 10.18.2
+        version: 10.18.2
       typescript:
         specifier: ^5.5.4
         version: 5.9.3
@@ -3093,8 +3093,8 @@ packages:
     resolution: {integrity: sha512-TfySrs/5nm8fQJDcBDuUng3VOUKsd7S+zqvbOTiGXHfxX4wK31ard+hoNuvkicM/2YFzlpDgABOevKSsB4G/FA==}
     engines: {node: '>= 6'}
 
-  pnpm@10.18.1:
-    resolution: {integrity: sha512-d6iEoWXLui2NHBnjtIgO7m0vyr0Nh5Eh4oIZa4AEI1HV6zygk1+lmdodxRJlzGiBatK93Sot5eqf35KtvsfNNA==}
+  pnpm@10.18.2:
+    resolution: {integrity: sha512-n7lp+nSbOt5gNeDxCfC4pgtdCKGof99y4zfakNzJMzbiKAyk5E8jWKZJuDwXlZ6Zk+d3wggIefOAHm8NmZrT3Q==}
     engines: {node: '>=18.12'}
     hasBin: true
 
@@ -7344,7 +7344,7 @@ snapshots:
 
   pirates@4.0.7: {}
 
-  pnpm@10.18.1: {}
+  pnpm@10.18.2: {}
 
   possible-typed-array-names@1.1.0: {}
 
