@@ -322,7 +322,7 @@ importers:
         version: 4.0.0
       rollup-plugin-visualizer:
         specifier: ^6.0.0
-        version: 6.0.4(rollup@4.52.4)
+        version: 6.0.5(rollup@4.52.4)
       storybook:
         specifier: ^9.1.7
         version: 9.1.10(@testing-library/dom@10.4.1)(msw@2.11.5(@types/node@22.18.10)(typescript@5.9.3))(prettier@3.6.2)(vite@7.1.10(@types/node@22.18.10)(jiti@1.21.7)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.6))
@@ -3437,8 +3437,8 @@ packages:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
 
-  rollup-plugin-visualizer@6.0.4:
-    resolution: {integrity: sha512-q8Q7J/6YofkmaGW1sH/fPRAz37x/+pd7VBuaUU7lwvOS/YikuiiEU9jeb9PH8XHiq50XFrUsBbOxeAMYQ7KZkg==}
+  rollup-plugin-visualizer@6.0.5:
+    resolution: {integrity: sha512-9+HlNgKCVbJDs8tVtjQ43US12eqaiHyyiLMdBwQ7vSZPiHMysGNo2E88TAp1si5wx8NAoYriI2A5kuKfIakmJg==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -7690,7 +7690,7 @@ snapshots:
 
   reusify@1.1.0: {}
 
-  rollup-plugin-visualizer@6.0.4(rollup@4.52.4):
+  rollup-plugin-visualizer@6.0.5(rollup@4.52.4):
     dependencies:
       open: 8.4.2
       picomatch: 4.0.3
