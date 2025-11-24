@@ -15,6 +15,7 @@ FROM nginx:1.29.2 AS frontend
 COPY <<EOF /etc/nginx/conf.d/default.conf
 server {
     listen 8080;
+    listen [::]:8080;
     server_name _;
 
     location / {
@@ -30,6 +31,7 @@ server {
 }
 server {
     listen 8081;
+    listen [::]:8081;
     server_name _;
 
     location / {
