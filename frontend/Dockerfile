@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM --platform=$BUILDPLATFORM node:22.19.0-slim AS builder
+FROM --platform=$BUILDPLATFORM node:22.20.0-slim AS builder
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN npm install -g pnpm
@@ -11,7 +11,7 @@ COPY . .
 RUN pnpm install --recursive --offline
 RUN pnpm run build
 
-FROM nginx:1.29.1 AS frontend
+FROM nginx:1.29.2 AS frontend
 COPY <<EOF /etc/nginx/conf.d/default.conf
 server {
     listen 8080;
