@@ -73,7 +73,9 @@ type (
 		Auth    ContestantAuth
 	}
 	ContestantAuth struct {
-		BaseURL             *url.URL
+		ExternalURL *url.URL
+		TrustProxy  bool
+
 		DiscordClientID     string
 		DiscordClientSecret string
 	}

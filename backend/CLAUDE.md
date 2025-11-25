@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ### Building
-- **Run scoreserver**: `./scripts/local-exec go run ./cmd/scoreserver/ -dev -contestant.base-url=http://localhost:3000/api -fake.schedule` (starts with local DB/Redis)
+- **Run scoreserver**: `./scripts/local-exec go run ./cmd/scoreserver/ -dev -fake.schedule` (starts with local DB/Redis)
 - **Build binary**: `go build ./cmd/scoreserver/`
 
 ### Testing
