@@ -23,8 +23,10 @@ type CLIOption struct {
 	AdminAuthPolicy     string
 	AdminAuthPolicyFile string
 
-	ContestantHTTPAddr netip.AddrPort
-	ContestantBaseURL  url.URL
+	ContestantHTTPAddr    netip.AddrPort
+	ContestantTrustProxy  bool
+	ContestantExternalURL url.URL
+	ContestantRoutePrefix string
 
 	UseFakeSchedule       bool
 	FakeSchedulePhase     domain.Phase
@@ -50,8 +52,10 @@ func NewOption(fs *flag.FlagSet) *CLIOption {
 	fs.StringVar(&opt.AdminAuthPolicyFile, "admin.auth-policy-file", "", "Admin API authorization policy file")
 
 	fs.TextVar(&opt.ContestantHTTPAddr, "contestant.http-addr", netip.MustParseAddrPort("127.0.0.1:8080"), "Contestant HTTP server address")
-	fs.TextVar((*urlValue)(&opt.ContestantBaseURL), "contestant.base-url",
-		(*urlValue)(&url.URL{Scheme: "http", Host: "localhost:8080"}), "Contestant base URL")
+	fs.BoolVar(&opt.ContestantTrustProxy, "contestant.trust-proxy", false, "Trust X-Forwarded-* headers for contestant API")
+	fs.TextVar((*urlValue)(&opt.ContestantExternalURL), "contestant.external-url", (*urlValue)(&url.URL{}), "Contestant base URL (optional)")
+	fs.StringVar(&opt.ContestantRoutePrefix, "contestant.route-prefix", "",
+		"Route prefix for contestant API (e.g., '/api')")
 
 	fs.BoolVar(&opt.UseFakeSchedule, "fake.schedule", false, "Use fake schedule")
 	fs.TextVar(&opt.FakeSchedulePhase, "fake.schedule.phase", domain.PhaseInContest, "Fake schedule current phase")
@@ -70,6 +74,8 @@ func NewOption(fs *flag.FlagSet) *CLIOption {
 		if opt.AdminAuthPolicy == "" && opt.AdminAuthPolicyFile == "" {
 			opt.AdminAuthPolicy = "g, system:unauthenticated, role:admin"
 		}
+
+		opt.ContestantTrustProxy = true
 
 		return nil
 	})
