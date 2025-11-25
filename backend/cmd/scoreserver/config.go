@@ -102,7 +102,9 @@ func newAdminConfig(opts *CLIOption) (*config.AdminAPI, error) {
 func newContestantConfig(opts *CLIOption) (*config.ContestantAPI, error) {
 	externalURL := &opts.ContestantExternalURL
 	if opts.ContestantRoutePrefix != "" {
-		externalURL.Path = "/"
+		if externalURL.Path == "" {
+			externalURL.Path = "/"
+		}
 		externalURL = externalURL.JoinPath(opts.ContestantRoutePrefix)
 	}
 
