@@ -123,11 +123,30 @@ func start(option Option) int {
 			log.Printf("[team:%d] unchanged", entry.ID)
 		}
 
-		idx := slices.IndexFunc(invitationCodes, func(ic *adminv1.InvitationCode) bool {
+		team_first_invitationcode_idx := slices.IndexFunc(invitationCodes, func(ic *adminv1.InvitationCode) bool {
 			return ic.GetTeamCode() == int64(entry.ID)
 		})
-		if idx >= 0 {
-			entry.InvitationCode = invitationCodes[idx].GetCode()
+		if team_first_invitationcode_idx >= 0 {
+			if entry.InvitationCode == "" {
+				log.Printf("[team:%d] using existing invitation code", entry.ID)
+				entry.InvitationCode = invitationCodes[team_first_invitationcode_idx].GetCode()
+			} else {
+				same_invitationcode_idx := slices.IndexFunc(invitationCodes, func(ic *adminv1.InvitationCode) bool {
+					return ic.GetCode() == entry.InvitationCode && ic.GetTeamCode() == int64(entry.ID)
+				})
+				if same_invitationcode_idx >= 0 {
+					log.Printf("[team:%d] using existing invitation code as specified code exists", entry.ID)
+				} else {
+					log.Printf("[team:%d] creating new invitation code as specified code does not exist", entry.ID)
+					code, err := createInvitationCode(ctx, invitationClient, entry, option.InvitationExpires)
+					if err != nil {
+						log.Printf("[team:%d] failed to create invitation code: %v", entry.ID, err)
+						continue
+					}
+					log.Printf("[team:%d] invitation code created with specified code", entry.ID)
+					entry.InvitationCode = code
+				}
+			}
 		} else {
 			code, err := createInvitationCode(ctx, invitationClient, entry, option.InvitationExpires)
 			if err != nil {
