@@ -2,9 +2,9 @@ import { type ReactNode, type HTMLInputAutoCompleteAttribute } from "react";
 import { useFormStatus } from "react-dom";
 import { clsx } from "clsx";
 import { Field, Label, Description, Input } from "@headlessui/react";
-import { MaterialSymbol } from "../../components/material-symbol";
-import { Title } from "../../components/title";
-import type { SignUpResponse } from "../../features/viewer/signup";
+import { MaterialSymbol } from "../components/material-symbol";
+import { Title } from "../components/title";
+import type { SignUpResponse } from "../features/viewer/signup";
 
 export function SignUpPage(
   props: {

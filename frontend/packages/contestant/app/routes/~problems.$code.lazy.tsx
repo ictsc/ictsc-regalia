@@ -7,11 +7,11 @@ import {
 } from "react";
 import { createLazyFileRoute, useRouter } from "@tanstack/react-router";
 import { DeploymentStatus } from "@ictsc/proto/contestant/v1";
-import type { ProblemDetail } from "../../features/problem";
-import type { Answer } from "../../features/answer";
-import { protoScoreToProps } from "../../features/score";
-import type { Deployment } from "../../features/deployment";
-import * as View from "./page";
+import type { ProblemDetail } from "../features/problem";
+import type { Answer } from "../features/answer";
+import { protoScoreToProps } from "../features/score";
+import type { Deployment } from "../features/deployment";
+import * as View from "./problems.$code/page";
 
 export const Route = createLazyFileRoute("/problems/$code")({
   component: RouteComponent,

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { fetchProblem } from "../../features/problem";
-import { fetchAnswer, fetchAnswers, submitAnswer } from "../../features/answer";
-import { deploy, fetchDeployments } from "../../features/deployment";
+import { fetchProblem } from "../features/problem";
+import { fetchAnswer, fetchAnswers, submitAnswer } from "../features/answer";
+import { deploy, fetchDeployments } from "../features/deployment";
 
 export const Route = createFileRoute("/problems/$code")({
   loader: ({ context: { transport }, params: { code } }) => {

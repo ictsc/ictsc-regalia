@@ -9,40 +9,40 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/~__root";
-import { Route as TeamsRouteRouteImport } from "./routes/~teams/~route";
-import { Route as SignupRouteRouteImport } from "./routes/~signup/~route";
-import { Route as SigninRouteRouteImport } from "./routes/~signin/~route";
-import { Route as RuleRouteRouteImport } from "./routes/~rule/~route";
-import { Route as RankingRouteRouteImport } from "./routes/~ranking/~route";
+import { Route as TeamsRouteImport } from "./routes/~teams";
+import { Route as SignupRouteImport } from "./routes/~signup";
+import { Route as SigninRouteImport } from "./routes/~signin";
+import { Route as RuleRouteImport } from "./routes/~rule";
+import { Route as RankingRouteImport } from "./routes/~ranking";
 import { Route as ProblemsRouteImport } from "./routes/~problems";
 import { Route as AnnouncesRouteImport } from "./routes/~announces";
-import { Route as IndexRouteRouteImport } from "./routes/~index/~route";
-import { Route as ProblemsCodeRouteRouteImport } from "./routes/~problems.$code/~route";
-import { Route as AnnouncesSlugRouteRouteImport } from "./routes/~announces.$slug/~route";
-import { Route as ProblemsIndexRouteRouteImport } from "./routes/~problems.index/~route";
-import { Route as AnnouncesIndexRouteRouteImport } from "./routes/~announces.index/~route";
+import { Route as IndexRouteImport } from "./routes/~index";
+import { Route as ProblemsIndexRouteImport } from "./routes/~problems.index";
+import { Route as AnnouncesIndexRouteImport } from "./routes/~announces.index";
+import { Route as ProblemsCodeRouteImport } from "./routes/~problems.$code";
+import { Route as AnnouncesSlugRouteImport } from "./routes/~announces.$slug";
 
-const TeamsRouteRoute = TeamsRouteRouteImport.update({
+const TeamsRoute = TeamsRouteImport.update({
   id: "/teams",
   path: "/teams",
   getParentRoute: () => rootRouteImport,
 } as any);
-const SignupRouteRoute = SignupRouteRouteImport.update({
+const SignupRoute = SignupRouteImport.update({
   id: "/signup",
   path: "/signup",
   getParentRoute: () => rootRouteImport,
 } as any);
-const SigninRouteRoute = SigninRouteRouteImport.update({
+const SigninRoute = SigninRouteImport.update({
   id: "/signin",
   path: "/signin",
   getParentRoute: () => rootRouteImport,
 } as any);
-const RuleRouteRoute = RuleRouteRouteImport.update({
+const RuleRoute = RuleRouteImport.update({
   id: "/rule",
   path: "/rule",
   getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import("./routes/~rule/~route.lazy").then((d) => d.Route));
-const RankingRouteRoute = RankingRouteRouteImport.update({
+} as any).lazy(() => import("./routes/~rule.lazy").then((d) => d.Route));
+const RankingRoute = RankingRouteImport.update({
   id: "/ranking",
   path: "/ranking",
   getParentRoute: () => rootRouteImport,
@@ -57,76 +57,76 @@ const AnnouncesRoute = AnnouncesRouteImport.update({
   path: "/announces",
   getParentRoute: () => rootRouteImport,
 } as any);
-const IndexRouteRoute = IndexRouteRouteImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any);
-const ProblemsCodeRouteRoute = ProblemsCodeRouteRouteImport.update({
+const ProblemsIndexRoute = ProblemsIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => ProblemsRoute,
+} as any);
+const AnnouncesIndexRoute = AnnouncesIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => AnnouncesRoute,
+} as any);
+const ProblemsCodeRoute = ProblemsCodeRouteImport.update({
   id: "/$code",
   path: "/$code",
   getParentRoute: () => ProblemsRoute,
 } as any).lazy(() =>
-  import("./routes/~problems.$code/~route.lazy").then((d) => d.Route),
+  import("./routes/~problems.$code.lazy").then((d) => d.Route),
 );
-const AnnouncesSlugRouteRoute = AnnouncesSlugRouteRouteImport.update({
+const AnnouncesSlugRoute = AnnouncesSlugRouteImport.update({
   id: "/$slug",
   path: "/$slug",
   getParentRoute: () => AnnouncesRoute,
 } as any).lazy(() =>
-  import("./routes/~announces.$slug/~route.lazy").then((d) => d.Route),
+  import("./routes/~announces.$slug.lazy").then((d) => d.Route),
 );
-const ProblemsIndexRouteRoute = ProblemsIndexRouteRouteImport.update({
-  id: "/",
-  path: "/",
-  getParentRoute: () => ProblemsRoute,
-} as any);
-const AnnouncesIndexRouteRoute = AnnouncesIndexRouteRouteImport.update({
-  id: "/",
-  path: "/",
-  getParentRoute: () => AnnouncesRoute,
-} as any);
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRouteRoute;
+  "/": typeof IndexRoute;
   "/announces": typeof AnnouncesRouteWithChildren;
   "/problems": typeof ProblemsRouteWithChildren;
-  "/ranking": typeof RankingRouteRoute;
-  "/rule": typeof RuleRouteRoute;
-  "/signin": typeof SigninRouteRoute;
-  "/signup": typeof SignupRouteRoute;
-  "/teams": typeof TeamsRouteRoute;
-  "/announces/": typeof AnnouncesIndexRouteRoute;
-  "/problems/": typeof ProblemsIndexRouteRoute;
-  "/announces/$slug": typeof AnnouncesSlugRouteRoute;
-  "/problems/$code": typeof ProblemsCodeRouteRoute;
+  "/ranking": typeof RankingRoute;
+  "/rule": typeof RuleRoute;
+  "/signin": typeof SigninRoute;
+  "/signup": typeof SignupRoute;
+  "/teams": typeof TeamsRoute;
+  "/announces/$slug": typeof AnnouncesSlugRoute;
+  "/problems/$code": typeof ProblemsCodeRoute;
+  "/announces/": typeof AnnouncesIndexRoute;
+  "/problems/": typeof ProblemsIndexRoute;
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRouteRoute;
-  "/ranking": typeof RankingRouteRoute;
-  "/rule": typeof RuleRouteRoute;
-  "/signin": typeof SigninRouteRoute;
-  "/signup": typeof SignupRouteRoute;
-  "/teams": typeof TeamsRouteRoute;
-  "/announces": typeof AnnouncesIndexRouteRoute;
-  "/problems": typeof ProblemsIndexRouteRoute;
-  "/announces/$slug": typeof AnnouncesSlugRouteRoute;
-  "/problems/$code": typeof ProblemsCodeRouteRoute;
+  "/": typeof IndexRoute;
+  "/ranking": typeof RankingRoute;
+  "/rule": typeof RuleRoute;
+  "/signin": typeof SigninRoute;
+  "/signup": typeof SignupRoute;
+  "/teams": typeof TeamsRoute;
+  "/announces/$slug": typeof AnnouncesSlugRoute;
+  "/problems/$code": typeof ProblemsCodeRoute;
+  "/announces": typeof AnnouncesIndexRoute;
+  "/problems": typeof ProblemsIndexRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
-  "/": typeof IndexRouteRoute;
+  "/": typeof IndexRoute;
   "/announces": typeof AnnouncesRouteWithChildren;
   "/problems": typeof ProblemsRouteWithChildren;
-  "/ranking": typeof RankingRouteRoute;
-  "/rule": typeof RuleRouteRoute;
-  "/signin": typeof SigninRouteRoute;
-  "/signup": typeof SignupRouteRoute;
-  "/teams": typeof TeamsRouteRoute;
-  "/announces/": typeof AnnouncesIndexRouteRoute;
-  "/problems/": typeof ProblemsIndexRouteRoute;
-  "/announces/$slug": typeof AnnouncesSlugRouteRoute;
-  "/problems/$code": typeof ProblemsCodeRouteRoute;
+  "/ranking": typeof RankingRoute;
+  "/rule": typeof RuleRoute;
+  "/signin": typeof SigninRoute;
+  "/signup": typeof SignupRoute;
+  "/teams": typeof TeamsRoute;
+  "/announces/$slug": typeof AnnouncesSlugRoute;
+  "/problems/$code": typeof ProblemsCodeRoute;
+  "/announces/": typeof AnnouncesIndexRoute;
+  "/problems/": typeof ProblemsIndexRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
@@ -139,10 +139,10 @@ export interface FileRouteTypes {
     | "/signin"
     | "/signup"
     | "/teams"
-    | "/announces/"
-    | "/problems/"
     | "/announces/$slug"
-    | "/problems/$code";
+    | "/problems/$code"
+    | "/announces/"
+    | "/problems/";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
@@ -151,10 +151,10 @@ export interface FileRouteTypes {
     | "/signin"
     | "/signup"
     | "/teams"
-    | "/announces"
-    | "/problems"
     | "/announces/$slug"
-    | "/problems/$code";
+    | "/problems/$code"
+    | "/announces"
+    | "/problems";
   id:
     | "__root__"
     | "/"
@@ -165,21 +165,21 @@ export interface FileRouteTypes {
     | "/signin"
     | "/signup"
     | "/teams"
-    | "/announces/"
-    | "/problems/"
     | "/announces/$slug"
-    | "/problems/$code";
+    | "/problems/$code"
+    | "/announces/"
+    | "/problems/";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRouteRoute: typeof IndexRouteRoute;
+  IndexRoute: typeof IndexRoute;
   AnnouncesRoute: typeof AnnouncesRouteWithChildren;
   ProblemsRoute: typeof ProblemsRouteWithChildren;
-  RankingRouteRoute: typeof RankingRouteRoute;
-  RuleRouteRoute: typeof RuleRouteRoute;
-  SigninRouteRoute: typeof SigninRouteRoute;
-  SignupRouteRoute: typeof SignupRouteRoute;
-  TeamsRouteRoute: typeof TeamsRouteRoute;
+  RankingRoute: typeof RankingRoute;
+  RuleRoute: typeof RuleRoute;
+  SigninRoute: typeof SigninRoute;
+  SignupRoute: typeof SignupRoute;
+  TeamsRoute: typeof TeamsRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -188,35 +188,35 @@ declare module "@tanstack/react-router" {
       id: "/teams";
       path: "/teams";
       fullPath: "/teams";
-      preLoaderRoute: typeof TeamsRouteRouteImport;
+      preLoaderRoute: typeof TeamsRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/signup": {
       id: "/signup";
       path: "/signup";
       fullPath: "/signup";
-      preLoaderRoute: typeof SignupRouteRouteImport;
+      preLoaderRoute: typeof SignupRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/signin": {
       id: "/signin";
       path: "/signin";
       fullPath: "/signin";
-      preLoaderRoute: typeof SigninRouteRouteImport;
+      preLoaderRoute: typeof SigninRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/rule": {
       id: "/rule";
       path: "/rule";
       fullPath: "/rule";
-      preLoaderRoute: typeof RuleRouteRouteImport;
+      preLoaderRoute: typeof RuleRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/ranking": {
       id: "/ranking";
       path: "/ranking";
       fullPath: "/ranking";
-      preLoaderRoute: typeof RankingRouteRouteImport;
+      preLoaderRoute: typeof RankingRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/problems": {
@@ -237,48 +237,48 @@ declare module "@tanstack/react-router" {
       id: "/";
       path: "/";
       fullPath: "/";
-      preLoaderRoute: typeof IndexRouteRouteImport;
+      preLoaderRoute: typeof IndexRouteImport;
       parentRoute: typeof rootRouteImport;
-    };
-    "/problems/$code": {
-      id: "/problems/$code";
-      path: "/$code";
-      fullPath: "/problems/$code";
-      preLoaderRoute: typeof ProblemsCodeRouteRouteImport;
-      parentRoute: typeof ProblemsRoute;
-    };
-    "/announces/$slug": {
-      id: "/announces/$slug";
-      path: "/$slug";
-      fullPath: "/announces/$slug";
-      preLoaderRoute: typeof AnnouncesSlugRouteRouteImport;
-      parentRoute: typeof AnnouncesRoute;
     };
     "/problems/": {
       id: "/problems/";
       path: "/";
       fullPath: "/problems/";
-      preLoaderRoute: typeof ProblemsIndexRouteRouteImport;
+      preLoaderRoute: typeof ProblemsIndexRouteImport;
       parentRoute: typeof ProblemsRoute;
     };
     "/announces/": {
       id: "/announces/";
       path: "/";
       fullPath: "/announces/";
-      preLoaderRoute: typeof AnnouncesIndexRouteRouteImport;
+      preLoaderRoute: typeof AnnouncesIndexRouteImport;
+      parentRoute: typeof AnnouncesRoute;
+    };
+    "/problems/$code": {
+      id: "/problems/$code";
+      path: "/$code";
+      fullPath: "/problems/$code";
+      preLoaderRoute: typeof ProblemsCodeRouteImport;
+      parentRoute: typeof ProblemsRoute;
+    };
+    "/announces/$slug": {
+      id: "/announces/$slug";
+      path: "/$slug";
+      fullPath: "/announces/$slug";
+      preLoaderRoute: typeof AnnouncesSlugRouteImport;
       parentRoute: typeof AnnouncesRoute;
     };
   }
 }
 
 interface AnnouncesRouteChildren {
-  AnnouncesIndexRouteRoute: typeof AnnouncesIndexRouteRoute;
-  AnnouncesSlugRouteRoute: typeof AnnouncesSlugRouteRoute;
+  AnnouncesSlugRoute: typeof AnnouncesSlugRoute;
+  AnnouncesIndexRoute: typeof AnnouncesIndexRoute;
 }
 
 const AnnouncesRouteChildren: AnnouncesRouteChildren = {
-  AnnouncesIndexRouteRoute: AnnouncesIndexRouteRoute,
-  AnnouncesSlugRouteRoute: AnnouncesSlugRouteRoute,
+  AnnouncesSlugRoute: AnnouncesSlugRoute,
+  AnnouncesIndexRoute: AnnouncesIndexRoute,
 };
 
 const AnnouncesRouteWithChildren = AnnouncesRoute._addFileChildren(
@@ -286,13 +286,13 @@ const AnnouncesRouteWithChildren = AnnouncesRoute._addFileChildren(
 );
 
 interface ProblemsRouteChildren {
-  ProblemsIndexRouteRoute: typeof ProblemsIndexRouteRoute;
-  ProblemsCodeRouteRoute: typeof ProblemsCodeRouteRoute;
+  ProblemsCodeRoute: typeof ProblemsCodeRoute;
+  ProblemsIndexRoute: typeof ProblemsIndexRoute;
 }
 
 const ProblemsRouteChildren: ProblemsRouteChildren = {
-  ProblemsIndexRouteRoute: ProblemsIndexRouteRoute,
-  ProblemsCodeRouteRoute: ProblemsCodeRouteRoute,
+  ProblemsCodeRoute: ProblemsCodeRoute,
+  ProblemsIndexRoute: ProblemsIndexRoute,
 };
 
 const ProblemsRouteWithChildren = ProblemsRoute._addFileChildren(
@@ -300,14 +300,14 @@ const ProblemsRouteWithChildren = ProblemsRoute._addFileChildren(
 );
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRouteRoute: IndexRouteRoute,
+  IndexRoute: IndexRoute,
   AnnouncesRoute: AnnouncesRouteWithChildren,
   ProblemsRoute: ProblemsRouteWithChildren,
-  RankingRouteRoute: RankingRouteRoute,
-  RuleRouteRoute: RuleRouteRoute,
-  SigninRouteRoute: SigninRouteRoute,
-  SignupRouteRoute: SignupRouteRoute,
-  TeamsRouteRoute: TeamsRouteRoute,
+  RankingRoute: RankingRoute,
+  RuleRoute: RuleRoute,
+  SigninRoute: SigninRoute,
+  SignupRoute: SignupRoute,
+  TeamsRoute: TeamsRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

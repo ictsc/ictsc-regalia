@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { fetchTeams } from "@app/features/teams";
 import { use, useDeferredValue } from "react";
-import { TeamsPage } from "./page";
+import { TeamsPage } from "./teams.page";
 
 export const Route = createFileRoute("/teams")({
   component: RouteComponent,

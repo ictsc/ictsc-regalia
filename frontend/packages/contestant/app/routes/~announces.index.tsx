@@ -1,7 +1,7 @@
 import { use, useDeferredValue } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { AnnounceList } from "./page";
-import { Route as ParentRoute } from "../~announces";
+import { AnnounceList } from "./announces.index.page";
+import { Route as ParentRoute } from "./~announces";
 
 export const Route = createFileRoute("/announces/")({
   component: RouteComponent,

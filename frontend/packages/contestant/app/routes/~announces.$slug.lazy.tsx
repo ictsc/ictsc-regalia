@@ -1,8 +1,8 @@
 import { use, useDeferredValue, useMemo } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { Markdown, Typography } from "../../components/markdown";
-import { Title } from "../../components/title";
-import { Route as ParentRoute } from "../~announces";
+import { Markdown, Typography } from "../components/markdown";
+import { Title } from "..//components/title";
+import { Route as ParentRoute } from "./~announces";
 
 export const Route = createLazyFileRoute("/announces/$slug")({
   component: RouteComponent,

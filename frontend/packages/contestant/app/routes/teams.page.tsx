@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { clsx } from "clsx";
 import type { TeamProfile } from "@ictsc/proto/contestant/v1";
-import { MaterialSymbol } from "../../components/material-symbol";
-import { Title } from "../../components/title";
+import { MaterialSymbol } from "../components/material-symbol";
+import { Title } from "../components/title";
 
 type TeamListProps = {
   teamProfile: TeamProfile[];

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { fetchRanking } from "@app/features/ranking";
 import { use, useDeferredValue } from "react";
-import { RankingPage } from "./page";
+import { RankingPage } from "./ranking.page";
 import { timestampDate } from "@bufbuild/protobuf/wkt";
 
 export const Route = createFileRoute("/ranking")({
