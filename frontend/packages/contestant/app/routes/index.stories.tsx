@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { IndexPage } from "./page";
+import { IndexPage } from "./index.page";
 import { Phase } from "@ictsc/proto/contestant/v1";
 
 export default {

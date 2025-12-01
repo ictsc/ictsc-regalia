@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { clsx } from "clsx";
-import { Title } from "../../components/title";
+import { Title } from "../components/title";
 
 type Rank = {
   rank: number;

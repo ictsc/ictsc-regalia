@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { fetchProblems } from "@app/features/problem";
 import { use, useDeferredValue } from "react";
-import { ProblemsPage } from "./page";
+import { ProblemsPage } from "./problems.index/page";
 
 export const Route = createFileRoute("/problems/")({
   component: RouteComponent,

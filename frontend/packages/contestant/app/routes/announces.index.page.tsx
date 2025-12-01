@@ -2,8 +2,8 @@ import { Fragment } from "react";
 import { Button } from "@headlessui/react";
 import { Link } from "@tanstack/react-router";
 import type { Notice } from "@ictsc/proto/contestant/v1";
-import { MaterialSymbol } from "../../components/material-symbol";
-import { Title } from "../../components/title";
+import { MaterialSymbol } from "../components/material-symbol";
+import { Title } from "../components/title";
 
 type AnnounceProps = {
   announces: Notice[];

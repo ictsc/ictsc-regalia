@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { AnnounceList } from "./page";
+import { AnnounceList } from "./announces.index.page";
 
 export default {
   title: "pages/announces",

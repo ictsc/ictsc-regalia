@@ -6,8 +6,8 @@ import {
   useState,
 } from "react";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { Route as RootRoute } from "../~__root";
-import { SignUpPage } from "./page";
+import { Route as RootRoute } from "./~__root";
+import { SignUpPage } from "./signup.page";
 import { signUp, type SignUpResponse } from "@app/features/viewer/signup";
 
 export const Route = createFileRoute("/signup")({

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { action } from "storybook/actions";
-import { SignUpPage } from "./page";
+import { SignUpPage } from "./signup.page";
 import { startTransition } from "react";
 
 const submitAction = action("submit");
@@ -9,7 +9,7 @@ export default {
   title: "pages/signup",
   component: SignUpPage,
   args: {
-    submit: (data) => {
+    submit: (data: unknown) => {
       startTransition(async () => {
         submitAction(data);
         await new Promise((resolve) => setTimeout(resolve, 2000));

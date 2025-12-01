@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { IndexPage, Timer } from "./page";
+import { IndexPage, Timer } from "./index.page";
 import { useSchedule } from "@app/features/schedule";
 import { Phase } from "@ictsc/proto/contestant/v1";
 import { timestampMs } from "@bufbuild/protobuf/wkt";
