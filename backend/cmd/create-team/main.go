@@ -123,18 +123,18 @@ func start(option Option) int {
 			log.Printf("[team:%d] unchanged", entry.ID)
 		}
 
-		team_first_invitationcode_idx := slices.IndexFunc(invitationCodes, func(ic *adminv1.InvitationCode) bool {
+		teamInvitationCodeIdx := slices.IndexFunc(invitationCodes, func(ic *adminv1.InvitationCode) bool {
 			return ic.GetTeamCode() == int64(entry.ID)
 		})
-		if team_first_invitationcode_idx >= 0 {
+		if teamInvitationCodeIdx >= 0 {
 			if entry.InvitationCode == "" {
 				log.Printf("[team:%d] using existing invitation code", entry.ID)
-				entry.InvitationCode = invitationCodes[team_first_invitationcode_idx].GetCode()
+				entry.InvitationCode = invitationCodes[teamInvitationCodeIdx].GetCode()
 			} else {
-				same_invitationcode_idx := slices.IndexFunc(invitationCodes, func(ic *adminv1.InvitationCode) bool {
+				exactMatchIdx := slices.IndexFunc(invitationCodes, func(ic *adminv1.InvitationCode) bool {
 					return ic.GetCode() == entry.InvitationCode && ic.GetTeamCode() == int64(entry.ID)
 				})
-				if same_invitationcode_idx >= 0 {
+				if exactMatchIdx >= 0 {
 					log.Printf("[team:%d] using existing invitation code as specified code exists", entry.ID)
 				} else {
 					log.Printf("[team:%d] creating new invitation code as specified code does not exist", entry.ID)
