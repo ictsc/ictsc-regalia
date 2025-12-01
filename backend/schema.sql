@@ -76,7 +76,7 @@ COMMENT ON COLUMN team_members.invitation_code_id IS '招待コード ID';
 COMMENT ON COLUMN team_members.invited_at IS '招待日時';
 
 CREATE TYPE problem_type AS ENUM ('DESCRIPTIVE');
-CREATE TYPE redeploy_rule AS ENUM ('UNREDEPLOYABLE', 'PERCENTAGE_PENALTY');
+CREATE TYPE redeploy_rule AS ENUM ('UNREDEPLOYABLE', 'PERCENTAGE_PENALTY', 'MANUAL');
 CREATE TABLE problems (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	code VARCHAR(8) NOT NULL UNIQUE,
