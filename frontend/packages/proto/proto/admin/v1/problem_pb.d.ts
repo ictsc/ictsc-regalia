@@ -315,6 +315,13 @@ export enum RedeployRuleType {
    * @generated from enum value: REDEPLOY_RULE_TYPE_PERCENTAGE_PENALTY = 2;
    */
   PERCENTAGE_PENALTY = 2,
+
+  /**
+   * 再展開のペナルティを採点者が手動で計算する問題
+   *
+   * @generated from enum value: REDEPLOY_RULE_TYPE_MANUAL = 3;
+   */
+  MANUAL = 3,
 }
 
 /**
