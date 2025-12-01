@@ -130,6 +130,35 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 					body = 'test' AND explanation = 'test'`,
 			},
 		},
+		"create manual": {
+			in: &domain.DescriptiveProblemData{
+				Problem: &domain.ProblemData{
+					ID:           uuid.FromStringOrNil("4b5e9308-1af5-5cc1-a366-b9c7b954b47d"),
+					Code:         "MAN",
+					ProblemType:  domain.ProblemTypeDescriptive,
+					Title:        "Manual Redeploy",
+					MaxScore:     100,
+					Category:     "Network",
+					RedeployRule: domain.RedeployRuleManual,
+				},
+				Content: &domain.ProblemContentData{
+					Body:        "manual redeploy problem",
+					Explanation: "manual redeploy explanation",
+				},
+			},
+			queries: map[string]string{
+				"problem": `
+					SELECT 1 FROM problems WHERE
+					id = '4b5e9308-1af5-5cc1-a366-b9c7b954b47d' AND
+					code = 'MAN' AND type = 'DESCRIPTIVE' AND
+					title = 'Manual Redeploy' AND max_score = 100 AND
+					category = 'Network' AND redeploy_rule = 'MANUAL'`,
+				"content": `
+					SELECT 1 FROM problem_contents WHERE
+					problem_id = '4b5e9308-1af5-5cc1-a366-b9c7b954b47d' AND
+					body = 'manual redeploy problem' AND explanation = 'manual redeploy explanation'`,
+			},
+		},
 		"update": {
 			in: &domain.DescriptiveProblemData{
 				Problem: &domain.ProblemData{

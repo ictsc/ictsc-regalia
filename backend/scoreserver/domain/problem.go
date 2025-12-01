@@ -86,6 +86,7 @@ const (
 	RedeployRuleUnknown           RedeployRule = iota
 	RedeployRuleUnredeployable                 // 再展開不可
 	RedeployRulePercentagePenalty              // 再展開回数に応じて最大得点の一定割合を減点
+	RedeployRuleManual                         // 再展開のペナルティを採点者が手動で計算
 )
 
 func (r RedeployRule) String() string {
@@ -94,6 +95,8 @@ func (r RedeployRule) String() string {
 		return "Unredeployable"
 	case RedeployRulePercentagePenalty:
 		return "PercentagePenalty"
+	case RedeployRuleManual:
+		return "Manual"
 	case RedeployRuleUnknown:
 		fallthrough
 	default:
@@ -112,6 +115,8 @@ func (r *RedeployRule) UnmarshalJSON(data []byte) error {
 		*r = RedeployRuleUnredeployable
 	case "PercentagePenalty":
 		*r = RedeployRulePercentagePenalty
+	case "Manual":
+		*r = RedeployRuleManual
 	default:
 		*r = RedeployRuleUnknown
 	}
@@ -190,19 +195,29 @@ func (p *Problem) PercentagePenalty() *RedeployPenaltyPercentage {
 }
 
 func (p *Problem) RemainingDeployments(revision uint32) int32 {
-	if p.redeployRule == RedeployRuleUnredeployable {
+	switch p.redeployRule {
+	case RedeployRuleUnredeployable:
+		return 0
+	case RedeployRulePercentagePenalty:
+		threshold := p.percentagePenalty.Threshold
+		return int32(int64(threshold) - int64(revision)) //nolint:gosec // uint32 - uint32 なので int32 に収まる
+	case RedeployRuleManual:
+		return 0 // マニュアルモードでは常に0(再展開ペナルティは常に発生する可能性がある)
+	default:
 		return 0
 	}
-	threshold := p.percentagePenalty.Threshold
-	return int32(int64(threshold) - int64(revision)) //nolint:gosec // uint32 - uint32 なので int32 に収まる
 }
 
 func (p *Problem) Penalty(deploymentCount uint32) uint32 {
-	if p.redeployRule != RedeployRulePercentagePenalty {
+	switch p.redeployRule {
+	case RedeployRulePercentagePenalty:
+		penalty := (p.maxScore * p.percentagePenalty.Percentage) / 100            //nolint:mnd
+		return penalty * uint32(max(0, -p.RemainingDeployments(deploymentCount))) //nolint:gosec
+	case RedeployRuleManual:
+		return 0 // マニュアルモードでは常に0
+	default:
 		return 0
 	}
-	penalty := (p.maxScore * p.percentagePenalty.Percentage) / 100            //nolint:mnd
-	return penalty * uint32(max(0, -p.RemainingDeployments(deploymentCount))) //nolint:gosec
 }
 
 type (
