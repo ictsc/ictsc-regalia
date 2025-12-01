@@ -89,7 +89,10 @@ func (h *InvitationServiceHandler) CreateInvitationCode(
 		return nil, err
 	}
 
-	invitationCode, err := team.CreateInvitationCode(ctx, h.CreateEffect, now, protoIC.GetExpiresAt().AsTime())
+	// リクエストからコードを取得（空文字列または不適切な文字列の場合は自動生成される）
+	manualCode := protoIC.GetCode()
+
+	invitationCode, err := team.CreateInvitationCode(ctx, h.CreateEffect, now, protoIC.GetExpiresAt().AsTime(), manualCode)
 	if err != nil {
 		return nil, err
 	}
