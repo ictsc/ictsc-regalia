@@ -1,4 +1,4 @@
-import pathToLogo from "@assets/ictsc2024.png";
+import pathToLogo from "@assets/ictsc2025.png";
 
 const RATIO = 1000 / 267;
 
