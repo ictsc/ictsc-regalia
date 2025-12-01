@@ -140,7 +140,7 @@ func (t *team) createInvitationCode(
 	ctx context.Context,
 	eff InvitationCodeCreator, now time.Time,
 	expiresAt time.Time,
-	manualCode string,
+	manualInvitationCode string,
 ) (*invitationCode, error) {
 	if expiresAt.Before(now) {
 		return nil, NewInvalidArgumentError("already expired", nil)
@@ -152,12 +152,12 @@ func (t *team) createInvitationCode(
 	}
 
 	var code invitationCodeString
-	if manualCode != "" {
+	if manualInvitationCode != "" {
 		// 手動でコードが指定された場合は検証
-		if err := validateInvitationCode(manualCode); err != nil {
+		if err := validateInvitationCode(manualInvitationCode); err != nil {
 			return nil, err
 		}
-		code = invitationCodeString(manualCode)
+		code = invitationCodeString(manualInvitationCode)
 	} else {
 		// 指定がない場合は自動生成
 		code, err = generateInvitationCode()
