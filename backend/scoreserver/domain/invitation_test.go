@@ -102,9 +102,11 @@ func Test_CreateInvitationCode(t *testing.T) {
 	})
 
 	cases := map[string]struct {
-		team      *domain.Team
-		effect    domain.InvitationCodeCreator
-		expiresAt time.Time
+		team             *domain.Team
+		effect           domain.InvitationCodeCreator
+		expiresAt        time.Time
+		manualCode       string
+		expectManualCode bool
 
 		want    *domain.InvitationCodeData
 		wantErr error
@@ -118,6 +120,57 @@ func Test_CreateInvitationCode(t *testing.T) {
 				ExpiresAt: expiresAt,
 				CreatedAt: now,
 			},
+		},
+		"manual code": {
+			team:             team1,
+			effect:           effect,
+			expiresAt:        expiresAt,
+			manualCode:       "MYCODE2025ABC",
+			expectManualCode: true,
+			want: &domain.InvitationCodeData{
+				Team:      team1.Data(),
+				Code:      "MYCODE2025ABC",
+				ExpiresAt: expiresAt,
+				CreatedAt: now,
+			},
+		},
+		"manual code with lowercase": {
+			team:             team1,
+			effect:           effect,
+			expiresAt:        expiresAt,
+			manualCode:       "MyCode2025xyz",
+			expectManualCode: true,
+			want: &domain.InvitationCodeData{
+				Team:      team1.Data(),
+				Code:      "MyCode2025xyz",
+				ExpiresAt: expiresAt,
+				CreatedAt: now,
+			},
+		},
+		"manual code empty string is rejected": {
+			team:       team1,
+			effect:     effect,
+			expiresAt:  expiresAt,
+			manualCode: "",
+			want: &domain.InvitationCodeData{
+				Team:      team1.Data(),
+				ExpiresAt: expiresAt,
+				CreatedAt: now,
+			},
+		},
+		"manual code with special characters": {
+			team:       team1,
+			effect:     effect,
+			expiresAt:  expiresAt,
+			manualCode: "CODE-2025-TEST",
+			wantErr:    domain.ErrInvalidArgument,
+		},
+		"manual code too long": {
+			team:       team1,
+			effect:     effect,
+			expiresAt:  expiresAt,
+			manualCode: "A" + string(make([]byte, 255)),
+			wantErr:    domain.ErrInvalidArgument,
 		},
 		"already expired": {
 			team:      team1,
@@ -139,7 +192,7 @@ func Test_CreateInvitationCode(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			code, err := tt.team.CreateInvitationCode(t.Context(), tt.effect, now, tt.expiresAt)
+			code, err := tt.team.CreateInvitationCode(t.Context(), tt.effect, now, tt.expiresAt, tt.manualCode)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("want error type %v, got %v", tt.wantErr, err)
 			}
@@ -148,12 +201,24 @@ func Test_CreateInvitationCode(t *testing.T) {
 			}
 
 			actual := code.Data()
+
+			// 手動コードが指定されている場合はCodeフィールドも検証
+			ignoreFields := []string{"ID"}
+			if !tt.expectManualCode {
+				ignoreFields = append(ignoreFields, "Code")
+			}
+
 			if diff := cmp.Diff(
 				tt.want, actual,
 				cmp.AllowUnexported(domain.Team{}),
-				cmpopts.IgnoreFields(domain.InvitationCodeData{}, "ID", "Code"),
+				cmpopts.IgnoreFields(domain.InvitationCodeData{}, ignoreFields...),
 			); diff != "" {
 				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
+
+			// 自動生成の場合、コードが空でないことを確認
+			if !tt.expectManualCode && tt.manualCode == "" && actual.Code == "" {
+				t.Error("expected auto-generated code to be non-empty")
 			}
 		})
 	}
