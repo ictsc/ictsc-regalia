@@ -27,6 +27,8 @@ enum RedeployRuleType {
   REDEPLOY_RULE_TYPE_UNREDEPLOYABLE = 1;
   // 再展開に最大点数への割合ペナルティがある問題
   REDEPLOY_RULE_TYPE_PERCENTAGE_PENALTY = 2;
+  // 再展開のペナルティを採点者が手動で計算する問題
+  REDEPLOY_RULE_TYPE_MANUAL = 3;
 }
 
 message RedeployRule {

@@ -30,6 +30,8 @@ const (
 	RedeployRuleType_REDEPLOY_RULE_TYPE_UNREDEPLOYABLE RedeployRuleType = 1
 	// 再展開に最大点数への割合ペナルティがある問題
 	RedeployRuleType_REDEPLOY_RULE_TYPE_PERCENTAGE_PENALTY RedeployRuleType = 2
+	// 再展開のペナルティを採点者が手動で計算する問題
+	RedeployRuleType_REDEPLOY_RULE_TYPE_MANUAL RedeployRuleType = 3
 )
 
 // Enum value maps for RedeployRuleType.
@@ -38,11 +40,13 @@ var (
 		0: "REDEPLOY_RULE_TYPE_UNSPECIFIED",
 		1: "REDEPLOY_RULE_TYPE_UNREDEPLOYABLE",
 		2: "REDEPLOY_RULE_TYPE_PERCENTAGE_PENALTY",
+		3: "REDEPLOY_RULE_TYPE_MANUAL",
 	}
 	RedeployRuleType_value = map[string]int32{
 		"REDEPLOY_RULE_TYPE_UNSPECIFIED":        0,
 		"REDEPLOY_RULE_TYPE_UNREDEPLOYABLE":     1,
 		"REDEPLOY_RULE_TYPE_PERCENTAGE_PENALTY": 2,
+		"REDEPLOY_RULE_TYPE_MANUAL":             3,
 	}
 )
 
@@ -861,11 +865,12 @@ const file_admin_v1_problem_proto_rawDesc = "" +
 	"\aproblem\x18\x01 \x01(\v2\x11.admin.v1.ProblemR\aproblem\"*\n" +
 	"\x14DeleteProblemRequest\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\"\x17\n" +
-	"\x15DeleteProblemResponse*\x88\x01\n" +
+	"\x15DeleteProblemResponse*\xa7\x01\n" +
 	"\x10RedeployRuleType\x12\"\n" +
 	"\x1eREDEPLOY_RULE_TYPE_UNSPECIFIED\x10\x00\x12%\n" +
 	"!REDEPLOY_RULE_TYPE_UNREDEPLOYABLE\x10\x01\x12)\n" +
-	"%REDEPLOY_RULE_TYPE_PERCENTAGE_PENALTY\x10\x02*I\n" +
+	"%REDEPLOY_RULE_TYPE_PERCENTAGE_PENALTY\x10\x02\x12\x1d\n" +
+	"\x19REDEPLOY_RULE_TYPE_MANUAL\x10\x03*I\n" +
 	"\vProblemType\x12\x1c\n" +
 	"\x18PROBLEM_TYPE_UNSPECIFIED\x10\x00\x12\x1c\n" +
 	"\x18PROBLEM_TYPE_DESCRIPTIVE\x10\x012\x9e\x03\n" +
