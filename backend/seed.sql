@@ -33,7 +33,8 @@ INSERT INTO team_members (user_id, team_id, invitation_code_id) VALUES
 TRUNCATE TABLE problems CASCADE;
 INSERT INTO problems (id, code, type, title, max_score, category, redeploy_rule, created_at, updated_at) VALUES
 	('16643c32-c686-44ba-996b-2fbe43b54513', 'ZZA', 'DESCRIPTIVE', '問題A', 100, 'Network', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
-	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'ZZB', 'DESCRIPTIVE', '問題B', 200, 'Server', 'PERCENTAGE_PENALTY', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00');
+	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'ZZB', 'DESCRIPTIVE', '問題B', 200, 'Server', 'PERCENTAGE_PENALTY', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('35f7bf01-6ede-5043-926c-e2c20c285b03', 'ZZC', 'DESCRIPTIVE', 'manual', 250, 'Server', 'MANUAL', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00');
 
 TRUNCATE TABLE redeploy_percentage_penalties CASCADE;
 INSERT INTO redeploy_percentage_penalties (problem_id, threshold, percentage) VALUES
@@ -42,7 +43,8 @@ INSERT INTO redeploy_percentage_penalties (problem_id, threshold, percentage) VA
 TRUNCATE TABLE problem_contents CASCADE;
 INSERT INTO problem_contents (problem_id, page_id, page_path, body, explanation) VALUES
 	('16643c32-c686-44ba-996b-2fbe43b54513', 'page1', '/page1', '問題Aの本文', '問題Aの解説'),
-	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'page2', '/page2', '問題Bの本文', '問題Bの解説');
+	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'page2', '/page2', '問題Bの本文', '問題Bの解説'),
+	('35f7bf01-6ede-5043-926c-e2c20c285b03', 'page3', '/page3', 'problem', 'explanation');
 
 TRUNCATE TABLE answers CASCADE;
 INSERT INTO answers (id, problem_id, team_id, number, user_id,  created_at_range) VALUES
