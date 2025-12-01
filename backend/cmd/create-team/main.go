@@ -175,11 +175,16 @@ func updateTeam(ctx context.Context, client adminv1connect.TeamServiceClient, te
 }
 
 func createInvitationCode(ctx context.Context, client adminv1connect.InvitationServiceClient, entry *teamEntry, expiresAt time.Time) (string, error) {
+	invitationCode := &adminv1.InvitationCode{
+		TeamCode:  int64(entry.ID),
+		ExpiresAt: timestamppb.New(expiresAt),
+	}
+	if entry.InvitationCode != "" {
+		invitationCode.Code = entry.InvitationCode
+	}
+
 	resp, err := client.CreateInvitationCode(ctx, connect.NewRequest(&adminv1.CreateInvitationCodeRequest{
-		InvitationCode: &adminv1.InvitationCode{
-			TeamCode:  int64(entry.ID),
-			ExpiresAt: timestamppb.New(expiresAt),
-		},
+		InvitationCode: invitationCode,
 	}))
 	if err != nil {
 		return "", errors.WithStack(err)
