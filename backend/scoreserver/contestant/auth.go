@@ -142,11 +142,8 @@ func (h *AuthHandler) externalURL(r *http.Request) *url.URL {
 		if proto := r.Header.Get("X-Forwarded-Proto"); url.Scheme == "" && (proto == "http" || proto == "https") {
 			url.Scheme = proto
 		}
-		if host := r.Header.Get("X-Forwarded-Host"); url.Host == "" && host != "" {
-			// Validate host doesn't contain path separators or other malicious content
-			if !strings.ContainsAny(host, "/\\@") {
-				url.Host = host
-			}
+		if host := r.Header.Get("X-Forwarded-Host"); url.Host == "" && host != "" && isValidHost(host) {
+			url.Host = host
 		}
 	}
 	// From Request
@@ -342,4 +339,20 @@ func parsePath(path string) (*url.URL, error) {
 	}
 
 	return parsedURL, nil
+}
+
+// isValidHost validates that the host doesn't contain path separators,
+// control characters, or other potentially malicious content.
+func isValidHost(host string) bool {
+	// Reject hosts containing path separators or credential markers
+	if strings.ContainsAny(host, "/\\@") {
+		return false
+	}
+	// Reject hosts containing whitespace or control characters
+	for _, c := range host {
+		if c <= 0x20 || c == 0x7f {
+			return false
+		}
+	}
+	return true
 }
