@@ -34,7 +34,7 @@ TRUNCATE TABLE problems CASCADE;
 INSERT INTO problems (id, code, type, title, max_score, category, redeploy_rule, created_at, updated_at) VALUES
 	('16643c32-c686-44ba-996b-2fbe43b54513', 'ZZA', 'DESCRIPTIVE', '問題A', 100, 'Network', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
 	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'ZZB', 'DESCRIPTIVE', '問題B', 200, 'Server', 'PERCENTAGE_PENALTY', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
-	('35f7bf01-6ede-5043-926c-e2c20c285b03', 'ZZC', 'DESCRIPTIVE', 'manual', 250, 'Server', 'MANUAL', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00');
+	('35f7bf01-6ede-5043-926c-e2c20c285b03', 'ZZC', 'DESCRIPTIVE', '問題C', 250, 'Server', 'MANUAL', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00');
 
 TRUNCATE TABLE redeploy_percentage_penalties CASCADE;
 INSERT INTO redeploy_percentage_penalties (problem_id, threshold, percentage) VALUES
