@@ -25,7 +25,7 @@
     "id": "35f7bf01-6ede-5043-926c-e2c20c285b03",
     "code": "ZZC",
     "problem_type": "Descriptive",
-    "title": "manual",
+    "title": "問題C",
     "max_score": 250,
     "category": "Server",
     "redeploy_rule": "Manual"
