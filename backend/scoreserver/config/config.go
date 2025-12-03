@@ -74,7 +74,6 @@ type (
 	}
 	ContestantAuth struct {
 		ExternalURL *url.URL
-		TrustProxy  bool
 
 		DiscordClientID     string
 		DiscordClientSecret string
