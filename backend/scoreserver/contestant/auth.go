@@ -27,7 +27,6 @@ type (
 		handler http.Handler
 		once    sync.Once
 
-		TrustProxy          bool
 		ExternalURL         *url.URL
 		DiscordOAuth2Config oauth2.Config
 		RateLimiter         ratelimiter.RateLimiter
@@ -61,7 +60,6 @@ const (
 
 func newAuthHandler(cfg config.ContestantAuth, repo *pg.Repository, rateLimiter ratelimiter.RateLimiter) *AuthHandler {
 	return &AuthHandler{
-		TrustProxy:  cfg.TrustProxy,
 		ExternalURL: cfg.ExternalURL,
 		DiscordOAuth2Config: oauth2.Config{
 			ClientID:     cfg.DiscordClientID,
@@ -125,7 +123,7 @@ func (h *AuthHandler) generateOAuth2Session(nextPath *url.URL) *session.OAuth2Se
 func (h *AuthHandler) externalURL(r *http.Request) *url.URL {
 	url := &url.URL{}
 
-	// From URL
+	// From External URL
 	if h.ExternalURL != nil {
 		if url.Scheme == "" && h.ExternalURL.Scheme != "" {
 			url.Scheme = h.ExternalURL.Scheme
@@ -138,13 +136,9 @@ func (h *AuthHandler) externalURL(r *http.Request) *url.URL {
 		}
 	}
 	// From Proxy Headers
-	if h.TrustProxy {
-		if proto := r.Header.Get("X-Forwarded-Proto"); url.Scheme == "" && proto != "" {
-			url.Scheme = proto
-		}
-		if host := r.Header.Get("X-Forwarded-Host"); url.Host == "" && host != "" {
-			url.Host = host
-		}
+	// TODO: Support Forwarded header
+	if url.Scheme == "" && strings.ToLower(r.Header.Get("X-Forwarded-Proto")) == "https" {
+		url.Scheme = "https"
 	}
 	// From Request
 	if url.Scheme == "" {

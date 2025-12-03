@@ -125,7 +125,6 @@ func newContestantConfig(opts *CLIOption) (*config.ContestantAPI, error) {
 	return &config.ContestantAPI{
 		Address: opts.ContestantHTTPAddr,
 		Auth: config.ContestantAuth{
-			TrustProxy:          opts.ContestantTrustProxy,
 			ExternalURL:         externalURL,
 			DiscordClientID:     discordClientID,
 			DiscordClientSecret: discordClientSecret,
