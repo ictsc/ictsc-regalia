@@ -139,11 +139,14 @@ func (h *AuthHandler) externalURL(r *http.Request) *url.URL {
 	}
 	// From Proxy Headers
 	if h.TrustProxy {
-		if proto := r.Header.Get("X-Forwarded-Proto"); url.Scheme == "" && proto != "" {
+		if proto := r.Header.Get("X-Forwarded-Proto"); url.Scheme == "" && (proto == "http" || proto == "https") {
 			url.Scheme = proto
 		}
 		if host := r.Header.Get("X-Forwarded-Host"); url.Host == "" && host != "" {
-			url.Host = host
+			// Validate host doesn't contain path separators or other malicious content
+			if !strings.ContainsAny(host, "/\\@") {
+				url.Host = host
+			}
 		}
 	}
 	// From Request
