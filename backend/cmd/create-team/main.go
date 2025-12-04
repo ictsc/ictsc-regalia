@@ -123,11 +123,30 @@ func start(option Option) int {
 			log.Printf("[team:%d] unchanged", entry.ID)
 		}
 
-		idx := slices.IndexFunc(invitationCodes, func(ic *adminv1.InvitationCode) bool {
+		teamInvitationCodeIdx := slices.IndexFunc(invitationCodes, func(ic *adminv1.InvitationCode) bool {
 			return ic.GetTeamCode() == int64(entry.ID)
 		})
-		if idx >= 0 {
-			entry.InvitationCode = invitationCodes[idx].GetCode()
+		if teamInvitationCodeIdx >= 0 {
+			if entry.InvitationCode == "" {
+				log.Printf("[team:%d] using existing invitation code", entry.ID)
+				entry.InvitationCode = invitationCodes[teamInvitationCodeIdx].GetCode()
+			} else {
+				exactMatchIdx := slices.IndexFunc(invitationCodes, func(ic *adminv1.InvitationCode) bool {
+					return ic.GetCode() == entry.InvitationCode && ic.GetTeamCode() == int64(entry.ID)
+				})
+				if exactMatchIdx >= 0 {
+					log.Printf("[team:%d] using existing invitation code as specified code exists", entry.ID)
+				} else {
+					log.Printf("[team:%d] creating new invitation code as specified code does not exist", entry.ID)
+					code, err := createInvitationCode(ctx, invitationClient, entry, option.InvitationExpires)
+					if err != nil {
+						log.Printf("[team:%d] failed to create invitation code: %v", entry.ID, err)
+						continue
+					}
+					log.Printf("[team:%d] invitation code created with specified code", entry.ID)
+					entry.InvitationCode = code
+				}
+			}
 		} else {
 			code, err := createInvitationCode(ctx, invitationClient, entry, option.InvitationExpires)
 			if err != nil {
@@ -175,11 +194,14 @@ func updateTeam(ctx context.Context, client adminv1connect.TeamServiceClient, te
 }
 
 func createInvitationCode(ctx context.Context, client adminv1connect.InvitationServiceClient, entry *teamEntry, expiresAt time.Time) (string, error) {
+	invitationCode := &adminv1.InvitationCode{
+		TeamCode:  int64(entry.ID),
+		ExpiresAt: timestamppb.New(expiresAt),
+		Code:      entry.InvitationCode,
+	}
+
 	resp, err := client.CreateInvitationCode(ctx, connect.NewRequest(&adminv1.CreateInvitationCodeRequest{
-		InvitationCode: &adminv1.InvitationCode{
-			TeamCode:  int64(entry.ID),
-			ExpiresAt: timestamppb.New(expiresAt),
-		},
+		InvitationCode: invitationCode,
 	}))
 	if err != nil {
 		return "", errors.WithStack(err)

@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log/slog"
-	"net/url"
 	"os"
 
 	"github.com/cockroachdb/errors"
@@ -102,13 +100,12 @@ func newAdminConfig(opts *CLIOption) (*config.AdminAPI, error) {
 }
 
 func newContestantConfig(opts *CLIOption) (*config.ContestantAPI, error) {
-	if baseURL, ok := os.LookupEnv("CONTESTANT_BASE_URL"); ok {
-		url, err := url.Parse(baseURL)
-		if err == nil {
-			opts.ContestantBaseURL = *url
-		} else {
-			slog.Info("CONTESTANT_BASE_URL is invalid. use default value", "error", err)
+	externalURL := &opts.ContestantExternalURL
+	if opts.ContestantRoutePrefix != "" {
+		if externalURL.Path == "" {
+			externalURL.Path = "/"
 		}
+		externalURL = externalURL.JoinPath(opts.ContestantRoutePrefix)
 	}
 
 	var errs []error
@@ -128,7 +125,7 @@ func newContestantConfig(opts *CLIOption) (*config.ContestantAPI, error) {
 	return &config.ContestantAPI{
 		Address: opts.ContestantHTTPAddr,
 		Auth: config.ContestantAuth{
-			BaseURL:             &opts.ContestantBaseURL,
+			ExternalURL:         externalURL,
 			DiscordClientID:     discordClientID,
 			DiscordClientSecret: discordClientSecret,
 		},
