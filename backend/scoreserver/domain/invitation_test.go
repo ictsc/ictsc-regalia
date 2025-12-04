@@ -2,6 +2,7 @@ package domain_test
 
 import (
 	"context"
+	"strings"
 	"testing"
 	"time"
 
@@ -169,7 +170,7 @@ func Test_CreateInvitationCode(t *testing.T) {
 			team:       team1,
 			effect:     effect,
 			expiresAt:  expiresAt,
-			manualCode: "A" + string(make([]byte, 255)),
+			manualCode: strings.Repeat("A", 256), // 256文字の英数字
 			wantErr:    domain.ErrInvalidArgument,
 		},
 		"already expired": {
