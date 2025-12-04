@@ -305,6 +305,8 @@ func (r *redployRule) Scan(src any) error {
 		*r = redployRule(domain.RedeployRuleUnredeployable)
 	case "PERCENTAGE_PENALTY":
 		*r = redployRule(domain.RedeployRulePercentagePenalty)
+	case "MANUAL":
+		*r = redployRule(domain.RedeployRuleManual)
 	}
 	return nil
 }
@@ -315,6 +317,8 @@ func (r redployRule) Value() (driver.Value, error) {
 		return "UNREDEPLOYABLE", nil
 	case domain.RedeployRulePercentagePenalty:
 		return "PERCENTAGE_PENALTY", nil
+	case domain.RedeployRuleManual:
+		return "MANUAL", nil
 	case domain.RedeployRuleUnknown:
 		fallthrough
 	default:

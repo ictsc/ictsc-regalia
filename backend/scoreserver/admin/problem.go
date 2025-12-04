@@ -292,6 +292,10 @@ func convertRedeployRule(problem *domain.Problem) *adminv1.RedeployRule {
 			PenaltyThreshold:  problem.PercentagePenalty().Threshold,
 			PenaltyPercentage: problem.PercentagePenalty().Percentage,
 		}
+	case domain.RedeployRuleManual:
+		return &adminv1.RedeployRule{
+			Type: adminv1.RedeployRuleType_REDEPLOY_RULE_TYPE_MANUAL,
+		}
 	case domain.RedeployRuleUnknown:
 		fallthrough
 	default:
@@ -310,6 +314,8 @@ func parseRedeployRule(proto *adminv1.RedeployRule) (domain.RedeployRule, *domai
 			Threshold:  proto.GetPenaltyThreshold(),
 			Percentage: proto.GetPenaltyPercentage(),
 		}
+	case adminv1.RedeployRuleType_REDEPLOY_RULE_TYPE_MANUAL:
+		return domain.RedeployRuleManual, nil
 	case adminv1.RedeployRuleType_REDEPLOY_RULE_TYPE_UNSPECIFIED:
 		fallthrough
 	default:

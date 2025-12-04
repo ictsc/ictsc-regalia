@@ -136,6 +136,32 @@ func FixDescriptiveProblem1(tb testing.TB, data *DescriptiveProblemData) *Descri
 	return problem
 }
 
+func FixDescriptiveProblemManual(tb testing.TB) *DescriptiveProblem {
+	tb.Helper()
+
+	//nolint:mnd
+	problemData := &DescriptiveProblemData{
+		Problem: &ProblemData{
+			ID:           uuid.FromStringOrNil("35f7bf01-6ede-5043-926c-e2c20c285b03"),
+			Code:         "MAN",
+			ProblemType:  ProblemTypeDescriptive,
+			Title:        "Manual Redeploy Problem",
+			MaxScore:     100,
+			Category:     "Network",
+			RedeployRule: RedeployRuleManual,
+		},
+		Content: &ProblemContentData{
+			Body:        "This is a manual redeploy problem.",
+			Explanation: "This is a manual redeploy explanation.",
+		},
+	}
+	problem, err := problemData.parse()
+	if err != nil {
+		tb.Fatal(err)
+	}
+	return problem
+}
+
 func FixNotice1(tb testing.TB, data *NoticeData) *Notice {
 	tb.Helper()
 
