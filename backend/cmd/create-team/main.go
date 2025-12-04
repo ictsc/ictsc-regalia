@@ -197,9 +197,7 @@ func createInvitationCode(ctx context.Context, client adminv1connect.InvitationS
 	invitationCode := &adminv1.InvitationCode{
 		TeamCode:  int64(entry.ID),
 		ExpiresAt: timestamppb.New(expiresAt),
-	}
-	if entry.InvitationCode != "" {
-		invitationCode.Code = entry.InvitationCode
+		Code:      entry.InvitationCode,
 	}
 
 	resp, err := client.CreateInvitationCode(ctx, connect.NewRequest(&adminv1.CreateInvitationCodeRequest{
