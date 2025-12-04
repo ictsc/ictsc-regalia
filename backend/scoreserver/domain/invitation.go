@@ -46,9 +46,9 @@ func ListInvitationCodes(ctx context.Context, eff InvitationCodeLister) ([]*Invi
 
 // CreateInvitationCode - 招待コードの作成
 func (t *Team) CreateInvitationCode(
-	ctx context.Context, eff InvitationCodeCreator, now time.Time, expiresAt time.Time,
+	ctx context.Context, eff InvitationCodeCreator, now time.Time, expiresAt time.Time, code string,
 ) (*InvitationCode, error) {
-	return t.createInvitationCode(ctx, eff, now, expiresAt)
+	return t.createInvitationCode(ctx, eff, now, expiresAt, code)
 }
 
 var (
@@ -140,6 +140,7 @@ func (t *team) createInvitationCode(
 	ctx context.Context,
 	eff InvitationCodeCreator, now time.Time,
 	expiresAt time.Time,
+	manualInvitationCode string,
 ) (*invitationCode, error) {
 	if expiresAt.Before(now) {
 		return nil, NewInvalidArgumentError("already expired", nil)
@@ -150,9 +151,19 @@ func (t *team) createInvitationCode(
 		return nil, WrapAsInternal(err, "failed to generate uuid")
 	}
 
-	code, err := generateInvitationCode()
-	if err != nil {
-		return nil, WrapAsInternal(err, "failed to generate invitation code")
+	var code invitationCodeString
+	if manualInvitationCode != "" {
+		// 手動でコードが指定された場合は検証
+		if err := validateInvitationCode(manualInvitationCode); err != nil {
+			return nil, err
+		}
+		code = invitationCodeString(manualInvitationCode)
+	} else {
+		// 指定がない場合は自動生成
+		code, err = generateInvitationCode()
+		if err != nil {
+			return nil, WrapAsInternal(err, "failed to generate invitation code")
+		}
 	}
 
 	invitationCode := &invitationCode{
@@ -174,6 +185,29 @@ const (
 	// 誤読しやすい文字を除外した文字セット
 	invitationCodeCharset = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 )
+
+func validateInvitationCode(code string) error {
+	if len(code) == 0 {
+		return NewInvalidArgumentError("invitation code cannot be empty", nil)
+	}
+	if len(code) < invitationCodeLength {
+		return NewInvalidArgumentError("invitation code is too short (min 16 characters)", nil)
+	}
+	if len(code) > 255 {
+		return NewInvalidArgumentError("invitation code is too long (max 255 characters)", nil)
+	}
+
+	for _, c := range code {
+		if !isAlphanumeric(c) {
+			return NewInvalidArgumentError("invitation code must contain only alphanumeric characters (A-Z, a-z, 0-9)", nil)
+		}
+	}
+	return nil
+}
+
+func isAlphanumeric(c rune) bool {
+	return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')
+}
 
 func generateInvitationCode() (invitationCodeString, error) {
 	charsetLen := big.NewInt(int64(len(invitationCodeCharset)))
