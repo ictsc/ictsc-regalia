@@ -147,7 +147,7 @@ func Test_CreateInvitationCode(t *testing.T) {
 				CreatedAt: now,
 			},
 		},
-		"manual code empty string is rejected": {
+		"empty string triggers auto-generation": {
 			team:       team1,
 			effect:     effect,
 			expiresAt:  expiresAt,
