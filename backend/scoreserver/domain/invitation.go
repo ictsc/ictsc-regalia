@@ -190,6 +190,9 @@ func validateInvitationCode(code string) error {
 	if len(code) == 0 {
 		return NewInvalidArgumentError("invitation code cannot be empty", nil)
 	}
+	if len(code) < invitationCodeLength {
+		return NewInvalidArgumentError("invitation code is too short (min 16 characters)", nil)
+	}
 	if len(code) > 255 {
 		return NewInvalidArgumentError("invitation code is too long (max 255 characters)", nil)
 	}
