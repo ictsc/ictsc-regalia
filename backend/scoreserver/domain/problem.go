@@ -204,7 +204,7 @@ func (p *Problem) RemainingDeployments(revision uint32) int32 {
 	case RedeployRuleManual:
 		return 0 // マニュアルモードでは常に0(再展開ペナルティは常に発生する可能性がある)
 	default:
-		return 0
+		panic(fmt.Sprintf("unknown redeploy rule: %s", p.redeployRule.String()))
 	}
 }
 
@@ -213,10 +213,10 @@ func (p *Problem) Penalty(deploymentCount uint32) uint32 {
 	case RedeployRulePercentagePenalty:
 		penalty := (p.maxScore * p.percentagePenalty.Percentage) / 100            //nolint:mnd
 		return penalty * uint32(max(0, -p.RemainingDeployments(deploymentCount))) //nolint:gosec
-	case RedeployRuleManual:
-		return 0 // マニュアルモードでは常に0
-	default:
+	case RedeployRuleManual, RedeployRuleUnredeployable:
 		return 0
+	default:
+		panic(fmt.Sprintf("unknown redeploy rule: %s", p.redeployRule.String()))
 	}
 }
 
