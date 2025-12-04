@@ -7,8 +7,8 @@ import {
 } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { type User } from "@app/features/viewer";
-import { Route as RootRoute } from "../~__root";
-import { SignInPage } from "./page";
+import { Route as RootRoute } from "./~__root";
+import { SignInPage } from "./signin.page";
 
 type SignInSearch = {
   next?: string;

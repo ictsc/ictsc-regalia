@@ -1,7 +1,7 @@
 import { Button, type ButtonProps } from "@headlessui/react";
-import clydeIcon from "../../../assets/icon_clyde_white_RGB.svg";
-import { Logo } from "../../components/logo";
-import { Title } from "../../components/title";
+import clydeIcon from "../../assets/icon_clyde_white_RGB.svg";
+import { Logo } from "../components/logo";
+import { Title } from "../components/title";
 
 type Props = {
   signInURL: string;

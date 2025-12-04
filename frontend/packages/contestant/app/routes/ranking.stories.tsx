@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { RankingPage } from "./page";
+import { RankingPage } from "./ranking.page";
 
 export default {
   title: "pages/ranking",

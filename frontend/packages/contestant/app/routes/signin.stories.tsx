@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { SignInPage } from "./page";
+import { SignInPage } from "./signin.page";
 
 export default {
   title: "pages/signin",

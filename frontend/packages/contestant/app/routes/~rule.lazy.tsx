@@ -1,7 +1,7 @@
 import { use } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { Title } from "../../components/title";
-import { Markdown, Typography } from "../../components/markdown";
+import { Title } from "../components/title";
+import { Markdown, Typography } from "../components/markdown";
 
 export const Route = createLazyFileRoute("/rule")({
   component: RouteComponent,

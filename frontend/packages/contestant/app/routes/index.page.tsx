@@ -1,9 +1,9 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { differenceInDays, formatDuration, intervalToDuration } from "date-fns";
 import { Phase } from "@ictsc/proto/contestant/v1";
-import { Logo } from "../../components/logo";
-import { MaterialSymbol } from "../../components/material-symbol";
-import { Title } from "../../components/title";
+import { Logo } from "../components/logo";
+import { MaterialSymbol } from "../components/material-symbol";
+import { Title } from "../components/title";
 
 export type IndexPageProps = {
   readonly phase: Phase;

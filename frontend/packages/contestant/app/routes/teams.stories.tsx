@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { TeamsPage } from "./page";
+import { TeamsPage } from "./teams.page";
 
 export default {
   title: "pages/teams",

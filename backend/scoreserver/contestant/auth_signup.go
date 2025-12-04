@@ -98,7 +98,7 @@ func (h *AuthHandler) handleSignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := session.SignUpSessionStore.Write(r, w, nil, h.signUpSessionOption()); err != nil {
+	if err := session.SignUpSessionStore.Write(r, w, nil, h.signUpSessionOption(r)); err != nil {
 		slog.ErrorContext(r.Context(), "failed to delete signup session", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		writeJSON(r.Context(), w, SignUpResponse{})
@@ -106,8 +106,7 @@ func (h *AuthHandler) handleSignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userSess := &session.UserSession{UserID: uuid.UUID(userProfile.ID())}
-	sessOpt := h.sessionOption()
-	sessOpt.MaxAge = int(userCookieAge.Seconds())
+	sessOpt := h.userSessionOption(r)
 	if err := session.UserSessionStore.Write(r, w, userSess, sessOpt); err != nil {
 		slog.ErrorContext(r.Context(), "failed to write user session", "error", err)
 		w.WriteHeader(http.StatusInternalServerError)
