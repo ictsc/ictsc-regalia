@@ -73,4 +73,3 @@ func TestProblem_Manual_Penalty(t *testing.T) {
 		}
 	}
 }
-
