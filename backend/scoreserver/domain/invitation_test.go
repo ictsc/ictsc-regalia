@@ -224,9 +224,8 @@ func Test_CreateInvitationCode(t *testing.T) {
 				t.Errorf("mismatch (-want +got):\n%s", diff)
 			}
 
-			// 自動生成の場合、コードが空でないことを確認
-			if !tt.expectManualCode && tt.manualCode == "" && actual.Code == "" {
-				t.Error("expected auto-generated code to be non-empty")
+			if actual.Code == "" {
+				t.Error("expected code not to be empty")
 			}
 		})
 	}
