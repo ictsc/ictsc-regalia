@@ -233,8 +233,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       material-symbols:
-        specifier: ^0.35.0
-        version: 0.35.2
+        specifier: ^0.40.0
+        version: 0.40.2
       react:
         specifier: ^19.0.0
         version: 19.2.0
@@ -2905,8 +2905,8 @@ packages:
   markdown-table@3.0.4:
     resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
 
-  material-symbols@0.35.2:
-    resolution: {integrity: sha512-ce0Bd3ySBdiTNgmVpFQCBdwtcsYPaZkSPHeVivFRyhu/hwB7iK1aVTRaqi5xaOw8yLPOtwp7O5A+3OyUS8S+Ow==}
+  material-symbols@0.40.2:
+    resolution: {integrity: sha512-QUJF1HztvcpP8pXHPPNESK05Thq/Zy8ub17T2xBDf4+gqx4KBs353lKHuVzE/eCYOtiB9JBlFOU7cjAI6vVMTQ==}
 
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
@@ -7054,7 +7054,7 @@ snapshots:
 
   markdown-table@3.0.4: {}
 
-  material-symbols@0.35.2: {}
+  material-symbols@0.40.2: {}
 
   math-intrinsics@1.1.0: {}
 
