@@ -49,6 +49,8 @@ require (
 	github.com/OpenPeeDeeP/depguard/v2 v2.2.1 // indirect
 	github.com/alecthomas/chroma/v2 v2.20.0 // indirect
 	github.com/alecthomas/go-check-sumtype v0.3.1 // indirect
+	github.com/alecthomas/kingpin/v2 v2.4.0 // indirect
+	github.com/alecthomas/units v0.0.0-20240927000941-0f3dac36c52b // indirect
 	github.com/alexkohler/nakedret/v2 v2.0.6 // indirect
 	github.com/alexkohler/prealloc v1.0.0 // indirect
 	github.com/alfatraining/structtag v1.0.0 // indirect
@@ -127,7 +129,7 @@ require (
 	github.com/golangci/go-printf-func-name v0.1.1 // indirect
 	github.com/golangci/gofmt v0.0.0-20250704145412-3e58ba0443c6 // indirect
 	github.com/golangci/golangci-lint/v2 v2.5.0 // indirect
-	github.com/golangci/golines v0.0.0-20250821215611-d4663ad2c370 // indirect
+	github.com/golangci/golines v0.0.0-20251214142620-63639e8a3e5b // indirect
 	github.com/golangci/misspell v0.7.0 // indirect
 	github.com/golangci/nilerr v0.0.0-20250918000102-015671e622fe // indirect
 	github.com/golangci/plugin-module-register v0.1.2 // indirect
@@ -167,6 +169,7 @@ require (
 	github.com/ldez/exptostd v0.4.5 // indirect
 	github.com/ldez/gomoddirectives v0.7.1 // indirect
 	github.com/ldez/grignotin v0.10.1 // indirect
+	github.com/ldez/structtags v0.6.1 // indirect
 	github.com/ldez/tagliatelle v0.7.2 // indirect
 	github.com/ldez/usetesting v0.5.0 // indirect
 	github.com/leonklingele/grouper v1.1.2 // indirect
@@ -257,6 +260,7 @@ require (
 	github.com/wasilibs/go-pgquery v0.0.0-20250409022910-10ac41983c07 // indirect
 	github.com/wasilibs/wazero-helpers v0.0.0-20250123031827-cd30c44769bb // indirect
 	github.com/xen0n/gosmopolitan v1.3.0 // indirect
+	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/yagipy/maintidx v1.0.0 // indirect
 	github.com/yeya24/promlinter v0.3.0 // indirect
@@ -280,16 +284,16 @@ require (
 	go.uber.org/zap v1.27.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.45.0 // indirect
+	golang.org/x/crypto v0.46.0 // indirect
 	golang.org/x/exp v0.0.0-20251017212417-90e834f514db // indirect
 	golang.org/x/exp/typeparams v0.0.0-20251017212417-90e834f514db // indirect
-	golang.org/x/mod v0.29.0 // indirect
-	golang.org/x/net v0.47.0 // indirect
-	golang.org/x/sync v0.18.0 // indirect
-	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/term v0.37.0 // indirect
-	golang.org/x/text v0.31.0 // indirect
-	golang.org/x/tools v0.38.0 // indirect
+	golang.org/x/mod v0.31.0 // indirect
+	golang.org/x/net v0.48.0 // indirect
+	golang.org/x/sync v0.19.0 // indirect
+	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/term v0.38.0 // indirect
+	golang.org/x/text v0.32.0 // indirect
+	golang.org/x/tools v0.40.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20251002232023-7c0ddcbb5797 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251002232023-7c0ddcbb5797 // indirect
 	google.golang.org/protobuf v1.36.9 // indirect
