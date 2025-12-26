@@ -14,6 +14,9 @@ jobs:
   codegen:
     name: Code Generation Autofix
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -21,7 +24,6 @@ jobs:
       - name: Setup Go
         uses: ./.github/actions/setup-go
       - name: Go Generate
-        working-directory: backend
         run: go generate -x ./...
 
       - name: Setup Node.js
