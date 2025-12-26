@@ -4,8 +4,8 @@
 4d63.com/gochecknoglobals v0.2.2/go.mod h1:lLxwTQjL5eIesRbvnzIP3jZtG140FnTdz+AlMa+ogt0=
 buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.10-20250718181942-e35f9b667443.1 h1:FzJGrb8r7vir+P3zJ5Ebey8p54LYTYtQsrM/U35YO9Q=
 buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.10-20250718181942-e35f9b667443.1/go.mod h1:E6HwqUm4Ag7bXtg/tX7jHWO7CgpknbmeACgDax0icV0=
-buf.build/gen/go/bufbuild/protodescriptor/protocolbuffers/go v1.36.10-20250109164928-1da0de137947.1 h1:9hkMnVoImDlY7rTlAWIWXdkGUKOjf3YlyZeSbYT29uA=
-buf.build/gen/go/bufbuild/protodescriptor/protocolbuffers/go v1.36.10-20250109164928-1da0de137947.1/go.mod h1:/AouMCAeQ+kB7+RRFpdUlZe3503p18VoUNcU2AFqZXM=
+buf.build/gen/go/bufbuild/protodescriptor/protocolbuffers/go v1.36.11-20250109164928-1da0de137947.1 h1:HwzzCRS4ZrEm1++rzSDxHnO0DOjiT1b8I/24e8a4exY=
+buf.build/gen/go/bufbuild/protodescriptor/protocolbuffers/go v1.36.11-20250109164928-1da0de137947.1/go.mod h1:8PRKXhgNes29Tjrnv8KdZzg3I1QceOkzibW1QK7EXv0=
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20250912141014-52f32327d4b0.1 h1:oKTVB9QIhFBU9y07QCs2lX2EhGkqWKTX3tTOl/ZbU9o=
 buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20250912141014-52f32327d4b0.1/go.mod h1:tvtbpgaVXZX4g6Pn+AnzFycuRK3MOz5HJfEGeEllXYM=
 buf.build/gen/go/bufbuild/registry/connectrpc/go v1.19.1-20251027152159-f1066ce064ca.2 h1:Dbh4Edwy5qHlz1/boPAQ7T5Q7ZDMgEuQlEbXa94+JEo=
