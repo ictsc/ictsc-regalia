@@ -297,6 +297,6 @@ require (
 	gotest.tools/v3 v3.5.2 // indirect
 	honnef.co/go/tools v0.6.1 // indirect
 	mvdan.cc/gofumpt v0.9.2 // indirect
-	mvdan.cc/unparam v0.0.0-20250301125049-0df0534333a4 // indirect
+	mvdan.cc/unparam v0.0.0-20251027182757-5beb8c8f8f15 // indirect
 	pluginrpc.com/pluginrpc v0.5.0 // indirect
 )
