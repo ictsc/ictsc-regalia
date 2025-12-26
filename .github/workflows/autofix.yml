@@ -21,12 +21,14 @@ jobs:
       - name: Setup Go
         uses: ./.github/actions/setup-go
       - name: Go Generate
-        run: cd backend && go generate -x ./...
+        working-directory: backend
+        run: go generate -x ./...
 
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
       - name: Frontend Generate
-        run: cd frontend && pnpm run generate
+        working-directory: frontend
+        run: pnpm run generate
 
       - name: Autofix
         # autofix-ci/action@v1.3.2
