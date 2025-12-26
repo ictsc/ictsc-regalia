@@ -75,6 +75,7 @@ jobs:
       - name: Go Generate
         run: go generate -x ./...
       - name: Autofix
+        # autofix-ci/action@v1.3.2
         uses: autofix-ci/action@635ffb0c9798bd160680f18fd73371e355b85f27
       - name: Save Cache
         uses: actions/cache/save@v4

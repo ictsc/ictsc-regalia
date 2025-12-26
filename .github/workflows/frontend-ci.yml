@@ -38,6 +38,7 @@ jobs:
       - name: Generate
         run: pnpm run generate
       - name: Autofix
+        # autofix-ci/action@v1.3.2
         uses: autofix-ci/action@635ffb0c9798bd160680f18fd73371e355b85f27
   test:
     name: Test
