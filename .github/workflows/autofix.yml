@@ -21,14 +21,14 @@ jobs:
       - name: Setup Go
         uses: ./.github/actions/setup-go
       - name: Go Generate
-        # Backend Go module is rooted in backend/
+        # Go module root is backend/go.mod
         working-directory: backend
         run: go generate -x ./...
 
       - name: Setup Node.js
         uses: ./.github/actions/setup-node
       - name: Frontend Generate
-        # Frontend package.json lives under frontend/
+        # Frontend package.json (generate script) lives under frontend/
         working-directory: frontend
         run: pnpm run generate
 
