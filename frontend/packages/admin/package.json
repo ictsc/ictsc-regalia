@@ -42,7 +42,7 @@
   "dependencies": {
     "@bufbuild/protobuf": "^2.0.0",
     "@connectrpc/connect": "2.1.0",
-    "@connectrpc/connect-web": "2.1.0",
+    "@connectrpc/connect-web": "2.1.1",
     "@ictsc/proto": "workspace:*",
     "@mantine/core": "^8.0.0",
     "@mantine/hooks": "^8.0.0",
