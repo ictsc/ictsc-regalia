@@ -54,33 +54,6 @@ jobs:
         with:
           path: ~/.cache/golangci-lint
           key: ${{ steps.golangci-lint-cache.outputs.cache-primary-key }}
-  generation:
-    name: Generation
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: Setup Go
-        uses: ./.github/actions/setup-go
-      - name: Restore Cache
-        id: go-generate-cache
-        uses: actions/cache/restore@v4
-        with:
-          path: ~/.cache/go-build
-          key: go-generate-${{ hashFiles('backend/tools/go.sum') }}
-          restore-keys: go-generate-
-      - name: Go Generate
-        run: go generate -x ./...
-      - name: Check Diff
-        run: git diff --exit-code
-      - name: Save Cache
-        uses: actions/cache/save@v4
-        if: >-
-          always() && steps.go-generate-cache.outputs.cache-hit != 'true'
-          && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        with:
-          path: ~/.cache/go-build
-          key: ${{ steps.go-generate-cache.outputs.cache-primary-key }}
   test:
     name: Test
     needs: [test-go, test-schema]

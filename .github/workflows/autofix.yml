@@ -1,0 +1,37 @@
+name: autofix.ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  codegen:
+    name: Code Generation Autofix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Go
+        uses: ./.github/actions/setup-go
+      - name: Go Generate
+        # Go module root is backend/go.mod
+        working-directory: backend
+        run: go generate -x ./...
+
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
+      - name: Frontend Generate
+        # Frontend package.json (generate script) lives under frontend/
+        working-directory: frontend
+        run: pnpm run generate
+
+      - name: Autofix
+        # autofix-ci/action@v1.3.2 (pinned commit for supply-chain safety)
+        uses: autofix-ci/action@635ffb0c9798bd160680f18fd73371e355b85f27
