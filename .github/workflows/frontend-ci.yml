@@ -24,19 +24,6 @@ jobs:
         uses: ./.github/actions/setup-node
       - name: Lint
         run: pnpm run ci:lint
-  generate:
-    name: Generation
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-      - name: Setup Node.js
-        uses: ./.github/actions/setup-node
-      - name: Generate
-        run: pnpm run generate
   test:
     name: Test
     runs-on: ubuntu-latest
