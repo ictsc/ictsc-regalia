@@ -1,22 +1,13 @@
-import { use, useDeferredValue, useMemo } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { Markdown, Typography } from "../components/markdown";
 import { Title } from "..//components/title";
-import { Route as ParentRoute } from "./~announces";
 
 export const Route = createLazyFileRoute("/announces/$slug")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { slug } = Route.useLoaderData();
-  const { announces } = ParentRoute.useLoaderData();
-  const announcePromise = useMemo(async () => {
-    const list = await announces;
-    return list.find((announce) => announce.slug === slug);
-  }, [announces, slug]);
-
-  const announce = use(useDeferredValue(announcePromise));
+  const { announce } = Route.useLoaderData();
 
   return (
     <>
