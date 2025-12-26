@@ -57,6 +57,9 @@ jobs:
   generation:
     name: Generation
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -71,8 +74,8 @@ jobs:
           restore-keys: go-generate-
       - name: Go Generate
         run: go generate -x ./...
-      - name: Check Diff
-        run: git diff --exit-code
+      - name: Autofix
+        uses: autofix-ci/action@v2
       - name: Save Cache
         uses: actions/cache/save@v4
         if: >-

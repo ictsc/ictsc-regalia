@@ -27,6 +27,9 @@ jobs:
   generate:
     name: Generation
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -34,8 +37,8 @@ jobs:
         uses: ./.github/actions/setup-node
       - name: Generate
         run: pnpm run generate
-      - name: Check diff
-        run: git diff --name-only --exit-code
+      - name: Autofix
+        uses: autofix-ci/action@v2
   test:
     name: Test
     runs-on: ubuntu-latest
