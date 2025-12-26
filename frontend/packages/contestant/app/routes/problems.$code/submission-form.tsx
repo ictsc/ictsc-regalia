@@ -18,11 +18,10 @@ function useAnswerable(
   lastSubmittedAt?: string,
   submitInterval?: number,
 ): AnswerableState {
-  const [state, setState] = useState<AnswerableState>({ remainingSeconds: 0 });
+  const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
-    if (!lastSubmittedAt || !submitInterval) {
-      setState({ remainingSeconds: 0 });
+    if (lastSubmittedAt == null || submitInterval == null) {
       return;
     }
 
@@ -38,7 +37,7 @@ function useAnswerable(
 
       const remainingSeconds = diffSec > 0 ? diffSec : 0;
 
-      setState({ remainingSeconds });
+      setSeconds(remainingSeconds);
     };
 
     checkAnswerable();
@@ -46,7 +45,10 @@ function useAnswerable(
     return () => clearInterval(interval);
   }, [lastSubmittedAt, submitInterval]);
 
-  return state;
+  const remainingSeconds =
+    lastSubmittedAt != null && submitInterval != null ? seconds : 0;
+
+  return { remainingSeconds };
 }
 
 export function SubmissionForm(props: {

@@ -29,6 +29,7 @@ function RoutedStory() {
   if (Story == null) {
     throw new Error("story not found");
   }
+  // eslint-disable-next-line react-hooks/static-components
   return <Story />;
 }
 
