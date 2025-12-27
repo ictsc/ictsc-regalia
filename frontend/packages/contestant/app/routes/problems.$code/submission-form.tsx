@@ -138,7 +138,7 @@ export function SubmissionForm(props: {
         {isAnswerable && lastResult?.type === "error" && (
           <label
             id={errorId}
-            className="flex-shrink text-16 font-bold text-primary"
+            className="shrink text-16 font-bold text-primary"
           >
             {lastResult.error}
           </label>

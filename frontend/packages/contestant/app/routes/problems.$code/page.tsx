@@ -74,7 +74,7 @@ function Layout(props: { content: React.ReactNode; sidebar: React.ReactNode }) {
       <div
         className={clsx(
           "overflow-y-auto px-40 pb-64",
-          "w-[--span] xl:w-[calc(var(--span)*2)]",
+          "w-(--span) xl:w-[calc(var(--span)*2)]",
           navbarTransitioning && "transition-[width]",
         )}
       >
@@ -82,14 +82,14 @@ function Layout(props: { content: React.ReactNode; sidebar: React.ReactNode }) {
       </div>
       <div
         className={clsx(
-          "fixed right-0 top-[--header-height] flex h-[--content-height] w-[--span] gap-4 px-12 pb-64 pt-20",
+          "fixed right-0 top-(--header-height) flex h-(--content-height) w-(--span) gap-4 px-12 pb-64 pt-20",
           showSidebar && "bg-surface-0",
           !showSidebar &&
             "translate-x-[calc(var(--span)-64px)] lg:translate-x-0",
-          "lg:w-[--span] lg:pl-0",
+          "lg:w-(--span) lg:pl-0",
           navbarTransitioning
-            ? "transition-[width,transform]"
-            : "transition-transform",
+            ? "transition-[width,translate]"
+            : "transition-translate",
         )}
       >
         <Button
