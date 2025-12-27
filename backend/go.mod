@@ -12,7 +12,7 @@ require (
 	github.com/DATA-DOG/go-txdb v0.2.1
 	github.com/XSAM/otelsql v0.40.0
 	github.com/bwmarrin/discordgo v0.29.0
-	github.com/casbin/casbin/v2 v2.128.0
+	github.com/casbin/casbin/v2 v2.135.0
 	github.com/cockroachdb/errors v1.12.0
 	github.com/coreos/go-oidc/v3 v3.16.0
 	github.com/docker/go-connections v0.6.0
