@@ -80,12 +80,12 @@ export function RankingPage(props: RankingProps) {
                     </span>
                   </div>
                 </div>
-                <div className="flex flex-col justify-center gap-16 rounded-16 p-24 shadow-lg sm:flex-row sm:items-center">
+                <div className="rounded-16 flex flex-col justify-center gap-16 p-24 shadow-lg sm:flex-row sm:items-center">
                   <div className="flex flex-1 sm:justify-center">
                     <div className="flex flex-col justify-self-center overflow-hidden">
                       <p className="text-14">チーム名</p>
                       <p
-                        className="mt-20 w-full overflow-hidden truncate whitespace-nowrap text-16"
+                        className="text-16 mt-20 w-full truncate overflow-hidden whitespace-nowrap"
                         title={ranking.teamName}
                       >
                         {ranking.teamName}
@@ -96,7 +96,7 @@ export function RankingPage(props: RankingProps) {
                     <div className="flex flex-col overflow-hidden">
                       <p className="text-14">所属</p>
                       <p
-                        className="mt-20 w-full overflow-hidden truncate whitespace-nowrap text-16"
+                        className="text-16 mt-20 w-full truncate overflow-hidden whitespace-nowrap"
                         title={ranking.organization}
                       >
                         {ranking.organization}

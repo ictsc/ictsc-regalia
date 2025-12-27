@@ -24,7 +24,7 @@
   }
   h1,
   h2 {
-    @apply border-b-2 border-disabled pb-4;
+    @apply border-disabled border-b-2 pb-4;
   }
   h1,
   h2,
@@ -51,7 +51,7 @@
   }
 
   hr {
-    @apply border-t-2 border-disabled;
+    @apply border-disabled border-t-2;
   }
 
   table {
@@ -60,7 +60,7 @@
 
   th,
   td {
-    @apply border border-disabled p-8 text-16;
+    @apply border-disabled text-16 border p-8;
   }
 
   th {
@@ -72,14 +72,14 @@
   }
 
   blockquote {
-    @apply border-l-4 border-primary bg-surface-1/50 pl-8;
+    @apply border-primary bg-surface-1/50 border-l-4 pl-8;
   }
 
   :where(code):not(pre > code) {
-    @apply rounded-4 bg-surface-1 px-4 py-2 font-mono text-14;
+    @apply rounded-4 bg-surface-1 text-14 px-4 py-2 font-mono;
   }
 
   pre:has(> code) {
-    @apply block overflow-x-auto rounded-4 bg-surface-1/50 py-2 font-mono text-14;
+    @apply rounded-4 bg-surface-1/50 text-14 block overflow-x-auto py-2 font-mono;
   }
 }

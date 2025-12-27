@@ -30,10 +30,10 @@ export function ContestStateView({
   const seconds = rest % MINUTE;
 
   return (
-    <div className="flex h-[48px] w-[288px] items-center justify-between rounded-[8px] bg-surface-1 px-[8px] text-text">
+    <div className="bg-surface-1 text-text flex h-[48px] w-[288px] items-center justify-between rounded-[8px] px-[8px]">
       <div className="flex items-center">
         <MaterialSymbol icon="schedule" size={24} />
-        <span className="ml-[4px] line-clamp-1 w-[80px] text-clip text-16">
+        <span className="text-16 ml-[4px] line-clamp-1 w-[80px] text-clip">
           {stateMap[state]}
         </span>
       </div>

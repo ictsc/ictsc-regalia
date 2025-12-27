@@ -1,8 +1,9 @@
 @import "tailwindcss";
 @import "material-symbols/outlined.css";
-
 @config "../tailwind.config.js";
 
-* {
-  @apply text-text;
+@layer base {
+  * {
+    @apply text-text;
+  }
 }

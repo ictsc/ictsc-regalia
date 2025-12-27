@@ -4,7 +4,7 @@ import { Score } from "../../components/score";
 
 export function SubmissionListContainer(props: { children?: ReactNode }) {
   return (
-    <div className="size-full rounded-12 bg-surface-1 py-12">
+    <div className="rounded-12 bg-surface-1 size-full py-12">
       <div className="size-full overflow-y-auto px-12 [scrollbar-gutter:stable_both-edges]">
         {props.children}
       </div>
@@ -30,7 +30,7 @@ export function SubmissionList(props: {
 
 export function EmptySubmissionList() {
   return (
-    <div className="grid size-full place-items-center text-16 font-bold text-text">
+    <div className="text-16 text-text grid size-full place-items-center font-bold">
       解答はまだありません！
     </div>
   );
@@ -48,7 +48,7 @@ export function SubmissionListItem(props: {
   readonly downloadAnswer: () => void;
 }) {
   return (
-    <li className="flex justify-between gap-8 rounded-12 bg-surface-0 p-16">
+    <li className="rounded-12 bg-surface-0 flex justify-between gap-8 p-16">
       <div className="flex flex-col justify-between">
         <div>
           <h2 className="text-20 font-bold text-[#000]">#{props.id}</h2>
