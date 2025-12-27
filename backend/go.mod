@@ -29,9 +29,9 @@ require (
 	github.com/redis/go-redis/v9 v9.17.2
 	github.com/samber/slog-formatter v1.2.2
 	github.com/samber/slog-http v1.9.0
-	github.com/testcontainers/testcontainers-go v0.39.0
-	github.com/testcontainers/testcontainers-go/modules/postgres v0.39.0
-	github.com/testcontainers/testcontainers-go/modules/redis v0.39.0
+	github.com/testcontainers/testcontainers-go v0.40.0
+	github.com/testcontainers/testcontainers-go/modules/postgres v0.40.0
+	github.com/testcontainers/testcontainers-go/modules/redis v0.40.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.64.0
 	go.opentelemetry.io/contrib/instrumentation/runtime v0.64.0
 	go.opentelemetry.io/otel v1.39.0
