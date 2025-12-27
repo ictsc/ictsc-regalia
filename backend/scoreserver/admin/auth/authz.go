@@ -6,9 +6,9 @@ import (
 	"io"
 	"strings"
 
-	"github.com/casbin/casbin/v2"
-	casbinmodel "github.com/casbin/casbin/v2/model"
-	casbinpersist "github.com/casbin/casbin/v2/persist"
+	"github.com/casbin/casbin/v3"
+	casbinmodel "github.com/casbin/casbin/v3/model"
+	casbinpersist "github.com/casbin/casbin/v3/persist"
 	"github.com/cockroachdb/errors"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 )
