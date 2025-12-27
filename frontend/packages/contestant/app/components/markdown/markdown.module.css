@@ -1,3 +1,6 @@
+/* Allow Tailwind utilities inside this CSS module */
+@reference "../../index.css";
+
 .content {
   > * {
     @apply px-12;
