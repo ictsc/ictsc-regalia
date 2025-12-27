@@ -23,14 +23,14 @@ jobs:
         uses: ./.github/actions/setup-go
       - name: Restore Build Cache
         id: golangci-lint-build-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.cache/go-build
           key: golangci-lint-build-${{ hashFiles('backend/tools/go.sum') }}
           restore-keys: golangci-lint-build-
       - name: Restore golangci-lint cache
         id: golangci-lint-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.cache/golangci-lint
           key: golangci-lint-cache-${{ hashFiles('backend/**/*.go') }}
@@ -39,7 +39,7 @@ jobs:
         run: ./tools/run github.com/golangci/golangci-lint/v2/cmd/golangci-lint run --timeout=10m --path-prefix=backend --issues-exit-code=0
         working-directory: backend
       - name: Save Build Cache
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         if: >-
           always() && steps.golangci-lint-build-cache.outputs.cache-hit != 'true'
           && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
@@ -47,7 +47,7 @@ jobs:
           path: ~/.cache/go-build
           key: ${{ steps.golangci-lint-build-cache.outputs.cache-primary-key }}
       - name: Save golangci-lint cache
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         if: >-
           always() && steps.golangci-lint-cache.outputs.cache-hit != 'true'
           && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
@@ -69,7 +69,7 @@ jobs:
         uses: actions/checkout@v6
       - name: Setup Go
         uses: ./.github/actions/setup-go
-      - uses: actions/cache/restore@v4
+      - uses: actions/cache/restore@v5
         id: go-build-cache
         with:
           path: ~/.cache/go-build
@@ -78,7 +78,7 @@ jobs:
             go-build-
       - name: Run Test
         run: go test -race -shuffle on -parallel 8 -v ./...
-      - uses: actions/cache/save@v4
+      - uses: actions/cache/save@v5
         if: >-
           always() && steps.go-build-cache.outputs.cache-hit != 'true'
           && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
@@ -122,7 +122,7 @@ jobs:
         uses: ./.github/actions/setup-go
       - name: Restore Cache
         id: sqldef-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ~/.cache/go-build
           key: sqldef-cache-${{ hashFiles('backend/tools/go.sum') }}
@@ -132,7 +132,7 @@ jobs:
         run: ./scripts/migrate
 
       - name: Save Cache
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         if: >-
           always() && steps.sqldef-cache.outputs.cache-hit != 'true'
           && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
