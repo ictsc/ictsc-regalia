@@ -37,7 +37,7 @@
     "shiki": "^3.2.1",
     "unified": "^11.0.5",
     "vite": "^7.0.0",
-    "vitest": "^3.0.0"
+    "vitest": "^4.0.0"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.0.0",
