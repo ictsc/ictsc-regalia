@@ -17,7 +17,7 @@ require (
 	github.com/coreos/go-oidc/v3 v3.16.0
 	github.com/docker/go-connections v0.6.0
 	github.com/go-slog/otelslog v0.3.0
-	github.com/gofrs/uuid/v5 v5.3.2
+	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/google/go-cmp v0.7.0
 	github.com/gorilla/sessions v1.4.0
 	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6
