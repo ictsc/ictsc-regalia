@@ -7,7 +7,7 @@
     "./prettier": "./prettier/config.js"
   },
   "dependencies": {
-    "@eslint/compat": "^1.1.1",
+    "@eslint/compat": "^2.0.0",
     "@eslint/js": "^9.9.0",
     "@types/eslint": "^9.6.1",
     "eslint-config-prettier": "^10.0.0",
