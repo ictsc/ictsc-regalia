@@ -15,7 +15,7 @@ jobs:
         working-directory: proto
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Install buf
         uses: bufbuild/buf-setup-action@v1
         with:
