@@ -24,7 +24,7 @@
     "@vitejs/plugin-react": "^5.0.0",
     "core": "link:@shikijs/rehype/core",
     "eslint": "^9.9.1",
-    "globals": "^16.0.0",
+    "globals": "^17.0.0",
     "npm-run-all2": "^8.0.0",
     "postcss": "^8.4.41",
     "postcss-preset-mantine": "^1.17.0",
