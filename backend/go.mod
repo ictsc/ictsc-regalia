@@ -8,7 +8,7 @@ require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20251209175733-2a1774d88802.1
 	connectrpc.com/connect v1.19.1
 	connectrpc.com/grpchealth v1.4.0
-	connectrpc.com/otelconnect v0.8.0
+	connectrpc.com/otelconnect v0.9.0
 	github.com/DATA-DOG/go-txdb v0.2.1
 	github.com/XSAM/otelsql v0.41.0
 	github.com/bwmarrin/discordgo v0.29.0
