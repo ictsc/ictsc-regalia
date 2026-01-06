@@ -109,7 +109,7 @@ require (
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/samber/lo v1.52.0 // indirect
 	github.com/samber/slog-common v0.19.0 // indirect
-	github.com/samber/slog-multi v1.6.0 // indirect
+	github.com/samber/slog-multi v1.7.0 // indirect
 	github.com/shirou/gopsutil/v4 v4.25.12 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
