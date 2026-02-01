@@ -17,8 +17,6 @@ import (
 type ProblemServiceHandler struct {
 	contestantv1connect.UnimplementedProblemServiceHandler
 
-	Enforcer *ScheduleEnforcer
-
 	ListProblemsEffect    ProblemListEffect
 	GetProblemEffect      ProblemGetEffect
 	ListDeploymentsEffect DeploymentsListEffect
@@ -27,9 +25,8 @@ type ProblemServiceHandler struct {
 
 var _ contestantv1connect.ProblemServiceHandler = (*ProblemServiceHandler)(nil)
 
-func newProblemServiceHandler(enforcer *ScheduleEnforcer, repo *pg.Repository) *ProblemServiceHandler {
+func newProblemServiceHandler(repo *pg.Repository) *ProblemServiceHandler {
 	return &ProblemServiceHandler{
-		Enforcer:              enforcer,
 		ListProblemsEffect:    repo,
 		GetProblemEffect:      repo,
 		ListDeploymentsEffect: repo,
@@ -48,6 +45,7 @@ func newProblemServiceHandler(enforcer *ScheduleEnforcer, repo *pg.Repository) *
 type ProblemListEffect interface {
 	domain.TeamMemberGetter
 	domain.TeamProblemReader
+	domain.ScheduleReader
 }
 
 func (h *ProblemServiceHandler) ListProblems(
@@ -61,9 +59,6 @@ func (h *ProblemServiceHandler) ListProblems(
 		}
 		return nil, err
 	}
-	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
-		return nil, err
-	}
 
 	teamMember, err := domain.UserID(userSess.UserID).TeamMember(ctx, h.ListProblemsEffect)
 	if err != nil {
@@ -75,14 +70,85 @@ func (h *ProblemServiceHandler) ListProblems(
 		return nil, err
 	}
 
-	protoProblems := make([]*contestantv1.Problem, 0, len(problems))
+	// 可視性フィルタリング: 過去に一度でも提出可能だった問題のみ表示
+	now := time.Now()
+	visibleProblems := make([]*domain.TeamProblem, 0, len(problems))
 	for _, problem := range problems {
-		protoProblems = append(protoProblems, convertTeamProblem(problem))
+		isVisible, err := problem.Problem().IsVisibleAt(ctx, now, h.ListProblemsEffect)
+		if err != nil {
+			return nil, err
+		}
+		if isVisible {
+			visibleProblems = append(visibleProblems, problem)
+		}
+	}
+
+	protoProblems := make([]*contestantv1.Problem, 0, len(visibleProblems))
+	for _, problem := range visibleProblems {
+		// 提出状態を計算
+		submissionStatus, err := h.calculateSubmissionStatus(ctx, problem.Problem(), now)
+		if err != nil {
+			return nil, err
+		}
+
+		proto := convertTeamProblem(problem)
+		proto.SubmissionStatus = submissionStatus
+		protoProblems = append(protoProblems, proto)
 	}
 
 	return connect.NewResponse(&contestantv1.ListProblemsResponse{
 		Problems: protoProblems,
 	}), nil
+}
+
+func (h *ProblemServiceHandler) calculateSubmissionStatus(
+	ctx context.Context,
+	problem *domain.Problem,
+	now time.Time,
+) (*contestantv1.SubmissionStatus, error) {
+	schedules, err := domain.GetSchedule(ctx, h.ListProblemsEffect)
+	if err != nil {
+		return nil, err
+	}
+
+	status := &contestantv1.SubmissionStatus{
+		IsVisible: true,
+	}
+
+	var currentWindow, nextWindow *domain.ScheduleEntry
+
+	for _, scheduleID := range problem.SubmissionableScheduleIDs() {
+		for _, entry := range schedules {
+			if entry.ID() != scheduleID {
+				continue
+			}
+
+			if !now.Before(entry.StartAt()) && now.Before(entry.EndAt()) {
+				currentWindow = entry
+				break
+			}
+
+			if now.Before(entry.StartAt()) {
+				if nextWindow == nil || entry.StartAt().Before(nextWindow.StartAt()) {
+					nextWindow = entry
+				}
+			}
+		}
+		if currentWindow != nil {
+			break
+		}
+	}
+
+	if currentWindow != nil {
+		status.IsSubmittable = true
+		status.SubmittableUntil = timestamppb.New(currentWindow.EndAt())
+	} else if nextWindow != nil {
+		status.IsSubmittable = false
+	} else {
+		status.IsSubmittable = false
+	}
+
+	return status, nil
 }
 
 type ProblemGetEffect = ProblemListEffect
@@ -96,9 +162,6 @@ func (h *ProblemServiceHandler) GetProblem(
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
-		return nil, err
-	}
-	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
 		return nil, err
 	}
 
@@ -118,7 +181,15 @@ func (h *ProblemServiceHandler) GetProblem(
 	}
 	detail := teamProblem.ProblemDetail()
 
+	// 提出状態を計算
+	now := time.Now()
+	submissionStatus, err := h.calculateSubmissionStatus(ctx, teamProblem.TeamProblem().Problem(), now)
+	if err != nil {
+		return nil, err
+	}
+
 	proto := convertTeamProblem(teamProblem.TeamProblem())
+	proto.SubmissionStatus = submissionStatus
 	proto.Body = &contestantv1.ProblemBody{
 		Type: contestantv1.ProblemType_PROBLEM_TYPE_DESCRIPTIVE,
 		Body: &contestantv1.ProblemBody_Descriptive{
@@ -148,9 +219,6 @@ func (h *ProblemServiceHandler) ListDeployments(
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
-		return nil, err
-	}
-	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
 		return nil, err
 	}
 
@@ -204,9 +272,6 @@ func (h *ProblemServiceHandler) Deploy(
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
-		return nil, err
-	}
-	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
 		return nil, err
 	}
 

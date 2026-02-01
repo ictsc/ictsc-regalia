@@ -2,7 +2,7 @@
 // @generated from file contestant/v1/contest.proto (package contestant.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 
@@ -12,18 +12,24 @@ import type { Timestamp } from "@bufbuild/protobuf/wkt";
 export declare const file_contestant_v1_contest: GenFile;
 
 /**
- * @generated from message contestant.v1.Schedule
+ * スケジュールエントリ
+ *
+ * @generated from message contestant.v1.ScheduleEntry
  */
-export declare type Schedule = Message<"contestant.v1.Schedule"> & {
+export declare type ScheduleEntry = Message<"contestant.v1.ScheduleEntry"> & {
   /**
-   * @generated from field: contestant.v1.Phase phase = 1;
+   * スケジュールID
+   *
+   * @generated from field: string id = 1;
    */
-  phase: Phase;
+  id: string;
 
   /**
-   * @generated from field: contestant.v1.Phase next_phase = 2;
+   * スケジュール名(例: "day1-am")
+   *
+   * @generated from field: string name = 2;
    */
-  nextPhase: Phase;
+  name: string;
 
   /**
    * @generated from field: google.protobuf.Timestamp start_at = 3;
@@ -31,9 +37,29 @@ export declare type Schedule = Message<"contestant.v1.Schedule"> & {
   startAt?: Timestamp;
 
   /**
-   * @generated from field: optional google.protobuf.Timestamp end_at = 4;
+   * @generated from field: google.protobuf.Timestamp end_at = 4;
    */
   endAt?: Timestamp;
+};
+
+/**
+ * Describes the message contestant.v1.ScheduleEntry.
+ * Use `create(ScheduleEntrySchema)` to create a new message.
+ */
+export declare const ScheduleEntrySchema: GenMessage<ScheduleEntry>;
+
+/**
+ * 現在のコンテスト状態
+ *
+ * @generated from message contestant.v1.Schedule
+ */
+export declare type Schedule = Message<"contestant.v1.Schedule"> & {
+  /**
+   * 全スケジュールのリスト
+   *
+   * @generated from field: repeated contestant.v1.ScheduleEntry schedules = 1;
+   */
+  schedules: ScheduleEntry[];
 };
 
 /**
@@ -113,41 +139,6 @@ export declare type GetRuleResponse = Message<"contestant.v1.GetRuleResponse"> &
  * Use `create(GetRuleResponseSchema)` to create a new message.
  */
 export declare const GetRuleResponseSchema: GenMessage<GetRuleResponse>;
-
-/**
- * @generated from enum contestant.v1.Phase
- */
-export enum Phase {
-  /**
-   * @generated from enum value: PHASE_UNSPECIFIED = 0;
-   */
-  UNSPECIFIED = 0,
-
-  /**
-   * @generated from enum value: PHASE_OUT_OF_CONTEST = 1;
-   */
-  OUT_OF_CONTEST = 1,
-
-  /**
-   * @generated from enum value: PHASE_IN_CONTEST = 2;
-   */
-  IN_CONTEST = 2,
-
-  /**
-   * @generated from enum value: PHASE_BREAK = 3;
-   */
-  BREAK = 3,
-
-  /**
-   * @generated from enum value: PHASE_AFTER_CONTEST = 4;
-   */
-  AFTER_CONTEST = 4,
-}
-
-/**
- * Describes the enum contestant.v1.Phase.
- */
-export declare const PhaseSchema: GenEnum<Phase>;
 
 /**
  * @generated from service contestant.v1.ContestService

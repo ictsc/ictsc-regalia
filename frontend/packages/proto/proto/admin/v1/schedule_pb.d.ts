@@ -2,7 +2,7 @@
 // @generated from file admin/v1/schedule.proto (package admin.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 
@@ -16,17 +16,26 @@ export declare const file_admin_v1_schedule: GenFile;
  */
 export declare type Schedule = Message<"admin.v1.Schedule"> & {
   /**
-   * @generated from field: admin.v1.Phase phase = 1;
+   * スケジュールID
+   *
+   * @generated from field: string id = 1;
    */
-  phase: Phase;
+  id: string;
 
   /**
-   * @generated from field: google.protobuf.Timestamp start_at = 2;
+   * スケジュール名(例: "day1-am")
+   *
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp start_at = 3;
    */
   startAt?: Timestamp;
 
   /**
-   * @generated from field: google.protobuf.Timestamp end_at = 3;
+   * @generated from field: google.protobuf.Timestamp end_at = 4;
    */
   endAt?: Timestamp;
 };
@@ -92,41 +101,6 @@ export declare type UpdateScheduleResponse = Message<"admin.v1.UpdateScheduleRes
  * Use `create(UpdateScheduleResponseSchema)` to create a new message.
  */
 export declare const UpdateScheduleResponseSchema: GenMessage<UpdateScheduleResponse>;
-
-/**
- * @generated from enum admin.v1.Phase
- */
-export enum Phase {
-  /**
-   * @generated from enum value: PHASE_UNSPECIFIED = 0;
-   */
-  UNSPECIFIED = 0,
-
-  /**
-   * @generated from enum value: PHASE_OUT_OF_CONTEST = 1;
-   */
-  OUT_OF_CONTEST = 1,
-
-  /**
-   * @generated from enum value: PHASE_IN_CONTEST = 2;
-   */
-  IN_CONTEST = 2,
-
-  /**
-   * @generated from enum value: PHASE_BREAK = 3;
-   */
-  BREAK = 3,
-
-  /**
-   * @generated from enum value: PHASE_AFTER_CONTEST = 4;
-   */
-  AFTER_CONTEST = 4,
-}
-
-/**
- * Describes the enum admin.v1.Phase.
- */
-export declare const PhaseSchema: GenEnum<Phase>;
 
 /**
  * @generated from service admin.v1.ScheduleService

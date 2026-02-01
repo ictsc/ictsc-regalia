@@ -8,83 +8,44 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from "./routes/~__root";
+import { Route as IndexRouteImport } from "./routes/~index";
+import { Route as SubmissionsIndexRouteRouteImport } from "./routes/~submissions.index/~route";
+import { Route as SubmissionsProblemTeamIdRouteRouteImport } from "./routes/~submissions.$problem.$team.$id/~route";
 
-import { Route as rootRoute } from "./routes/~__root";
-import { Route as IndexImport } from "./routes/~index";
-import { Route as SubmissionsIndexRouteImport } from "./routes/~submissions.index/~route";
-import { Route as SubmissionsProblemTeamIdRouteImport } from "./routes/~submissions.$problem.$team.$id/~route";
-
-// Create/Update Routes
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any);
-
-const SubmissionsIndexRouteRoute = SubmissionsIndexRouteImport.update({
+const SubmissionsIndexRouteRoute = SubmissionsIndexRouteRouteImport.update({
   id: "/submissions/",
-  path: "/submissions/",
-  getParentRoute: () => rootRoute,
+  path: "/submissions",
+  getParentRoute: () => rootRouteImport,
 } as any);
-
 const SubmissionsProblemTeamIdRouteRoute =
-  SubmissionsProblemTeamIdRouteImport.update({
+  SubmissionsProblemTeamIdRouteRouteImport.update({
     id: "/submissions/$problem/$team/$id",
     path: "/submissions/$problem/$team/$id",
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => rootRouteImport,
   } as any);
-
-// Populate the FileRoutesByPath interface
-
-declare module "@tanstack/react-router" {
-  interface FileRoutesByPath {
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/submissions/": {
-      id: "/submissions/";
-      path: "/submissions";
-      fullPath: "/submissions";
-      preLoaderRoute: typeof SubmissionsIndexRouteImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/submissions/$problem/$team/$id": {
-      id: "/submissions/$problem/$team/$id";
-      path: "/submissions/$problem/$team/$id";
-      fullPath: "/submissions/$problem/$team/$id";
-      preLoaderRoute: typeof SubmissionsProblemTeamIdRouteImport;
-      parentRoute: typeof rootRoute;
-    };
-  }
-}
-
-// Create and export the route tree
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
   "/submissions": typeof SubmissionsIndexRouteRoute;
   "/submissions/$problem/$team/$id": typeof SubmissionsProblemTeamIdRouteRoute;
 }
-
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/submissions": typeof SubmissionsIndexRouteRoute;
   "/submissions/$problem/$team/$id": typeof SubmissionsProblemTeamIdRouteRoute;
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute;
+  __root__: typeof rootRouteImport;
   "/": typeof IndexRoute;
   "/submissions/": typeof SubmissionsIndexRouteRoute;
   "/submissions/$problem/$team/$id": typeof SubmissionsProblemTeamIdRouteRoute;
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths: "/" | "/submissions" | "/submissions/$problem/$team/$id";
@@ -93,11 +54,36 @@ export interface FileRouteTypes {
   id: "__root__" | "/" | "/submissions/" | "/submissions/$problem/$team/$id";
   fileRoutesById: FileRoutesById;
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
   SubmissionsIndexRouteRoute: typeof SubmissionsIndexRouteRoute;
   SubmissionsProblemTeamIdRouteRoute: typeof SubmissionsProblemTeamIdRouteRoute;
+}
+
+declare module "@tanstack/react-router" {
+  interface FileRoutesByPath {
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/submissions/": {
+      id: "/submissions/";
+      path: "/submissions";
+      fullPath: "/submissions";
+      preLoaderRoute: typeof SubmissionsIndexRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/submissions/$problem/$team/$id": {
+      id: "/submissions/$problem/$team/$id";
+      path: "/submissions/$problem/$team/$id";
+      fullPath: "/submissions/$problem/$team/$id";
+      preLoaderRoute: typeof SubmissionsProblemTeamIdRouteRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -105,31 +91,6 @@ const rootRouteChildren: RootRouteChildren = {
   SubmissionsIndexRouteRoute: SubmissionsIndexRouteRoute,
   SubmissionsProblemTeamIdRouteRoute: SubmissionsProblemTeamIdRouteRoute,
 };
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>();
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "~__root.tsx",
-      "children": [
-        "/",
-        "/submissions/",
-        "/submissions/$problem/$team/$id"
-      ]
-    },
-    "/": {
-      "filePath": "~index.tsx"
-    },
-    "/submissions/": {
-      "filePath": "~submissions.index/~route.tsx"
-    },
-    "/submissions/$problem/$team/$id": {
-      "filePath": "~submissions.$problem.$team.$id/~route.tsx"
-    }
-  }
-}
-ROUTE_MANIFEST_END */

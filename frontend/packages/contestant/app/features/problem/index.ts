@@ -7,6 +7,7 @@ import {
 import {
   ProblemService,
   type Problem as ProtoProblem,
+  type SubmissionStatus,
 } from "@ictsc/proto/contestant/v1";
 
 // TODO: アプリケーションが利用する値を定義する
@@ -25,6 +26,7 @@ export type ProblemDetail = {
   redeployable: boolean;
   penaltyThreashold: number;
   body: string;
+  submissionStatus?: SubmissionStatus;
 };
 
 export async function fetchProblem(
@@ -47,5 +49,6 @@ export async function fetchProblem(
     redeployable: problem.deployment?.redeployable ?? false,
     penaltyThreashold: problem.deployment?.penaltyThreashold ?? 0,
     body,
+    submissionStatus: problem.submissionStatus,
   };
 }

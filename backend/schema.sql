@@ -239,14 +239,31 @@ CREATE TYPE contest_phase AS ENUM ('UNSPECIFIED', 'OUT_OF_CONTEST', 'IN_CONTEST'
 
 CREATE TABLE schedules (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    phase contest_phase NOT NULL,
+	name VARCHAR(255),
+    phase contest_phase NOT NULL DEFAULT 'IN_CONTEST',
     start_at TIMESTAMPTZ NOT NULL,
     end_at TIMESTAMPTZ NOT NULL,
     CONSTRAINT schedules_start_end CHECK (start_at < end_at)
 );
 
+CREATE INDEX idx_schedules_name ON schedules(name) WHERE name IS NOT NULL;
+
 COMMENT ON TABLE schedules IS 'コンテストスケジュール';
 COMMENT ON COLUMN schedules.id IS 'スケジュール ID';
-COMMENT ON COLUMN schedules.phase IS 'フェーズ';
+COMMENT ON COLUMN schedules.name IS 'スケジュール名 (例: day1-am)';
+COMMENT ON COLUMN schedules.phase IS 'フェーズ (deprecated: 常にIN_CONTEST)';
 COMMENT ON COLUMN schedules.start_at IS '開始時刻';
 COMMENT ON COLUMN schedules.end_at IS '終了時刻';
+
+CREATE TABLE problem_schedules (
+	problem_id UUID NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
+	schedule_id UUID NOT NULL REFERENCES schedules(id) ON DELETE CASCADE,
+	PRIMARY KEY (problem_id, schedule_id)
+);
+
+CREATE INDEX idx_problem_schedules_problem ON problem_schedules(problem_id);
+CREATE INDEX idx_problem_schedules_schedule ON problem_schedules(schedule_id);
+
+COMMENT ON TABLE problem_schedules IS '問題の提出可能スケジュール';
+COMMENT ON COLUMN problem_schedules.problem_id IS '問題 ID';
+COMMENT ON COLUMN problem_schedules.schedule_id IS 'スケジュール ID';

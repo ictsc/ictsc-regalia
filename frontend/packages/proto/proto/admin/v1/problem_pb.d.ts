@@ -51,6 +51,13 @@ export declare type Problem = Message<"admin.v1.Problem"> & {
    * @generated from field: admin.v1.ProblemBody body = 6;
    */
   body?: ProblemBody;
+
+  /**
+   * 提出可能なスケジュール名のセット(例: ["day1-am", "day1-pm"])
+   *
+   * @generated from field: repeated string submissionable_schedules = 7;
+   */
+  submissionableSchedules: string[];
 };
 
 /**
