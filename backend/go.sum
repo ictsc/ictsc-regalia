@@ -193,8 +193,8 @@ github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0t
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
 github.com/samber/lo v1.52.0 h1:Rvi+3BFHES3A8meP33VPAxiBZX/Aws5RxrschYGjomw=
 github.com/samber/lo v1.52.0/go.mod h1:4+MXEGsJzbKGaUEQFKBq2xtfuznW9oz/WrgyzMzRoM0=
-github.com/samber/slog-common v0.19.0 h1:fNcZb8B2uOLooeYwFpAlKjkQTUafdjfqKcwcC89G9YI=
-github.com/samber/slog-common v0.19.0/go.mod h1:dTz+YOU76aH007YUU0DffsXNsGFQRQllPQh9XyNoA3M=
+github.com/samber/slog-common v0.20.0 h1:WaLnm/aCvBJSk5nR5aXZTFBaV0B47A+AEaEOiZDeUnc=
+github.com/samber/slog-common v0.20.0/go.mod h1:+Ozat1jgnnE59UAlmNX1IF3IByHsODnnwf9jUcBZ+m8=
 github.com/samber/slog-formatter v1.2.2 h1:/JSzXcF0TUA1GRt/4g1AJc7h0ofyn7wx21oUjzpPh54=
 github.com/samber/slog-formatter v1.2.2/go.mod h1:zBYmoFkeV2LT3tyiaAehpJ1pOI+CtQz/xjXvbedx26Q=
 github.com/samber/slog-http v1.10.0 h1:/zimEtRqXJeDYzM+0MVzStG3O32gfgNxWfpmFO+iEIE=
