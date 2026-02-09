@@ -179,10 +179,18 @@ func (h *ProblemServiceHandler) GetProblem(
 	if err != nil {
 		return nil, err
 	}
-	detail := teamProblem.ProblemDetail()
 
-	// 提出状態を計算
+	// 可視性チェック: まだ開始されていないスケジュールの問題はアクセス不可
 	now := time.Now()
+	isVisible, err := teamProblem.TeamProblem().Problem().IsVisibleAt(ctx, now, h.GetProblemEffect)
+	if err != nil {
+		return nil, err
+	}
+	if !isVisible {
+		return nil, connect.NewError(connect.CodeNotFound, nil)
+	}
+
+	detail := teamProblem.ProblemDetail()
 	submissionStatus, err := h.calculateSubmissionStatus(ctx, teamProblem.TeamProblem().Problem(), now)
 	if err != nil {
 		return nil, err

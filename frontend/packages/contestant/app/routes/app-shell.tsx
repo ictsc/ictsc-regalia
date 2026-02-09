@@ -6,7 +6,7 @@ import {
   useReducer,
 } from "react";
 import { useSignOut, type User } from "../features/viewer";
-import { useSchedule, isInContest } from "../features/schedule";
+import { useSchedule, hasContestStarted } from "../features/schedule";
 import { Layout, Header, Navbar, AccountMenu } from "../components/app-shell";
 
 export function AppShell({
@@ -20,7 +20,7 @@ export function AppShell({
   const [schedule] = useSchedule();
   const [collapsed, toggle] = useReducer((o) => !o, false);
   const signOutAction = useSignOut();
-  const inContest = isInContest(schedule);
+  const inContest = hasContestStarted(schedule);
 
   return (
     <Layout
