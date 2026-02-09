@@ -108,8 +108,17 @@ func (r *repo) GetDescriptiveProblem(ctx context.Context, id uuid.UUID) (*domain
 		}
 		return nil, errors.Wrap(err, "failed to get descriptive problem")
 	}
+	data := row.problemDataRow.data()
+
+	// スケジュールをロード
+	scheduleMap, err := r.loadProblemSchedules(ctx, []uuid.UUID{data.ID})
+	if err != nil {
+		return nil, err
+	}
+	data.SubmissionableScheduleIDs = scheduleMap[data.ID]
+
 	return &domain.DescriptiveProblemData{
-		Problem: row.problemDataRow.data(),
+		Problem: data,
 		Content: row.Content.data(),
 	}, nil
 }

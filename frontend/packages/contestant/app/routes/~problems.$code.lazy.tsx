@@ -7,6 +7,7 @@ import {
 } from "react";
 import { createLazyFileRoute, useRouter } from "@tanstack/react-router";
 import { DeploymentStatus } from "@ictsc/proto/contestant/v1";
+import { timestampDate } from "@bufbuild/protobuf/wkt";
 import type { ProblemDetail } from "../features/problem";
 import type { Answer } from "../features/answer";
 import { protoScoreToProps } from "../features/score";
@@ -90,7 +91,7 @@ function SubmissionForm(props: {
     ? {
         isSubmittable: problem.submissionStatus.isSubmittable,
         submittableUntil: problem.submissionStatus.submittableUntil
-          ? new Date(problem.submissionStatus.submittableUntil.toDate())
+          ? timestampDate(problem.submissionStatus.submittableUntil)
           : undefined,
       }
     : undefined;

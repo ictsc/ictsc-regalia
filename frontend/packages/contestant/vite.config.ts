@@ -14,7 +14,12 @@ export default {
     proxy: {
       "/api": {
         target: "http://localhost:8080",
+        changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+      "/auth": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
       },
     },
   },
