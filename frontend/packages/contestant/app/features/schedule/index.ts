@@ -1,6 +1,7 @@
 export {
   fetchSchedule,
   isInContest,
+  hasContestStarted,
   getCurrentScheduleEntry,
   getNextScheduleEntry,
   currentStartAt,

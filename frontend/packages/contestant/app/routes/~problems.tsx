@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
-import { useSchedule, isInContest } from "../features/schedule";
+import { useSchedule, hasContestStarted } from "../features/schedule";
 import { startTransition, useEffect } from "react";
 
 export const Route = createFileRoute("/problems")({
@@ -13,7 +13,7 @@ function RouteComponent() {
     if (schedule == null || isPending) {
       return;
     }
-    if (!isInContest(schedule)) {
+    if (!hasContestStarted(schedule)) {
       startTransition(() => navigate({ to: "/" }));
     }
   }, [schedule, isPending, navigate]);

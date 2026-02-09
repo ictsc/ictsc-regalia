@@ -50,6 +50,22 @@ export function isInContest(schedule: Schedule | null): boolean {
 }
 
 /**
+ * コンテストが開始済みかどうか（いずれかのスケジュールが過去に開始されたか）
+ * 一度開始されたら、全スケジュール終了後もtrueを返す
+ */
+export function hasContestStarted(schedule: Schedule | null): boolean {
+  if (schedule == null) return false;
+  const now = new Date();
+  for (const entry of schedule.schedules) {
+    const start = entry.startAt != null ? timestampDate(entry.startAt) : null;
+    if (start != null && now >= start) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * 現在のスケジュールの開始時刻
  */
 export function currentStartAt(schedule: Schedule | null): Date | null {
