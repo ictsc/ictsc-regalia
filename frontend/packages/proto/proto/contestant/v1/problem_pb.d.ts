@@ -86,13 +86,6 @@ export declare type SubmissionStatus = Message<"contestant.v1.SubmissionStatus">
   isSubmittable: boolean;
 
   /**
-   * 常にtrue（見えない問題はレスポンスに含まれない）
-   *
-   * @generated from field: bool is_visible = 2;
-   */
-  isVisible: boolean;
-
-  /**
    * 現在の提出ウィンドウ終了時刻（提出可能の場合のみ）
    *
    * @generated from field: optional google.protobuf.Timestamp submittable_until = 3;

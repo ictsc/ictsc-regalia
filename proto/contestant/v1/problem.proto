@@ -27,8 +27,6 @@ message Problem {
 message SubmissionStatus {
   // 現在提出可能かどうか
   bool is_submittable = 1;
-  // 常にtrue（見えない問題はレスポンスに含まれない）
-  bool is_visible = 2;
   // 現在の提出ウィンドウ終了時刻（提出可能の場合のみ）
   optional google.protobuf.Timestamp submittable_until = 3;
 }

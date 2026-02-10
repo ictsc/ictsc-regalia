@@ -111,9 +111,7 @@ func (h *ProblemServiceHandler) calculateSubmissionStatus(
 		return nil, err
 	}
 
-	status := &contestantv1.SubmissionStatus{
-		IsVisible: true,
-	}
+	status := &contestantv1.SubmissionStatus{}
 
 	var currentWindow, nextWindow *domain.ScheduleEntry
 
