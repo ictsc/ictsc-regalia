@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
+	"github.com/gofrs/uuid/v5"
 	adminv1 "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
@@ -12,12 +13,13 @@ import (
 )
 
 type ProblemServiceHandler struct {
-	Enforcer     *auth.Enforcer
-	ListEffect   ProblemListEffect
-	GetEffect    ProblemGetEffect
-	CreateEffect ProblemCreateEffect
-	UpdateEffect ProblemUpdateEffect
-	DeleteEffect ProblemDeleteEffect
+	Enforcer         *auth.Enforcer
+	ListEffect       ProblemListEffect
+	GetEffect        ProblemGetEffect
+	CreateEffect     ProblemCreateEffect
+	UpdateEffect     ProblemUpdateEffect
+	DeleteEffect     ProblemDeleteEffect
+	ScheduleResolver ScheduleIDResolver
 
 	adminv1connect.UnimplementedProblemServiceHandler
 }
@@ -30,12 +32,13 @@ func NewProblemServiceHandler(
 ) *ProblemServiceHandler {
 	createEffect := pg.Tx(repo, func(rt *pg.RepositoryTx) domain.ProblemWriter { return rt })
 	return &ProblemServiceHandler{
-		Enforcer:     enforcer,
-		ListEffect:   repo,
-		GetEffect:    repo,
-		CreateEffect: createEffect,
-		UpdateEffect: createEffect,
-		DeleteEffect: createEffect,
+		Enforcer:         enforcer,
+		ListEffect:       repo,
+		GetEffect:        repo,
+		CreateEffect:     createEffect,
+		UpdateEffect:     createEffect,
+		DeleteEffect:     createEffect,
+		ScheduleResolver: repo,
 	}
 }
 
@@ -54,9 +57,19 @@ func (h *ProblemServiceHandler) ListProblems(
 		return nil, err
 	}
 
+	allScheduleIDs := make([]uuid.UUID, 0)
+	for _, problem := range problems {
+		allScheduleIDs = append(allScheduleIDs, problem.SubmissionableScheduleIDs()...)
+	}
+
+	scheduleNames, err := h.ScheduleResolver.GetScheduleNamesByIDs(ctx, allScheduleIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	protoProblems := make([]*adminv1.Problem, 0, len(problems))
 	for _, problem := range problems {
-		protoProblems = append(protoProblems, convertProblem(problem))
+		protoProblems = append(protoProblems, convertProblem(problem, scheduleNames))
 	}
 	return connect.NewResponse(&adminv1.ListProblemsResponse{
 		Problems: protoProblems,
@@ -88,6 +101,11 @@ func (h *ProblemServiceHandler) GetProblem(
 		return nil, err
 	}
 
+	scheduleNames, err := h.ScheduleResolver.GetScheduleNamesByIDs(ctx, problem.SubmissionableScheduleIDs())
+	if err != nil {
+		return nil, err
+	}
+
 	switch problem.Type() {
 	case domain.ProblemTypeDescriptive:
 		descriptiveProblem, err := problem.DescriptiveProblem(ctx, h.GetEffect)
@@ -95,19 +113,24 @@ func (h *ProblemServiceHandler) GetProblem(
 			return nil, err
 		}
 		return connect.NewResponse(&adminv1.GetProblemResponse{
-			Problem: convertDescriptiveProblem(descriptiveProblem),
+			Problem: convertDescriptiveProblem(descriptiveProblem, scheduleNames),
 		}), nil
 	case domain.ProblemTypeUnknown:
 		fallthrough
 	default:
 		return connect.NewResponse(&adminv1.GetProblemResponse{
-			Problem: convertProblem(problem),
+			Problem: convertProblem(problem, scheduleNames),
 		}), nil
 	}
 }
 
 type ProblemCreateEffect interface {
 	domain.Tx[domain.ProblemWriter]
+}
+
+type ScheduleIDResolver interface {
+	GetScheduleIDsByNames(ctx context.Context, names []string) (map[string]uuid.UUID, error)
+	GetScheduleNamesByIDs(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]string, error)
 }
 
 func (h *ProblemServiceHandler) CreateProblem(
@@ -135,15 +158,32 @@ func (h *ProblemServiceHandler) CreateProblem(
 		return nil, err
 	}
 
+	// スケジュール名からIDを解決
+	scheduleNames := req.Msg.GetProblem().GetSubmissionableSchedules()
+	if len(scheduleNames) == 0 {
+		return nil, domain.NewInvalidArgumentError("submissionable_schedules is required", nil)
+	}
+
+	scheduleMap, err := h.ScheduleResolver.GetScheduleIDsByNames(ctx, scheduleNames)
+	if err != nil {
+		return nil, domain.NewInvalidArgumentError("failed to resolve schedule names", err)
+	}
+
+	scheduleIDs := make([]uuid.UUID, 0, len(scheduleNames))
+	for _, name := range scheduleNames {
+		scheduleIDs = append(scheduleIDs, scheduleMap[name])
+	}
+
 	rule, penalty := parseRedeployRule(req.Msg.GetProblem().GetRedeployRule())
 	descriptiveProblem, err := domain.CreateDescriptiveProblem(domain.CreateDescriptiveProblemInput{
-		Code:              code,
-		Title:             req.Msg.GetProblem().GetTitle(),
-		MaxScore:          req.Msg.GetProblem().GetMaxScore(),
-		Category:          req.Msg.GetProblem().GetCategory(),
-		RedeployRule:      rule,
-		PercentagePenalty: penalty,
-		Content:           content,
+		Code:                      code,
+		Title:                     req.Msg.GetProblem().GetTitle(),
+		MaxScore:                  req.Msg.GetProblem().GetMaxScore(),
+		Category:                  req.Msg.GetProblem().GetCategory(),
+		RedeployRule:              rule,
+		PercentagePenalty:         penalty,
+		Content:                   content,
+		SubmissionableScheduleIDs: scheduleIDs,
 	})
 	if err != nil {
 		return nil, err
@@ -155,8 +195,13 @@ func (h *ProblemServiceHandler) CreateProblem(
 		return nil, err
 	}
 
+	responseScheduleNames, err := h.ScheduleResolver.GetScheduleNamesByIDs(ctx, scheduleIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	return connect.NewResponse(&adminv1.CreateProblemResponse{
-		Problem: convertDescriptiveProblem(descriptiveProblem),
+		Problem: convertDescriptiveProblem(descriptiveProblem, responseScheduleNames),
 	}), nil
 }
 
@@ -177,14 +222,30 @@ func (h *ProblemServiceHandler) UpdateProblem(
 
 	rule, penalty := parseRedeployRule(req.Msg.GetProblem().GetRedeployRule())
 
+	scheduleNames := req.Msg.GetProblem().GetSubmissionableSchedules()
+	var scheduleIDs *[]uuid.UUID
+	if len(scheduleNames) > 0 {
+		scheduleMap, err := h.ScheduleResolver.GetScheduleIDsByNames(ctx, scheduleNames)
+		if err != nil {
+			return nil, domain.NewInvalidArgumentError("failed to resolve schedule names", err)
+		}
+
+		ids := make([]uuid.UUID, 0, len(scheduleNames))
+		for _, name := range scheduleNames {
+			ids = append(ids, scheduleMap[name])
+		}
+		scheduleIDs = &ids
+	}
+
 	input := domain.UpdateDescriptiveProblemInput{
-		Title:             req.Msg.GetProblem().GetTitle(),
-		MaxScore:          req.Msg.GetProblem().GetMaxScore(),
-		Category:          req.Msg.GetProblem().GetCategory(),
-		RedeployRule:      rule,
-		PercentagePenalty: penalty,
-		Body:              req.Msg.GetProblem().GetBody().GetDescriptive().GetProblemMarkdown(),
-		Explanation:       req.Msg.GetProblem().GetBody().GetDescriptive().GetExplanationMarkdown(),
+		Title:                     req.Msg.GetProblem().GetTitle(),
+		MaxScore:                  req.Msg.GetProblem().GetMaxScore(),
+		Category:                  req.Msg.GetProblem().GetCategory(),
+		RedeployRule:              rule,
+		PercentagePenalty:         penalty,
+		Body:                      req.Msg.GetProblem().GetBody().GetDescriptive().GetProblemMarkdown(),
+		Explanation:               req.Msg.GetProblem().GetBody().GetDescriptive().GetExplanationMarkdown(),
+		SubmissionableScheduleIDs: scheduleIDs,
 	}
 
 	descriptiveProblem, err := domain.RunTx(ctx, h.UpdateEffect, func(tx domain.ProblemWriter) (*domain.DescriptiveProblem, error) {
@@ -212,8 +273,13 @@ func (h *ProblemServiceHandler) UpdateProblem(
 		return nil, err
 	}
 
+	responseScheduleNames, err := h.ScheduleResolver.GetScheduleNamesByIDs(ctx, descriptiveProblem.Problem().SubmissionableScheduleIDs())
+	if err != nil {
+		return nil, err
+	}
+
 	return connect.NewResponse(&adminv1.UpdateProblemResponse{
-		Problem: convertDescriptiveProblem(descriptiveProblem),
+		Problem: convertDescriptiveProblem(descriptiveProblem, responseScheduleNames),
 	}), nil
 }
 
@@ -246,7 +312,7 @@ func (h *ProblemServiceHandler) DeleteProblem(
 	return connect.NewResponse(&adminv1.DeleteProblemResponse{}), nil
 }
 
-func convertProblem(problem *domain.Problem) *adminv1.Problem {
+func convertProblem(problem *domain.Problem, scheduleNames map[uuid.UUID]string) *adminv1.Problem {
 	var typ adminv1.ProblemType
 	switch problem.Type() {
 	case domain.ProblemTypeDescriptive:
@@ -257,20 +323,29 @@ func convertProblem(problem *domain.Problem) *adminv1.Problem {
 		typ = adminv1.ProblemType_PROBLEM_TYPE_UNSPECIFIED
 	}
 
+	// スケジュールIDから名前を抽出
+	submissionableSchedules := make([]string, 0, len(problem.SubmissionableScheduleIDs()))
+	for _, scheduleID := range problem.SubmissionableScheduleIDs() {
+		if name, ok := scheduleNames[scheduleID]; ok {
+			submissionableSchedules = append(submissionableSchedules, name)
+		}
+	}
+
 	return &adminv1.Problem{
-		Code:         string(problem.Code()),
-		Title:        problem.Title(),
-		MaxScore:     problem.MaxScore(),
-		Category:     problem.Category(),
-		RedeployRule: convertRedeployRule(problem),
+		Code:                    string(problem.Code()),
+		Title:                   problem.Title(),
+		MaxScore:                problem.MaxScore(),
+		Category:                problem.Category(),
+		RedeployRule:            convertRedeployRule(problem),
+		SubmissionableSchedules: submissionableSchedules,
 		Body: &adminv1.ProblemBody{
 			Type: typ,
 		},
 	}
 }
 
-func convertDescriptiveProblem(problem *domain.DescriptiveProblem) *adminv1.Problem {
-	proto := convertProblem(problem.Problem())
+func convertDescriptiveProblem(problem *domain.DescriptiveProblem, scheduleNames map[uuid.UUID]string) *adminv1.Problem {
+	proto := convertProblem(problem.Problem(), scheduleNames)
 	proto.Body.Body = &adminv1.ProblemBody_Descriptive{
 		Descriptive: &adminv1.DescriptiveProblem{
 			ProblemMarkdown:     problem.Body(),

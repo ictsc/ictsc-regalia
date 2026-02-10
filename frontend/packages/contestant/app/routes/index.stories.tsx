@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { IndexPage } from "./index.page";
-import { Phase } from "@ictsc/proto/contestant/v1";
 
 export default {
   title: "pages/index",
@@ -11,10 +10,24 @@ type Story = StoryObj<typeof IndexPage>;
 
 export const InContest: Story = {
   name: "競技中",
-  args: { phase: Phase.IN_CONTEST, nextPhase: Phase.IN_CONTEST },
+  args: {
+    state: "in_contest",
+    currentScheduleName: "day1-am",
+    nextScheduleName: "day1-pm",
+  },
 };
 
-export const OutOfContest: Story = {
-  name: "競技時間外",
-  args: { phase: Phase.OUT_OF_CONTEST },
+export const Waiting: Story = {
+  name: "競技時間外（待機中）",
+  args: {
+    state: "waiting",
+    nextScheduleName: "day1-am",
+  },
+};
+
+export const Ended: Story = {
+  name: "競技終了",
+  args: {
+    state: "ended",
+  },
 };

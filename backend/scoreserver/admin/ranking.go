@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
+	"github.com/gofrs/uuid/v5"
 	adminv1 "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
@@ -18,6 +19,7 @@ type RankingServiceHandler struct {
 	Enforcer         *auth.Enforcer
 	ListScoreEffect  domain.TeamProblemLister
 	GetRankingEffect domain.RankingEffect
+	ScheduleResolver ScheduleIDResolver
 }
 
 var _ adminv1connect.RankingServiceHandler = (*RankingServiceHandler)(nil)
@@ -27,6 +29,7 @@ func newRankingServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *Ran
 		Enforcer:         enforcer,
 		ListScoreEffect:  repo,
 		GetRankingEffect: repo,
+		ScheduleResolver: repo,
 	}
 }
 
@@ -43,6 +46,23 @@ func (h *RankingServiceHandler) ListScore(
 		return nil, err
 	}
 
+	scheduleIDsSet := make(map[uuid.UUID]struct{})
+	for _, teamProblem := range teamProblems {
+		for _, scheduleID := range teamProblem.Problem().SubmissionableScheduleIDs() {
+			scheduleIDsSet[scheduleID] = struct{}{}
+		}
+	}
+
+	scheduleIDs := make([]uuid.UUID, 0, len(scheduleIDsSet))
+	for id := range scheduleIDsSet {
+		scheduleIDs = append(scheduleIDs, id)
+	}
+
+	scheduleNames, err := h.ScheduleResolver.GetScheduleNamesByIDs(ctx, scheduleIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	protoScores := make([]*adminv1.Score, 0, len(teamProblems))
 	for _, teamProblem := range teamProblems {
 		score := teamProblem.Score()
@@ -51,7 +71,7 @@ func (h *RankingServiceHandler) ListScore(
 		}
 		protoScores = append(protoScores, &adminv1.Score{
 			Team:        convertTeam(teamProblem.Team()),
-			Problem:     convertProblem(teamProblem.Problem()),
+			Problem:     convertProblem(teamProblem.Problem(), scheduleNames),
 			MarkedScore: int64(score.MarkedScore()),
 			Penalty:     int64(score.Penalty()),
 			Score:       int64(score.TotalScore()),

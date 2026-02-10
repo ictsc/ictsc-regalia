@@ -132,11 +132,13 @@ type Problem struct {
 	// 最大得点
 	MaxScore uint32 `protobuf:"varint,3,opt,name=max_score,json=maxScore,proto3" json:"max_score,omitempty"`
 	// 問題カテゴリー
-	Category      string        `protobuf:"bytes,4,opt,name=category,proto3" json:"category,omitempty"`
-	RedeployRule  *RedeployRule `protobuf:"bytes,5,opt,name=redeploy_rule,json=redeployRule,proto3" json:"redeploy_rule,omitempty"`
-	Body          *ProblemBody  `protobuf:"bytes,6,opt,name=body,proto3" json:"body,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Category     string        `protobuf:"bytes,4,opt,name=category,proto3" json:"category,omitempty"`
+	RedeployRule *RedeployRule `protobuf:"bytes,5,opt,name=redeploy_rule,json=redeployRule,proto3" json:"redeploy_rule,omitempty"`
+	Body         *ProblemBody  `protobuf:"bytes,6,opt,name=body,proto3" json:"body,omitempty"`
+	// 提出可能なスケジュール名のセット(例: ["day1-am", "day1-pm"])
+	SubmissionableSchedules []string `protobuf:"bytes,7,rep,name=submissionable_schedules,json=submissionableSchedules,proto3" json:"submissionable_schedules,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *Problem) Reset() {
@@ -207,6 +209,13 @@ func (x *Problem) GetRedeployRule() *RedeployRule {
 func (x *Problem) GetBody() *ProblemBody {
 	if x != nil {
 		return x.Body
+	}
+	return nil
+}
+
+func (x *Problem) GetSubmissionableSchedules() []string {
+	if x != nil {
+		return x.SubmissionableSchedules
 	}
 	return nil
 }
@@ -829,14 +838,15 @@ var File_admin_v1_problem_proto protoreflect.FileDescriptor
 
 const file_admin_v1_problem_proto_rawDesc = "" +
 	"\n" +
-	"\x16admin/v1/problem.proto\x12\badmin.v1\x1a\x1bbuf/validate/validate.proto\"\xdd\x01\n" +
+	"\x16admin/v1/problem.proto\x12\badmin.v1\x1a\x1bbuf/validate/validate.proto\"\x98\x02\n" +
 	"\aProblem\x12\x1b\n" +
 	"\x04code\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04code\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1b\n" +
 	"\tmax_score\x18\x03 \x01(\rR\bmaxScore\x12\x1a\n" +
 	"\bcategory\x18\x04 \x01(\tR\bcategory\x12;\n" +
 	"\rredeploy_rule\x18\x05 \x01(\v2\x16.admin.v1.RedeployRuleR\fredeployRule\x12)\n" +
-	"\x04body\x18\x06 \x01(\v2\x15.admin.v1.ProblemBodyR\x04body\"\x9a\x01\n" +
+	"\x04body\x18\x06 \x01(\v2\x15.admin.v1.ProblemBodyR\x04body\x129\n" +
+	"\x18submissionable_schedules\x18\a \x03(\tR\x17submissionableSchedules\"\x9a\x01\n" +
 	"\fRedeployRule\x12.\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x1a.admin.v1.RedeployRuleTypeR\x04type\x12+\n" +
 	"\x11penalty_threshold\x18\x02 \x01(\rR\x10penaltyThreshold\x12-\n" +

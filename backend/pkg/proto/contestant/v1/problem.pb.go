@@ -132,12 +132,14 @@ type Problem struct {
 	// 最大得点
 	MaxScore uint32 `protobuf:"varint,3,opt,name=max_score,json=maxScore,proto3" json:"max_score,omitempty"`
 	// 問題カテゴリー
-	Category      string       `protobuf:"bytes,4,opt,name=category,proto3" json:"category,omitempty"`
-	Score         *Score       `protobuf:"bytes,5,opt,name=score,proto3,oneof" json:"score,omitempty"`
-	Deployment    *Deployment  `protobuf:"bytes,6,opt,name=deployment,proto3" json:"deployment,omitempty"`
-	Body          *ProblemBody `protobuf:"bytes,7,opt,name=body,proto3" json:"body,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Category   string       `protobuf:"bytes,4,opt,name=category,proto3" json:"category,omitempty"`
+	Score      *Score       `protobuf:"bytes,5,opt,name=score,proto3,oneof" json:"score,omitempty"`
+	Deployment *Deployment  `protobuf:"bytes,6,opt,name=deployment,proto3" json:"deployment,omitempty"`
+	Body       *ProblemBody `protobuf:"bytes,7,opt,name=body,proto3" json:"body,omitempty"`
+	// 提出状態（スケジュールに基づく提出可否）
+	SubmissionStatus *SubmissionStatus `protobuf:"bytes,8,opt,name=submission_status,json=submissionStatus,proto3" json:"submission_status,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *Problem) Reset() {
@@ -219,6 +221,77 @@ func (x *Problem) GetBody() *ProblemBody {
 	return nil
 }
 
+func (x *Problem) GetSubmissionStatus() *SubmissionStatus {
+	if x != nil {
+		return x.SubmissionStatus
+	}
+	return nil
+}
+
+// 提出状態（スケジュールベース）
+type SubmissionStatus struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// 現在提出可能かどうか
+	IsSubmittable bool `protobuf:"varint,1,opt,name=is_submittable,json=isSubmittable,proto3" json:"is_submittable,omitempty"`
+	// 常にtrue（見えない問題はレスポンスに含まれない）
+	IsVisible bool `protobuf:"varint,2,opt,name=is_visible,json=isVisible,proto3" json:"is_visible,omitempty"`
+	// 現在の提出ウィンドウ終了時刻（提出可能の場合のみ）
+	SubmittableUntil *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=submittable_until,json=submittableUntil,proto3,oneof" json:"submittable_until,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *SubmissionStatus) Reset() {
+	*x = SubmissionStatus{}
+	mi := &file_contestant_v1_problem_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SubmissionStatus) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubmissionStatus) ProtoMessage() {}
+
+func (x *SubmissionStatus) ProtoReflect() protoreflect.Message {
+	mi := &file_contestant_v1_problem_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubmissionStatus.ProtoReflect.Descriptor instead.
+func (*SubmissionStatus) Descriptor() ([]byte, []int) {
+	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *SubmissionStatus) GetIsSubmittable() bool {
+	if x != nil {
+		return x.IsSubmittable
+	}
+	return false
+}
+
+func (x *SubmissionStatus) GetIsVisible() bool {
+	if x != nil {
+		return x.IsVisible
+	}
+	return false
+}
+
+func (x *SubmissionStatus) GetSubmittableUntil() *timestamppb.Timestamp {
+	if x != nil {
+		return x.SubmittableUntil
+	}
+	return nil
+}
+
 type Score struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// 採点による得点
@@ -235,7 +308,7 @@ type Score struct {
 
 func (x *Score) Reset() {
 	*x = Score{}
-	mi := &file_contestant_v1_problem_proto_msgTypes[1]
+	mi := &file_contestant_v1_problem_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -247,7 +320,7 @@ func (x *Score) String() string {
 func (*Score) ProtoMessage() {}
 
 func (x *Score) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_problem_proto_msgTypes[1]
+	mi := &file_contestant_v1_problem_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -260,7 +333,7 @@ func (x *Score) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Score.ProtoReflect.Descriptor instead.
 func (*Score) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{1}
+	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Score) GetMarkedScore() uint32 {
@@ -302,7 +375,7 @@ type Deployment struct {
 
 func (x *Deployment) Reset() {
 	*x = Deployment{}
-	mi := &file_contestant_v1_problem_proto_msgTypes[2]
+	mi := &file_contestant_v1_problem_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -314,7 +387,7 @@ func (x *Deployment) String() string {
 func (*Deployment) ProtoMessage() {}
 
 func (x *Deployment) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_problem_proto_msgTypes[2]
+	mi := &file_contestant_v1_problem_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -327,7 +400,7 @@ func (x *Deployment) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Deployment.ProtoReflect.Descriptor instead.
 func (*Deployment) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{2}
+	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Deployment) GetStatus() DeploymentStatus {
@@ -364,7 +437,7 @@ type DeploymentRequest struct {
 
 func (x *DeploymentRequest) Reset() {
 	*x = DeploymentRequest{}
-	mi := &file_contestant_v1_problem_proto_msgTypes[3]
+	mi := &file_contestant_v1_problem_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -376,7 +449,7 @@ func (x *DeploymentRequest) String() string {
 func (*DeploymentRequest) ProtoMessage() {}
 
 func (x *DeploymentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_problem_proto_msgTypes[3]
+	mi := &file_contestant_v1_problem_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -389,7 +462,7 @@ func (x *DeploymentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeploymentRequest.ProtoReflect.Descriptor instead.
 func (*DeploymentRequest) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{3}
+	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DeploymentRequest) GetRevision() uint32 {
@@ -440,7 +513,7 @@ type ProblemBody struct {
 
 func (x *ProblemBody) Reset() {
 	*x = ProblemBody{}
-	mi := &file_contestant_v1_problem_proto_msgTypes[4]
+	mi := &file_contestant_v1_problem_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -452,7 +525,7 @@ func (x *ProblemBody) String() string {
 func (*ProblemBody) ProtoMessage() {}
 
 func (x *ProblemBody) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_problem_proto_msgTypes[4]
+	mi := &file_contestant_v1_problem_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -465,7 +538,7 @@ func (x *ProblemBody) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProblemBody.ProtoReflect.Descriptor instead.
 func (*ProblemBody) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{4}
+	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ProblemBody) GetType() ProblemType {
@@ -511,7 +584,7 @@ type DescriptiveProblem struct {
 
 func (x *DescriptiveProblem) Reset() {
 	*x = DescriptiveProblem{}
-	mi := &file_contestant_v1_problem_proto_msgTypes[5]
+	mi := &file_contestant_v1_problem_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -523,7 +596,7 @@ func (x *DescriptiveProblem) String() string {
 func (*DescriptiveProblem) ProtoMessage() {}
 
 func (x *DescriptiveProblem) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_problem_proto_msgTypes[5]
+	mi := &file_contestant_v1_problem_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -536,7 +609,7 @@ func (x *DescriptiveProblem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DescriptiveProblem.ProtoReflect.Descriptor instead.
 func (*DescriptiveProblem) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{5}
+	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DescriptiveProblem) GetBody() string {
@@ -554,7 +627,7 @@ type ListProblemsRequest struct {
 
 func (x *ListProblemsRequest) Reset() {
 	*x = ListProblemsRequest{}
-	mi := &file_contestant_v1_problem_proto_msgTypes[6]
+	mi := &file_contestant_v1_problem_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -566,7 +639,7 @@ func (x *ListProblemsRequest) String() string {
 func (*ListProblemsRequest) ProtoMessage() {}
 
 func (x *ListProblemsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_problem_proto_msgTypes[6]
+	mi := &file_contestant_v1_problem_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -579,7 +652,7 @@ func (x *ListProblemsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProblemsRequest.ProtoReflect.Descriptor instead.
 func (*ListProblemsRequest) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{6}
+	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{7}
 }
 
 type ListProblemsResponse struct {
@@ -591,7 +664,7 @@ type ListProblemsResponse struct {
 
 func (x *ListProblemsResponse) Reset() {
 	*x = ListProblemsResponse{}
-	mi := &file_contestant_v1_problem_proto_msgTypes[7]
+	mi := &file_contestant_v1_problem_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -603,7 +676,7 @@ func (x *ListProblemsResponse) String() string {
 func (*ListProblemsResponse) ProtoMessage() {}
 
 func (x *ListProblemsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_problem_proto_msgTypes[7]
+	mi := &file_contestant_v1_problem_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -616,7 +689,7 @@ func (x *ListProblemsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListProblemsResponse.ProtoReflect.Descriptor instead.
 func (*ListProblemsResponse) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{7}
+	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListProblemsResponse) GetProblems() []*Problem {
@@ -635,7 +708,7 @@ type GetProblemRequest struct {
 
 func (x *GetProblemRequest) Reset() {
 	*x = GetProblemRequest{}
-	mi := &file_contestant_v1_problem_proto_msgTypes[8]
+	mi := &file_contestant_v1_problem_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -647,7 +720,7 @@ func (x *GetProblemRequest) String() string {
 func (*GetProblemRequest) ProtoMessage() {}
 
 func (x *GetProblemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_problem_proto_msgTypes[8]
+	mi := &file_contestant_v1_problem_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -660,7 +733,7 @@ func (x *GetProblemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetProblemRequest.ProtoReflect.Descriptor instead.
 func (*GetProblemRequest) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{8}
+	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetProblemRequest) GetCode() string {
@@ -679,7 +752,7 @@ type GetProblemResponse struct {
 
 func (x *GetProblemResponse) Reset() {
 	*x = GetProblemResponse{}
-	mi := &file_contestant_v1_problem_proto_msgTypes[9]
+	mi := &file_contestant_v1_problem_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -691,7 +764,7 @@ func (x *GetProblemResponse) String() string {
 func (*GetProblemResponse) ProtoMessage() {}
 
 func (x *GetProblemResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_problem_proto_msgTypes[9]
+	mi := &file_contestant_v1_problem_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -704,7 +777,7 @@ func (x *GetProblemResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetProblemResponse.ProtoReflect.Descriptor instead.
 func (*GetProblemResponse) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{9}
+	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GetProblemResponse) GetProblem() *Problem {
@@ -723,7 +796,7 @@ type ListDeploymentsRequest struct {
 
 func (x *ListDeploymentsRequest) Reset() {
 	*x = ListDeploymentsRequest{}
-	mi := &file_contestant_v1_problem_proto_msgTypes[10]
+	mi := &file_contestant_v1_problem_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -735,7 +808,7 @@ func (x *ListDeploymentsRequest) String() string {
 func (*ListDeploymentsRequest) ProtoMessage() {}
 
 func (x *ListDeploymentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_problem_proto_msgTypes[10]
+	mi := &file_contestant_v1_problem_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -748,7 +821,7 @@ func (x *ListDeploymentsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDeploymentsRequest.ProtoReflect.Descriptor instead.
 func (*ListDeploymentsRequest) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{10}
+	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ListDeploymentsRequest) GetCode() string {
@@ -767,7 +840,7 @@ type ListDeploymentsResponse struct {
 
 func (x *ListDeploymentsResponse) Reset() {
 	*x = ListDeploymentsResponse{}
-	mi := &file_contestant_v1_problem_proto_msgTypes[11]
+	mi := &file_contestant_v1_problem_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -779,7 +852,7 @@ func (x *ListDeploymentsResponse) String() string {
 func (*ListDeploymentsResponse) ProtoMessage() {}
 
 func (x *ListDeploymentsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_problem_proto_msgTypes[11]
+	mi := &file_contestant_v1_problem_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -792,7 +865,7 @@ func (x *ListDeploymentsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDeploymentsResponse.ProtoReflect.Descriptor instead.
 func (*ListDeploymentsResponse) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{11}
+	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ListDeploymentsResponse) GetDeployments() []*DeploymentRequest {
@@ -811,7 +884,7 @@ type DeployRequest struct {
 
 func (x *DeployRequest) Reset() {
 	*x = DeployRequest{}
-	mi := &file_contestant_v1_problem_proto_msgTypes[12]
+	mi := &file_contestant_v1_problem_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -823,7 +896,7 @@ func (x *DeployRequest) String() string {
 func (*DeployRequest) ProtoMessage() {}
 
 func (x *DeployRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_problem_proto_msgTypes[12]
+	mi := &file_contestant_v1_problem_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -836,7 +909,7 @@ func (x *DeployRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeployRequest.ProtoReflect.Descriptor instead.
 func (*DeployRequest) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{12}
+	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *DeployRequest) GetCode() string {
@@ -855,7 +928,7 @@ type DeployResponse struct {
 
 func (x *DeployResponse) Reset() {
 	*x = DeployResponse{}
-	mi := &file_contestant_v1_problem_proto_msgTypes[13]
+	mi := &file_contestant_v1_problem_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -867,7 +940,7 @@ func (x *DeployResponse) String() string {
 func (*DeployResponse) ProtoMessage() {}
 
 func (x *DeployResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_problem_proto_msgTypes[13]
+	mi := &file_contestant_v1_problem_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -880,7 +953,7 @@ func (x *DeployResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeployResponse.ProtoReflect.Descriptor instead.
 func (*DeployResponse) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{13}
+	return file_contestant_v1_problem_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *DeployResponse) GetDeployment() *DeploymentRequest {
@@ -894,7 +967,7 @@ var File_contestant_v1_problem_proto protoreflect.FileDescriptor
 
 const file_contestant_v1_problem_proto_rawDesc = "" +
 	"\n" +
-	"\x1bcontestant/v1/problem.proto\x12\rcontestant.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x92\x02\n" +
+	"\x1bcontestant/v1/problem.proto\x12\rcontestant.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe0\x02\n" +
 	"\aProblem\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1b\n" +
@@ -904,8 +977,15 @@ const file_contestant_v1_problem_proto_rawDesc = "" +
 	"\n" +
 	"deployment\x18\x06 \x01(\v2\x19.contestant.v1.DeploymentR\n" +
 	"deployment\x12.\n" +
-	"\x04body\x18\a \x01(\v2\x1a.contestant.v1.ProblemBodyR\x04bodyB\b\n" +
-	"\x06_score\"w\n" +
+	"\x04body\x18\a \x01(\v2\x1a.contestant.v1.ProblemBodyR\x04body\x12L\n" +
+	"\x11submission_status\x18\b \x01(\v2\x1f.contestant.v1.SubmissionStatusR\x10submissionStatusB\b\n" +
+	"\x06_score\"\xbc\x01\n" +
+	"\x10SubmissionStatus\x12%\n" +
+	"\x0eis_submittable\x18\x01 \x01(\bR\risSubmittable\x12\x1d\n" +
+	"\n" +
+	"is_visible\x18\x02 \x01(\bR\tisVisible\x12L\n" +
+	"\x11submittable_until\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\x10submittableUntil\x88\x01\x01B\x14\n" +
+	"\x12_submittable_until\"w\n" +
 	"\x05Score\x12!\n" +
 	"\fmarked_score\x18\x01 \x01(\rR\vmarkedScore\x12\x18\n" +
 	"\apenalty\x18\x02 \x01(\rR\apenalty\x12\x14\n" +
@@ -973,52 +1053,55 @@ func file_contestant_v1_problem_proto_rawDescGZIP() []byte {
 }
 
 var file_contestant_v1_problem_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_contestant_v1_problem_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_contestant_v1_problem_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_contestant_v1_problem_proto_goTypes = []any{
 	(DeploymentStatus)(0),           // 0: contestant.v1.DeploymentStatus
 	(ProblemType)(0),                // 1: contestant.v1.ProblemType
 	(*Problem)(nil),                 // 2: contestant.v1.Problem
-	(*Score)(nil),                   // 3: contestant.v1.Score
-	(*Deployment)(nil),              // 4: contestant.v1.Deployment
-	(*DeploymentRequest)(nil),       // 5: contestant.v1.DeploymentRequest
-	(*ProblemBody)(nil),             // 6: contestant.v1.ProblemBody
-	(*DescriptiveProblem)(nil),      // 7: contestant.v1.DescriptiveProblem
-	(*ListProblemsRequest)(nil),     // 8: contestant.v1.ListProblemsRequest
-	(*ListProblemsResponse)(nil),    // 9: contestant.v1.ListProblemsResponse
-	(*GetProblemRequest)(nil),       // 10: contestant.v1.GetProblemRequest
-	(*GetProblemResponse)(nil),      // 11: contestant.v1.GetProblemResponse
-	(*ListDeploymentsRequest)(nil),  // 12: contestant.v1.ListDeploymentsRequest
-	(*ListDeploymentsResponse)(nil), // 13: contestant.v1.ListDeploymentsResponse
-	(*DeployRequest)(nil),           // 14: contestant.v1.DeployRequest
-	(*DeployResponse)(nil),          // 15: contestant.v1.DeployResponse
-	(*timestamppb.Timestamp)(nil),   // 16: google.protobuf.Timestamp
+	(*SubmissionStatus)(nil),        // 3: contestant.v1.SubmissionStatus
+	(*Score)(nil),                   // 4: contestant.v1.Score
+	(*Deployment)(nil),              // 5: contestant.v1.Deployment
+	(*DeploymentRequest)(nil),       // 6: contestant.v1.DeploymentRequest
+	(*ProblemBody)(nil),             // 7: contestant.v1.ProblemBody
+	(*DescriptiveProblem)(nil),      // 8: contestant.v1.DescriptiveProblem
+	(*ListProblemsRequest)(nil),     // 9: contestant.v1.ListProblemsRequest
+	(*ListProblemsResponse)(nil),    // 10: contestant.v1.ListProblemsResponse
+	(*GetProblemRequest)(nil),       // 11: contestant.v1.GetProblemRequest
+	(*GetProblemResponse)(nil),      // 12: contestant.v1.GetProblemResponse
+	(*ListDeploymentsRequest)(nil),  // 13: contestant.v1.ListDeploymentsRequest
+	(*ListDeploymentsResponse)(nil), // 14: contestant.v1.ListDeploymentsResponse
+	(*DeployRequest)(nil),           // 15: contestant.v1.DeployRequest
+	(*DeployResponse)(nil),          // 16: contestant.v1.DeployResponse
+	(*timestamppb.Timestamp)(nil),   // 17: google.protobuf.Timestamp
 }
 var file_contestant_v1_problem_proto_depIdxs = []int32{
-	3,  // 0: contestant.v1.Problem.score:type_name -> contestant.v1.Score
-	4,  // 1: contestant.v1.Problem.deployment:type_name -> contestant.v1.Deployment
-	6,  // 2: contestant.v1.Problem.body:type_name -> contestant.v1.ProblemBody
-	0,  // 3: contestant.v1.Deployment.status:type_name -> contestant.v1.DeploymentStatus
-	0,  // 4: contestant.v1.DeploymentRequest.status:type_name -> contestant.v1.DeploymentStatus
-	16, // 5: contestant.v1.DeploymentRequest.requested_at:type_name -> google.protobuf.Timestamp
-	1,  // 6: contestant.v1.ProblemBody.type:type_name -> contestant.v1.ProblemType
-	7,  // 7: contestant.v1.ProblemBody.descriptive:type_name -> contestant.v1.DescriptiveProblem
-	2,  // 8: contestant.v1.ListProblemsResponse.problems:type_name -> contestant.v1.Problem
-	2,  // 9: contestant.v1.GetProblemResponse.problem:type_name -> contestant.v1.Problem
-	5,  // 10: contestant.v1.ListDeploymentsResponse.deployments:type_name -> contestant.v1.DeploymentRequest
-	5,  // 11: contestant.v1.DeployResponse.deployment:type_name -> contestant.v1.DeploymentRequest
-	8,  // 12: contestant.v1.ProblemService.ListProblems:input_type -> contestant.v1.ListProblemsRequest
-	10, // 13: contestant.v1.ProblemService.GetProblem:input_type -> contestant.v1.GetProblemRequest
-	12, // 14: contestant.v1.ProblemService.ListDeployments:input_type -> contestant.v1.ListDeploymentsRequest
-	14, // 15: contestant.v1.ProblemService.Deploy:input_type -> contestant.v1.DeployRequest
-	9,  // 16: contestant.v1.ProblemService.ListProblems:output_type -> contestant.v1.ListProblemsResponse
-	11, // 17: contestant.v1.ProblemService.GetProblem:output_type -> contestant.v1.GetProblemResponse
-	13, // 18: contestant.v1.ProblemService.ListDeployments:output_type -> contestant.v1.ListDeploymentsResponse
-	15, // 19: contestant.v1.ProblemService.Deploy:output_type -> contestant.v1.DeployResponse
-	16, // [16:20] is the sub-list for method output_type
-	12, // [12:16] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	4,  // 0: contestant.v1.Problem.score:type_name -> contestant.v1.Score
+	5,  // 1: contestant.v1.Problem.deployment:type_name -> contestant.v1.Deployment
+	7,  // 2: contestant.v1.Problem.body:type_name -> contestant.v1.ProblemBody
+	3,  // 3: contestant.v1.Problem.submission_status:type_name -> contestant.v1.SubmissionStatus
+	17, // 4: contestant.v1.SubmissionStatus.submittable_until:type_name -> google.protobuf.Timestamp
+	0,  // 5: contestant.v1.Deployment.status:type_name -> contestant.v1.DeploymentStatus
+	0,  // 6: contestant.v1.DeploymentRequest.status:type_name -> contestant.v1.DeploymentStatus
+	17, // 7: contestant.v1.DeploymentRequest.requested_at:type_name -> google.protobuf.Timestamp
+	1,  // 8: contestant.v1.ProblemBody.type:type_name -> contestant.v1.ProblemType
+	8,  // 9: contestant.v1.ProblemBody.descriptive:type_name -> contestant.v1.DescriptiveProblem
+	2,  // 10: contestant.v1.ListProblemsResponse.problems:type_name -> contestant.v1.Problem
+	2,  // 11: contestant.v1.GetProblemResponse.problem:type_name -> contestant.v1.Problem
+	6,  // 12: contestant.v1.ListDeploymentsResponse.deployments:type_name -> contestant.v1.DeploymentRequest
+	6,  // 13: contestant.v1.DeployResponse.deployment:type_name -> contestant.v1.DeploymentRequest
+	9,  // 14: contestant.v1.ProblemService.ListProblems:input_type -> contestant.v1.ListProblemsRequest
+	11, // 15: contestant.v1.ProblemService.GetProblem:input_type -> contestant.v1.GetProblemRequest
+	13, // 16: contestant.v1.ProblemService.ListDeployments:input_type -> contestant.v1.ListDeploymentsRequest
+	15, // 17: contestant.v1.ProblemService.Deploy:input_type -> contestant.v1.DeployRequest
+	10, // 18: contestant.v1.ProblemService.ListProblems:output_type -> contestant.v1.ListProblemsResponse
+	12, // 19: contestant.v1.ProblemService.GetProblem:output_type -> contestant.v1.GetProblemResponse
+	14, // 20: contestant.v1.ProblemService.ListDeployments:output_type -> contestant.v1.ListDeploymentsResponse
+	16, // 21: contestant.v1.ProblemService.Deploy:output_type -> contestant.v1.DeployResponse
+	18, // [18:22] is the sub-list for method output_type
+	14, // [14:18] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_contestant_v1_problem_proto_init() }
@@ -1027,7 +1110,8 @@ func file_contestant_v1_problem_proto_init() {
 		return
 	}
 	file_contestant_v1_problem_proto_msgTypes[0].OneofWrappers = []any{}
-	file_contestant_v1_problem_proto_msgTypes[4].OneofWrappers = []any{
+	file_contestant_v1_problem_proto_msgTypes[1].OneofWrappers = []any{}
+	file_contestant_v1_problem_proto_msgTypes[5].OneofWrappers = []any{
 		(*ProblemBody_Descriptive)(nil),
 	}
 	type x struct{}
@@ -1036,7 +1120,7 @@ func file_contestant_v1_problem_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_contestant_v1_problem_proto_rawDesc), len(file_contestant_v1_problem_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   14,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

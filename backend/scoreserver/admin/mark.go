@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/gofrs/uuid/v5"
 	adminv1 "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1/adminv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
@@ -22,6 +23,7 @@ type MarkServiceHandler struct {
 	ListMarkingResultEffect   domain.MarkingResultReader
 	CreateMarkingResultEffect domain.Tx[CreateMarkingResultTxEffect]
 	UpdateScoreEffect         UpdateScoreEffect
+	ScheduleResolver          ScheduleIDResolver
 }
 
 var _ adminv1connect.MarkServiceHandler = (*MarkServiceHandler)(nil)
@@ -34,6 +36,7 @@ func newMarkServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *MarkSe
 		ListMarkingResultEffect:   repo,
 		CreateMarkingResultEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) CreateMarkingResultTxEffect { return rt }),
 		UpdateScoreEffect:         newUpdateScoreEffect(repo),
+		ScheduleResolver:          repo,
 	}
 }
 
@@ -50,9 +53,29 @@ func (h *MarkServiceHandler) ListAnswers(
 		return nil, err
 	}
 
+	// Collect all schedule IDs from problems
+	scheduleIDsSet := make(map[uuid.UUID]struct{})
+	for _, answer := range answers {
+		for _, scheduleID := range answer.Problem().SubmissionableScheduleIDs() {
+			scheduleIDsSet[scheduleID] = struct{}{}
+		}
+	}
+
+	// Convert set to slice
+	scheduleIDs := make([]uuid.UUID, 0, len(scheduleIDsSet))
+	for id := range scheduleIDsSet {
+		scheduleIDs = append(scheduleIDs, id)
+	}
+
+	// Get schedule names
+	scheduleNames, err := h.ScheduleResolver.GetScheduleNamesByIDs(ctx, scheduleIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	protoAnswers := make([]*adminv1.Answer, 0, len(answers))
 	for _, answer := range answers {
-		protoAnswers = append(protoAnswers, convertAnswer(answer))
+		protoAnswers = append(protoAnswers, convertAnswer(answer, scheduleNames))
 	}
 
 	return connect.NewResponse(&adminv1.ListAnswersResponse{
@@ -95,7 +118,15 @@ func (h *MarkServiceHandler) GetAnswer(
 	if err != nil {
 		return nil, err
 	}
-	protoAnser := convertAnswer(answer.Answer())
+
+	// Get schedule names for the problem
+	scheduleIDs := answer.Problem().SubmissionableScheduleIDs()
+	scheduleNames, err := h.ScheduleResolver.GetScheduleNamesByIDs(ctx, scheduleIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	protoAnser := convertAnswer(answer.Answer(), scheduleNames)
 	switch answer.Problem().Type() {
 	case domain.ProblemTypeDescriptive:
 		desc, err := answer.Body().Descriptive()
@@ -132,9 +163,26 @@ func (h *MarkServiceHandler) ListMarkingResults(
 		return nil, err
 	}
 
+	scheduleIDsSet := make(map[uuid.UUID]struct{})
+	for _, markingResult := range markingResults {
+		for _, scheduleID := range markingResult.Answer().Problem().SubmissionableScheduleIDs() {
+			scheduleIDsSet[scheduleID] = struct{}{}
+		}
+	}
+
+	scheduleIDs := make([]uuid.UUID, 0, len(scheduleIDsSet))
+	for id := range scheduleIDsSet {
+		scheduleIDs = append(scheduleIDs, id)
+	}
+
+	scheduleNames, err := h.ScheduleResolver.GetScheduleNamesByIDs(ctx, scheduleIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	protoMarkingResults := make([]*adminv1.MarkingResult, 0, len(markingResults))
 	for _, markingResult := range markingResults {
-		protoMarkingResults = append(protoMarkingResults, convertMarkingResult(markingResult))
+		protoMarkingResults = append(protoMarkingResults, convertMarkingResult(markingResult, scheduleNames))
 	}
 
 	return connect.NewResponse(&adminv1.ListMarkingResultsResponse{
@@ -208,8 +256,15 @@ func (h *MarkServiceHandler) CreateMarkingResult(
 		return nil, err
 	}
 
+	// Get schedule names for the response
+	scheduleIDs := markingResult.Answer().Problem().SubmissionableScheduleIDs()
+	scheduleNames, err := h.ScheduleResolver.GetScheduleNamesByIDs(ctx, scheduleIDs)
+	if err != nil {
+		return nil, err
+	}
+
 	return connect.NewResponse(&adminv1.CreateMarkingResultResponse{
-		MarkingResult: convertMarkingResult(markingResult),
+		MarkingResult: convertMarkingResult(markingResult, scheduleNames),
 	}), nil
 }
 
@@ -228,11 +283,11 @@ func (h *MarkServiceHandler) UpdateScores(
 	return connect.NewResponse(&adminv1.UpdateScoresResponse{}), nil
 }
 
-func convertAnswer(answer *domain.Answer) *adminv1.Answer {
+func convertAnswer(answer *domain.Answer, scheduleNames map[uuid.UUID]string) *adminv1.Answer {
 	proto := &adminv1.Answer{
 		Id:        answer.Number(),
 		Team:      convertTeam(answer.Team()),
-		Problem:   convertProblem(answer.Problem()),
+		Problem:   convertProblem(answer.Problem(), scheduleNames),
 		CreatedAt: timestamppb.New(answer.CreatedAt()),
 	}
 	if score := answer.Score(); score != nil {
@@ -246,9 +301,9 @@ func convertAnswer(answer *domain.Answer) *adminv1.Answer {
 	return proto
 }
 
-func convertMarkingResult(markingResult *domain.MarkingResult) *adminv1.MarkingResult {
+func convertMarkingResult(markingResult *domain.MarkingResult, scheduleNames map[uuid.UUID]string) *adminv1.MarkingResult {
 	proto := &adminv1.MarkingResult{
-		Answer:    convertAnswer(markingResult.Answer()),
+		Answer:    convertAnswer(markingResult.Answer(), scheduleNames),
 		Judge:     &adminv1.Admin{Name: markingResult.Judge()},
 		Score:     markingResult.Score().MarkedScore(),
 		CreatedAt: timestamppb.New(markingResult.CreatedAt()),

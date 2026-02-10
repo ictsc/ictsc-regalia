@@ -7,6 +7,7 @@ import {
 } from "react";
 import { createLazyFileRoute, useRouter } from "@tanstack/react-router";
 import { DeploymentStatus } from "@ictsc/proto/contestant/v1";
+import { timestampDate } from "@bufbuild/protobuf/wkt";
 import type { ProblemDetail } from "../features/problem";
 import type { Answer } from "../features/answer";
 import { protoScoreToProps } from "../features/score";
@@ -84,6 +85,17 @@ function SubmissionForm(props: {
   const router = useRouter();
   const problem = use(props.problemPromise);
   const metadata = use(props.metatataPromise);
+
+  // Convert Timestamp to Date if present
+  const submissionStatus = problem.submissionStatus
+    ? {
+        isSubmittable: problem.submissionStatus.isSubmittable,
+        submittableUntil: problem.submissionStatus.submittableUntil
+          ? timestampDate(problem.submissionStatus.submittableUntil)
+          : undefined,
+      }
+    : undefined;
+
   return (
     <View.SubmissionForm
       action={async (body) => {
@@ -99,6 +111,7 @@ function SubmissionForm(props: {
       submitInterval={metadata.submitIntervalSeconds}
       lastSubmittedAt={metadata.lastSubmittedAt}
       storageKey={`/problems/${problem.code}`}
+      submissionStatus={submissionStatus}
     />
   );
 }

@@ -2,7 +2,6 @@ package contestant
 
 import (
 	"context"
-	"time"
 
 	"connectrpc.com/connect"
 	"github.com/cockroachdb/errors"
@@ -68,42 +67,24 @@ func (h *ContestServiceHandler) GetSchedule(
 		return nil, err
 	}
 
-	schedule, err := domain.GetSchedule(ctx, h.GetScheduleEffect)
+	schedules, err := domain.GetSchedule(ctx, h.GetScheduleEffect)
 	if err != nil {
 		return nil, err
 	}
 
-	now := time.Now()
-	current := schedule.Current(now)
-	next := schedule.Next(now)
-
-	protoSchedule := &contestantv1.Schedule{
-		Phase:     convertPhase(current.Phase()),
-		NextPhase: convertPhase(next.Phase()),
-		StartAt:   timestamppb.New(current.StartAt()),
-	}
-	if endAt := current.EndAt(); !endAt.IsZero() {
-		protoSchedule.EndAt = timestamppb.New(endAt)
+	protoSchedules := make([]*contestantv1.ScheduleEntry, 0, len(schedules))
+	for _, entry := range schedules {
+		protoSchedules = append(protoSchedules, &contestantv1.ScheduleEntry{
+			Id:      entry.ID().String(),
+			Name:    entry.Name(),
+			StartAt: timestamppb.New(entry.StartAt()),
+			EndAt:   timestamppb.New(entry.EndAt()),
+		})
 	}
 
 	return connect.NewResponse(&contestantv1.GetScheduleResponse{
-		Schedule: protoSchedule,
+		Schedule: &contestantv1.Schedule{
+			Schedules: protoSchedules,
+		},
 	}), nil
-}
-
-func convertPhase(phase domain.Phase) contestantv1.Phase {
-	switch phase {
-	case domain.PhaseOutOfContest:
-		return contestantv1.Phase_PHASE_OUT_OF_CONTEST
-	case domain.PhaseInContest:
-		return contestantv1.Phase_PHASE_IN_CONTEST
-	case domain.PhaseBreak:
-		return contestantv1.Phase_PHASE_BREAK
-	case domain.PhaseAfterContest:
-		return contestantv1.Phase_PHASE_AFTER_CONTEST
-	case domain.PhaseUnspecified:
-		fallthrough
-	default:
-		return contestantv1.Phase_PHASE_UNSPECIFIED
-	}
 }

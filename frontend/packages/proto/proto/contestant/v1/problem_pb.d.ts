@@ -57,6 +57,13 @@ export declare type Problem = Message<"contestant.v1.Problem"> & {
    * @generated from field: contestant.v1.ProblemBody body = 7;
    */
   body?: ProblemBody;
+
+  /**
+   * 提出状態（スケジュールに基づく提出可否）
+   *
+   * @generated from field: contestant.v1.SubmissionStatus submission_status = 8;
+   */
+  submissionStatus?: SubmissionStatus;
 };
 
 /**
@@ -64,6 +71,40 @@ export declare type Problem = Message<"contestant.v1.Problem"> & {
  * Use `create(ProblemSchema)` to create a new message.
  */
 export declare const ProblemSchema: GenMessage<Problem>;
+
+/**
+ * 提出状態（スケジュールベース）
+ *
+ * @generated from message contestant.v1.SubmissionStatus
+ */
+export declare type SubmissionStatus = Message<"contestant.v1.SubmissionStatus"> & {
+  /**
+   * 現在提出可能かどうか
+   *
+   * @generated from field: bool is_submittable = 1;
+   */
+  isSubmittable: boolean;
+
+  /**
+   * 常にtrue（見えない問題はレスポンスに含まれない）
+   *
+   * @generated from field: bool is_visible = 2;
+   */
+  isVisible: boolean;
+
+  /**
+   * 現在の提出ウィンドウ終了時刻（提出可能の場合のみ）
+   *
+   * @generated from field: optional google.protobuf.Timestamp submittable_until = 3;
+   */
+  submittableUntil?: Timestamp;
+};
+
+/**
+ * Describes the message contestant.v1.SubmissionStatus.
+ * Use `create(SubmissionStatusSchema)` to create a new message.
+ */
+export declare const SubmissionStatusSchema: GenMessage<SubmissionStatus>;
 
 /**
  * @generated from message contestant.v1.Score

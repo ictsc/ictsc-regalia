@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/jackc/pgx/v5"
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/oauth2"
@@ -15,9 +14,8 @@ type Config struct {
 	AdminAPI      AdminAPI
 	ContestantAPI ContestantAPI
 
-	PgConfig     pgx.ConnConfig
-	Redis        redis.Options
-	FakeSchedule *FakeSchedule
+	PgConfig pgx.ConnConfig
+	Redis    redis.Options
 }
 
 type (
@@ -80,9 +78,3 @@ type (
 	}
 )
 
-type FakeSchedule struct {
-	Phase     domain.Phase
-	NextPhase domain.Phase
-	StartAt   time.Time
-	EndAt     time.Time
-}

@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { type Schedule } from "@ictsc/proto/contestant/v1";
-import { endAt } from "./feature";
+import { currentEndAt as endAt } from "./feature";
 import { ScheduleContext } from "./use-schedule";
 
 export function ScheduleProvider(props: {

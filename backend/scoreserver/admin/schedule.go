@@ -65,11 +65,11 @@ func (h *ScheduleServiceHandler) UpdateSchedule(
 	}
 
 	schedules := make([]*domain.UpdateScheduleInput, 0, len(req.Msg.GetSchedule()))
-	for _, schdule := range req.Msg.GetSchedule() {
+	for _, schedule := range req.Msg.GetSchedule() {
 		schedules = append(schedules, &domain.UpdateScheduleInput{
-			Phase:   convertProtoPhaseToDomain(schdule.GetPhase()),
-			StartAt: schdule.GetStartAt().AsTime(),
-			EndAt:   schdule.GetEndAt().AsTime(),
+			Name:    schedule.GetName(),
+			StartAt: schedule.GetStartAt().AsTime(),
+			EndAt:   schedule.GetEndAt().AsTime(),
 		})
 	}
 	if err := h.UpdateEffect.RunInTx(ctx, func(w domain.ScheduleWriter) error {
@@ -82,24 +82,9 @@ func (h *ScheduleServiceHandler) UpdateSchedule(
 }
 
 func convertScheduleEntry(schedule *domain.ScheduleEntry) *adminv1.Schedule {
-	var phase adminv1.Phase
-	switch schedule.Phase() {
-	case domain.PhaseOutOfContest:
-		phase = adminv1.Phase_PHASE_OUT_OF_CONTEST
-	case domain.PhaseInContest:
-		phase = adminv1.Phase_PHASE_IN_CONTEST
-	case domain.PhaseBreak:
-		phase = adminv1.Phase_PHASE_BREAK
-	case domain.PhaseAfterContest:
-		phase = adminv1.Phase_PHASE_AFTER_CONTEST
-	case domain.PhaseUnspecified:
-		fallthrough
-	default:
-		phase = adminv1.Phase_PHASE_UNSPECIFIED
-	}
-
 	proto := &adminv1.Schedule{
-		Phase: phase,
+		Id:   schedule.ID().String(),
+		Name: schedule.Name(),
 	}
 	if !schedule.StartAt().IsZero() {
 		proto.StartAt = timestamppb.New(schedule.StartAt())
@@ -109,21 +94,4 @@ func convertScheduleEntry(schedule *domain.ScheduleEntry) *adminv1.Schedule {
 	}
 
 	return proto
-}
-
-func convertProtoPhaseToDomain(protoPhase adminv1.Phase) domain.Phase {
-	switch protoPhase {
-	case adminv1.Phase_PHASE_OUT_OF_CONTEST:
-		return domain.PhaseOutOfContest
-	case adminv1.Phase_PHASE_IN_CONTEST:
-		return domain.PhaseInContest
-	case adminv1.Phase_PHASE_BREAK:
-		return domain.PhaseBreak
-	case adminv1.Phase_PHASE_AFTER_CONTEST:
-		return domain.PhaseAfterContest
-	case adminv1.Phase_PHASE_UNSPECIFIED:
-		fallthrough
-	default:
-		return domain.PhaseUnspecified
-	}
 }
