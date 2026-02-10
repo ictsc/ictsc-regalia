@@ -235,12 +235,9 @@ COMMENT ON COLUMN notices.title IS 'タイトル';
 COMMENT ON COLUMN notices.markdown IS '本文';
 COMMENT ON COLUMN notices.effective_from IS '掲示開始時間';
 
-CREATE TYPE contest_phase AS ENUM ('UNSPECIFIED', 'OUT_OF_CONTEST', 'IN_CONTEST', 'BREAK', 'AFTER_CONTEST');
-
 CREATE TABLE schedules (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	name VARCHAR(255),
-    phase contest_phase NOT NULL DEFAULT 'IN_CONTEST',
     start_at TIMESTAMPTZ NOT NULL,
     end_at TIMESTAMPTZ NOT NULL,
     CONSTRAINT schedules_start_end CHECK (start_at < end_at)
@@ -251,7 +248,6 @@ CREATE INDEX idx_schedules_name ON schedules(name) WHERE name IS NOT NULL;
 COMMENT ON TABLE schedules IS 'コンテストスケジュール';
 COMMENT ON COLUMN schedules.id IS 'スケジュール ID';
 COMMENT ON COLUMN schedules.name IS 'スケジュール名 (例: day1-am)';
-COMMENT ON COLUMN schedules.phase IS 'フェーズ (deprecated: 常にIN_CONTEST)';
 COMMENT ON COLUMN schedules.start_at IS '開始時刻';
 COMMENT ON COLUMN schedules.end_at IS '終了時刻';
 

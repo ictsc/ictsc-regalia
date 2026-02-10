@@ -79,10 +79,9 @@ func (r *RepositoryTx) SaveSchedule(ctx context.Context, data []*domain.Schedule
 			scheduleID = uuid.Must(uuid.NewV4()) // 新規作成
 		}
 
-		// UPSERT (phaseは互換性のためIN_CONTESTを固定で入れる)
 		query := `
-            INSERT INTO schedules (id, name, phase, start_at, end_at)
-            VALUES ($1, $2, 'IN_CONTEST', $3, $4)
+            INSERT INTO schedules (id, name, start_at, end_at)
+            VALUES ($1, $2, $3, $4)
             ON CONFLICT (id) DO UPDATE SET
                 name = EXCLUDED.name,
                 start_at = EXCLUDED.start_at,

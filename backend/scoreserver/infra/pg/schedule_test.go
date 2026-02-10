@@ -21,13 +21,11 @@ func TestGetSchedule(t *testing.T) {
 	expected := []*domain.ScheduleData{
 		{
 			ID:      uuid.FromStringOrNil("8a23ce3f-4506-48e9-bf68-7d2d90592bf1"),
-			Phase:   domain.PhaseInContest,
 			StartAt: startAt,
 			EndAt:   endAt,
 		},
 		{
 			ID:      uuid.FromStringOrNil("4e72d440-dfde-4923-801d-0fd5ee2c0730"),
-			Phase:   domain.PhaseAfterContest,
 			StartAt: endAt,
 			EndAt:   endAt.Add(24 * time.Hour),
 		},
@@ -64,7 +62,6 @@ func TestSaveSchedule(t *testing.T) {
 			input: []*domain.ScheduleData{
 				{
 					ID:      uuid.FromStringOrNil("11d41cc7-c7c8-45c4-990b-0e3bcab4e54d"),
-					Phase:   domain.PhaseInContest,
 					StartAt: startAt,
 					EndAt:   endAt,
 				},
@@ -73,7 +70,6 @@ func TestSaveSchedule(t *testing.T) {
 				`SELECT 1
 				 FROM schedules
 				 WHERE id = '11d41cc7-c7c8-45c4-990b-0e3bcab4e54d'
-				   AND phase = 'IN_CONTEST'
 				   AND start_at = '2025-02-03 00:00:00'
 				   AND end_at = '2025-02-04 00:00:00'`,
 			},
@@ -82,13 +78,11 @@ func TestSaveSchedule(t *testing.T) {
 			input: []*domain.ScheduleData{
 				{
 					ID:      uuid.FromStringOrNil("816c496b-6bcb-46c2-b4df-a8c537bae51b"),
-					Phase:   domain.PhaseOutOfContest,
 					StartAt: startAt,
 					EndAt:   endAt,
 				},
 				{
 					ID:      uuid.FromStringOrNil("5b88ebcc-2ef6-4ae7-b401-18eefe72cbbe"),
-					Phase:   domain.PhaseInContest,
 					StartAt: endAt,
 					EndAt:   endAt.Add(24 * time.Hour),
 				},
@@ -97,13 +91,11 @@ func TestSaveSchedule(t *testing.T) {
 				`SELECT 1
 				FROM schedules
 				WHERE id = '816c496b-6bcb-46c2-b4df-a8c537bae51b'
-				AND phase = 'OUT_OF_CONTEST'
 				AND start_at = '2025-02-03 00:00:00'
 				AND end_at = '2025-02-04 00:00:00'`,
 				`SELECT 1
 				FROM schedules
 				WHERE id = '5b88ebcc-2ef6-4ae7-b401-18eefe72cbbe'
-				AND phase = 'IN_CONTEST'
 				AND start_at = '2025-02-04 00:00:00'
 				AND end_at = '2025-02-05 00:00:00'`,
 			},

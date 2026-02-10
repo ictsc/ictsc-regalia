@@ -97,9 +97,9 @@ INSERT INTO notices (slug, title, markdown, effective_from) VALUES
 	('future-notice', 'Future Notice', '未来のお知らせです', '2035-03-03T00:00:00Z');
 
 TRUNCATE TABLE schedules CASCADE;
-INSERT INTO schedules (id, phase, start_at, end_at) VALUES
-    ('8a23ce3f-4506-48e9-bf68-7d2d90592bf1', 'IN_CONTEST', '2025-02-03 00:00:00+00', '2025-02-04 00:00:00+00'),
-    ('4e72d440-dfde-4923-801d-0fd5ee2c0730', 'AFTER_CONTEST', '2025-02-04 00:00:00+00', '2025-02-05 00:00:00+00');
+INSERT INTO schedules (id, name, start_at, end_at) VALUES
+    ('8a23ce3f-4506-48e9-bf68-7d2d90592bf1', 'day1', '2025-02-03 00:00:00+00', '2025-02-04 00:00:00+00'),
+    ('4e72d440-dfde-4923-801d-0fd5ee2c0730', 'day2', '2025-02-04 00:00:00+00', '2025-02-05 00:00:00+00');
 
 TRUNCATE TABLE redeployment_requests CASCADE;
 INSERT INTO redeployment_requests (id, team_id, problem_id, revision) VALUES
