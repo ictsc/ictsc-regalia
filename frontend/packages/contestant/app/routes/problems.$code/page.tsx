@@ -74,7 +74,7 @@ function Layout(props: { content: React.ReactNode; sidebar: React.ReactNode }) {
       <div
         className={clsx(
           "overflow-y-auto px-40 pb-64",
-          "w-[--span] xl:w-[calc(var(--span)*2)]",
+          "w-(--span) xl:w-[calc(var(--span)*2)]",
           navbarTransitioning && "transition-[width]",
         )}
       >
@@ -82,18 +82,18 @@ function Layout(props: { content: React.ReactNode; sidebar: React.ReactNode }) {
       </div>
       <div
         className={clsx(
-          "fixed right-0 top-[--header-height] flex h-[--content-height] w-[--span] gap-4 px-12 pb-64 pt-20",
+          "fixed top-(--header-height) right-0 flex h-(--content-height) w-(--span) gap-4 px-12 pt-20 pb-64",
           showSidebar && "bg-surface-0",
           !showSidebar &&
             "translate-x-[calc(var(--span)-64px)] lg:translate-x-0",
-          "lg:w-[--span] lg:pl-0",
+          "lg:w-(--span) lg:pl-0",
           navbarTransitioning
-            ? "transition-[width,transform]"
-            : "transition-transform",
+            ? "transition-[width,translate]"
+            : "transition-translate",
         )}
       >
         <Button
-          className="grid h-40 w-[40px] place-items-center rounded-full transition data-[hover]:bg-surface-1 data-[active]:opacity-80 lg:hidden"
+          className="data-[hover]:bg-surface-1 grid h-40 w-[40px] place-items-center rounded-full transition data-[active]:opacity-80 lg:hidden"
           onClick={toggleSidebar}
           title={showSidebar ? "閉じる" : "サイドバーを開く"}
         >
@@ -166,12 +166,12 @@ function SidebarTab(props: { disabled?: boolean; children?: ReactNode }) {
   return (
     <Tab
       disabled={props.disabled}
-      className="group relative rounded-8 px-8 text-16 transition data-[hover]:bg-surface-1 data-[selected]:text-primary data-[active]:opacity-80"
+      className="group rounded-8 text-16 data-[hover]:bg-surface-1 data-[selected]:text-primary relative px-8 transition data-[active]:opacity-80"
     >
-      <div className="py-8 group-data-[disabled]:text-disabled group-data-[selected]:text-primary">
+      <div className="group-data-[disabled]:text-disabled group-data-[selected]:text-primary py-8">
         {props.children}
       </div>
-      <div className="absolute bottom-0 mx-2 h-2 w-[calc(100%-20px)] rounded-t-full bg-transparent group-data-[selected]:bg-primary" />
+      <div className="group-data-[selected]:bg-primary absolute bottom-0 mx-2 h-2 w-[calc(100%-20px)] rounded-t-full bg-transparent" />
     </Tab>
   );
 }

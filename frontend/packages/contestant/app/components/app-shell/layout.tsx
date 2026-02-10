@@ -33,12 +33,12 @@ export function Layout({
         onTransitionStart={() => setNavbarTransitioning(true)}
         onTransitionEnd={() => setNavbarTransitioning(false)}
       >
-        <header className="fixed left-0 right-0 top-0 z-10 h-[--header-height] bg-surface-0">
+        <header className="bg-surface-0 fixed top-0 right-0 left-0 z-10 h-(--header-height)">
           {header}
         </header>
         <nav
           className={clsx(
-            "fixed bottom-0 left-0 top-[--header-height] w-[--navbar-width]",
+            "fixed top-(--header-height) bottom-0 left-0 w-(--navbar-width)",
             navbarTransitioning && "motion-safe:transition-[width]",
           )}
         >
@@ -46,7 +46,7 @@ export function Layout({
         </nav>
         <main
           className={clsx(
-            "fixed bottom-0 right-0 top-[--header-height] h-[--content-height] w-[--content-width] overflow-y-auto overflow-x-clip [scroll-gutter:stable]",
+            "fixed top-(--header-height) right-0 bottom-0 h-(--content-height) w-(--content-width) overflow-x-clip overflow-y-auto [scroll-gutter:stable]",
             navbarTransitioning && "motion-safe:transition-[width]",
           )}
         >

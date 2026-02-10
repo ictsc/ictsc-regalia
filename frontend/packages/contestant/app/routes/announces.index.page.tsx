@@ -21,7 +21,7 @@ export function AnnounceList(props: AnnounceProps) {
             return (
               <Button as={Fragment} key={announce.slug}>
                 <Link
-                  className="flex w-full items-center gap-8 rounded-8 bg-surface-1 py-4 pl-20 pr-40 text-16 font-bold transition data-[hover]:bg-surface-2 data-[active]:opacity-50"
+                  className="rounded-8 bg-surface-1 text-16 data-[hover]:bg-surface-2 flex w-full items-center gap-8 py-4 pr-40 pl-20 font-bold transition data-[active]:opacity-50"
                   to="/announces/$slug"
                   params={{ slug: announce.slug }}
                 >

@@ -21,7 +21,7 @@ export function AccountMenu(props: {
     <Menu>
       <MenuButton
         title="アカウントメニュー"
-        className="flex size-[50px] items-center justify-center rounded-full transition data-[hover]:bg-surface-0/50"
+        className="data-[hover]:bg-surface-0/50 flex size-[50px] items-center justify-center rounded-full transition"
       >
         <MaterialSymbol
           icon="person"
@@ -35,11 +35,11 @@ export function AccountMenu(props: {
         anchor={{ to: "bottom", gap: 15 }}
         transition
         className={clsx(
-          "flex w-[200px] flex-col gap-[5px] rounded-[12px] bg-surface-0 py-[15px] drop-shadow",
+          "bg-surface-0 flex w-[200px] flex-col gap-[5px] rounded-[12px] py-[15px] drop-shadow",
           "transition duration-200 ease-out data-[closed]:opacity-0",
         )}
       >
-        <span className="mx-[15px] text-14 text-text">{props.name}</span>
+        <span className="text-14 text-text mx-[15px]">{props.name}</span>
         {/* <MenuItem>
           <AccountMenuButton icon="settings">アカウント設定</AccountMenuButton>
         </MenuItem> */}
@@ -67,11 +67,11 @@ function AccountMenuButton({
       {...restProps}
       className={clsx(
         className,
-        "flex items-center px-[15px] py-[10px] transition data-[focus]:bg-surface-1",
+        "data-[focus]:bg-surface-1 flex items-center px-[15px] py-[10px] transition",
       )}
     >
       <MaterialSymbol icon={icon} size={20} />
-      <span className="ml-[5px] text-14">{children}</span>
+      <span className="text-14 ml-[5px]">{children}</span>
     </Button>
   );
 }

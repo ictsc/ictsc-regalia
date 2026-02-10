@@ -22,7 +22,7 @@ export function SignUpPage(
       <Title>アカウント登録</Title>
       <div className="grid h-full items-center justify-center">
         <form
-          className="w-96 flex flex-col rounded-16 p-64 shadow-lg"
+          className="rounded-16 flex w-96 flex-col p-64 shadow-lg"
           onSubmit={(e) => {
             e.preventDefault();
             const form = e.target as HTMLFormElement;
@@ -86,7 +86,7 @@ export function SignUpPage(
           </div>
           <div className="mt-64 flex items-center justify-end gap-24">
             {props.error && (
-              <p className="text-16 font-bold text-primary">
+              <p className="text-16 text-primary font-bold">
                 {
                   {
                     rate_limit: "リクエストが多すぎます",
@@ -117,7 +117,7 @@ function TextField(props: {
   const { pending } = useFormStatus();
   return (
     <Field className={props.className} disabled={pending}>
-      <div className="flex items-center gap-16 text-16 font-bold">
+      <div className="text-16 flex items-center gap-16 font-bold">
         <Label>{props.label}</Label>
         {props.errorMessage && (
           <Description className="text-primary">
@@ -128,7 +128,7 @@ function TextField(props: {
       <Input
         name={props.name}
         type="text"
-        className="mt-8 w-full rounded-12 bg-surface-2 px-12 py-8 transition"
+        className="rounded-12 bg-surface-2 mt-8 w-full px-12 py-8 transition"
         placeholder={props.placeholder}
         invalid={Boolean(props.errorMessage)}
         defaultValue={props.defaultValue}
@@ -148,7 +148,7 @@ function Submit() {
     <button
       type="submit"
       className={clsx(
-        "group rounded-12 bg-surface-2 py-[14px] pl-[36px] pr-[28px] shadow-md transition",
+        "group rounded-12 bg-surface-2 py-[14px] pr-[28px] pl-[36px] shadow-md transition",
         "hover:bg-surface-2/90 active:shadow-transparent",
       )}
       disabled={pending}

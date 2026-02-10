@@ -81,10 +81,10 @@ function InContest(props: IndexPageProps) {
   return (
     <div className="mx-40 flex h-full flex-col items-center justify-center">
       <Logo width={500} />
-      <span className="mt-16 text-16 underline">
+      <span className="text-16 mt-16 underline">
         左のサイドメニューからタブを選択してください
       </span>
-      <div className="mt-[48px] flex flex-col gap-8 rounded-16 border-2 border-primary p-16 *:px-8">
+      <div className="rounded-16 border-primary mt-[48px] flex flex-col gap-8 border-2 p-16 *:px-8">
         <div className="flex">
           <MaterialSymbol icon="schedule" size={40} className="text-icon" />
           <div className="ml-8 flex flex-col">
@@ -92,13 +92,13 @@ function InContest(props: IndexPageProps) {
             {props.timer != null && (
               <div className="flex items-baseline">
                 <div className="text-14">残り</div>
-                <div className="w-[168px] text-end text-32">{props.timer}</div>
+                <div className="text-32 w-[168px] text-end">{props.timer}</div>
               </div>
             )}
           </div>
         </div>
         {nextPhase != null && (
-          <div className="flex w-full items-center border-t border-primary pt-8">
+          <div className="border-primary flex w-full items-center border-t pt-8">
             <div className="flex size-40 items-center justify-center">
               <MaterialSymbol
                 icon="arrow_forward_ios"
@@ -106,7 +106,7 @@ function InContest(props: IndexPageProps) {
                 className="text-icon"
               />
             </div>
-            <div className="ml-8 mt-2 text-14">次のフェーズ: {nextPhase}</div>
+            <div className="text-14 mt-2 ml-8">次のフェーズ: {nextPhase}</div>
           </div>
         )}
       </div>
@@ -129,7 +129,7 @@ function OutOfContest(props: IndexPageProps) {
       <h1 className="text-48 font-bold underline">{title}</h1>
       <div className="mt-40 flex items-center">
         <MaterialSymbol icon="schedule" size={48} className="text-icon" />
-        <span className="ml-16 text-48 font-bold">{props.timer}</span>
+        <span className="text-48 ml-16 font-bold">{props.timer}</span>
       </div>
     </div>
   );
