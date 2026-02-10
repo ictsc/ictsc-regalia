@@ -76,7 +76,7 @@ func newAuthHandler(cfg config.ContestantAuth, repo *pg.Repository, rateLimiter 
 			*discord.UserClient
 			*pg.Repository
 		}{
-			UserClient: &discord.UserClient{HTTPClient: otelhttp.DefaultClient},
+			UserClient: &discord.UserClient{HTTPClient: &http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}},
 			Repository: repo,
 		},
 		SignUpEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) SignUpTxEffect { return rt }),
@@ -86,14 +86,10 @@ func newAuthHandler(cfg config.ContestantAuth, repo *pg.Repository, rateLimiter 
 func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.once.Do(func() {
 		mux := http.NewServeMux()
-		mux.Handle("GET /auth/signin",
-			otelhttp.WithRouteTag("/auth/signin", http.HandlerFunc(h.handleSignIn)))
-		mux.Handle("GET /auth/callback",
-			otelhttp.WithRouteTag("/auth/callback", http.HandlerFunc(h.handleCallback)))
-		mux.Handle("POST /auth/signup",
-			otelhttp.WithRouteTag("/auth/signup", http.HandlerFunc(h.handleSignUp)))
-		mux.Handle("POST /auth/signout",
-			otelhttp.WithRouteTag("/auth/signout", http.HandlerFunc(h.handleSignOut)))
+		mux.Handle("GET /auth/signin", http.HandlerFunc(h.handleSignIn))
+		mux.Handle("GET /auth/callback", http.HandlerFunc(h.handleCallback))
+		mux.Handle("POST /auth/signup", http.HandlerFunc(h.handleSignUp))
+		mux.Handle("POST /auth/signout", http.HandlerFunc(h.handleSignOut))
 		h.handler = mux
 	})
 	h.handler.ServeHTTP(w, r)
@@ -215,7 +211,7 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	oauthCfg.RedirectURL = h.externalURL(r).JoinPath("./auth/callback").String()
 
 	token, err := oauthCfg.Exchange(
-		context.WithValue(r.Context(), oauth2.HTTPClient, otelhttp.DefaultClient),
+		context.WithValue(r.Context(), oauth2.HTTPClient, &http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}),
 		code, oauth2.VerifierOption(oauthSess.Verifier),
 	)
 	if err != nil {
