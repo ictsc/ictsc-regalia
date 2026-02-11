@@ -2,7 +2,7 @@ module github.com/ictsc/ictsc-regalia/backend
 
 go 1.25
 
-toolchain go1.25.7
+toolchain go1.26.0
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.11-20260209202127-80ab13bee0bf.1
