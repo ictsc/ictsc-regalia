@@ -8,8 +8,6 @@ option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant
 
 // スケジュールエントリ
 message ScheduleEntry {
-  // スケジュールID
-  string id = 1;
   // スケジュール名(例: "day1-am")
   string name = 2;
   google.protobuf.Timestamp start_at = 3;
@@ -18,8 +16,12 @@ message ScheduleEntry {
 
 // 現在のコンテスト状態
 message Schedule {
-  // 全スケジュールのリスト
-  repeated ScheduleEntry schedules = 1;
+  // コンテストが開始済みか（一度でもスケジュールが開始されたか）
+  bool has_started = 2;
+  // 現在アクティブなスケジュール（なければ空）
+  optional ScheduleEntry current = 3;
+  // 次のスケジュール（なければ空）
+  optional ScheduleEntry next = 4;
 }
 
 message Rule {

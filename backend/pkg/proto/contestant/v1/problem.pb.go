@@ -233,8 +233,6 @@ type SubmissionStatus struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// 現在提出可能かどうか
 	IsSubmittable bool `protobuf:"varint,1,opt,name=is_submittable,json=isSubmittable,proto3" json:"is_submittable,omitempty"`
-	// 常にtrue（見えない問題はレスポンスに含まれない）
-	IsVisible bool `protobuf:"varint,2,opt,name=is_visible,json=isVisible,proto3" json:"is_visible,omitempty"`
 	// 現在の提出ウィンドウ終了時刻（提出可能の場合のみ）
 	SubmittableUntil *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=submittable_until,json=submittableUntil,proto3,oneof" json:"submittable_until,omitempty"`
 	unknownFields    protoimpl.UnknownFields
@@ -274,13 +272,6 @@ func (*SubmissionStatus) Descriptor() ([]byte, []int) {
 func (x *SubmissionStatus) GetIsSubmittable() bool {
 	if x != nil {
 		return x.IsSubmittable
-	}
-	return false
-}
-
-func (x *SubmissionStatus) GetIsVisible() bool {
-	if x != nil {
-		return x.IsVisible
 	}
 	return false
 }
@@ -979,11 +970,9 @@ const file_contestant_v1_problem_proto_rawDesc = "" +
 	"deployment\x12.\n" +
 	"\x04body\x18\a \x01(\v2\x1a.contestant.v1.ProblemBodyR\x04body\x12L\n" +
 	"\x11submission_status\x18\b \x01(\v2\x1f.contestant.v1.SubmissionStatusR\x10submissionStatusB\b\n" +
-	"\x06_score\"\xbc\x01\n" +
+	"\x06_score\"\x9d\x01\n" +
 	"\x10SubmissionStatus\x12%\n" +
-	"\x0eis_submittable\x18\x01 \x01(\bR\risSubmittable\x12\x1d\n" +
-	"\n" +
-	"is_visible\x18\x02 \x01(\bR\tisVisible\x12L\n" +
+	"\x0eis_submittable\x18\x01 \x01(\bR\risSubmittable\x12L\n" +
 	"\x11submittable_until\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\x10submittableUntil\x88\x01\x01B\x14\n" +
 	"\x12_submittable_until\"w\n" +
 	"\x05Score\x12!\n" +

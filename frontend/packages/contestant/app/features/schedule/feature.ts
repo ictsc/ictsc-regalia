@@ -10,43 +10,21 @@ import { timestampDate } from "@bufbuild/protobuf/wkt";
  * 現在アクティブなスケジュールエントリを取得
  */
 export function getCurrentScheduleEntry(schedule: Schedule | null): ScheduleEntry | null {
-  if (schedule == null) return null;
-  const now = new Date();
-  for (const entry of schedule.schedules) {
-    const start = entry.startAt != null ? timestampDate(entry.startAt) : null;
-    const end = entry.endAt != null ? timestampDate(entry.endAt) : null;
-    if (start != null && end != null && now >= start && now < end) {
-      return entry;
-    }
-  }
-  return null;
+  return schedule?.current ?? null;
 }
 
 /**
  * 次のスケジュールエントリを取得
  */
 export function getNextScheduleEntry(schedule: Schedule | null): ScheduleEntry | null {
-  if (schedule == null) return null;
-  const now = new Date();
-  let nextEntry: ScheduleEntry | null = null;
-  let nextStartAt: Date | null = null;
-  for (const entry of schedule.schedules) {
-    const start = entry.startAt != null ? timestampDate(entry.startAt) : null;
-    if (start != null && start > now) {
-      if (nextStartAt == null || start < nextStartAt) {
-        nextEntry = entry;
-        nextStartAt = start;
-      }
-    }
-  }
-  return nextEntry;
+  return schedule?.next ?? null;
 }
 
 /**
  * 現在競技中かどうか（いずれかのスケジュール内にいるか）
  */
 export function isInContest(schedule: Schedule | null): boolean {
-  return getCurrentScheduleEntry(schedule) != null;
+  return schedule?.current != null;
 }
 
 /**
@@ -54,22 +32,14 @@ export function isInContest(schedule: Schedule | null): boolean {
  * 一度開始されたら、全スケジュール終了後もtrueを返す
  */
 export function hasContestStarted(schedule: Schedule | null): boolean {
-  if (schedule == null) return false;
-  const now = new Date();
-  for (const entry of schedule.schedules) {
-    const start = entry.startAt != null ? timestampDate(entry.startAt) : null;
-    if (start != null && now >= start) {
-      return true;
-    }
-  }
-  return false;
+  return schedule?.hasStarted ?? false;
 }
 
 /**
  * 現在のスケジュールの開始時刻
  */
 export function currentStartAt(schedule: Schedule | null): Date | null {
-  const entry = getCurrentScheduleEntry(schedule);
+  const entry = schedule?.current;
   return entry?.startAt != null ? timestampDate(entry.startAt) : null;
 }
 
@@ -77,7 +47,7 @@ export function currentStartAt(schedule: Schedule | null): Date | null {
  * 現在のスケジュールの終了時刻
  */
 export function currentEndAt(schedule: Schedule | null): Date | null {
-  const entry = getCurrentScheduleEntry(schedule);
+  const entry = schedule?.current;
   return entry?.endAt != null ? timestampDate(entry.endAt) : null;
 }
 
@@ -85,7 +55,7 @@ export function currentEndAt(schedule: Schedule | null): Date | null {
  * 次のスケジュールの開始時刻
  */
 export function nextStartAt(schedule: Schedule | null): Date | null {
-  const entry = getNextScheduleEntry(schedule);
+  const entry = schedule?.next;
   return entry?.startAt != null ? timestampDate(entry.startAt) : null;
 }
 

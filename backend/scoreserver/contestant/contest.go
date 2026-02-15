@@ -2,6 +2,7 @@ package contestant
 
 import (
 	"context"
+	"time"
 
 	"connectrpc.com/connect"
 	"github.com/cockroachdb/errors"
@@ -72,19 +73,39 @@ func (h *ContestServiceHandler) GetSchedule(
 		return nil, err
 	}
 
-	protoSchedules := make([]*contestantv1.ScheduleEntry, 0, len(schedules))
+	now := time.Now()
+	schedule := &contestantv1.Schedule{}
+
+	// コンテストが開始済みか（いずれかのスケジュールが開始されたか）
 	for _, entry := range schedules {
-		protoSchedules = append(protoSchedules, &contestantv1.ScheduleEntry{
-			Id:      entry.ID().String(),
-			Name:    entry.Name(),
-			StartAt: timestamppb.New(entry.StartAt()),
-			EndAt:   timestamppb.New(entry.EndAt()),
-		})
+		if !now.Before(entry.StartAt()) {
+			schedule.HasStarted = true
+			break
+		}
+	}
+
+	// 現在アクティブなスケジュール
+	if current := schedules.Current(now); current != nil {
+		schedule.Current = &contestantv1.ScheduleEntry{
+			Name:    current.Name(),
+			StartAt: timestamppb.New(current.StartAt()),
+			EndAt:   timestamppb.New(current.EndAt()),
+		}
+	}
+
+	// 次のスケジュール
+	for _, entry := range schedules {
+		if now.Before(entry.StartAt()) {
+			schedule.Next = &contestantv1.ScheduleEntry{
+				Name:    entry.Name(),
+				StartAt: timestamppb.New(entry.StartAt()),
+				EndAt:   timestamppb.New(entry.EndAt()),
+			}
+			break // schedules はstartAt順なので最初に見つかったものが次
+		}
 	}
 
 	return connect.NewResponse(&contestantv1.GetScheduleResponse{
-		Schedule: &contestantv1.Schedule{
-			Schedules: protoSchedules,
-		},
+		Schedule: schedule,
 	}), nil
 }

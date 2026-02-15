@@ -18,13 +18,6 @@ export declare const file_contestant_v1_contest: GenFile;
  */
 export declare type ScheduleEntry = Message<"contestant.v1.ScheduleEntry"> & {
   /**
-   * スケジュールID
-   *
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  /**
    * スケジュール名(例: "day1-am")
    *
    * @generated from field: string name = 2;
@@ -55,11 +48,25 @@ export declare const ScheduleEntrySchema: GenMessage<ScheduleEntry>;
  */
 export declare type Schedule = Message<"contestant.v1.Schedule"> & {
   /**
-   * 全スケジュールのリスト
+   * コンテストが開始済みか（一度でもスケジュールが開始されたか）
    *
-   * @generated from field: repeated contestant.v1.ScheduleEntry schedules = 1;
+   * @generated from field: bool has_started = 2;
    */
-  schedules: ScheduleEntry[];
+  hasStarted: boolean;
+
+  /**
+   * 現在アクティブなスケジュール（なければ空）
+   *
+   * @generated from field: optional contestant.v1.ScheduleEntry current = 3;
+   */
+  current?: ScheduleEntry;
+
+  /**
+   * 次のスケジュール（なければ空）
+   *
+   * @generated from field: optional contestant.v1.ScheduleEntry next = 4;
+   */
+  next?: ScheduleEntry;
 };
 
 /**
