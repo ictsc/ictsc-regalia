@@ -136,8 +136,8 @@ type (
 		redeployRule      RedeployRule
 		percentagePenalty *RedeployPenaltyPercentage
 
-		// 提出可能なスケジュールのIDリスト
-		submissionableScheduleIDs []uuid.UUID
+		// 提出可能なスケジュール名リスト
+		submissionableScheduleNames []string
 	}
 	RedeployPenaltyPercentage struct {
 		Threshold  uint32 `json:"threshold"`
@@ -198,14 +198,14 @@ func (p *Problem) PercentagePenalty() *RedeployPenaltyPercentage {
 	return &penalty
 }
 
-func (p *Problem) SubmissionableScheduleIDs() []uuid.UUID {
-	return p.submissionableScheduleIDs
+func (p *Problem) SubmissionableScheduleNames() []string {
+	return p.submissionableScheduleNames
 }
 
 // IsSubmittableAt は指定時刻に問題が提出可能かどうかを判定する
-// 提出可能条件: 現在時刻が submissionableScheduleIDs のいずれかのスケジュール期間内にある
+// 提出可能条件: 現在時刻が submissionableScheduleNames のいずれかのスケジュール期間内にある
 func (p *Problem) IsSubmittableAt(ctx context.Context, now time.Time, scheduleReader ScheduleReader) (bool, error) {
-	if len(p.submissionableScheduleIDs) == 0 {
+	if len(p.submissionableScheduleNames) == 0 {
 		return false, NewInvalidArgumentError("no submissionable schedules configured", nil)
 	}
 
@@ -214,9 +214,9 @@ func (p *Problem) IsSubmittableAt(ctx context.Context, now time.Time, scheduleRe
 		return false, err
 	}
 
-	for _, scheduleID := range p.submissionableScheduleIDs {
+	for _, scheduleName := range p.submissionableScheduleNames {
 		for _, entry := range schedules {
-			if entry.ID() == scheduleID {
+			if entry.Name() == scheduleName {
 				// 期間内かチェック: start_at <= now < end_at
 				if !now.Before(entry.StartAt()) && now.Before(entry.EndAt()) {
 					return true, nil
@@ -230,7 +230,7 @@ func (p *Problem) IsSubmittableAt(ctx context.Context, now time.Time, scheduleRe
 // IsVisibleAt は指定時刻に問題が閲覧可能かどうかを判定する
 // 閲覧可能条件: いずれかのスケジュールが既に開始されている（一度見えたら消えない）
 func (p *Problem) IsVisibleAt(ctx context.Context, now time.Time, scheduleReader ScheduleReader) (bool, error) {
-	if len(p.submissionableScheduleIDs) == 0 {
+	if len(p.submissionableScheduleNames) == 0 {
 		return false, NewInvalidArgumentError("no submissionable schedules configured", nil)
 	}
 
@@ -239,9 +239,9 @@ func (p *Problem) IsVisibleAt(ctx context.Context, now time.Time, scheduleReader
 		return false, err
 	}
 
-	for _, scheduleID := range p.submissionableScheduleIDs {
+	for _, scheduleName := range p.submissionableScheduleNames {
 		for _, entry := range schedules {
-			if entry.ID() == scheduleID {
+			if entry.Name() == scheduleName {
 				// いずれかのスケジュールが既に開始されていれば可視
 				if !now.Before(entry.StartAt()) {
 					return true, nil
@@ -328,8 +328,8 @@ type CreateDescriptiveProblemInput struct {
 	RedeployRule      RedeployRule
 	PercentagePenalty *RedeployPenaltyPercentage
 	Content           *ProblemContent
-	// 提出可能なスケジュールのIDリスト
-	SubmissionableScheduleIDs []uuid.UUID
+	// 提出可能なスケジュール名リスト
+	SubmissionableScheduleNames []string
 }
 
 func CreateDescriptiveProblem(input CreateDescriptiveProblemInput) (*DescriptiveProblem, error) {
@@ -338,21 +338,21 @@ func CreateDescriptiveProblem(input CreateDescriptiveProblemInput) (*Descriptive
 		return nil, WrapAsInternal(err, "failed to generate ID")
 	}
 
-	// スケジュールIDが空の場合はエラー
-	if len(input.SubmissionableScheduleIDs) == 0 {
-		return nil, NewInvalidArgumentError("submissionable schedule IDs are required", nil)
+	// スケジュール名が空の場合はエラー
+	if len(input.SubmissionableScheduleNames) == 0 {
+		return nil, NewInvalidArgumentError("submissionable schedule names are required", nil)
 	}
 
 	problem, err := (&ProblemData{
-		ID:                        id,
-		Code:                      string(input.Code),
-		ProblemType:               ProblemTypeDescriptive,
-		Title:                     input.Title,
-		MaxScore:                  input.MaxScore,
-		Category:                  input.Category,
-		RedeployRule:              input.RedeployRule,
-		PercentagePenalty:         input.PercentagePenalty,
-		SubmissionableScheduleIDs: input.SubmissionableScheduleIDs,
+		ID:                          id,
+		Code:                        string(input.Code),
+		ProblemType:                 ProblemTypeDescriptive,
+		Title:                       input.Title,
+		MaxScore:                    input.MaxScore,
+		Category:                    input.Category,
+		RedeployRule:                input.RedeployRule,
+		PercentagePenalty:           input.PercentagePenalty,
+		SubmissionableScheduleNames: input.SubmissionableScheduleNames,
 	}).parse()
 	if err != nil {
 		return nil, err
@@ -374,8 +374,8 @@ type UpdateDescriptiveProblemInput struct {
 	PercentagePenalty *RedeployPenaltyPercentage
 	Body              string
 	Explanation       string
-	// 提出可能なスケジュールのIDリスト
-	SubmissionableScheduleIDs *[]uuid.UUID
+	// 提出可能なスケジュール名リスト
+	SubmissionableScheduleNames *[]string
 }
 
 func (dp *DescriptiveProblem) Update(input UpdateDescriptiveProblemInput) (*DescriptiveProblem, error) {
@@ -413,12 +413,12 @@ func (dp *DescriptiveProblem) Update(input UpdateDescriptiveProblemInput) (*Desc
 	if input.Explanation != "" {
 		data.Content.Explanation = input.Explanation
 	}
-	if input.SubmissionableScheduleIDs != nil {
-		// スケジュールIDが空の場合はエラー
-		if len(*input.SubmissionableScheduleIDs) == 0 {
-			return nil, NewInvalidArgumentError("submissionable schedule IDs are required", nil)
+	if input.SubmissionableScheduleNames != nil {
+		// スケジュール名が空の場合はエラー
+		if len(*input.SubmissionableScheduleNames) == 0 {
+			return nil, NewInvalidArgumentError("submissionable schedule names are required", nil)
 		}
-		data.Problem.SubmissionableScheduleIDs = *input.SubmissionableScheduleIDs
+		data.Problem.SubmissionableScheduleNames = *input.SubmissionableScheduleNames
 	}
 
 	return data.parse()
@@ -467,8 +467,8 @@ type ProblemData struct {
 	RedeployRule      RedeployRule               `json:"redeploy_rule"`
 	PercentagePenalty *RedeployPenaltyPercentage `json:"percentage_penalty,omitempty"`
 
-	// 提出可能なスケジュール
-	SubmissionableScheduleIDs []uuid.UUID `json:"submissionable_schedule_ids,omitempty"`
+	// 提出可能なスケジュール名
+	SubmissionableScheduleNames []string `json:"submissionable_schedule_names,omitempty"`
 }
 
 func (d *ProblemData) parse() (*problem, error) {
@@ -524,7 +524,7 @@ func (d *ProblemData) parse() (*problem, error) {
 		redeployRule:      d.RedeployRule,
 		percentagePenalty: percentagePenalty,
 
-		submissionableScheduleIDs: d.SubmissionableScheduleIDs,
+		submissionableScheduleNames: d.SubmissionableScheduleNames,
 	}, nil
 }
 
@@ -540,7 +540,7 @@ func (p *Problem) Data() *ProblemData {
 		RedeployRule:      p.redeployRule,
 		PercentagePenalty: p.PercentagePenalty(),
 
-		SubmissionableScheduleIDs: p.submissionableScheduleIDs,
+		SubmissionableScheduleNames: p.submissionableScheduleNames,
 	}
 }
 

@@ -83,7 +83,6 @@ func (h *ScheduleServiceHandler) UpdateSchedule(
 
 func convertScheduleEntry(schedule *domain.ScheduleEntry) *adminv1.Schedule {
 	proto := &adminv1.Schedule{
-		Id:   schedule.ID().String(),
 		Name: schedule.Name(),
 	}
 	if !schedule.StartAt().IsZero() {

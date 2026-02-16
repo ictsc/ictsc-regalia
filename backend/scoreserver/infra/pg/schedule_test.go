@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/pgtest"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
@@ -15,36 +14,26 @@ import (
 func TestGetSchedule(t *testing.T) {
 	t.Parallel()
 
-	startAt := time.Date(2025, 2, 3, 0, 0, 0, 0, time.UTC)
-	endAt := time.Date(2025, 2, 4, 0, 0, 0, 0, time.UTC)
-
-	expected := []*domain.ScheduleData{
-		{
-			ID:      uuid.FromStringOrNil("8a23ce3f-4506-48e9-bf68-7d2d90592bf1"),
-			StartAt: startAt,
-			EndAt:   endAt,
-		},
-		{
-			ID:      uuid.FromStringOrNil("4e72d440-dfde-4923-801d-0fd5ee2c0730"),
-			StartAt: endAt,
-			EndAt:   endAt.Add(24 * time.Hour),
-		},
-	}
-
 	repo := pg.NewRepository(pgtest.SetupDB(t))
 	actual, err := repo.GetSchedule(t.Context())
 	if err != nil {
 		t.Fatal(err)
 	}
-	slices.SortFunc(expected, func(a, b *domain.ScheduleData) int {
-		return a.StartAt.Compare(b.StartAt)
-	})
+
+	// seed.sql に 4 件のスケジュールが登録されている
+	if len(actual) != 4 {
+		t.Fatalf("expected 4 schedules, got %d", len(actual))
+	}
+
 	slices.SortFunc(actual, func(a, b *domain.ScheduleData) int {
 		return a.StartAt.Compare(b.StartAt)
 	})
 
-	if diff := cmp.Diff(expected, actual); diff != "" {
-		t.Errorf("schedules mismatch (-want +got):\n%s", diff)
+	expectedNames := []string{"day1-am", "day1-pm", "day2-am", "day2-pm"}
+	for i, name := range expectedNames {
+		if actual[i].Name != name {
+			t.Errorf("schedule[%d].Name = %q, want %q", i, actual[i].Name, name)
+		}
 	}
 }
 
@@ -61,7 +50,7 @@ func TestSaveSchedule(t *testing.T) {
 		"single schedule": {
 			input: []*domain.ScheduleData{
 				{
-					ID:      uuid.FromStringOrNil("11d41cc7-c7c8-45c4-990b-0e3bcab4e54d"),
+					Name:    "new-schedule",
 					StartAt: startAt,
 					EndAt:   endAt,
 				},
@@ -69,7 +58,7 @@ func TestSaveSchedule(t *testing.T) {
 			queries: []string{
 				`SELECT 1
 				 FROM schedules
-				 WHERE id = '11d41cc7-c7c8-45c4-990b-0e3bcab4e54d'
+				 WHERE name = 'new-schedule'
 				   AND start_at = '2025-02-03 00:00:00'
 				   AND end_at = '2025-02-04 00:00:00'`,
 			},
@@ -77,12 +66,12 @@ func TestSaveSchedule(t *testing.T) {
 		"multiple schedules": {
 			input: []*domain.ScheduleData{
 				{
-					ID:      uuid.FromStringOrNil("816c496b-6bcb-46c2-b4df-a8c537bae51b"),
+					Name:    "sched-1",
 					StartAt: startAt,
 					EndAt:   endAt,
 				},
 				{
-					ID:      uuid.FromStringOrNil("5b88ebcc-2ef6-4ae7-b401-18eefe72cbbe"),
+					Name:    "sched-2",
 					StartAt: endAt,
 					EndAt:   endAt.Add(24 * time.Hour),
 				},
@@ -90,12 +79,12 @@ func TestSaveSchedule(t *testing.T) {
 			queries: []string{
 				`SELECT 1
 				FROM schedules
-				WHERE id = '816c496b-6bcb-46c2-b4df-a8c537bae51b'
+				WHERE name = 'sched-1'
 				AND start_at = '2025-02-03 00:00:00'
 				AND end_at = '2025-02-04 00:00:00'`,
 				`SELECT 1
 				FROM schedules
-				WHERE id = '5b88ebcc-2ef6-4ae7-b401-18eefe72cbbe'
+				WHERE name = 'sched-2'
 				AND start_at = '2025-02-04 00:00:00'
 				AND end_at = '2025-02-05 00:00:00'`,
 			},
@@ -123,5 +112,40 @@ func TestSaveSchedule(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestSaveScheduleUpdate(t *testing.T) {
+	t.Parallel()
+
+	// 既存の day1-am を更新する
+	startAt := time.Date(2025, 6, 1, 9, 0, 0, 0, time.UTC)
+	endAt := time.Date(2025, 6, 1, 12, 0, 0, 0, time.UTC)
+
+	db := pgtest.SetupDB(t)
+	repo := pg.NewRepository(db)
+
+	err := repo.RunTx(t.Context(), func(tx *pg.RepositoryTx) error {
+		return tx.SaveSchedule(t.Context(), []*domain.ScheduleData{
+			{Name: "day1-am", StartAt: startAt, EndAt: endAt},
+		})
+	})
+	if err != nil {
+		t.Fatalf("failed to save schedule: %+v", err)
+	}
+
+	actual, err := repo.GetSchedule(t.Context())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// SaveSchedule deletes schedules not in the input, so only 1 should remain
+	if len(actual) != 1 {
+		t.Fatalf("expected 1 schedule, got %d", len(actual))
+	}
+
+	expected := &domain.ScheduleData{Name: "day1-am", StartAt: startAt, EndAt: endAt}
+	if diff := cmp.Diff(expected, actual[0]); diff != "" {
+		t.Errorf("schedule mismatch (-want +got):\n%s", diff)
 	}
 }

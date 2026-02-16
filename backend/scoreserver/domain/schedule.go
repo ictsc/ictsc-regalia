@@ -4,14 +4,11 @@ import (
 	"context"
 	"slices"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
 )
 
 type (
 	Schedule      []*ScheduleEntry
 	ScheduleEntry struct {
-		id      uuid.UUID
 		name    string // スケジュール名 (例: "day1-am")
 		startAt time.Time
 		endAt   time.Time
@@ -35,10 +32,6 @@ func (s *ScheduleEntry) Contains(t time.Time) bool {
 	afterStart := t.Equal(s.startAt) || t.After(s.startAt)
 	beforeEnd := t.Before(s.endAt)
 	return afterStart && beforeEnd
-}
-
-func (s *ScheduleEntry) ID() uuid.UUID {
-	return s.id
 }
 
 func (s *ScheduleEntry) Name() string {
@@ -72,7 +65,6 @@ func SaveSchedule(ctx context.Context, eff ScheduleWriter, input []*UpdateSchedu
 	data := make([]*ScheduleData, 0, len(input))
 	for _, schedule := range input {
 		data = append(data, &ScheduleData{
-			ID:      uuid.Nil, // Repository層で適切なIDが設定される
 			Name:    schedule.Name,
 			StartAt: schedule.StartAt,
 			EndAt:   schedule.EndAt,
@@ -86,7 +78,6 @@ func SaveSchedule(ctx context.Context, eff ScheduleWriter, input []*UpdateSchedu
 
 type (
 	ScheduleData struct {
-		ID      uuid.UUID
 		Name    string // スケジュール名
 		StartAt time.Time
 		EndAt   time.Time
@@ -107,7 +98,6 @@ type (
 
 func (d *ScheduleData) parse() *ScheduleEntry {
 	return &ScheduleEntry{
-		id:      d.ID,
 		name:    d.Name,
 		startAt: d.StartAt,
 		endAt:   d.EndAt,

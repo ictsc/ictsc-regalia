@@ -24,8 +24,6 @@ const (
 
 type Schedule struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// スケジュールID
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// スケジュール名(例: "day1-am")
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	StartAt       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_at,json=startAt,proto3" json:"start_at,omitempty"`
@@ -62,13 +60,6 @@ func (x *Schedule) ProtoReflect() protoreflect.Message {
 // Deprecated: Use Schedule.ProtoReflect.Descriptor instead.
 func (*Schedule) Descriptor() ([]byte, []int) {
 	return file_admin_v1_schedule_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *Schedule) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
 }
 
 func (x *Schedule) GetName() string {
@@ -256,12 +247,11 @@ var File_admin_v1_schedule_proto protoreflect.FileDescriptor
 
 const file_admin_v1_schedule_proto_rawDesc = "" +
 	"\n" +
-	"\x17admin/v1/schedule.proto\x12\badmin.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x98\x01\n" +
-	"\bSchedule\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x17admin/v1/schedule.proto\x12\badmin.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8e\x01\n" +
+	"\bSchedule\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x125\n" +
 	"\bstart_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\astartAt\x121\n" +
-	"\x06end_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\x05endAt\"\x14\n" +
+	"\x06end_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\x05endAtJ\x04\b\x01\x10\x02\"\x14\n" +
 	"\x12GetScheduleRequest\"E\n" +
 	"\x13GetScheduleResponse\x12.\n" +
 	"\bschedule\x18\x01 \x03(\v2\x12.admin.v1.ScheduleR\bschedule\"G\n" +

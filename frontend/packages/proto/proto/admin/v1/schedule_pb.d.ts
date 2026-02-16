@@ -16,13 +16,6 @@ export declare const file_admin_v1_schedule: GenFile;
  */
 export declare type Schedule = Message<"admin.v1.Schedule"> & {
   /**
-   * スケジュールID
-   *
-   * @generated from field: string id = 1;
-   */
-  id: string;
-
-  /**
    * スケジュール名(例: "day1-am")
    *
    * @generated from field: string name = 2;

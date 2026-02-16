@@ -105,25 +105,25 @@ INSERT INTO notices (slug, title, markdown, effective_from) VALUES
 	('future-notice', 'Future Notice', '未来のお知らせです', '2035-03-03T00:00:00Z');
 
 TRUNCATE TABLE schedules CASCADE;
-INSERT INTO schedules (id, name, start_at, end_at) VALUES
-    ('8a23ce3f-4506-48e9-bf68-7d2d90592bf1', 'day1-am', NOW() - INTERVAL '4 hours', NOW() - INTERVAL '2 hours'),
-    ('4e72d440-dfde-4923-801d-0fd5ee2c0730', 'day1-pm', NOW() - INTERVAL '1 hour',  NOW() + INTERVAL '2 hours'),
-    ('b5f3e551-7a84-4b35-9c6d-8e1f2a3b4c5d', 'day2-am', NOW() + INTERVAL '18 hours', NOW() + INTERVAL '20 hours'),
-    ('c6a4f662-8b95-5c46-ad7e-9f203b4c5d6e', 'day2-pm', NOW() + INTERVAL '21 hours', NOW() + INTERVAL '23 hours');
+INSERT INTO schedules (name, start_at, end_at) VALUES
+    ('day1-am', NOW() - INTERVAL '4 hours', NOW() - INTERVAL '2 hours'),
+    ('day1-pm', NOW() - INTERVAL '1 hour',  NOW() + INTERVAL '2 hours'),
+    ('day2-am', NOW() + INTERVAL '18 hours', NOW() + INTERVAL '20 hours'),
+    ('day2-pm', NOW() + INTERVAL '21 hours', NOW() + INTERVAL '23 hours');
 
 TRUNCATE TABLE problem_schedules CASCADE;
-INSERT INTO problem_schedules (problem_id, schedule_id) VALUES
+INSERT INTO problem_schedules (problem_id, schedule_name) VALUES
     -- AAA: day1-pm のみ (現在 → 表示○、提出○)
-    ('16643c32-c686-44ba-996b-2fbe43b54513', '4e72d440-dfde-4923-801d-0fd5ee2c0730'),
+    ('16643c32-c686-44ba-996b-2fbe43b54513', 'day1-pm'),
     -- BBB: day1-am のみ (過去 → 表示○、提出✗)
-    ('24f6aef0-5dcd-4032-825b-d1b19174a6f2', '8a23ce3f-4506-48e9-bf68-7d2d90592bf1'),
+    ('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'day1-am'),
     -- CCC: day2-am のみ (未来 → 表示✗、提出✗)
-    ('35f7bf01-6ede-5043-926c-e2c20c285b03', 'b5f3e551-7a84-4b35-9c6d-8e1f2a3b4c5d'),
+    ('35f7bf01-6ede-5043-926c-e2c20c285b03', 'day2-am'),
     -- DDD: 全スケジュール (過去+現在+未来 → 表示○、提出○)
-    ('46a8cf12-7fef-6154-a37d-f3d31d396c14', '8a23ce3f-4506-48e9-bf68-7d2d90592bf1'),
-    ('46a8cf12-7fef-6154-a37d-f3d31d396c14', '4e72d440-dfde-4923-801d-0fd5ee2c0730'),
-    ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'b5f3e551-7a84-4b35-9c6d-8e1f2a3b4c5d'),
-    ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'c6a4f662-8b95-5c46-ad7e-9f203b4c5d6e');
+    ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'day1-am'),
+    ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'day1-pm'),
+    ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'day2-am'),
+    ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'day2-pm');
 
 TRUNCATE TABLE redeployment_requests CASCADE;
 INSERT INTO redeployment_requests (id, team_id, problem_id, revision) VALUES

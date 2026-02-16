@@ -7,8 +7,7 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1";
 
 message Schedule {
-  // スケジュールID
-  string id = 1;
+  reserved 1;
   // スケジュール名(例: "day1-am")
   string name = 2;
   google.protobuf.Timestamp start_at = 3;

@@ -115,9 +115,9 @@ func (h *ProblemServiceHandler) calculateSubmissionStatus(
 
 	var currentWindow, nextWindow *domain.ScheduleEntry
 
-	for _, scheduleID := range problem.SubmissionableScheduleIDs() {
+	for _, scheduleName := range problem.SubmissionableScheduleNames() {
 		for _, entry := range schedules {
-			if entry.ID() != scheduleID {
+			if entry.Name() != scheduleName {
 				continue
 			}
 
@@ -142,6 +142,7 @@ func (h *ProblemServiceHandler) calculateSubmissionStatus(
 		status.SubmittableUntil = timestamppb.New(currentWindow.EndAt())
 	} else if nextWindow != nil {
 		status.IsSubmittable = false
+		status.SubmittableFrom = timestamppb.New(nextWindow.StartAt())
 	} else {
 		status.IsSubmittable = false
 	}

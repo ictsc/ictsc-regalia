@@ -91,6 +91,13 @@ export declare type SubmissionStatus = Message<"contestant.v1.SubmissionStatus">
    * @generated from field: optional google.protobuf.Timestamp submittable_until = 3;
    */
   submittableUntil?: Timestamp;
+
+  /**
+   * 次に提出可能になる時刻（提出不可の場合のみ）
+   *
+   * @generated from field: optional google.protobuf.Timestamp submittable_from = 4;
+   */
+  submittableFrom?: Timestamp;
 };
 
 /**

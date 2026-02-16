@@ -47,7 +47,7 @@ func (r *repo) ListProblems(ctx context.Context) ([]*domain.ProblemData, error) 
 		return nil, err
 	}
 	for _, problem := range problems {
-		problem.SubmissionableScheduleIDs = scheduleMap[problem.ID]
+		problem.SubmissionableScheduleNames = scheduleMap[problem.ID]
 	}
 
 	return problems, nil
@@ -71,7 +71,7 @@ func (r *repo) GetProblemByCode(ctx context.Context, code string) (*domain.Probl
 	if err != nil {
 		return nil, err
 	}
-	data.SubmissionableScheduleIDs = scheduleMap[data.ID]
+	data.SubmissionableScheduleNames = scheduleMap[data.ID]
 
 	return data, nil
 }
@@ -115,7 +115,7 @@ func (r *repo) GetDescriptiveProblem(ctx context.Context, id uuid.UUID) (*domain
 	if err != nil {
 		return nil, err
 	}
-	data.SubmissionableScheduleIDs = scheduleMap[data.ID]
+	data.SubmissionableScheduleNames = scheduleMap[data.ID]
 
 	return &domain.DescriptiveProblemData{
 		Problem: data,
@@ -221,9 +221,9 @@ func (r *RepositoryTx) SaveDescriptiveProblem(ctx context.Context, descriptivePr
 	}
 
 	// 新しい紐付けを挿入
-	if len(descriptiveProblem.Problem.SubmissionableScheduleIDs) > 0 {
-		query := `INSERT INTO problem_schedules (problem_id, schedule_id) VALUES ($1, unnest($2::uuid[]))`
-		if _, err := r.ext.ExecContext(ctx, query, problemID, descriptiveProblem.Problem.SubmissionableScheduleIDs); err != nil {
+	if len(descriptiveProblem.Problem.SubmissionableScheduleNames) > 0 {
+		query := `INSERT INTO problem_schedules (problem_id, schedule_name) VALUES ($1, unnest($2::text[]))`
+		if _, err := r.ext.ExecContext(ctx, query, problemID, descriptiveProblem.Problem.SubmissionableScheduleNames); err != nil {
 			return errors.Wrap(err, "failed to insert problem schedules")
 		}
 	}
@@ -375,16 +375,16 @@ func (r redployRule) Value() (driver.Value, error) {
 }
 
 // 問題とスケジュールの関連を取得する
-func (r *repo) loadProblemSchedules(ctx context.Context, problemIDs []uuid.UUID) (map[uuid.UUID][]uuid.UUID, error) {
+func (r *repo) loadProblemSchedules(ctx context.Context, problemIDs []uuid.UUID) (map[uuid.UUID][]string, error) {
 	if len(problemIDs) == 0 {
-		return make(map[uuid.UUID][]uuid.UUID), nil
+		return make(map[uuid.UUID][]string), nil
 	}
 
 	query := `
-        SELECT problem_id, schedule_id
+        SELECT problem_id, schedule_name
         FROM problem_schedules
         WHERE problem_id = ANY($1)
-        ORDER BY problem_id, schedule_id
+        ORDER BY problem_id, schedule_name
     `
 	rows, err := r.ext.QueryxContext(ctx, query, problemIDs)
 	if err != nil {
@@ -392,13 +392,14 @@ func (r *repo) loadProblemSchedules(ctx context.Context, problemIDs []uuid.UUID)
 	}
 	defer rows.Close()
 
-	result := make(map[uuid.UUID][]uuid.UUID)
+	result := make(map[uuid.UUID][]string)
 	for rows.Next() {
-		var problemID, scheduleID uuid.UUID
-		if err := rows.Scan(&problemID, &scheduleID); err != nil {
+		var problemID uuid.UUID
+		var scheduleName string
+		if err := rows.Scan(&problemID, &scheduleName); err != nil {
 			return nil, errors.Wrap(err, "failed to scan problem schedule")
 		}
-		result[problemID] = append(result[problemID], scheduleID)
+		result[problemID] = append(result[problemID], scheduleName)
 	}
 	return result, nil
 }
