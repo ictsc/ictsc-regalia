@@ -32,19 +32,27 @@ INSERT INTO team_members (user_id, team_id, invitation_code_id) VALUES
 
 TRUNCATE TABLE problems CASCADE;
 INSERT INTO problems (id, code, type, title, max_score, category, redeploy_rule, created_at, updated_at) VALUES
-	('16643c32-c686-44ba-996b-2fbe43b54513', 'ZZA', 'DESCRIPTIVE', '問題A', 100, 'Network', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
-	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'ZZB', 'DESCRIPTIVE', '問題B', 200, 'Server', 'PERCENTAGE_PENALTY', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
-	('35f7bf01-6ede-5043-926c-e2c20c285b03', 'ZZC', 'DESCRIPTIVE', '問題C', 250, 'Server', 'MANUAL', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00');
+	('16643c32-c686-44ba-996b-2fbe43b54513', 'AAA', 'DESCRIPTIVE', 'チーム名をください', 10, 'Server', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'BBB', 'DESCRIPTIVE', '過去のみ問題 (day1-am)', 100, 'Test', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('35f7bf01-6ede-5043-926c-e2c20c285b03', 'CCC', 'DESCRIPTIVE', '未来のみ問題 (day2-am)', 150, 'Test', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'DDD', 'DESCRIPTIVE', '全期間問題', 500, 'Test', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00');
 
 TRUNCATE TABLE redeploy_percentage_penalties CASCADE;
-INSERT INTO redeploy_percentage_penalties (problem_id, threshold, percentage) VALUES
-	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 1, 10);
 
 TRUNCATE TABLE problem_contents CASCADE;
 INSERT INTO problem_contents (problem_id, page_id, page_path, body, explanation) VALUES
-	('16643c32-c686-44ba-996b-2fbe43b54513', 'page1', '/page1', '問題Aの本文', '問題Aの解説'),
-	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'page2', '/page2', '問題Bの本文', '問題Bの解説'),
-	('35f7bf01-6ede-5043-926c-e2c20c285b03', 'page3', '/page3', '問題Cの本文', '問題Cの解説');
+	('16643c32-c686-44ba-996b-2fbe43b54513', 'page1', '/page1',
+		E'## 概要\n\nトラコン君はチーム名を求めています。チーム名を教えてあげましょう。\n\n## 制約\n\n- チーム名の読みがひらがなで書かれていること',
+		E'## 採点基準\n\nチーム名の読みが書かれていれば10点'),
+	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'page2', '/page2',
+		E'## 概要\n\nこの問題はday1-amのみで提出可能でした。\n\n現在は**表示されるが提出できない**はずです。\n\n## 回答\n\n何か書いてください。',
+		E'## 採点基準\n\n何か書いてあれば100点'),
+	('35f7bf01-6ede-5043-926c-e2c20c285b03', 'page3', '/page3',
+		E'## 概要\n\nこの問題はday2-amで提出可能になります。\n\n現在は**表示されない**はずです。\n\n## 回答\n\n何か書いてください。',
+		E'## 採点基準\n\n何か書いてあれば150点'),
+	('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'page4', '/page4',
+		E'## 概要\n\nこの問題は全てのスケジュールで提出可能です。\n\n常に**表示も提出も可能**なはずです。\n\n## 回答\n\n何か書いてください。',
+		E'## 採点基準\n\n何か書いてあれば500点');
 
 TRUNCATE TABLE answers CASCADE;
 INSERT INTO answers (id, problem_id, team_id, number, user_id,  created_at_range) VALUES
@@ -72,8 +80,8 @@ INSERT INTO descriptive_marking_rationales (marking_result_id, rationale) VALUES
 
 TRUNCATE TABLE scores CASCADE;
 INSERT INTO scores (marking_result_id, marked_score) VALUES
-	('862b646a-5fdd-4a77-bb2d-7ef5d4f1d069', 80),
-	('358ebef7-c626-44fa-9a3d-da2d9083fe5e', 70),
+	('862b646a-5fdd-4a77-bb2d-7ef5d4f1d069', 8),
+	('358ebef7-c626-44fa-9a3d-da2d9083fe5e', 7),
 	('87cb974d-dedd-4039-a189-b34f3a57e62c', 80);
 
 TRUNCATE TABLE answer_scores CASCADE;
@@ -98,8 +106,24 @@ INSERT INTO notices (slug, title, markdown, effective_from) VALUES
 
 TRUNCATE TABLE schedules CASCADE;
 INSERT INTO schedules (id, name, start_at, end_at) VALUES
-    ('8a23ce3f-4506-48e9-bf68-7d2d90592bf1', 'day1', '2025-02-03 00:00:00+00', '2025-02-04 00:00:00+00'),
-    ('4e72d440-dfde-4923-801d-0fd5ee2c0730', 'day2', '2025-02-04 00:00:00+00', '2025-02-05 00:00:00+00');
+    ('8a23ce3f-4506-48e9-bf68-7d2d90592bf1', 'day1-am', NOW() - INTERVAL '4 hours', NOW() - INTERVAL '2 hours'),
+    ('4e72d440-dfde-4923-801d-0fd5ee2c0730', 'day1-pm', NOW() - INTERVAL '1 hour',  NOW() + INTERVAL '2 hours'),
+    ('b5f3e551-7a84-4b35-9c6d-8e1f2a3b4c5d', 'day2-am', NOW() + INTERVAL '18 hours', NOW() + INTERVAL '20 hours'),
+    ('c6a4f662-8b95-5c46-ad7e-9f203b4c5d6e', 'day2-pm', NOW() + INTERVAL '21 hours', NOW() + INTERVAL '23 hours');
+
+TRUNCATE TABLE problem_schedules CASCADE;
+INSERT INTO problem_schedules (problem_id, schedule_id) VALUES
+    -- AAA: day1-pm のみ (現在 → 表示○、提出○)
+    ('16643c32-c686-44ba-996b-2fbe43b54513', '4e72d440-dfde-4923-801d-0fd5ee2c0730'),
+    -- BBB: day1-am のみ (過去 → 表示○、提出✗)
+    ('24f6aef0-5dcd-4032-825b-d1b19174a6f2', '8a23ce3f-4506-48e9-bf68-7d2d90592bf1'),
+    -- CCC: day2-am のみ (未来 → 表示✗、提出✗)
+    ('35f7bf01-6ede-5043-926c-e2c20c285b03', 'b5f3e551-7a84-4b35-9c6d-8e1f2a3b4c5d'),
+    -- DDD: 全スケジュール (過去+現在+未来 → 表示○、提出○)
+    ('46a8cf12-7fef-6154-a37d-f3d31d396c14', '8a23ce3f-4506-48e9-bf68-7d2d90592bf1'),
+    ('46a8cf12-7fef-6154-a37d-f3d31d396c14', '4e72d440-dfde-4923-801d-0fd5ee2c0730'),
+    ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'b5f3e551-7a84-4b35-9c6d-8e1f2a3b4c5d'),
+    ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'c6a4f662-8b95-5c46-ad7e-9f203b4c5d6e');
 
 TRUNCATE TABLE redeployment_requests CASCADE;
 INSERT INTO redeployment_requests (id, team_id, problem_id, revision) VALUES
