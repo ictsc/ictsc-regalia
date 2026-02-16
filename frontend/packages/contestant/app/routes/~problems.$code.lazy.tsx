@@ -3,6 +3,7 @@ import {
   use,
   useActionState,
   useDeferredValue,
+  useEffect,
   useOptimistic,
 } from "react";
 import { createLazyFileRoute, useRouter } from "@tanstack/react-router";
@@ -95,6 +96,22 @@ function SubmissionForm(props: {
           : undefined,
       }
     : undefined;
+
+  // submittableUntil/submittableFrom に達したら自動リフェッチして提出状態を更新
+  useEffect(() => {
+    const until = submissionStatus?.submittableUntil;
+    const from = problem.submissionStatus?.submittableFrom
+      ? timestampDate(problem.submissionStatus.submittableFrom)
+      : undefined;
+    const target = until ?? from;
+    if (target == null) return;
+    const ms = target.getTime() - Date.now();
+    if (ms <= 0) return;
+    const timer = setTimeout(() => {
+      startTransition(() => router.invalidate());
+    }, ms);
+    return () => clearTimeout(timer);
+  }, [submissionStatus?.submittableUntil, problem.submissionStatus?.submittableFrom, router]);
 
   return (
     <View.SubmissionForm
