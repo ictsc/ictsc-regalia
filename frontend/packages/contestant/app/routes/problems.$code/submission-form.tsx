@@ -129,13 +129,13 @@ export function SubmissionForm(props: {
       <div className="mt-20 flex items-center justify-end gap-24">
         {!isRateLimitOk && (
           <div className="flex w-[160px] items-center justify-between">
-            <span className="text-black text-16">解答可能まで</span>
+            <span className="text-16 text-black">解答可能まで</span>
             <div className="flex items-center">
-              <span className="w-[24px] text-right text-20 font-bold text-primary">
+              <span className="text-20 text-primary w-[24px] text-right font-bold">
                 {minutes}
               </span>
-              <span className="mx-2 text-20 font-bold text-primary">:</span>
-              <span className="w-[24px] text-right text-20 font-bold text-primary">
+              <span className="text-20 text-primary mx-2 font-bold">:</span>
+              <span className="text-20 text-primary w-[24px] text-right font-bold">
                 {seconds.toString().padStart(2, "0")}
               </span>
             </div>
@@ -153,10 +153,7 @@ export function SubmissionForm(props: {
           </div>
         )}
         {isAnswerable && lastResult?.type === "error" && (
-          <label
-            id={errorId}
-            className="flex-shrink text-16 font-bold text-primary"
-          >
+          <label id={errorId} className="text-16 text-primary shrink font-bold">
             {lastResult.error}
           </label>
         )}
@@ -167,7 +164,7 @@ export function SubmissionForm(props: {
           disabled={
             !isAnswerable || (lastResult?.type === "confirm" && isPending)
           }
-          className="flex items-center justify-center self-end rounded-12 bg-surface-2 py-16 pl-24 pr-20 shadow-md transition hover:opacity-80 active:shadow-none disabled:bg-disabled"
+          className="rounded-12 bg-surface-2 disabled:bg-disabled flex items-center justify-center self-end py-16 pr-20 pl-24 shadow-md transition hover:opacity-80 active:shadow-none"
         >
           <div className="text-16 font-bold">解答する</div>
           <MaterialSymbol icon="send" size={24} />
@@ -187,7 +184,7 @@ export function SubmissionForm(props: {
           dialogClassName="w-full max-w-[1024px] transform rounded-8 bg-surface-0 p-16 text-left align-middle shadow-xl transition-all"
         >
           <div className="my-12]">
-            <p className="mb-24 text-16 text-text">
+            <p className="text-16 text-text mb-24">
               本当に解答を送信しますか？
             </p>
             <Typography>
@@ -216,7 +213,7 @@ function AnswerTextInputField(props: {
       <Label className="sr-only">解答(必須)</Label>
       <Textarea
         name="answer"
-        className="flex-1 resize-none rounded-12 border border-text p-12 data-[disabled]:cursor-not-allowed data-[disabled]:bg-disabled/45"
+        className="rounded-12 border-text data-[disabled]:bg-disabled/45 flex-1 resize-none border p-12 data-[disabled]:cursor-not-allowed"
         placeholder="お世話になっております、チーム◯◯◯です。"
         defaultValue={props.defaultValue ?? storageValue ?? undefined}
         onChange={(e) => {

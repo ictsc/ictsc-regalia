@@ -32,7 +32,7 @@ export function Deployments(props: {
   return (
     <>
       <div className="flex size-full flex-col gap-16">
-        <div className="size-full rounded-12 bg-surface-1 py-12">
+        <div className="rounded-12 bg-surface-1 size-full py-12">
           <div className="size-full overflow-y-auto px-12 [scrollbar-gutter:stable_both-edges]">
             {props.list}
           </div>
@@ -46,8 +46,8 @@ export function Deployments(props: {
           <Button
             id={buttonID}
             className={clsx(
-              "grid place-items-center rounded-12 bg-surface-2 px-24 py-16 shadow-md transition",
-              "data-[disabled]:bg-disabled data-[hover]:opacity-80 data-[active]:shadow-none",
+              "rounded-12 bg-surface-2 grid place-items-center px-24 py-16 shadow-md transition",
+              "data-[disabled]:bg-disabled data-[active]:shadow-none data-[hover]:opacity-80",
             )}
             disabled={!props.canRedeploy || props.isRedeploying}
             onClick={handleRedeployClick}
@@ -71,7 +71,7 @@ export function Deployments(props: {
             残り許容回数:
             <span
               className={clsx(
-                "pl-4 text-16 font-bold",
+                "text-16 pl-4 font-bold",
                 props.allowedDeploymentCount <= 0
                   ? "text-primary"
                   : "text-text",
@@ -88,7 +88,7 @@ export function Deployments(props: {
 
 export function EmptyDeploymentList(props: { allowedDeploymentCount: number }) {
   return (
-    <div className="grid size-full place-items-center text-16 text-text">
+    <div className="text-16 text-text grid size-full place-items-center">
       <p className="flex flex-col items-center gap-8">
         <h1 className="font-bold">まだ再展開されていません</h1>
         <h2>
@@ -128,7 +128,7 @@ export function DeploymentItem(
   return (
     <li
       className={clsx(
-        "flex justify-between gap-8 rounded-12 p-16",
+        "rounded-12 flex justify-between gap-8 p-16",
         status !== DeploymentStatus.DEPLOYED ? "bg-surface-0" : "bg-disabled",
         props.isPending && "opacity-75",
       )}
@@ -154,11 +154,11 @@ export function DeploymentItem(
         </h3>
       </div>
       <div className="flex flex-col">
-        <p className="flex items-baseline justify-end gap-4 border-b border-text pb-4 font-bold">
+        <p className="border-text flex items-baseline justify-end gap-4 border-b pb-4 font-bold">
           <span className="text-24">{props.revision}</span>
           <span className="text-14">回目</span>
         </p>
-        <div className="grid grid-cols-[repeat(2,minmax(24px,auto))] grid-rows-2 place-items-end gap-4 text-14 font-bold">
+        <div className="text-14 grid grid-cols-[repeat(2,minmax(24px,auto))] grid-rows-2 place-items-end gap-4 font-bold">
           <p>残り許容回数</p>
           <p className={clsx(props.thresholdExceeded && "text-primary")}>
             {props.allowedDeploymentCount}

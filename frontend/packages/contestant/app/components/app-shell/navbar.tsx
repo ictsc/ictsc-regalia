@@ -16,7 +16,7 @@ export function Navbar(props: {
   const { collapsed } = props;
   const state = useRouterState();
   return (
-    <div className="flex size-full flex-col items-start gap-4 bg-surface-1 text-text">
+    <div className="bg-surface-1 text-text flex size-full flex-col items-start gap-4">
       <Button as={Fragment}>
         {(buttonProps) => (
           <button
@@ -147,7 +147,7 @@ function navbarButtonClassName({
   matched?: boolean;
 }): string {
   return clsx(
-    "flex flex-row items-center rounded-[10px] bg-surface-1 transition",
+    "bg-surface-1 flex flex-row items-center rounded-[10px] transition",
     !collapsed && "w-full",
     disabled ? "cursor-not-allowed opacity-75" : "text-text",
     (hover || matched) && "bg-surface-2",
@@ -166,7 +166,7 @@ function NavbarButtonInner(props: {
         <MaterialSymbol icon={props.icon} size={24} />
       </div>
       {!props.collapsed && (
-        <span className="line-clamp-1 overflow-x-hidden text-left text-16">
+        <span className="text-16 line-clamp-1 overflow-x-hidden text-left">
           {props.title}
         </span>
       )}

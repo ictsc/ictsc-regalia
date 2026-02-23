@@ -28,7 +28,7 @@ export function TeamsPage(props: TeamListProps) {
               key={index}
               className="flex items-center justify-center gap-x-40 pb-64 pl-8 md:flex-nowrap"
             >
-              <div className="flex w-[90%] min-w-[300px] max-w-[650px] flex-row gap-16 rounded-16 px-20 py-24 shadow-lg md:w-[650px]">
+              <div className="rounded-16 flex w-[90%] max-w-[650px] min-w-[300px] flex-row gap-16 px-20 py-24 shadow-lg md:w-[650px]">
                 {/* アコーディオンボタン */}
                 <div>
                   <button
@@ -52,7 +52,7 @@ export function TeamsPage(props: TeamListProps) {
                     <div className="flex flex-[1] flex-col overflow-hidden">
                       <p className="text-14 md:pb-20">チーム名</p>
                       <p
-                        className="w-full overflow-hidden truncate whitespace-nowrap text-16 font-bold"
+                        className="text-16 w-full truncate overflow-hidden font-bold whitespace-nowrap"
                         title={team.name}
                       >
                         {team.name}
@@ -62,7 +62,7 @@ export function TeamsPage(props: TeamListProps) {
                     <div className="flex flex-[1] flex-col overflow-hidden">
                       <p className="text-14 md:pb-20">所属</p>
                       <p
-                        className="text- w-full overflow-hidden truncate whitespace-nowrap font-bold"
+                        className="text- w-full truncate overflow-hidden font-bold whitespace-nowrap"
                         title={team.organization}
                       >
                         {team.organization}
@@ -71,7 +71,7 @@ export function TeamsPage(props: TeamListProps) {
                   </div>
                   {/* 名前表示 */}
                   {openStates[index] && (
-                    <div className="ml-20 mt-40 md:ml-40">
+                    <div className="mt-40 ml-20 md:ml-40">
                       <p className="pb-20">名前</p>
                       {team.members.map((member, index) => (
                         <p key={index} className="mb-8 font-bold">

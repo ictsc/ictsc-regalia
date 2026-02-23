@@ -23,10 +23,10 @@ function DiscordLoginButton(props: ButtonProps<"a">) {
   return (
     <Button
       as="a"
-      className="rounded-16 bg-[#5865f2] py-[22px] pe-[20px] ps-16 text-32 shadow-md disabled:bg-[#a0a0a0] data-[hover]:bg-[#4752c4]"
+      className="rounded-16 text-32 bg-[#5865f2] py-[22px] ps-16 pe-[20px] shadow-md disabled:bg-[#a0a0a0] data-[hover]:bg-[#4752c4]"
       {...props}
     >
-      <span className="flex flex-row gap-[12px] text-surface-0">
+      <span className="text-surface-0 flex flex-row gap-[12px]">
         <img src={clydeIcon} width={40} height={40} alt="" />
         Discord でログイン
       </span>

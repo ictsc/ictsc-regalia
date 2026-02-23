@@ -26,7 +26,7 @@ export function ProblemItem(props: ProblemItemProps) {
           params={{ code: props.code }}
           disabled={disabled}
           className={clsx(
-            "flex w-full max-w-[512px] justify-between gap-24 rounded-16 px-20 py-12 transition",
+            "rounded-16 flex w-full max-w-[512px] justify-between gap-24 px-20 py-12 transition",
             active ? "shadow-transparent" : "shadow-lg",
             props.score.rawFullScore
               ? hover

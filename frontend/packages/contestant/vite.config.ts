@@ -1,5 +1,6 @@
 /// <reference types="vitest/config" />
 import type { UserConfig } from "vite";
+import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
@@ -24,6 +25,7 @@ export default {
     },
   },
   plugins: [
+    tailwindcss(),
     !isTest &&
       TanStackRouterVite({
         routesDirectory: "app/routes",

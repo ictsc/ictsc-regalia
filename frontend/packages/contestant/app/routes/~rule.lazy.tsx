@@ -13,7 +13,7 @@ function RouteComponent() {
   return (
     <>
       <Title>ルール</Title>
-      <div className="mx-40 mb-64 mt-20 max-w-screen-lg">
+      <div className="mx-40 mt-20 mb-64 max-w-screen-lg">
         <Typography>
           <Markdown>{rule.markdown}</Markdown>
         </Typography>
