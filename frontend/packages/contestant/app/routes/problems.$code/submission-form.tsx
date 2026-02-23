@@ -144,9 +144,7 @@ export function SubmissionForm(props: {
         {isRateLimitOk && !isScheduleOk && (
           <div className="text-16 text-text">
             {props.submissionStatus?.submittableUntil ? (
-              <span>
-                次回提出可能時刻まで提出できません
-              </span>
+              <span>次回提出可能時刻まで提出できません</span>
             ) : (
               <span>この問題は現在提出できません</span>
             )}

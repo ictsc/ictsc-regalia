@@ -39,8 +39,8 @@ export function ProblemItem(props: ProblemItemProps) {
         >
           <div className="flex flex-col items-start justify-between gap-4">
             <div className="flex flex-col">
-              <h3 className="text-24 font-bold text-primary">{props.code}</h3>
-              <p className="line-clamp-1 text-16">{props.title}</p>
+              <h3 className="text-24 text-primary font-bold">{props.code}</h3>
+              <p className="text-16 line-clamp-1">{props.title}</p>
             </div>
             {props.submissionStatus && (
               <p className={clsx("text-14 font-medium", statusColor)}>

@@ -9,14 +9,18 @@ import { timestampDate } from "@bufbuild/protobuf/wkt";
 /**
  * 現在アクティブなスケジュールエントリを取得
  */
-export function getCurrentScheduleEntry(schedule: Schedule | null): ScheduleEntry | null {
+export function getCurrentScheduleEntry(
+  schedule: Schedule | null,
+): ScheduleEntry | null {
   return schedule?.current ?? null;
 }
 
 /**
  * 次のスケジュールエントリを取得
  */
-export function getNextScheduleEntry(schedule: Schedule | null): ScheduleEntry | null {
+export function getNextScheduleEntry(
+  schedule: Schedule | null,
+): ScheduleEntry | null {
   return schedule?.next ?? null;
 }
 

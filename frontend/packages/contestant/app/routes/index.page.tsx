@@ -79,7 +79,8 @@ function InContest(props: IndexPageProps) {
           <MaterialSymbol icon="schedule" size={40} className="text-icon" />
           <div className="ml-8 flex flex-col">
             <div className="text-24 leading-[40px]">
-              競技中{props.currentScheduleName && ` (${props.currentScheduleName})`}
+              競技中
+              {props.currentScheduleName && ` (${props.currentScheduleName})`}
             </div>
             {props.timer != null && (
               <div className="flex items-baseline">
@@ -90,7 +91,7 @@ function InContest(props: IndexPageProps) {
           </div>
         </div>
         {props.nextScheduleName != null && (
-          <div className="flex w-full items-center border-t border-primary pt-8">
+          <div className="border-primary flex w-full items-center border-t pt-8">
             <div className="flex size-40 items-center justify-center">
               <MaterialSymbol
                 icon="arrow_forward_ios"
@@ -98,7 +99,9 @@ function InContest(props: IndexPageProps) {
                 className="text-icon"
               />
             </div>
-            <div className="ml-8 mt-2 text-14">次のスケジュール: {props.nextScheduleName}</div>
+            <div className="text-14 mt-2 ml-8">
+              次のスケジュール: {props.nextScheduleName}
+            </div>
           </div>
         )}
       </div>

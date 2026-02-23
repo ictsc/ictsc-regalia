@@ -111,7 +111,11 @@ function SubmissionForm(props: {
       startTransition(() => router.invalidate());
     }, ms);
     return () => clearTimeout(timer);
-  }, [submissionStatus?.submittableUntil, problem.submissionStatus?.submittableFrom, router]);
+  }, [
+    submissionStatus?.submittableUntil,
+    problem.submissionStatus?.submittableFrom,
+    router,
+  ]);
 
   return (
     <View.SubmissionForm
