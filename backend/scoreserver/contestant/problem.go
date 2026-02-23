@@ -25,10 +25,19 @@ type ProblemServiceHandler struct {
 
 var _ contestantv1connect.ProblemServiceHandler = (*ProblemServiceHandler)(nil)
 
-func newProblemServiceHandler(repo *pg.Repository) *ProblemServiceHandler {
+func newProblemServiceHandler(repo *pg.Repository, scheduleReader domain.ScheduleReader) *ProblemServiceHandler {
+	listEffect := struct {
+		domain.TeamMemberGetter
+		domain.TeamProblemReader
+		domain.ScheduleReader
+	}{
+		TeamMemberGetter:  repo,
+		TeamProblemReader: repo,
+		ScheduleReader:    scheduleReader,
+	}
 	return &ProblemServiceHandler{
-		ListProblemsEffect:    repo,
-		GetProblemEffect:      repo,
+		ListProblemsEffect:    listEffect,
+		GetProblemEffect:      listEffect,
 		ListDeploymentsEffect: repo,
 		DeployEffect: struct {
 			domain.TeamMemberGetter

@@ -14,8 +14,17 @@ type Config struct {
 	AdminAPI      AdminAPI
 	ContestantAPI ContestantAPI
 
-	PgConfig pgx.ConnConfig
-	Redis    redis.Options
+	PgConfig     pgx.ConnConfig
+	Redis        redis.Options
+	FakeSchedule *FakeSchedule
+}
+
+// FakeSchedule はDBを使わずにスケジュールをシミュレートするための設定。
+// 指定した名前・期間のスケジュールが常に返される。
+type FakeSchedule struct {
+	Name    string
+	StartAt time.Time
+	EndAt   time.Time
 }
 
 type (

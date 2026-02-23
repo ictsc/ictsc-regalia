@@ -38,6 +38,15 @@ func newConfig(opts *CLIOption) (*config.Config, error) {
 		errs = append(errs, errors.Wrap(err, "invalid REDIS_URL"))
 	}
 
+	var fakeSchedule *config.FakeSchedule
+	if opts.UseFakeSchedule {
+		fakeSchedule = &config.FakeSchedule{
+			Name:    opts.FakeScheduleName,
+			StartAt: opts.FakeScheduleStartAt,
+			EndAt:   opts.FakeScheduleEndAt,
+		}
+	}
+
 	if err := errors.Join(errs...); err != nil {
 		return nil, err
 	}
@@ -47,6 +56,7 @@ func newConfig(opts *CLIOption) (*config.Config, error) {
 		ContestantAPI: *contestantAPI,
 		PgConfig:      *cfg,
 		Redis:         *redisOpts,
+		FakeSchedule:  fakeSchedule,
 	}, nil
 }
 func newAdminConfig(opts *CLIOption) (*config.AdminAPI, error) {

@@ -106,10 +106,10 @@ INSERT INTO notices (slug, title, markdown, effective_from) VALUES
 
 TRUNCATE TABLE schedules CASCADE;
 INSERT INTO schedules (name, start_at, end_at) VALUES
-    ('day1-am', NOW() - INTERVAL '4 hours', NOW() - INTERVAL '2 hours'),
-    ('day1-pm', NOW() - INTERVAL '1 hour',  NOW() + INTERVAL '2 hours'),
-    ('day2-am', NOW() + INTERVAL '18 hours', NOW() + INTERVAL '20 hours'),
-    ('day2-pm', NOW() + INTERVAL '21 hours', NOW() + INTERVAL '23 hours');
+    ('day1-am', '2026-01-01 01:00:00+00', '2026-01-01 03:00:00+00'),
+    ('day1-pm', '2026-01-01 04:00:00+00', '2099-12-31 23:59:59+00'),
+    ('day2-am', '2100-01-01 00:00:00+00', '2100-01-01 03:00:00+00'),
+    ('day2-pm', '2100-01-01 04:00:00+00', '2100-01-01 07:00:00+00');
 
 TRUNCATE TABLE problem_schedules CASCADE;
 INSERT INTO problem_schedules (problem_id, schedule_name) VALUES

@@ -70,7 +70,7 @@ func New(
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(contestantv1connect.NewProblemServiceHandler(
-		newProblemServiceHandler(repo),
+		newProblemServiceHandler(repo, scheduler),
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(contestantv1connect.NewAnswerServiceHandler(

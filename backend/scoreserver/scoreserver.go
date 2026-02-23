@@ -12,6 +12,8 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/admin"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/contestant"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/fake"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
@@ -42,7 +44,14 @@ func New(ctx context.Context, cfg *config.Config) (*ScoreServer, error) {
 
 	repo := pg.NewRepository(db)
 
-	adminHandler, err := admin.New(ctx, cfg.AdminAPI, db, repo)
+	var scheduleReader domain.ScheduleReader
+	if cfg.FakeSchedule != nil {
+		scheduleReader = (*fake.FakeScheduler)(cfg.FakeSchedule)
+	} else {
+		scheduleReader = repo
+	}
+
+	adminHandler, err := admin.New(ctx, cfg.AdminAPI, db, scheduleReader)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +64,7 @@ func New(ctx context.Context, cfg *config.Config) (*ScoreServer, error) {
 		MaxHeaderBytes:    maxHeaderBytes,
 	}
 
-	contestantHandler, err := contestant.New(ctx, cfg.ContestantAPI, db, rdb, repo)
+	contestantHandler, err := contestant.New(ctx, cfg.ContestantAPI, db, rdb, scheduleReader)
 	if err != nil {
 		return nil, err
 	}
