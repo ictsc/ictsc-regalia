@@ -67,7 +67,7 @@ require (
 	github.com/bombsimon/wsl/v5 v5.6.0 // indirect
 	github.com/breml/bidichk v0.3.3 // indirect
 	github.com/breml/errchkjson v0.4.1 // indirect
-	github.com/bufbuild/buf v1.65.0 // indirect
+	github.com/bufbuild/buf v1.66.0 // indirect
 	github.com/bufbuild/protocompile v0.14.2-0.20260223192139-6bd261dd3318 // indirect
 	github.com/bufbuild/protoplugin v0.0.0-20250218205857-750e09ce93e1 // indirect
 	github.com/butuzov/ireturn v0.4.0 // indirect
@@ -109,7 +109,6 @@ require (
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/fzipp/gocyclo v0.6.0 // indirect
 	github.com/ghostiam/protogetter v0.3.20 // indirect
-	github.com/go-chi/chi/v5 v5.2.5 // indirect
 	github.com/go-critic/go-critic v0.14.3 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
