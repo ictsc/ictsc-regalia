@@ -15,9 +15,9 @@
   "prettier": "@ictsc/config/prettier",
   "devDependencies": {
     "@ictsc/config": "workspace:*",
-    "@shikijs/langs": "^3.2.1",
-    "@shikijs/rehype": "^3.2.1",
-    "@shikijs/themes": "^3.2.1",
+    "@shikijs/langs": "^4.0.0",
+    "@shikijs/rehype": "^4.0.0",
+    "@shikijs/themes": "^4.0.0",
     "@tanstack/router-plugin": "^1.49.3",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
@@ -34,7 +34,7 @@
     "remark-breaks": "^4.0.0",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.1",
-    "shiki": "^3.2.1",
+    "shiki": "^4.0.0",
     "unified": "^11.0.5",
     "vite": "^7.0.0",
     "vitest": "^4.0.0"
