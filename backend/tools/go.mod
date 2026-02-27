@@ -159,7 +159,7 @@ require (
 	github.com/julz/importas v0.2.0 // indirect
 	github.com/k0kubun/pp/v3 v3.5.1 // indirect
 	github.com/karamaru-alpha/copyloopvar v1.2.2 // indirect
-	github.com/kisielk/errcheck v1.9.0 // indirect
+	github.com/kisielk/errcheck v1.10.0 // indirect
 	github.com/kkHAIKE/contextcheck v1.1.6 // indirect
 	github.com/klauspost/compress v1.18.4 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
