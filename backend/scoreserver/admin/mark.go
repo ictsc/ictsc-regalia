@@ -95,6 +95,7 @@ func (h *MarkServiceHandler) GetAnswer(
 	if err != nil {
 		return nil, err
 	}
+
 	protoAnser := convertAnswer(answer.Answer())
 	switch answer.Problem().Type() {
 	case domain.ProblemTypeDescriptive:

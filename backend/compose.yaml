@@ -5,7 +5,7 @@ services:
     ports:
       - 127.0.0.1::5432
     volumes:
-      - db:/var/lib/postgresql/data
+      - db:/var/lib/postgresql
       - ./schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
       - ./view.sql:/docker-entrypoint-initdb.d/2-view.sql
       - ./seed.sql:/docker-entrypoint-initdb.d/3-seed.sql

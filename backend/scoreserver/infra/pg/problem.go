@@ -30,13 +30,26 @@ func (r *repo) ListProblems(ctx context.Context) ([]*domain.ProblemData, error) 
 	defer func() { _ = rows.Close() }()
 
 	var problems []*domain.ProblemData
+	var problemIDs []uuid.UUID
 	for rows.Next() {
 		var row problemDataRow
 		if err := rows.StructScan(&row); err != nil {
 			return nil, errors.Wrap(err, "failed to scan problem row")
 		}
-		problems = append(problems, row.data())
+		data := row.data()
+		problems = append(problems, data)
+		problemIDs = append(problemIDs, data.ID)
 	}
+
+	// スケジュールをロード
+	scheduleMap, err := r.loadProblemSchedules(ctx, problemIDs)
+	if err != nil {
+		return nil, err
+	}
+	for _, problem := range problems {
+		problem.SubmissionableScheduleNames = scheduleMap[problem.ID]
+	}
+
 	return problems, nil
 }
 
@@ -51,7 +64,16 @@ func (r *repo) GetProblemByCode(ctx context.Context, code string) (*domain.Probl
 		}
 		return nil, errors.Wrap(err, "failed to get problem by code")
 	}
-	return row.data(), nil
+	data := row.data()
+
+	// スケジュールをロード
+	scheduleMap, err := r.loadProblemSchedules(ctx, []uuid.UUID{data.ID})
+	if err != nil {
+		return nil, err
+	}
+	data.SubmissionableScheduleNames = scheduleMap[data.ID]
+
+	return data, nil
 }
 
 type problemDataRow struct {
@@ -86,8 +108,17 @@ func (r *repo) GetDescriptiveProblem(ctx context.Context, id uuid.UUID) (*domain
 		}
 		return nil, errors.Wrap(err, "failed to get descriptive problem")
 	}
+	data := row.problemDataRow.data()
+
+	// スケジュールをロード
+	scheduleMap, err := r.loadProblemSchedules(ctx, []uuid.UUID{data.ID})
+	if err != nil {
+		return nil, err
+	}
+	data.SubmissionableScheduleNames = scheduleMap[data.ID]
+
 	return &domain.DescriptiveProblemData{
-		Problem: row.problemDataRow.data(),
+		Problem: data,
 		Content: row.Content.data(),
 	}, nil
 }
@@ -180,6 +211,23 @@ func (r *RepositoryTx) SaveDescriptiveProblem(ctx context.Context, descriptivePr
 			return errors.Wrap(err, "failed to save problem content")
 		}
 	}
+
+	// スケジュール紐付けを保存
+	problemID := descriptiveProblem.Problem.ID
+
+	// 既存の紐付けを削除
+	if _, err := r.ext.ExecContext(ctx, `DELETE FROM problem_schedules WHERE problem_id = $1`, problemID); err != nil {
+		return errors.Wrap(err, "failed to delete old problem schedules")
+	}
+
+	// 新しい紐付けを挿入
+	if len(descriptiveProblem.Problem.SubmissionableScheduleNames) > 0 {
+		query := `INSERT INTO problem_schedules (problem_id, schedule_name) VALUES ($1, unnest($2::text[]))`
+		if _, err := r.ext.ExecContext(ctx, query, problemID, descriptiveProblem.Problem.SubmissionableScheduleNames); err != nil {
+			return errors.Wrap(err, "failed to insert problem schedules")
+		}
+	}
+
 	return nil
 }
 
@@ -324,4 +372,34 @@ func (r redployRule) Value() (driver.Value, error) {
 	default:
 		return nil, errors.New("unknown redeploy rule")
 	}
+}
+
+// 問題とスケジュールの関連を取得する
+func (r *repo) loadProblemSchedules(ctx context.Context, problemIDs []uuid.UUID) (map[uuid.UUID][]string, error) {
+	if len(problemIDs) == 0 {
+		return make(map[uuid.UUID][]string), nil
+	}
+
+	query := `
+        SELECT problem_id, schedule_name
+        FROM problem_schedules
+        WHERE problem_id = ANY($1)
+        ORDER BY problem_id, schedule_name
+    `
+	rows, err := r.ext.QueryxContext(ctx, query, problemIDs)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to load problem schedules")
+	}
+	defer rows.Close()
+
+	result := make(map[uuid.UUID][]string)
+	for rows.Next() {
+		var problemID uuid.UUID
+		var scheduleName string
+		if err := rows.Scan(&problemID, &scheduleName); err != nil {
+			return nil, errors.Wrap(err, "failed to scan problem schedule")
+		}
+		result[problemID] = append(result[problemID], scheduleName)
+	}
+	return result, nil
 }

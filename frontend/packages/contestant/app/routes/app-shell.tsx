@@ -6,9 +6,8 @@ import {
   useReducer,
 } from "react";
 import { useSignOut, type User } from "../features/viewer";
-import { useSchedule } from "../features/schedule";
+import { useSchedule, hasContestStarted } from "../features/schedule";
 import { Layout, Header, Navbar, AccountMenu } from "../components/app-shell";
-import { Phase } from "@ictsc/proto/contestant/v1";
 
 export function AppShell({
   children,
@@ -21,6 +20,7 @@ export function AppShell({
   const [schedule] = useSchedule();
   const [collapsed, toggle] = useReducer((o) => !o, false);
   const signOutAction = useSignOut();
+  const inContest = hasContestStarted(schedule);
 
   return (
     <Layout
@@ -41,8 +41,8 @@ export function AppShell({
       navbar={
         viewer?.type === "contestant" ? (
           <Navbar
-            canViewProblems={schedule?.phase === Phase.IN_CONTEST}
-            canViewAnnounces={schedule?.phase === Phase.IN_CONTEST}
+            canViewProblems={inContest}
+            canViewAnnounces={inContest}
             collapsed={collapsed}
             onOpenToggleClick={toggle}
           />

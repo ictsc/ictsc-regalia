@@ -6,18 +6,12 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1";
 
-enum Phase {
-  PHASE_UNSPECIFIED = 0;
-  PHASE_OUT_OF_CONTEST = 1;
-  PHASE_IN_CONTEST = 2;
-  PHASE_BREAK = 3;
-  PHASE_AFTER_CONTEST = 4;
-}
-
 message Schedule {
-  Phase phase = 1;
-  google.protobuf.Timestamp start_at = 2;
-  google.protobuf.Timestamp end_at = 3;
+  reserved 1;
+  // スケジュール名(例: "day1-am")
+  string name = 2;
+  google.protobuf.Timestamp start_at = 3;
+  google.protobuf.Timestamp end_at = 4;
 }
 
 message GetScheduleRequest {}

@@ -147,6 +147,9 @@ func (h *AuthHandler) externalURL(r *http.Request) *url.URL {
 	if url.Host == "" {
 		url.Host = r.Host
 	}
+	if url.Path == "" {
+		url.Path = "/"
+	}
 
 	return url
 }

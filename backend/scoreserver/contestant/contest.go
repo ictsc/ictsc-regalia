@@ -68,42 +68,44 @@ func (h *ContestServiceHandler) GetSchedule(
 		return nil, err
 	}
 
-	schedule, err := domain.GetSchedule(ctx, h.GetScheduleEffect)
+	schedules, err := domain.GetSchedule(ctx, h.GetScheduleEffect)
 	if err != nil {
 		return nil, err
 	}
 
 	now := time.Now()
-	current := schedule.Current(now)
-	next := schedule.Next(now)
+	schedule := &contestantv1.Schedule{}
 
-	protoSchedule := &contestantv1.Schedule{
-		Phase:     convertPhase(current.Phase()),
-		NextPhase: convertPhase(next.Phase()),
-		StartAt:   timestamppb.New(current.StartAt()),
+	// コンテストが開始済みか（いずれかのスケジュールが開始されたか）
+	for _, entry := range schedules {
+		if !now.Before(entry.StartAt()) {
+			schedule.HasStarted = true
+			break
+		}
 	}
-	if endAt := current.EndAt(); !endAt.IsZero() {
-		protoSchedule.EndAt = timestamppb.New(endAt)
+
+	// 現在アクティブなスケジュール
+	if current := schedules.Current(now); current != nil {
+		schedule.Current = &contestantv1.ScheduleEntry{
+			Name:    current.Name(),
+			StartAt: timestamppb.New(current.StartAt()),
+			EndAt:   timestamppb.New(current.EndAt()),
+		}
+	}
+
+	// 次のスケジュール
+	for _, entry := range schedules {
+		if now.Before(entry.StartAt()) {
+			schedule.Next = &contestantv1.ScheduleEntry{
+				Name:    entry.Name(),
+				StartAt: timestamppb.New(entry.StartAt()),
+				EndAt:   timestamppb.New(entry.EndAt()),
+			}
+			break // schedules はstartAt順なので最初に見つかったものが次
+		}
 	}
 
 	return connect.NewResponse(&contestantv1.GetScheduleResponse{
-		Schedule: protoSchedule,
+		Schedule: schedule,
 	}), nil
-}
-
-func convertPhase(phase domain.Phase) contestantv1.Phase {
-	switch phase {
-	case domain.PhaseOutOfContest:
-		return contestantv1.Phase_PHASE_OUT_OF_CONTEST
-	case domain.PhaseInContest:
-		return contestantv1.Phase_PHASE_IN_CONTEST
-	case domain.PhaseBreak:
-		return contestantv1.Phase_PHASE_BREAK
-	case domain.PhaseAfterContest:
-		return contestantv1.Phase_PHASE_AFTER_CONTEST
-	case domain.PhaseUnspecified:
-		fallthrough
-	default:
-		return contestantv1.Phase_PHASE_UNSPECIFIED
-	}
 }

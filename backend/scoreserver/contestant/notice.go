@@ -16,16 +16,13 @@ import (
 type NoticeServiceHandler struct {
 	contestantv1connect.UnimplementedNoticeServiceHandler
 
-	Enforcer *ScheduleEnforcer
-
 	ListEffect NoticeListEffect
 }
 
 var _ contestantv1connect.NoticeServiceHandler = (*NoticeServiceHandler)(nil)
 
-func newNoticeServiceHandler(enforcer *ScheduleEnforcer, repo *pg.Repository) *NoticeServiceHandler {
+func newNoticeServiceHandler(repo *pg.Repository) *NoticeServiceHandler {
 	return &NoticeServiceHandler{
-		Enforcer:   enforcer,
 		ListEffect: repo,
 	}
 }
@@ -42,9 +39,6 @@ func (h *NoticeServiceHandler) ListNotices(
 		if !errors.Is(err, domain.ErrNotFound) {
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
-		return nil, err
-	}
-	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
 		return nil, err
 	}
 

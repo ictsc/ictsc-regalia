@@ -235,18 +235,27 @@ COMMENT ON COLUMN notices.title IS 'タイトル';
 COMMENT ON COLUMN notices.markdown IS '本文';
 COMMENT ON COLUMN notices.effective_from IS '掲示開始時間';
 
-CREATE TYPE contest_phase AS ENUM ('UNSPECIFIED', 'OUT_OF_CONTEST', 'IN_CONTEST', 'BREAK', 'AFTER_CONTEST');
-
 CREATE TABLE schedules (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    phase contest_phase NOT NULL,
+	name VARCHAR(255) PRIMARY KEY,
     start_at TIMESTAMPTZ NOT NULL,
     end_at TIMESTAMPTZ NOT NULL,
     CONSTRAINT schedules_start_end CHECK (start_at < end_at)
 );
 
 COMMENT ON TABLE schedules IS 'コンテストスケジュール';
-COMMENT ON COLUMN schedules.id IS 'スケジュール ID';
-COMMENT ON COLUMN schedules.phase IS 'フェーズ';
+COMMENT ON COLUMN schedules.name IS 'スケジュール名 (例: day1-am)';
 COMMENT ON COLUMN schedules.start_at IS '開始時刻';
 COMMENT ON COLUMN schedules.end_at IS '終了時刻';
+
+CREATE TABLE problem_schedules (
+	problem_id UUID NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
+	schedule_name VARCHAR(255) NOT NULL REFERENCES schedules(name) ON DELETE CASCADE,
+	PRIMARY KEY (problem_id, schedule_name)
+);
+
+CREATE INDEX idx_problem_schedules_problem ON problem_schedules(problem_id);
+CREATE INDEX idx_problem_schedules_schedule ON problem_schedules(schedule_name);
+
+COMMENT ON TABLE problem_schedules IS '問題の提出可能スケジュール';
+COMMENT ON COLUMN problem_schedules.problem_id IS '問題 ID';
+COMMENT ON COLUMN problem_schedules.schedule_name IS 'スケジュール名';

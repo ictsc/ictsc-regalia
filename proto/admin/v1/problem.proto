@@ -19,6 +19,9 @@ message Problem {
   RedeployRule redeploy_rule = 5;
 
   ProblemBody body = 6;
+
+  // 提出可能なスケジュール名のセット(例: ["day1-am", "day1-pm"])
+  repeated string submissionable_schedules = 7;
 }
 
 enum RedeployRuleType {

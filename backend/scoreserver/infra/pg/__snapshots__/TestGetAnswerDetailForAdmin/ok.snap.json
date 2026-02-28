@@ -11,11 +11,11 @@
     },
     "problem": {
       "id": "16643c32-c686-44ba-996b-2fbe43b54513",
-      "code": "ZZA",
+      "code": "AAA",
       "problem_type": "Descriptive",
-      "title": "問題A",
-      "max_score": 100,
-      "category": "Network",
+      "title": "チーム名をください",
+      "max_score": 10,
+      "category": "Server",
       "redeploy_rule": "Unredeployable"
     },
     "author": {
@@ -26,7 +26,7 @@
     "interval": 1200000000000,
     "score": {
       "marking_result_id": "358ebef7-c626-44fa-9a3d-da2d9083fe5e",
-      "marked_score": 70,
+      "marked_score": 7,
       "penalty": 0
     }
   },

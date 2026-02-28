@@ -135,15 +135,21 @@ func (h *ProblemServiceHandler) CreateProblem(
 		return nil, err
 	}
 
+	scheduleNames := req.Msg.GetProblem().GetSubmissionableSchedules()
+	if len(scheduleNames) == 0 {
+		return nil, domain.NewInvalidArgumentError("submissionable_schedules is required", nil)
+	}
+
 	rule, penalty := parseRedeployRule(req.Msg.GetProblem().GetRedeployRule())
 	descriptiveProblem, err := domain.CreateDescriptiveProblem(domain.CreateDescriptiveProblemInput{
-		Code:              code,
-		Title:             req.Msg.GetProblem().GetTitle(),
-		MaxScore:          req.Msg.GetProblem().GetMaxScore(),
-		Category:          req.Msg.GetProblem().GetCategory(),
-		RedeployRule:      rule,
-		PercentagePenalty: penalty,
-		Content:           content,
+		Code:                        code,
+		Title:                       req.Msg.GetProblem().GetTitle(),
+		MaxScore:                    req.Msg.GetProblem().GetMaxScore(),
+		Category:                    req.Msg.GetProblem().GetCategory(),
+		RedeployRule:                rule,
+		PercentagePenalty:           penalty,
+		Content:                     content,
+		SubmissionableScheduleNames: scheduleNames,
 	})
 	if err != nil {
 		return nil, err
@@ -177,14 +183,21 @@ func (h *ProblemServiceHandler) UpdateProblem(
 
 	rule, penalty := parseRedeployRule(req.Msg.GetProblem().GetRedeployRule())
 
+	scheduleNames := req.Msg.GetProblem().GetSubmissionableSchedules()
+	var scheduleNamesPtr *[]string
+	if len(scheduleNames) > 0 {
+		scheduleNamesPtr = &scheduleNames
+	}
+
 	input := domain.UpdateDescriptiveProblemInput{
-		Title:             req.Msg.GetProblem().GetTitle(),
-		MaxScore:          req.Msg.GetProblem().GetMaxScore(),
-		Category:          req.Msg.GetProblem().GetCategory(),
-		RedeployRule:      rule,
-		PercentagePenalty: penalty,
-		Body:              req.Msg.GetProblem().GetBody().GetDescriptive().GetProblemMarkdown(),
-		Explanation:       req.Msg.GetProblem().GetBody().GetDescriptive().GetExplanationMarkdown(),
+		Title:                       req.Msg.GetProblem().GetTitle(),
+		MaxScore:                    req.Msg.GetProblem().GetMaxScore(),
+		Category:                    req.Msg.GetProblem().GetCategory(),
+		RedeployRule:                rule,
+		PercentagePenalty:           penalty,
+		Body:                        req.Msg.GetProblem().GetBody().GetDescriptive().GetProblemMarkdown(),
+		Explanation:                 req.Msg.GetProblem().GetBody().GetDescriptive().GetExplanationMarkdown(),
+		SubmissionableScheduleNames: scheduleNamesPtr,
 	}
 
 	descriptiveProblem, err := domain.RunTx(ctx, h.UpdateEffect, func(tx domain.ProblemWriter) (*domain.DescriptiveProblem, error) {
@@ -258,11 +271,12 @@ func convertProblem(problem *domain.Problem) *adminv1.Problem {
 	}
 
 	return &adminv1.Problem{
-		Code:         string(problem.Code()),
-		Title:        problem.Title(),
-		MaxScore:     problem.MaxScore(),
-		Category:     problem.Category(),
-		RedeployRule: convertRedeployRule(problem),
+		Code:                    string(problem.Code()),
+		Title:                   problem.Title(),
+		MaxScore:                problem.MaxScore(),
+		Category:                problem.Category(),
+		RedeployRule:            convertRedeployRule(problem),
+		SubmissionableSchedules: problem.SubmissionableScheduleNames(),
 		Body: &adminv1.ProblemBody{
 			Type: typ,
 		},

@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/jackc/pgx/v5"
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/oauth2"
@@ -18,6 +17,14 @@ type Config struct {
 	PgConfig     pgx.ConnConfig
 	Redis        redis.Options
 	FakeSchedule *FakeSchedule
+}
+
+// FakeSchedule はDBを使わずにスケジュールをシミュレートするための設定。
+// 指定した名前・期間のスケジュールが常に返される。
+type FakeSchedule struct {
+	Name    string
+	StartAt time.Time
+	EndAt   time.Time
 }
 
 type (
@@ -80,9 +87,3 @@ type (
 	}
 )
 
-type FakeSchedule struct {
-	Phase     domain.Phase
-	NextPhase domain.Phase
-	StartAt   time.Time
-	EndAt     time.Time
-}

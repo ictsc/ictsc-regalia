@@ -40,12 +40,12 @@ func TestListAnswersByTeamProblem(t *testing.T) {
 		"ok/admin": {
 			viewer:      "admin",
 			teamCode:    1,
-			problemCode: "ZZA",
+			problemCode: "AAA",
 		},
 		"ok/public": {
 			viewer:      "public",
 			teamCode:    1,
-			problemCode: "ZZA",
+			problemCode: "AAA",
 		},
 	}
 
@@ -124,12 +124,12 @@ func TestGetAnswerDetailForAdmin(t *testing.T) {
 	}{
 		"ok": {
 			teamCode:     1,
-			problemCode:  "ZZA",
+			problemCode:  "AAA",
 			answerNumber: 1,
 		},
 		"not found": {
 			teamCode:     1,
-			problemCode:  "ZZA",
+			problemCode:  "AAA",
 			answerNumber: 3,
 
 			wantErr: domain.ErrNotFound,

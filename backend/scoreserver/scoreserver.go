@@ -42,11 +42,13 @@ func New(ctx context.Context, cfg *config.Config) (*ScoreServer, error) {
 		slog.InfoContext(ctx, "Failed to instrument metrics for redis", "error", errors.WithStack(err))
 	}
 
+	repo := pg.NewRepository(db)
+
 	var scheduleReader domain.ScheduleReader
 	if cfg.FakeSchedule != nil {
 		scheduleReader = (*fake.FakeScheduler)(cfg.FakeSchedule)
 	} else {
-		scheduleReader = pg.NewRepository(db)
+		scheduleReader = repo
 	}
 
 	adminHandler, err := admin.New(ctx, cfg.AdminAPI, db, scheduleReader)
