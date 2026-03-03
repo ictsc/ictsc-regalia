@@ -6,19 +6,22 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1;contestantv1";
 
-enum Phase {
-  PHASE_UNSPECIFIED = 0;
-  PHASE_OUT_OF_CONTEST = 1;
-  PHASE_IN_CONTEST = 2;
-  PHASE_BREAK = 3;
-  PHASE_AFTER_CONTEST = 4;
+// スケジュールエントリ
+message ScheduleEntry {
+  // スケジュール名(例: "day1-am")
+  string name = 2;
+  google.protobuf.Timestamp start_at = 3;
+  google.protobuf.Timestamp end_at = 4;
 }
 
+// 現在のコンテスト状態
 message Schedule {
-  Phase phase = 1;
-  Phase next_phase = 2;
-  google.protobuf.Timestamp start_at = 3;
-  optional google.protobuf.Timestamp end_at = 4;
+  // コンテストが開始済みか（一度でもスケジュールが開始されたか）
+  bool has_started = 2;
+  // 現在アクティブなスケジュール（なければ空）
+  optional ScheduleEntry current = 3;
+  // 次のスケジュール（なければ空）
+  optional ScheduleEntry next = 4;
 }
 
 message Rule {

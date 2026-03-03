@@ -18,8 +18,6 @@ import (
 type AnswerServiceHandler struct {
 	contestantv1connect.UnimplementedAnswerServiceHandler
 
-	Enforcer *ScheduleEnforcer
-
 	ListEffect   ListAnswersEffect
 	GetEffect    GetAnswerEffect
 	SubmitEffect SubmitAnswerEffect
@@ -27,19 +25,19 @@ type AnswerServiceHandler struct {
 
 var _ contestantv1connect.AnswerServiceHandler = (*AnswerServiceHandler)(nil)
 
-func newAnswerServiceHandler(enforcer *ScheduleEnforcer, repo *pg.Repository) *AnswerServiceHandler {
+func newAnswerServiceHandler(repo *pg.Repository) *AnswerServiceHandler {
 	return &AnswerServiceHandler{
-		Enforcer: enforcer,
-
 		ListEffect: repo,
 		GetEffect:  repo,
 		SubmitEffect: struct {
 			domain.TeamMemberGetter
 			domain.ProblemReader
+			domain.ScheduleReader
 			domain.Tx[domain.AnswerWriter]
 		}{
 			TeamMemberGetter: repo,
 			ProblemReader:    repo,
+			ScheduleReader:   repo,
 			Tx:               pg.Tx(repo, func(rt *pg.RepositoryTx) domain.AnswerWriter { return rt }),
 		},
 	}
@@ -59,9 +57,6 @@ func (h *AnswerServiceHandler) ListAnswers(
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
-		return nil, err
-	}
-	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
 		return nil, err
 	}
 
@@ -120,9 +115,6 @@ func (h *AnswerServiceHandler) GetAnswer(
 		}
 		return nil, err
 	}
-	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
-		return nil, err
-	}
 
 	teamMember, err := domain.UserID(userSess.UserID).TeamMember(ctx, h.ListEffect)
 	if err != nil {
@@ -158,6 +150,7 @@ func (h *AnswerServiceHandler) GetAnswer(
 type SubmitAnswerEffect interface {
 	domain.TeamMemberGetter
 	domain.ProblemReader
+	domain.ScheduleReader
 	domain.Tx[domain.AnswerWriter]
 }
 
@@ -170,9 +163,6 @@ func (h *AnswerServiceHandler) SubmitAnswer(
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
-		return nil, err
-	}
-	if err := h.Enforcer.Enforce(ctx, domain.PhaseInContest); err != nil {
 		return nil, err
 	}
 
@@ -194,12 +184,23 @@ func (h *AnswerServiceHandler) SubmitAnswer(
 		return nil, err
 	}
 
+	// スケジュールベースの提出可否チェック
+	now := time.Now()
+	isSubmittable, err := problem.IsSubmittableAt(ctx, now, h.SubmitEffect)
+	if err != nil {
+		return nil, err
+	}
+	if !isSubmittable {
+		return nil, connect.NewError(
+			connect.CodeFailedPrecondition,
+			errors.New("この問題は現在提出できません"),
+		)
+	}
+
 	body := req.Msg.GetBody()
 	if body == "" {
 		return nil, domain.NewInvalidArgumentError("body is required", nil)
 	}
-
-	now := time.Now()
 	answer, err := domain.RunTx(ctx, h.SubmitEffect, func(tx domain.AnswerWriter) (*domain.AnswerDetail, error) {
 		return teamMember.SubmitDescriptiveAnswer(ctx, now, tx, problem, body)
 	})

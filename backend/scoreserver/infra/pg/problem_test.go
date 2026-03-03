@@ -36,7 +36,7 @@ func TestGetProblemByCode(t *testing.T) {
 		wantErr error
 	}{
 		"ok": {
-			code: "ZZA",
+			code: "AAA",
 		},
 		"not found": {
 			code:    "ZZZ",

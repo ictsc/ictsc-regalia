@@ -1,23 +1,25 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { differenceInDays, formatDuration, intervalToDuration } from "date-fns";
-import { Phase } from "@ictsc/proto/contestant/v1";
 import { Logo } from "../components/logo";
 import { MaterialSymbol } from "../components/material-symbol";
 import { Title } from "../components/title";
 
+export type ContestState = "in_contest" | "waiting" | "ended";
+
 export type IndexPageProps = {
-  readonly phase: Phase;
-  readonly nextPhase?: Phase;
+  readonly state: ContestState;
+  readonly currentScheduleName?: string;
+  readonly nextScheduleName?: string;
   readonly timer?: ReactNode;
 };
+
 export function IndexPage(props: IndexPageProps) {
-  switch (props.phase) {
-    case Phase.IN_CONTEST:
+  switch (props.state) {
+    case "in_contest":
       return <InContest {...props} />;
-    case Phase.OUT_OF_CONTEST:
-    case Phase.BREAK:
+    case "waiting":
       return <OutOfContest {...props} />;
-    case Phase.AFTER_CONTEST:
+    case "ended":
       return <EndOfContest />;
     default:
       return null;
@@ -66,18 +68,6 @@ export function Timer(props: {
 }
 
 function InContest(props: IndexPageProps) {
-  let nextPhase: string | undefined;
-  switch (props.nextPhase) {
-    case Phase.IN_CONTEST:
-      nextPhase = "競技開始";
-      break;
-    case Phase.AFTER_CONTEST:
-      nextPhase = "競技終了";
-      break;
-    case Phase.BREAK:
-      nextPhase = "休憩";
-      break;
-  }
   return (
     <div className="mx-40 flex h-full flex-col items-center justify-center">
       <Logo width={500} />
@@ -88,7 +78,10 @@ function InContest(props: IndexPageProps) {
         <div className="flex">
           <MaterialSymbol icon="schedule" size={40} className="text-icon" />
           <div className="ml-8 flex flex-col">
-            <div className="text-24 leading-[40px]">競技中</div>
+            <div className="text-24 leading-[40px]">
+              競技中
+              {props.currentScheduleName && ` (${props.currentScheduleName})`}
+            </div>
             {props.timer != null && (
               <div className="flex items-baseline">
                 <div className="text-14">残り</div>
@@ -97,7 +90,7 @@ function InContest(props: IndexPageProps) {
             )}
           </div>
         </div>
-        {nextPhase != null && (
+        {props.nextScheduleName != null && (
           <div className="border-primary flex w-full items-center border-t pt-8">
             <div className="flex size-40 items-center justify-center">
               <MaterialSymbol
@@ -106,7 +99,9 @@ function InContest(props: IndexPageProps) {
                 className="text-icon"
               />
             </div>
-            <div className="text-14 mt-2 ml-8">次のフェーズ: {nextPhase}</div>
+            <div className="text-14 mt-2 ml-8">
+              次のスケジュール: {props.nextScheduleName}
+            </div>
           </div>
         )}
       </div>
@@ -115,15 +110,9 @@ function InContest(props: IndexPageProps) {
 }
 
 function OutOfContest(props: IndexPageProps) {
-  let title: string | undefined;
-  switch (props.phase) {
-    case Phase.OUT_OF_CONTEST:
-      title = "競技開始まであと";
-      break;
-    case Phase.BREAK:
-      title = "競技再開まであと";
-      break;
-  }
+  const title = props.nextScheduleName
+    ? `${props.nextScheduleName} まであと`
+    : "次の競技まであと";
   return (
     <div className="mx-40 flex h-full flex-col items-center justify-center">
       <h1 className="text-48 font-bold underline">{title}</h1>

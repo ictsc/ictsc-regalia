@@ -41,10 +41,9 @@ func newConfig(opts *CLIOption) (*config.Config, error) {
 	var fakeSchedule *config.FakeSchedule
 	if opts.UseFakeSchedule {
 		fakeSchedule = &config.FakeSchedule{
-			Phase:     opts.FakeSchedulePhase,
-			NextPhase: opts.FakeScheduleNextPhase,
-			StartAt:   opts.FakeScheduleStartAt,
-			EndAt:     opts.FakeScheduleEndAt,
+			Name:    opts.FakeScheduleName,
+			StartAt: opts.FakeScheduleStartAt,
+			EndAt:   opts.FakeScheduleEndAt,
 		}
 	}
 

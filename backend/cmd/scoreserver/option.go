@@ -9,7 +9,6 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/slogutil"
-	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 )
 
 type CLIOption struct {
@@ -27,11 +26,10 @@ type CLIOption struct {
 	ContestantExternalURL url.URL
 	ContestantRoutePrefix string
 
-	UseFakeSchedule       bool
-	FakeSchedulePhase     domain.Phase
-	FakeScheduleNextPhase domain.Phase
-	FakeScheduleStartAt   time.Time
-	FakeScheduleEndAt     time.Time
+	UseFakeSchedule     bool
+	FakeScheduleName    string
+	FakeScheduleStartAt time.Time
+	FakeScheduleEndAt   time.Time
 }
 
 // NewOption creates a new CLIOption combined with the given flag.FlagSet.
@@ -56,8 +54,7 @@ func NewOption(fs *flag.FlagSet) *CLIOption {
 		"Route prefix for contestant API (e.g., '/api')")
 
 	fs.BoolVar(&opt.UseFakeSchedule, "fake.schedule", false, "Use fake schedule")
-	fs.TextVar(&opt.FakeSchedulePhase, "fake.schedule.phase", domain.PhaseInContest, "Fake schedule current phase")
-	fs.TextVar(&opt.FakeScheduleNextPhase, "fake.schedule.next-phase", domain.PhaseBreak, "Fake schedule next phase")
+	fs.StringVar(&opt.FakeScheduleName, "fake.schedule.name", "contest", "Fake schedule name (must match problem_schedules in DB)")
 	fs.TextVar(&opt.FakeScheduleStartAt, "fake.schedule.start-at", time.Now(), "Fake schedule start time")
 	fs.TextVar(&opt.FakeScheduleEndAt, "fake.schedule.end-at", time.Now().Add(2*time.Hour), "Fake schedule end time")
 

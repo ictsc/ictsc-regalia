@@ -4,66 +4,38 @@ import (
 	"context"
 	"slices"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
 )
 
 type (
 	Schedule      []*ScheduleEntry
 	ScheduleEntry struct {
-		id      uuid.UUID
-		phase   Phase
+		name    string // スケジュール名 (例: "day1-am")
 		startAt time.Time
 		endAt   time.Time
 	}
 )
 
+// Current は現在時刻に該当するスケジュールエントリを返す
+// 該当がない場合はnilを返す
 func (s Schedule) Current(now time.Time) *ScheduleEntry {
-	entry, _ := s.getEntry(now)
-	return entry
-}
-
-func (s Schedule) Next(now time.Time) *ScheduleEntry {
-	entry, idx := s.getEntry(now)
-	if idx+1 < len(s) {
-		return s[idx+1]
-	} else if idx+1 == len(s) {
-		return &ScheduleEntry{phase: PhaseAfterContest, startAt: s[idx].endAt}
-	}
-	return entry
-}
-
-func (s Schedule) getEntry(now time.Time) (*ScheduleEntry, int) {
-	if len(s) == 0 {
-		return &ScheduleEntry{phase: PhaseOutOfContest}, 0
-	}
-	idx := slices.IndexFunc(s, func(entry *ScheduleEntry) bool {
-		// now <@ [startAt, endAt)
-		var lowerBound, upperBound bool
-		if entry.startAt.IsZero() {
-			lowerBound = true
-		} else {
-			lowerBound = now.Equal(entry.startAt) || now.After(entry.startAt)
+	for _, entry := range s {
+		if entry.Contains(now) {
+			return entry
 		}
-		if entry.endAt.IsZero() {
-			upperBound = true
-		} else {
-			upperBound = now.Before(entry.endAt)
-		}
-		return lowerBound && upperBound
-	})
-	if idx >= 0 {
-		return s[idx], idx
 	}
-	if now.Before(s[0].startAt) {
-		return &ScheduleEntry{phase: PhaseOutOfContest, endAt: s[0].startAt}, -1
-	} else {
-		return &ScheduleEntry{phase: PhaseAfterContest, startAt: s[len(s)-1].endAt}, len(s)
-	}
+	return nil
 }
 
-func (s *ScheduleEntry) Phase() Phase {
-	return s.phase
+// Contains は指定時刻がこのスケジュールの範囲内かどうかを返す
+func (s *ScheduleEntry) Contains(t time.Time) bool {
+	// t <@ [startAt, endAt)
+	afterStart := t.Equal(s.startAt) || t.After(s.startAt)
+	beforeEnd := t.Before(s.endAt)
+	return afterStart && beforeEnd
+}
+
+func (s *ScheduleEntry) Name() string {
+	return s.name
 }
 
 func (s *ScheduleEntry) StartAt() time.Time {
@@ -93,8 +65,7 @@ func SaveSchedule(ctx context.Context, eff ScheduleWriter, input []*UpdateSchedu
 	data := make([]*ScheduleData, 0, len(input))
 	for _, schedule := range input {
 		data = append(data, &ScheduleData{
-			ID:      uuid.Must(uuid.NewV4()),
-			Phase:   schedule.Phase,
+			Name:    schedule.Name,
 			StartAt: schedule.StartAt,
 			EndAt:   schedule.EndAt,
 		})
@@ -107,13 +78,12 @@ func SaveSchedule(ctx context.Context, eff ScheduleWriter, input []*UpdateSchedu
 
 type (
 	ScheduleData struct {
-		ID      uuid.UUID
-		Phase   Phase
+		Name    string // スケジュール名
 		StartAt time.Time
 		EndAt   time.Time
 	}
 	UpdateScheduleInput struct {
-		Phase   Phase
+		Name    string // スケジュール名
 		StartAt time.Time
 		EndAt   time.Time
 	}
@@ -128,8 +98,7 @@ type (
 
 func (d *ScheduleData) parse() *ScheduleEntry {
 	return &ScheduleEntry{
-		id:      d.ID,
-		phase:   d.Phase,
+		name:    d.Name,
 		startAt: d.StartAt,
 		endAt:   d.EndAt,
 	}

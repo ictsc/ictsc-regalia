@@ -3,10 +3,12 @@ import {
   use,
   useActionState,
   useDeferredValue,
+  useEffect,
   useOptimistic,
 } from "react";
 import { createLazyFileRoute, useRouter } from "@tanstack/react-router";
 import { DeploymentStatus } from "@ictsc/proto/contestant/v1";
+import { timestampDate } from "@bufbuild/protobuf/wkt";
 import type { ProblemDetail } from "../features/problem";
 import type { Answer } from "../features/answer";
 import { protoScoreToProps } from "../features/score";
@@ -84,6 +86,37 @@ function SubmissionForm(props: {
   const router = useRouter();
   const problem = use(props.problemPromise);
   const metadata = use(props.metatataPromise);
+
+  // Convert Timestamp to Date if present
+  const submissionStatus = problem.submissionStatus
+    ? {
+        isSubmittable: problem.submissionStatus.isSubmittable,
+        submittableUntil: problem.submissionStatus.submittableUntil
+          ? timestampDate(problem.submissionStatus.submittableUntil)
+          : undefined,
+      }
+    : undefined;
+
+  // submittableUntil/submittableFrom に達したら自動リフェッチして提出状態を更新
+  useEffect(() => {
+    const until = submissionStatus?.submittableUntil;
+    const from = problem.submissionStatus?.submittableFrom
+      ? timestampDate(problem.submissionStatus.submittableFrom)
+      : undefined;
+    const target = until ?? from;
+    if (target == null) return;
+    const ms = target.getTime() - Date.now();
+    if (ms <= 0) return;
+    const timer = setTimeout(() => {
+      startTransition(() => router.invalidate());
+    }, ms);
+    return () => clearTimeout(timer);
+  }, [
+    submissionStatus?.submittableUntil,
+    problem.submissionStatus?.submittableFrom,
+    router,
+  ]);
+
   return (
     <View.SubmissionForm
       action={async (body) => {
@@ -99,6 +132,7 @@ function SubmissionForm(props: {
       submitInterval={metadata.submitIntervalSeconds}
       lastSubmittedAt={metadata.lastSubmittedAt}
       storageKey={`/problems/${problem.code}`}
+      submissionStatus={submissionStatus}
     />
   );
 }

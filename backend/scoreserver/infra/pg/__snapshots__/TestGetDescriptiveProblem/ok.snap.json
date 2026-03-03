@@ -1,15 +1,18 @@
 {
   "problem": {
     "id": "16643c32-c686-44ba-996b-2fbe43b54513",
-    "code": "ZZA",
+    "code": "AAA",
     "problem_type": "Descriptive",
-    "title": "問題A",
-    "max_score": 100,
-    "category": "Network",
-    "redeploy_rule": "Unredeployable"
+    "title": "チーム名をください",
+    "max_score": 10,
+    "category": "Server",
+    "redeploy_rule": "Unredeployable",
+    "submissionable_schedule_names": [
+      "day1-pm"
+    ]
   },
   "content": {
-    "body": "問題Aの本文",
-    "explanation": "問題Aの解説"
+    "body": "## 概要\n\nトラコン君はチーム名を求めています。チーム名を教えてあげましょう。\n\n## 制約\n\n- チーム名の読みがひらがなで書かれていること",
+    "explanation": "## 採点基準\n\nチーム名の読みが書かれていれば10点"
   }
 }

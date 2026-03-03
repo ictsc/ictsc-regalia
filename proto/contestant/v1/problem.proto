@@ -19,6 +19,18 @@ message Problem {
   optional Score score = 5;
   Deployment deployment = 6;
   ProblemBody body = 7;
+  // 提出状態（スケジュールに基づく提出可否）
+  SubmissionStatus submission_status = 8;
+}
+
+// 提出状態（スケジュールベース）
+message SubmissionStatus {
+  // 現在提出可能かどうか
+  bool is_submittable = 1;
+  // 現在の提出ウィンドウ終了時刻（提出可能の場合のみ）
+  optional google.protobuf.Timestamp submittable_until = 3;
+  // 次に提出可能になる時刻（提出不可の場合のみ）
+  optional google.protobuf.Timestamp submittable_from = 4;
 }
 
 message Score {

@@ -1,33 +1,53 @@
 [
   {
     "id": "16643c32-c686-44ba-996b-2fbe43b54513",
-    "code": "ZZA",
+    "code": "AAA",
     "problem_type": "Descriptive",
-    "title": "問題A",
-    "max_score": 100,
-    "category": "Network",
-    "redeploy_rule": "Unredeployable"
+    "title": "チーム名をください",
+    "max_score": 10,
+    "category": "Server",
+    "redeploy_rule": "Unredeployable",
+    "submissionable_schedule_names": [
+      "day1-pm"
+    ]
   },
   {
     "id": "24f6aef0-5dcd-4032-825b-d1b19174a6f2",
-    "code": "ZZB",
+    "code": "BBB",
     "problem_type": "Descriptive",
-    "title": "問題B",
-    "max_score": 200,
-    "category": "Server",
-    "redeploy_rule": "PercentagePenalty",
-    "percentage_penalty": {
-      "threshold": 1,
-      "percentage": 10
-    }
+    "title": "過去のみ問題 (day1-am)",
+    "max_score": 100,
+    "category": "Test",
+    "redeploy_rule": "Unredeployable",
+    "submissionable_schedule_names": [
+      "day1-am"
+    ]
   },
   {
     "id": "35f7bf01-6ede-5043-926c-e2c20c285b03",
-    "code": "ZZC",
+    "code": "CCC",
     "problem_type": "Descriptive",
-    "title": "問題C",
-    "max_score": 250,
-    "category": "Server",
-    "redeploy_rule": "Manual"
+    "title": "未来のみ問題 (day2-am)",
+    "max_score": 150,
+    "category": "Test",
+    "redeploy_rule": "Unredeployable",
+    "submissionable_schedule_names": [
+      "day2-am"
+    ]
+  },
+  {
+    "id": "46a8cf12-7fef-6154-a37d-f3d31d396c14",
+    "code": "DDD",
+    "problem_type": "Descriptive",
+    "title": "全期間問題",
+    "max_score": 500,
+    "category": "Test",
+    "redeploy_rule": "Unredeployable",
+    "submissionable_schedule_names": [
+      "day1-am",
+      "day1-pm",
+      "day2-am",
+      "day2-pm"
+    ]
   }
 ]
