@@ -35,19 +35,33 @@ func newProblemServiceHandler(repo *pg.Repository, scheduleReader domain.Schedul
 		TeamProblemReader: repo,
 		ScheduleReader:    scheduleReader,
 	}
+	listDeploymentsEffect := struct {
+		domain.TeamMemberGetter
+		domain.TeamProblemReader
+		domain.DeploymentReader
+		domain.ScheduleReader
+	}{
+		TeamMemberGetter:  repo,
+		TeamProblemReader: repo,
+		DeploymentReader:  repo,
+		ScheduleReader:    scheduleReader,
+	}
+	deployEffect := struct {
+		domain.TeamMemberGetter
+		domain.TeamProblemReader
+		domain.ScheduleReader
+		domain.Tx[domain.DeploymentWriter]
+	}{
+		TeamMemberGetter:  repo,
+		TeamProblemReader: repo,
+		ScheduleReader:    scheduleReader,
+		Tx:                pg.Tx(repo, func(rt *pg.RepositoryTx) domain.DeploymentWriter { return rt }),
+	}
 	return &ProblemServiceHandler{
 		ListProblemsEffect:    listEffect,
 		GetProblemEffect:      listEffect,
-		ListDeploymentsEffect: repo,
-		DeployEffect: struct {
-			domain.TeamMemberGetter
-			domain.TeamProblemReader
-			domain.Tx[domain.DeploymentWriter]
-		}{
-			TeamMemberGetter:  repo,
-			TeamProblemReader: repo,
-			Tx:                pg.Tx(repo, func(rt *pg.RepositoryTx) domain.DeploymentWriter { return rt }),
-		},
+		ListDeploymentsEffect: listDeploymentsEffect,
+		DeployEffect:          deployEffect,
 	}
 }
 
@@ -224,6 +238,7 @@ type DeploymentsListEffect interface {
 	domain.TeamMemberGetter
 	domain.TeamProblemReader
 	domain.DeploymentReader
+	domain.ScheduleReader
 }
 
 func (h *ProblemServiceHandler) ListDeployments(
@@ -235,6 +250,9 @@ func (h *ProblemServiceHandler) ListDeployments(
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
+		return nil, err
+	}
+	if err := enforceDeploymentWindow(ctx, time.Now(), h.ListDeploymentsEffect); err != nil {
 		return nil, err
 	}
 
@@ -276,6 +294,7 @@ func (h *ProblemServiceHandler) ListDeployments(
 type DeployEffect interface {
 	domain.TeamMemberGetter
 	domain.TeamProblemReader
+	domain.ScheduleReader
 	domain.Tx[domain.DeploymentWriter]
 }
 
@@ -288,6 +307,10 @@ func (h *ProblemServiceHandler) Deploy(
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
+		return nil, err
+	}
+	now := time.Now()
+	if err := enforceDeploymentWindow(ctx, now, h.DeployEffect); err != nil {
 		return nil, err
 	}
 
@@ -311,7 +334,6 @@ func (h *ProblemServiceHandler) Deploy(
 		return nil, err
 	}
 
-	now := time.Now()
 	deployment, err := domain.RunTx(ctx, h.DeployEffect,
 		func(eff domain.DeploymentWriter) (*domain.Deployment, error) {
 			return teamProblem.Deploy(ctx, eff, now)
@@ -324,6 +346,17 @@ func (h *ProblemServiceHandler) Deploy(
 	return connect.NewResponse(&contestantv1.DeployResponse{
 		Deployment: convertDeployment(teamProblem.Problem(), deployment),
 	}), nil
+}
+
+func enforceDeploymentWindow(ctx context.Context, now time.Time, scheduleReader domain.ScheduleReader) error {
+	schedule, err := domain.GetSchedule(ctx, scheduleReader)
+	if err != nil {
+		return err
+	}
+	if schedule.Current(now) != nil {
+		return nil
+	}
+	return connect.NewError(connect.CodeFailedPrecondition, errors.New("現在はデプロイできません"))
 }
 
 func convertTeamProblem(problem *domain.TeamProblem) *contestantv1.Problem {
