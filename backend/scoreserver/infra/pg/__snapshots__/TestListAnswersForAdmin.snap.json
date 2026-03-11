@@ -11,7 +11,7 @@
     },
     "problem": {
       "id": "16643c32-c686-44ba-996b-2fbe43b54513",
-      "code": "ZZA",
+      "code": "0001",
       "problem_type": "Descriptive",
       "title": "問題A",
       "max_score": 100,
@@ -37,7 +37,7 @@
     },
     "problem": {
       "id": "16643c32-c686-44ba-996b-2fbe43b54513",
-      "code": "ZZA",
+      "code": "0001",
       "problem_type": "Descriptive",
       "title": "問題A",
       "max_score": 100,
@@ -68,7 +68,7 @@
     },
     "problem": {
       "id": "24f6aef0-5dcd-4032-825b-d1b19174a6f2",
-      "code": "ZZB",
+      "code": "0002",
       "problem_type": "Descriptive",
       "title": "問題B",
       "max_score": 200,

@@ -22,14 +22,13 @@ func (id problemID) Delete(ctx context.Context, eff ProblemWriter) error {
 type ProblemCode string
 
 var (
-	problemCodeRegexp = regexp.MustCompile(`^[a-zA-Z]{3}$`)
+	problemCodeRegexp = regexp.MustCompile(`^\d{4}$`)
 )
 
 func NewProblemCode(code string) (ProblemCode, error) {
 	if !problemCodeRegexp.MatchString(code) {
 		return "", NewInvalidArgumentError("invalid problem code", nil)
 	}
-	code = strings.ToUpper(code)
 	return ProblemCode(code), nil
 }
 
