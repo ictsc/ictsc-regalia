@@ -63,6 +63,13 @@ export function nextStartAt(schedule: Schedule | null): Date | null {
   return entry?.startAt != null ? timestampDate(entry.startAt) : null;
 }
 
+/**
+ * schedule の再取得が必要になる次の時刻
+ */
+export function nextReloadAt(schedule: Schedule | null): Date | null {
+  return currentEndAt(schedule) ?? nextStartAt(schedule);
+}
+
 export async function fetchSchedule(
   transport: Transport,
 ): Promise<Schedule | null> {
