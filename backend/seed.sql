@@ -32,12 +32,14 @@ INSERT INTO team_members (user_id, team_id, invitation_code_id) VALUES
 
 TRUNCATE TABLE problems CASCADE;
 INSERT INTO problems (id, code, type, title, max_score, category, redeploy_rule, created_at, updated_at) VALUES
-	('16643c32-c686-44ba-996b-2fbe43b54513', 'AAA', 'DESCRIPTIVE', 'チーム名をください', 10, 'Server', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
-	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'BBB', 'DESCRIPTIVE', '過去のみ問題 (day1-am)', 100, 'Test', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
-	('35f7bf01-6ede-5043-926c-e2c20c285b03', 'CCC', 'DESCRIPTIVE', '未来のみ問題 (day2-am)', 150, 'Test', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
-	('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'DDD', 'DESCRIPTIVE', '全期間問題', 500, 'Test', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00');
+	('16643c32-c686-44ba-996b-2fbe43b54513', '0001', 'DESCRIPTIVE', 'チーム名をください', 10, 'Server', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', '0002', 'DESCRIPTIVE', '過去のみ問題 (day1-am)', 100, 'Test', 'PERCENTAGE_PENALTY', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('35f7bf01-6ede-5043-926c-e2c20c285b03', '0003', 'DESCRIPTIVE', '未来のみ問題 (day2-am)', 150, 'Test', 'MANUAL', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('46a8cf12-7fef-6154-a37d-f3d31d396c14', '0004', 'DESCRIPTIVE', '全期間問題', 500, 'Test', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00');
 
 TRUNCATE TABLE redeploy_percentage_penalties CASCADE;
+INSERT INTO redeploy_percentage_penalties (problem_id, threshold, percentage) VALUES
+	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 1, 10);
 
 TRUNCATE TABLE problem_contents CASCADE;
 INSERT INTO problem_contents (problem_id, page_id, page_path, body, explanation) VALUES
@@ -113,13 +115,13 @@ INSERT INTO schedules (name, start_at, end_at) VALUES
 
 TRUNCATE TABLE problem_schedules CASCADE;
 INSERT INTO problem_schedules (problem_id, schedule_name) VALUES
-    -- AAA: day1-pm のみ (現在 → 表示○、提出○)
+    -- 0001: day1-pm のみ (現在 → 表示○、提出○)
     ('16643c32-c686-44ba-996b-2fbe43b54513', 'day1-pm'),
-    -- BBB: day1-am のみ (過去 → 表示○、提出✗)
+    -- 0002: day1-am のみ (過去 → 表示○、提出✗)
     ('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'day1-am'),
-    -- CCC: day2-am のみ (未来 → 表示✗、提出✗)
+    -- 0003: day2-am のみ (未来 → 表示✗、提出✗)
     ('35f7bf01-6ede-5043-926c-e2c20c285b03', 'day2-am'),
-    -- DDD: 全スケジュール (過去+現在+未来 → 表示○、提出○)
+    -- 0004: 全スケジュール (過去+現在+未来 → 表示○、提出○)
     ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'day1-am'),
     ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'day1-pm'),
     ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'day2-am'),

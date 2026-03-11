@@ -36,10 +36,10 @@ func TestGetProblemByCode(t *testing.T) {
 		wantErr error
 	}{
 		"ok": {
-			code: "AAA",
+			code: "0001",
 		},
 		"not found": {
-			code:    "ZZZ",
+			code:    "9999",
 			wantErr: domain.ErrNotFound,
 		},
 	}
@@ -105,7 +105,7 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 			in: &domain.DescriptiveProblemData{
 				Problem: &domain.ProblemData{
 					ID:           uuid.FromStringOrNil("3a4d8197-09f4-4bb0-9255-a8b6a943a36c"),
-					Code:         "ZZZ",
+					Code:         "9999",
 					ProblemType:  domain.ProblemTypeDescriptive,
 					Title:        "test",
 					MaxScore:     100,
@@ -121,7 +121,7 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 				"problem": `
 					SELECT 1 FROM problems WHERE
 					id = '3a4d8197-09f4-4bb0-9255-a8b6a943a36c' AND
-					code = 'ZZZ' AND type = 'DESCRIPTIVE' AND
+					code = '9999' AND type = 'DESCRIPTIVE' AND
 					title = 'test' AND max_score = 100 AND
 					category = 'Network' AND redeploy_rule = 'UNREDEPLOYABLE'`,
 				"content": `
@@ -134,7 +134,7 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 			in: &domain.DescriptiveProblemData{
 				Problem: &domain.ProblemData{
 					ID:           uuid.FromStringOrNil("4b5e9308-1af5-5cc1-a366-b9c7b954b47d"),
-					Code:         "MAN",
+					Code:         "1234",
 					ProblemType:  domain.ProblemTypeDescriptive,
 					Title:        "Manual Redeploy",
 					MaxScore:     100,
@@ -150,7 +150,7 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 				"problem": `
 					SELECT 1 FROM problems WHERE
 					id = '4b5e9308-1af5-5cc1-a366-b9c7b954b47d' AND
-					code = 'MAN' AND type = 'DESCRIPTIVE' AND
+					code = '1234' AND type = 'DESCRIPTIVE' AND
 					title = 'Manual Redeploy' AND max_score = 100 AND
 					category = 'Network' AND redeploy_rule = 'MANUAL'`,
 				"content": `
@@ -163,7 +163,7 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 			in: &domain.DescriptiveProblemData{
 				Problem: &domain.ProblemData{
 					ID:           uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
-					Code:         "ZZQ",
+					Code:         "0099",
 					ProblemType:  domain.ProblemTypeDescriptive,
 					Title:        "問題Q",
 					MaxScore:     200,
@@ -182,7 +182,7 @@ func TestSaveDescriptiveProblem(t *testing.T) {
 				"problem": `
 					SELECT 1 FROM problems WHERE
 					id = '16643c32-c686-44ba-996b-2fbe43b54513' AND
-					code = 'ZZQ' AND type = 'DESCRIPTIVE' AND
+					code = '0099' AND type = 'DESCRIPTIVE' AND
 					title = '問題Q' AND max_score = 200 AND
 					category = 'Server' AND redeploy_rule = 'PERCENTAGE_PENALTY'`,
 				"content": `

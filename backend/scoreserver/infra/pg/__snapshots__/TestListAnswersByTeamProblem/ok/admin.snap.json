@@ -11,7 +11,7 @@
     },
     "problem": {
       "id": "16643c32-c686-44ba-996b-2fbe43b54513",
-      "code": "AAA",
+      "code": "0001",
       "problem_type": "Descriptive",
       "title": "チーム名をください",
       "max_score": 10,
@@ -42,7 +42,7 @@
     },
     "problem": {
       "id": "16643c32-c686-44ba-996b-2fbe43b54513",
-      "code": "AAA",
+      "code": "0001",
       "problem_type": "Descriptive",
       "title": "チーム名をください",
       "max_score": 10,

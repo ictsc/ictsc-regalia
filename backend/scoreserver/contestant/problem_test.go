@@ -38,7 +38,7 @@ func TestProblemServiceListDeploymentsRequiresActiveSchedule(t *testing.T) {
 			client := newProblemServiceTestClient(t, store)
 
 			_, err := client.ListDeployments(t.Context(), connect.NewRequest(&contestantv1.ListDeploymentsRequest{
-				Code: "ABC",
+				Code: "0001",
 			}))
 			if got := connect.CodeOf(err); got != connect.CodeFailedPrecondition {
 				t.Fatalf("connect.CodeOf(err) = %v, want %v (err=%v)", got, connect.CodeFailedPrecondition, err)
@@ -59,7 +59,7 @@ func TestProblemServiceListDeploymentsWithinActiveSchedule(t *testing.T) {
 	client := newProblemServiceTestClient(t, store)
 
 	resp, err := client.ListDeployments(t.Context(), connect.NewRequest(&contestantv1.ListDeploymentsRequest{
-		Code: "ABC",
+		Code: "0001",
 	}))
 	if err != nil {
 		t.Fatalf("ListDeployments() error = %v", err)
@@ -92,7 +92,7 @@ func TestProblemServiceDeployRequiresActiveSchedule(t *testing.T) {
 			client := newProblemServiceTestClient(t, store)
 
 			_, err := client.Deploy(t.Context(), connect.NewRequest(&contestantv1.DeployRequest{
-				Code: "ABC",
+				Code: "0001",
 			}))
 			if got := connect.CodeOf(err); got != connect.CodeFailedPrecondition {
 				t.Fatalf("connect.CodeOf(err) = %v, want %v (err=%v)", got, connect.CodeFailedPrecondition, err)
@@ -113,7 +113,7 @@ func TestProblemServiceDeployWithinActiveSchedule(t *testing.T) {
 	client := newProblemServiceTestClient(t, store)
 
 	resp, err := client.Deploy(t.Context(), connect.NewRequest(&contestantv1.DeployRequest{
-		Code: "ABC",
+		Code: "0001",
 	}))
 	if err != nil {
 		t.Fatalf("Deploy() error = %v", err)
@@ -167,7 +167,7 @@ func newProblemServiceTestStore(schedules []*domain.ScheduleData) *problemServic
 		teamID: uuid.Must(uuid.NewV4()),
 		problem: &domain.ProblemData{
 			ID:                          uuid.Must(uuid.NewV4()),
-			Code:                        "ABC",
+			Code:                        "0001",
 			ProblemType:                 domain.ProblemTypeDescriptive,
 			Title:                       "Test Problem",
 			MaxScore:                    100,

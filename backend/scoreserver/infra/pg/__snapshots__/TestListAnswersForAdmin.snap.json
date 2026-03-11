@@ -11,7 +11,7 @@
     },
     "problem": {
       "id": "16643c32-c686-44ba-996b-2fbe43b54513",
-      "code": "AAA",
+      "code": "0001",
       "problem_type": "Descriptive",
       "title": "チーム名をください",
       "max_score": 10,
@@ -37,7 +37,7 @@
     },
     "problem": {
       "id": "16643c32-c686-44ba-996b-2fbe43b54513",
-      "code": "AAA",
+      "code": "0001",
       "problem_type": "Descriptive",
       "title": "チーム名をください",
       "max_score": 10,
@@ -68,12 +68,16 @@
     },
     "problem": {
       "id": "24f6aef0-5dcd-4032-825b-d1b19174a6f2",
-      "code": "BBB",
+      "code": "0002",
       "problem_type": "Descriptive",
       "title": "過去のみ問題 (day1-am)",
       "max_score": 100,
       "category": "Test",
-      "redeploy_rule": "Unredeployable"
+      "redeploy_rule": "PercentagePenalty",
+      "percentage_penalty": {
+        "threshold": 1,
+        "percentage": 10
+      }
     },
     "author": {
       "id": "3a4ca027-5e02-4ade-8e2d-eddb39adc235",

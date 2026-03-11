@@ -40,12 +40,12 @@ func TestListAnswersByTeamProblem(t *testing.T) {
 		"ok/admin": {
 			viewer:      "admin",
 			teamCode:    1,
-			problemCode: "AAA",
+			problemCode: "0001",
 		},
 		"ok/public": {
 			viewer:      "public",
 			teamCode:    1,
-			problemCode: "AAA",
+			problemCode: "0001",
 		},
 	}
 
@@ -124,12 +124,12 @@ func TestGetAnswerDetailForAdmin(t *testing.T) {
 	}{
 		"ok": {
 			teamCode:     1,
-			problemCode:  "AAA",
+			problemCode:  "0001",
 			answerNumber: 1,
 		},
 		"not found": {
 			teamCode:     1,
-			problemCode:  "AAA",
+			problemCode:  "0001",
 			answerNumber: 3,
 
 			wantErr: domain.ErrNotFound,
@@ -175,7 +175,7 @@ func TestCreateAnswer(t *testing.T) {
 					},
 					Problem: &domain.ProblemData{
 						ID:           uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
-						Code:         "ZZA",
+						Code:         "0001",
 						ProblemType:  domain.ProblemTypeDescriptive,
 						Title:        "問題A",
 						MaxScore:     100,
