@@ -117,7 +117,7 @@ func FixDescriptiveProblem1(tb testing.TB, data *DescriptiveProblemData) *Descri
 	problemData := &DescriptiveProblemData{
 		Problem: &ProblemData{
 			ID:           uuid.FromStringOrNil("24f6aef0-5dcd-4032-825b-d1b19174a6f2"),
-			Code:         "ZZB",
+			Code:         "0002",
 			ProblemType:  ProblemTypeDescriptive,
 			Title:        "Problem 1",
 			MaxScore:     100,
@@ -143,7 +143,7 @@ func FixDescriptiveProblemManual(tb testing.TB) *DescriptiveProblem {
 	problemData := &DescriptiveProblemData{
 		Problem: &ProblemData{
 			ID:           uuid.FromStringOrNil("35f7bf01-6ede-5043-926c-e2c20c285b03"),
-			Code:         "MAN",
+			Code:         "0003",
 			ProblemType:  ProblemTypeDescriptive,
 			Title:        "Manual Redeploy Problem",
 			MaxScore:     100,
