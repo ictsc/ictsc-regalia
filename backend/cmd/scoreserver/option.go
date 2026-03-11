@@ -54,7 +54,7 @@ func NewOption(fs *flag.FlagSet) *CLIOption {
 		"Route prefix for contestant API (e.g., '/api')")
 
 	fs.BoolVar(&opt.UseFakeSchedule, "fake.schedule", false, "Use fake schedule")
-	fs.StringVar(&opt.FakeScheduleName, "fake.schedule.name", "contest", "Fake schedule name (must match problem_schedules in DB)")
+	fs.StringVar(&opt.FakeScheduleName, "fake.schedule.name", "day1-pm", "Fake schedule name (must match problem_schedules in DB)")
 	fs.TextVar(&opt.FakeScheduleStartAt, "fake.schedule.start-at", time.Now(), "Fake schedule start time")
 	fs.TextVar(&opt.FakeScheduleEndAt, "fake.schedule.end-at", time.Now().Add(2*time.Hour), "Fake schedule end time")
 
