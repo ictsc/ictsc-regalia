@@ -8,11 +8,7 @@ import {
 import { describe, expect, it } from "vitest";
 import { nextReloadAt } from "./feature";
 
-function scheduleEntry(
-  name: string,
-  startAt: Date,
-  endAt: Date,
-) {
+function scheduleEntry(name: string, startAt: Date, endAt: Date) {
   return create(ScheduleEntrySchema, {
     name,
     startAt: timestampFromDate(startAt),
