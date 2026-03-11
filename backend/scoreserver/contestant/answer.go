@@ -25,7 +25,7 @@ type AnswerServiceHandler struct {
 
 var _ contestantv1connect.AnswerServiceHandler = (*AnswerServiceHandler)(nil)
 
-func newAnswerServiceHandler(repo *pg.Repository) *AnswerServiceHandler {
+func newAnswerServiceHandler(repo *pg.Repository, scheduleReader domain.ScheduleReader) *AnswerServiceHandler {
 	return &AnswerServiceHandler{
 		ListEffect: repo,
 		GetEffect:  repo,
@@ -37,7 +37,7 @@ func newAnswerServiceHandler(repo *pg.Repository) *AnswerServiceHandler {
 		}{
 			TeamMemberGetter: repo,
 			ProblemReader:    repo,
-			ScheduleReader:   repo,
+			ScheduleReader:   scheduleReader,
 			Tx:               pg.Tx(repo, func(rt *pg.RepositoryTx) domain.AnswerWriter { return rt }),
 		},
 	}

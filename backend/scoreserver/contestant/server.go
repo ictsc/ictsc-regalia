@@ -74,7 +74,7 @@ func New(
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(contestantv1connect.NewAnswerServiceHandler(
-		newAnswerServiceHandler(repo),
+		newAnswerServiceHandler(repo, scheduler),
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(contestantv1connect.NewNoticeServiceHandler(
