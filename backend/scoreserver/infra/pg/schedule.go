@@ -41,47 +41,32 @@ func (r *repo) GetSchedule(ctx context.Context) ([]*domain.ScheduleData, error) 
 }
 
 func (r *RepositoryTx) SaveSchedule(ctx context.Context, data []*domain.ScheduleData) error {
-	// 既存のスケジュール名を取得
-	existingSchedules, err := r.GetSchedule(ctx)
-	if err != nil {
-		return err
+	rows := make([]scheduleRow, 0, len(data))
+	for _, schedule := range data {
+		rows = append(rows, scheduleRow{
+			Name:    schedule.Name,
+			StartAt: schedule.StartAt,
+			EndAt:   schedule.EndAt,
+		})
 	}
 
-	existingNames := make(map[string]bool)
-	for _, existing := range existingSchedules {
-		existingNames[existing.Name] = true
+	if _, err := r.ext.ExecContext(ctx, `LOCK TABLE schedules IN ACCESS EXCLUSIVE MODE`); err != nil {
+		return errors.Wrap(err, "failed to lock schedules")
 	}
 
-	// リクエストで指定されたスケジュールを処理
-	updatedNames := make(map[string]bool)
-	for _, d := range data {
-		if d.Name == "" {
-			continue // 名前がない場合はスキップ
-		}
-
-		query := `
-            INSERT INTO schedules (name, start_at, end_at)
-            VALUES ($1, $2, $3)
-            ON CONFLICT (name) DO UPDATE SET
-                start_at = EXCLUDED.start_at,
-                end_at = EXCLUDED.end_at
-        `
-
-		if _, err := r.ext.ExecContext(ctx, query, d.Name, d.StartAt, d.EndAt); err != nil {
-			return errors.Wrap(err, "failed to upsert schedule")
-		}
-
-		updatedNames[d.Name] = true
+	if _, err := r.ext.ExecContext(ctx, `DELETE FROM schedules`); err != nil {
+		return errors.Wrap(err, "failed to delete schedules")
 	}
 
-	// リクエストに含まれなかった既存スケジュールを削除
-	for name := range existingNames {
-		if !updatedNames[name] {
-			if _, err := r.ext.ExecContext(ctx, `DELETE FROM schedules WHERE name = $1`, name); err != nil {
-				return errors.Wrap(err, "failed to delete old schedule")
-			}
-		}
+	if len(rows) == 0 {
+		return nil
 	}
 
+	if _, err := sqlx.NamedExecContext(ctx, r.ext, `
+		INSERT INTO schedules (name, start_at, end_at)
+		VALUES (:name, :start_at, :end_at)
+	`, rows); err != nil {
+		return errors.Wrap(err, "failed to insert schedules")
+	}
 	return nil
 }

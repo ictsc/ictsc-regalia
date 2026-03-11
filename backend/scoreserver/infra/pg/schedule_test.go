@@ -119,8 +119,8 @@ func TestSaveScheduleUpdate(t *testing.T) {
 	t.Parallel()
 
 	// 既存の day1-am を更新する
-	startAt := time.Date(2025, 6, 1, 9, 0, 0, 0, time.UTC)
-	endAt := time.Date(2025, 6, 1, 12, 0, 0, 0, time.UTC)
+	startAt := time.Date(2026, 6, 1, 9, 0, 0, 0, time.UTC)
+	endAt := time.Date(2026, 6, 1, 12, 0, 0, 0, time.UTC)
 
 	db := pgtest.SetupDB(t)
 	repo := pg.NewRepository(db)
@@ -139,12 +139,10 @@ func TestSaveScheduleUpdate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// SaveSchedule deletes schedules not in the input, so only 1 should remain
+	expected := &domain.ScheduleData{Name: "day1-am", StartAt: startAt, EndAt: endAt}
 	if len(actual) != 1 {
 		t.Fatalf("expected 1 schedule, got %d", len(actual))
 	}
-
-	expected := &domain.ScheduleData{Name: "day1-am", StartAt: startAt, EndAt: endAt}
 	if diff := cmp.Diff(expected, actual[0]); diff != "" {
 		t.Errorf("schedule mismatch (-want +got):\n%s", diff)
 	}

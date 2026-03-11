@@ -249,7 +249,7 @@ COMMENT ON COLUMN schedules.end_at IS '終了時刻';
 
 CREATE TABLE problem_schedules (
 	problem_id UUID NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
-	schedule_name VARCHAR(255) NOT NULL REFERENCES schedules(name) ON DELETE CASCADE,
+	schedule_name VARCHAR(255) NOT NULL,
 	PRIMARY KEY (problem_id, schedule_name)
 );
 

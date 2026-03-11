@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"fmt"
 	"slices"
 	"time"
 )
@@ -63,7 +64,22 @@ func GetSchedule(ctx context.Context, eff ScheduleReader) (Schedule, error) {
 
 func SaveSchedule(ctx context.Context, eff ScheduleWriter, input []*UpdateScheduleInput) error {
 	data := make([]*ScheduleData, 0, len(input))
-	for _, schedule := range input {
+	seenNames := make(map[string]struct{}, len(input))
+	for index, schedule := range input {
+		if schedule == nil {
+			return NewInvalidArgumentError(fmt.Sprintf("schedule[%d] is required", index), nil)
+		}
+		if schedule.Name == "" {
+			return NewInvalidArgumentError(fmt.Sprintf("schedule[%d].name is required", index), nil)
+		}
+		if !schedule.StartAt.Before(schedule.EndAt) {
+			return NewInvalidArgumentError(fmt.Sprintf("schedule[%d] start_at must be before end_at", index), nil)
+		}
+		if _, exists := seenNames[schedule.Name]; exists {
+			return NewInvalidArgumentError(fmt.Sprintf("duplicated schedule name: %s", schedule.Name), nil)
+		}
+		seenNames[schedule.Name] = struct{}{}
+
 		data = append(data, &ScheduleData{
 			Name:    schedule.Name,
 			StartAt: schedule.StartAt,
