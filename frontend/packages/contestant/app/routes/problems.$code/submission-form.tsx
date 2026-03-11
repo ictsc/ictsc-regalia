@@ -56,6 +56,10 @@ export function SubmissionForm(props: {
   readonly submitInterval?: number;
   readonly lastSubmittedAt?: string;
   readonly storageKey?: string;
+  readonly submissionStatus?: {
+    isSubmittable: boolean;
+    submittableUntil?: Date;
+  };
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [lastResult, action, isPending] = useActionState(
@@ -100,7 +104,9 @@ export function SubmissionForm(props: {
     props.lastSubmittedAt,
     props.submitInterval,
   );
-  const isAnswerable = remainingSeconds <= 0;
+  const isRateLimitOk = remainingSeconds <= 0;
+  const isScheduleOk = props.submissionStatus?.isSubmittable ?? true;
+  const isAnswerable = isRateLimitOk && isScheduleOk;
   const { minutes, seconds } = formatRemainingTimeParts(remainingSeconds);
 
   const formId = useId();
@@ -121,7 +127,7 @@ export function SubmissionForm(props: {
         storageKey={props.storageKey}
       />
       <div className="mt-20 flex items-center justify-end gap-24">
-        {!isAnswerable && (
+        {!isRateLimitOk && (
           <div className="flex w-[160px] items-center justify-between">
             <span className="text-16 text-black">解答可能まで</span>
             <div className="flex items-center">
@@ -133,6 +139,15 @@ export function SubmissionForm(props: {
                 {seconds.toString().padStart(2, "0")}
               </span>
             </div>
+          </div>
+        )}
+        {isRateLimitOk && !isScheduleOk && (
+          <div className="text-16 text-text">
+            {props.submissionStatus?.submittableUntil ? (
+              <span>次回提出可能時刻まで提出できません</span>
+            ) : (
+              <span>この問題は現在提出できません</span>
+            )}
           </div>
         )}
         {isAnswerable && lastResult?.type === "error" && (

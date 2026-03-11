@@ -22,74 +22,84 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Phase int32
+// スケジュールエントリ
+type ScheduleEntry struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// スケジュール名(例: "day1-am")
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	StartAt       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_at,json=startAt,proto3" json:"start_at,omitempty"`
+	EndAt         *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end_at,json=endAt,proto3" json:"end_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
 
-const (
-	Phase_PHASE_UNSPECIFIED    Phase = 0
-	Phase_PHASE_OUT_OF_CONTEST Phase = 1
-	Phase_PHASE_IN_CONTEST     Phase = 2
-	Phase_PHASE_BREAK          Phase = 3
-	Phase_PHASE_AFTER_CONTEST  Phase = 4
-)
+func (x *ScheduleEntry) Reset() {
+	*x = ScheduleEntry{}
+	mi := &file_contestant_v1_contest_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
 
-// Enum value maps for Phase.
-var (
-	Phase_name = map[int32]string{
-		0: "PHASE_UNSPECIFIED",
-		1: "PHASE_OUT_OF_CONTEST",
-		2: "PHASE_IN_CONTEST",
-		3: "PHASE_BREAK",
-		4: "PHASE_AFTER_CONTEST",
+func (x *ScheduleEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ScheduleEntry) ProtoMessage() {}
+
+func (x *ScheduleEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_contestant_v1_contest_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
 	}
-	Phase_value = map[string]int32{
-		"PHASE_UNSPECIFIED":    0,
-		"PHASE_OUT_OF_CONTEST": 1,
-		"PHASE_IN_CONTEST":     2,
-		"PHASE_BREAK":          3,
-		"PHASE_AFTER_CONTEST":  4,
-	}
-)
-
-func (x Phase) Enum() *Phase {
-	p := new(Phase)
-	*p = x
-	return p
+	return mi.MessageOf(x)
 }
 
-func (x Phase) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (Phase) Descriptor() protoreflect.EnumDescriptor {
-	return file_contestant_v1_contest_proto_enumTypes[0].Descriptor()
-}
-
-func (Phase) Type() protoreflect.EnumType {
-	return &file_contestant_v1_contest_proto_enumTypes[0]
-}
-
-func (x Phase) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use Phase.Descriptor instead.
-func (Phase) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use ScheduleEntry.ProtoReflect.Descriptor instead.
+func (*ScheduleEntry) Descriptor() ([]byte, []int) {
 	return file_contestant_v1_contest_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *ScheduleEntry) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ScheduleEntry) GetStartAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartAt
+	}
+	return nil
+}
+
+func (x *ScheduleEntry) GetEndAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndAt
+	}
+	return nil
+}
+
+// 現在のコンテスト状態
 type Schedule struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Phase         Phase                  `protobuf:"varint,1,opt,name=phase,proto3,enum=contestant.v1.Phase" json:"phase,omitempty"`
-	NextPhase     Phase                  `protobuf:"varint,2,opt,name=next_phase,json=nextPhase,proto3,enum=contestant.v1.Phase" json:"next_phase,omitempty"`
-	StartAt       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_at,json=startAt,proto3" json:"start_at,omitempty"`
-	EndAt         *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end_at,json=endAt,proto3,oneof" json:"end_at,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// コンテストが開始済みか（一度でもスケジュールが開始されたか）
+	HasStarted bool `protobuf:"varint,2,opt,name=has_started,json=hasStarted,proto3" json:"has_started,omitempty"`
+	// 現在アクティブなスケジュール（なければ空）
+	Current *ScheduleEntry `protobuf:"bytes,3,opt,name=current,proto3,oneof" json:"current,omitempty"`
+	// 次のスケジュール（なければ空）
+	Next          *ScheduleEntry `protobuf:"bytes,4,opt,name=next,proto3,oneof" json:"next,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Schedule) Reset() {
 	*x = Schedule{}
-	mi := &file_contestant_v1_contest_proto_msgTypes[0]
+	mi := &file_contestant_v1_contest_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -101,7 +111,7 @@ func (x *Schedule) String() string {
 func (*Schedule) ProtoMessage() {}
 
 func (x *Schedule) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_contest_proto_msgTypes[0]
+	mi := &file_contestant_v1_contest_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -114,33 +124,26 @@ func (x *Schedule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Schedule.ProtoReflect.Descriptor instead.
 func (*Schedule) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_contest_proto_rawDescGZIP(), []int{0}
+	return file_contestant_v1_contest_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *Schedule) GetPhase() Phase {
+func (x *Schedule) GetHasStarted() bool {
 	if x != nil {
-		return x.Phase
+		return x.HasStarted
 	}
-	return Phase_PHASE_UNSPECIFIED
+	return false
 }
 
-func (x *Schedule) GetNextPhase() Phase {
+func (x *Schedule) GetCurrent() *ScheduleEntry {
 	if x != nil {
-		return x.NextPhase
-	}
-	return Phase_PHASE_UNSPECIFIED
-}
-
-func (x *Schedule) GetStartAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.StartAt
+		return x.Current
 	}
 	return nil
 }
 
-func (x *Schedule) GetEndAt() *timestamppb.Timestamp {
+func (x *Schedule) GetNext() *ScheduleEntry {
 	if x != nil {
-		return x.EndAt
+		return x.Next
 	}
 	return nil
 }
@@ -154,7 +157,7 @@ type Rule struct {
 
 func (x *Rule) Reset() {
 	*x = Rule{}
-	mi := &file_contestant_v1_contest_proto_msgTypes[1]
+	mi := &file_contestant_v1_contest_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -166,7 +169,7 @@ func (x *Rule) String() string {
 func (*Rule) ProtoMessage() {}
 
 func (x *Rule) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_contest_proto_msgTypes[1]
+	mi := &file_contestant_v1_contest_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -179,7 +182,7 @@ func (x *Rule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Rule.ProtoReflect.Descriptor instead.
 func (*Rule) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_contest_proto_rawDescGZIP(), []int{1}
+	return file_contestant_v1_contest_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Rule) GetMarkdown() string {
@@ -197,7 +200,7 @@ type GetScheduleRequest struct {
 
 func (x *GetScheduleRequest) Reset() {
 	*x = GetScheduleRequest{}
-	mi := &file_contestant_v1_contest_proto_msgTypes[2]
+	mi := &file_contestant_v1_contest_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -209,7 +212,7 @@ func (x *GetScheduleRequest) String() string {
 func (*GetScheduleRequest) ProtoMessage() {}
 
 func (x *GetScheduleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_contest_proto_msgTypes[2]
+	mi := &file_contestant_v1_contest_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -222,7 +225,7 @@ func (x *GetScheduleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetScheduleRequest.ProtoReflect.Descriptor instead.
 func (*GetScheduleRequest) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_contest_proto_rawDescGZIP(), []int{2}
+	return file_contestant_v1_contest_proto_rawDescGZIP(), []int{3}
 }
 
 type GetScheduleResponse struct {
@@ -234,7 +237,7 @@ type GetScheduleResponse struct {
 
 func (x *GetScheduleResponse) Reset() {
 	*x = GetScheduleResponse{}
-	mi := &file_contestant_v1_contest_proto_msgTypes[3]
+	mi := &file_contestant_v1_contest_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -246,7 +249,7 @@ func (x *GetScheduleResponse) String() string {
 func (*GetScheduleResponse) ProtoMessage() {}
 
 func (x *GetScheduleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_contest_proto_msgTypes[3]
+	mi := &file_contestant_v1_contest_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -259,7 +262,7 @@ func (x *GetScheduleResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetScheduleResponse.ProtoReflect.Descriptor instead.
 func (*GetScheduleResponse) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_contest_proto_rawDescGZIP(), []int{3}
+	return file_contestant_v1_contest_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetScheduleResponse) GetSchedule() *Schedule {
@@ -277,7 +280,7 @@ type GetRuleRequest struct {
 
 func (x *GetRuleRequest) Reset() {
 	*x = GetRuleRequest{}
-	mi := &file_contestant_v1_contest_proto_msgTypes[4]
+	mi := &file_contestant_v1_contest_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -289,7 +292,7 @@ func (x *GetRuleRequest) String() string {
 func (*GetRuleRequest) ProtoMessage() {}
 
 func (x *GetRuleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_contest_proto_msgTypes[4]
+	mi := &file_contestant_v1_contest_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -302,7 +305,7 @@ func (x *GetRuleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRuleRequest.ProtoReflect.Descriptor instead.
 func (*GetRuleRequest) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_contest_proto_rawDescGZIP(), []int{4}
+	return file_contestant_v1_contest_proto_rawDescGZIP(), []int{5}
 }
 
 type GetRuleResponse struct {
@@ -314,7 +317,7 @@ type GetRuleResponse struct {
 
 func (x *GetRuleResponse) Reset() {
 	*x = GetRuleResponse{}
-	mi := &file_contestant_v1_contest_proto_msgTypes[5]
+	mi := &file_contestant_v1_contest_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -326,7 +329,7 @@ func (x *GetRuleResponse) String() string {
 func (*GetRuleResponse) ProtoMessage() {}
 
 func (x *GetRuleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_contest_proto_msgTypes[5]
+	mi := &file_contestant_v1_contest_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -339,7 +342,7 @@ func (x *GetRuleResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRuleResponse.ProtoReflect.Descriptor instead.
 func (*GetRuleResponse) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_contest_proto_rawDescGZIP(), []int{5}
+	return file_contestant_v1_contest_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetRuleResponse) GetRule() *Rule {
@@ -353,14 +356,19 @@ var File_contestant_v1_contest_proto protoreflect.FileDescriptor
 
 const file_contestant_v1_contest_proto_rawDesc = "" +
 	"\n" +
-	"\x1bcontestant/v1/contest.proto\x12\rcontestant.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe5\x01\n" +
-	"\bSchedule\x12*\n" +
-	"\x05phase\x18\x01 \x01(\x0e2\x14.contestant.v1.PhaseR\x05phase\x123\n" +
+	"\x1bcontestant/v1/contest.proto\x12\rcontestant.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8d\x01\n" +
+	"\rScheduleEntry\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x125\n" +
+	"\bstart_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\astartAt\x121\n" +
+	"\x06end_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\x05endAt\"\xb4\x01\n" +
+	"\bSchedule\x12\x1f\n" +
+	"\vhas_started\x18\x02 \x01(\bR\n" +
+	"hasStarted\x12;\n" +
+	"\acurrent\x18\x03 \x01(\v2\x1c.contestant.v1.ScheduleEntryH\x00R\acurrent\x88\x01\x01\x125\n" +
+	"\x04next\x18\x04 \x01(\v2\x1c.contestant.v1.ScheduleEntryH\x01R\x04next\x88\x01\x01B\n" +
 	"\n" +
-	"next_phase\x18\x02 \x01(\x0e2\x14.contestant.v1.PhaseR\tnextPhase\x125\n" +
-	"\bstart_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\astartAt\x126\n" +
-	"\x06end_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\x05endAt\x88\x01\x01B\t\n" +
-	"\a_end_at\"\"\n" +
+	"\b_currentB\a\n" +
+	"\x05_next\"\"\n" +
 	"\x04Rule\x12\x1a\n" +
 	"\bmarkdown\x18\x01 \x01(\tR\bmarkdown\"\x14\n" +
 	"\x12GetScheduleRequest\"J\n" +
@@ -368,13 +376,7 @@ const file_contestant_v1_contest_proto_rawDesc = "" +
 	"\bschedule\x18\x01 \x01(\v2\x17.contestant.v1.ScheduleR\bschedule\"\x10\n" +
 	"\x0eGetRuleRequest\":\n" +
 	"\x0fGetRuleResponse\x12'\n" +
-	"\x04rule\x18\x01 \x01(\v2\x13.contestant.v1.RuleR\x04rule*x\n" +
-	"\x05Phase\x12\x15\n" +
-	"\x11PHASE_UNSPECIFIED\x10\x00\x12\x18\n" +
-	"\x14PHASE_OUT_OF_CONTEST\x10\x01\x12\x14\n" +
-	"\x10PHASE_IN_CONTEST\x10\x02\x12\x0f\n" +
-	"\vPHASE_BREAK\x10\x03\x12\x17\n" +
-	"\x13PHASE_AFTER_CONTEST\x10\x042\xb0\x01\n" +
+	"\x04rule\x18\x01 \x01(\v2\x13.contestant.v1.RuleR\x04rule2\xb0\x01\n" +
 	"\x0eContestService\x12T\n" +
 	"\vGetSchedule\x12!.contestant.v1.GetScheduleRequest\x1a\".contestant.v1.GetScheduleResponse\x12H\n" +
 	"\aGetRule\x12\x1d.contestant.v1.GetRuleRequest\x1a\x1e.contestant.v1.GetRuleResponseBMZKgithub.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1;contestantv1b\x06proto3"
@@ -391,10 +393,9 @@ func file_contestant_v1_contest_proto_rawDescGZIP() []byte {
 	return file_contestant_v1_contest_proto_rawDescData
 }
 
-var file_contestant_v1_contest_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_contestant_v1_contest_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_contestant_v1_contest_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_contestant_v1_contest_proto_goTypes = []any{
-	(Phase)(0),                    // 0: contestant.v1.Phase
+	(*ScheduleEntry)(nil),         // 0: contestant.v1.ScheduleEntry
 	(*Schedule)(nil),              // 1: contestant.v1.Schedule
 	(*Rule)(nil),                  // 2: contestant.v1.Rule
 	(*GetScheduleRequest)(nil),    // 3: contestant.v1.GetScheduleRequest
@@ -404,10 +405,10 @@ var file_contestant_v1_contest_proto_goTypes = []any{
 	(*timestamppb.Timestamp)(nil), // 7: google.protobuf.Timestamp
 }
 var file_contestant_v1_contest_proto_depIdxs = []int32{
-	0, // 0: contestant.v1.Schedule.phase:type_name -> contestant.v1.Phase
-	0, // 1: contestant.v1.Schedule.next_phase:type_name -> contestant.v1.Phase
-	7, // 2: contestant.v1.Schedule.start_at:type_name -> google.protobuf.Timestamp
-	7, // 3: contestant.v1.Schedule.end_at:type_name -> google.protobuf.Timestamp
+	7, // 0: contestant.v1.ScheduleEntry.start_at:type_name -> google.protobuf.Timestamp
+	7, // 1: contestant.v1.ScheduleEntry.end_at:type_name -> google.protobuf.Timestamp
+	0, // 2: contestant.v1.Schedule.current:type_name -> contestant.v1.ScheduleEntry
+	0, // 3: contestant.v1.Schedule.next:type_name -> contestant.v1.ScheduleEntry
 	1, // 4: contestant.v1.GetScheduleResponse.schedule:type_name -> contestant.v1.Schedule
 	2, // 5: contestant.v1.GetRuleResponse.rule:type_name -> contestant.v1.Rule
 	3, // 6: contestant.v1.ContestService.GetSchedule:input_type -> contestant.v1.GetScheduleRequest
@@ -426,20 +427,19 @@ func file_contestant_v1_contest_proto_init() {
 	if File_contestant_v1_contest_proto != nil {
 		return
 	}
-	file_contestant_v1_contest_proto_msgTypes[0].OneofWrappers = []any{}
+	file_contestant_v1_contest_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_contestant_v1_contest_proto_rawDesc), len(file_contestant_v1_contest_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   6,
+			NumEnums:      0,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_contestant_v1_contest_proto_goTypes,
 		DependencyIndexes: file_contestant_v1_contest_proto_depIdxs,
-		EnumInfos:         file_contestant_v1_contest_proto_enumTypes,
 		MessageInfos:      file_contestant_v1_contest_proto_msgTypes,
 	}.Build()
 	File_contestant_v1_contest_proto = out.File

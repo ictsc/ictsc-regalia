@@ -9,7 +9,7 @@ import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
  * Describes the file contestant/v1/problem.proto.
  */
 export const file_contestant_v1_problem = /*@__PURE__*/
-  fileDesc("Chtjb250ZXN0YW50L3YxL3Byb2JsZW0ucHJvdG8SDWNvbnRlc3RhbnQudjEi2AEKB1Byb2JsZW0SDAoEY29kZRgBIAEoCRINCgV0aXRsZRgCIAEoCRIRCgltYXhfc2NvcmUYAyABKA0SEAoIY2F0ZWdvcnkYBCABKAkSKAoFc2NvcmUYBSABKAsyFC5jb250ZXN0YW50LnYxLlNjb3JlSACIAQESLQoKZGVwbG95bWVudBgGIAEoCzIZLmNvbnRlc3RhbnQudjEuRGVwbG95bWVudBIoCgRib2R5GAcgASgLMhouY29udGVzdGFudC52MS5Qcm9ibGVtQm9keUIICgZfc2NvcmUiUAoFU2NvcmUSFAoMbWFya2VkX3Njb3JlGAEgASgNEg8KB3BlbmFsdHkYAiABKA0SDQoFc2NvcmUYAyABKA0SEQoJbWF4X3Njb3JlGAQgASgNIm8KCkRlcGxveW1lbnQSLwoGc3RhdHVzGAEgASgOMh8uY29udGVzdGFudC52MS5EZXBsb3ltZW50U3RhdHVzEhQKDHJlZGVwbG95YWJsZRgCIAEoCBIaChJwZW5hbHR5X3RocmVhc2hvbGQYAyABKA0iuAEKEURlcGxveW1lbnRSZXF1ZXN0EhAKCHJldmlzaW9uGAEgASgNEi8KBnN0YXR1cxgCIAEoDjIfLmNvbnRlc3RhbnQudjEuRGVwbG95bWVudFN0YXR1cxIwCgxyZXF1ZXN0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEg8KB3BlbmFsdHkYBCABKA0SHQoVYWxsb3dlZF9yZXF1ZXN0X2NvdW50GAUgASgFInkKC1Byb2JsZW1Cb2R5EigKBHR5cGUYASABKA4yGi5jb250ZXN0YW50LnYxLlByb2JsZW1UeXBlEjgKC2Rlc2NyaXB0aXZlGAIgASgLMiEuY29udGVzdGFudC52MS5EZXNjcmlwdGl2ZVByb2JsZW1IAEIGCgRib2R5IiIKEkRlc2NyaXB0aXZlUHJvYmxlbRIMCgRib2R5GAEgASgJIhUKE0xpc3RQcm9ibGVtc1JlcXVlc3QiQAoUTGlzdFByb2JsZW1zUmVzcG9uc2USKAoIcHJvYmxlbXMYASADKAsyFi5jb250ZXN0YW50LnYxLlByb2JsZW0iIQoRR2V0UHJvYmxlbVJlcXVlc3QSDAoEY29kZRgBIAEoCSI9ChJHZXRQcm9ibGVtUmVzcG9uc2USJwoHcHJvYmxlbRgBIAEoCzIWLmNvbnRlc3RhbnQudjEuUHJvYmxlbSImChZMaXN0RGVwbG95bWVudHNSZXF1ZXN0EgwKBGNvZGUYASABKAkiUAoXTGlzdERlcGxveW1lbnRzUmVzcG9uc2USNQoLZGVwbG95bWVudHMYASADKAsyIC5jb250ZXN0YW50LnYxLkRlcGxveW1lbnRSZXF1ZXN0Ih0KDURlcGxveVJlcXVlc3QSDAoEY29kZRgBIAEoCSJGCg5EZXBsb3lSZXNwb25zZRI0CgpkZXBsb3ltZW50GAEgASgLMiAuY29udGVzdGFudC52MS5EZXBsb3ltZW50UmVxdWVzdCqUAQoQRGVwbG95bWVudFN0YXR1cxIhCh1ERVBMT1lNRU5UX1NUQVRVU19VTlNQRUNJRklFRBAAEh4KGkRFUExPWU1FTlRfU1RBVFVTX0RFUExPWUVEEAESHwobREVQTE9ZTUVOVF9TVEFUVVNfREVQTE9ZSU5HEAISHAoYREVQTE9ZTUVOVF9TVEFUVVNfRkFJTEVEEAMqSQoLUHJvYmxlbVR5cGUSHAoYUFJPQkxFTV9UWVBFX1VOU1BFQ0lGSUVEEAASHAoYUFJPQkxFTV9UWVBFX0RFU0NSSVBUSVZFEAEy5QIKDlByb2JsZW1TZXJ2aWNlElcKDExpc3RQcm9ibGVtcxIiLmNvbnRlc3RhbnQudjEuTGlzdFByb2JsZW1zUmVxdWVzdBojLmNvbnRlc3RhbnQudjEuTGlzdFByb2JsZW1zUmVzcG9uc2USUQoKR2V0UHJvYmxlbRIgLmNvbnRlc3RhbnQudjEuR2V0UHJvYmxlbVJlcXVlc3QaIS5jb250ZXN0YW50LnYxLkdldFByb2JsZW1SZXNwb25zZRJgCg9MaXN0RGVwbG95bWVudHMSJS5jb250ZXN0YW50LnYxLkxpc3REZXBsb3ltZW50c1JlcXVlc3QaJi5jb250ZXN0YW50LnYxLkxpc3REZXBsb3ltZW50c1Jlc3BvbnNlEkUKBkRlcGxveRIcLmNvbnRlc3RhbnQudjEuRGVwbG95UmVxdWVzdBodLmNvbnRlc3RhbnQudjEuRGVwbG95UmVzcG9uc2VCwwEKEWNvbS5jb250ZXN0YW50LnYxQgxQcm9ibGVtUHJvdG9QAVpLZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2NvbnRlc3RhbnQvdjE7Y29udGVzdGFudHYxogIDQ1hYqgINQ29udGVzdGFudC5WMcoCDUNvbnRlc3RhbnRcVjHiAhlDb250ZXN0YW50XFYxXEdQQk1ldGFkYXRh6gIOQ29udGVzdGFudDo6VjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
+  fileDesc("Chtjb250ZXN0YW50L3YxL3Byb2JsZW0ucHJvdG8SDWNvbnRlc3RhbnQudjEilAIKB1Byb2JsZW0SDAoEY29kZRgBIAEoCRINCgV0aXRsZRgCIAEoCRIRCgltYXhfc2NvcmUYAyABKA0SEAoIY2F0ZWdvcnkYBCABKAkSKAoFc2NvcmUYBSABKAsyFC5jb250ZXN0YW50LnYxLlNjb3JlSACIAQESLQoKZGVwbG95bWVudBgGIAEoCzIZLmNvbnRlc3RhbnQudjEuRGVwbG95bWVudBIoCgRib2R5GAcgASgLMhouY29udGVzdGFudC52MS5Qcm9ibGVtQm9keRI6ChFzdWJtaXNzaW9uX3N0YXR1cxgIIAEoCzIfLmNvbnRlc3RhbnQudjEuU3VibWlzc2lvblN0YXR1c0IICgZfc2NvcmUizAEKEFN1Ym1pc3Npb25TdGF0dXMSFgoOaXNfc3VibWl0dGFibGUYASABKAgSOgoRc3VibWl0dGFibGVfdW50aWwYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSACIAQESOQoQc3VibWl0dGFibGVfZnJvbRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIAYgBAUIUChJfc3VibWl0dGFibGVfdW50aWxCEwoRX3N1Ym1pdHRhYmxlX2Zyb20iUAoFU2NvcmUSFAoMbWFya2VkX3Njb3JlGAEgASgNEg8KB3BlbmFsdHkYAiABKA0SDQoFc2NvcmUYAyABKA0SEQoJbWF4X3Njb3JlGAQgASgNIm8KCkRlcGxveW1lbnQSLwoGc3RhdHVzGAEgASgOMh8uY29udGVzdGFudC52MS5EZXBsb3ltZW50U3RhdHVzEhQKDHJlZGVwbG95YWJsZRgCIAEoCBIaChJwZW5hbHR5X3RocmVhc2hvbGQYAyABKA0iuAEKEURlcGxveW1lbnRSZXF1ZXN0EhAKCHJldmlzaW9uGAEgASgNEi8KBnN0YXR1cxgCIAEoDjIfLmNvbnRlc3RhbnQudjEuRGVwbG95bWVudFN0YXR1cxIwCgxyZXF1ZXN0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEg8KB3BlbmFsdHkYBCABKA0SHQoVYWxsb3dlZF9yZXF1ZXN0X2NvdW50GAUgASgFInkKC1Byb2JsZW1Cb2R5EigKBHR5cGUYASABKA4yGi5jb250ZXN0YW50LnYxLlByb2JsZW1UeXBlEjgKC2Rlc2NyaXB0aXZlGAIgASgLMiEuY29udGVzdGFudC52MS5EZXNjcmlwdGl2ZVByb2JsZW1IAEIGCgRib2R5IiIKEkRlc2NyaXB0aXZlUHJvYmxlbRIMCgRib2R5GAEgASgJIhUKE0xpc3RQcm9ibGVtc1JlcXVlc3QiQAoUTGlzdFByb2JsZW1zUmVzcG9uc2USKAoIcHJvYmxlbXMYASADKAsyFi5jb250ZXN0YW50LnYxLlByb2JsZW0iIQoRR2V0UHJvYmxlbVJlcXVlc3QSDAoEY29kZRgBIAEoCSI9ChJHZXRQcm9ibGVtUmVzcG9uc2USJwoHcHJvYmxlbRgBIAEoCzIWLmNvbnRlc3RhbnQudjEuUHJvYmxlbSImChZMaXN0RGVwbG95bWVudHNSZXF1ZXN0EgwKBGNvZGUYASABKAkiUAoXTGlzdERlcGxveW1lbnRzUmVzcG9uc2USNQoLZGVwbG95bWVudHMYASADKAsyIC5jb250ZXN0YW50LnYxLkRlcGxveW1lbnRSZXF1ZXN0Ih0KDURlcGxveVJlcXVlc3QSDAoEY29kZRgBIAEoCSJGCg5EZXBsb3lSZXNwb25zZRI0CgpkZXBsb3ltZW50GAEgASgLMiAuY29udGVzdGFudC52MS5EZXBsb3ltZW50UmVxdWVzdCqUAQoQRGVwbG95bWVudFN0YXR1cxIhCh1ERVBMT1lNRU5UX1NUQVRVU19VTlNQRUNJRklFRBAAEh4KGkRFUExPWU1FTlRfU1RBVFVTX0RFUExPWUVEEAESHwobREVQTE9ZTUVOVF9TVEFUVVNfREVQTE9ZSU5HEAISHAoYREVQTE9ZTUVOVF9TVEFUVVNfRkFJTEVEEAMqSQoLUHJvYmxlbVR5cGUSHAoYUFJPQkxFTV9UWVBFX1VOU1BFQ0lGSUVEEAASHAoYUFJPQkxFTV9UWVBFX0RFU0NSSVBUSVZFEAEy5QIKDlByb2JsZW1TZXJ2aWNlElcKDExpc3RQcm9ibGVtcxIiLmNvbnRlc3RhbnQudjEuTGlzdFByb2JsZW1zUmVxdWVzdBojLmNvbnRlc3RhbnQudjEuTGlzdFByb2JsZW1zUmVzcG9uc2USUQoKR2V0UHJvYmxlbRIgLmNvbnRlc3RhbnQudjEuR2V0UHJvYmxlbVJlcXVlc3QaIS5jb250ZXN0YW50LnYxLkdldFByb2JsZW1SZXNwb25zZRJgCg9MaXN0RGVwbG95bWVudHMSJS5jb250ZXN0YW50LnYxLkxpc3REZXBsb3ltZW50c1JlcXVlc3QaJi5jb250ZXN0YW50LnYxLkxpc3REZXBsb3ltZW50c1Jlc3BvbnNlEkUKBkRlcGxveRIcLmNvbnRlc3RhbnQudjEuRGVwbG95UmVxdWVzdBodLmNvbnRlc3RhbnQudjEuRGVwbG95UmVzcG9uc2VCwwEKEWNvbS5jb250ZXN0YW50LnYxQgxQcm9ibGVtUHJvdG9QAVpLZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2NvbnRlc3RhbnQvdjE7Y29udGVzdGFudHYxogIDQ1hYqgINQ29udGVzdGFudC5WMcoCDUNvbnRlc3RhbnRcVjHiAhlDb250ZXN0YW50XFYxXEdQQk1ldGFkYXRh6gIOQ29udGVzdGFudDo6VjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
 
 /**
  * Describes the message contestant.v1.Problem.
@@ -19,95 +19,102 @@ export const ProblemSchema = /*@__PURE__*/
   messageDesc(file_contestant_v1_problem, 0);
 
 /**
+ * Describes the message contestant.v1.SubmissionStatus.
+ * Use `create(SubmissionStatusSchema)` to create a new message.
+ */
+export const SubmissionStatusSchema = /*@__PURE__*/
+  messageDesc(file_contestant_v1_problem, 1);
+
+/**
  * Describes the message contestant.v1.Score.
  * Use `create(ScoreSchema)` to create a new message.
  */
 export const ScoreSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 1);
+  messageDesc(file_contestant_v1_problem, 2);
 
 /**
  * Describes the message contestant.v1.Deployment.
  * Use `create(DeploymentSchema)` to create a new message.
  */
 export const DeploymentSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 2);
+  messageDesc(file_contestant_v1_problem, 3);
 
 /**
  * Describes the message contestant.v1.DeploymentRequest.
  * Use `create(DeploymentRequestSchema)` to create a new message.
  */
 export const DeploymentRequestSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 3);
+  messageDesc(file_contestant_v1_problem, 4);
 
 /**
  * Describes the message contestant.v1.ProblemBody.
  * Use `create(ProblemBodySchema)` to create a new message.
  */
 export const ProblemBodySchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 4);
+  messageDesc(file_contestant_v1_problem, 5);
 
 /**
  * Describes the message contestant.v1.DescriptiveProblem.
  * Use `create(DescriptiveProblemSchema)` to create a new message.
  */
 export const DescriptiveProblemSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 5);
+  messageDesc(file_contestant_v1_problem, 6);
 
 /**
  * Describes the message contestant.v1.ListProblemsRequest.
  * Use `create(ListProblemsRequestSchema)` to create a new message.
  */
 export const ListProblemsRequestSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 6);
+  messageDesc(file_contestant_v1_problem, 7);
 
 /**
  * Describes the message contestant.v1.ListProblemsResponse.
  * Use `create(ListProblemsResponseSchema)` to create a new message.
  */
 export const ListProblemsResponseSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 7);
+  messageDesc(file_contestant_v1_problem, 8);
 
 /**
  * Describes the message contestant.v1.GetProblemRequest.
  * Use `create(GetProblemRequestSchema)` to create a new message.
  */
 export const GetProblemRequestSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 8);
+  messageDesc(file_contestant_v1_problem, 9);
 
 /**
  * Describes the message contestant.v1.GetProblemResponse.
  * Use `create(GetProblemResponseSchema)` to create a new message.
  */
 export const GetProblemResponseSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 9);
+  messageDesc(file_contestant_v1_problem, 10);
 
 /**
  * Describes the message contestant.v1.ListDeploymentsRequest.
  * Use `create(ListDeploymentsRequestSchema)` to create a new message.
  */
 export const ListDeploymentsRequestSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 10);
+  messageDesc(file_contestant_v1_problem, 11);
 
 /**
  * Describes the message contestant.v1.ListDeploymentsResponse.
  * Use `create(ListDeploymentsResponseSchema)` to create a new message.
  */
 export const ListDeploymentsResponseSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 11);
+  messageDesc(file_contestant_v1_problem, 12);
 
 /**
  * Describes the message contestant.v1.DeployRequest.
  * Use `create(DeployRequestSchema)` to create a new message.
  */
 export const DeployRequestSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 12);
+  messageDesc(file_contestant_v1_problem, 13);
 
 /**
  * Describes the message contestant.v1.DeployResponse.
  * Use `create(DeployResponseSchema)` to create a new message.
  */
 export const DeployResponseSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_problem, 13);
+  messageDesc(file_contestant_v1_problem, 14);
 
 /**
  * Describes the enum contestant.v1.DeploymentStatus.

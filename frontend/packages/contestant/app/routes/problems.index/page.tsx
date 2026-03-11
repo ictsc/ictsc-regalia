@@ -19,6 +19,7 @@ export function ProblemsPage(props: PageProps) {
                 code={problem.code}
                 title={problem.title}
                 score={protoScoreToProps(problem.maxScore, problem.score)}
+                submissionStatus={problem.submissionStatus}
               />
             </li>
           ))}

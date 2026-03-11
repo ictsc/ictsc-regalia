@@ -1,15 +1,15 @@
-import { isAfter } from "date-fns";
 import {
   Suspense,
   use,
   useDeferredValue,
   useEffect,
+  useEffectEvent,
   useState,
   useTransition,
   type ReactNode,
 } from "react";
 import { type Schedule } from "@ictsc/proto/contestant/v1";
-import { endAt } from "./feature";
+import { nextReloadAt } from "./feature";
 import { ScheduleContext } from "./use-schedule";
 
 export function ScheduleProvider(props: {
@@ -57,18 +57,24 @@ function ScheduleReloader(props: {
   schedule: Promise<Schedule | null>;
   load: () => void;
 }) {
-  const { load } = props;
+  const onLoad = useEffectEvent(props.load);
   const schedule = use(props.schedule);
+
   useEffect(() => {
-    const timer = setInterval(() => {
-      if (schedule == null) return;
-      const end = endAt(schedule);
-      if (end == null || isAfter(new Date(), end)) {
-        load();
-      }
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [schedule, load]);
+    const reloadAt = nextReloadAt(schedule);
+    if (reloadAt == null) return;
+
+    const delayMs = reloadAt.getTime() - Date.now();
+    if (delayMs <= 0) {
+      onLoad();
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      onLoad();
+    }, delayMs);
+    return () => window.clearTimeout(timer);
+  }, [schedule]);
 
   return null;
 }

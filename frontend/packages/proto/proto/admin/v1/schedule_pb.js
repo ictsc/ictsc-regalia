@@ -2,14 +2,14 @@
 // @generated from file admin/v1/schedule.proto (package admin.v1, syntax proto3)
 /* eslint-disable */
 
-import { enumDesc, fileDesc, messageDesc, serviceDesc, tsEnum } from "@bufbuild/protobuf/codegenv2";
+import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 
 /**
  * Describes the file admin/v1/schedule.proto.
  */
 export const file_admin_v1_schedule = /*@__PURE__*/
-  fileDesc("ChdhZG1pbi92MS9zY2hlZHVsZS5wcm90bxIIYWRtaW4udjEihAEKCFNjaGVkdWxlEh4KBXBoYXNlGAEgASgOMg8uYWRtaW4udjEuUGhhc2USLAoIc3RhcnRfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEioKBmVuZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiFAoSR2V0U2NoZWR1bGVSZXF1ZXN0IjsKE0dldFNjaGVkdWxlUmVzcG9uc2USJAoIc2NoZWR1bGUYASADKAsyEi5hZG1pbi52MS5TY2hlZHVsZSI9ChVVcGRhdGVTY2hlZHVsZVJlcXVlc3QSJAoIc2NoZWR1bGUYASADKAsyEi5hZG1pbi52MS5TY2hlZHVsZSIYChZVcGRhdGVTY2hlZHVsZVJlc3BvbnNlKngKBVBoYXNlEhUKEVBIQVNFX1VOU1BFQ0lGSUVEEAASGAoUUEhBU0VfT1VUX09GX0NPTlRFU1QQARIUChBQSEFTRV9JTl9DT05URVNUEAISDwoLUEhBU0VfQlJFQUsQAxIXChNQSEFTRV9BRlRFUl9DT05URVNUEAQysgEKD1NjaGVkdWxlU2VydmljZRJKCgtHZXRTY2hlZHVsZRIcLmFkbWluLnYxLkdldFNjaGVkdWxlUmVxdWVzdBodLmFkbWluLnYxLkdldFNjaGVkdWxlUmVzcG9uc2USUwoOVXBkYXRlU2NoZWR1bGUSHy5hZG1pbi52MS5VcGRhdGVTY2hlZHVsZVJlcXVlc3QaIC5hZG1pbi52MS5VcGRhdGVTY2hlZHVsZVJlc3BvbnNlQqEBCgxjb20uYWRtaW4udjFCDVNjaGVkdWxlUHJvdG9QAVpBZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2FkbWluL3YxO2FkbWludjGiAgNBWFiqAghBZG1pbi5WMcoCCEFkbWluXFYx4gIUQWRtaW5cVjFcR1BCTWV0YWRhdGHqAglBZG1pbjo6VjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
+  fileDesc("ChdhZG1pbi92MS9zY2hlZHVsZS5wcm90bxIIYWRtaW4udjEieAoIU2NoZWR1bGUSDAoEbmFtZRgCIAEoCRIsCghzdGFydF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASKgoGZW5kX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEoECAEQAiIUChJHZXRTY2hlZHVsZVJlcXVlc3QiOwoTR2V0U2NoZWR1bGVSZXNwb25zZRIkCghzY2hlZHVsZRgBIAMoCzISLmFkbWluLnYxLlNjaGVkdWxlIj0KFVVwZGF0ZVNjaGVkdWxlUmVxdWVzdBIkCghzY2hlZHVsZRgBIAMoCzISLmFkbWluLnYxLlNjaGVkdWxlIhgKFlVwZGF0ZVNjaGVkdWxlUmVzcG9uc2UysgEKD1NjaGVkdWxlU2VydmljZRJKCgtHZXRTY2hlZHVsZRIcLmFkbWluLnYxLkdldFNjaGVkdWxlUmVxdWVzdBodLmFkbWluLnYxLkdldFNjaGVkdWxlUmVzcG9uc2USUwoOVXBkYXRlU2NoZWR1bGUSHy5hZG1pbi52MS5VcGRhdGVTY2hlZHVsZVJlcXVlc3QaIC5hZG1pbi52MS5VcGRhdGVTY2hlZHVsZVJlc3BvbnNlQqEBCgxjb20uYWRtaW4udjFCDVNjaGVkdWxlUHJvdG9QAVpBZ2l0aHViLmNvbS9pY3RzYy9pY3RzYy1yZWdhbGlhL2JhY2tlbmQvcGtnL3Byb3RvL2FkbWluL3YxO2FkbWludjGiAgNBWFiqAghBZG1pbi5WMcoCCEFkbWluXFYx4gIUQWRtaW5cVjFcR1BCTWV0YWRhdGHqAglBZG1pbjo6VjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
 
 /**
  * Describes the message admin.v1.Schedule.
@@ -45,18 +45,6 @@ export const UpdateScheduleRequestSchema = /*@__PURE__*/
  */
 export const UpdateScheduleResponseSchema = /*@__PURE__*/
   messageDesc(file_admin_v1_schedule, 4);
-
-/**
- * Describes the enum admin.v1.Phase.
- */
-export const PhaseSchema = /*@__PURE__*/
-  enumDesc(file_admin_v1_schedule, 0);
-
-/**
- * @generated from enum admin.v1.Phase
- */
-export const Phase = /*@__PURE__*/
-  tsEnum(PhaseSchema);
 
 /**
  * @generated from service admin.v1.ScheduleService
