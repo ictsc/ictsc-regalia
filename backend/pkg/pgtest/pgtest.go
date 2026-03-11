@@ -27,10 +27,13 @@ import (
 func SetupDB(tb testing.TB) *sqlx.DB {
 	tb.Helper()
 
+	ctr, err := getContainer()
+	if err != nil {
+		tb.Fatalf("Failed to start Postgres container: %v", err)
+		return nil
+	}
+
 	ctx := tb.Context()
-
-	ctr := getContainer(ctx)
-
 	connString, err := ctr.ConnectionString(ctx)
 	if err != nil {
 		tb.Fatalf("Failed to get connection string: %v", err)
@@ -56,25 +59,40 @@ func SetupTrueDB(tb testing.TB) *sqlx.DB {
 
 var (
 	container *postgres.PostgresContainer
+	startErr  error
 	startOnce sync.Once
 )
 
-func getContainer(ctx context.Context) *postgres.PostgresContainer {
+func getContainer() (*postgres.PostgresContainer, error) {
 	startOnce.Do(func() {
-		var err error
-		container, err = startContainer(ctx)
-		if err != nil {
-			panic(err)
+		for i := 0; i < containerStartRetries; i++ {
+			ctx, cancel := context.WithTimeout(context.Background(), containerStartTimeout)
+			ctr, err := startContainer(ctx)
+			cancel()
+			if err == nil {
+				container = ctr
+				startErr = nil
+				return
+			}
+
+			startErr = err
+			if i < containerStartRetries-1 {
+				time.Sleep(containerRetryInterval)
+			}
 		}
 	})
-	return container
+
+	return container, startErr
 }
 
 const (
-	postgresImage = "postgres:17"
-	schemaFile    = "schema.sql"
-	viewFile      = "view.sql"
-	seedFile      = "seed.sql"
+	postgresImage          = "postgres:17"
+	schemaFile             = "schema.sql"
+	viewFile               = "view.sql"
+	seedFile               = "seed.sql"
+	containerStartTimeout  = 60 * time.Second
+	containerStartRetries  = 3
+	containerRetryInterval = 2 * time.Second
 )
 
 func startContainer(ctx context.Context) (*postgres.PostgresContainer, error) {
@@ -105,12 +123,12 @@ func startContainer(ctx context.Context) (*postgres.PostgresContainer, error) {
 			filepath.Join(baseDir, viewFile),
 			filepath.Join(baseDir, seedFile),
 		),
-		testcontainers.WithWaitStrategy(
-			//nolint:mnd
-			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(2).
-				WithStartupTimeout(5*time.Second),
-		))
+		testcontainers.WithAdditionalWaitStrategyAndDeadline(
+			containerStartTimeout,
+			wait.ForLog("database system is ready to accept connections").WithOccurrence(2),
+			wait.ForListeningPort("5432/tcp"),
+		),
+	)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to start Postgres container")
 	}
