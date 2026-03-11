@@ -3,6 +3,7 @@ import { fetchProblems } from "@app/features/problem";
 import { startTransition, use, useDeferredValue, useEffect } from "react";
 import { timestampDate } from "@bufbuild/protobuf/wkt";
 import { ProblemsPage } from "./problems.index/page";
+import { nextStartAt, useSchedule } from "../features/schedule";
 
 export const Route = createFileRoute("/problems/")({
   component: RouteComponent,
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/problems/")({
 
 function RouteComponent() {
   const router = useRouter();
+  const [schedule] = useSchedule();
   const { problems: problemsPromise } = Route.useLoaderData();
   const deferredProblemsPromise = useDeferredValue(problemsPromise);
   const problems = use(deferredProblemsPromise);
@@ -22,6 +24,15 @@ function RouteComponent() {
   // 最も近い submittableUntil/submittableFrom に達したらリフェッチ
   useEffect(() => {
     let earliest: number | null = null;
+
+    const nextSlotStartAt = nextStartAt(schedule);
+    if (nextSlotStartAt != null) {
+      const ms = nextSlotStartAt.getTime() - Date.now();
+      if (ms > 0) {
+        earliest = ms;
+      }
+    }
+
     for (const p of problems) {
       const until = p.submissionStatus?.submittableUntil;
       const from = p.submissionStatus?.submittableFrom;
@@ -36,7 +47,7 @@ function RouteComponent() {
       startTransition(() => router.invalidate());
     }, earliest);
     return () => clearTimeout(timer);
-  }, [problems, router]);
+  }, [problems, router, schedule]);
 
   return <ProblemsPage problems={problems} />;
 }
