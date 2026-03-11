@@ -252,9 +252,7 @@ func (h *ProblemServiceHandler) ListDeployments(
 		}
 		return nil, err
 	}
-	if err := enforceDeploymentWindow(ctx, time.Now(), h.ListDeploymentsEffect); err != nil {
-		return nil, err
-	}
+	now := time.Now()
 
 	protoCode := req.Msg.GetCode()
 	if protoCode == "" {
@@ -273,6 +271,9 @@ func (h *ProblemServiceHandler) ListDeployments(
 
 	teamProblem, err := teamMember.Team().ProblemByCodeForPublic(ctx, h.ListDeploymentsEffect, code)
 	if err != nil {
+		return nil, err
+	}
+	if err := enforceDeploymentWindow(ctx, now, h.ListDeploymentsEffect, teamProblem.Problem()); err != nil {
 		return nil, err
 	}
 
@@ -310,9 +311,6 @@ func (h *ProblemServiceHandler) Deploy(
 		return nil, err
 	}
 	now := time.Now()
-	if err := enforceDeploymentWindow(ctx, now, h.DeployEffect); err != nil {
-		return nil, err
-	}
 
 	protoCode := req.Msg.GetCode()
 	if protoCode == "" {
@@ -333,6 +331,9 @@ func (h *ProblemServiceHandler) Deploy(
 	if err != nil {
 		return nil, err
 	}
+	if err := enforceDeploymentWindow(ctx, now, h.DeployEffect, teamProblem.Problem()); err != nil {
+		return nil, err
+	}
 
 	deployment, err := domain.RunTx(ctx, h.DeployEffect,
 		func(eff domain.DeploymentWriter) (*domain.Deployment, error) {
@@ -348,12 +349,21 @@ func (h *ProblemServiceHandler) Deploy(
 	}), nil
 }
 
-func enforceDeploymentWindow(ctx context.Context, now time.Time, scheduleReader domain.ScheduleReader) error {
-	schedule, err := domain.GetSchedule(ctx, scheduleReader)
+func enforceDeploymentWindow(
+	ctx context.Context,
+	now time.Time,
+	scheduleReader domain.ScheduleReader,
+	problem *domain.Problem,
+) error {
+	if problem == nil {
+		return connect.NewError(connect.CodeFailedPrecondition, errors.New("現在はデプロイできません"))
+	}
+
+	isSubmittable, err := problem.IsSubmittableAt(ctx, now, scheduleReader)
 	if err != nil {
 		return err
 	}
-	if schedule.Current(now) != nil {
+	if isSubmittable {
 		return nil
 	}
 	return connect.NewError(connect.CodeFailedPrecondition, errors.New("現在はデプロイできません"))

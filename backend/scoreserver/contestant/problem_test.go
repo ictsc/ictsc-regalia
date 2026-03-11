@@ -43,8 +43,8 @@ func TestProblemServiceListDeploymentsRequiresActiveSchedule(t *testing.T) {
 			if got := connect.CodeOf(err); got != connect.CodeFailedPrecondition {
 				t.Fatalf("connect.CodeOf(err) = %v, want %v (err=%v)", got, connect.CodeFailedPrecondition, err)
 			}
-			if store.getProblemByCodeCalls != 0 {
-				t.Fatalf("GetProblemByCode called %d times, want 0", store.getProblemByCodeCalls)
+			if store.getProblemByCodeCalls == 0 {
+				t.Fatal("GetProblemByCode was not called")
 			}
 		})
 	}
@@ -66,6 +66,26 @@ func TestProblemServiceListDeploymentsWithinActiveSchedule(t *testing.T) {
 	}
 	if got := len(resp.Msg.GetDeployments()); got != 0 {
 		t.Fatalf("len(resp.Msg.Deployments) = %d, want 0", got)
+	}
+	if store.getProblemByCodeCalls == 0 {
+		t.Fatal("GetProblemByCode was not called")
+	}
+}
+
+func TestProblemServiceListDeploymentsRequiresProblemSchedule(t *testing.T) {
+	t.Parallel()
+
+	store := newProblemServiceTestStore([]*domain.ScheduleData{
+		testSchedule("other", time.Now().Add(-time.Hour), time.Now().Add(time.Hour)),
+		testSchedule("contest", time.Now().Add(time.Hour), time.Now().Add(2*time.Hour)),
+	})
+	client := newProblemServiceTestClient(t, store)
+
+	_, err := client.ListDeployments(t.Context(), connect.NewRequest(&contestantv1.ListDeploymentsRequest{
+		Code: "0001",
+	}))
+	if got := connect.CodeOf(err); got != connect.CodeFailedPrecondition {
+		t.Fatalf("connect.CodeOf(err) = %v, want %v (err=%v)", got, connect.CodeFailedPrecondition, err)
 	}
 	if store.getProblemByCodeCalls == 0 {
 		t.Fatal("GetProblemByCode was not called")
@@ -97,6 +117,9 @@ func TestProblemServiceDeployRequiresActiveSchedule(t *testing.T) {
 			if got := connect.CodeOf(err); got != connect.CodeFailedPrecondition {
 				t.Fatalf("connect.CodeOf(err) = %v, want %v (err=%v)", got, connect.CodeFailedPrecondition, err)
 			}
+			if store.getProblemByCodeCalls == 0 {
+				t.Fatal("GetProblemByCode was not called")
+			}
 			if store.createDeploymentCalls != 0 {
 				t.Fatalf("CreateDeployment called %d times, want 0", store.createDeploymentCalls)
 			}
@@ -126,7 +149,27 @@ func TestProblemServiceDeployWithinActiveSchedule(t *testing.T) {
 	}
 }
 
-func TestProblemServiceDeployChecksScheduleBeforeProblemValidation(t *testing.T) {
+func TestProblemServiceDeployRequiresProblemSchedule(t *testing.T) {
+	t.Parallel()
+
+	store := newProblemServiceTestStore([]*domain.ScheduleData{
+		testSchedule("other", time.Now().Add(-time.Hour), time.Now().Add(time.Hour)),
+		testSchedule("contest", time.Now().Add(time.Hour), time.Now().Add(2*time.Hour)),
+	})
+	client := newProblemServiceTestClient(t, store)
+
+	_, err := client.Deploy(t.Context(), connect.NewRequest(&contestantv1.DeployRequest{
+		Code: "0001",
+	}))
+	if got := connect.CodeOf(err); got != connect.CodeFailedPrecondition {
+		t.Fatalf("connect.CodeOf(err) = %v, want %v (err=%v)", got, connect.CodeFailedPrecondition, err)
+	}
+	if store.createDeploymentCalls != 0 {
+		t.Fatalf("CreateDeployment called %d times, want 0", store.createDeploymentCalls)
+	}
+}
+
+func TestProblemServiceDeployValidatesCodeBeforeSchedule(t *testing.T) {
 	t.Parallel()
 
 	store := newProblemServiceTestStore([]*domain.ScheduleData{
@@ -137,8 +180,8 @@ func TestProblemServiceDeployChecksScheduleBeforeProblemValidation(t *testing.T)
 	_, err := client.Deploy(t.Context(), connect.NewRequest(&contestantv1.DeployRequest{
 		Code: "!",
 	}))
-	if got := connect.CodeOf(err); got != connect.CodeFailedPrecondition {
-		t.Fatalf("connect.CodeOf(err) = %v, want %v (err=%v)", got, connect.CodeFailedPrecondition, err)
+	if got := connect.CodeOf(err); got != connect.CodeInvalidArgument {
+		t.Fatalf("connect.CodeOf(err) = %v, want %v (err=%v)", got, connect.CodeInvalidArgument, err)
 	}
 	if store.getProblemByCodeCalls != 0 {
 		t.Fatalf("GetProblemByCode called %d times, want 0", store.getProblemByCodeCalls)
