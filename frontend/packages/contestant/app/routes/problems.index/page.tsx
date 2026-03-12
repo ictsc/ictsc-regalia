@@ -16,7 +16,10 @@ export function ProblemsPage(props: PageProps) {
       <Title>問題一覧</Title>
       <div className="mx-16 my-64 flex flex-col gap-48">
         {groups.map((group) => (
-          <section key={group.type} className={group.type === "not-submittable" ? "mt-16" : undefined}>
+          <section
+            key={group.type}
+            className={group.type === "not-submittable" ? "mt-16" : undefined}
+          >
             <h2 className="text-24 mb-16 font-bold">{group.label}</h2>
             <ul className="grid grid-flow-row grid-cols-1 gap-x-40 gap-y-24 lg:grid-cols-2">
               {group.problems.map((problem) => (

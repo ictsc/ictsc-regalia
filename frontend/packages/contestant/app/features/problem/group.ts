@@ -21,11 +21,19 @@ export function groupProblems(problems: Problem[]): ProblemGroup[] {
   const groups: ProblemGroup[] = [];
 
   if (submittable.length > 0) {
-    groups.push({ type: "submittable", label: "提出可能", problems: submittable });
+    groups.push({
+      type: "submittable",
+      label: "提出可能",
+      problems: submittable,
+    });
   }
 
   if (notSubmittable.length > 0) {
-    groups.push({ type: "not-submittable", label: "提出不可", problems: notSubmittable });
+    groups.push({
+      type: "not-submittable",
+      label: "提出不可",
+      problems: notSubmittable,
+    });
   }
 
   return groups;
