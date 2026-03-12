@@ -26,14 +26,14 @@ type MarkServiceHandler struct {
 
 var _ adminv1connect.MarkServiceHandler = (*MarkServiceHandler)(nil)
 
-func newMarkServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository) *MarkServiceHandler {
+func newMarkServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository, scheduleReader domain.ScheduleReader) *MarkServiceHandler {
 	return &MarkServiceHandler{
 		Enforcer:                  enforcer,
 		ListAnswerEffect:          repo,
 		GetAnswerEffect:           repo,
 		ListMarkingResultEffect:   repo,
 		CreateMarkingResultEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) CreateMarkingResultTxEffect { return rt }),
-		UpdateScoreEffect:         newUpdateScoreEffect(repo),
+		UpdateScoreEffect:         newUpdateScoreEffect(repo, scheduleReader),
 	}
 }
 
@@ -205,7 +205,7 @@ func (h *MarkServiceHandler) CreateMarkingResult(
 		return nil, err
 	}
 
-	if _, err := UpdateScore(ctx, h.UpdateScoreEffect, now); err != nil {
+	if _, err := UpdateScore(ctx, h.UpdateScoreEffect, now, domain.ScoreUpdateModeNormal); err != nil {
 		return nil, err
 	}
 
@@ -222,11 +222,26 @@ func (h *MarkServiceHandler) UpdateScores(
 		return nil, err
 	}
 
-	if _, err := UpdateScore(ctx, h.UpdateScoreEffect, time.Now()); err != nil {
+	if _, err := UpdateScore(ctx, h.UpdateScoreEffect, time.Now(), domain.ScoreUpdateModeNormal); err != nil {
 		return nil, err
 	}
 
 	return connect.NewResponse(&adminv1.UpdateScoresResponse{}), nil
+}
+
+func (h *MarkServiceHandler) RevealFinalScores(
+	ctx context.Context,
+	req *connect.Request[adminv1.RevealFinalScoresRequest],
+) (*connect.Response[adminv1.RevealFinalScoresResponse], error) {
+	if err := enforce(ctx, h.Enforcer, "scores", "reveal"); err != nil {
+		return nil, err
+	}
+
+	if _, err := UpdateScore(ctx, h.UpdateScoreEffect, time.Now(), domain.ScoreUpdateModeRevealFinal); err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&adminv1.RevealFinalScoresResponse{}), nil
 }
 
 func convertAnswer(answer *domain.Answer) *adminv1.Answer {

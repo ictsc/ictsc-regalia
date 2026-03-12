@@ -120,10 +120,11 @@ func (*GetScheduleRequest) Descriptor() ([]byte, []int) {
 }
 
 type GetScheduleResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Schedule      []*Schedule            `protobuf:"bytes,1,rep,name=schedule,proto3" json:"schedule,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Schedule        []*Schedule            `protobuf:"bytes,1,rep,name=schedule,proto3" json:"schedule,omitempty"`
+	RankingFreezeAt *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=ranking_freeze_at,json=rankingFreezeAt,proto3,oneof" json:"ranking_freeze_at,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *GetScheduleResponse) Reset() {
@@ -163,11 +164,19 @@ func (x *GetScheduleResponse) GetSchedule() []*Schedule {
 	return nil
 }
 
+func (x *GetScheduleResponse) GetRankingFreezeAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.RankingFreezeAt
+	}
+	return nil
+}
+
 type UpdateScheduleRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Schedule      []*Schedule            `protobuf:"bytes,1,rep,name=schedule,proto3" json:"schedule,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Schedule        []*Schedule            `protobuf:"bytes,1,rep,name=schedule,proto3" json:"schedule,omitempty"`
+	RankingFreezeAt *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=ranking_freeze_at,json=rankingFreezeAt,proto3,oneof" json:"ranking_freeze_at,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *UpdateScheduleRequest) Reset() {
@@ -203,6 +212,13 @@ func (*UpdateScheduleRequest) Descriptor() ([]byte, []int) {
 func (x *UpdateScheduleRequest) GetSchedule() []*Schedule {
 	if x != nil {
 		return x.Schedule
+	}
+	return nil
+}
+
+func (x *UpdateScheduleRequest) GetRankingFreezeAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.RankingFreezeAt
 	}
 	return nil
 }
@@ -252,11 +268,15 @@ const file_admin_v1_schedule_proto_rawDesc = "" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x125\n" +
 	"\bstart_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\astartAt\x121\n" +
 	"\x06end_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\x05endAtJ\x04\b\x01\x10\x02\"\x14\n" +
-	"\x12GetScheduleRequest\"E\n" +
+	"\x12GetScheduleRequest\"\xa8\x01\n" +
 	"\x13GetScheduleResponse\x12.\n" +
-	"\bschedule\x18\x01 \x03(\v2\x12.admin.v1.ScheduleR\bschedule\"G\n" +
+	"\bschedule\x18\x01 \x03(\v2\x12.admin.v1.ScheduleR\bschedule\x12K\n" +
+	"\x11ranking_freeze_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\x0frankingFreezeAt\x88\x01\x01B\x14\n" +
+	"\x12_ranking_freeze_at\"\xaa\x01\n" +
 	"\x15UpdateScheduleRequest\x12.\n" +
-	"\bschedule\x18\x01 \x03(\v2\x12.admin.v1.ScheduleR\bschedule\"\x18\n" +
+	"\bschedule\x18\x01 \x03(\v2\x12.admin.v1.ScheduleR\bschedule\x12K\n" +
+	"\x11ranking_freeze_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\x0frankingFreezeAt\x88\x01\x01B\x14\n" +
+	"\x12_ranking_freeze_at\"\x18\n" +
 	"\x16UpdateScheduleResponse2\xb2\x01\n" +
 	"\x0fScheduleService\x12J\n" +
 	"\vGetSchedule\x12\x1c.admin.v1.GetScheduleRequest\x1a\x1d.admin.v1.GetScheduleResponse\x12S\n" +
@@ -287,16 +307,18 @@ var file_admin_v1_schedule_proto_depIdxs = []int32{
 	5, // 0: admin.v1.Schedule.start_at:type_name -> google.protobuf.Timestamp
 	5, // 1: admin.v1.Schedule.end_at:type_name -> google.protobuf.Timestamp
 	0, // 2: admin.v1.GetScheduleResponse.schedule:type_name -> admin.v1.Schedule
-	0, // 3: admin.v1.UpdateScheduleRequest.schedule:type_name -> admin.v1.Schedule
-	1, // 4: admin.v1.ScheduleService.GetSchedule:input_type -> admin.v1.GetScheduleRequest
-	3, // 5: admin.v1.ScheduleService.UpdateSchedule:input_type -> admin.v1.UpdateScheduleRequest
-	2, // 6: admin.v1.ScheduleService.GetSchedule:output_type -> admin.v1.GetScheduleResponse
-	4, // 7: admin.v1.ScheduleService.UpdateSchedule:output_type -> admin.v1.UpdateScheduleResponse
-	6, // [6:8] is the sub-list for method output_type
-	4, // [4:6] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	5, // 3: admin.v1.GetScheduleResponse.ranking_freeze_at:type_name -> google.protobuf.Timestamp
+	0, // 4: admin.v1.UpdateScheduleRequest.schedule:type_name -> admin.v1.Schedule
+	5, // 5: admin.v1.UpdateScheduleRequest.ranking_freeze_at:type_name -> google.protobuf.Timestamp
+	1, // 6: admin.v1.ScheduleService.GetSchedule:input_type -> admin.v1.GetScheduleRequest
+	3, // 7: admin.v1.ScheduleService.UpdateSchedule:input_type -> admin.v1.UpdateScheduleRequest
+	2, // 8: admin.v1.ScheduleService.GetSchedule:output_type -> admin.v1.GetScheduleResponse
+	4, // 9: admin.v1.ScheduleService.UpdateSchedule:output_type -> admin.v1.UpdateScheduleResponse
+	8, // [8:10] is the sub-list for method output_type
+	6, // [6:8] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_admin_v1_schedule_proto_init() }
@@ -304,6 +326,8 @@ func file_admin_v1_schedule_proto_init() {
 	if File_admin_v1_schedule_proto != nil {
 		return
 	}
+	file_admin_v1_schedule_proto_msgTypes[2].OneofWrappers = []any{}
+	file_admin_v1_schedule_proto_msgTypes[3].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

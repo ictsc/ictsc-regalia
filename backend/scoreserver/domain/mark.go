@@ -124,7 +124,17 @@ func (a *Answer) latestMarkingResult(ctx context.Context, eff MarkingResultReade
 	return latest, nil
 }
 
-func (a *Answer) latestPublicMarkingResult(ctx context.Context, eff MarkingResultReader, now time.Time) (*MarkingResult, error) {
+func (a *Answer) latestMarkingResultForVisibility(
+	ctx context.Context,
+	eff MarkingResultReader,
+	now time.Time,
+	visibility ScoreVisibility,
+	bypassDelay bool,
+) (*MarkingResult, error) {
+	if visibility == ScoreVisibilityPrivate || bypassDelay {
+		return a.latestMarkingResult(ctx, eff)
+	}
+
 	results, err := ListAllMarkingResults(ctx, eff)
 	if err != nil {
 		return nil, err

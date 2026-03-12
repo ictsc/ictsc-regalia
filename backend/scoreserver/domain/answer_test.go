@@ -28,7 +28,7 @@ func TestSubmitDescriptiveAnswer(t *testing.T) {
 		"new answer": {
 			at: time.Date(2021, 1, 1, 1, 0, 0, 0, time.UTC),
 			eff: answerWriter{
-				getLatestAnswerByTeamProblemForPublicFunc: func(context.Context, uuid.UUID, uuid.UUID) (*domain.AnswerData, error) {
+				getLatestAnswerByTeamProblemFunc: func(context.Context, domain.ScoreVisibility, uuid.UUID, uuid.UUID) (*domain.AnswerData, error) {
 					return nil, domain.ErrNotFound
 				},
 			},
@@ -55,8 +55,8 @@ func TestSubmitDescriptiveAnswer(t *testing.T) {
 		"additional answer": {
 			at: time.Date(2021, 1, 1, 1, 30, 0, 0, time.UTC),
 			eff: answerWriter{
-				getLatestAnswerByTeamProblemForPublicFunc: func(
-					ctx context.Context, teamID, problemID uuid.UUID,
+				getLatestAnswerByTeamProblemFunc: func(
+					ctx context.Context, visibility domain.ScoreVisibility, teamID, problemID uuid.UUID,
 				) (*domain.AnswerData, error) {
 					return &domain.AnswerData{
 						ID:        uuid.Must(uuid.NewV4()),
@@ -92,8 +92,8 @@ func TestSubmitDescriptiveAnswer(t *testing.T) {
 		"too early": {
 			at: time.Date(2021, 1, 1, 1, 10, 0, 0, time.UTC),
 			eff: answerWriter{
-				getLatestAnswerByTeamProblemForPublicFunc: func(
-					ctx context.Context, teamID, problemID uuid.UUID,
+				getLatestAnswerByTeamProblemFunc: func(
+					ctx context.Context, visibility domain.ScoreVisibility, teamID, problemID uuid.UUID,
 				) (*domain.AnswerData, error) {
 					return &domain.AnswerData{
 						ID:        uuid.Must(uuid.NewV4()),
@@ -120,7 +120,7 @@ func TestSubmitDescriptiveAnswer(t *testing.T) {
 
 			var createdAnswer *domain.AnswerDetailData
 			eff := answerWriter{
-				getLatestAnswerByTeamProblemForPublicFunc: tt.eff.getLatestAnswerByTeamProblemForPublicFunc,
+				getLatestAnswerByTeamProblemFunc: tt.eff.getLatestAnswerByTeamProblemFunc,
 				createAnswerFunc: func(ctx context.Context, data *domain.AnswerDetailData) error {
 					if f := tt.eff.createAnswerFunc; f != nil {
 						if err := f(ctx, data); err != nil {
@@ -157,24 +157,19 @@ func TestSubmitDescriptiveAnswer(t *testing.T) {
 }
 
 type (
-	listAnswersForAdminFunc                   func(ctx context.Context) ([]*domain.AnswerData, error)
-	listAnswersByTeamProblemForAdminFunc      func(ctx context.Context, teamCode int64, problemCode string) ([]*domain.AnswerData, error)
-	listAnswersByTeamProblemForPublicFunc     func(ctx context.Context, teamCode int64, problemCode string) ([]*domain.AnswerData, error)
-	getLatestAnswerByTeamProblemForPublicFunc func(ctx context.Context, teamID, problemID uuid.UUID) (*domain.AnswerData, error)
-
-	getAnswerDetailForAdminFunc  func(ctx context.Context, teamCode int64, problemCode string, answerNumber uint32) (*domain.AnswerDetailData, error)
-	getAnswerDetailForPublicFunc func(ctx context.Context, teamCode int64, problemCode string, answerNumber uint32) (*domain.AnswerDetailData, error)
-	createAnswerFunc             func(ctx context.Context, data *domain.AnswerDetailData) error
+	listAnswersForAdminFunc          func(ctx context.Context) ([]*domain.AnswerData, error)
+	listAnswersByTeamProblemFunc     func(ctx context.Context, visibility domain.ScoreVisibility, teamCode int64, problemCode string) ([]*domain.AnswerData, error)
+	getLatestAnswerByTeamProblemFunc func(ctx context.Context, visibility domain.ScoreVisibility, teamID, problemID uuid.UUID) (*domain.AnswerData, error)
+	getAnswerDetailFunc              func(ctx context.Context, visibility domain.ScoreVisibility, teamCode int64, problemCode string, answerNumber uint32) (*domain.AnswerDetailData, error)
+	createAnswerFunc                 func(ctx context.Context, data *domain.AnswerDetailData) error
 
 	answerReader struct {
 		listAnswersForAdminFunc
-		listAnswersByTeamProblemForAdminFunc
-		listAnswersByTeamProblemForPublicFunc
-		getAnswerDetailForPublicFunc
-		getAnswerDetailForAdminFunc
+		listAnswersByTeamProblemFunc
+		getAnswerDetailFunc
 	}
 	answerWriter struct {
-		getLatestAnswerByTeamProblemForPublicFunc
+		getLatestAnswerByTeamProblemFunc
 		createAnswerFunc
 	}
 )
@@ -184,40 +179,27 @@ var (
 	_ domain.AnswerWriter = answerWriter{}
 )
 
-func (f listAnswersForAdminFunc) ListAnswersForAdmin(ctx context.Context) ([]*domain.AnswerData, error) {
+func (f listAnswersForAdminFunc) ListAnswers(ctx context.Context, _ domain.ScoreVisibility) ([]*domain.AnswerData, error) {
 	return f(ctx)
 }
 
-func (f listAnswersByTeamProblemForAdminFunc) ListAnswersByTeamProblemForAdmin(
-	ctx context.Context, teamCode int64, problemCode string,
+func (f listAnswersByTeamProblemFunc) ListAnswersByTeamProblem(
+	ctx context.Context, visibility domain.ScoreVisibility, teamCode int64, problemCode string,
 ) ([]*domain.AnswerData, error) {
-	return f(ctx, teamCode, problemCode)
+	return f(ctx, visibility, teamCode, problemCode)
 }
 
-func (f listAnswersByTeamProblemForPublicFunc) ListAnswersByTeamProblemForPublic(
-	ctx context.Context, teamCode int64, problemCode string,
-) ([]*domain.AnswerData, error) {
-	return f(ctx, teamCode, problemCode)
-}
-
-func (f getLatestAnswerByTeamProblemForPublicFunc) GetLatestAnswerByTeamProblemForPublic(
-	ctx context.Context, teamID, problemID uuid.UUID,
+func (f getLatestAnswerByTeamProblemFunc) GetLatestAnswerByTeamProblem(
+	ctx context.Context, visibility domain.ScoreVisibility, teamID, problemID uuid.UUID,
 ) (*domain.AnswerData, error) {
-	return f(ctx, teamID, problemID)
+	return f(ctx, visibility, teamID, problemID)
 }
 
-func (f getAnswerDetailForPublicFunc) GetAnswerDetailForPublic(
-	ctx context.Context,
+func (f getAnswerDetailFunc) GetAnswerDetail(
+	ctx context.Context, visibility domain.ScoreVisibility,
 	teamCode int64, problemCode string, answerNumber uint32,
 ) (*domain.AnswerDetailData, error) {
-	return f(ctx, teamCode, problemCode, answerNumber)
-}
-
-func (f getAnswerDetailForAdminFunc) GetAnswerDetailForAdmin(
-	ctx context.Context,
-	teamCode int64, problemCode string, answerNumber uint32,
-) (*domain.AnswerDetailData, error) {
-	return f(ctx, teamCode, problemCode, answerNumber)
+	return f(ctx, visibility, teamCode, problemCode, answerNumber)
 }
 
 func (f createAnswerFunc) CreateAnswer(ctx context.Context, data *domain.AnswerDetailData) error {

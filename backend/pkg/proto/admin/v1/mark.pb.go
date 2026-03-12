@@ -1069,6 +1069,78 @@ func (*UpdateScoresResponse) Descriptor() ([]byte, []int) {
 	return file_admin_v1_mark_proto_rawDescGZIP(), []int{18}
 }
 
+type RevealFinalScoresRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RevealFinalScoresRequest) Reset() {
+	*x = RevealFinalScoresRequest{}
+	mi := &file_admin_v1_mark_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RevealFinalScoresRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RevealFinalScoresRequest) ProtoMessage() {}
+
+func (x *RevealFinalScoresRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_mark_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RevealFinalScoresRequest.ProtoReflect.Descriptor instead.
+func (*RevealFinalScoresRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_mark_proto_rawDescGZIP(), []int{19}
+}
+
+type RevealFinalScoresResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RevealFinalScoresResponse) Reset() {
+	*x = RevealFinalScoresResponse{}
+	mi := &file_admin_v1_mark_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RevealFinalScoresResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RevealFinalScoresResponse) ProtoMessage() {}
+
+func (x *RevealFinalScoresResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_mark_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RevealFinalScoresResponse.ProtoReflect.Descriptor instead.
+func (*RevealFinalScoresResponse) Descriptor() ([]byte, []int) {
+	return file_admin_v1_mark_proto_rawDescGZIP(), []int{20}
+}
+
 var File_admin_v1_mark_proto protoreflect.FileDescriptor
 
 const file_admin_v1_mark_proto_rawDesc = "" +
@@ -1135,18 +1207,21 @@ const file_admin_v1_mark_proto_rawDesc = "" +
 	"&UpdateMarkingResultVisibilitiesRequest\")\n" +
 	"'UpdateMarkingResultVisibilitiesResponse\"\x15\n" +
 	"\x13UpdateScoresRequest\"\x16\n" +
-	"\x14UpdateScoresResponse*\x91\x01\n" +
+	"\x14UpdateScoresResponse\"\x1a\n" +
+	"\x18RevealFinalScoresRequest\"\x1b\n" +
+	"\x19RevealFinalScoresResponse*\x91\x01\n" +
 	"\x17MarkingResultVisibility\x12)\n" +
 	"%MARKING_RESULT_VISIBILITY_UNSPECIFIED\x10\x00\x12$\n" +
 	" MARKING_RESULT_VISIBILITY_PUBLIC\x10\x01\x12%\n" +
-	"!MARKING_RESULT_VISIBILITY_PRIVATE\x10\x022\xbc\x04\n" +
+	"!MARKING_RESULT_VISIBILITY_PRIVATE\x10\x022\x9a\x05\n" +
 	"\vMarkService\x12J\n" +
 	"\vListAnswers\x12\x1c.admin.v1.ListAnswersRequest\x1a\x1d.admin.v1.ListAnswersResponse\x12D\n" +
 	"\tGetAnswer\x12\x1a.admin.v1.GetAnswerRequest\x1a\x1b.admin.v1.GetAnswerResponse\x12_\n" +
 	"\x12ListMarkingResults\x12#.admin.v1.ListMarkingResultsRequest\x1a$.admin.v1.ListMarkingResultsResponse\x12b\n" +
 	"\x13CreateMarkingResult\x12$.admin.v1.CreateMarkingResultRequest\x1a%.admin.v1.CreateMarkingResultResponse\x12\x86\x01\n" +
 	"\x1fUpdateMarkingResultVisibilities\x120.admin.v1.UpdateMarkingResultVisibilitiesRequest\x1a1.admin.v1.UpdateMarkingResultVisibilitiesResponse\x12M\n" +
-	"\fUpdateScores\x12\x1d.admin.v1.UpdateScoresRequest\x1a\x1e.admin.v1.UpdateScoresResponseBCZAgithub.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1b\x06proto3"
+	"\fUpdateScores\x12\x1d.admin.v1.UpdateScoresRequest\x1a\x1e.admin.v1.UpdateScoresResponse\x12\\\n" +
+	"\x11RevealFinalScores\x12\".admin.v1.RevealFinalScoresRequest\x1a#.admin.v1.RevealFinalScoresResponseBCZAgithub.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1;adminv1b\x06proto3"
 
 var (
 	file_admin_v1_mark_proto_rawDescOnce sync.Once
@@ -1161,7 +1236,7 @@ func file_admin_v1_mark_proto_rawDescGZIP() []byte {
 }
 
 var file_admin_v1_mark_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_admin_v1_mark_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_admin_v1_mark_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_admin_v1_mark_proto_goTypes = []any{
 	(MarkingResultVisibility)(0),                    // 0: admin.v1.MarkingResultVisibility
 	(*Answer)(nil),                                  // 1: admin.v1.Answer
@@ -1183,28 +1258,30 @@ var file_admin_v1_mark_proto_goTypes = []any{
 	(*UpdateMarkingResultVisibilitiesResponse)(nil), // 17: admin.v1.UpdateMarkingResultVisibilitiesResponse
 	(*UpdateScoresRequest)(nil),                     // 18: admin.v1.UpdateScoresRequest
 	(*UpdateScoresResponse)(nil),                    // 19: admin.v1.UpdateScoresResponse
-	(*Team)(nil),                                    // 20: admin.v1.Team
-	(*Contestant)(nil),                              // 21: admin.v1.Contestant
-	(*Problem)(nil),                                 // 22: admin.v1.Problem
-	(*timestamppb.Timestamp)(nil),                   // 23: google.protobuf.Timestamp
-	(ProblemType)(0),                                // 24: admin.v1.ProblemType
-	(*Admin)(nil),                                   // 25: admin.v1.Admin
+	(*RevealFinalScoresRequest)(nil),                // 20: admin.v1.RevealFinalScoresRequest
+	(*RevealFinalScoresResponse)(nil),               // 21: admin.v1.RevealFinalScoresResponse
+	(*Team)(nil),                                    // 22: admin.v1.Team
+	(*Contestant)(nil),                              // 23: admin.v1.Contestant
+	(*Problem)(nil),                                 // 24: admin.v1.Problem
+	(*timestamppb.Timestamp)(nil),                   // 25: google.protobuf.Timestamp
+	(ProblemType)(0),                                // 26: admin.v1.ProblemType
+	(*Admin)(nil),                                   // 27: admin.v1.Admin
 }
 var file_admin_v1_mark_proto_depIdxs = []int32{
-	20, // 0: admin.v1.Answer.team:type_name -> admin.v1.Team
-	21, // 1: admin.v1.Answer.author:type_name -> admin.v1.Contestant
-	22, // 2: admin.v1.Answer.problem:type_name -> admin.v1.Problem
+	22, // 0: admin.v1.Answer.team:type_name -> admin.v1.Team
+	23, // 1: admin.v1.Answer.author:type_name -> admin.v1.Contestant
+	24, // 2: admin.v1.Answer.problem:type_name -> admin.v1.Problem
 	2,  // 3: admin.v1.Answer.body:type_name -> admin.v1.AnswerBody
-	23, // 4: admin.v1.Answer.created_at:type_name -> google.protobuf.Timestamp
+	25, // 4: admin.v1.Answer.created_at:type_name -> google.protobuf.Timestamp
 	5,  // 5: admin.v1.Answer.score:type_name -> admin.v1.MarkingScore
-	24, // 6: admin.v1.AnswerBody.type:type_name -> admin.v1.ProblemType
+	26, // 6: admin.v1.AnswerBody.type:type_name -> admin.v1.ProblemType
 	3,  // 7: admin.v1.AnswerBody.descriptive:type_name -> admin.v1.DescriptiveAnswer
 	1,  // 8: admin.v1.MarkingResult.answer:type_name -> admin.v1.Answer
-	25, // 9: admin.v1.MarkingResult.judge:type_name -> admin.v1.Admin
+	27, // 9: admin.v1.MarkingResult.judge:type_name -> admin.v1.Admin
 	6,  // 10: admin.v1.MarkingResult.rationale:type_name -> admin.v1.MarkingRationale
-	23, // 11: admin.v1.MarkingResult.created_at:type_name -> google.protobuf.Timestamp
+	25, // 11: admin.v1.MarkingResult.created_at:type_name -> google.protobuf.Timestamp
 	0,  // 12: admin.v1.MarkingResult.visibility:type_name -> admin.v1.MarkingResultVisibility
-	24, // 13: admin.v1.MarkingRationale.type:type_name -> admin.v1.ProblemType
+	26, // 13: admin.v1.MarkingRationale.type:type_name -> admin.v1.ProblemType
 	7,  // 14: admin.v1.MarkingRationale.descriptive:type_name -> admin.v1.DescriptiveMarkingRationale
 	1,  // 15: admin.v1.ListAnswersResponse.answers:type_name -> admin.v1.Answer
 	1,  // 16: admin.v1.GetAnswerResponse.answer:type_name -> admin.v1.Answer
@@ -1218,14 +1295,16 @@ var file_admin_v1_mark_proto_depIdxs = []int32{
 	14, // 24: admin.v1.MarkService.CreateMarkingResult:input_type -> admin.v1.CreateMarkingResultRequest
 	16, // 25: admin.v1.MarkService.UpdateMarkingResultVisibilities:input_type -> admin.v1.UpdateMarkingResultVisibilitiesRequest
 	18, // 26: admin.v1.MarkService.UpdateScores:input_type -> admin.v1.UpdateScoresRequest
-	9,  // 27: admin.v1.MarkService.ListAnswers:output_type -> admin.v1.ListAnswersResponse
-	11, // 28: admin.v1.MarkService.GetAnswer:output_type -> admin.v1.GetAnswerResponse
-	13, // 29: admin.v1.MarkService.ListMarkingResults:output_type -> admin.v1.ListMarkingResultsResponse
-	15, // 30: admin.v1.MarkService.CreateMarkingResult:output_type -> admin.v1.CreateMarkingResultResponse
-	17, // 31: admin.v1.MarkService.UpdateMarkingResultVisibilities:output_type -> admin.v1.UpdateMarkingResultVisibilitiesResponse
-	19, // 32: admin.v1.MarkService.UpdateScores:output_type -> admin.v1.UpdateScoresResponse
-	27, // [27:33] is the sub-list for method output_type
-	21, // [21:27] is the sub-list for method input_type
+	20, // 27: admin.v1.MarkService.RevealFinalScores:input_type -> admin.v1.RevealFinalScoresRequest
+	9,  // 28: admin.v1.MarkService.ListAnswers:output_type -> admin.v1.ListAnswersResponse
+	11, // 29: admin.v1.MarkService.GetAnswer:output_type -> admin.v1.GetAnswerResponse
+	13, // 30: admin.v1.MarkService.ListMarkingResults:output_type -> admin.v1.ListMarkingResultsResponse
+	15, // 31: admin.v1.MarkService.CreateMarkingResult:output_type -> admin.v1.CreateMarkingResultResponse
+	17, // 32: admin.v1.MarkService.UpdateMarkingResultVisibilities:output_type -> admin.v1.UpdateMarkingResultVisibilitiesResponse
+	19, // 33: admin.v1.MarkService.UpdateScores:output_type -> admin.v1.UpdateScoresResponse
+	21, // 34: admin.v1.MarkService.RevealFinalScores:output_type -> admin.v1.RevealFinalScoresResponse
+	28, // [28:35] is the sub-list for method output_type
+	21, // [21:28] is the sub-list for method input_type
 	21, // [21:21] is the sub-list for extension type_name
 	21, // [21:21] is the sub-list for extension extendee
 	0,  // [0:21] is the sub-list for field type_name
@@ -1253,7 +1332,7 @@ func file_admin_v1_mark_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_mark_proto_rawDesc), len(file_admin_v1_mark_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   19,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

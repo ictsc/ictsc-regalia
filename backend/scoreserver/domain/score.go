@@ -51,43 +51,80 @@ type UpdateAnswerScoreEffect interface {
 	ScoreWriter
 }
 
-func (a *Answer) UpdateScore(ctx context.Context, eff UpdateAnswerScoreEffect, now time.Time) error {
-	var errs []error
-	if err := a.updatePrivateScore(ctx, eff); err != nil {
-		errs = append(errs, err)
+type ScoreUpdatePolicy struct {
+	UpdatePrivate         bool
+	UpdateTeam            bool
+	UpdatePublic          bool
+	BypassVisibilityDelay bool
+}
+
+func NewScoreUpdatePolicy(
+	mode ScoreUpdateMode,
+	inContest bool,
+	rankingFrozen bool,
+) ScoreUpdatePolicy {
+	switch mode {
+	case ScoreUpdateModeRevealFinal:
+		return ScoreUpdatePolicy{
+			UpdatePrivate:         true,
+			UpdateTeam:            true,
+			UpdatePublic:          true,
+			BypassVisibilityDelay: true,
+		}
+	case ScoreUpdateModeNormal:
+		fallthrough
+	default:
+		return ScoreUpdatePolicy{
+			UpdatePrivate: true,
+			UpdateTeam:    inContest,
+			UpdatePublic:  inContest && !rankingFrozen,
+		}
 	}
-	if err := a.updatePublicScore(ctx, eff, now); err != nil {
-		errs = append(errs, err)
+}
+
+func (a *Answer) UpdateScore(
+	ctx context.Context,
+	eff UpdateAnswerScoreEffect,
+	now time.Time,
+	policy ScoreUpdatePolicy,
+) error {
+	var errs []error
+	if policy.UpdatePrivate {
+		if err := a.updateScore(ctx, eff, ScoreVisibilityPrivate, now, true); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	if policy.UpdateTeam {
+		if err := a.updateScore(ctx, eff, ScoreVisibilityTeam, now, policy.BypassVisibilityDelay); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	if policy.UpdatePublic {
+		if err := a.updateScore(ctx, eff, ScoreVisibilityPublic, now, policy.BypassVisibilityDelay); err != nil {
+			errs = append(errs, err)
+		}
 	}
 	return errors.Join(errs...)
 }
 
-func (a *Answer) updatePublicScore(ctx context.Context, eff UpdateAnswerScoreEffect, now time.Time) error {
-	latestPublicMark, err := a.latestPublicMarkingResult(ctx, eff, now)
+func (a *Answer) updateScore(
+	ctx context.Context,
+	eff UpdateAnswerScoreEffect,
+	visibility ScoreVisibility,
+	now time.Time,
+	bypassDelay bool,
+) error {
+	latestMark, err := a.latestMarkingResultForVisibility(ctx, eff, now, visibility, bypassDelay)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return nil
 		}
+		return err
 	}
-	if err := eff.UpdatePublicAnswerScore(ctx, &UpdateAnswerScoreInput{
-		AnswerID:        a.id,
-		MarkingResultID: latestPublicMark.id,
-	}); err != nil {
-		return WrapAsInternal(err, "failed to update answer score")
-	}
-	return nil
-}
-
-func (a *Answer) updatePrivateScore(ctx context.Context, eff UpdateAnswerScoreEffect) error {
-	latestMark, err := a.latestMarkingResult(ctx, eff)
-	if err != nil {
-		if errors.Is(err, ErrNotFound) {
-			return nil
-		}
-	}
-	if err := eff.UpdatePrivateAnswerScore(ctx, &UpdateAnswerScoreInput{
+	if err := eff.UpdateAnswerScore(ctx, &UpdateAnswerScoreInput{
 		AnswerID:        a.id,
 		MarkingResultID: latestMark.id,
+		Visibility:      visibility,
 	}); err != nil {
 		return WrapAsInternal(err, "failed to update answer score")
 	}
@@ -100,19 +137,49 @@ type UpdateProblemScoreEffect interface {
 	ScoreWriter
 }
 
-func (tp *TeamProblem) UpdateScore(ctx context.Context, eff UpdateProblemScoreEffect) error {
+func (tp *TeamProblem) UpdateScore(
+	ctx context.Context,
+	eff UpdateProblemScoreEffect,
+	policy ScoreUpdatePolicy,
+) error {
 	var errs []error
-	if err := tp.updatePrivateScore(ctx, eff); err != nil {
-		errs = append(errs, err)
+	if policy.UpdatePrivate {
+		if err := tp.updateScore(ctx, eff, ScoreVisibilityPrivate); err != nil {
+			errs = append(errs, err)
+		}
 	}
-	if err := tp.updatePublicScore(ctx, eff); err != nil {
-		errs = append(errs, err)
+	if policy.UpdateTeam {
+		if err := tp.updateScore(ctx, eff, ScoreVisibilityTeam); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	if policy.UpdatePublic {
+		if err := tp.updateScore(ctx, eff, ScoreVisibilityPublic); err != nil {
+			errs = append(errs, err)
+		}
 	}
 	return errors.Join(errs...)
 }
 
-func (tp *TeamProblem) updatePrivateScore(ctx context.Context, eff UpdateProblemScoreEffect) error {
-	answers, err := tp.answersForAdmin(ctx, eff)
+func (tp *TeamProblem) updateScore(
+	ctx context.Context,
+	eff UpdateProblemScoreEffect,
+	visibility ScoreVisibility,
+) error {
+	var (
+		answers []*Answer
+		err     error
+	)
+	switch visibility {
+	case ScoreVisibilityPrivate:
+		answers, err = tp.answersForAdmin(ctx, eff)
+	case ScoreVisibilityTeam:
+		answers, err = tp.answersForTeam(ctx, eff)
+	case ScoreVisibilityPublic:
+		answers, err = tp.answersForPublic(ctx, eff)
+	default:
+		return NewInvalidArgumentError("unknown score visibility", nil)
+	}
 	if err != nil {
 		return err
 	}
@@ -125,28 +192,8 @@ func (tp *TeamProblem) updatePrivateScore(ctx context.Context, eff UpdateProblem
 		return err
 	}
 
-	if err := eff.UpdatePrivateProblemScore(ctx, updates); err != nil {
-		return WrapAsInternal(err, "failed to update problem score")
-	}
-
-	return nil
-}
-
-func (tp *TeamProblem) updatePublicScore(ctx context.Context, eff UpdateProblemScoreEffect) error {
-	answers, err := tp.answersForPublic(ctx, eff)
-	if err != nil {
-		return err
-	}
-
-	updates, err := tp.problemUpdate(answers)
-	if err != nil {
-		if errors.Is(err, ErrNotFound) {
-			return nil
-		}
-		return err
-	}
-
-	if err := eff.UpdatePublicProblemScore(ctx, updates); err != nil {
+	updates.Visibility = visibility
+	if err := eff.UpdateProblemScore(ctx, updates); err != nil {
 		return WrapAsInternal(err, "failed to update problem score")
 	}
 
@@ -190,18 +237,18 @@ type (
 	UpdateAnswerScoreInput struct {
 		AnswerID        uuid.UUID
 		MarkingResultID uuid.UUID
+		Visibility      ScoreVisibility
 	}
 	UpdateProblemScoreInput struct {
 		TeamID          uuid.UUID
 		ProblemID       uuid.UUID
 		MarkingResultID uuid.UUID
 		UpdateSubmitAt  time.Time
+		Visibility      ScoreVisibility
 	}
 	ScoreWriter interface {
-		UpdatePrivateAnswerScore(ctx context.Context, input *UpdateAnswerScoreInput) error
-		UpdatePublicAnswerScore(ctx context.Context, input *UpdateAnswerScoreInput) error
-		UpdatePrivateProblemScore(ctx context.Context, input *UpdateProblemScoreInput) error
-		UpdatePublicProblemScore(ctx context.Context, input *UpdateProblemScoreInput) error
+		UpdateAnswerScore(ctx context.Context, input *UpdateAnswerScoreInput) error
+		UpdateProblemScore(ctx context.Context, input *UpdateProblemScoreInput) error
 	}
 )
 

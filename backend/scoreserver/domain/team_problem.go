@@ -28,10 +28,10 @@ type TeamProblemLister interface {
 }
 
 func ListTeamProblemsForAdmin(ctx context.Context, eff TeamProblemLister) ([]*TeamProblem, error) {
-	return listTeamProblems(ctx, false, eff)
+	return listTeamProblems(ctx, ScoreVisibilityPrivate, eff)
 }
 
-func listTeamProblems(ctx context.Context, isPublic bool, eff TeamProblemLister) ([]*TeamProblem, error) {
+func listTeamProblems(ctx context.Context, visibility ScoreVisibility, eff TeamProblemLister) ([]*TeamProblem, error) {
 	teams, err := ListTeams(ctx, eff)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func listTeamProblems(ctx context.Context, isPublic bool, eff TeamProblemLister)
 		return nil, err
 	}
 
-	scores, err := eff.ListTeamProblemScores(ctx, isPublic)
+	scores, err := eff.ListTeamProblemScores(ctx, visibility)
 	if err != nil {
 		return nil, WrapAsInternal(err, "failed to list scores")
 	}
@@ -75,17 +75,17 @@ type TeamProblemReader interface {
 	TeamProblemScoreReader
 }
 
-func (t *Team) ProblemsForPublic(ctx context.Context, eff TeamProblemReader) ([]*TeamProblem, error) {
-	return t.problems(ctx, true, eff)
+func (t *Team) ProblemsForTeam(ctx context.Context, eff TeamProblemReader) ([]*TeamProblem, error) {
+	return t.problems(ctx, ScoreVisibilityTeam, eff)
 }
 
-func (t *Team) problems(ctx context.Context, isPublic bool, eff TeamProblemReader) ([]*TeamProblem, error) {
+func (t *Team) problems(ctx context.Context, visibility ScoreVisibility, eff TeamProblemReader) ([]*TeamProblem, error) {
 	problems, err := ListProblems(ctx, eff)
 	if err != nil {
 		return nil, err
 	}
 
-	scores, err := eff.ListTeamProblemScoresByTeamID(ctx, isPublic, uuid.UUID(t.teamID))
+	scores, err := eff.ListTeamProblemScoresByTeamID(ctx, visibility, uuid.UUID(t.teamID))
 	if err != nil {
 		return nil, WrapAsInternal(err, "failed to list scores")
 	}
@@ -138,7 +138,7 @@ func (tp *TeamProblem) Details(ctx context.Context, eff ProblemReader) (*TeamPro
 	}, nil
 }
 
-func (t *Team) ProblemDetailByCodeForPublic(ctx context.Context, eff TeamProblemReader, code ProblemCode) (*TeamProblemDetail, error) {
+func (t *Team) ProblemDetailByCodeForTeam(ctx context.Context, eff TeamProblemReader, code ProblemCode) (*TeamProblemDetail, error) {
 	problem, err := code.Problem(ctx, eff)
 	if err != nil {
 		return nil, err
@@ -152,7 +152,7 @@ func (t *Team) ProblemDetailByCodeForPublic(ctx context.Context, eff TeamProblem
 	teamProblem := &TeamProblemDetail{team: t, problemDetail: detail}
 
 	if scoreData, err := eff.GetTeamProblemScore(
-		ctx, true, uuid.UUID(t.teamID), uuid.UUID(problem.problemID),
+		ctx, ScoreVisibilityTeam, uuid.UUID(t.teamID), uuid.UUID(problem.problemID),
 	); err == nil {
 		score, err := scoreData.parse(problem)
 		if err != nil {
@@ -166,19 +166,19 @@ func (t *Team) ProblemDetailByCodeForPublic(ctx context.Context, eff TeamProblem
 	return teamProblem, nil
 }
 
-func (t *Team) ProblemByCodeForPublic(
+func (t *Team) ProblemByCodeForTeam(
 	ctx context.Context, eff TeamProblemReader, code ProblemCode,
 ) (*TeamProblem, error) {
-	return t.problemByCode(ctx, eff, true, code)
+	return t.problemByCode(ctx, eff, ScoreVisibilityTeam, code)
 }
 
 func (t *Team) ProblemByCodeForAdmin(
 	ctx context.Context, eff TeamProblemReader, code ProblemCode,
 ) (*TeamProblem, error) {
-	return t.problemByCode(ctx, eff, false, code)
+	return t.problemByCode(ctx, eff, ScoreVisibilityPrivate, code)
 }
 
-func (t *Team) problemByCode(ctx context.Context, eff TeamProblemReader, isPublic bool, code ProblemCode) (*TeamProblem, error) {
+func (t *Team) problemByCode(ctx context.Context, eff TeamProblemReader, visibility ScoreVisibility, code ProblemCode) (*TeamProblem, error) {
 	problem, err := code.Problem(ctx, eff)
 	if err != nil {
 		return nil, err
@@ -187,7 +187,7 @@ func (t *Team) problemByCode(ctx context.Context, eff TeamProblemReader, isPubli
 	teamProblem := &TeamProblem{team: t, problem: problem}
 
 	if scoreData, err := eff.GetTeamProblemScore(
-		ctx, isPublic, uuid.UUID(t.teamID), uuid.UUID(problem.problemID),
+		ctx, visibility, uuid.UUID(t.teamID), uuid.UUID(problem.problemID),
 	); err == nil {
 		score, err := scoreData.parse(problem)
 		if err != nil {
@@ -224,8 +224,8 @@ type (
 		Score     ScoreData `json:"score"`
 	}
 	TeamProblemScoreReader interface {
-		GetTeamProblemScore(ctx context.Context, isPublic bool, teamID, problemID uuid.UUID) (*ScoreData, error)
-		ListTeamProblemScoresByTeamID(ctx context.Context, isPublic bool, teamID uuid.UUID) ([]*TeamProblemScoreData, error)
-		ListTeamProblemScores(ctx context.Context, isPublic bool) ([]*TeamProblemScoreData, error)
+		GetTeamProblemScore(ctx context.Context, visibility ScoreVisibility, teamID, problemID uuid.UUID) (*ScoreData, error)
+		ListTeamProblemScoresByTeamID(ctx context.Context, visibility ScoreVisibility, teamID uuid.UUID) ([]*TeamProblemScoreData, error)
+		ListTeamProblemScores(ctx context.Context, visibility ScoreVisibility) ([]*TeamProblemScoreData, error)
 	}
 )

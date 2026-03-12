@@ -5,6 +5,7 @@ import (
 
 	"github.com/ictsc/ictsc-regalia/backend/pkg/pgtest"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/snaptest"
+	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 )
 
@@ -12,10 +13,10 @@ func TestGetRanking(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		isPublic bool
+		visibility domain.ScoreVisibility
 	}{
-		"public": {isPublic: true},
-		"admin":  {isPublic: false},
+		"public": {visibility: domain.ScoreVisibilityPublic},
+		"admin":  {visibility: domain.ScoreVisibilityPrivate},
 	}
 
 	for name, tt := range cases {
@@ -23,7 +24,7 @@ func TestGetRanking(t *testing.T) {
 			t.Parallel()
 
 			repo := pg.NewRepository(pgtest.SetupDB(t))
-			actual, err := repo.GetRanking(t.Context(), tt.isPublic)
+			actual, err := repo.GetRanking(t.Context(), tt.visibility)
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"time"
 
 	"connectrpc.com/connect"
 	adminv1 "github.com/ictsc/ictsc-regalia/backend/pkg/proto/admin/v1"
@@ -24,14 +25,31 @@ var _ adminv1connect.ScheduleServiceHandler = (*ScheduleServiceHandler)(nil)
 
 func newScheduleServiceHandler(enforcer *auth.Enforcer, repo *pg.Repository, scheduleReader domain.ScheduleReader) *ScheduleServiceHandler {
 	return &ScheduleServiceHandler{
-		Enforcer:     enforcer,
-		GetEffect:    scheduleReader,
-		UpdateEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) domain.ScheduleWriter { return rt }),
+		Enforcer: enforcer,
+		GetEffect: struct {
+			domain.ScheduleReader
+			domain.ScoreVisibilitySettingsReader
+		}{
+			ScheduleReader:                scheduleReader,
+			ScoreVisibilitySettingsReader: repo,
+		},
+		UpdateEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) scheduleWriter {
+			return scheduleWriter{ScheduleWriter: rt, ScoreVisibilitySettingsWriter: rt}
+		}),
 	}
 }
 
-type ScheduleGetEffect = domain.ScheduleReader
-type ScheduleUpdateEffect = domain.Tx[domain.ScheduleWriter]
+type ScheduleGetEffect interface {
+	domain.ScheduleReader
+	domain.ScoreVisibilitySettingsReader
+}
+
+type scheduleWriter struct {
+	domain.ScheduleWriter
+	domain.ScoreVisibilitySettingsWriter
+}
+
+type ScheduleUpdateEffect = domain.Tx[scheduleWriter]
 
 func (h *ScheduleServiceHandler) GetSchedule(
 	ctx context.Context,
@@ -45,15 +63,23 @@ func (h *ScheduleServiceHandler) GetSchedule(
 	if err != nil {
 		return nil, err
 	}
+	settings, err := domain.GetScoreVisibilitySettings(ctx, h.GetEffect)
+	if err != nil {
+		return nil, err
+	}
 
 	protoSchedules := make([]*adminv1.Schedule, 0, len(schedules))
 	for _, schedule := range schedules {
 		protoSchedules = append(protoSchedules, convertScheduleEntry(schedule))
 	}
 
-	return connect.NewResponse(&adminv1.GetScheduleResponse{
+	resp := &adminv1.GetScheduleResponse{
 		Schedule: protoSchedules,
-	}), nil
+	}
+	if freezeAt := settings.RankingFreezeAt(); freezeAt != nil {
+		resp.RankingFreezeAt = timestamppb.New(*freezeAt)
+	}
+	return connect.NewResponse(resp), nil
 }
 
 func (h *ScheduleServiceHandler) UpdateSchedule(
@@ -72,8 +98,18 @@ func (h *ScheduleServiceHandler) UpdateSchedule(
 			EndAt:   schedule.GetEndAt().AsTime(),
 		})
 	}
-	if err := h.UpdateEffect.RunInTx(ctx, func(w domain.ScheduleWriter) error {
-		return domain.SaveSchedule(ctx, w, schedules)
+	var freezeAt *time.Time
+	if ts := req.Msg.GetRankingFreezeAt(); ts != nil {
+		t := ts.AsTime()
+		freezeAt = &t
+	}
+	if err := h.UpdateEffect.RunInTx(ctx, func(w scheduleWriter) error {
+		if err := domain.SaveSchedule(ctx, w.ScheduleWriter, schedules); err != nil {
+			return err
+		}
+		return domain.SaveScoreVisibilitySettings(ctx, w.ScoreVisibilitySettingsWriter, &domain.UpdateScoreVisibilitySettingsInput{
+			RankingFreezeAt: freezeAt,
+		})
 	}); err != nil {
 		return nil, err
 	}

@@ -74,7 +74,7 @@ func (h *AnswerServiceHandler) ListAnswers(
 		return nil, err
 	}
 
-	answers, err := domain.ListAnswersByTeamProblemForPublic(ctx, h.ListEffect, teamMember.Team().Code(), problemCode)
+	answers, err := domain.ListAnswersByTeamProblemForTeam(ctx, h.ListEffect, teamMember.Team().Code(), problemCode)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (h *AnswerServiceHandler) GetAnswer(
 		return nil, err
 	}
 
-	answerDetail, err := domain.GetAnswerDetailForPublic(ctx, h.ListEffect, teamMember.Team().Code(), problemCode, req.Msg.Id)
+	answerDetail, err := domain.GetAnswerDetailForTeam(ctx, h.ListEffect, teamMember.Team().Code(), problemCode, req.Msg.Id)
 	if err != nil {
 		return nil, err
 	}

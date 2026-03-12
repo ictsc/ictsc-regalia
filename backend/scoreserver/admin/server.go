@@ -59,7 +59,7 @@ func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB, scheduleReader d
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(adminv1connect.NewMarkServiceHandler(
-		newMarkServiceHandler(enforcer, repo),
+		newMarkServiceHandler(enforcer, repo, scheduleReader),
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(adminv1connect.NewScheduleServiceHandler(

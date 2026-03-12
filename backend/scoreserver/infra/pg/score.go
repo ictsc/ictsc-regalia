@@ -37,16 +37,11 @@ type teamProblemScoreRow struct {
 	scoreRow
 }
 
-func (r *repo) GetTeamProblemScore(ctx context.Context, isPublic bool, teamID, problemID uuid.UUID) (*domain.ScoreData, error) {
-	visibility := "PRIVATE"
-	if isPublic {
-		visibility = "PUBLIC"
-	}
-
+func (r *repo) GetTeamProblemScore(ctx context.Context, visibility domain.ScoreVisibility, teamID, problemID uuid.UUID) (*domain.ScoreData, error) {
 	var row teamProblemScoreRow
 	if err := sqlx.GetContext(
 		ctx, r.ext, &row, r.ext.Rebind(teamProblemScoreByTeamIDAndProblemIDQuery),
-		visibility, teamID, problemID,
+		string(visibility), teamID, problemID,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, domain.NewNotFoundError("team problem score", nil)
@@ -58,24 +53,19 @@ func (r *repo) GetTeamProblemScore(ctx context.Context, isPublic bool, teamID, p
 	return (*domain.ScoreData)(&row.scoreRow), nil
 }
 
-func (r *repo) ListTeamProblemScoresByTeamID(ctx context.Context, isPublic bool, teamID uuid.UUID) ([]*domain.TeamProblemScoreData, error) {
-	return r.listTeamProblemScores(ctx, teamProblemScoreByTeamIDQuery, isPublic, teamID)
+func (r *repo) ListTeamProblemScoresByTeamID(ctx context.Context, visibility domain.ScoreVisibility, teamID uuid.UUID) ([]*domain.TeamProblemScoreData, error) {
+	return r.listTeamProblemScores(ctx, teamProblemScoreByTeamIDQuery, visibility, teamID)
 }
 
-func (r *repo) ListTeamProblemScores(ctx context.Context, isPublic bool) ([]*domain.TeamProblemScoreData, error) {
-	return r.listTeamProblemScores(ctx, teamProblemScoresQuery, isPublic)
+func (r *repo) ListTeamProblemScores(ctx context.Context, visibility domain.ScoreVisibility) ([]*domain.TeamProblemScoreData, error) {
+	return r.listTeamProblemScores(ctx, teamProblemScoresQuery, visibility)
 }
 
 func (r *repo) listTeamProblemScores(
-	ctx context.Context, query string, isPublic bool, args ...any,
+	ctx context.Context, query string, visibility domain.ScoreVisibility, args ...any,
 ) ([]*domain.TeamProblemScoreData, error) {
-	visibility := "PRIVATE"
-	if isPublic {
-		visibility = "PUBLIC"
-	}
-
 	rows := make([]teamProblemScoreRow, 0)
-	queryArgs := []any{visibility}
+	queryArgs := []any{string(visibility)}
 	queryArgs = append(queryArgs, args...)
 	if err := sqlx.SelectContext(
 		ctx, r.ext, &rows, r.ext.Rebind(query), queryArgs...,
@@ -98,44 +88,20 @@ func (r *repo) listTeamProblemScores(
 
 var _ domain.UpdateAnswerScoreEffect = (*repo)(nil)
 
-func (r *repo) UpdatePublicAnswerScore(ctx context.Context, input *domain.UpdateAnswerScoreInput) error {
-	return r.updateAnswerScore(ctx, input, true)
-}
-
-func (r *repo) UpdatePrivateAnswerScore(ctx context.Context, input *domain.UpdateAnswerScoreInput) error {
-	return r.updateAnswerScore(ctx, input, false)
-}
-
-func (r *repo) updateAnswerScore(ctx context.Context, input *domain.UpdateAnswerScoreInput, isPublic bool) error {
-	visibility := "PRIVATE"
-	if isPublic {
-		visibility = "PUBLIC"
-	}
+func (r *repo) UpdateAnswerScore(ctx context.Context, input *domain.UpdateAnswerScoreInput) error {
 	if _, err := r.ext.ExecContext(ctx, `
 		INSERT INTO answer_scores (answer_id, visibility, marking_result_id)
 		VALUES ($1, $2, $3)
 		ON CONFLICT (answer_id, visibility) DO UPDATE SET
 			marking_result_id = EXCLUDED.marking_result_id`,
-		input.AnswerID, visibility, input.MarkingResultID,
+		input.AnswerID, string(input.Visibility), input.MarkingResultID,
 	); err != nil {
 		return errors.Wrap(err, "failed to insert answer_scores")
 	}
 	return nil
 }
 
-func (r *repo) UpdatePublicProblemScore(ctx context.Context, input *domain.UpdateProblemScoreInput) error {
-	return r.updateProblemScore(ctx, input, true)
-}
-
-func (r *repo) UpdatePrivateProblemScore(ctx context.Context, input *domain.UpdateProblemScoreInput) error {
-	return r.updateProblemScore(ctx, input, false)
-}
-
-func (r *repo) updateProblemScore(ctx context.Context, input *domain.UpdateProblemScoreInput, isPublic bool) error {
-	visibility := "PRIVATE"
-	if isPublic {
-		visibility = "PUBLIC"
-	}
+func (r *repo) UpdateProblemScore(ctx context.Context, input *domain.UpdateProblemScoreInput) error {
 	if _, err := r.ext.ExecContext(ctx, `
 		INSERT INTO problem_scores
 			(team_id, problem_id, visibility, marking_result_id, updated_at)
@@ -144,7 +110,7 @@ func (r *repo) updateProblemScore(ctx context.Context, input *domain.UpdateProbl
 		ON CONFLICT (team_id, problem_id, visibility) DO UPDATE SET
 			marking_result_id = EXCLUDED.marking_result_id,
 			updated_at = EXCLUDED.updated_at`,
-		input.TeamID, input.ProblemID, visibility, input.MarkingResultID, input.UpdateSubmitAt,
+		input.TeamID, input.ProblemID, string(input.Visibility), input.MarkingResultID, input.UpdateSubmitAt,
 	); err != nil {
 		return errors.Wrap(err, "failed to insert problem_scores")
 	}

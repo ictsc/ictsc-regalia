@@ -15,10 +15,10 @@ func TestListTeamProblemScores(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		isPublic bool
+		visibility domain.ScoreVisibility
 	}{
-		"admin":  {isPublic: false},
-		"public": {isPublic: true},
+		"admin": {visibility: domain.ScoreVisibilityPrivate},
+		"team":  {visibility: domain.ScoreVisibilityTeam},
 	}
 
 	for name, tt := range cases {
@@ -27,7 +27,7 @@ func TestListTeamProblemScores(t *testing.T) {
 
 			repo := pg.NewRepository(pgtest.SetupDB(t))
 
-			actual, err := repo.ListTeamProblemScores(t.Context(), tt.isPublic)
+			actual, err := repo.ListTeamProblemScores(t.Context(), tt.visibility)
 			if err != nil {
 				t.Fatalf("ListTeamProblemScores failed: %v", err)
 			}
@@ -41,11 +41,11 @@ func TestListProblemScoresByTeamID(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		isPublic bool
-		teamID   uuid.UUID
+		visibility domain.ScoreVisibility
+		teamID     uuid.UUID
 	}{
-		"admin":  {isPublic: false, teamID: uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091")},
-		"public": {isPublic: true, teamID: uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091")},
+		"admin": {visibility: domain.ScoreVisibilityPrivate, teamID: uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091")},
+		"team":  {visibility: domain.ScoreVisibilityTeam, teamID: uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091")},
 	}
 
 	for name, tt := range cases {
@@ -54,7 +54,7 @@ func TestListProblemScoresByTeamID(t *testing.T) {
 
 			repo := pg.NewRepository(pgtest.SetupDB(t))
 
-			actual, err := repo.ListTeamProblemScoresByTeamID(t.Context(), tt.isPublic, tt.teamID)
+			actual, err := repo.ListTeamProblemScoresByTeamID(t.Context(), tt.visibility, tt.teamID)
 			if err != nil {
 				t.Fatalf("ListProblemScoresByTeamID failed: %v", err)
 			}
@@ -68,27 +68,27 @@ func TestGetProblemScoreByTeamIDAndProblemID(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
-		isPublic  bool
-		teamID    uuid.UUID
-		problemID uuid.UUID
+		visibility domain.ScoreVisibility
+		teamID     uuid.UUID
+		problemID  uuid.UUID
 
 		wantErr error
 	}{
 		"admin": {
-			isPublic:  false,
-			teamID:    uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-			problemID: uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
+			visibility: domain.ScoreVisibilityPrivate,
+			teamID:     uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
+			problemID:  uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
 		},
-		"public": {
-			isPublic:  true,
-			teamID:    uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-			problemID: uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
+		"team": {
+			visibility: domain.ScoreVisibilityTeam,
+			teamID:     uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
+			problemID:  uuid.FromStringOrNil("16643c32-c686-44ba-996b-2fbe43b54513"),
 		},
 		"not found": {
-			isPublic:  false,
-			teamID:    uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
-			problemID: uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000"),
-			wantErr:   domain.ErrNotFound,
+			visibility: domain.ScoreVisibilityPrivate,
+			teamID:     uuid.FromStringOrNil("a1de8fe6-26c8-42d7-b494-dea48e409091"),
+			problemID:  uuid.FromStringOrNil("00000000-0000-0000-0000-000000000000"),
+			wantErr:    domain.ErrNotFound,
 		},
 	}
 
@@ -98,7 +98,7 @@ func TestGetProblemScoreByTeamIDAndProblemID(t *testing.T) {
 
 			repo := pg.NewRepository(pgtest.SetupDB(t))
 
-			actual, err := repo.GetTeamProblemScore(t.Context(), tt.isPublic, tt.teamID, tt.problemID)
+			actual, err := repo.GetTeamProblemScore(t.Context(), tt.visibility, tt.teamID, tt.problemID)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("GetProblemScoreByTeamIDAndProblemID failed: %v", err)
 			}

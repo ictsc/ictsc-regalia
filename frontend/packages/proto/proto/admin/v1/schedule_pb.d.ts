@@ -59,6 +59,11 @@ export declare type GetScheduleResponse = Message<"admin.v1.GetScheduleResponse"
    * @generated from field: repeated admin.v1.Schedule schedule = 1;
    */
   schedule: Schedule[];
+
+  /**
+   * @generated from field: optional google.protobuf.Timestamp ranking_freeze_at = 2;
+   */
+  rankingFreezeAt?: Timestamp;
 };
 
 /**
@@ -75,6 +80,11 @@ export declare type UpdateScheduleRequest = Message<"admin.v1.UpdateScheduleRequ
    * @generated from field: repeated admin.v1.Schedule schedule = 1;
    */
   schedule: Schedule[];
+
+  /**
+   * @generated from field: optional google.protobuf.Timestamp ranking_freeze_at = 2;
+   */
+  rankingFreezeAt?: Timestamp;
 };
 
 /**

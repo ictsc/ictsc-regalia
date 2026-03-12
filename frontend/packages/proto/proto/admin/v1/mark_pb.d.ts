@@ -414,6 +414,30 @@ export declare type UpdateScoresResponse = Message<"admin.v1.UpdateScoresRespons
 export declare const UpdateScoresResponseSchema: GenMessage<UpdateScoresResponse>;
 
 /**
+ * @generated from message admin.v1.RevealFinalScoresRequest
+ */
+export declare type RevealFinalScoresRequest = Message<"admin.v1.RevealFinalScoresRequest"> & {
+};
+
+/**
+ * Describes the message admin.v1.RevealFinalScoresRequest.
+ * Use `create(RevealFinalScoresRequestSchema)` to create a new message.
+ */
+export declare const RevealFinalScoresRequestSchema: GenMessage<RevealFinalScoresRequest>;
+
+/**
+ * @generated from message admin.v1.RevealFinalScoresResponse
+ */
+export declare type RevealFinalScoresResponse = Message<"admin.v1.RevealFinalScoresResponse"> & {
+};
+
+/**
+ * Describes the message admin.v1.RevealFinalScoresResponse.
+ * Use `create(RevealFinalScoresResponseSchema)` to create a new message.
+ */
+export declare const RevealFinalScoresResponseSchema: GenMessage<RevealFinalScoresResponse>;
+
+/**
  * @generated from enum admin.v1.MarkingResultVisibility
  */
 export enum MarkingResultVisibility {
@@ -493,6 +517,14 @@ export declare const MarkService: GenService<{
     methodKind: "unary";
     input: typeof UpdateScoresRequestSchema;
     output: typeof UpdateScoresResponseSchema;
+  },
+  /**
+   * @generated from rpc admin.v1.MarkService.RevealFinalScores
+   */
+  revealFinalScores: {
+    methodKind: "unary";
+    input: typeof RevealFinalScoresRequestSchema;
+    output: typeof RevealFinalScoresResponseSchema;
   },
 }>;
 
