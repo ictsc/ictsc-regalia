@@ -93,22 +93,23 @@ func (h *ProblemServiceHandler) ListProblems(
 		return nil, err
 	}
 
+	schedules, err := domain.GetSchedule(ctx, h.ListProblemsEffect)
+	if err != nil {
+		return nil, err
+	}
+	scheduleReader := domain.NewCachedScheduleReader(schedules)
+
 	// 可視性フィルタリング: 過去に一度でも提出可能だった問題のみ表示
 	now := time.Now()
 	visibleProblems := make([]*domain.TeamProblem, 0, len(problems))
 	for _, problem := range problems {
-		isVisible, err := problem.Problem().IsVisibleAt(ctx, now, h.ListProblemsEffect)
+		isVisible, err := problem.Problem().IsVisibleAt(ctx, now, scheduleReader)
 		if err != nil {
 			return nil, err
 		}
 		if isVisible {
 			visibleProblems = append(visibleProblems, problem)
 		}
-	}
-
-	schedules, err := domain.GetSchedule(ctx, h.ListProblemsEffect)
-	if err != nil {
-		return nil, err
 	}
 
 	protoProblems := make([]*contestantv1.Problem, 0, len(visibleProblems))
@@ -196,17 +197,17 @@ func (h *ProblemServiceHandler) GetProblem(
 
 	// 可視性チェック: まだ開始されていないスケジュールの問題はアクセス不可
 	now := time.Now()
-	isVisible, err := teamProblem.TeamProblem().Problem().IsVisibleAt(ctx, now, h.GetProblemEffect)
+	schedules, err := domain.GetSchedule(ctx, h.GetProblemEffect)
+	if err != nil {
+		return nil, err
+	}
+	scheduleReader := domain.NewCachedScheduleReader(schedules)
+	isVisible, err := teamProblem.TeamProblem().Problem().IsVisibleAt(ctx, now, scheduleReader)
 	if err != nil {
 		return nil, err
 	}
 	if !isVisible {
 		return nil, connect.NewError(connect.CodeNotFound, nil)
-	}
-
-	schedules, err := domain.GetSchedule(ctx, h.GetProblemEffect)
-	if err != nil {
-		return nil, err
 	}
 
 	detail := teamProblem.ProblemDetail()
