@@ -21,7 +21,5 @@ export type * from "../proto/admin/v1/rule_pb.d.ts";
 export * from "../proto/admin/v1/rule_pb.js";
 export type * from "../proto/admin/v1/schedule_pb.d.ts";
 export * from "../proto/admin/v1/schedule_pb.js";
-export type * from "../proto/admin/v1/score_visibility_settings_pb.d.ts";
-export * from "../proto/admin/v1/score_visibility_settings_pb.js";
 export type * from "../proto/admin/v1/team_pb.d.ts";
 export * from "../proto/admin/v1/team_pb.js";
