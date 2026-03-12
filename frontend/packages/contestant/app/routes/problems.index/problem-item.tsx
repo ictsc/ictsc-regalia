@@ -26,15 +26,14 @@ export function ProblemItem(props: ProblemItemProps) {
           className={clsx(
             "rounded-16 flex w-full max-w-[512px] justify-between gap-24 px-20 py-12 transition",
             active ? "shadow-transparent" : "shadow-lg",
-            !isSubmittable
-              ? "opacity-50 grayscale"
-              : props.score.rawFullScore
-                ? hover
-                  ? "bg-surface-2"
-                  : "bg-disabled"
-                : hover
-                  ? "bg-surface-1"
-                  : "bg-surface-0",
+            props.score.rawFullScore
+              ? hover
+                ? "bg-surface-2"
+                : "bg-disabled"
+              : hover
+                ? "bg-surface-1"
+                : "bg-surface-0",
+            !isSubmittable && "opacity-50 grayscale",
           )}
         >
           <div className="flex flex-col items-start justify-between gap-4">
