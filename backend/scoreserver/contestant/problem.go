@@ -106,17 +106,14 @@ func (h *ProblemServiceHandler) ListProblems(
 		}
 	}
 
+	schedules, err := domain.GetSchedule(ctx, h.ListProblemsEffect)
+	if err != nil {
+		return nil, err
+	}
+
 	protoProblems := make([]*contestantv1.Problem, 0, len(visibleProblems))
 	for _, problem := range visibleProblems {
-		// 提出状態を計算
-		submissionStatus, err := h.calculateSubmissionStatus(ctx, problem.Problem(), now)
-		if err != nil {
-			return nil, err
-		}
-
-		proto := convertTeamProblem(problem)
-		proto.SubmissionStatus = submissionStatus
-		protoProblems = append(protoProblems, proto)
+		protoProblems = append(protoProblems, convertTeamProblem(problem, schedules, now))
 	}
 
 	return connect.NewResponse(&contestantv1.ListProblemsResponse{
@@ -124,16 +121,11 @@ func (h *ProblemServiceHandler) ListProblems(
 	}), nil
 }
 
-func (h *ProblemServiceHandler) calculateSubmissionStatus(
-	ctx context.Context,
+func calculateSubmissionStatus(
 	problem *domain.Problem,
+	schedules domain.Schedule,
 	now time.Time,
-) (*contestantv1.SubmissionStatus, error) {
-	schedules, err := domain.GetSchedule(ctx, h.ListProblemsEffect)
-	if err != nil {
-		return nil, err
-	}
-
+) *contestantv1.SubmissionStatus {
 	status := &contestantv1.SubmissionStatus{}
 
 	var currentWindow, nextWindow *domain.ScheduleEntry
@@ -170,7 +162,7 @@ func (h *ProblemServiceHandler) calculateSubmissionStatus(
 		status.IsSubmittable = false
 	}
 
-	return status, nil
+	return status
 }
 
 type ProblemGetEffect = ProblemListEffect
@@ -212,14 +204,13 @@ func (h *ProblemServiceHandler) GetProblem(
 		return nil, connect.NewError(connect.CodeNotFound, nil)
 	}
 
-	detail := teamProblem.ProblemDetail()
-	submissionStatus, err := h.calculateSubmissionStatus(ctx, teamProblem.TeamProblem().Problem(), now)
+	schedules, err := domain.GetSchedule(ctx, h.GetProblemEffect)
 	if err != nil {
 		return nil, err
 	}
 
-	proto := convertTeamProblem(teamProblem.TeamProblem())
-	proto.SubmissionStatus = submissionStatus
+	detail := teamProblem.ProblemDetail()
+	proto := convertTeamProblem(teamProblem.TeamProblem(), schedules, now)
 	proto.Body = &contestantv1.ProblemBody{
 		Type: contestantv1.ProblemType_PROBLEM_TYPE_DESCRIPTIVE,
 		Body: &contestantv1.ProblemBody_Descriptive{
@@ -369,7 +360,7 @@ func enforceDeploymentWindow(
 	return connect.NewError(connect.CodeFailedPrecondition, errors.New("現在はデプロイできません"))
 }
 
-func convertTeamProblem(problem *domain.TeamProblem) *contestantv1.Problem {
+func convertTeamProblem(problem *domain.TeamProblem, schedules domain.Schedule, now time.Time) *contestantv1.Problem {
 	proto := &contestantv1.Problem{
 		Code:     string(problem.Code()),
 		Title:    problem.Title(),
@@ -378,6 +369,8 @@ func convertTeamProblem(problem *domain.TeamProblem) *contestantv1.Problem {
 		Deployment: &contestantv1.Deployment{
 			Redeployable: problem.Redeployable(),
 		},
+		SubmissionStatus:        calculateSubmissionStatus(problem.Problem(), schedules, now),
+		SubmissionableSchedules: convertSubmissionableSchedules(problem.Problem(), schedules),
 	}
 	if score := problem.Score(); score != nil {
 		proto.Score = &contestantv1.Score{
@@ -391,6 +384,29 @@ func convertTeamProblem(problem *domain.TeamProblem) *contestantv1.Problem {
 		proto.Deployment.PenaltyThreashold = problem.PercentagePenalty().Threshold
 	}
 	return proto
+}
+
+func convertSubmissionableSchedules(
+	problem *domain.Problem,
+	schedules domain.Schedule,
+) []*contestantv1.ScheduleEntry {
+	scheduleNames := make(map[string]struct{}, len(problem.SubmissionableScheduleNames()))
+	for _, name := range problem.SubmissionableScheduleNames() {
+		scheduleNames[name] = struct{}{}
+	}
+
+	entries := make([]*contestantv1.ScheduleEntry, 0, len(scheduleNames))
+	for _, schedule := range schedules {
+		if _, ok := scheduleNames[schedule.Name()]; !ok {
+			continue
+		}
+		entries = append(entries, &contestantv1.ScheduleEntry{
+			Name:    schedule.Name(),
+			StartAt: timestamppb.New(schedule.StartAt()),
+			EndAt:   timestamppb.New(schedule.EndAt()),
+		})
+	}
+	return entries
 }
 
 func convertDeployment(problem *domain.Problem, deployment *domain.Deployment) *contestantv1.DeploymentRequest {

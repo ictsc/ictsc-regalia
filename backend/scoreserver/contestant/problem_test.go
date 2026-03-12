@@ -18,6 +18,131 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 )
 
+func TestProblemServiceListProblemsIncludesSubmissionableSchedules(t *testing.T) {
+	t.Parallel()
+
+	pastStart := time.Now().Add(-2 * time.Hour)
+	pastEnd := time.Now().Add(-time.Hour)
+	futureStart := time.Now().Add(time.Hour)
+	futureEnd := time.Now().Add(2 * time.Hour)
+
+	store := newProblemServiceTestStore([]*domain.ScheduleData{
+		testSchedule("slot2", futureStart, futureEnd),
+		testSchedule("slot1", pastStart, pastEnd),
+	})
+	store.problem.SubmissionableScheduleNames = []string{"slot2", "slot1"}
+	client := newProblemServiceTestClient(t, store)
+
+	resp, err := client.ListProblems(t.Context(), connect.NewRequest(&contestantv1.ListProblemsRequest{}))
+	if err != nil {
+		t.Fatalf("ListProblems() error = %v", err)
+	}
+	if got := len(resp.Msg.GetProblems()); got != 1 {
+		t.Fatalf("len(resp.Msg.Problems) = %d, want 1", got)
+	}
+
+	problem := resp.Msg.GetProblems()[0]
+	if got := len(problem.GetSubmissionableSchedules()); got != 2 {
+		t.Fatalf("len(problem.SubmissionableSchedules) = %d, want 2", got)
+	}
+	if got := problem.GetSubmissionableSchedules()[0].GetName(); got != "slot1" {
+		t.Fatalf("problem.SubmissionableSchedules[0].Name = %q, want %q", got, "slot1")
+	}
+	if got := problem.GetSubmissionableSchedules()[1].GetName(); got != "slot2" {
+		t.Fatalf("problem.SubmissionableSchedules[1].Name = %q, want %q", got, "slot2")
+	}
+	if got := problem.GetSubmissionableSchedules()[0].GetStartAt().AsTime(); !got.Equal(pastStart) {
+		t.Fatalf("problem.SubmissionableSchedules[0].StartAt = %v, want %v", got, pastStart)
+	}
+	if got := problem.GetSubmissionableSchedules()[1].GetEndAt().AsTime(); !got.Equal(futureEnd) {
+		t.Fatalf("problem.SubmissionableSchedules[1].EndAt = %v, want %v", got, futureEnd)
+	}
+	if problem.GetSubmissionStatus().GetIsSubmittable() {
+		t.Fatal("problem.SubmissionStatus.IsSubmittable = true, want false")
+	}
+	if got := problem.GetSubmissionStatus().GetSubmittableFrom().AsTime(); !got.Equal(futureStart) {
+		t.Fatalf("problem.SubmissionStatus.SubmittableFrom = %v, want %v", got, futureStart)
+	}
+	if got := problem.GetSubmissionStatus().GetSubmittableUntil(); got != nil {
+		t.Fatalf("problem.SubmissionStatus.SubmittableUntil = %v, want nil", got)
+	}
+}
+
+func TestProblemServiceGetProblemIncludesSubmissionableSchedules(t *testing.T) {
+	t.Parallel()
+
+	activeStart := time.Now().Add(-time.Hour)
+	activeEnd := time.Now().Add(time.Hour)
+	futureStart := time.Now().Add(2 * time.Hour)
+	futureEnd := time.Now().Add(3 * time.Hour)
+
+	store := newProblemServiceTestStore([]*domain.ScheduleData{
+		testSchedule("slot2", futureStart, futureEnd),
+		testSchedule("slot1", activeStart, activeEnd),
+	})
+	store.problem.SubmissionableScheduleNames = []string{"slot2", "slot1"}
+	client := newProblemServiceTestClient(t, store)
+
+	resp, err := client.GetProblem(t.Context(), connect.NewRequest(&contestantv1.GetProblemRequest{
+		Code: "0001",
+	}))
+	if err != nil {
+		t.Fatalf("GetProblem() error = %v", err)
+	}
+
+	problem := resp.Msg.GetProblem()
+	if got := problem.GetBody().GetDescriptive().GetBody(); got != store.problemContent.Body {
+		t.Fatalf("problem.Body.Descriptive.Body = %q, want %q", got, store.problemContent.Body)
+	}
+	if got := len(problem.GetSubmissionableSchedules()); got != 2 {
+		t.Fatalf("len(problem.SubmissionableSchedules) = %d, want 2", got)
+	}
+	if got := problem.GetSubmissionableSchedules()[0].GetName(); got != "slot1" {
+		t.Fatalf("problem.SubmissionableSchedules[0].Name = %q, want %q", got, "slot1")
+	}
+	if got := problem.GetSubmissionableSchedules()[1].GetName(); got != "slot2" {
+		t.Fatalf("problem.SubmissionableSchedules[1].Name = %q, want %q", got, "slot2")
+	}
+	if !problem.GetSubmissionStatus().GetIsSubmittable() {
+		t.Fatal("problem.SubmissionStatus.IsSubmittable = false, want true")
+	}
+	if got := problem.GetSubmissionStatus().GetSubmittableUntil().AsTime(); !got.Equal(activeEnd) {
+		t.Fatalf("problem.SubmissionStatus.SubmittableUntil = %v, want %v", got, activeEnd)
+	}
+	if got := problem.GetSubmissionStatus().GetSubmittableFrom(); got != nil {
+		t.Fatalf("problem.SubmissionStatus.SubmittableFrom = %v, want nil", got)
+	}
+}
+
+func TestProblemServiceListProblemsOmitsMissingSubmissionableSchedules(t *testing.T) {
+	t.Parallel()
+
+	pastStart := time.Now().Add(-2 * time.Hour)
+	pastEnd := time.Now().Add(-time.Hour)
+
+	store := newProblemServiceTestStore([]*domain.ScheduleData{
+		testSchedule("slot1", pastStart, pastEnd),
+	})
+	store.problem.SubmissionableScheduleNames = []string{"missing", "slot1"}
+	client := newProblemServiceTestClient(t, store)
+
+	resp, err := client.ListProblems(t.Context(), connect.NewRequest(&contestantv1.ListProblemsRequest{}))
+	if err != nil {
+		t.Fatalf("ListProblems() error = %v", err)
+	}
+	if got := len(resp.Msg.GetProblems()); got != 1 {
+		t.Fatalf("len(resp.Msg.Problems) = %d, want 1", got)
+	}
+
+	problem := resp.Msg.GetProblems()[0]
+	if got := len(problem.GetSubmissionableSchedules()); got != 1 {
+		t.Fatalf("len(problem.SubmissionableSchedules) = %d, want 1", got)
+	}
+	if got := problem.GetSubmissionableSchedules()[0].GetName(); got != "slot1" {
+		t.Fatalf("problem.SubmissionableSchedules[0].Name = %q, want %q", got, "slot1")
+	}
+}
+
 func TestProblemServiceListDeploymentsRequiresActiveSchedule(t *testing.T) {
 	t.Parallel()
 
@@ -192,9 +317,10 @@ func TestProblemServiceDeployValidatesCodeBeforeSchedule(t *testing.T) {
 }
 
 type problemServiceTestStore struct {
-	userID  uuid.UUID
-	teamID  uuid.UUID
-	problem *domain.ProblemData
+	userID         uuid.UUID
+	teamID         uuid.UUID
+	problem        *domain.ProblemData
+	problemContent *domain.ProblemContentData
 
 	schedules []*domain.ScheduleData
 
@@ -217,6 +343,10 @@ func newProblemServiceTestStore(schedules []*domain.ScheduleData) *problemServic
 			Category:                    "network",
 			RedeployRule:                domain.RedeployRuleManual,
 			SubmissionableScheduleNames: []string{"contest"},
+		},
+		problemContent: &domain.ProblemContentData{
+			Body:        "# Test Problem",
+			Explanation: "for test",
 		},
 		schedules: schedules,
 	}
@@ -257,8 +387,14 @@ func (s *problemServiceTestStore) GetProblemByCode(_ context.Context, code strin
 	return s.problem, nil
 }
 
-func (*problemServiceTestStore) GetDescriptiveProblem(context.Context, uuid.UUID) (*domain.DescriptiveProblemData, error) {
-	return nil, domain.ErrNotFound
+func (s *problemServiceTestStore) GetDescriptiveProblem(_ context.Context, problemID uuid.UUID) (*domain.DescriptiveProblemData, error) {
+	if problemID != s.problem.ID {
+		return nil, domain.ErrNotFound
+	}
+	return &domain.DescriptiveProblemData{
+		Problem: s.problem,
+		Content: s.problemContent,
+	}, nil
 }
 
 func (*problemServiceTestStore) GetTeamProblemScore(context.Context, domain.ScoreVisibility, uuid.UUID, uuid.UUID) (*domain.ScoreData, error) {
@@ -322,6 +458,8 @@ func newProblemServiceTestClient(t *testing.T, store *problemServiceTestStore) c
 	})
 
 	problemService := &ProblemServiceHandler{
+		ListProblemsEffect:    store,
+		GetProblemEffect:      store,
 		ListDeploymentsEffect: store,
 		DeployEffect:          store,
 	}
