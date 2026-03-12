@@ -28,15 +28,15 @@ func (r *repo) ListAnswersByTeamProblemForAdmin(ctx context.Context, teamCode in
 	return r.ListAnswersByTeamProblem(ctx, domain.ScoreVisibilityPrivate, teamCode, problemCode)
 }
 
-func (r *repo) ListAnswersByTeamProblemForPublic(ctx context.Context, teamCode int64, problemCode string) ([]*domain.AnswerData, error) {
+func (r *repo) ListAnswersByTeamProblemForTeam(ctx context.Context, teamCode int64, problemCode string) ([]*domain.AnswerData, error) {
 	return r.ListAnswersByTeamProblem(ctx, domain.ScoreVisibilityTeam, teamCode, problemCode)
 }
 
-func (r *repo) GetLatestAnswerByTeamProblemForPublic(ctx context.Context, teamID, problemID uuid.UUID) (*domain.AnswerData, error) {
+func (r *repo) GetLatestAnswerByTeamProblemForTeam(ctx context.Context, teamID, problemID uuid.UUID) (*domain.AnswerData, error) {
 	return r.GetLatestAnswerByTeamProblem(ctx, domain.ScoreVisibilityTeam, teamID, problemID)
 }
 
-func (r *repo) GetAnswerDetailForPublic(
+func (r *repo) GetAnswerDetailForTeam(
 	ctx context.Context, teamCode int64, problemCode string, answerNumber uint32,
 ) (*domain.AnswerDetailData, error) {
 	return r.GetAnswerDetail(ctx, domain.ScoreVisibilityTeam, teamCode, problemCode, answerNumber)

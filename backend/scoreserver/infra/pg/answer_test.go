@@ -42,8 +42,8 @@ func TestListAnswersByTeamProblem(t *testing.T) {
 			teamCode:    1,
 			problemCode: "0001",
 		},
-		"ok/public": {
-			viewer:      "public",
+		"ok/team": {
+			viewer:      "team",
 			teamCode:    1,
 			problemCode: "0001",
 		},
@@ -59,8 +59,8 @@ func TestListAnswersByTeamProblem(t *testing.T) {
 			switch tt.viewer {
 			case "admin":
 				lister = repo.ListAnswersByTeamProblemForAdmin
-			case "public":
-				lister = repo.ListAnswersByTeamProblemForPublic
+			case "team":
+				lister = repo.ListAnswersByTeamProblemForTeam
 			default:
 				t.Fatalf("unexpected viewer: %s", tt.viewer)
 			}
@@ -74,7 +74,7 @@ func TestListAnswersByTeamProblem(t *testing.T) {
 	}
 }
 
-func TestGetLatestAnswersByTeamProblemForPublic(t *testing.T) {
+func TestGetLatestAnswersByTeamProblemForTeam(t *testing.T) {
 	t.Parallel()
 
 	cases := map[string]struct {
@@ -100,7 +100,7 @@ func TestGetLatestAnswersByTeamProblemForPublic(t *testing.T) {
 			t.Parallel()
 
 			repo := pg.NewRepository(pgtest.SetupDB(t))
-			actual, err := repo.GetLatestAnswerByTeamProblemForPublic(t.Context(), tt.teamID, tt.problemID)
+			actual, err := repo.GetLatestAnswerByTeamProblemForTeam(t.Context(), tt.teamID, tt.problemID)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("unexpected error: %v", err)
 			}

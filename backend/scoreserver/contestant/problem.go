@@ -88,7 +88,7 @@ func (h *ProblemServiceHandler) ListProblems(
 		return nil, err
 	}
 
-	problems, err := teamMember.Team().ProblemsForPublic(ctx, h.ListProblemsEffect)
+	problems, err := teamMember.Team().ProblemsForTeam(ctx, h.ListProblemsEffect)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +197,7 @@ func (h *ProblemServiceHandler) GetProblem(
 		return nil, err
 	}
 
-	teamProblem, err := teamMember.Team().ProblemDetailByCodeForPublic(ctx, h.GetProblemEffect, code)
+	teamProblem, err := teamMember.Team().ProblemDetailByCodeForTeam(ctx, h.GetProblemEffect, code)
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +269,7 @@ func (h *ProblemServiceHandler) ListDeployments(
 		return nil, err
 	}
 
-	teamProblem, err := teamMember.Team().ProblemByCodeForPublic(ctx, h.ListDeploymentsEffect, code)
+	teamProblem, err := teamMember.Team().ProblemByCodeForTeam(ctx, h.ListDeploymentsEffect, code)
 	if err != nil {
 		return nil, err
 	}
@@ -327,7 +327,7 @@ func (h *ProblemServiceHandler) Deploy(
 		return nil, err
 	}
 
-	teamProblem, err := teamMember.Team().ProblemByCodeForPublic(ctx, h.DeployEffect, code)
+	teamProblem, err := teamMember.Team().ProblemByCodeForTeam(ctx, h.DeployEffect, code)
 	if err != nil {
 		return nil, err
 	}

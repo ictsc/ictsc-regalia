@@ -53,7 +53,7 @@ func ListAnswersForAdmin(ctx context.Context, eff AnswerReader) ([]*Answer, erro
 	return answers, nil
 }
 
-func ListAnswersByTeamProblemForPublic(ctx context.Context, eff AnswerReader, teamCode TeamCode, problemCode ProblemCode) ([]*Answer, error) {
+func ListAnswersByTeamProblemForTeam(ctx context.Context, eff AnswerReader, teamCode TeamCode, problemCode ProblemCode) ([]*Answer, error) {
 	answerDataList, err := eff.ListAnswersByTeamProblem(ctx, ScoreVisibilityTeam, int64(teamCode), string(problemCode))
 	if err != nil {
 		return nil, err
@@ -166,13 +166,6 @@ func GetAnswerDetailForTeam(
 	}
 
 	return answerDetailData.parse()
-}
-
-func GetAnswerDetailForPublic(
-	ctx context.Context, eff AnswerReader,
-	teamCode TeamCode, problemCode ProblemCode, answerNumber uint32,
-) (*AnswerDetail, error) {
-	return GetAnswerDetailForTeam(ctx, eff, teamCode, problemCode, answerNumber)
 }
 
 func GetAnswerDetailForAdmin(

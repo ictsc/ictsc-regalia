@@ -75,7 +75,7 @@ type TeamProblemReader interface {
 	TeamProblemScoreReader
 }
 
-func (t *Team) ProblemsForPublic(ctx context.Context, eff TeamProblemReader) ([]*TeamProblem, error) {
+func (t *Team) ProblemsForTeam(ctx context.Context, eff TeamProblemReader) ([]*TeamProblem, error) {
 	return t.problems(ctx, ScoreVisibilityTeam, eff)
 }
 
@@ -138,7 +138,7 @@ func (tp *TeamProblem) Details(ctx context.Context, eff ProblemReader) (*TeamPro
 	}, nil
 }
 
-func (t *Team) ProblemDetailByCodeForPublic(ctx context.Context, eff TeamProblemReader, code ProblemCode) (*TeamProblemDetail, error) {
+func (t *Team) ProblemDetailByCodeForTeam(ctx context.Context, eff TeamProblemReader, code ProblemCode) (*TeamProblemDetail, error) {
 	problem, err := code.Problem(ctx, eff)
 	if err != nil {
 		return nil, err
@@ -166,7 +166,7 @@ func (t *Team) ProblemDetailByCodeForPublic(ctx context.Context, eff TeamProblem
 	return teamProblem, nil
 }
 
-func (t *Team) ProblemByCodeForPublic(
+func (t *Team) ProblemByCodeForTeam(
 	ctx context.Context, eff TeamProblemReader, code ProblemCode,
 ) (*TeamProblem, error) {
 	return t.problemByCode(ctx, eff, ScoreVisibilityTeam, code)
