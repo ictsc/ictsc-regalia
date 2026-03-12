@@ -40,7 +40,7 @@ const (
 )
 
 func ListAnswersForAdmin(ctx context.Context, eff AnswerReader) ([]*Answer, error) {
-	answerDataList, err := eff.ListAnswersForAdmin(ctx)
+	answerDataList, err := eff.ListAnswers(ctx, ScoreVisibilityPrivate)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,27 @@ func ListAnswersForAdmin(ctx context.Context, eff AnswerReader) ([]*Answer, erro
 }
 
 func ListAnswersByTeamProblemForPublic(ctx context.Context, eff AnswerReader, teamCode TeamCode, problemCode ProblemCode) ([]*Answer, error) {
-	answerDataList, err := eff.ListAnswersByTeamProblemForPublic(ctx, int64(teamCode), string(problemCode))
+	answerDataList, err := eff.ListAnswersByTeamProblem(ctx, ScoreVisibilityTeam, int64(teamCode), string(problemCode))
+	if err != nil {
+		return nil, err
+	}
+
+	answers, err := parseAnswerDataList(answerDataList)
+	if err != nil {
+		return nil, err
+	}
+
+	return answers, nil
+}
+
+func ListAnswersByTeamProblemForVisibility(
+	ctx context.Context,
+	eff AnswerReader,
+	visibility ScoreVisibility,
+	teamCode TeamCode,
+	problemCode ProblemCode,
+) ([]*Answer, error) {
+	answerDataList, err := eff.ListAnswersByTeamProblem(ctx, visibility, int64(teamCode), string(problemCode))
 	if err != nil {
 		return nil, err
 	}
@@ -68,12 +88,16 @@ func ListAnswersByTeamProblemForPublic(ctx context.Context, eff AnswerReader, te
 }
 
 func (tp *TeamProblem) answersForPublic(ctx context.Context, eff AnswerReader) ([]*Answer, error) {
-	return ListAnswersByTeamProblemForPublic(ctx, eff, tp.team.Code(), tp.problem.Code())
+	return ListAnswersByTeamProblemForVisibility(ctx, eff, ScoreVisibilityPublic, tp.team.Code(), tp.problem.Code())
+}
+
+func (tp *TeamProblem) answersForTeam(ctx context.Context, eff AnswerReader) ([]*Answer, error) {
+	return ListAnswersByTeamProblemForVisibility(ctx, eff, ScoreVisibilityTeam, tp.team.Code(), tp.problem.Code())
 }
 
 func (tp *TeamProblem) answersForAdmin(ctx context.Context, eff AnswerReader) ([]*Answer, error) {
-	answerDataList, err := eff.ListAnswersByTeamProblemForAdmin(ctx,
-		int64(tp.team.Code()), string(tp.problem.Code()))
+	answerDataList, err := eff.ListAnswersByTeamProblem(ctx,
+		ScoreVisibilityPrivate, int64(tp.team.Code()), string(tp.problem.Code()))
 	if err != nil {
 		return nil, err
 	}
@@ -132,11 +156,11 @@ func (a *Answer) Score() *Score {
 	return a.score
 }
 
-func GetAnswerDetailForPublic(
+func GetAnswerDetailForTeam(
 	ctx context.Context, eff AnswerReader,
 	teamCode TeamCode, problemCode ProblemCode, answerNumber uint32,
 ) (*AnswerDetail, error) {
-	answerDetailData, err := eff.GetAnswerDetailForPublic(ctx, int64(teamCode), string(problemCode), answerNumber)
+	answerDetailData, err := eff.GetAnswerDetail(ctx, ScoreVisibilityTeam, int64(teamCode), string(problemCode), answerNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -144,11 +168,18 @@ func GetAnswerDetailForPublic(
 	return answerDetailData.parse()
 }
 
+func GetAnswerDetailForPublic(
+	ctx context.Context, eff AnswerReader,
+	teamCode TeamCode, problemCode ProblemCode, answerNumber uint32,
+) (*AnswerDetail, error) {
+	return GetAnswerDetailForTeam(ctx, eff, teamCode, problemCode, answerNumber)
+}
+
 func GetAnswerDetailForAdmin(
 	ctx context.Context, eff AnswerReader,
 	teamCode TeamCode, problemCode ProblemCode, answerNumber uint32,
 ) (*AnswerDetail, error) {
-	answerDetailData, err := eff.GetAnswerDetailForAdmin(ctx, int64(teamCode), string(problemCode), answerNumber)
+	answerDetailData, err := eff.GetAnswerDetail(ctx, ScoreVisibilityPrivate, int64(teamCode), string(problemCode), answerNumber)
 	if err != nil {
 		return nil, err
 	}
@@ -194,8 +225,8 @@ func (tm *TeamMember) submitAnswer(
 	ctx context.Context, now time.Time, eff AnswerWriter,
 	problem *Problem, body *AnswerBodyData,
 ) (*AnswerDetail, error) {
-	prevAnswerData, err := eff.GetLatestAnswerByTeamProblemForPublic(
-		ctx, uuid.UUID(tm.team.teamID), uuid.UUID(problem.problemID))
+	prevAnswerData, err := eff.GetLatestAnswerByTeamProblem(
+		ctx, ScoreVisibilityTeam, uuid.UUID(tm.team.teamID), uuid.UUID(problem.problemID))
 	if err != nil && !errors.Is(err, ErrNotFound) {
 		return nil, errors.Wrap(err, "failed to get latest answer")
 	}
@@ -267,14 +298,12 @@ type (
 		Body string `json:"body"`
 	}
 	AnswerReader interface {
-		ListAnswersForAdmin(ctx context.Context) ([]*AnswerData, error)
-		ListAnswersByTeamProblemForAdmin(ctx context.Context, teamCode int64, problemCode string) ([]*AnswerData, error)
-		ListAnswersByTeamProblemForPublic(ctx context.Context, teamCode int64, problemCode string) ([]*AnswerData, error)
-		GetAnswerDetailForAdmin(ctx context.Context, teamCode int64, problemCode string, answerNumber uint32) (*AnswerDetailData, error)
-		GetAnswerDetailForPublic(ctx context.Context, teamCode int64, problemCode string, answerNumber uint32) (*AnswerDetailData, error)
+		ListAnswers(ctx context.Context, visibility ScoreVisibility) ([]*AnswerData, error)
+		ListAnswersByTeamProblem(ctx context.Context, visibility ScoreVisibility, teamCode int64, problemCode string) ([]*AnswerData, error)
+		GetAnswerDetail(ctx context.Context, visibility ScoreVisibility, teamCode int64, problemCode string, answerNumber uint32) (*AnswerDetailData, error)
 	}
 	AnswerWriter interface {
-		GetLatestAnswerByTeamProblemForPublic(ctx context.Context, teamID, problemID uuid.UUID) (*AnswerData, error)
+		GetLatestAnswerByTeamProblem(ctx context.Context, visibility ScoreVisibility, teamID, problemID uuid.UUID) (*AnswerData, error)
 		CreateAnswer(ctx context.Context, data *AnswerDetailData) error
 	}
 )

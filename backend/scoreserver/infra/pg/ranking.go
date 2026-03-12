@@ -30,12 +30,8 @@ type rankRow struct {
 	UpdateSubmitAt time.Time `db:"update_submit_at"`
 }
 
-func (r *repo) GetRanking(ctx context.Context, isPublic bool) ([]*domain.RankData, error) {
-	visibility := "PRIVATE"
-	if isPublic {
-		visibility = "PUBLIC"
-	}
-	rows, err := r.ext.QueryxContext(ctx, rankingQuery, visibility)
+func (r *repo) GetRanking(ctx context.Context, visibility domain.ScoreVisibility) ([]*domain.RankData, error) {
+	rows, err := r.ext.QueryxContext(ctx, rankingQuery, string(visibility))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to select problem_scores")
 	}

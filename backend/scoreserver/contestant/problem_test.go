@@ -261,15 +261,15 @@ func (*problemServiceTestStore) GetDescriptiveProblem(context.Context, uuid.UUID
 	return nil, domain.ErrNotFound
 }
 
-func (*problemServiceTestStore) GetTeamProblemScore(context.Context, bool, uuid.UUID, uuid.UUID) (*domain.ScoreData, error) {
+func (*problemServiceTestStore) GetTeamProblemScore(context.Context, domain.ScoreVisibility, uuid.UUID, uuid.UUID) (*domain.ScoreData, error) {
 	return nil, domain.ErrNotFound
 }
 
-func (*problemServiceTestStore) ListTeamProblemScoresByTeamID(context.Context, bool, uuid.UUID) ([]*domain.TeamProblemScoreData, error) {
+func (*problemServiceTestStore) ListTeamProblemScoresByTeamID(context.Context, domain.ScoreVisibility, uuid.UUID) ([]*domain.TeamProblemScoreData, error) {
 	return nil, nil
 }
 
-func (*problemServiceTestStore) ListTeamProblemScores(context.Context, bool) ([]*domain.TeamProblemScoreData, error) {
+func (*problemServiceTestStore) ListTeamProblemScores(context.Context, domain.ScoreVisibility) ([]*domain.TeamProblemScoreData, error) {
 	return nil, nil
 }
 

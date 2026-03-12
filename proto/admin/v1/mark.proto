@@ -106,6 +106,9 @@ message UpdateMarkingResultVisibilitiesResponse {}
 message UpdateScoresRequest {}
 message UpdateScoresResponse {}
 
+message RevealFinalScoresRequest {}
+message RevealFinalScoresResponse {}
+
 service MarkService {
   rpc ListAnswers(ListAnswersRequest) returns (ListAnswersResponse);
   rpc GetAnswer(GetAnswerRequest) returns (GetAnswerResponse);
@@ -113,4 +116,5 @@ service MarkService {
   rpc CreateMarkingResult(CreateMarkingResultRequest) returns (CreateMarkingResultResponse);
   rpc UpdateMarkingResultVisibilities(UpdateMarkingResultVisibilitiesRequest) returns (UpdateMarkingResultVisibilitiesResponse);
   rpc UpdateScores(UpdateScoresRequest) returns (UpdateScoresResponse);
+  rpc RevealFinalScores(RevealFinalScoresRequest) returns (RevealFinalScoresResponse);
 }

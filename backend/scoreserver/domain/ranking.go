@@ -26,20 +26,20 @@ type RankingEffect interface {
 }
 
 func GetRankingForPublic(ctx context.Context, eff RankingEffect) (Ranking, error) {
-	return getRanking(ctx, eff, true)
+	return getRanking(ctx, eff, ScoreVisibilityPublic)
 }
 
 func GetRankingForAdmin(ctx context.Context, eff RankingEffect) (Ranking, error) {
-	return getRanking(ctx, eff, false)
+	return getRanking(ctx, eff, ScoreVisibilityPrivate)
 }
 
-func getRanking(ctx context.Context, eff RankingEffect, isPublic bool) (Ranking, error) {
+func getRanking(ctx context.Context, eff RankingEffect, visibility ScoreVisibility) (Ranking, error) {
 	teams, err := ListTeams(ctx, eff)
 	if err != nil {
 		return nil, err
 	}
 
-	ranks, err := eff.GetRanking(ctx, isPublic)
+	ranks, err := eff.GetRanking(ctx, visibility)
 	if err != nil {
 		return nil, WrapAsInternal(err, "failed to get ranking")
 	}
@@ -127,6 +127,6 @@ type (
 		UpdateSubmitAt time.Time `json:"update_submit_at"`
 	}
 	RankingReader interface {
-		GetRanking(ctx context.Context, isPublic bool) ([]*RankData, error)
+		GetRanking(ctx context.Context, visibility ScoreVisibility) ([]*RankData, error)
 	}
 )

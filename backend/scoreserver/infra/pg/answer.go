@@ -16,104 +16,101 @@ import (
 
 var _ domain.AnswerReader = (*repo)(nil)
 
+func answerVisibilityForScore(visibility domain.ScoreVisibility) string {
+	return string(visibility)
+}
+
 func (r *repo) ListAnswersForAdmin(ctx context.Context) ([]*domain.AnswerData, error) {
-	ctx, span := tracer.Start(ctx, "ListAnswersForAdmin")
-	defer span.End()
-	return r.listAnswers(ctx, `
-SELECT
-	`+answerViewColumns.String("answer")+`,
-	`+scoreColumns.As("score")+`
-FROM answer_view AS answer
-LEFT JOIN answer_scores AS answer_score
-	ON answer_score.answer_id = answer.id AND answer_score.visibility = 'PRIVATE'
-LEFT JOIN scores AS score ON score.marking_result_id = answer_score.marking_result_id
-ORDER BY answer.created_at ASC`)
+	return r.ListAnswers(ctx, domain.ScoreVisibilityPrivate)
 }
 
 func (r *repo) ListAnswersByTeamProblemForAdmin(ctx context.Context, teamCode int64, problemCode string) ([]*domain.AnswerData, error) {
-	ctx, span := tracer.Start(ctx, "ListAnswersByTeamProblemForAdmin")
-	defer span.End()
-	return r.listAnswers(ctx, `
-SELECT
-	`+answerViewColumns.String("answer")+`,
-	`+scoreColumns.As("score")+`
-FROM answer_view AS answer
-LEFT JOIN answer_scores AS answer_score
-	ON answer_score.answer_id = answer.id AND answer_score.visibility = 'PRIVATE'
-LEFT JOIN scores AS score ON score.marking_result_id = answer_score.marking_result_id
-WHERE answer."team.code" = $1 AND answer."problem.code" = $2
-ORDER BY answer.number ASC`,
-		teamCode, problemCode)
+	return r.ListAnswersByTeamProblem(ctx, domain.ScoreVisibilityPrivate, teamCode, problemCode)
 }
 
 func (r *repo) ListAnswersByTeamProblemForPublic(ctx context.Context, teamCode int64, problemCode string) ([]*domain.AnswerData, error) {
-	ctx, span := tracer.Start(ctx, "ListAnswersByTeamProblemForPublic")
-	defer span.End()
-	return r.listAnswers(ctx, `
-SELECT
-	`+answerViewColumns.String("answer")+`,
-	`+scoreColumns.As("score")+`
-FROM answer_view AS answer
-LEFT JOIN answer_scores AS answer_score
-	ON answer_score.answer_id = answer.id AND answer_score.visibility = 'PUBLIC'
-LEFT JOIN scores AS score ON score.marking_result_id = answer_score.marking_result_id
-WHERE answer."team.code" = $1 AND answer."problem.code" = $2
-ORDER BY answer.number ASC`,
-		teamCode, problemCode)
+	return r.ListAnswersByTeamProblem(ctx, domain.ScoreVisibilityTeam, teamCode, problemCode)
 }
 
 func (r *repo) GetLatestAnswerByTeamProblemForPublic(ctx context.Context, teamID, problemID uuid.UUID) (*domain.AnswerData, error) {
-	ctx, span := tracer.Start(ctx, "GetLatestAnswerByTeamProblemForPublic")
-	defer span.End()
-	return r.getAnswer(ctx, `
-SELECT
-	`+answerViewColumns.String("answer")+`,
-	`+scoreColumns.As("score")+`
-FROM answer_view AS answer
-LEFT JOIN answer_scores AS answer_score
-	ON answer_score.answer_id = answer.id AND answer_score.visibility = 'PUBLIC'
-LEFT JOIN scores AS score ON score.marking_result_id = answer_score.marking_result_id
-WHERE answer."team.id" = $1 AND answer."problem.id" = $2
-ORDER BY answer.number DESC
-LIMIT 1`, teamID, problemID)
+	return r.GetLatestAnswerByTeamProblem(ctx, domain.ScoreVisibilityTeam, teamID, problemID)
 }
 
 func (r *repo) GetAnswerDetailForPublic(
 	ctx context.Context, teamCode int64, problemCode string, answerNumber uint32,
 ) (*domain.AnswerDetailData, error) {
-	ctx, span := tracer.Start(ctx, "GetAnswerDetailForPublic")
-	defer span.End()
-	return r.getAnswerDetail(ctx, `
-SELECT
-	`+answerViewColumns.String("answer")+`,
-	`+scoreColumns.As("score")+`,
-	descriptive.body AS "descriptive.body"
-FROM answer_view AS answer
-LEFT JOIN answer_scores AS answer_score
-	ON answer_score.answer_id = answer.id AND answer_score.visibility = 'PUBLIC'
-LEFT JOIN scores AS score ON score.marking_result_id = answer_score.marking_result_id
-LEFT JOIN descriptive_answers AS descriptive ON descriptive.answer_id = answer.id
-WHERE answer."team.code" = $1 AND answer."problem.code" = $2 AND answer.number = $3
-LIMIT 1`, teamCode, problemCode, answerNumber)
+	return r.GetAnswerDetail(ctx, domain.ScoreVisibilityTeam, teamCode, problemCode, answerNumber)
 }
 
 func (r *repo) GetAnswerDetailForAdmin(
 	ctx context.Context, teamCode int64, problemCode string, answerNumber uint32,
 ) (*domain.AnswerDetailData, error) {
-	ctx, span := tracer.Start(ctx, "GetAnswerDetailForAdmin")
+	return r.GetAnswerDetail(ctx, domain.ScoreVisibilityPrivate, teamCode, problemCode, answerNumber)
+}
+
+func (r *repo) ListAnswers(ctx context.Context, visibility domain.ScoreVisibility) ([]*domain.AnswerData, error) {
+	ctx, span := tracer.Start(ctx, "ListAnswers")
 	defer span.End()
-	return r.getAnswerDetail(ctx, `
+	return r.listAnswers(ctx, r.ext.Rebind(`
+SELECT
+	`+answerViewColumns.String("answer")+`,
+	`+scoreColumns.As("score")+`
+FROM answer_view AS answer
+LEFT JOIN answer_scores AS answer_score
+	ON answer_score.answer_id = answer.id AND answer_score.visibility = ?
+LEFT JOIN scores AS score ON score.marking_result_id = answer_score.marking_result_id
+ORDER BY answer.created_at ASC`), answerVisibilityForScore(visibility))
+}
+
+func (r *repo) ListAnswersByTeamProblem(ctx context.Context, visibility domain.ScoreVisibility, teamCode int64, problemCode string) ([]*domain.AnswerData, error) {
+	ctx, span := tracer.Start(ctx, "ListAnswersByTeamProblem")
+	defer span.End()
+	return r.listAnswers(ctx, r.ext.Rebind(`
+SELECT
+	`+answerViewColumns.String("answer")+`,
+	`+scoreColumns.As("score")+`
+FROM answer_view AS answer
+LEFT JOIN answer_scores AS answer_score
+	ON answer_score.answer_id = answer.id AND answer_score.visibility = ?
+LEFT JOIN scores AS score ON score.marking_result_id = answer_score.marking_result_id
+WHERE answer."team.code" = ? AND answer."problem.code" = ?
+ORDER BY answer.number ASC`),
+		answerVisibilityForScore(visibility), teamCode, problemCode)
+}
+
+func (r *repo) GetLatestAnswerByTeamProblem(ctx context.Context, visibility domain.ScoreVisibility, teamID, problemID uuid.UUID) (*domain.AnswerData, error) {
+	ctx, span := tracer.Start(ctx, "GetLatestAnswerByTeamProblem")
+	defer span.End()
+	return r.getAnswer(ctx, r.ext.Rebind(`
+SELECT
+	`+answerViewColumns.String("answer")+`,
+	`+scoreColumns.As("score")+`
+FROM answer_view AS answer
+LEFT JOIN answer_scores AS answer_score
+	ON answer_score.answer_id = answer.id AND answer_score.visibility = ?
+LEFT JOIN scores AS score ON score.marking_result_id = answer_score.marking_result_id
+WHERE answer."team.id" = ? AND answer."problem.id" = ?
+ORDER BY answer.number DESC
+LIMIT 1`), answerVisibilityForScore(visibility), teamID, problemID)
+}
+
+func (r *repo) GetAnswerDetail(
+	ctx context.Context, visibility domain.ScoreVisibility, teamCode int64, problemCode string, answerNumber uint32,
+) (*domain.AnswerDetailData, error) {
+	ctx, span := tracer.Start(ctx, "GetAnswerDetail")
+	defer span.End()
+	return r.getAnswerDetail(ctx, r.ext.Rebind(`
 SELECT
 	`+answerViewColumns.String("answer")+`,
 	`+scoreColumns.As("score")+`,
 	descriptive.body AS "descriptive.body"
 FROM answer_view AS answer
 LEFT JOIN answer_scores AS answer_score
-	ON answer_score.answer_id = answer.id AND answer_score.visibility = 'PRIVATE'
+	ON answer_score.answer_id = answer.id AND answer_score.visibility = ?
 LEFT JOIN scores AS score ON score.marking_result_id = answer_score.marking_result_id
 LEFT JOIN descriptive_answers AS descriptive ON descriptive.answer_id = answer.id
-WHERE answer."team.code" = $1 AND answer."problem.code" = $2 AND answer.number = $3
-LIMIT 1`, teamCode, problemCode, answerNumber)
+WHERE answer."team.code" = ? AND answer."problem.code" = ? AND answer.number = ?
+LIMIT 1`), answerVisibilityForScore(visibility), teamCode, problemCode, answerNumber)
 }
 
 func (r *repo) listAnswers(ctx context.Context, query string, args ...any) ([]*domain.AnswerData, error) {

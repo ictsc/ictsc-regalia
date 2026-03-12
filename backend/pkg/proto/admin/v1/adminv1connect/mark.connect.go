@@ -49,6 +49,9 @@ const (
 	// MarkServiceUpdateScoresProcedure is the fully-qualified name of the MarkService's UpdateScores
 	// RPC.
 	MarkServiceUpdateScoresProcedure = "/admin.v1.MarkService/UpdateScores"
+	// MarkServiceRevealFinalScoresProcedure is the fully-qualified name of the MarkService's
+	// RevealFinalScores RPC.
+	MarkServiceRevealFinalScoresProcedure = "/admin.v1.MarkService/RevealFinalScores"
 )
 
 // MarkServiceClient is a client for the admin.v1.MarkService service.
@@ -59,6 +62,7 @@ type MarkServiceClient interface {
 	CreateMarkingResult(context.Context, *connect.Request[v1.CreateMarkingResultRequest]) (*connect.Response[v1.CreateMarkingResultResponse], error)
 	UpdateMarkingResultVisibilities(context.Context, *connect.Request[v1.UpdateMarkingResultVisibilitiesRequest]) (*connect.Response[v1.UpdateMarkingResultVisibilitiesResponse], error)
 	UpdateScores(context.Context, *connect.Request[v1.UpdateScoresRequest]) (*connect.Response[v1.UpdateScoresResponse], error)
+	RevealFinalScores(context.Context, *connect.Request[v1.RevealFinalScoresRequest]) (*connect.Response[v1.RevealFinalScoresResponse], error)
 }
 
 // NewMarkServiceClient constructs a client for the admin.v1.MarkService service. By default, it
@@ -108,6 +112,12 @@ func NewMarkServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(markServiceMethods.ByName("UpdateScores")),
 			connect.WithClientOptions(opts...),
 		),
+		revealFinalScores: connect.NewClient[v1.RevealFinalScoresRequest, v1.RevealFinalScoresResponse](
+			httpClient,
+			baseURL+MarkServiceRevealFinalScoresProcedure,
+			connect.WithSchema(markServiceMethods.ByName("RevealFinalScores")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -119,6 +129,7 @@ type markServiceClient struct {
 	createMarkingResult             *connect.Client[v1.CreateMarkingResultRequest, v1.CreateMarkingResultResponse]
 	updateMarkingResultVisibilities *connect.Client[v1.UpdateMarkingResultVisibilitiesRequest, v1.UpdateMarkingResultVisibilitiesResponse]
 	updateScores                    *connect.Client[v1.UpdateScoresRequest, v1.UpdateScoresResponse]
+	revealFinalScores               *connect.Client[v1.RevealFinalScoresRequest, v1.RevealFinalScoresResponse]
 }
 
 // ListAnswers calls admin.v1.MarkService.ListAnswers.
@@ -151,6 +162,11 @@ func (c *markServiceClient) UpdateScores(ctx context.Context, req *connect.Reque
 	return c.updateScores.CallUnary(ctx, req)
 }
 
+// RevealFinalScores calls admin.v1.MarkService.RevealFinalScores.
+func (c *markServiceClient) RevealFinalScores(ctx context.Context, req *connect.Request[v1.RevealFinalScoresRequest]) (*connect.Response[v1.RevealFinalScoresResponse], error) {
+	return c.revealFinalScores.CallUnary(ctx, req)
+}
+
 // MarkServiceHandler is an implementation of the admin.v1.MarkService service.
 type MarkServiceHandler interface {
 	ListAnswers(context.Context, *connect.Request[v1.ListAnswersRequest]) (*connect.Response[v1.ListAnswersResponse], error)
@@ -159,6 +175,7 @@ type MarkServiceHandler interface {
 	CreateMarkingResult(context.Context, *connect.Request[v1.CreateMarkingResultRequest]) (*connect.Response[v1.CreateMarkingResultResponse], error)
 	UpdateMarkingResultVisibilities(context.Context, *connect.Request[v1.UpdateMarkingResultVisibilitiesRequest]) (*connect.Response[v1.UpdateMarkingResultVisibilitiesResponse], error)
 	UpdateScores(context.Context, *connect.Request[v1.UpdateScoresRequest]) (*connect.Response[v1.UpdateScoresResponse], error)
+	RevealFinalScores(context.Context, *connect.Request[v1.RevealFinalScoresRequest]) (*connect.Response[v1.RevealFinalScoresResponse], error)
 }
 
 // NewMarkServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -204,6 +221,12 @@ func NewMarkServiceHandler(svc MarkServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(markServiceMethods.ByName("UpdateScores")),
 		connect.WithHandlerOptions(opts...),
 	)
+	markServiceRevealFinalScoresHandler := connect.NewUnaryHandler(
+		MarkServiceRevealFinalScoresProcedure,
+		svc.RevealFinalScores,
+		connect.WithSchema(markServiceMethods.ByName("RevealFinalScores")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/admin.v1.MarkService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case MarkServiceListAnswersProcedure:
@@ -218,6 +241,8 @@ func NewMarkServiceHandler(svc MarkServiceHandler, opts ...connect.HandlerOption
 			markServiceUpdateMarkingResultVisibilitiesHandler.ServeHTTP(w, r)
 		case MarkServiceUpdateScoresProcedure:
 			markServiceUpdateScoresHandler.ServeHTTP(w, r)
+		case MarkServiceRevealFinalScoresProcedure:
+			markServiceRevealFinalScoresHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -249,4 +274,8 @@ func (UnimplementedMarkServiceHandler) UpdateMarkingResultVisibilities(context.C
 
 func (UnimplementedMarkServiceHandler) UpdateScores(context.Context, *connect.Request[v1.UpdateScoresRequest]) (*connect.Response[v1.UpdateScoresResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.MarkService.UpdateScores is not implemented"))
+}
+
+func (UnimplementedMarkServiceHandler) RevealFinalScores(context.Context, *connect.Request[v1.RevealFinalScoresRequest]) (*connect.Response[v1.RevealFinalScoresResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("admin.v1.MarkService.RevealFinalScores is not implemented"))
 }

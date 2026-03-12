@@ -145,7 +145,7 @@ COMMENT ON TABLE descriptive_answers IS '記述式解答';
 COMMENT ON COLUMN descriptive_answers.answer_id IS '解答 ID';
 COMMENT ON COLUMN descriptive_answers.body IS '解答内容';
 
-CREATE TYPE marking_result_visilibity AS ENUM ('PRIVATE', 'PUBLIC');
+CREATE TYPE marking_result_visilibity AS ENUM ('PRIVATE', 'TEAM', 'PUBLIC');
 CREATE TABLE marking_results (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	answer_id UUID NOT NULL REFERENCES answers(id) ON DELETE CASCADE,
@@ -192,6 +192,11 @@ CREATE TABLE team_scores (
 	team_id UUID PRIMARY KEY REFERENCES teams(id) ON DELETE CASCADE,
 	total_score INT NOT NULL CHECK (total_score >= 0) DEFAULT 0,
 	updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE score_visibility_settings (
+	id BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (id),
+	ranking_freeze_at TIMESTAMPTZ
 );
 
 CREATE TABLE descriptive_marking_rationales (
