@@ -138,8 +138,10 @@ type Problem struct {
 	Body       *ProblemBody `protobuf:"bytes,7,opt,name=body,proto3" json:"body,omitempty"`
 	// 提出状態（スケジュールに基づく提出可否）
 	SubmissionStatus *SubmissionStatus `protobuf:"bytes,8,opt,name=submission_status,json=submissionStatus,proto3" json:"submission_status,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// この問題で提出可能なスケジュール一覧
+	SubmissionableSchedules []*ScheduleEntry `protobuf:"bytes,9,rep,name=submissionable_schedules,json=submissionableSchedules,proto3" json:"submissionable_schedules,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *Problem) Reset() {
@@ -224,6 +226,13 @@ func (x *Problem) GetBody() *ProblemBody {
 func (x *Problem) GetSubmissionStatus() *SubmissionStatus {
 	if x != nil {
 		return x.SubmissionStatus
+	}
+	return nil
+}
+
+func (x *Problem) GetSubmissionableSchedules() []*ScheduleEntry {
+	if x != nil {
+		return x.SubmissionableSchedules
 	}
 	return nil
 }
@@ -967,7 +976,7 @@ var File_contestant_v1_problem_proto protoreflect.FileDescriptor
 
 const file_contestant_v1_problem_proto_rawDesc = "" +
 	"\n" +
-	"\x1bcontestant/v1/problem.proto\x12\rcontestant.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe0\x02\n" +
+	"\x1bcontestant/v1/problem.proto\x12\rcontestant.v1\x1a\x1bcontestant/v1/contest.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb9\x03\n" +
 	"\aProblem\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1b\n" +
@@ -978,7 +987,8 @@ const file_contestant_v1_problem_proto_rawDesc = "" +
 	"deployment\x18\x06 \x01(\v2\x19.contestant.v1.DeploymentR\n" +
 	"deployment\x12.\n" +
 	"\x04body\x18\a \x01(\v2\x1a.contestant.v1.ProblemBodyR\x04body\x12L\n" +
-	"\x11submission_status\x18\b \x01(\v2\x1f.contestant.v1.SubmissionStatusR\x10submissionStatusB\b\n" +
+	"\x11submission_status\x18\b \x01(\v2\x1f.contestant.v1.SubmissionStatusR\x10submissionStatus\x12W\n" +
+	"\x18submissionable_schedules\x18\t \x03(\v2\x1c.contestant.v1.ScheduleEntryR\x17submissionableSchedulesB\b\n" +
 	"\x06_score\"\xfe\x01\n" +
 	"\x10SubmissionStatus\x12%\n" +
 	"\x0eis_submittable\x18\x01 \x01(\bR\risSubmittable\x12L\n" +
@@ -1072,37 +1082,39 @@ var file_contestant_v1_problem_proto_goTypes = []any{
 	(*ListDeploymentsResponse)(nil), // 14: contestant.v1.ListDeploymentsResponse
 	(*DeployRequest)(nil),           // 15: contestant.v1.DeployRequest
 	(*DeployResponse)(nil),          // 16: contestant.v1.DeployResponse
-	(*timestamppb.Timestamp)(nil),   // 17: google.protobuf.Timestamp
+	(*ScheduleEntry)(nil),           // 17: contestant.v1.ScheduleEntry
+	(*timestamppb.Timestamp)(nil),   // 18: google.protobuf.Timestamp
 }
 var file_contestant_v1_problem_proto_depIdxs = []int32{
 	4,  // 0: contestant.v1.Problem.score:type_name -> contestant.v1.Score
 	5,  // 1: contestant.v1.Problem.deployment:type_name -> contestant.v1.Deployment
 	7,  // 2: contestant.v1.Problem.body:type_name -> contestant.v1.ProblemBody
 	3,  // 3: contestant.v1.Problem.submission_status:type_name -> contestant.v1.SubmissionStatus
-	17, // 4: contestant.v1.SubmissionStatus.submittable_until:type_name -> google.protobuf.Timestamp
-	17, // 5: contestant.v1.SubmissionStatus.submittable_from:type_name -> google.protobuf.Timestamp
-	0,  // 6: contestant.v1.Deployment.status:type_name -> contestant.v1.DeploymentStatus
-	0,  // 7: contestant.v1.DeploymentRequest.status:type_name -> contestant.v1.DeploymentStatus
-	17, // 8: contestant.v1.DeploymentRequest.requested_at:type_name -> google.protobuf.Timestamp
-	1,  // 9: contestant.v1.ProblemBody.type:type_name -> contestant.v1.ProblemType
-	8,  // 10: contestant.v1.ProblemBody.descriptive:type_name -> contestant.v1.DescriptiveProblem
-	2,  // 11: contestant.v1.ListProblemsResponse.problems:type_name -> contestant.v1.Problem
-	2,  // 12: contestant.v1.GetProblemResponse.problem:type_name -> contestant.v1.Problem
-	6,  // 13: contestant.v1.ListDeploymentsResponse.deployments:type_name -> contestant.v1.DeploymentRequest
-	6,  // 14: contestant.v1.DeployResponse.deployment:type_name -> contestant.v1.DeploymentRequest
-	9,  // 15: contestant.v1.ProblemService.ListProblems:input_type -> contestant.v1.ListProblemsRequest
-	11, // 16: contestant.v1.ProblemService.GetProblem:input_type -> contestant.v1.GetProblemRequest
-	13, // 17: contestant.v1.ProblemService.ListDeployments:input_type -> contestant.v1.ListDeploymentsRequest
-	15, // 18: contestant.v1.ProblemService.Deploy:input_type -> contestant.v1.DeployRequest
-	10, // 19: contestant.v1.ProblemService.ListProblems:output_type -> contestant.v1.ListProblemsResponse
-	12, // 20: contestant.v1.ProblemService.GetProblem:output_type -> contestant.v1.GetProblemResponse
-	14, // 21: contestant.v1.ProblemService.ListDeployments:output_type -> contestant.v1.ListDeploymentsResponse
-	16, // 22: contestant.v1.ProblemService.Deploy:output_type -> contestant.v1.DeployResponse
-	19, // [19:23] is the sub-list for method output_type
-	15, // [15:19] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	17, // 4: contestant.v1.Problem.submissionable_schedules:type_name -> contestant.v1.ScheduleEntry
+	18, // 5: contestant.v1.SubmissionStatus.submittable_until:type_name -> google.protobuf.Timestamp
+	18, // 6: contestant.v1.SubmissionStatus.submittable_from:type_name -> google.protobuf.Timestamp
+	0,  // 7: contestant.v1.Deployment.status:type_name -> contestant.v1.DeploymentStatus
+	0,  // 8: contestant.v1.DeploymentRequest.status:type_name -> contestant.v1.DeploymentStatus
+	18, // 9: contestant.v1.DeploymentRequest.requested_at:type_name -> google.protobuf.Timestamp
+	1,  // 10: contestant.v1.ProblemBody.type:type_name -> contestant.v1.ProblemType
+	8,  // 11: contestant.v1.ProblemBody.descriptive:type_name -> contestant.v1.DescriptiveProblem
+	2,  // 12: contestant.v1.ListProblemsResponse.problems:type_name -> contestant.v1.Problem
+	2,  // 13: contestant.v1.GetProblemResponse.problem:type_name -> contestant.v1.Problem
+	6,  // 14: contestant.v1.ListDeploymentsResponse.deployments:type_name -> contestant.v1.DeploymentRequest
+	6,  // 15: contestant.v1.DeployResponse.deployment:type_name -> contestant.v1.DeploymentRequest
+	9,  // 16: contestant.v1.ProblemService.ListProblems:input_type -> contestant.v1.ListProblemsRequest
+	11, // 17: contestant.v1.ProblemService.GetProblem:input_type -> contestant.v1.GetProblemRequest
+	13, // 18: contestant.v1.ProblemService.ListDeployments:input_type -> contestant.v1.ListDeploymentsRequest
+	15, // 19: contestant.v1.ProblemService.Deploy:input_type -> contestant.v1.DeployRequest
+	10, // 20: contestant.v1.ProblemService.ListProblems:output_type -> contestant.v1.ListProblemsResponse
+	12, // 21: contestant.v1.ProblemService.GetProblem:output_type -> contestant.v1.GetProblemResponse
+	14, // 22: contestant.v1.ProblemService.ListDeployments:output_type -> contestant.v1.ListDeploymentsResponse
+	16, // 23: contestant.v1.ProblemService.Deploy:output_type -> contestant.v1.DeployResponse
+	20, // [20:24] is the sub-list for method output_type
+	16, // [16:20] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_contestant_v1_problem_proto_init() }
@@ -1110,6 +1122,7 @@ func file_contestant_v1_problem_proto_init() {
 	if File_contestant_v1_problem_proto != nil {
 		return
 	}
+	file_contestant_v1_contest_proto_init()
 	file_contestant_v1_problem_proto_msgTypes[0].OneofWrappers = []any{}
 	file_contestant_v1_problem_proto_msgTypes[1].OneofWrappers = []any{}
 	file_contestant_v1_problem_proto_msgTypes[5].OneofWrappers = []any{

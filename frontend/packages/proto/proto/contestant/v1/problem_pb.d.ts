@@ -4,6 +4,7 @@
 
 import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import type { Message } from "@bufbuild/protobuf";
+import type { ScheduleEntry } from "./contest_pb";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 
 /**
@@ -64,6 +65,13 @@ export declare type Problem = Message<"contestant.v1.Problem"> & {
    * @generated from field: contestant.v1.SubmissionStatus submission_status = 8;
    */
   submissionStatus?: SubmissionStatus;
+
+  /**
+   * この問題で提出可能なスケジュール一覧
+   *
+   * @generated from field: repeated contestant.v1.ScheduleEntry submissionable_schedules = 9;
+   */
+  submissionableSchedules: ScheduleEntry[];
 };
 
 /**
