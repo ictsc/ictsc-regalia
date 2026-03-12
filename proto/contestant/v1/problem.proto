@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package contestant.v1;
 
+import "contestant/v1/contest.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1;contestantv1";
@@ -21,6 +22,8 @@ message Problem {
   ProblemBody body = 7;
   // 提出状態（スケジュールに基づく提出可否）
   SubmissionStatus submission_status = 8;
+  // この問題で提出可能なスケジュール一覧
+  repeated ScheduleEntry submissionable_schedules = 9;
 }
 
 // 提出状態（スケジュールベース）
