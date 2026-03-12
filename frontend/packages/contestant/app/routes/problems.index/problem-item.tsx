@@ -15,8 +15,6 @@ type ProblemItemProps = {
 
 export function ProblemItem(props: ProblemItemProps) {
   const isSubmittable = props.submissionStatus?.isSubmittable ?? true;
-  const statusColor = isSubmittable ? "text-green-600" : "text-gray-500";
-  const statusText = isSubmittable ? "提出可能" : "提出不可";
 
   return (
     <Button as={Fragment}>
@@ -28,13 +26,15 @@ export function ProblemItem(props: ProblemItemProps) {
           className={clsx(
             "rounded-16 flex w-full max-w-[512px] justify-between gap-24 px-20 py-12 transition",
             active ? "shadow-transparent" : "shadow-lg",
-            props.score.rawFullScore
-              ? hover
-                ? "bg-surface-2"
-                : "bg-disabled"
-              : hover
-                ? "bg-surface-1"
-                : "bg-surface-0",
+            !isSubmittable
+              ? "opacity-50 grayscale"
+              : props.score.rawFullScore
+                ? hover
+                  ? "bg-surface-2"
+                  : "bg-disabled"
+                : hover
+                  ? "bg-surface-1"
+                  : "bg-surface-0",
           )}
         >
           <div className="flex flex-col items-start justify-between gap-4">
@@ -42,11 +42,6 @@ export function ProblemItem(props: ProblemItemProps) {
               <h3 className="text-24 text-primary font-bold">{props.code}</h3>
               <p className="text-16 line-clamp-1">{props.title}</p>
             </div>
-            {props.submissionStatus && (
-              <p className={clsx("text-14 font-medium", statusColor)}>
-                {statusText}
-              </p>
-            )}
           </div>
           <Score {...props.score} />
         </Link>
