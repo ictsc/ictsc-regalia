@@ -20,8 +20,6 @@ p, role:admin, answers, list
 p, role:admin, answers, get
 p, role:admin, schedules, get
 p, role:admin, schedules, update
-p, role:admin, score_visibility_settings, get
-p, role:admin, score_visibility_settings, update
 p, role:admin, marking_results, list
 p, role:admin, marking_results, create
 p, role:admin, deployments, list

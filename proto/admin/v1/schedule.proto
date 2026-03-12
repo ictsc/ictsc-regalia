@@ -17,10 +17,12 @@ message Schedule {
 message GetScheduleRequest {}
 message GetScheduleResponse {
   repeated Schedule schedule = 1;
+  optional google.protobuf.Timestamp ranking_freeze_at = 2;
 }
 
 message UpdateScheduleRequest {
   repeated Schedule schedule = 1;
+  optional google.protobuf.Timestamp ranking_freeze_at = 2;
 }
 message UpdateScheduleResponse {}
 

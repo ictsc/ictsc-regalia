@@ -62,10 +62,6 @@ func New(ctx context.Context, cfg config.AdminAPI, db *sqlx.DB, scheduleReader d
 		newMarkServiceHandler(enforcer, repo, scheduleReader),
 		connect.WithInterceptors(interceptors...),
 	))
-	mux.Handle(adminv1connect.NewScoreVisibilitySettingsServiceHandler(
-		newScoreVisibilitySettingsServiceHandler(enforcer, repo),
-		connect.WithInterceptors(interceptors...),
-	))
 	mux.Handle(adminv1connect.NewScheduleServiceHandler(
 		newScheduleServiceHandler(enforcer, repo, scheduleReader),
 		connect.WithInterceptors(interceptors...),
