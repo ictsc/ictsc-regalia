@@ -135,6 +135,7 @@ export const Default: Story = {
 
 export const GroupedBySchedule: Story = {
   args: {
+    notices: [],
     problems: [
       // day1-am（過去 → 提出不可）
       makeProblem("NET01", "ネットワーク基礎問題", {
