@@ -22,6 +22,7 @@ export async function fetchProblems(transport: Transport): Promise<Problem[]> {
 export type ProblemDetail = {
   code: string;
   title: string;
+  category: string;
   maxScore: number;
   redeployable: boolean;
   penaltyThreashold: number;
@@ -45,6 +46,7 @@ export async function fetchProblem(
   return {
     code: problem.code,
     title: problem.title,
+    category: problem.category,
     maxScore: problem.maxScore,
     redeployable: problem.deployment?.redeployable ?? false,
     penaltyThreashold: problem.deployment?.penaltyThreashold ?? 0,
