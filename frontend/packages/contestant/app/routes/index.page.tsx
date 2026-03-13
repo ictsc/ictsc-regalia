@@ -178,7 +178,10 @@ function ScheduleTimeline(props: { readonly entries: ScheduleEntry[] }) {
         return (
           <div
             key={entry.name}
-            className={clsx("grid grid-cols-[1em_auto_1fr] gap-x-8", temporalColorClass[status])}
+            className={clsx(
+              "grid grid-cols-[1em_auto_1fr] gap-x-8",
+              temporalColorClass[status],
+            )}
           >
             <span>{status === "current" ? "▶" : ""}</span>
             <span>{entry.name}</span>
