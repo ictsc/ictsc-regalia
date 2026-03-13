@@ -15,8 +15,10 @@ function RouteComponent() {
   const { markAsRead } = useReadAnnouncements();
 
   useEffect(() => {
-    markAsRead(slug);
-  }, [slug, markAsRead]);
+    if (announce != null) {
+      markAsRead(slug);
+    }
+  }, [slug, markAsRead, announce]);
 
   return (
     <>

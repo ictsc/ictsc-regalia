@@ -145,7 +145,7 @@ function Content(props: {
   notices: Promise<Notice[]>;
 }) {
   const problem = use(useDeferredValue(props.problem));
-  const notices = use(props.notices);
+  const notices = use(useDeferredValue(props.notices));
   return (
     <>
       <UnreadAnnouncesBanner notices={notices} />

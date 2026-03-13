@@ -4,9 +4,10 @@ import type { Notice } from "@ictsc/proto/contestant/v1";
 const STORAGE_KEY = "readAnnouncements";
 
 function getSnapshot(): string[] {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored == null) return [];
+  if (typeof window === "undefined") return [];
   try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored == null) return [];
     return JSON.parse(stored) as string[];
   } catch {
     return [];
@@ -26,18 +27,23 @@ function setSlugs(slugs: string[]): void {
 
 let listeners: Array<() => void> = [];
 
+function handleStorageEvent(e: StorageEvent): void {
+  if (e.key === STORAGE_KEY) {
+    cachedSlugs = getSnapshot();
+    notifyListeners();
+  }
+}
+
 function subscribeInternal(callback: () => void): () => void {
+  if (listeners.length === 0) {
+    window.addEventListener("storage", handleStorageEvent);
+  }
   listeners.push(callback);
-  const handler = (e: StorageEvent) => {
-    if (e.key === STORAGE_KEY) {
-      cachedSlugs = getSnapshot();
-      callback();
-    }
-  };
-  window.addEventListener("storage", handler);
   return () => {
     listeners = listeners.filter((l) => l !== callback);
-    window.removeEventListener("storage", handler);
+    if (listeners.length === 0) {
+      window.removeEventListener("storage", handleStorageEvent);
+    }
   };
 }
 
