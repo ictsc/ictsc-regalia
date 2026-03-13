@@ -170,10 +170,12 @@ function ScheduleTimeline(props: { readonly entries: ScheduleEntry[] }) {
   if (props.entries.length === 0) return null;
 
   const now = new Date();
+  const startMs = (e: ScheduleEntry) =>
+    e.startAt != null ? timestampDate(e.startAt).getTime() : 0;
 
   return (
     <div className="border-primary mt-8 flex w-full flex-col gap-4 border-t pt-8">
-      {props.entries.map((entry) => {
+      {props.entries.toSorted((a, b) => startMs(a) - startMs(b)).map((entry) => {
         const status = getTemporalStatus(entry, now);
         return (
           <div
