@@ -8,6 +8,7 @@ import type { SubmissionStatus } from "@ictsc/proto/contestant/v1";
 type ProblemItemProps = {
   code: string;
   title: string;
+  category?: string;
 
   score: ComponentProps<typeof Score>;
   submissionStatus?: SubmissionStatus;
@@ -37,9 +38,14 @@ export function ProblemItem(props: ProblemItemProps) {
           )}
         >
           <div className="flex flex-col items-start justify-between gap-4">
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-4">
               <h3 className="text-24 text-primary font-bold">{props.code}</h3>
               <p className="text-16 line-clamp-1">{props.title}</p>
+              {props.category && (
+                <span className="text-12 bg-surface-2 text-secondary w-fit rounded-full px-8 py-2 font-medium">
+                  {props.category}
+                </span>
+              )}
             </div>
           </div>
           <Score {...props.score} />
