@@ -15,8 +15,6 @@ type ProblemItemProps = {
 
 export function ProblemItem(props: ProblemItemProps) {
   const isSubmittable = props.submissionStatus?.isSubmittable ?? true;
-  const statusColor = isSubmittable ? "text-green-600" : "text-gray-500";
-  const statusText = isSubmittable ? "提出可能" : "提出不可";
 
   return (
     <Button as={Fragment}>
@@ -35,6 +33,7 @@ export function ProblemItem(props: ProblemItemProps) {
               : hover
                 ? "bg-surface-1"
                 : "bg-surface-0",
+            !isSubmittable && "opacity-50 grayscale",
           )}
         >
           <div className="flex flex-col items-start justify-between gap-4">
@@ -42,11 +41,6 @@ export function ProblemItem(props: ProblemItemProps) {
               <h3 className="text-24 text-primary font-bold">{props.code}</h3>
               <p className="text-16 line-clamp-1">{props.title}</p>
             </div>
-            {props.submissionStatus && (
-              <p className={clsx("text-14 font-medium", statusColor)}>
-                {statusText}
-              </p>
-            )}
           </div>
           <Score {...props.score} />
         </Link>

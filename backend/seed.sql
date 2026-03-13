@@ -35,11 +35,30 @@ INSERT INTO problems (id, code, type, title, max_score, category, redeploy_rule,
 	('16643c32-c686-44ba-996b-2fbe43b54513', '0001', 'DESCRIPTIVE', 'チーム名をください', 10, 'Server', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
 	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', '0002', 'DESCRIPTIVE', '過去のみ問題 (day1-am)', 100, 'Test', 'PERCENTAGE_PENALTY', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
 	('35f7bf01-6ede-5043-926c-e2c20c285b03', '0003', 'DESCRIPTIVE', '未来のみ問題 (day2-am)', 150, 'Test', 'MANUAL', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
-	('46a8cf12-7fef-6154-a37d-f3d31d396c14', '0004', 'DESCRIPTIVE', '全期間問題', 500, 'Test', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00');
+	('46a8cf12-7fef-6154-a37d-f3d31d396c14', '0004', 'DESCRIPTIVE', '全期間問題', 500, 'Test', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	-- 追加: 現在提出可能 (day1-pm)
+	('57b9d023-8100-4265-b48e-e4e42e507d25', '0005', 'DESCRIPTIVE', 'OSPF経路制御', 200, 'Network', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('68cae134-9211-4376-a59f-f5f53f618e36', '0006', 'DESCRIPTIVE', 'Webサーバー構築', 150, 'Server', 'MANUAL', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('79dbe245-a322-4487-b6a0-060640729f47', '0007', 'DESCRIPTIVE', 'ファイアウォール設定', 300, 'Security', 'PERCENTAGE_PENALTY', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('8aecf356-b433-4598-87b1-171751830058', '0008', 'DESCRIPTIVE', 'コンテナ運用管理', 250, 'Server', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	-- 追加: 過去 (day1-am のみ → 提出終了)
+	('9bfd0467-c544-46a9-98c2-282862941169', '0009', 'DESCRIPTIVE', 'BGPピアリング (day1-am)', 200, 'Network', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('ac0e1578-d655-47ba-a9d3-39397305227a', '0010', 'DESCRIPTIVE', 'DNS権威サーバー (day1-am)', 100, 'Network', 'MANUAL', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('bd1f2689-e766-48cb-bae4-4a4a8416338b', '0011', 'DESCRIPTIVE', 'RADIUS認証 (day1-am)', 150, 'Security', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	-- 追加: 未来 (day2-am → 提出予定)
+	('ce30379a-f877-49dc-8bf5-5b5b9527449c', '0012', 'DESCRIPTIVE', 'IDS/IPSチューニング (day2-am)', 200, 'Security', 'MANUAL', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('df41489b-0988-4aed-9c06-6c6ca63855ad', '0013', 'DESCRIPTIVE', 'IPv6移行 (day2-am)', 250, 'Network', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	-- 追加: 未来 (day2-pm → 別の提出予定グループ)
+	('e05259ac-1a99-4bfe-ad17-7d7db74966be', '0014', 'DESCRIPTIVE', 'ロードバランサ冗長化 (day2-pm)', 300, 'Server', 'PERCENTAGE_PENALTY', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	('f1636abd-2baa-4c0f-be28-8e8ec85a77cf', '0015', 'DESCRIPTIVE', 'TLS証明書管理 (day2-pm)', 150, 'Security', 'UNREDEPLOYABLE', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00'),
+	-- 追加: 複数スケジュール (day1-pm + day2-am → 現在提出可能)
+	('02747bce-3cbb-4d10-8f39-9f9fd96b88d0', '0016', 'DESCRIPTIVE', '総合トラブルシューティング', 500, 'Network', 'MANUAL', '2025-02-03 00:00:00+00', '2025-02-03 00:00:00+00');
 
 TRUNCATE TABLE redeploy_percentage_penalties CASCADE;
 INSERT INTO redeploy_percentage_penalties (problem_id, threshold, percentage) VALUES
-	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 1, 10);
+	('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 1, 10),
+	('79dbe245-a322-4487-b6a0-060640729f47', 2, 15),
+	('e05259ac-1a99-4bfe-ad17-7d7db74966be', 1, 20);
 
 TRUNCATE TABLE problem_contents CASCADE;
 INSERT INTO problem_contents (problem_id, page_id, page_path, body, explanation) VALUES
@@ -54,7 +73,43 @@ INSERT INTO problem_contents (problem_id, page_id, page_path, body, explanation)
 		E'## 採点基準\n\n何か書いてあれば150点'),
 	('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'page4', '/page4',
 		E'## 概要\n\nこの問題は全てのスケジュールで提出可能です。\n\n常に**表示も提出も可能**なはずです。\n\n## 回答\n\n何か書いてください。',
-		E'## 採点基準\n\n何か書いてあれば500点');
+		E'## 採点基準\n\n何か書いてあれば500点'),
+	('57b9d023-8100-4265-b48e-e4e42e507d25', 'page5', '/page5',
+		E'## 概要\n\nOSPF (Open Shortest Path First) の経路制御に関する問題です。\n\n指定されたネットワークトポロジでOSPFを正しく設定してください。\n\n## 回答\n\n設定内容を記述してください。',
+		E'## 採点基準\n\n正しい経路が確立されていれば200点'),
+	('68cae134-9211-4376-a59f-f5f53f618e36', 'page6', '/page6',
+		E'## 概要\n\nApache/Nginx を用いたWebサーバーの構築問題です。\n\nバーチャルホストの設定とSSLの有効化を行ってください。\n\n## 回答\n\n設定ファイルの内容を記述してください。',
+		E'## 採点基準\n\nHTTPSでアクセスできれば150点'),
+	('79dbe245-a322-4487-b6a0-060640729f47', 'page7', '/page7',
+		E'## 概要\n\niptables/nftables を用いたファイアウォールの設定問題です。\n\n指定された通信のみを許可するルールを作成してください。\n\n## 回答\n\nルールの設定内容を記述してください。',
+		E'## 採点基準\n\n正しいフィルタリングができていれば300点'),
+	('8aecf356-b433-4598-87b1-171751830058', 'page8', '/page8',
+		E'## 概要\n\nDockerコンテナの運用管理に関する問題です。\n\n停止したコンテナの原因を特定し、復旧してください。\n\n## 回答\n\n原因と対処方法を記述してください。',
+		E'## 採点基準\n\nコンテナが正常稼働していれば250点'),
+	('9bfd0467-c544-46a9-98c2-282862941169', 'page9', '/page9',
+		E'## 概要\n\nBGPピアリングの設定問題です（day1-amで終了）。\n\nAS間のピアリングを確立してください。\n\n## 回答\n\n設定内容を記述してください。',
+		E'## 採点基準\n\nピアリングが確立されていれば200点'),
+	('ac0e1578-d655-47ba-a9d3-39397305227a', 'page10', '/page10',
+		E'## 概要\n\nDNS権威サーバーの構築問題です（day1-amで終了）。\n\nBINDまたはNSDを用いてゾーンを設定してください。\n\n## 回答\n\nゾーンファイルの内容を記述してください。',
+		E'## 採点基準\n\n名前解決ができれば100点'),
+	('bd1f2689-e766-48cb-bae4-4a4a8416338b', 'page11', '/page11',
+		E'## 概要\n\nRADIUS認証サーバーの設定問題です（day1-amで終了）。\n\nFreeRADIUSを用いて802.1X認証を設定してください。\n\n## 回答\n\n設定内容を記述してください。',
+		E'## 採点基準\n\n認証が通れば150点'),
+	('ce30379a-f877-49dc-8bf5-5b5b9527449c', 'page12', '/page12',
+		E'## 概要\n\nIDS/IPSのチューニング問題です（day2-amから提出可能）。\n\nSnort/Suricataのルールを最適化してください。\n\n## 回答\n\nルールの内容を記述してください。',
+		E'## 採点基準\n\n検知精度が基準を満たせば200点'),
+	('df41489b-0988-4aed-9c06-6c6ca63855ad', 'page13', '/page13',
+		E'## 概要\n\nIPv4からIPv6への移行問題です（day2-amから提出可能）。\n\nデュアルスタック環境を構築してください。\n\n## 回答\n\n設定内容を記述してください。',
+		E'## 採点基準\n\nIPv6で通信できれば250点'),
+	('e05259ac-1a99-4bfe-ad17-7d7db74966be', 'page14', '/page14',
+		E'## 概要\n\nロードバランサの冗長化問題です（day2-pmから提出可能）。\n\nHAProxyまたはKeepalivedを用いて冗長構成を構築してください。\n\n## 回答\n\n設定内容を記述してください。',
+		E'## 採点基準\n\nフェイルオーバーが動作すれば300点'),
+	('f1636abd-2baa-4c0f-be28-8e8ec85a77cf', 'page15', '/page15',
+		E'## 概要\n\nTLS証明書の管理問題です（day2-pmから提出可能）。\n\nLet''s Encryptを用いた証明書の自動更新を設定してください。\n\n## 回答\n\n手順を記述してください。',
+		E'## 採点基準\n\n証明書が有効であれば150点'),
+	('02747bce-3cbb-4d10-8f39-9f9fd96b88d0', 'page16', '/page16',
+		E'## 概要\n\n総合トラブルシューティング問題です（day1-pm〜day2-amの長期間）。\n\n複数のサービスが停止しています。全て復旧してください。\n\n## 回答\n\n原因と対処方法を記述してください。',
+		E'## 採点基準\n\n全サービスが復旧していれば500点');
 
 TRUNCATE TABLE answers CASCADE;
 INSERT INTO answers (id, problem_id, team_id, number, user_id,  created_at_range) VALUES
@@ -123,17 +178,35 @@ INSERT INTO schedules (name, start_at, end_at) VALUES
 
 TRUNCATE TABLE problem_schedules CASCADE;
 INSERT INTO problem_schedules (problem_id, schedule_name) VALUES
-    -- 0001: day1-pm のみ (現在 → 表示○、提出○)
+    -- 0001: day1-pm のみ (現在 → 提出○)
     ('16643c32-c686-44ba-996b-2fbe43b54513', 'day1-pm'),
-    -- 0002: day1-am のみ (過去 → 表示○、提出✗)
+    -- 0002: day1-am のみ (過去 → 提出✗)
     ('24f6aef0-5dcd-4032-825b-d1b19174a6f2', 'day1-am'),
-    -- 0003: day2-am のみ (未来 → 表示✗、提出✗)
+    -- 0003: day2-am のみ (未来 → 提出予定)
     ('35f7bf01-6ede-5043-926c-e2c20c285b03', 'day2-am'),
-    -- 0004: 全スケジュール (過去+現在+未来 → 表示○、提出○)
+    -- 0004: 全スケジュール (過去+現在+未来 → 提出○)
     ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'day1-am'),
     ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'day1-pm'),
     ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'day2-am'),
-    ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'day2-pm');
+    ('46a8cf12-7fef-6154-a37d-f3d31d396c14', 'day2-pm'),
+    -- 0005〜0008: day1-pm のみ (現在 → 提出○)
+    ('57b9d023-8100-4265-b48e-e4e42e507d25', 'day1-pm'),
+    ('68cae134-9211-4376-a59f-f5f53f618e36', 'day1-pm'),
+    ('79dbe245-a322-4487-b6a0-060640729f47', 'day1-pm'),
+    ('8aecf356-b433-4598-87b1-171751830058', 'day1-pm'),
+    -- 0009〜0011: day1-am のみ (過去 → 提出✗)
+    ('9bfd0467-c544-46a9-98c2-282862941169', 'day1-am'),
+    ('ac0e1578-d655-47ba-a9d3-39397305227a', 'day1-am'),
+    ('bd1f2689-e766-48cb-bae4-4a4a8416338b', 'day1-am'),
+    -- 0012〜0013: day2-am のみ (未来 → 提出予定)
+    ('ce30379a-f877-49dc-8bf5-5b5b9527449c', 'day2-am'),
+    ('df41489b-0988-4aed-9c06-6c6ca63855ad', 'day2-am'),
+    -- 0014〜0015: day2-pm のみ (未来・別グループ → 提出予定)
+    ('e05259ac-1a99-4bfe-ad17-7d7db74966be', 'day2-pm'),
+    ('f1636abd-2baa-4c0f-be28-8e8ec85a77cf', 'day2-pm'),
+    -- 0016: day1-pm + day2-am (現在+未来 → 提出○)
+    ('02747bce-3cbb-4d10-8f39-9f9fd96b88d0', 'day1-pm'),
+    ('02747bce-3cbb-4d10-8f39-9f9fd96b88d0', 'day2-am');
 
 TRUNCATE TABLE redeployment_requests CASCADE;
 INSERT INTO redeployment_requests (id, team_id, problem_id, revision) VALUES
