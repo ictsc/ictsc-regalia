@@ -1,0 +1,194 @@
+import type { Meta, StoryObj } from "@storybook/react";
+import { ActivityPage } from "./activity.page";
+
+export default {
+  title: "pages/activity",
+  component: ActivityPage,
+} satisfies Meta<typeof ActivityPage>;
+
+type Story = StoryObj<typeof ActivityPage>;
+
+export const Default: Story = {
+  args: {
+    entries: [
+      // Day2 午後 — 最新の提出
+      {
+        problemCode: "MNO",
+        problemTitle: "コンテナが再起動を繰り返す",
+        answerId: 3,
+        submittedAt: "2026-01-02T16:50:00+09:00",
+        score: { maxScore: 250 },
+        scored: false,
+      },
+      {
+        problemCode: "JKL",
+        problemTitle: "ロードバランサの設定を見直せ",
+        answerId: 4,
+        submittedAt: "2026-01-02T16:30:00+09:00",
+        score: { maxScore: 300 },
+        scored: false,
+      },
+      {
+        problemCode: "JKL",
+        problemTitle: "ロードバランサの設定を見直せ",
+        answerId: 3,
+        submittedAt: "2026-01-02T15:45:00+09:00",
+        score: { maxScore: 300, score: 250, rawScore: 300, penalty: 50, fullScore: false, rawFullScore: true },
+        scored: true,
+      },
+      {
+        problemCode: "ABC",
+        problemTitle: "ネットワークが繋がらない",
+        answerId: 7,
+        submittedAt: "2026-01-02T15:10:00+09:00",
+        score: { maxScore: 100, score: 100, rawScore: 100, penalty: 0, fullScore: true, rawFullScore: true },
+        scored: true,
+      },
+      {
+        problemCode: "MNO",
+        problemTitle: "コンテナが再起動を繰り返す",
+        answerId: 2,
+        submittedAt: "2026-01-02T14:40:00+09:00",
+        score: { maxScore: 250, score: 120, rawScore: 120, penalty: 0, fullScore: false, rawFullScore: false },
+        scored: true,
+      },
+      {
+        problemCode: "PQR",
+        problemTitle: "証明書の有効期限が切れている",
+        answerId: 2,
+        submittedAt: "2026-01-02T14:00:00+09:00",
+        score: { maxScore: 200, score: 200, rawScore: 200, penalty: 0, fullScore: true, rawFullScore: true },
+        scored: true,
+      },
+      // Day2 午前
+      {
+        problemCode: "ABC",
+        problemTitle: "ネットワークが繋がらない",
+        answerId: 6,
+        submittedAt: "2026-01-02T11:50:00+09:00",
+        score: { maxScore: 100, score: 80, rawScore: 80, penalty: 0, fullScore: false, rawFullScore: false },
+        scored: true,
+      },
+      {
+        problemCode: "PQR",
+        problemTitle: "証明書の有効期限が切れている",
+        answerId: 1,
+        submittedAt: "2026-01-02T11:10:00+09:00",
+        score: { maxScore: 200, score: 60, rawScore: 60, penalty: 0, fullScore: false, rawFullScore: false },
+        scored: true,
+      },
+      {
+        problemCode: "MNO",
+        problemTitle: "コンテナが再起動を繰り返す",
+        answerId: 1,
+        submittedAt: "2026-01-02T10:30:00+09:00",
+        score: { maxScore: 250, score: 0, rawScore: 0, penalty: 0, fullScore: false, rawFullScore: false },
+        scored: true,
+      },
+      // Day1 午後
+      {
+        problemCode: "ABC",
+        problemTitle: "ネットワークが繋がらない",
+        answerId: 5,
+        submittedAt: "2026-01-01T16:20:00+09:00",
+        score: { maxScore: 100, score: 100, rawScore: 100, penalty: 0, fullScore: true, rawFullScore: true },
+        scored: true,
+      },
+      {
+        problemCode: "DEF",
+        problemTitle: "DNSの設定が間違っている",
+        answerId: 3,
+        submittedAt: "2026-01-01T15:50:00+09:00",
+        score: { maxScore: 200, score: 200, rawScore: 200, penalty: 0, fullScore: true, rawFullScore: true },
+        scored: true,
+      },
+      {
+        problemCode: "JKL",
+        problemTitle: "ロードバランサの設定を見直せ",
+        answerId: 2,
+        submittedAt: "2026-01-01T15:20:00+09:00",
+        score: { maxScore: 300, score: 180, rawScore: 200, penalty: 20, fullScore: false, rawFullScore: false },
+        scored: true,
+      },
+      {
+        problemCode: "ABC",
+        problemTitle: "ネットワークが繋がらない",
+        answerId: 4,
+        submittedAt: "2026-01-01T15:10:00+09:00",
+        score: { maxScore: 100, score: 80, rawScore: 80, penalty: 0, fullScore: false, rawFullScore: false },
+        scored: true,
+      },
+      {
+        problemCode: "JKL",
+        problemTitle: "ロードバランサの設定を見直せ",
+        answerId: 1,
+        submittedAt: "2026-01-01T14:30:00+09:00",
+        score: { maxScore: 300, score: 100, rawScore: 150, penalty: 50, fullScore: false, rawFullScore: false },
+        scored: true,
+      },
+      {
+        problemCode: "DEF",
+        problemTitle: "DNSの設定が間違っている",
+        answerId: 2,
+        submittedAt: "2026-01-01T13:45:00+09:00",
+        score: { maxScore: 200, score: 150, rawScore: 200, penalty: 50, fullScore: false, rawFullScore: true },
+        scored: true,
+      },
+      // Day1 午前
+      {
+        problemCode: "ABC",
+        problemTitle: "ネットワークが繋がらない",
+        answerId: 3,
+        submittedAt: "2026-01-01T13:00:00+09:00",
+        score: { maxScore: 100, score: 50, rawScore: 50, penalty: 0, fullScore: false, rawFullScore: false },
+        scored: true,
+      },
+      {
+        problemCode: "GHI",
+        problemTitle: "Webサーバーが起動しない",
+        answerId: 2,
+        submittedAt: "2026-01-01T12:30:00+09:00",
+        score: { maxScore: 150, score: 150, rawScore: 150, penalty: 0, fullScore: true, rawFullScore: true },
+        scored: true,
+      },
+      {
+        problemCode: "ABC",
+        problemTitle: "ネットワークが繋がらない",
+        answerId: 2,
+        submittedAt: "2026-01-01T12:00:00+09:00",
+        score: { maxScore: 100, score: 20, rawScore: 20, penalty: 0, fullScore: false, rawFullScore: false },
+        scored: true,
+      },
+      {
+        problemCode: "DEF",
+        problemTitle: "DNSの設定が間違っている",
+        answerId: 1,
+        submittedAt: "2026-01-01T11:20:00+09:00",
+        score: { maxScore: 200, score: 0, rawScore: 0, penalty: 0, fullScore: false, rawFullScore: false },
+        scored: true,
+      },
+      {
+        problemCode: "GHI",
+        problemTitle: "Webサーバーが起動しない",
+        answerId: 1,
+        submittedAt: "2026-01-01T11:00:00+09:00",
+        score: { maxScore: 150, score: 75, rawScore: 75, penalty: 0, fullScore: false, rawFullScore: false },
+        scored: true,
+      },
+      {
+        problemCode: "ABC",
+        problemTitle: "ネットワークが繋がらない",
+        answerId: 1,
+        submittedAt: "2026-01-01T10:30:00+09:00",
+        score: { maxScore: 100, score: 0, rawScore: 0, penalty: 0, fullScore: false, rawFullScore: false },
+        scored: true,
+      },
+    ],
+  },
+};
+
+export const Empty: Story = {
+  args: {
+    entries: [],
+  },
+};
