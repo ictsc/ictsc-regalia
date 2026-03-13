@@ -53,5 +53,158 @@
       "day2-am",
       "day2-pm"
     ]
+  },
+  {
+    "id": "57b9d023-8100-4265-b48e-e4e42e507d25",
+    "code": "0005",
+    "problem_type": "Descriptive",
+    "title": "OSPF経路制御",
+    "max_score": 200,
+    "category": "Network",
+    "redeploy_rule": "Unredeployable",
+    "submissionable_schedule_names": [
+      "day1-pm"
+    ]
+  },
+  {
+    "id": "68cae134-9211-4376-a59f-f5f53f618e36",
+    "code": "0006",
+    "problem_type": "Descriptive",
+    "title": "Webサーバー構築",
+    "max_score": 150,
+    "category": "Server",
+    "redeploy_rule": "Manual",
+    "submissionable_schedule_names": [
+      "day1-pm"
+    ]
+  },
+  {
+    "id": "79dbe245-a322-4487-b6a0-060640729f47",
+    "code": "0007",
+    "problem_type": "Descriptive",
+    "title": "ファイアウォール設定",
+    "max_score": 300,
+    "category": "Security",
+    "redeploy_rule": "PercentagePenalty",
+    "percentage_penalty": {
+      "threshold": 2,
+      "percentage": 15
+    },
+    "submissionable_schedule_names": [
+      "day1-pm"
+    ]
+  },
+  {
+    "id": "8aecf356-b433-4598-87b1-171751830058",
+    "code": "0008",
+    "problem_type": "Descriptive",
+    "title": "コンテナ運用管理",
+    "max_score": 250,
+    "category": "Server",
+    "redeploy_rule": "Unredeployable",
+    "submissionable_schedule_names": [
+      "day1-pm"
+    ]
+  },
+  {
+    "id": "9bfd0467-c544-46a9-98c2-282862941169",
+    "code": "0009",
+    "problem_type": "Descriptive",
+    "title": "BGPピアリング (day1-am)",
+    "max_score": 200,
+    "category": "Network",
+    "redeploy_rule": "Unredeployable",
+    "submissionable_schedule_names": [
+      "day1-am"
+    ]
+  },
+  {
+    "id": "ac0e1578-d655-47ba-a9d3-39397305227a",
+    "code": "0010",
+    "problem_type": "Descriptive",
+    "title": "DNS権威サーバー (day1-am)",
+    "max_score": 100,
+    "category": "Network",
+    "redeploy_rule": "Manual",
+    "submissionable_schedule_names": [
+      "day1-am"
+    ]
+  },
+  {
+    "id": "bd1f2689-e766-48cb-bae4-4a4a8416338b",
+    "code": "0011",
+    "problem_type": "Descriptive",
+    "title": "RADIUS認証 (day1-am)",
+    "max_score": 150,
+    "category": "Security",
+    "redeploy_rule": "Unredeployable",
+    "submissionable_schedule_names": [
+      "day1-am"
+    ]
+  },
+  {
+    "id": "ce30379a-f877-49dc-8bf5-5b5b9527449c",
+    "code": "0012",
+    "problem_type": "Descriptive",
+    "title": "IDS/IPSチューニング (day2-am)",
+    "max_score": 200,
+    "category": "Security",
+    "redeploy_rule": "Manual",
+    "submissionable_schedule_names": [
+      "day2-am"
+    ]
+  },
+  {
+    "id": "df41489b-0988-4aed-9c06-6c6ca63855ad",
+    "code": "0013",
+    "problem_type": "Descriptive",
+    "title": "IPv6移行 (day2-am)",
+    "max_score": 250,
+    "category": "Network",
+    "redeploy_rule": "Unredeployable",
+    "submissionable_schedule_names": [
+      "day2-am"
+    ]
+  },
+  {
+    "id": "e05259ac-1a99-4bfe-ad17-7d7db74966be",
+    "code": "0014",
+    "problem_type": "Descriptive",
+    "title": "ロードバランサ冗長化 (day2-pm)",
+    "max_score": 300,
+    "category": "Server",
+    "redeploy_rule": "PercentagePenalty",
+    "percentage_penalty": {
+      "threshold": 1,
+      "percentage": 20
+    },
+    "submissionable_schedule_names": [
+      "day2-pm"
+    ]
+  },
+  {
+    "id": "f1636abd-2baa-4c0f-be28-8e8ec85a77cf",
+    "code": "0015",
+    "problem_type": "Descriptive",
+    "title": "TLS証明書管理 (day2-pm)",
+    "max_score": 150,
+    "category": "Security",
+    "redeploy_rule": "Unredeployable",
+    "submissionable_schedule_names": [
+      "day2-pm"
+    ]
+  },
+  {
+    "id": "02747bce-3cbb-4d10-8f39-9f9fd96b88d0",
+    "code": "0016",
+    "problem_type": "Descriptive",
+    "title": "総合トラブルシューティング",
+    "max_score": 500,
+    "category": "Network",
+    "redeploy_rule": "Manual",
+    "submissionable_schedule_names": [
+      "day1-pm",
+      "day2-am"
+    ]
   }
 ]

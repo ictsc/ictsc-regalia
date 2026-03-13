@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { create } from "@bufbuild/protobuf";
+import { SubmissionStatusSchema } from "@ictsc/proto/contestant/v1";
 import { ProblemItem } from "./problem-item";
 
 export default {
@@ -52,6 +54,38 @@ export const Default: Story = {
         score={{
           maxScore: 200,
         }}
+      />
+    </div>
+  ),
+};
+
+export const NotSubmittable: Story = {
+  render: () => (
+    <div className="grid grid-cols-2 gap-64">
+      <ProblemItem
+        code="ABC"
+        title="提出不可（スコアあり）"
+        score={{
+          maxScore: 200,
+          score: 100,
+          rawScore: 120,
+          penalty: -20,
+          fullScore: false,
+          rawFullScore: false,
+        }}
+        submissionStatus={create(SubmissionStatusSchema, {
+          isSubmittable: false,
+        })}
+      />
+      <ProblemItem
+        code="ABC"
+        title="提出不可（未回答）"
+        score={{
+          maxScore: 200,
+        }}
+        submissionStatus={create(SubmissionStatusSchema, {
+          isSubmittable: false,
+        })}
       />
     </div>
   ),
