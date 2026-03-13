@@ -19,10 +19,7 @@ export function AnnounceList(props: AnnounceProps) {
           <h1 className="font-bold">現在アナウンスはありません</h1>
         ) : (
           props.announces.map((announce) => (
-            <div
-              key={announce.slug}
-              className="flex w-full items-center gap-8"
-            >
+            <div key={announce.slug} className="flex w-full items-center gap-8">
               <Button as={Fragment}>
                 <Link
                   className="rounded-8 bg-surface-1 text-16 data-[hover]:bg-surface-2 flex min-w-0 flex-1 items-center gap-8 py-4 pr-40 pl-20 font-bold transition data-[active]:opacity-50"

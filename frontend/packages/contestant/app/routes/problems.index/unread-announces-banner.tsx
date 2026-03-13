@@ -22,15 +22,19 @@ export function UnreadAnnouncesBanner({ notices }: BannerProps) {
       <Link
         to="/announces"
         title={label}
-        className="text-14 bg-surface-1 hover:bg-surface-2 rounded-full flex min-w-0 items-center gap-4 py-4 pr-12 pl-8 font-bold transition"
+        className="text-14 bg-surface-1 hover:bg-surface-2 flex min-w-0 items-center gap-4 rounded-full py-4 pr-12 pl-8 font-bold transition"
       >
-        <MaterialSymbol icon="notifications" size={20} className="text-icon shrink-0" />
+        <MaterialSymbol
+          icon="notifications"
+          size={20}
+          className="text-icon shrink-0"
+        />
         <span className="truncate">{label}</span>
       </Link>
       <button
         type="button"
         title="既読にする"
-        className="text-14 bg-surface-1 hover:bg-surface-2 rounded-full flex shrink-0 items-center gap-4 py-4 pr-12 pl-8 transition"
+        className="text-14 bg-surface-1 hover:bg-surface-2 flex shrink-0 items-center gap-4 rounded-full py-4 pr-12 pl-8 transition"
         onClick={() => markAllAsRead(notices)}
       >
         <MaterialSymbol icon="done_all" size={20} className="text-icon" />
@@ -47,7 +51,7 @@ export function ReadToggleButton({ slug }: { slug: string }) {
   return (
     <button
       type="button"
-      className="text-14 bg-surface-1 hover:bg-surface-2 rounded-full flex shrink-0 items-center gap-4 py-4 pr-12 pl-8 transition"
+      className="text-14 bg-surface-1 hover:bg-surface-2 flex shrink-0 items-center gap-4 rounded-full py-4 pr-12 pl-8 transition"
       onClick={() => (read ? markAsUnread(slug) : markAsRead(slug))}
     >
       <MaterialSymbol

@@ -140,7 +140,10 @@ function SubmissionForm(props: {
   );
 }
 
-function Content(props: { problem: Promise<ProblemDetail>; notices: Promise<Notice[]> }) {
+function Content(props: {
+  problem: Promise<ProblemDetail>;
+  notices: Promise<Notice[]>;
+}) {
   const problem = use(useDeferredValue(props.problem));
   const notices = use(props.notices);
   return (
