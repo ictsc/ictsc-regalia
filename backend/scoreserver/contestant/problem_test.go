@@ -40,6 +40,9 @@ func TestProblemServiceListProblemsIncludesSubmissionableSchedules(t *testing.T)
 	if got := len(resp.Msg.GetProblems()); got != 1 {
 		t.Fatalf("len(resp.Msg.Problems) = %d, want 1", got)
 	}
+	if got := store.getScheduleCalls; got != 1 {
+		t.Fatalf("GetSchedule called %d times, want 1", got)
+	}
 
 	problem := resp.Msg.GetProblems()[0]
 	if got := len(problem.GetSubmissionableSchedules()); got != 2 {
@@ -88,6 +91,9 @@ func TestProblemServiceGetProblemIncludesSubmissionableSchedules(t *testing.T) {
 	}))
 	if err != nil {
 		t.Fatalf("GetProblem() error = %v", err)
+	}
+	if got := store.getScheduleCalls; got != 1 {
+		t.Fatalf("GetSchedule called %d times, want 1", got)
 	}
 
 	problem := resp.Msg.GetProblem()
@@ -327,6 +333,7 @@ type problemServiceTestStore struct {
 	deployments []*domain.DeploymentData
 
 	getProblemByCodeCalls int
+	getScheduleCalls      int
 	createDeploymentCalls int
 }
 
@@ -414,6 +421,7 @@ func (s *problemServiceTestStore) ListDeployments(context.Context) ([]*domain.De
 }
 
 func (s *problemServiceTestStore) GetSchedule(context.Context) ([]*domain.ScheduleData, error) {
+	s.getScheduleCalls++
 	return s.schedules, nil
 }
 

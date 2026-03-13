@@ -62,6 +62,10 @@ func GetSchedule(ctx context.Context, eff ScheduleReader) (Schedule, error) {
 	return entries, nil
 }
 
+func NewCachedScheduleReader(schedule Schedule) ScheduleReader {
+	return &cachedScheduleReader{schedule: schedule}
+}
+
 func SaveSchedule(ctx context.Context, eff ScheduleWriter, input []*UpdateScheduleInput) error {
 	data := make([]*ScheduleData, 0, len(input))
 	seenNames := make(map[string]struct{}, len(input))
@@ -111,6 +115,22 @@ type (
 		SaveSchedule(ctx context.Context, data []*ScheduleData) error
 	}
 )
+
+type cachedScheduleReader struct {
+	schedule Schedule
+}
+
+func (r *cachedScheduleReader) GetSchedule(context.Context) ([]*ScheduleData, error) {
+	result := make([]*ScheduleData, 0, len(r.schedule))
+	for _, entry := range r.schedule {
+		result = append(result, &ScheduleData{
+			Name:    entry.name,
+			StartAt: entry.startAt,
+			EndAt:   entry.endAt,
+		})
+	}
+	return result, nil
+}
 
 func (d *ScheduleData) parse() *ScheduleEntry {
 	return &ScheduleEntry{
