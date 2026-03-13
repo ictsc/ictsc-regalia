@@ -69,7 +69,7 @@ export declare type Schedule = Message<"contestant.v1.Schedule"> & {
   next?: ScheduleEntry;
 
   /**
-   * 全スケジュール一覧
+   * 全スケジュール一覧。start_at の昇順で返される。
    *
    * @generated from field: repeated contestant.v1.ScheduleEntry entries = 5;
    */

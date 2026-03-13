@@ -93,7 +93,7 @@ type Schedule struct {
 	Current *ScheduleEntry `protobuf:"bytes,3,opt,name=current,proto3,oneof" json:"current,omitempty"`
 	// 次のスケジュール（なければ空）
 	Next *ScheduleEntry `protobuf:"bytes,4,opt,name=next,proto3,oneof" json:"next,omitempty"`
-	// 全スケジュール一覧
+	// 全スケジュール一覧。start_at の昇順で返される。
 	Entries       []*ScheduleEntry `protobuf:"bytes,5,rep,name=entries,proto3" json:"entries,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
