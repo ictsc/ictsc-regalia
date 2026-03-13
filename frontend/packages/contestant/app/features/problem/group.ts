@@ -71,7 +71,7 @@ export function groupProblems(
         name: e.name,
         temporalStatus: getTemporalStatus(e, now),
       })),
-      problems,
+      problems: problems.slice().sort((a, b) => a.code.localeCompare(b.code)),
       hasSubmittableProblem,
       _sortKey: entries.length > 0 ? startAtMs(entries[0]) : Infinity,
     }))
