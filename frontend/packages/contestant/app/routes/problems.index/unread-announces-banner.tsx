@@ -40,17 +40,14 @@ export function UnreadAnnouncesBanner({ notices }: BannerProps) {
   );
 }
 
-const defaultToggleClassName =
-  "text-14 bg-surface-1 hover:bg-surface-2 rounded-full flex shrink-0 items-center gap-4 py-4 pr-12 pl-8 transition";
-
-export function ReadToggleButton({ slug, className }: { slug: string; className?: string }) {
+export function ReadToggleButton({ slug }: { slug: string }) {
   const { isRead, markAsRead, markAsUnread } = useReadAnnouncements();
   const read = isRead(slug);
 
   return (
     <button
       type="button"
-      className={className ?? defaultToggleClassName}
+      className="text-14 bg-surface-1 hover:bg-surface-2 rounded-full flex shrink-0 items-center gap-4 py-4 pr-12 pl-8 transition"
       onClick={() => (read ? markAsUnread(slug) : markAsRead(slug))}
     >
       <MaterialSymbol
