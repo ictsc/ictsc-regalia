@@ -36,7 +36,7 @@ export function ActivityPage(props: ActivityPageProps) {
                 <div className="flex w-12 shrink-0 flex-col items-center self-stretch">
                   {index === 0 ? (
                     <div
-                      className="grow w-2"
+                      className="w-2 grow"
                       style={{
                         backgroundImage:
                           "linear-gradient(to bottom, transparent, var(--color-text) 100%)",
