@@ -1,8 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { create } from "@bufbuild/protobuf";
+import { timestampFromDate } from "@bufbuild/protobuf/wkt";
 import {
+  ScheduleEntrySchema,
   SubmissionStatusSchema,
   type Problem,
+  type ScheduleEntry,
 } from "@ictsc/proto/contestant/v1";
 import { ProblemsPage } from "./page";
 
@@ -13,12 +16,45 @@ export default {
 
 type Story = StoryObj<typeof ProblemsPage>;
 
+const day1Am = create(ScheduleEntrySchema, {
+  name: "day1-am",
+  startAt: timestampFromDate(new Date("2026-01-01T10:00:00+09:00")),
+  endAt: timestampFromDate(new Date("2026-01-01T12:00:00+09:00")),
+});
+
+const day1Pm = create(ScheduleEntrySchema, {
+  name: "day1-pm",
+  startAt: timestampFromDate(new Date("2026-01-01T13:00:00+09:00")),
+  endAt: timestampFromDate(new Date("2099-12-31T23:59:59+09:00")),
+});
+
+const day2Am = create(ScheduleEntrySchema, {
+  name: "day2-am",
+  startAt: timestampFromDate(new Date("2100-01-01T10:00:00+09:00")),
+  endAt: timestampFromDate(new Date("2100-01-01T12:00:00+09:00")),
+});
+
+const day2Pm = create(ScheduleEntrySchema, {
+  name: "day2-pm",
+  startAt: timestampFromDate(new Date("2100-01-01T13:00:00+09:00")),
+  endAt: timestampFromDate(new Date("2100-01-01T16:00:00+09:00")),
+});
+
+const submittable = create(SubmissionStatusSchema, {
+  isSubmittable: true,
+});
+
+const notSubmittable = create(SubmissionStatusSchema, {
+  isSubmittable: false,
+});
+
 function makeProblem(
   code: string,
   title: string,
   opts?: {
     score?: { score: number; markedScore: number; penalty: number };
     submissionStatus?: Problem["submissionStatus"];
+    submissionableSchedules?: ScheduleEntry[];
   },
 ): Problem {
   return {
@@ -35,16 +71,9 @@ function makeProblem(
         }
       : undefined,
     submissionStatus: opts?.submissionStatus,
+    submissionableSchedules: opts?.submissionableSchedules ?? [],
   } as Problem;
 }
-
-const submittable = create(SubmissionStatusSchema, {
-  isSubmittable: true,
-});
-
-const notSubmittable = create(SubmissionStatusSchema, {
-  isSubmittable: false,
-});
 
 export const Default: Story = {
   args: {
@@ -103,86 +132,91 @@ export const Default: Story = {
   },
 };
 
-export const Grouped: Story = {
+export const GroupedBySchedule: Story = {
   args: {
     problems: [
-      // 提出可能
+      // day1-am（過去 → 提出不可）
       makeProblem("NET01", "ネットワーク基礎問題", {
-        submissionStatus: submittable,
+        submissionStatus: notSubmittable,
+        submissionableSchedules: [day1Am],
+        score: { score: 200, markedScore: 200, penalty: 0 },
       }),
       makeProblem("NET02", "VLAN設定問題", {
-        submissionStatus: submittable,
+        submissionStatus: notSubmittable,
+        submissionableSchedules: [day1Am],
         score: { score: 100, markedScore: 120, penalty: -20 },
       }),
       makeProblem("SRV01", "Webサーバー構築", {
-        submissionStatus: submittable,
+        submissionStatus: notSubmittable,
+        submissionableSchedules: [day1Am],
       }),
+      // day1-pm（現在 → 提出可能）
       makeProblem("SRV02", "データベース復旧", {
         submissionStatus: submittable,
+        submissionableSchedules: [day1Pm],
       }),
       makeProblem("SRV03", "コンテナ運用管理", {
         submissionStatus: submittable,
+        submissionableSchedules: [day1Pm],
         score: { score: 80, markedScore: 100, penalty: -20 },
       }),
       makeProblem("DNS01", "DNS権威サーバー設定", {
         submissionStatus: submittable,
+        submissionableSchedules: [day1Pm],
       }),
       makeProblem("DNS02", "DNSキャッシュ問題", {
         submissionStatus: submittable,
+        submissionableSchedules: [day1Pm],
       }),
-      makeProblem("MON01", "監視システム構築", {
-        submissionStatus: submittable,
-      }),
-      // 提出不可
+      // day2-am（未来 → 提出不可）
       makeProblem("SEC01", "セキュリティ診断", {
         submissionStatus: notSubmittable,
+        submissionableSchedules: [day2Am],
       }),
       makeProblem("SEC02", "ファイアウォール設定", {
         submissionStatus: notSubmittable,
+        submissionableSchedules: [day2Am],
       }),
-      makeProblem("SEC03", "IDS/IPS チューニング", {
-        submissionStatus: notSubmittable,
-      }),
+      // day2-pm（未来 → 提出不可）
       makeProblem("APP01", "ロードバランサ冗長化", {
         submissionStatus: notSubmittable,
+        submissionableSchedules: [day2Pm],
       }),
-      makeProblem("OLD01", "終了済み：OSPF経路制御", {
-        submissionStatus: notSubmittable,
-        score: { score: 200, markedScore: 200, penalty: 0 },
+      // day1-pm + day2-am（複数スケジュール）
+      makeProblem("MON01", "監視システム構築", {
+        submissionStatus: submittable,
+        submissionableSchedules: [day1Pm, day2Am],
       }),
-      makeProblem("OLD02", "終了済み：BGPピアリング", {
-        submissionStatus: notSubmittable,
-        score: { score: 150, markedScore: 180, penalty: -30 },
-      }),
-      makeProblem("OLD03", "終了済み：IPv6移行", {
-        submissionStatus: notSubmittable,
-        score: { score: 60, markedScore: 80, penalty: -20 },
-      }),
-      makeProblem("OLD04", "終了済み：RADIUS認証", {
-        submissionStatus: notSubmittable,
+      // 全スケジュール
+      makeProblem("ALL01", "総合演習", {
+        submissionStatus: submittable,
+        submissionableSchedules: [day1Am, day1Pm, day2Am, day2Pm],
       }),
     ],
   },
 };
 
-export const SubmittableOnly: Story = {
+export const SingleSchedule: Story = {
   args: {
     problems: [
       makeProblem("NET01", "ネットワーク基礎問題", {
         submissionStatus: submittable,
+        submissionableSchedules: [day1Pm],
       }),
       makeProblem("NET02", "VLAN設定問題", {
         submissionStatus: submittable,
+        submissionableSchedules: [day1Pm],
         score: { score: 100, markedScore: 120, penalty: -20 },
       }),
       makeProblem("SRV01", "Webサーバー構築", {
         submissionStatus: submittable,
+        submissionableSchedules: [day1Pm],
       }),
     ],
   },
 };
 
-export const NotSubmittableOnly: Story = {
+export const NoSchedules: Story = {
   args: {
     problems: [
       makeProblem("OLD01", "終了済み：OSPF経路制御", {
