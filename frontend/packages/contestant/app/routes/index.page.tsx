@@ -138,9 +138,9 @@ function EndOfContest(props: IndexPageProps) {
 }
 
 const temporalStatusLabel = {
-  past: "過去",
-  current: "現在",
-  future: "未来",
+  past: "終了済のスケジュール",
+  current: "現在進行中のスケジュール",
+  future: "未来のスケジュール",
 } as const;
 
 const temporalColorClass = {
@@ -183,10 +183,9 @@ function ScheduleTimeline(props: { readonly entries: ScheduleEntry[] }) {
             <span>{entry.name}</span>
             <span
               className="font-mono tabular-nums"
-              aria-label={`${formatTime(entry)}（${temporalStatusLabel[status]}）`}
+              title={temporalStatusLabel[status]}
             >
-              {formatTime(entry)}{" "}
-              <span aria-hidden="true">［{temporalStatusLabel[status]}］</span>
+              {formatTime(entry)}
             </span>
           </div>
         );
