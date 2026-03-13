@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"log/slog"
+	"slices"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -66,6 +67,12 @@ func (d *DescriptiveMarkingRaionale) Comment() string {
 }
 
 func ListAllMarkingResults(ctx context.Context, eff MarkingResultReader) ([]*MarkingResult, error) {
+	if cached, ok := eff.(interface {
+		ListAllParsedMarkingResults(context.Context) ([]*MarkingResult, error)
+	}); ok {
+		return cached.ListAllParsedMarkingResults(ctx)
+	}
+
 	markingResultDataList, err := eff.ListMarkingResults(ctx)
 	if err != nil {
 		return nil, WrapAsInternal(err, "failed to list marking results")
@@ -131,6 +138,12 @@ func (a *Answer) latestMarkingResultForVisibility(
 	visibility ScoreVisibility,
 	bypassDelay bool,
 ) (*MarkingResult, error) {
+	if cached, ok := eff.(interface {
+		LatestMarkingResultForAnswer(uuid.UUID, time.Time, ScoreVisibility, bool) (*MarkingResult, error)
+	}); ok {
+		return cached.LatestMarkingResultForAnswer(a.id, now, visibility, bypassDelay)
+	}
+
 	if visibility == ScoreVisibilityPrivate || bypassDelay {
 		return a.latestMarkingResult(ctx, eff)
 	}
@@ -216,6 +229,59 @@ type (
 		MarkingResultPenaltyUpdator
 	}
 )
+
+type CachedMarkingResultReader struct {
+	data     []*MarkingResultData
+	parsed   []*MarkingResult
+	byAnswer map[uuid.UUID][]*MarkingResult
+}
+
+func NewCachedMarkingResultReader(data []*MarkingResultData) (*CachedMarkingResultReader, error) {
+	parsed := make([]*MarkingResult, 0, len(data))
+	byAnswer := make(map[uuid.UUID][]*MarkingResult)
+	for _, item := range data {
+		markingResult, err := item.parse()
+		if err != nil {
+			return nil, err
+		}
+		parsed = append(parsed, markingResult)
+		byAnswer[markingResult.Answer().id] = append(byAnswer[markingResult.Answer().id], markingResult)
+	}
+	for _, results := range byAnswer {
+		slices.SortFunc(results, func(a, b *MarkingResult) int {
+			return b.CreatedAt().Compare(a.CreatedAt())
+		})
+	}
+	return &CachedMarkingResultReader{
+		data:     data,
+		parsed:   parsed,
+		byAnswer: byAnswer,
+	}, nil
+}
+
+func (r *CachedMarkingResultReader) ListMarkingResults(context.Context) ([]*MarkingResultData, error) {
+	return r.data, nil
+}
+
+func (r *CachedMarkingResultReader) ListAllParsedMarkingResults(context.Context) ([]*MarkingResult, error) {
+	return r.parsed, nil
+}
+
+func (r *CachedMarkingResultReader) LatestMarkingResultForAnswer(
+	answerID uuid.UUID,
+	now time.Time,
+	visibility ScoreVisibility,
+	bypassDelay bool,
+) (*MarkingResult, error) {
+	results := r.byAnswer[answerID]
+	for _, result := range results {
+		if visibility != ScoreVisibilityPrivate && !bypassDelay && !result.IsPublic(now) {
+			continue
+		}
+		return result, nil
+	}
+	return nil, NewNotFoundError("marking result for answer", nil)
+}
 
 func (m *MarkingResult) Data() *MarkingResultData {
 	return &MarkingResultData{

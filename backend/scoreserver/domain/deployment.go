@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"slices"
+	"sort"
 	"time"
 
 	"github.com/cockroachdb/errors"
@@ -70,6 +71,12 @@ func (e *DeploymentEvent) OccurredAt() time.Time {
 type AllDeployments []*Deployment
 
 func ListDeployments(ctx context.Context, eff DeploymentReader) (AllDeployments, error) {
+	if cached, ok := eff.(interface {
+		ListParsedDeployments(context.Context) (AllDeployments, error)
+	}); ok {
+		return cached.ListParsedDeployments(ctx)
+	}
+
 	deployments, err := eff.ListDeployments(ctx)
 	if err != nil {
 		return nil, err
@@ -102,6 +109,14 @@ func (tp *TeamProblem) Deployments(ctx context.Context, eff DeploymentReader) ([
 }
 
 func (tp *TeamProblem) DeploymentCountAt(ctx context.Context, eff DeploymentReader, timeAt time.Time) (int, error) {
+	if cached, ok := eff.(interface {
+		DeploymentCountAt(TeamCode, ProblemCode, time.Time) (int, bool)
+	}); ok {
+		if count, found := cached.DeploymentCountAt(tp.Team().Code(), tp.Problem().Code(), timeAt); found {
+			return count, nil
+		}
+	}
+
 	list, err := tp.Deployments(ctx, eff)
 	if err != nil {
 		return 0, err
@@ -239,6 +254,63 @@ type (
 		UpdateDeploymentStatus(ctx context.Context, input *UpdateDeploymentStatusInput) error
 	}
 )
+
+type CachedDeploymentReader struct {
+	data          []*DeploymentData
+	parsed        AllDeployments
+	createdAtByTP map[deploymentCacheKey][]time.Time
+}
+
+type deploymentCacheKey struct {
+	teamCode    TeamCode
+	problemCode ProblemCode
+}
+
+func NewCachedDeploymentReader(data []*DeploymentData) (*CachedDeploymentReader, error) {
+	parsed := make(AllDeployments, 0, len(data))
+	createdAtByTP := make(map[deploymentCacheKey][]time.Time)
+	for _, item := range data {
+		deployment, err := item.parse()
+		if err != nil {
+			return nil, err
+		}
+		parsed = append(parsed, deployment)
+		key := deploymentCacheKey{
+			teamCode:    deployment.TeamCode(),
+			problemCode: deployment.ProblemCode(),
+		}
+		createdAtByTP[key] = append(createdAtByTP[key], deployment.CreatedAt())
+	}
+	for key := range createdAtByTP {
+		sort.Slice(createdAtByTP[key], func(i, j int) bool {
+			return createdAtByTP[key][i].Before(createdAtByTP[key][j])
+		})
+	}
+	return &CachedDeploymentReader{
+		data:          data,
+		parsed:        parsed,
+		createdAtByTP: createdAtByTP,
+	}, nil
+}
+
+func (r *CachedDeploymentReader) ListDeployments(context.Context) ([]*DeploymentData, error) {
+	return r.data, nil
+}
+
+func (r *CachedDeploymentReader) ListParsedDeployments(context.Context) (AllDeployments, error) {
+	return r.parsed, nil
+}
+
+func (r *CachedDeploymentReader) DeploymentCountAt(teamCode TeamCode, problemCode ProblemCode, timeAt time.Time) (int, bool) {
+	key := deploymentCacheKey{teamCode: teamCode, problemCode: problemCode}
+	createdAtList, ok := r.createdAtByTP[key]
+	if !ok {
+		return 0, false
+	}
+	return sort.Search(len(createdAtList), func(i int) bool {
+		return !createdAtList[i].Before(timeAt)
+	}), true
+}
 
 func (d *Deployment) Data() *DeploymentData {
 	events := make([]*DeploymentEventData, 0, len(d.events))
