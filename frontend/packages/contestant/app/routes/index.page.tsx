@@ -7,6 +7,7 @@ import {
 } from "date-fns";
 import type { ScheduleEntry } from "@ictsc/proto/contestant/v1";
 import { timestampDate } from "@bufbuild/protobuf/wkt";
+import { clsx } from "clsx";
 import { Logo } from "../components/logo";
 import { MaterialSymbol } from "../components/material-symbol";
 import { Title } from "../components/title";
@@ -177,7 +178,7 @@ function ScheduleTimeline(props: { readonly entries: ScheduleEntry[] }) {
         return (
           <div
             key={entry.name}
-            className={`grid grid-cols-[1em_auto_1fr] gap-x-8 ${temporalColorClass[status]}`}
+            className={clsx("grid grid-cols-[1em_auto_1fr] gap-x-8", temporalColorClass[status])}
           >
             <span>{status === "current" ? "▶" : ""}</span>
             <span>{entry.name}</span>
