@@ -77,6 +77,7 @@ function makeProblem(
 
 export const Default: Story = {
   args: {
+    notices: [],
     problems: [
       ...Array.from({ length: 4 }, () => ({
         $typeName: "contestant.v1.Problem" as const,

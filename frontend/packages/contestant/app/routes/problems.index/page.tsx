@@ -6,7 +6,9 @@ import {
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
+import type { Notice } from "../../features/announce";
 import { ProblemItem } from "./problem-item";
+import { UnreadAnnouncesBanner } from "./unread-announces-banner";
 import { protoScoreToProps } from "../../features/score";
 import { Title } from "../../components/title";
 import { MaterialSymbol } from "../../components/material-symbol";
@@ -17,6 +19,7 @@ import {
 
 type PageProps = {
   problems: Problem[];
+  notices: Notice[];
 };
 
 function ScheduleLabel(props: { schedules: GroupScheduleInfo[] }) {
@@ -45,6 +48,9 @@ export function ProblemsPage(props: PageProps) {
     <>
       <Title>問題一覧</Title>
       <div className="mx-16 my-64 flex flex-col gap-16">
+        <div className="ml-16">
+          <UnreadAnnouncesBanner notices={props.notices} />
+        </div>
         {groups.map((group) => (
           <Disclosure key={group.key} as="section" defaultOpen>
             <DisclosureButton className="group/disc flex w-full cursor-pointer items-center gap-16">

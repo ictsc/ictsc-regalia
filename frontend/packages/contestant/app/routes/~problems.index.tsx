@@ -1,5 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { fetchProblems } from "@app/features/problem";
+import { fetchNotices } from "@app/features/announce";
 import { startTransition, use, useDeferredValue, useEffect } from "react";
 import { timestampDate } from "@bufbuild/protobuf/wkt";
 import { ProblemsPage } from "./problems.index/page";
@@ -9,15 +10,18 @@ export const Route = createFileRoute("/problems/")({
   loader: ({ context: { transport } }) => {
     return {
       problems: fetchProblems(transport),
+      notices: fetchNotices(transport),
     };
   },
 });
 
 function RouteComponent() {
   const router = useRouter();
-  const { problems: problemsPromise } = Route.useLoaderData();
+  const { problems: problemsPromise, notices: noticesPromise } =
+    Route.useLoaderData();
   const deferredProblemsPromise = useDeferredValue(problemsPromise);
   const problems = use(deferredProblemsPromise);
+  const notices = use(noticesPromise);
 
   // 最も近い submittableUntil/submittableFrom に達したらリフェッチ
   useEffect(() => {
@@ -38,5 +42,5 @@ function RouteComponent() {
     return () => clearTimeout(timer);
   }, [problems, router]);
 
-  return <ProblemsPage problems={problems} />;
+  return <ProblemsPage problems={problems} notices={notices} />;
 }
