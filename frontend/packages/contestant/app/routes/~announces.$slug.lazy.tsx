@@ -21,7 +21,7 @@ function RouteComponent() {
   return (
     <>
       <Title>{announce?.title}</Title>
-      <div className="mt-64 flex w-full flex-col px-40">
+      <div className="mt-64 flex w-full px-40">
         {announce == null ? (
           <h1 className="mx-auto font-bold">アナウンスがありません</h1>
         ) : (
