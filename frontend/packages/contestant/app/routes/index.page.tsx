@@ -175,27 +175,29 @@ function ScheduleTimeline(props: { readonly entries: ScheduleEntry[] }) {
 
   return (
     <div className="border-primary mt-8 flex w-full flex-col gap-4 border-t pt-8">
-      {props.entries.toSorted((a, b) => startMs(a) - startMs(b)).map((entry) => {
-        const status = getTemporalStatus(entry, now);
-        return (
-          <div
-            key={entry.name}
-            className={clsx(
-              "grid grid-cols-[1em_auto_1fr] gap-x-8",
-              temporalColorClass[status],
-            )}
-          >
-            <span>{status === "current" ? "▶" : ""}</span>
-            <span>{entry.name}</span>
-            <span
-              className="font-mono tabular-nums"
-              title={temporalStatusLabel[status]}
+      {[...props.entries]
+        .sort((a, b) => startMs(a) - startMs(b))
+        .map((entry) => {
+          const status = getTemporalStatus(entry, now);
+          return (
+            <div
+              key={entry.name}
+              className={clsx(
+                "grid grid-cols-[1em_auto_1fr] gap-x-8",
+                temporalColorClass[status],
+              )}
             >
-              {formatTime(entry)}
-            </span>
-          </div>
-        );
-      })}
+              <span>{status === "current" ? "▶" : ""}</span>
+              <span>{entry.name}</span>
+              <span
+                className="font-mono tabular-nums"
+                title={temporalStatusLabel[status]}
+              >
+                {formatTime(entry)}
+              </span>
+            </div>
+          );
+        })}
     </div>
   );
 }
