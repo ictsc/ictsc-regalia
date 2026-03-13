@@ -16,6 +16,7 @@ import { Route as RuleRouteImport } from "./routes/~rule";
 import { Route as RankingRouteImport } from "./routes/~ranking";
 import { Route as ProblemsRouteImport } from "./routes/~problems";
 import { Route as AnnouncesRouteImport } from "./routes/~announces";
+import { Route as ActivityRouteImport } from "./routes/~activity";
 import { Route as IndexRouteImport } from "./routes/~index";
 import { Route as ProblemsIndexRouteImport } from "./routes/~problems.index";
 import { Route as AnnouncesIndexRouteImport } from "./routes/~announces.index";
@@ -57,6 +58,11 @@ const AnnouncesRoute = AnnouncesRouteImport.update({
   path: "/announces",
   getParentRoute: () => rootRouteImport,
 } as any);
+const ActivityRoute = ActivityRouteImport.update({
+  id: "/activity",
+  path: "/activity",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const IndexRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
@@ -89,6 +95,7 @@ const AnnouncesSlugRoute = AnnouncesSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
+  "/activity": typeof ActivityRoute;
   "/announces": typeof AnnouncesRouteWithChildren;
   "/problems": typeof ProblemsRouteWithChildren;
   "/ranking": typeof RankingRoute;
@@ -103,6 +110,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
+  "/activity": typeof ActivityRoute;
   "/ranking": typeof RankingRoute;
   "/rule": typeof RuleRoute;
   "/signin": typeof SigninRoute;
@@ -116,6 +124,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
   "/": typeof IndexRoute;
+  "/activity": typeof ActivityRoute;
   "/announces": typeof AnnouncesRouteWithChildren;
   "/problems": typeof ProblemsRouteWithChildren;
   "/ranking": typeof RankingRoute;
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
     | "/"
+    | "/activity"
     | "/announces"
     | "/problems"
     | "/ranking"
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
+    | "/activity"
     | "/ranking"
     | "/rule"
     | "/signin"
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
   id:
     | "__root__"
     | "/"
+    | "/activity"
     | "/announces"
     | "/problems"
     | "/ranking"
@@ -173,6 +185,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
+  ActivityRoute: typeof ActivityRoute;
   AnnouncesRoute: typeof AnnouncesRouteWithChildren;
   ProblemsRoute: typeof ProblemsRouteWithChildren;
   RankingRoute: typeof RankingRoute;
@@ -231,6 +244,13 @@ declare module "@tanstack/react-router" {
       path: "/announces";
       fullPath: "/announces";
       preLoaderRoute: typeof AnnouncesRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/activity": {
+      id: "/activity";
+      path: "/activity";
+      fullPath: "/activity";
+      preLoaderRoute: typeof ActivityRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/": {
@@ -301,6 +321,7 @@ const ProblemsRouteWithChildren = ProblemsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ActivityRoute: ActivityRoute,
   AnnouncesRoute: AnnouncesRouteWithChildren,
   ProblemsRoute: ProblemsRouteWithChildren,
   RankingRoute: RankingRoute,
