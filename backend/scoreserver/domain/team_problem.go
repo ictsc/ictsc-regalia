@@ -47,20 +47,29 @@ func listTeamProblems(ctx context.Context, visibility ScoreVisibility, eff TeamP
 		return nil, WrapAsInternal(err, "failed to list scores")
 	}
 
+	scoreMap := make(map[teamProblemScoreKey]*TeamProblemScoreData, len(scores))
+	for _, score := range scores {
+		scoreMap[teamProblemScoreKey{
+			teamID:    score.TeamID,
+			problemID: score.ProblemID,
+		}] = score
+	}
+
 	teamProblems := make([]*TeamProblem, 0)
 	for _, team := range teams {
 		for _, problem := range problems {
 			teamProblem := &TeamProblem{team: team, problem: problem}
 
-			idx := slices.IndexFunc(scores, func(score *TeamProblemScoreData) bool {
-				return score.TeamID == uuid.UUID(team.teamID) && score.ProblemID == uuid.UUID(problem.problemID)
-			})
-			if idx >= 0 {
-				score, err := scores[idx].Score.parse(problem)
+			scoreData, ok := scoreMap[teamProblemScoreKey{
+				teamID:    uuid.UUID(team.teamID),
+				problemID: uuid.UUID(problem.problemID),
+			}]
+			if ok {
+				parsedScore, err := scoreData.Score.parse(problem)
 				if err != nil {
 					return nil, err
 				}
-				teamProblem.score = score
+				teamProblem.score = parsedScore
 			}
 
 			teamProblems = append(teamProblems, teamProblem)
@@ -68,6 +77,11 @@ func listTeamProblems(ctx context.Context, visibility ScoreVisibility, eff TeamP
 	}
 
 	return teamProblems, nil
+}
+
+type teamProblemScoreKey struct {
+	teamID    uuid.UUID
+	problemID uuid.UUID
 }
 
 type TeamProblemReader interface {
