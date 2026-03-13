@@ -30,9 +30,13 @@ export async function fetchActivity(
     }),
   );
   const entries = results.flat();
-  entries.sort(
-    (a, b) =>
-      new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime(),
-  );
+  entries.sort((a, b) => {
+    const timeDiff =
+      new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime();
+    if (timeDiff !== 0) return timeDiff;
+    const codeDiff = a.problemCode.localeCompare(b.problemCode);
+    if (codeDiff !== 0) return codeDiff;
+    return a.answerId - b.answerId;
+  });
   return entries;
 }

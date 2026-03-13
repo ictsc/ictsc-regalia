@@ -31,7 +31,10 @@ export function ActivityPage(props: ActivityPageProps) {
         ) : (
           <div className="flex w-full max-w-screen-md flex-col">
             {props.entries.map((entry, index) => (
-              <div key={index} className="flex flex-row items-center">
+              <div
+                key={`${entry.problemCode}-${entry.answerId}`}
+                className="flex flex-row items-center"
+              >
                 {/* 縦線+丸 */}
                 <div className="flex w-12 shrink-0 flex-col items-center self-stretch">
                   {index === 0 ? (

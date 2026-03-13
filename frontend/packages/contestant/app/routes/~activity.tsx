@@ -37,7 +37,7 @@ function RouteComponent() {
         answerId: entry.answerId,
         submittedAt: entry.submittedAt,
         score: protoScoreToProps(entry.maxScore, entry.score),
-        scored: entry.score?.score != null,
+        scored: entry.score != null,
       }))}
     />
   );
