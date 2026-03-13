@@ -22,7 +22,7 @@ message Schedule {
   optional ScheduleEntry current = 3;
   // 次のスケジュール（なければ空）
   optional ScheduleEntry next = 4;
-  // 全スケジュール一覧
+  // 全スケジュール一覧。start_at の昇順で返される。
   repeated ScheduleEntry entries = 5;
 }
 

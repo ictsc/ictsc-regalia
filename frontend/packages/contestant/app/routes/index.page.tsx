@@ -137,6 +137,12 @@ function EndOfContest(props: IndexPageProps) {
   );
 }
 
+const temporalStatusLabel = {
+  past: "過去",
+  current: "現在",
+  future: "未来",
+} as const;
+
 const temporalColorClass = {
   past: "*:!text-disabled",
   current: "*:!text-primary",
@@ -175,7 +181,13 @@ function ScheduleTimeline(props: { readonly entries: ScheduleEntry[] }) {
           >
             <span>{status === "current" ? "▶" : ""}</span>
             <span>{entry.name}</span>
-            <span className="font-mono tabular-nums">{formatTime(entry)}</span>
+            <span
+              className="font-mono tabular-nums"
+              aria-label={`${formatTime(entry)}（${temporalStatusLabel[status]}）`}
+            >
+              {formatTime(entry)}{" "}
+              <span aria-hidden="true">［{temporalStatusLabel[status]}］</span>
+            </span>
           </div>
         );
       })}
