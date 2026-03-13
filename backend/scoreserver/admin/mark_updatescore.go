@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/cockroachdb/errors"
+	"github.com/gofrs/uuid/v5"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/infra/pg"
 )
@@ -39,6 +40,11 @@ type problemScoreUpdateEffect interface {
 	domain.TeamProblemLister
 }
 
+type scoreCacheReader interface {
+	domain.AnswerReader
+	domain.TeamProblemScoreReader
+}
+
 func UpdateScore(
 	ctx context.Context,
 	eff UpdateScoreEffect,
@@ -62,6 +68,10 @@ func UpdateScore(
 	if err != nil {
 		return nil, domain.WrapAsInternal(err, "failed to cache marking results")
 	}
+	cachedScoreWriter, err := newCachedScoreWriter(ctx, eff, eff)
+	if err != nil {
+		return nil, err
+	}
 
 	innerEff := struct {
 		domain.MarkingResultReader
@@ -77,7 +87,7 @@ func UpdateScore(
 		MarkingResultReader:         cachedMarkReader,
 		DeploymentReader:            cachedDeployReader,
 		MarkingResultPenaltyUpdator: eff,
-		ScoreWriter:                 eff,
+		ScoreWriter:                 cachedScoreWriter,
 
 		AnswerReader:                  eff,
 		TeamProblemLister:             eff,
@@ -126,7 +136,7 @@ func updateScore(ctx context.Context, eff UpdateScoreEffect, now time.Time, mode
 	}
 
 	slog.InfoContext(ctx, "Update problem scores")
-	problemScoreEff, err := newProblemScoreUpdateEffect(ctx, eff)
+	problemScoreEff, err := newProblemScoreUpdateEffect(ctx, eff, eff)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +154,11 @@ func updateScore(ctx context.Context, eff UpdateScoreEffect, now time.Time, mode
 	return &UpdateScoreResult{}, nil
 }
 
-func newProblemScoreUpdateEffect(ctx context.Context, eff UpdateScoreEffect) (problemScoreUpdateEffect, error) {
+func newProblemScoreUpdateEffect(
+	ctx context.Context,
+	eff UpdateScoreEffect,
+	scoreWriter domain.ScoreWriter,
+) (problemScoreUpdateEffect, error) {
 	cachedAnswerReader, err := newCachedAnswerReader(ctx, eff)
 	if err != nil {
 		return nil, err
@@ -157,9 +171,103 @@ func newProblemScoreUpdateEffect(ctx context.Context, eff UpdateScoreEffect) (pr
 	}{
 		AnswerReader:        cachedAnswerReader,
 		MarkingResultReader: eff,
-		ScoreWriter:         eff,
+		ScoreWriter:         scoreWriter,
 		TeamProblemLister:   eff,
 	}, nil
+}
+
+type cachedScoreWriter struct {
+	fallback      domain.ScoreWriter
+	answerScores  map[domain.ScoreVisibility]map[uuid.UUID]uuid.UUID
+	problemScores map[domain.ScoreVisibility]map[teamProblemKey]uuid.UUID
+}
+
+type teamProblemKey struct {
+	teamID    uuid.UUID
+	problemID uuid.UUID
+}
+
+func newCachedScoreWriter(
+	ctx context.Context,
+	reader scoreCacheReader,
+	fallback domain.ScoreWriter,
+) (*cachedScoreWriter, error) {
+	answerScores := make(map[domain.ScoreVisibility]map[uuid.UUID]uuid.UUID, 3)
+	problemScores := make(map[domain.ScoreVisibility]map[teamProblemKey]uuid.UUID, 3)
+	for _, visibility := range []domain.ScoreVisibility{
+		domain.ScoreVisibilityPrivate,
+		domain.ScoreVisibilityTeam,
+		domain.ScoreVisibilityPublic,
+	} {
+		answers, err := reader.ListAnswers(ctx, visibility)
+		if err != nil {
+			return nil, domain.WrapAsInternal(err, "failed to list answers")
+		}
+		answerScores[visibility] = make(map[uuid.UUID]uuid.UUID, len(answers))
+		for _, answer := range answers {
+			if answer == nil || answer.Score == nil {
+				continue
+			}
+			answerScores[visibility][answer.ID] = answer.Score.MarkingResultID
+		}
+
+		teamProblemScores, err := reader.ListTeamProblemScores(ctx, visibility)
+		if err != nil {
+			return nil, domain.WrapAsInternal(err, "failed to list team problem scores")
+		}
+		problemScores[visibility] = make(map[teamProblemKey]uuid.UUID, len(teamProblemScores))
+		for _, score := range teamProblemScores {
+			if score == nil {
+				continue
+			}
+			problemScores[visibility][teamProblemKey{
+				teamID:    score.TeamID,
+				problemID: score.ProblemID,
+			}] = score.Score.MarkingResultID
+		}
+	}
+
+	return &cachedScoreWriter{
+		fallback:      fallback,
+		answerScores:  answerScores,
+		problemScores: problemScores,
+	}, nil
+}
+
+func (w *cachedScoreWriter) UpdateAnswerScore(ctx context.Context, input *domain.UpdateAnswerScoreInput) error {
+	current := w.answerScores[input.Visibility]
+	if current != nil && current[input.AnswerID] == input.MarkingResultID {
+		return nil
+	}
+	if err := w.fallback.UpdateAnswerScore(ctx, input); err != nil {
+		return err
+	}
+	if current == nil {
+		current = make(map[uuid.UUID]uuid.UUID)
+		w.answerScores[input.Visibility] = current
+	}
+	current[input.AnswerID] = input.MarkingResultID
+	return nil
+}
+
+func (w *cachedScoreWriter) UpdateProblemScore(ctx context.Context, input *domain.UpdateProblemScoreInput) error {
+	key := teamProblemKey{
+		teamID:    input.TeamID,
+		problemID: input.ProblemID,
+	}
+	current := w.problemScores[input.Visibility]
+	if current != nil && current[key] == input.MarkingResultID {
+		return nil
+	}
+	if err := w.fallback.UpdateProblemScore(ctx, input); err != nil {
+		return err
+	}
+	if current == nil {
+		current = make(map[teamProblemKey]uuid.UUID)
+		w.problemScores[input.Visibility] = current
+	}
+	current[key] = input.MarkingResultID
+	return nil
 }
 
 type cachedAnswerReader struct {
