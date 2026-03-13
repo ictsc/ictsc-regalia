@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { action } from "storybook/actions";
 import { ActivityPage } from "./activity.page";
 
 export default {
@@ -7,6 +8,8 @@ export default {
 } satisfies Meta<typeof ActivityPage>;
 
 type Story = StoryObj<typeof ActivityPage>;
+
+const onDownload = action("download");
 
 export const Default: Story = {
   args: {
@@ -19,6 +22,7 @@ export const Default: Story = {
         submittedAt: "2026-01-02T16:50:00+09:00",
         score: { maxScore: 250 },
         scored: false,
+        onDownload,
       },
       {
         problemCode: "JKL",
@@ -27,6 +31,7 @@ export const Default: Story = {
         submittedAt: "2026-01-02T16:30:00+09:00",
         score: { maxScore: 300 },
         scored: false,
+        onDownload,
       },
       {
         problemCode: "JKL",
@@ -42,6 +47,7 @@ export const Default: Story = {
           rawFullScore: true,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "ABC",
@@ -57,6 +63,7 @@ export const Default: Story = {
           rawFullScore: true,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "MNO",
@@ -72,6 +79,7 @@ export const Default: Story = {
           rawFullScore: false,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "PQR",
@@ -87,6 +95,7 @@ export const Default: Story = {
           rawFullScore: true,
         },
         scored: true,
+        onDownload,
       },
       // Day2 午前
       {
@@ -103,6 +112,7 @@ export const Default: Story = {
           rawFullScore: false,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "PQR",
@@ -118,6 +128,7 @@ export const Default: Story = {
           rawFullScore: false,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "MNO",
@@ -133,6 +144,7 @@ export const Default: Story = {
           rawFullScore: false,
         },
         scored: true,
+        onDownload,
       },
       // Day1 午後
       {
@@ -149,6 +161,7 @@ export const Default: Story = {
           rawFullScore: true,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "DEF",
@@ -164,6 +177,7 @@ export const Default: Story = {
           rawFullScore: true,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "JKL",
@@ -179,6 +193,7 @@ export const Default: Story = {
           rawFullScore: false,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "ABC",
@@ -194,6 +209,7 @@ export const Default: Story = {
           rawFullScore: false,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "JKL",
@@ -209,6 +225,7 @@ export const Default: Story = {
           rawFullScore: false,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "DEF",
@@ -224,6 +241,7 @@ export const Default: Story = {
           rawFullScore: true,
         },
         scored: true,
+        onDownload,
       },
       // Day1 午前
       {
@@ -240,6 +258,7 @@ export const Default: Story = {
           rawFullScore: false,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "GHI",
@@ -255,6 +274,7 @@ export const Default: Story = {
           rawFullScore: true,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "ABC",
@@ -270,6 +290,7 @@ export const Default: Story = {
           rawFullScore: false,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "DEF",
@@ -285,6 +306,7 @@ export const Default: Story = {
           rawFullScore: false,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "GHI",
@@ -300,6 +322,7 @@ export const Default: Story = {
           rawFullScore: false,
         },
         scored: true,
+        onDownload,
       },
       {
         problemCode: "ABC",
@@ -315,6 +338,7 @@ export const Default: Story = {
           rawFullScore: false,
         },
         scored: true,
+        onDownload,
       },
     ],
   },

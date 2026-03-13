@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import { clsx } from "clsx";
+import { Link } from "@tanstack/react-router";
 import { Title } from "../components/title";
 import { Score } from "../components/score";
 
@@ -10,6 +11,7 @@ type ActivityEntry = {
   submittedAt: string;
   score: ComponentProps<typeof Score>;
   scored: boolean;
+  onDownload: () => void;
 };
 
 type ActivityPageProps = {
@@ -92,10 +94,19 @@ export function ActivityPage(props: ActivityPageProps) {
                   )}
                 >
                   <div className="flex min-w-0 flex-1 flex-col gap-4">
-                    <p className="text-14 truncate font-bold">
+                    <Link
+                      to="/problems/$code"
+                      params={{ code: entry.problemCode }}
+                      className="text-14 truncate font-bold hover:underline"
+                    >
                       {entry.problemCode}: {entry.problemTitle}
-                    </p>
-                    <p className="text-12">提出 #{entry.answerId}</p>
+                    </Link>
+                    <div className="flex items-center gap-8">
+                      <p className="text-12">提出 #{entry.answerId}</p>
+                      <a href="#" className="text-8" onClick={entry.onDownload}>
+                        ダウンロード
+                      </a>
+                    </div>
                   </div>
                   {entry.scored ? (
                     <Score {...entry.score} />
