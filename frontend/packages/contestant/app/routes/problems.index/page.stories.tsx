@@ -135,6 +135,7 @@ export const Default: Story = {
 
 export const GroupedBySchedule: Story = {
   args: {
+    notices: [],
     problems: [
       // day1-am（過去 → 提出不可）
       makeProblem("NET01", "ネットワーク基礎問題", {
@@ -199,6 +200,7 @@ export const GroupedBySchedule: Story = {
 
 export const SingleSchedule: Story = {
   args: {
+    notices: [],
     problems: [
       makeProblem("NET01", "ネットワーク基礎問題", {
         submissionStatus: submittable,
@@ -219,6 +221,7 @@ export const SingleSchedule: Story = {
 
 export const NoSchedules: Story = {
   args: {
+    notices: [],
     problems: [
       makeProblem("OLD01", "終了済み：OSPF経路制御", {
         submissionStatus: notSubmittable,
