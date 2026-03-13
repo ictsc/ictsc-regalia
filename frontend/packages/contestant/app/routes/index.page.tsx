@@ -8,6 +8,7 @@ import {
 import type { ScheduleEntry } from "@ictsc/proto/contestant/v1";
 import { timestampDate } from "@bufbuild/protobuf/wkt";
 import { clsx } from "clsx";
+import { getTemporalStatus, startAtMs } from "../features/schedule";
 import { Logo } from "../components/logo";
 import { MaterialSymbol } from "../components/material-symbol";
 import { Title } from "../components/title";
@@ -150,16 +151,6 @@ const temporalColorClass = {
   future: "*:!text-icon",
 } as const;
 
-function getTemporalStatus(
-  entry: ScheduleEntry,
-  now: Date,
-): "past" | "current" | "future" {
-  if (entry.endAt != null && now >= timestampDate(entry.endAt)) return "past";
-  if (entry.startAt != null && now >= timestampDate(entry.startAt))
-    return "current";
-  return "future";
-}
-
 function formatTime(entry: ScheduleEntry): string {
   const fmt = (ts: ScheduleEntry["startAt"]) =>
     ts != null ? format(timestampDate(ts), "MM/dd HH:mm") : "";
@@ -170,13 +161,11 @@ function ScheduleTimeline(props: { readonly entries: ScheduleEntry[] }) {
   if (props.entries.length === 0) return null;
 
   const now = new Date();
-  const startMs = (e: ScheduleEntry) =>
-    e.startAt != null ? timestampDate(e.startAt).getTime() : 0;
 
   return (
     <div className="border-primary mt-8 flex w-full flex-col gap-4 border-t pt-8">
       {[...props.entries]
-        .sort((a, b) => startMs(a) - startMs(b))
+        .sort((a, b) => startAtMs(a) - startAtMs(b))
         .map((entry) => {
           const status = getTemporalStatus(entry, now);
           return (
