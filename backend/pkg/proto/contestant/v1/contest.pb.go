@@ -92,7 +92,9 @@ type Schedule struct {
 	// 現在アクティブなスケジュール（なければ空）
 	Current *ScheduleEntry `protobuf:"bytes,3,opt,name=current,proto3,oneof" json:"current,omitempty"`
 	// 次のスケジュール（なければ空）
-	Next          *ScheduleEntry `protobuf:"bytes,4,opt,name=next,proto3,oneof" json:"next,omitempty"`
+	Next *ScheduleEntry `protobuf:"bytes,4,opt,name=next,proto3,oneof" json:"next,omitempty"`
+	// 全スケジュール一覧。start_at の昇順で返される。
+	Entries       []*ScheduleEntry `protobuf:"bytes,5,rep,name=entries,proto3" json:"entries,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -144,6 +146,13 @@ func (x *Schedule) GetCurrent() *ScheduleEntry {
 func (x *Schedule) GetNext() *ScheduleEntry {
 	if x != nil {
 		return x.Next
+	}
+	return nil
+}
+
+func (x *Schedule) GetEntries() []*ScheduleEntry {
+	if x != nil {
+		return x.Entries
 	}
 	return nil
 }
@@ -360,12 +369,13 @@ const file_contestant_v1_contest_proto_rawDesc = "" +
 	"\rScheduleEntry\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x125\n" +
 	"\bstart_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\astartAt\x121\n" +
-	"\x06end_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\x05endAt\"\xb4\x01\n" +
+	"\x06end_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\x05endAt\"\xec\x01\n" +
 	"\bSchedule\x12\x1f\n" +
 	"\vhas_started\x18\x02 \x01(\bR\n" +
 	"hasStarted\x12;\n" +
 	"\acurrent\x18\x03 \x01(\v2\x1c.contestant.v1.ScheduleEntryH\x00R\acurrent\x88\x01\x01\x125\n" +
-	"\x04next\x18\x04 \x01(\v2\x1c.contestant.v1.ScheduleEntryH\x01R\x04next\x88\x01\x01B\n" +
+	"\x04next\x18\x04 \x01(\v2\x1c.contestant.v1.ScheduleEntryH\x01R\x04next\x88\x01\x01\x126\n" +
+	"\aentries\x18\x05 \x03(\v2\x1c.contestant.v1.ScheduleEntryR\aentriesB\n" +
 	"\n" +
 	"\b_currentB\a\n" +
 	"\x05_next\"\"\n" +
@@ -409,17 +419,18 @@ var file_contestant_v1_contest_proto_depIdxs = []int32{
 	7, // 1: contestant.v1.ScheduleEntry.end_at:type_name -> google.protobuf.Timestamp
 	0, // 2: contestant.v1.Schedule.current:type_name -> contestant.v1.ScheduleEntry
 	0, // 3: contestant.v1.Schedule.next:type_name -> contestant.v1.ScheduleEntry
-	1, // 4: contestant.v1.GetScheduleResponse.schedule:type_name -> contestant.v1.Schedule
-	2, // 5: contestant.v1.GetRuleResponse.rule:type_name -> contestant.v1.Rule
-	3, // 6: contestant.v1.ContestService.GetSchedule:input_type -> contestant.v1.GetScheduleRequest
-	5, // 7: contestant.v1.ContestService.GetRule:input_type -> contestant.v1.GetRuleRequest
-	4, // 8: contestant.v1.ContestService.GetSchedule:output_type -> contestant.v1.GetScheduleResponse
-	6, // 9: contestant.v1.ContestService.GetRule:output_type -> contestant.v1.GetRuleResponse
-	8, // [8:10] is the sub-list for method output_type
-	6, // [6:8] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	0, // 4: contestant.v1.Schedule.entries:type_name -> contestant.v1.ScheduleEntry
+	1, // 5: contestant.v1.GetScheduleResponse.schedule:type_name -> contestant.v1.Schedule
+	2, // 6: contestant.v1.GetRuleResponse.rule:type_name -> contestant.v1.Rule
+	3, // 7: contestant.v1.ContestService.GetSchedule:input_type -> contestant.v1.GetScheduleRequest
+	5, // 8: contestant.v1.ContestService.GetRule:input_type -> contestant.v1.GetRuleRequest
+	4, // 9: contestant.v1.ContestService.GetSchedule:output_type -> contestant.v1.GetScheduleResponse
+	6, // 10: contestant.v1.ContestService.GetRule:output_type -> contestant.v1.GetRuleResponse
+	9, // [9:11] is the sub-list for method output_type
+	7, // [7:9] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_contestant_v1_contest_proto_init() }

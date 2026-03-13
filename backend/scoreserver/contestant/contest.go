@@ -105,6 +105,17 @@ func (h *ContestServiceHandler) GetSchedule(
 		}
 	}
 
+	// 全スケジュールエントリ
+	entries := make([]*contestantv1.ScheduleEntry, 0, len(schedules))
+	for _, entry := range schedules {
+		entries = append(entries, &contestantv1.ScheduleEntry{
+			Name:    entry.Name(),
+			StartAt: timestamppb.New(entry.StartAt()),
+			EndAt:   timestamppb.New(entry.EndAt()),
+		})
+	}
+	schedule.Entries = entries
+
 	return connect.NewResponse(&contestantv1.GetScheduleResponse{
 		Schedule: schedule,
 	}), nil

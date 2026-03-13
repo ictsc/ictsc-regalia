@@ -9,4 +9,9 @@ export {
   nextStartAt,
 } from "./feature";
 export { ScheduleProvider } from "./provider";
+export {
+  getTemporalStatus,
+  startAtMs,
+  type ScheduleTemporalStatus,
+} from "./temporal";
 export { useSchedule } from "./use-schedule";
