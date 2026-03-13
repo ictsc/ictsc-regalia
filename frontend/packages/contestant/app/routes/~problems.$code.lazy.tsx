@@ -10,9 +10,11 @@ import { createLazyFileRoute, useRouter } from "@tanstack/react-router";
 import { DeploymentStatus } from "@ictsc/proto/contestant/v1";
 import { timestampDate } from "@bufbuild/protobuf/wkt";
 import type { ProblemDetail } from "../features/problem";
+import type { Notice } from "../features/announce";
 import type { Answer } from "../features/answer";
 import { protoScoreToProps } from "../features/score";
 import type { Deployment } from "../features/deployment";
+import { UnreadAnnouncesBanner } from "./problems.index/unread-announces-banner";
 import * as View from "./problems.$code/page";
 
 export const Route = createLazyFileRoute("/problems/$code")({
@@ -23,6 +25,7 @@ function RouteComponent() {
   const router = useRouter();
   const {
     problem,
+    notices,
     answers,
     metadata,
     submitAnswer,
@@ -42,7 +45,7 @@ function RouteComponent() {
         startTransition(() => router.load());
       }}
       redeployable={redeployable}
-      content={<Content problem={problem} />}
+      content={<Content problem={problem} notices={notices} />}
       submissionForm={
         <SubmissionForm
           submitAnswer={submitAnswer}
@@ -137,9 +140,15 @@ function SubmissionForm(props: {
   );
 }
 
-function Content(props: { problem: Promise<ProblemDetail> }) {
+function Content(props: { problem: Promise<ProblemDetail>; notices: Promise<Notice[]> }) {
   const problem = use(useDeferredValue(props.problem));
-  return <View.Content {...problem} />;
+  const notices = use(props.notices);
+  return (
+    <>
+      <UnreadAnnouncesBanner notices={notices} />
+      <View.Content {...problem} />
+    </>
+  );
 }
 
 function SubmissionList(props: {

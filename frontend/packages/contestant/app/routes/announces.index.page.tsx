@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router";
 import type { Notice } from "@ictsc/proto/contestant/v1";
 import { MaterialSymbol } from "../components/material-symbol";
 import { Title } from "../components/title";
+import { ReadToggleButton } from "./problems.index/unread-announces-banner";
 
 type AnnounceProps = {
   announces: Notice[];
@@ -17,24 +18,31 @@ export function AnnounceList(props: AnnounceProps) {
         {props.announces.length === 0 ? (
           <h1 className="font-bold">現在アナウンスはありません</h1>
         ) : (
-          props.announces.map((announce) => {
-            return (
-              <Button as={Fragment} key={announce.slug}>
+          props.announces.map((announce) => (
+            <div
+              key={announce.slug}
+              className="rounded-8 bg-surface-1 flex w-full items-center transition"
+            >
+              <Button as={Fragment}>
                 <Link
-                  className="rounded-8 bg-surface-1 text-16 data-[hover]:bg-surface-2 flex w-full items-center gap-8 py-4 pr-40 pl-20 font-bold transition data-[active]:opacity-50"
+                  className="text-16 hover:bg-surface-2 rounded-l-8 flex min-w-0 flex-1 items-center gap-8 py-4 pl-20 font-bold transition data-[active]:opacity-50"
                   to="/announces/$slug"
                   params={{ slug: announce.slug }}
                 >
                   <MaterialSymbol
                     icon="arrow_forward_ios"
                     size={20}
-                    className="text-icon"
+                    className="text-icon shrink-0"
                   />
-                  {announce.title}
+                  <span className="truncate">{announce.title}</span>
                 </Link>
               </Button>
-            );
-          })
+              <ReadToggleButton
+                slug={announce.slug}
+                className="text-14 hover:bg-surface-2 rounded-r-8 flex shrink-0 items-center gap-4 px-16 py-4 transition"
+              />
+            </div>
+          ))
         )}
       </div>
     </>

@@ -1,29 +1,37 @@
 import type { Problem } from "@ictsc/proto/contestant/v1";
+import type { Notice } from "../../features/announce";
 import { ProblemItem } from "./problem-item";
+import { UnreadAnnouncesBanner } from "./unread-announces-banner";
 import { protoScoreToProps } from "../../features/score";
 import { Title } from "../../components/title";
 
 type PageProps = {
   problems: Problem[];
+  notices: Notice[];
 };
 
 export function ProblemsPage(props: PageProps) {
   return (
     <>
       <Title>問題一覧</Title>
-      <div className="mx-16 my-64 flex justify-center">
-        <ul className="grid grid-flow-row grid-cols-1 gap-x-40 gap-y-24 lg:grid-cols-2">
-          {props.problems.map((problem) => (
-            <li key={problem.code}>
-              <ProblemItem
-                code={problem.code}
-                title={problem.title}
-                score={protoScoreToProps(problem.maxScore, problem.score)}
-                submissionStatus={problem.submissionStatus}
-              />
-            </li>
-          ))}
-        </ul>
+      <div className="mx-16 my-64 flex flex-col gap-24">
+        <div className="ml-16">
+          <UnreadAnnouncesBanner notices={props.notices} />
+        </div>
+        <div className="flex justify-center">
+          <ul className="grid grid-flow-row grid-cols-1 gap-x-40 gap-y-24 lg:grid-cols-2">
+            {props.problems.map((problem) => (
+              <li key={problem.code}>
+                <ProblemItem
+                  code={problem.code}
+                  title={problem.title}
+                  score={protoScoreToProps(problem.maxScore, problem.score)}
+                  submissionStatus={problem.submissionStatus}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </>
   );
