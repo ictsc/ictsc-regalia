@@ -76,6 +76,7 @@ export function ProblemsPage(props: PageProps) {
                       <ProblemItem
                         code={problem.code}
                         title={problem.title}
+                        category={problem.category}
                         score={protoScoreToProps(
                           problem.maxScore,
                           problem.score,

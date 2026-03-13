@@ -55,6 +55,7 @@ function makeProblem(
     score?: { score: number; markedScore: number; penalty: number };
     submissionStatus?: Problem["submissionStatus"];
     submissionableSchedules?: ScheduleEntry[];
+    category?: string;
   },
 ): Problem {
   return {
@@ -62,7 +63,7 @@ function makeProblem(
     code,
     title,
     maxScore: 200,
-    category: "Network",
+    category: opts?.category ?? "Network",
     score: opts?.score
       ? {
           $typeName: "contestant.v1.Score" as const,
@@ -142,57 +143,69 @@ export const GroupedBySchedule: Story = {
         submissionStatus: notSubmittable,
         submissionableSchedules: [day1Am],
         score: { score: 200, markedScore: 200, penalty: 0 },
+        category: "Network",
       }),
       makeProblem("NET02", "VLAN設定問題", {
         submissionStatus: notSubmittable,
         submissionableSchedules: [day1Am],
         score: { score: 100, markedScore: 120, penalty: -20 },
+        category: "Network",
       }),
       makeProblem("SRV01", "Webサーバー構築", {
         submissionStatus: notSubmittable,
         submissionableSchedules: [day1Am],
+        category: "Server",
       }),
       // day1-pm（現在 → 提出可能）
       makeProblem("SRV02", "データベース復旧", {
         submissionStatus: submittable,
         submissionableSchedules: [day1Pm],
+        category: "Server",
       }),
       makeProblem("SRV03", "コンテナ運用管理", {
         submissionStatus: submittable,
         submissionableSchedules: [day1Pm],
         score: { score: 80, markedScore: 100, penalty: -20 },
+        category: "Server",
       }),
       makeProblem("DNS01", "DNS権威サーバー設定", {
         submissionStatus: submittable,
         submissionableSchedules: [day1Pm],
+        category: "Network",
       }),
       makeProblem("DNS02", "DNSキャッシュ問題", {
         submissionStatus: submittable,
         submissionableSchedules: [day1Pm],
+        category: "Network",
       }),
       // day2-am（未来 → 提出不可）
       makeProblem("SEC01", "セキュリティ診断", {
         submissionStatus: notSubmittable,
         submissionableSchedules: [day2Am],
+        category: "Network",
       }),
       makeProblem("SEC02", "ファイアウォール設定", {
         submissionStatus: notSubmittable,
         submissionableSchedules: [day2Am],
+        category: "Server",
       }),
       // day2-pm（未来 → 提出不可）
       makeProblem("APP01", "ロードバランサ冗長化", {
         submissionStatus: notSubmittable,
         submissionableSchedules: [day2Pm],
+        category: "Server",
       }),
       // day1-pm + day2-am（複数スケジュール）
       makeProblem("MON01", "監視システム構築", {
         submissionStatus: submittable,
         submissionableSchedules: [day1Pm, day2Am],
+        category: "Network",
       }),
       // 全スケジュール
       makeProblem("ALL01", "総合演習", {
         submissionStatus: submittable,
         submissionableSchedules: [day1Am, day1Pm, day2Am, day2Pm],
+        category: "Server",
       }),
     ],
   },

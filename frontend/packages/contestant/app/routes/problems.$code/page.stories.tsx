@@ -30,6 +30,7 @@ export default {
       <Content
         code="AAA"
         title="Title"
+        category="Network"
         body={`
 ## 概要
 

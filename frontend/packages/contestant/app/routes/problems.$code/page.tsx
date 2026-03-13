@@ -112,13 +112,25 @@ function Layout(props: { content: React.ReactNode; sidebar: React.ReactNode }) {
   );
 }
 
-export function Content(props: { code: string; title: string; body: string }) {
+export function Content(props: {
+  code: string;
+  title: string;
+  category?: string;
+  body: string;
+}) {
   return (
     <>
       <Title>{`${props.code}:${props.title}`}</Title>
       <Typography className="flex-1">
-        <h1>
-          {props.code}: {props.title}
+        <h1 className="flex items-center gap-8">
+          <span>
+            {props.code}: {props.title}
+          </span>
+          {props.category && (
+            <span className="text-14 bg-surface-1 shrink-0 rounded-full px-12 py-4 font-bold">
+              {props.category}
+            </span>
+          )}
         </h1>
         <Markdown>{props.body}</Markdown>
       </Typography>
