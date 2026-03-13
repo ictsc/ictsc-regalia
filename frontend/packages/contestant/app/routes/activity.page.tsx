@@ -66,7 +66,7 @@ export function ActivityPage(props: ActivityPageProps) {
                 {/* 時刻 */}
                 <div
                   className={clsx(
-                    "text-12 ml-12 shrink-0 whitespace-nowrap",
+                    "text-12 ml-12 w-[150px] shrink-0 whitespace-nowrap",
                     !entry.scored && "text-text/40",
                   )}
                 >
