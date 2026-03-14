@@ -1,5 +1,6 @@
 import type { Problem, ScheduleEntry } from "@ictsc/proto/contestant/v1";
 import {
+  endAtMs,
   getTemporalStatus,
   startAtMs,
   type ScheduleTemporalStatus,
@@ -61,12 +62,14 @@ export function groupProblems(
       })),
       problems: problems.slice().sort((a, b) => a.code.localeCompare(b.code)),
       hasSubmittableProblem,
-      _sortKey: entries.length > 0 ? startAtMs(entries[0]) : Infinity,
+      _startKey: entries.length > 0 ? startAtMs(entries[0]) : Infinity,
+      _endKey:
+        entries.length > 0 ? endAtMs(entries[entries.length - 1]) : Infinity,
     }))
     .sort((a, b) => {
       if (a.hasSubmittableProblem !== b.hasSubmittableProblem) {
         return a.hasSubmittableProblem ? -1 : 1;
       }
-      return a._sortKey - b._sortKey;
+      return a._startKey - b._startKey || a._endKey - b._endKey;
     });
 }
