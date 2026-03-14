@@ -2,7 +2,7 @@ module github.com/ictsc/ictsc-regalia/backend/tools
 
 go 1.25.6
 
-toolchain go1.26.0
+toolchain go1.26.1
 
 tool (
 	connectrpc.com/connect/cmd/protoc-gen-connect-go
