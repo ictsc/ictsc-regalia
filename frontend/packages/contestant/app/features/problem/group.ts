@@ -30,6 +30,8 @@ export function groupProblems(
     }
   >();
 
+  problems.sort((a, b) => a.code.localeCompare(b.code));
+
   for (const problem of problems) {
     const schedules = problem.submissionableSchedules;
     const key = schedules
@@ -59,7 +61,7 @@ export function groupProblems(
         name: e.name,
         temporalStatus: getTemporalStatus(e, now),
       })),
-      problems: problems.slice().sort((a, b) => a.code.localeCompare(b.code)),
+      problems,
       hasSubmittableProblem,
       _sortKey: entries.length > 0 ? startAtMs(entries[0]) : Infinity,
     }))
