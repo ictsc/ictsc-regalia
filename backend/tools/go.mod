@@ -68,7 +68,7 @@ require (
 	github.com/breml/bidichk v0.3.3 // indirect
 	github.com/breml/errchkjson v0.4.1 // indirect
 	github.com/bufbuild/buf v1.66.0 // indirect
-	github.com/bufbuild/protocompile v0.14.2-0.20260225215724-b8c2e2d4ce33 // indirect
+	github.com/bufbuild/protocompile v0.14.2-0.20260313233150-4b57e9e2a3ff // indirect
 	github.com/bufbuild/protoplugin v0.0.0-20250218205857-750e09ce93e1 // indirect
 	github.com/butuzov/ireturn v0.4.0 // indirect
 	github.com/butuzov/mirror v1.3.0 // indirect
