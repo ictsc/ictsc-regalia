@@ -18,7 +18,7 @@ import {
   type Problem,
   type Team,
 } from "@ictsc/proto/admin/v1";
-import { Center, Table, Text, Button, MultiSelect } from "@mantine/core";
+import { Center, Table, Text, Button, MultiSelect, Combobox, InputBase, useCombobox } from "@mantine/core";
 
 export const Route = createFileRoute("/submissions/")({
   component: RouteComponent,
@@ -50,24 +50,14 @@ function RouteComponent() {
   const deferredProblemsPromise = useDeferredValue(problemPromise);
   const router = useRouter();
 
-  const [selectedProblemCodes, setSelectedProblemCodes] = usePersistentState<
-    string[]
-  >("selectedProblemCodes", []);
-  const [selectedTeamNames, setSelectedTeamNames] = usePersistentState<
-    string[]
-  >("selectedTeamNames", []);
-  const [filterRecent, setFilterRecent] = usePersistentState<boolean>(
-    "filterRecent",
-    false,
-  );
-  const [showPerfect, setShowPerfect] = usePersistentState<boolean>(
-    "showPerfect",
-    true,
-  );
-  const [showUnscored, setShowUnscored] = usePersistentState<boolean>(
-    "showUnscored",
-    false,
-  );
+  const [selectedProblemCodes, setSelectedProblemCodes] = usePersistentState<string[]>("selectedProblemCodes", []);
+  const [selectedTeamNames, setSelectedTeamNames] = usePersistentState<string[]>("selectedTeamNames", []);
+  const [filterRecent, setFilterRecent] = usePersistentState<boolean>("filterRecent", false);
+  const [showPerfect, setShowPerfect] = usePersistentState<boolean>("showPerfect", true);
+  const [showUnscored, setShowUnscored] = usePersistentState<boolean>("showUnscored", false);
+
+  // 追加: sortOrder の状態
+  const [sortOrder, setSortOrder] = useState<"default" | "alphabetical_asc"| "alphabetical_desc" | "created_at_asc" | "created_at_desc">("default");
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -104,6 +94,38 @@ function RouteComponent() {
     showUnscored,
   );
 
+const sortedFilteredItems = useMemo(() => {
+  const copy = [...filteredItems];
+  switch (sortOrder) {
+    case "alphabetical_asc":
+      copy.sort((a, b) => {
+        const teamCompare = a.teamName.localeCompare(b.teamName);
+        if (teamCompare !== 0) return teamCompare;
+        return a.problemTitle.localeCompare(b.problemTitle);
+      });
+      break;
+    case "alphabetical_desc":
+      copy.sort((a, b) => {
+        const teamCompare = b.teamName.localeCompare(a.teamName);
+        if (teamCompare !== 0) return teamCompare;
+        return b.problemTitle.localeCompare(a.problemTitle);
+      });
+      break;
+    case "created_at_asc":
+      copy.sort((a, b) => a.submitTimeMs - b.submitTimeMs);
+      break;
+    case "created_at_desc":
+      copy.sort((a, b) => b.submitTimeMs - a.submitTimeMs);
+      break;
+    case "default":
+    default:
+      // 既存の並び順（useAnswers の処理順）を利用
+      break;
+  }
+  return copy;
+}, [filteredItems, sortOrder]);
+
+
   return (
     <>
       <FilterBar
@@ -119,13 +141,16 @@ function RouteComponent() {
         onToggleShowUnscored={() => setShowUnscored((prev) => !prev)}
         problemOptions={problemOptions}
         teamOptions={teamOptions}
+        sortOrder={sortOrder}
+        onSortOrderChange={setSortOrder}
       />
       <Center>
-        <AnswerTable answers={filteredItems} />
+        <AnswerTable answers={sortedFilteredItems} />
       </Center>
     </>
   );
 }
+
 
 type AnswerItem = {
   readonly key: string;
@@ -290,12 +315,12 @@ function filterAnswers(
   let filtered = items;
   if (selectedProblemCodes.length > 0) {
     filtered = filtered.filter((item) =>
-      selectedProblemCodes.includes(item.problemCode),
+      selectedProblemCodes.includes(item.problemCode)
     );
   }
   if (selectedTeamNames.length > 0) {
     filtered = filtered.filter((item) =>
-      selectedTeamNames.includes(item.teamName),
+      selectedTeamNames.includes(item.teamName)
     );
   }
   if (filterRecent) {
@@ -304,7 +329,7 @@ function filterAnswers(
   }
   if (!showPerfect) {
     filtered = filtered.filter(
-      (item) => !(item.score && item.score.total === item.score.max),
+      (item) => !(item.score && item.score.total === item.score.max)
     );
   }
   if (showUnscored) {
@@ -312,6 +337,8 @@ function filterAnswers(
   }
   return filtered;
 }
+
+
 
 function FilterBar(props: {
   selectedProblemCodes: string[];
@@ -326,6 +353,8 @@ function FilterBar(props: {
   onToggleShowUnscored: () => void;
   problemOptions: { label: string; value: string }[];
   teamOptions: { label: string; value: string }[];
+  sortOrder: "default" | "alphabetical_asc"| "alphabetical_desc" | "created_at_asc" | "created_at_desc";
+  onSortOrderChange: (value: "default" | "alphabetical_asc"| "alphabetical_desc" | "created_at_asc" | "created_at_desc") => void;
 }) {
   return (
     <div
@@ -362,7 +391,73 @@ function FilterBar(props: {
         <Button onClick={props.onToggleShowUnscored}>
           {props.showUnscored ? "全採点解答表示" : "未採点のみ表示"}
         </Button>
+        <SortOrderSelect value={props.sortOrder} onChange={props.onSortOrderChange
+        } />
       </div>
     </div>
   );
 }
+
+type SortOrder =
+  | "default"
+  | "alphabetical_asc"
+  | "alphabetical_desc"
+  | "created_at_asc"
+  | "created_at_desc";
+
+const sortOptions = [
+  { value: "default", label: "デフォルト" },
+  { value: "alphabetical_asc", label: "アルファベット昇順" },
+  { value: "alphabetical_desc", label: "アルファベット降順" },
+  { value: "created_at_asc", label: "作成日時昇順" },
+  { value: "created_at_desc", label: "作成日時降順" },
+];
+
+
+function SortOrderSelect(props: { value: SortOrder; onChange: (value: SortOrder) => void }) {
+  const combobox = useCombobox({
+    onDropdownClose: () => combobox.resetSelectedOption(),
+  });
+
+  const options = sortOptions.map((option) => (
+    <Combobox.Option value={option.value} key={option.value}>
+      {option.label}
+    </Combobox.Option>
+  ));
+
+  return (
+    <Combobox
+      store={combobox}
+      onOptionSubmit={(val) => {
+        props.onChange(val as SortOrder);
+        combobox.closeDropdown();
+      }}
+    >
+      <Combobox.Target>
+        <InputBase
+          component="button"
+          type="button"
+          pointer
+          rightSection={<Combobox.Chevron />}
+          rightSectionPointerEvents="none"
+          style={{
+            width: '160px', // 固定の幅を指定
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+          onClick={() => combobox.toggleDropdown()}
+        >
+          {
+            sortOptions.find((option) => option.value === props.value)
+              ?.label || "並び替え"
+          }
+        </InputBase>
+      </Combobox.Target>
+      <Combobox.Dropdown>
+        <Combobox.Options>{options}</Combobox.Options>
+      </Combobox.Dropdown>
+    </Combobox>
+  );
+}
+
