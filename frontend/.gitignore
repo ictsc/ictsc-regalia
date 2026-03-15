@@ -45,3 +45,6 @@ next-env.d.ts
 
 # turborepo
 .turbo
+
+# npm lock file (project uses pnpm)
+package-lock.json

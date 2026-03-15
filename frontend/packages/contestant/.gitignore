@@ -1,3 +1,7 @@
 dist
 
 *storybook.log
+
+# compiled JS output from TypeScript
+app/**/*.js
+vite.config.js
