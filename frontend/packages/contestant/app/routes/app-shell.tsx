@@ -43,7 +43,7 @@ export function AppShell({
           <Navbar
             canViewProblems={inContest}
             canViewAnnounces={inContest}
-            canViewActivity={inContest}
+            canViewActivity={true}
             collapsed={collapsed}
             onOpenToggleClick={toggle}
           />
