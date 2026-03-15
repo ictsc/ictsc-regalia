@@ -16,5 +16,41 @@
       "marked_score": 80,
       "penalty": 0
     }
+  },
+  {
+    "team_id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+    "problem_id": "46a8cf12-7fef-6154-a37d-f3d31d396c14",
+    "score": {
+      "marking_result_id": "b0000005-0000-4000-8000-000000000002",
+      "marked_score": 350,
+      "penalty": 0
+    }
+  },
+  {
+    "team_id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+    "problem_id": "57b9d023-8100-4265-b48e-e4e42e507d25",
+    "score": {
+      "marking_result_id": "b0000001-0000-4000-8000-000000000003",
+      "marked_score": 200,
+      "penalty": 0
+    }
+  },
+  {
+    "team_id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+    "problem_id": "68cae134-9211-4376-a59f-f5f53f618e36",
+    "score": {
+      "marking_result_id": "b0000002-0000-4000-8000-000000000002",
+      "marked_score": 150,
+      "penalty": 0
+    }
+  },
+  {
+    "team_id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+    "problem_id": "79dbe245-a322-4487-b6a0-060640729f47",
+    "score": {
+      "marking_result_id": "b0000003-0000-4000-8000-000000000001",
+      "marked_score": 150,
+      "penalty": 30
+    }
   }
 ]

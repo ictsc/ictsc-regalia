@@ -25,6 +25,7 @@ function AppShell() {
         <Navbar
           canViewProblems
           canViewAnnounces
+          canViewActivity
           collapsed={collapsed}
           onOpenToggleClick={toggle}
         />

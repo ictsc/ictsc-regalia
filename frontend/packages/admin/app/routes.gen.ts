@@ -32,7 +32,7 @@ const SubmissionsProblemTeamIdRouteRoute =
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
-  "/submissions": typeof SubmissionsIndexRouteRoute;
+  "/submissions/": typeof SubmissionsIndexRouteRoute;
   "/submissions/$problem/$team/$id": typeof SubmissionsProblemTeamIdRouteRoute;
 }
 export interface FileRoutesByTo {
@@ -48,7 +48,7 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/submissions" | "/submissions/$problem/$team/$id";
+  fullPaths: "/" | "/submissions/" | "/submissions/$problem/$team/$id";
   fileRoutesByTo: FileRoutesByTo;
   to: "/" | "/submissions" | "/submissions/$problem/$team/$id";
   id: "__root__" | "/" | "/submissions/" | "/submissions/$problem/$team/$id";
@@ -72,7 +72,7 @@ declare module "@tanstack/react-router" {
     "/submissions/": {
       id: "/submissions/";
       path: "/submissions";
-      fullPath: "/submissions";
+      fullPath: "/submissions/";
       preLoaderRoute: typeof SubmissionsIndexRouteRouteImport;
       parentRoute: typeof rootRouteImport;
     };

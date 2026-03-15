@@ -82,6 +82,45 @@
     "created_at": "2025-02-03T10:20:00+09:00"
   },
   {
+    "id": "b0000001-0000-4000-8000-000000000001",
+    "judge": "judge",
+    "answer": {
+      "id": "a0000001-0000-4000-8000-000000000001",
+      "number": 1,
+      "team": {
+        "id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+        "code": 1,
+        "name": "トラブルシューターズ",
+        "organization": "ICTSC Association",
+        "max_members": 6
+      },
+      "problem": {
+        "id": "57b9d023-8100-4265-b48e-e4e42e507d25",
+        "code": "0005",
+        "problem_type": "Descriptive",
+        "title": "OSPF経路制御",
+        "max_score": 200,
+        "category": "Network",
+        "redeploy_rule": "Unredeployable"
+      },
+      "author": {
+        "id": "3a4ca027-5e02-4ade-8e2d-eddb39adc235",
+        "name": "alice"
+      },
+      "created_at": "2025-02-03T10:00:00+09:00",
+      "interval": 1200000000000
+    },
+    "score": {
+      "marking_result_id": "b0000001-0000-4000-8000-000000000001",
+      "marked_score": 0,
+      "penalty": 0
+    },
+    "rationale": {
+      "descriptive_comment": "area設定のみでは不十分"
+    },
+    "created_at": "2025-02-03T10:30:00+09:00"
+  },
+  {
     "id": "358ebef7-c626-44fa-9a3d-da2d9083fe5e",
     "judge": "judge",
     "answer": {
@@ -119,5 +158,282 @@
       "descriptive_comment": "comment2"
     },
     "created_at": "2025-02-03T10:30:00+09:00"
+  },
+  {
+    "id": "b0000002-0000-4000-8000-000000000001",
+    "judge": "judge",
+    "answer": {
+      "id": "a0000002-0000-4000-8000-000000000001",
+      "number": 1,
+      "team": {
+        "id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+        "code": 1,
+        "name": "トラブルシューターズ",
+        "organization": "ICTSC Association",
+        "max_members": 6
+      },
+      "problem": {
+        "id": "68cae134-9211-4376-a59f-f5f53f618e36",
+        "code": "0006",
+        "problem_type": "Descriptive",
+        "title": "Webサーバー構築",
+        "max_score": 150,
+        "category": "Server",
+        "redeploy_rule": "Manual"
+      },
+      "author": {
+        "id": "3a4ca027-5e02-4ade-8e2d-eddb39adc235",
+        "name": "alice"
+      },
+      "created_at": "2025-02-03T10:30:00+09:00",
+      "interval": 1200000000000
+    },
+    "score": {
+      "marking_result_id": "b0000002-0000-4000-8000-000000000001",
+      "marked_score": 80,
+      "penalty": 0
+    },
+    "rationale": {
+      "descriptive_comment": "バーチャルホストはOK、SSLが未設定"
+    },
+    "created_at": "2025-02-03T11:00:00+09:00"
+  },
+  {
+    "id": "b0000001-0000-4000-8000-000000000002",
+    "judge": "judge",
+    "answer": {
+      "id": "a0000001-0000-4000-8000-000000000002",
+      "number": 2,
+      "team": {
+        "id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+        "code": 1,
+        "name": "トラブルシューターズ",
+        "organization": "ICTSC Association",
+        "max_members": 6
+      },
+      "problem": {
+        "id": "57b9d023-8100-4265-b48e-e4e42e507d25",
+        "code": "0005",
+        "problem_type": "Descriptive",
+        "title": "OSPF経路制御",
+        "max_score": 200,
+        "category": "Network",
+        "redeploy_rule": "Unredeployable"
+      },
+      "author": {
+        "id": "3a4ca027-5e02-4ade-8e2d-eddb39adc235",
+        "name": "alice"
+      },
+      "created_at": "2025-02-03T11:00:00+09:00",
+      "interval": 1200000000000
+    },
+    "score": {
+      "marking_result_id": "b0000001-0000-4000-8000-000000000002",
+      "marked_score": 100,
+      "penalty": 0
+    },
+    "rationale": {
+      "descriptive_comment": "redistribute の設定は正しいが cost 調整が不足"
+    },
+    "created_at": "2025-02-03T11:30:00+09:00"
+  },
+  {
+    "id": "b0000003-0000-4000-8000-000000000001",
+    "judge": "judge",
+    "answer": {
+      "id": "a0000003-0000-4000-8000-000000000001",
+      "number": 1,
+      "team": {
+        "id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+        "code": 1,
+        "name": "トラブルシューターズ",
+        "organization": "ICTSC Association",
+        "max_members": 6
+      },
+      "problem": {
+        "id": "79dbe245-a322-4487-b6a0-060640729f47",
+        "code": "0007",
+        "problem_type": "Descriptive",
+        "title": "ファイアウォール設定",
+        "max_score": 300,
+        "category": "Security",
+        "redeploy_rule": "PercentagePenalty",
+        "percentage_penalty": {
+          "threshold": 2,
+          "percentage": 15
+        }
+      },
+      "author": {
+        "id": "3a4ca027-5e02-4ade-8e2d-eddb39adc235",
+        "name": "alice"
+      },
+      "created_at": "2025-02-03T11:30:00+09:00",
+      "interval": 1200000000000
+    },
+    "score": {
+      "marking_result_id": "b0000003-0000-4000-8000-000000000001",
+      "marked_score": 150,
+      "penalty": 30
+    },
+    "rationale": {
+      "descriptive_comment": "フィルタリングは概ね正しいがICMP許可漏れ"
+    },
+    "created_at": "2025-02-03T12:00:00+09:00"
+  },
+  {
+    "id": "b0000001-0000-4000-8000-000000000003",
+    "judge": "judge",
+    "answer": {
+      "id": "a0000001-0000-4000-8000-000000000003",
+      "number": 3,
+      "team": {
+        "id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+        "code": 1,
+        "name": "トラブルシューターズ",
+        "organization": "ICTSC Association",
+        "max_members": 6
+      },
+      "problem": {
+        "id": "57b9d023-8100-4265-b48e-e4e42e507d25",
+        "code": "0005",
+        "problem_type": "Descriptive",
+        "title": "OSPF経路制御",
+        "max_score": 200,
+        "category": "Network",
+        "redeploy_rule": "Unredeployable"
+      },
+      "author": {
+        "id": "3a4ca027-5e02-4ade-8e2d-eddb39adc235",
+        "name": "alice"
+      },
+      "created_at": "2025-02-03T12:00:00+09:00",
+      "interval": 1200000000000
+    },
+    "score": {
+      "marking_result_id": "b0000001-0000-4000-8000-000000000003",
+      "marked_score": 200,
+      "penalty": 0
+    },
+    "rationale": {
+      "descriptive_comment": "完璧な設定"
+    },
+    "created_at": "2025-02-03T12:30:00+09:00"
+  },
+  {
+    "id": "b0000002-0000-4000-8000-000000000002",
+    "judge": "judge",
+    "answer": {
+      "id": "a0000002-0000-4000-8000-000000000002",
+      "number": 2,
+      "team": {
+        "id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+        "code": 1,
+        "name": "トラブルシューターズ",
+        "organization": "ICTSC Association",
+        "max_members": 6
+      },
+      "problem": {
+        "id": "68cae134-9211-4376-a59f-f5f53f618e36",
+        "code": "0006",
+        "problem_type": "Descriptive",
+        "title": "Webサーバー構築",
+        "max_score": 150,
+        "category": "Server",
+        "redeploy_rule": "Manual"
+      },
+      "author": {
+        "id": "3a4ca027-5e02-4ade-8e2d-eddb39adc235",
+        "name": "alice"
+      },
+      "created_at": "2025-02-03T12:30:00+09:00",
+      "interval": 1200000000000
+    },
+    "score": {
+      "marking_result_id": "b0000002-0000-4000-8000-000000000002",
+      "marked_score": 150,
+      "penalty": 0
+    },
+    "rationale": {
+      "descriptive_comment": "完璧な設定"
+    },
+    "created_at": "2025-02-03T13:00:00+09:00"
+  },
+  {
+    "id": "b0000005-0000-4000-8000-000000000001",
+    "judge": "judge",
+    "answer": {
+      "id": "a0000005-0000-4000-8000-000000000001",
+      "number": 1,
+      "team": {
+        "id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+        "code": 1,
+        "name": "トラブルシューターズ",
+        "organization": "ICTSC Association",
+        "max_members": 6
+      },
+      "problem": {
+        "id": "46a8cf12-7fef-6154-a37d-f3d31d396c14",
+        "code": "0004",
+        "problem_type": "Descriptive",
+        "title": "全期間問題",
+        "max_score": 500,
+        "category": "Test",
+        "redeploy_rule": "Unredeployable"
+      },
+      "author": {
+        "id": "3a4ca027-5e02-4ade-8e2d-eddb39adc235",
+        "name": "alice"
+      },
+      "created_at": "2025-02-03T13:30:00+09:00",
+      "interval": 1200000000000
+    },
+    "score": {
+      "marking_result_id": "b0000005-0000-4000-8000-000000000001",
+      "marked_score": 200,
+      "penalty": 0
+    },
+    "rationale": {
+      "descriptive_comment": "ネットワーク疎通のみ確認、サービス復旧は未着手"
+    },
+    "created_at": "2025-02-03T14:00:00+09:00"
+  },
+  {
+    "id": "b0000005-0000-4000-8000-000000000002",
+    "judge": "judge",
+    "answer": {
+      "id": "a0000005-0000-4000-8000-000000000002",
+      "number": 2,
+      "team": {
+        "id": "a1de8fe6-26c8-42d7-b494-dea48e409091",
+        "code": 1,
+        "name": "トラブルシューターズ",
+        "organization": "ICTSC Association",
+        "max_members": 6
+      },
+      "problem": {
+        "id": "46a8cf12-7fef-6154-a37d-f3d31d396c14",
+        "code": "0004",
+        "problem_type": "Descriptive",
+        "title": "全期間問題",
+        "max_score": 500,
+        "category": "Test",
+        "redeploy_rule": "Unredeployable"
+      },
+      "author": {
+        "id": "3a4ca027-5e02-4ade-8e2d-eddb39adc235",
+        "name": "alice"
+      },
+      "created_at": "2025-02-03T14:00:00+09:00",
+      "interval": 1200000000000
+    },
+    "score": {
+      "marking_result_id": "b0000005-0000-4000-8000-000000000002",
+      "marked_score": 350,
+      "penalty": 0
+    },
+    "rationale": {
+      "descriptive_comment": "ほぼ全サービス復旧、一部ログ設定が不足"
+    },
+    "created_at": "2025-02-03T14:30:00+09:00"
   }
 ]
