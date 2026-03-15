@@ -1,8 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { fetchActivity } from "@app/features/activity";
 import { fetchAnswer } from "@app/features/answer";
-import { startTransition, use, useDeferredValue, useEffect } from "react";
-import { useSchedule, hasContestStarted } from "../features/schedule";
+import { startTransition, use, useDeferredValue } from "react";
 import { protoScoreToProps } from "../features/score";
 import { ActivityPage } from "./activity.page";
 
@@ -18,17 +17,6 @@ export const Route = createFileRoute("/activity")({
 });
 
 function RouteComponent() {
-  const [schedule, isPending] = useSchedule();
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (schedule == null || isPending) {
-      return;
-    }
-    if (!hasContestStarted(schedule)) {
-      startTransition(() => navigate({ to: "/" }));
-    }
-  }, [schedule, isPending, navigate]);
-
   const { activity: activityPromise, fetchAnswer: fetchAnswerFn } =
     Route.useLoaderData();
   const deferredActivityPromise = useDeferredValue(activityPromise);

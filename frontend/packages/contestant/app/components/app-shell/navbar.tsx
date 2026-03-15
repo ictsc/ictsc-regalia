@@ -11,7 +11,7 @@ export function Navbar(props: {
   readonly collapsed: boolean;
   readonly canViewProblems: boolean;
   readonly canViewAnnounces: boolean;
-  readonly canViewActivity: boolean;
+
   readonly onOpenToggleClick?: () => void;
 }) {
   const { collapsed } = props;
@@ -124,11 +124,11 @@ export function Navbar(props: {
           </Link>
         )}
       </Button>
-      <Button as={Fragment} disabled={!props.canViewActivity}>
+      <Button as={Fragment}>
         {(buttonProps) => (
           <Link
             to="/activity"
-            title={props.canViewActivity ? "アクティビティ" : "開催期間外です"}
+            title="アクティビティ"
             className={navbarButtonClassName({
               collapsed,
               matched: state.location.pathname?.startsWith("/activity"),
