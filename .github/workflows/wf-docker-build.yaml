@@ -47,7 +47,7 @@ jobs:
             type=sha
       - name: Build and Push Artifacts
         id: build_and_push
-        uses: docker/bake-action@v6
+        uses: docker/bake-action@v7
         with:
           source: .
           push: ${{ inputs.push-ghcr }}
