@@ -131,13 +131,15 @@ func newIssuer(ctx context.Context, cfg config.Issuer) (*issuer, error) {
 }
 
 func (a *JWTAuthenticator) HandleRequest(req *http.Request) (*Viewer, error) {
-	authHeader := req.Header.Get("Authorization")
+	return a.HandleAuthorization(req.Context(), req.Header.Get("Authorization"))
+}
+
+func (a *JWTAuthenticator) HandleAuthorization(ctx context.Context, authHeader string) (*Viewer, error) {
 	if !strings.HasPrefix(authHeader, "Bearer ") {
 		return nil, ErrUnauthenticated
 	}
 	rawIDToken := strings.TrimPrefix(authHeader, "Bearer ")
 
-	ctx := req.Context()
 	for _, iss := range a.issuers {
 		idToken, err := iss.verifier.Verify(ctx, rawIDToken)
 		if err != nil {

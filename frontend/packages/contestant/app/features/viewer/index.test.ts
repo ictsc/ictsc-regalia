@@ -13,6 +13,10 @@ describe("fetchMe", () => {
       connect.rpc(ViewerService.method.getViewer, () => ({
         viewer: {
           name: "alice",
+          admin: {
+            canListContestants: false,
+            canImpersonateContestants: false,
+          },
           viewer: {
             case: "contestant",
             value: {
@@ -29,6 +33,38 @@ describe("fetchMe", () => {
       type: "contestant",
       name: "alice",
       displayName: "Alice",
+      admin: {
+        canListContestants: false,
+        canImpersonateContestants: false,
+      },
+      impersonation: undefined,
+    });
+  });
+
+  it("returns impersonation capability while signed out", async () => {
+    server.use(
+      connect.rpc(ViewerService.method.getViewer, () => ({
+        viewer: {
+          admin: {
+            canListContestants: true,
+            canImpersonateContestants: true,
+          },
+          viewer: {
+            case: "unauthenticated",
+            value: {},
+          },
+        },
+      })),
+    );
+    const transport = createConnectTransport({
+      baseUrl: "http://example.test",
+    });
+    expect(await fetchViewer(transport)).toEqual({
+      type: "unauthenticated",
+      admin: {
+        canListContestants: true,
+        canImpersonateContestants: true,
+      },
     });
   });
 });

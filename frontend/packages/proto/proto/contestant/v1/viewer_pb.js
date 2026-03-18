@@ -9,7 +9,7 @@ import { file_buf_validate_validate } from "../../buf/validate/validate_pb";
  * Describes the file contestant/v1/viewer.proto.
  */
 export const file_contestant_v1_viewer = /*@__PURE__*/
-  fileDesc("Chpjb250ZXN0YW50L3YxL3ZpZXdlci5wcm90bxINY29udGVzdGFudC52MSKwAQoGVmlld2VyEgwKBG5hbWUYASABKAkSJwoEdHlwZRgCIAEoDjIZLmNvbnRlc3RhbnQudjEuVmlld2VyVHlwZRI1Cgpjb250ZXN0YW50GAMgASgLMh8uY29udGVzdGFudC52MS5Db250ZXN0YW50Vmlld2VySAASLgoHc2lnbl91cBgEIAEoCzIbLmNvbnRlc3RhbnQudjEuU2lnblVwVmlld2VySABCCAoGdmlld2VyIjYKEENvbnRlc3RhbnRWaWV3ZXISDAoEbmFtZRgBIAEoCRIUCgxkaXNwbGF5X25hbWUYAiABKAkiMgoMU2lnblVwVmlld2VyEgwKBG5hbWUYASABKAkSFAoMZGlzcGxheV9uYW1lGAIgASgJIhIKEEdldFZpZXdlclJlcXVlc3QiQgoRR2V0Vmlld2VyUmVzcG9uc2USLQoGdmlld2VyGAEgASgLMhUuY29udGVzdGFudC52MS5WaWV3ZXJCBrpIA8gBASJMCg1TaWduVXBSZXF1ZXN0EgwKBG5hbWUYASABKAkSFAoMZGlzcGxheV9uYW1lGAIgASgJEhcKD2ludml0YXRpb25fY29kZRgDIAEoCSIQCg5TaWduVXBSZXNwb25zZSpeCgpWaWV3ZXJUeXBlEhsKF1ZJRVdFUl9UWVBFX1VOU1BFQ0lGSUVEEAASGgoWVklFV0VSX1RZUEVfQ09OVEVTVEFOVBABEhcKE1ZJRVdFUl9UWVBFX1NJR05fVVAQAjKmAQoNVmlld2VyU2VydmljZRJOCglHZXRWaWV3ZXISHy5jb250ZXN0YW50LnYxLkdldFZpZXdlclJlcXVlc3QaIC5jb250ZXN0YW50LnYxLkdldFZpZXdlclJlc3BvbnNlEkUKBlNpZ25VcBIcLmNvbnRlc3RhbnQudjEuU2lnblVwUmVxdWVzdBodLmNvbnRlc3RhbnQudjEuU2lnblVwUmVzcG9uc2VCwgEKEWNvbS5jb250ZXN0YW50LnYxQgtWaWV3ZXJQcm90b1ABWktnaXRodWIuY29tL2ljdHNjL2ljdHNjLXJlZ2FsaWEvYmFja2VuZC9wa2cvcHJvdG8vY29udGVzdGFudC92MTtjb250ZXN0YW50djGiAgNDWFiqAg1Db250ZXN0YW50LlYxygINQ29udGVzdGFudFxWMeICGUNvbnRlc3RhbnRcVjFcR1BCTWV0YWRhdGHqAg5Db250ZXN0YW50OjpWMWIGcHJvdG8z", [file_buf_validate_validate]);
+  fileDesc("Chpjb250ZXN0YW50L3YxL3ZpZXdlci5wcm90bxINY29udGVzdGFudC52MSKcAgoGVmlld2VyEgwKBG5hbWUYASABKAkSJwoEdHlwZRgCIAEoDjIZLmNvbnRlc3RhbnQudjEuVmlld2VyVHlwZRI1Cgpjb250ZXN0YW50GAMgASgLMh8uY29udGVzdGFudC52MS5Db250ZXN0YW50Vmlld2VySAASLgoHc2lnbl91cBgEIAEoCzIbLmNvbnRlc3RhbnQudjEuU2lnblVwVmlld2VySAASPwoPdW5hdXRoZW50aWNhdGVkGAUgASgLMiQuY29udGVzdGFudC52MS5VbmF1dGhlbnRpY2F0ZWRWaWV3ZXJIABIpCgVhZG1pbhgGIAEoCzIaLmNvbnRlc3RhbnQudjEuVmlld2VyQWRtaW5CCAoGdmlld2VyImsKEENvbnRlc3RhbnRWaWV3ZXISDAoEbmFtZRgBIAEoCRIUCgxkaXNwbGF5X25hbWUYAiABKAkSMwoNaW1wZXJzb25hdGlvbhgDIAEoCzIcLmNvbnRlc3RhbnQudjEuSW1wZXJzb25hdGlvbiIjCg1JbXBlcnNvbmF0aW9uEhIKCmFkbWluX25hbWUYASABKAkiMgoMU2lnblVwVmlld2VyEgwKBG5hbWUYASABKAkSFAoMZGlzcGxheV9uYW1lGAIgASgJIhcKFVVuYXV0aGVudGljYXRlZFZpZXdlciJQCgtWaWV3ZXJBZG1pbhIcChRjYW5fbGlzdF9jb250ZXN0YW50cxgBIAEoCBIjChtjYW5faW1wZXJzb25hdGVfY29udGVzdGFudHMYAiABKAgiXQoRQ29udGVzdGFudFN1bW1hcnkSDAoEbmFtZRgBIAEoCRIUCgxkaXNwbGF5X25hbWUYAiABKAkSEQoJdGVhbV9uYW1lGAMgASgJEhEKCXRlYW1fY29kZRgEIAEoAyISChBHZXRWaWV3ZXJSZXF1ZXN0IkIKEUdldFZpZXdlclJlc3BvbnNlEi0KBnZpZXdlchgBIAEoCzIVLmNvbnRlc3RhbnQudjEuVmlld2VyQga6SAPIAQEiGAoWTGlzdENvbnRlc3RhbnRzUmVxdWVzdCJQChdMaXN0Q29udGVzdGFudHNSZXNwb25zZRI1Cgtjb250ZXN0YW50cxgBIAMoCzIgLmNvbnRlc3RhbnQudjEuQ29udGVzdGFudFN1bW1hcnkiTAoNU2lnblVwUmVxdWVzdBIMCgRuYW1lGAEgASgJEhQKDGRpc3BsYXlfbmFtZRgCIAEoCRIXCg9pbnZpdGF0aW9uX2NvZGUYAyABKAkiEAoOU2lnblVwUmVzcG9uc2UqfwoKVmlld2VyVHlwZRIbChdWSUVXRVJfVFlQRV9VTlNQRUNJRklFRBAAEhoKFlZJRVdFUl9UWVBFX0NPTlRFU1RBTlQQARIXChNWSUVXRVJfVFlQRV9TSUdOX1VQEAISHwobVklFV0VSX1RZUEVfVU5BVVRIRU5USUNBVEVEEAMyiAIKDVZpZXdlclNlcnZpY2USTgoJR2V0Vmlld2VyEh8uY29udGVzdGFudC52MS5HZXRWaWV3ZXJSZXF1ZXN0GiAuY29udGVzdGFudC52MS5HZXRWaWV3ZXJSZXNwb25zZRJgCg9MaXN0Q29udGVzdGFudHMSJS5jb250ZXN0YW50LnYxLkxpc3RDb250ZXN0YW50c1JlcXVlc3QaJi5jb250ZXN0YW50LnYxLkxpc3RDb250ZXN0YW50c1Jlc3BvbnNlEkUKBlNpZ25VcBIcLmNvbnRlc3RhbnQudjEuU2lnblVwUmVxdWVzdBodLmNvbnRlc3RhbnQudjEuU2lnblVwUmVzcG9uc2VCwgEKEWNvbS5jb250ZXN0YW50LnYxQgtWaWV3ZXJQcm90b1ABWktnaXRodWIuY29tL2ljdHNjL2ljdHNjLXJlZ2FsaWEvYmFja2VuZC9wa2cvcHJvdG8vY29udGVzdGFudC92MTtjb250ZXN0YW50djGiAgNDWFiqAg1Db250ZXN0YW50LlYxygINQ29udGVzdGFudFxWMeICGUNvbnRlc3RhbnRcVjFcR1BCTWV0YWRhdGHqAg5Db250ZXN0YW50OjpWMWIGcHJvdG8z", [file_buf_validate_validate]);
 
 /**
  * Describes the message contestant.v1.Viewer.
@@ -26,39 +26,81 @@ export const ContestantViewerSchema = /*@__PURE__*/
   messageDesc(file_contestant_v1_viewer, 1);
 
 /**
+ * Describes the message contestant.v1.Impersonation.
+ * Use `create(ImpersonationSchema)` to create a new message.
+ */
+export const ImpersonationSchema = /*@__PURE__*/
+  messageDesc(file_contestant_v1_viewer, 2);
+
+/**
  * Describes the message contestant.v1.SignUpViewer.
  * Use `create(SignUpViewerSchema)` to create a new message.
  */
 export const SignUpViewerSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_viewer, 2);
+  messageDesc(file_contestant_v1_viewer, 3);
+
+/**
+ * Describes the message contestant.v1.UnauthenticatedViewer.
+ * Use `create(UnauthenticatedViewerSchema)` to create a new message.
+ */
+export const UnauthenticatedViewerSchema = /*@__PURE__*/
+  messageDesc(file_contestant_v1_viewer, 4);
+
+/**
+ * Describes the message contestant.v1.ViewerAdmin.
+ * Use `create(ViewerAdminSchema)` to create a new message.
+ */
+export const ViewerAdminSchema = /*@__PURE__*/
+  messageDesc(file_contestant_v1_viewer, 5);
+
+/**
+ * Describes the message contestant.v1.ContestantSummary.
+ * Use `create(ContestantSummarySchema)` to create a new message.
+ */
+export const ContestantSummarySchema = /*@__PURE__*/
+  messageDesc(file_contestant_v1_viewer, 6);
 
 /**
  * Describes the message contestant.v1.GetViewerRequest.
  * Use `create(GetViewerRequestSchema)` to create a new message.
  */
 export const GetViewerRequestSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_viewer, 3);
+  messageDesc(file_contestant_v1_viewer, 7);
 
 /**
  * Describes the message contestant.v1.GetViewerResponse.
  * Use `create(GetViewerResponseSchema)` to create a new message.
  */
 export const GetViewerResponseSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_viewer, 4);
+  messageDesc(file_contestant_v1_viewer, 8);
+
+/**
+ * Describes the message contestant.v1.ListContestantsRequest.
+ * Use `create(ListContestantsRequestSchema)` to create a new message.
+ */
+export const ListContestantsRequestSchema = /*@__PURE__*/
+  messageDesc(file_contestant_v1_viewer, 9);
+
+/**
+ * Describes the message contestant.v1.ListContestantsResponse.
+ * Use `create(ListContestantsResponseSchema)` to create a new message.
+ */
+export const ListContestantsResponseSchema = /*@__PURE__*/
+  messageDesc(file_contestant_v1_viewer, 10);
 
 /**
  * Describes the message contestant.v1.SignUpRequest.
  * Use `create(SignUpRequestSchema)` to create a new message.
  */
 export const SignUpRequestSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_viewer, 5);
+  messageDesc(file_contestant_v1_viewer, 11);
 
 /**
  * Describes the message contestant.v1.SignUpResponse.
  * Use `create(SignUpResponseSchema)` to create a new message.
  */
 export const SignUpResponseSchema = /*@__PURE__*/
-  messageDesc(file_contestant_v1_viewer, 6);
+  messageDesc(file_contestant_v1_viewer, 12);
 
 /**
  * Describes the enum contestant.v1.ViewerType.

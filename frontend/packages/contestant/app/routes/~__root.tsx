@@ -93,7 +93,7 @@ function Redirector({ viewer: viewerPromise }: { viewer: Promise<User> }) {
   useEffect(() => {
     switch (viewer.type) {
       case "unauthenticated": {
-        if (routerState.location.pathname !== "/signin") {
+        if (!routerState.location.pathname.startsWith("/signin")) {
           startTransition(() =>
             navigate({
               to: "/signin",
@@ -114,6 +114,13 @@ function Redirector({ viewer: viewerPromise }: { viewer: Promise<User> }) {
         }
         break;
       }
+    }
+
+    if (
+      routerState.location.pathname === "/signin/impersonation" &&
+      !viewer.admin.canImpersonateContestants
+    ) {
+      startTransition(() => navigate({ to: "/signin" }));
     }
   }, [routerState, navigate, viewer]);
 

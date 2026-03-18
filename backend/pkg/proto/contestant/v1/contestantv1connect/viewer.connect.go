@@ -35,6 +35,9 @@ const (
 const (
 	// ViewerServiceGetViewerProcedure is the fully-qualified name of the ViewerService's GetViewer RPC.
 	ViewerServiceGetViewerProcedure = "/contestant.v1.ViewerService/GetViewer"
+	// ViewerServiceListContestantsProcedure is the fully-qualified name of the ViewerService's
+	// ListContestants RPC.
+	ViewerServiceListContestantsProcedure = "/contestant.v1.ViewerService/ListContestants"
 	// ViewerServiceSignUpProcedure is the fully-qualified name of the ViewerService's SignUp RPC.
 	ViewerServiceSignUpProcedure = "/contestant.v1.ViewerService/SignUp"
 )
@@ -42,6 +45,7 @@ const (
 // ViewerServiceClient is a client for the contestant.v1.ViewerService service.
 type ViewerServiceClient interface {
 	GetViewer(context.Context, *connect.Request[v1.GetViewerRequest]) (*connect.Response[v1.GetViewerResponse], error)
+	ListContestants(context.Context, *connect.Request[v1.ListContestantsRequest]) (*connect.Response[v1.ListContestantsResponse], error)
 	SignUp(context.Context, *connect.Request[v1.SignUpRequest]) (*connect.Response[v1.SignUpResponse], error)
 }
 
@@ -62,6 +66,12 @@ func NewViewerServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(viewerServiceMethods.ByName("GetViewer")),
 			connect.WithClientOptions(opts...),
 		),
+		listContestants: connect.NewClient[v1.ListContestantsRequest, v1.ListContestantsResponse](
+			httpClient,
+			baseURL+ViewerServiceListContestantsProcedure,
+			connect.WithSchema(viewerServiceMethods.ByName("ListContestants")),
+			connect.WithClientOptions(opts...),
+		),
 		signUp: connect.NewClient[v1.SignUpRequest, v1.SignUpResponse](
 			httpClient,
 			baseURL+ViewerServiceSignUpProcedure,
@@ -73,13 +83,19 @@ func NewViewerServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 
 // viewerServiceClient implements ViewerServiceClient.
 type viewerServiceClient struct {
-	getViewer *connect.Client[v1.GetViewerRequest, v1.GetViewerResponse]
-	signUp    *connect.Client[v1.SignUpRequest, v1.SignUpResponse]
+	getViewer       *connect.Client[v1.GetViewerRequest, v1.GetViewerResponse]
+	listContestants *connect.Client[v1.ListContestantsRequest, v1.ListContestantsResponse]
+	signUp          *connect.Client[v1.SignUpRequest, v1.SignUpResponse]
 }
 
 // GetViewer calls contestant.v1.ViewerService.GetViewer.
 func (c *viewerServiceClient) GetViewer(ctx context.Context, req *connect.Request[v1.GetViewerRequest]) (*connect.Response[v1.GetViewerResponse], error) {
 	return c.getViewer.CallUnary(ctx, req)
+}
+
+// ListContestants calls contestant.v1.ViewerService.ListContestants.
+func (c *viewerServiceClient) ListContestants(ctx context.Context, req *connect.Request[v1.ListContestantsRequest]) (*connect.Response[v1.ListContestantsResponse], error) {
+	return c.listContestants.CallUnary(ctx, req)
 }
 
 // SignUp calls contestant.v1.ViewerService.SignUp.
@@ -90,6 +106,7 @@ func (c *viewerServiceClient) SignUp(ctx context.Context, req *connect.Request[v
 // ViewerServiceHandler is an implementation of the contestant.v1.ViewerService service.
 type ViewerServiceHandler interface {
 	GetViewer(context.Context, *connect.Request[v1.GetViewerRequest]) (*connect.Response[v1.GetViewerResponse], error)
+	ListContestants(context.Context, *connect.Request[v1.ListContestantsRequest]) (*connect.Response[v1.ListContestantsResponse], error)
 	SignUp(context.Context, *connect.Request[v1.SignUpRequest]) (*connect.Response[v1.SignUpResponse], error)
 }
 
@@ -106,6 +123,12 @@ func NewViewerServiceHandler(svc ViewerServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(viewerServiceMethods.ByName("GetViewer")),
 		connect.WithHandlerOptions(opts...),
 	)
+	viewerServiceListContestantsHandler := connect.NewUnaryHandler(
+		ViewerServiceListContestantsProcedure,
+		svc.ListContestants,
+		connect.WithSchema(viewerServiceMethods.ByName("ListContestants")),
+		connect.WithHandlerOptions(opts...),
+	)
 	viewerServiceSignUpHandler := connect.NewUnaryHandler(
 		ViewerServiceSignUpProcedure,
 		svc.SignUp,
@@ -116,6 +139,8 @@ func NewViewerServiceHandler(svc ViewerServiceHandler, opts ...connect.HandlerOp
 		switch r.URL.Path {
 		case ViewerServiceGetViewerProcedure:
 			viewerServiceGetViewerHandler.ServeHTTP(w, r)
+		case ViewerServiceListContestantsProcedure:
+			viewerServiceListContestantsHandler.ServeHTTP(w, r)
 		case ViewerServiceSignUpProcedure:
 			viewerServiceSignUpHandler.ServeHTTP(w, r)
 		default:
@@ -129,6 +154,10 @@ type UnimplementedViewerServiceHandler struct{}
 
 func (UnimplementedViewerServiceHandler) GetViewer(context.Context, *connect.Request[v1.GetViewerRequest]) (*connect.Response[v1.GetViewerResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.ViewerService.GetViewer is not implemented"))
+}
+
+func (UnimplementedViewerServiceHandler) ListContestants(context.Context, *connect.Request[v1.ListContestantsRequest]) (*connect.Response[v1.ListContestantsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("contestant.v1.ViewerService.ListContestants is not implemented"))
 }
 
 func (UnimplementedViewerServiceHandler) SignUp(context.Context, *connect.Request[v1.SignUpRequest]) (*connect.Response[v1.SignUpResponse], error) {

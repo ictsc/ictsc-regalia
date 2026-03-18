@@ -22,7 +22,11 @@ type (
 		Discord *domain.DiscordIdentityData
 	}
 	UserSession struct {
-		UserID uuid.UUID
+		UserID        uuid.UUID
+		Impersonation *ImpersonationSession
+	}
+	ImpersonationSession struct {
+		AdminName string
 	}
 
 	sessionCtxKey struct{}
@@ -38,6 +42,7 @@ func init() {
 	gob.Register(&SignUpSession{})
 	gob.Register(&domain.DiscordIdentityData{})
 	gob.Register(&UserSession{})
+	gob.Register(&ImpersonationSession{})
 }
 
 func NewHandler(store sessions.Store) func(http.Handler) http.Handler {
@@ -88,9 +93,7 @@ func (s *SessionStore[V]) Get(ctx context.Context) (V, error) {
 }
 
 func (s *SessionStore[V]) Write(r *http.Request, w http.ResponseWriter, val V, options *sessions.Options) error {
-	ctx := r.Context()
-
-	sessCtx, err := getSessCtx(ctx)
+	sessCtx, err := getSessCtx(r.Context())
 	if err != nil {
 		return err
 	}
