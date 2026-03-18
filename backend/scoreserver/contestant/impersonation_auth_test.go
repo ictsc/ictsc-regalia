@@ -183,10 +183,10 @@ func newImpersonationAuthTestServerWithPolicy(
 		t.Fatalf("failed to initialize session: %v", err)
 	}
 	if resp.StatusCode != http.StatusNoContent {
-		resp.Body.Close()
+		closeImpersonationAuthTestResponseBody(t, resp)
 		t.Fatalf("failed to initialize session: status = %d", resp.StatusCode)
 	}
-	resp.Body.Close()
+	closeImpersonationAuthTestResponseBody(t, resp)
 
 	return server, client
 }
@@ -198,6 +198,14 @@ func doImpersonationAuthTestRequest(t *testing.T, client *http.Client, url strin
 	if err != nil {
 		t.Fatalf("failed to send request: %v", err)
 	}
-	t.Cleanup(func() { resp.Body.Close() })
+	t.Cleanup(func() { closeImpersonationAuthTestResponseBody(t, resp) })
 	return resp
+}
+
+func closeImpersonationAuthTestResponseBody(t *testing.T, resp *http.Response) {
+	t.Helper()
+
+	if err := resp.Body.Close(); err != nil {
+		t.Fatalf("failed to close response body: %v", err)
+	}
 }
