@@ -3,6 +3,8 @@ package auth
 import (
 	"context"
 	"crypto/x509"
+	"encoding/base64"
+	"encoding/json"
 	"log/slog"
 	"net/http"
 	"os"
@@ -60,24 +62,27 @@ func WithAuthn(handler http.Handler, authenticator HTTPAuthenticator) http.Handl
 
 type (
 	JWTAuthenticator struct {
-		issuers []*issuer
+		issuers map[string][]*issuer
+	}
+	issuerVerifier interface {
+		Verify(ctx context.Context, rawIDToken string) (*oidc.IDToken, error)
 	}
 	issuer struct {
 		name      string
-		verifier  *oidc.IDTokenVerifier
+		verifier  issuerVerifier
 		nameKey   string
 		groupKeys []string
 	}
 )
 
 func NewJWTAuthenticator(ctx context.Context, cfg config.AdminAuthn) (*JWTAuthenticator, error) {
-	issuers := make([]*issuer, 0, len(cfg.Issuers))
+	issuers := make(map[string][]*issuer, len(cfg.Issuers))
 	for _, issuerCfg := range cfg.Issuers {
 		iss, err := newIssuer(ctx, issuerCfg)
 		if err != nil {
 			return nil, err
 		}
-		issuers = append(issuers, iss)
+		issuers[issuerCfg.Issuer] = append(issuers[issuerCfg.Issuer], iss)
 	}
 
 	return &JWTAuthenticator{issuers: issuers}, nil
@@ -138,7 +143,13 @@ func (a *JWTAuthenticator) HandleRequest(req *http.Request) (*Viewer, error) {
 	rawIDToken := strings.TrimPrefix(authHeader, "Bearer ")
 
 	ctx := req.Context()
-	for _, iss := range a.issuers {
+	tokenIssuer, err := parseTokenIssuer(rawIDToken)
+	if err != nil {
+		slog.DebugContext(ctx, "failed to parse token issuer", "error", err)
+		return nil, ErrUnauthenticated
+	}
+
+	for _, iss := range a.issuers[tokenIssuer] {
 		idToken, err := iss.verifier.Verify(ctx, rawIDToken)
 		if err != nil {
 			err = errors.Wrapf(err, "for %s", iss.name)
@@ -162,6 +173,30 @@ func (a *JWTAuthenticator) HandleRequest(req *http.Request) (*Viewer, error) {
 	}
 
 	return nil, ErrUnauthenticated
+}
+
+func parseTokenIssuer(rawIDToken string) (string, error) {
+	parts := strings.Split(rawIDToken, ".")
+	if len(parts) != 3 {
+		return "", errors.New("invalid jwt format")
+	}
+
+	payload, err := base64.RawURLEncoding.DecodeString(parts[1])
+	if err != nil {
+		return "", errors.Wrap(err, "failed to decode jwt payload")
+	}
+
+	var claims struct {
+		Issuer string `json:"iss"`
+	}
+	if err := json.Unmarshal(payload, &claims); err != nil {
+		return "", errors.Wrap(err, "failed to decode jwt claims")
+	}
+	if claims.Issuer == "" {
+		return "", errors.New("jwt issuer claim is empty")
+	}
+
+	return claims.Issuer, nil
 }
 
 func mapViewerName(idToken *oidc.IDToken, claims map[string]any, nameClaim string) string {
