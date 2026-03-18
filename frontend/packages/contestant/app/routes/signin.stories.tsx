@@ -12,5 +12,14 @@ export const Default: Story = {
   name: "デフォルト",
   args: {
     signInURL: "/",
+    adminTokenAvailable: false,
+  },
+};
+
+export const WithAdminLink: Story = {
+  name: "Admin リンクあり",
+  args: {
+    signInURL: "/",
+    adminTokenAvailable: true,
   },
 };

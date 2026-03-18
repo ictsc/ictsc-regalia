@@ -18,8 +18,10 @@ import { Route as ProblemsRouteImport } from "./routes/~problems";
 import { Route as AnnouncesRouteImport } from "./routes/~announces";
 import { Route as ActivityRouteImport } from "./routes/~activity";
 import { Route as IndexRouteImport } from "./routes/~index";
+import { Route as SigninIndexRouteImport } from "./routes/~signin.index";
 import { Route as ProblemsIndexRouteImport } from "./routes/~problems.index";
 import { Route as AnnouncesIndexRouteImport } from "./routes/~announces.index";
+import { Route as SigninImpersonationRouteImport } from "./routes/~signin.impersonation";
 import { Route as ProblemsCodeRouteImport } from "./routes/~problems.$code";
 import { Route as AnnouncesSlugRouteImport } from "./routes/~announces.$slug";
 
@@ -68,6 +70,11 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any);
+const SigninIndexRoute = SigninIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => SigninRoute,
+} as any);
 const ProblemsIndexRoute = ProblemsIndexRouteImport.update({
   id: "/",
   path: "/",
@@ -77,6 +84,11 @@ const AnnouncesIndexRoute = AnnouncesIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => AnnouncesRoute,
+} as any);
+const SigninImpersonationRoute = SigninImpersonationRouteImport.update({
+  id: "/impersonation",
+  path: "/impersonation",
+  getParentRoute: () => SigninRoute,
 } as any);
 const ProblemsCodeRoute = ProblemsCodeRouteImport.update({
   id: "/$code",
@@ -100,26 +112,29 @@ export interface FileRoutesByFullPath {
   "/problems": typeof ProblemsRouteWithChildren;
   "/ranking": typeof RankingRoute;
   "/rule": typeof RuleRoute;
-  "/signin": typeof SigninRoute;
+  "/signin": typeof SigninRouteWithChildren;
   "/signup": typeof SignupRoute;
   "/teams": typeof TeamsRoute;
   "/announces/$slug": typeof AnnouncesSlugRoute;
   "/problems/$code": typeof ProblemsCodeRoute;
+  "/signin/impersonation": typeof SigninImpersonationRoute;
   "/announces/": typeof AnnouncesIndexRoute;
   "/problems/": typeof ProblemsIndexRoute;
+  "/signin/": typeof SigninIndexRoute;
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/activity": typeof ActivityRoute;
   "/ranking": typeof RankingRoute;
   "/rule": typeof RuleRoute;
-  "/signin": typeof SigninRoute;
   "/signup": typeof SignupRoute;
   "/teams": typeof TeamsRoute;
   "/announces/$slug": typeof AnnouncesSlugRoute;
   "/problems/$code": typeof ProblemsCodeRoute;
+  "/signin/impersonation": typeof SigninImpersonationRoute;
   "/announces": typeof AnnouncesIndexRoute;
   "/problems": typeof ProblemsIndexRoute;
+  "/signin": typeof SigninIndexRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
@@ -129,13 +144,15 @@ export interface FileRoutesById {
   "/problems": typeof ProblemsRouteWithChildren;
   "/ranking": typeof RankingRoute;
   "/rule": typeof RuleRoute;
-  "/signin": typeof SigninRoute;
+  "/signin": typeof SigninRouteWithChildren;
   "/signup": typeof SignupRoute;
   "/teams": typeof TeamsRoute;
   "/announces/$slug": typeof AnnouncesSlugRoute;
   "/problems/$code": typeof ProblemsCodeRoute;
+  "/signin/impersonation": typeof SigninImpersonationRoute;
   "/announces/": typeof AnnouncesIndexRoute;
   "/problems/": typeof ProblemsIndexRoute;
+  "/signin/": typeof SigninIndexRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
@@ -151,21 +168,24 @@ export interface FileRouteTypes {
     | "/teams"
     | "/announces/$slug"
     | "/problems/$code"
+    | "/signin/impersonation"
     | "/announces/"
-    | "/problems/";
+    | "/problems/"
+    | "/signin/";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
     | "/activity"
     | "/ranking"
     | "/rule"
-    | "/signin"
     | "/signup"
     | "/teams"
     | "/announces/$slug"
     | "/problems/$code"
+    | "/signin/impersonation"
     | "/announces"
-    | "/problems";
+    | "/problems"
+    | "/signin";
   id:
     | "__root__"
     | "/"
@@ -179,8 +199,10 @@ export interface FileRouteTypes {
     | "/teams"
     | "/announces/$slug"
     | "/problems/$code"
+    | "/signin/impersonation"
     | "/announces/"
-    | "/problems/";
+    | "/problems/"
+    | "/signin/";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
@@ -190,7 +212,7 @@ export interface RootRouteChildren {
   ProblemsRoute: typeof ProblemsRouteWithChildren;
   RankingRoute: typeof RankingRoute;
   RuleRoute: typeof RuleRoute;
-  SigninRoute: typeof SigninRoute;
+  SigninRoute: typeof SigninRouteWithChildren;
   SignupRoute: typeof SignupRoute;
   TeamsRoute: typeof TeamsRoute;
 }
@@ -260,6 +282,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/signin/": {
+      id: "/signin/";
+      path: "/";
+      fullPath: "/signin/";
+      preLoaderRoute: typeof SigninIndexRouteImport;
+      parentRoute: typeof SigninRoute;
+    };
     "/problems/": {
       id: "/problems/";
       path: "/";
@@ -273,6 +302,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/announces/";
       preLoaderRoute: typeof AnnouncesIndexRouteImport;
       parentRoute: typeof AnnouncesRoute;
+    };
+    "/signin/impersonation": {
+      id: "/signin/impersonation";
+      path: "/impersonation";
+      fullPath: "/signin/impersonation";
+      preLoaderRoute: typeof SigninImpersonationRouteImport;
+      parentRoute: typeof SigninRoute;
     };
     "/problems/$code": {
       id: "/problems/$code";
@@ -319,6 +355,19 @@ const ProblemsRouteWithChildren = ProblemsRoute._addFileChildren(
   ProblemsRouteChildren,
 );
 
+interface SigninRouteChildren {
+  SigninImpersonationRoute: typeof SigninImpersonationRoute;
+  SigninIndexRoute: typeof SigninIndexRoute;
+}
+
+const SigninRouteChildren: SigninRouteChildren = {
+  SigninImpersonationRoute: SigninImpersonationRoute,
+  SigninIndexRoute: SigninIndexRoute,
+};
+
+const SigninRouteWithChildren =
+  SigninRoute._addFileChildren(SigninRouteChildren);
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivityRoute: ActivityRoute,
@@ -326,7 +375,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProblemsRoute: ProblemsRouteWithChildren,
   RankingRoute: RankingRoute,
   RuleRoute: RuleRoute,
-  SigninRoute: SigninRoute,
+  SigninRoute: SigninRouteWithChildren,
   SignupRoute: SignupRoute,
   TeamsRoute: TeamsRoute,
 };
