@@ -7,12 +7,11 @@ import (
 	"net/url"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/cockroachdb/errors"
 	"github.com/gofrs/uuid/v5"
-	"github.com/gorilla/sessions"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/ratelimiter"
+	adminauth "github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/contestant/session"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/domain"
@@ -33,6 +32,8 @@ type (
 
 		DiscordCallbackEffect DiscordCallbackEffect
 		SignUpEffect          SignUpEffect
+		ImpersonationEffect   ImpersonationEffect
+		AdminEnforcer         *adminauth.Enforcer
 	}
 	DiscordCallbackEffect interface {
 		domain.DiscordIdentityGetter
@@ -52,13 +53,13 @@ const (
 	oauthErrorServerError            oauthErrorCode = "server_error"
 	oauthErrorTemporarilyUnavailable oauthErrorCode = "temporarily_unavailable"
 )
-const (
-	authCookieAge   = 10 * time.Minute
-	signUpCookieAge = 10 * time.Minute
-	userCookieAge   = 3 * 24 * time.Hour
-)
 
-func newAuthHandler(cfg config.ContestantAuth, repo *pg.Repository, rateLimiter ratelimiter.RateLimiter) *AuthHandler {
+func newAuthHandler(
+	cfg config.ContestantAuth,
+	repo *pg.Repository,
+	rateLimiter ratelimiter.RateLimiter,
+	adminEnforcer *adminauth.Enforcer,
+) *AuthHandler {
 	return &AuthHandler{
 		ExternalURL: cfg.ExternalURL,
 		DiscordOAuth2Config: oauth2.Config{
@@ -79,7 +80,9 @@ func newAuthHandler(cfg config.ContestantAuth, repo *pg.Repository, rateLimiter 
 			UserClient: &discord.UserClient{HTTPClient: &http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}},
 			Repository: repo,
 		},
-		SignUpEffect: pg.Tx(repo, func(rt *pg.RepositoryTx) SignUpTxEffect { return rt }),
+		SignUpEffect:        pg.Tx(repo, func(rt *pg.RepositoryTx) SignUpTxEffect { return rt }),
+		ImpersonationEffect: repo,
+		AdminEnforcer:       adminEnforcer,
 	}
 }
 
@@ -88,6 +91,7 @@ func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		mux := http.NewServeMux()
 		mux.Handle("GET /auth/signin", http.HandlerFunc(h.handleSignIn))
 		mux.Handle("GET /auth/callback", http.HandlerFunc(h.handleCallback))
+		mux.Handle("POST /auth/impersonation", http.HandlerFunc(h.handleStartImpersonation))
 		mux.Handle("POST /auth/signup", http.HandlerFunc(h.handleSignUp))
 		mux.Handle("POST /auth/signout", http.HandlerFunc(h.handleSignOut))
 		h.handler = mux
@@ -117,41 +121,7 @@ func (h *AuthHandler) generateOAuth2Session(nextPath *url.URL) *session.OAuth2Se
 }
 
 func (h *AuthHandler) externalURL(r *http.Request) *url.URL {
-	url := &url.URL{}
-
-	// From External URL
-	if h.ExternalURL != nil {
-		if url.Scheme == "" && h.ExternalURL.Scheme != "" {
-			url.Scheme = h.ExternalURL.Scheme
-		}
-		if url.Host == "" && h.ExternalURL.Host != "" {
-			url.Host = h.ExternalURL.Host
-		}
-		if url.Path == "" && h.ExternalURL.Path != "" {
-			url.Path = h.ExternalURL.Path
-		}
-	}
-	// From Proxy Headers
-	// TODO: Support Forwarded header
-	if url.Scheme == "" && strings.ToLower(r.Header.Get("X-Forwarded-Proto")) == "https" {
-		url.Scheme = "https"
-	}
-	// From Request
-	if url.Scheme == "" {
-		if r.TLS != nil {
-			url.Scheme = "https"
-		} else {
-			url.Scheme = "http"
-		}
-	}
-	if url.Host == "" {
-		url.Host = r.Host
-	}
-	if url.Path == "" {
-		url.Path = "/"
-	}
-
-	return url
+	return externalURL(h.ExternalURL, r)
 }
 
 func (h *AuthHandler) discordAuthCodeURLRedirect(w http.ResponseWriter, r *http.Request, sess *session.OAuth2Session) {
@@ -162,7 +132,7 @@ func (h *AuthHandler) discordAuthCodeURLRedirect(w http.ResponseWriter, r *http.
 		sess.State,
 		oauth2.S256ChallengeOption(sess.Verifier),
 	)
-	if err := session.OAuth2SessionStore.Write(r, w, sess, h.oauth2SessionOption(r)); err != nil {
+	if err := session.OAuth2SessionStore.Write(r, w, sess, oauth2SessionOption(h.ExternalURL, r)); err != nil {
 		slog.ErrorContext(r.Context(), "failed to write oauth2 session", "error", errors.WithStack(err))
 		h.errorRedirect(w, r, sess.NextPath, oauthErrorServerError)
 		return
@@ -185,7 +155,7 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Delete session
-	if err := session.OAuth2SessionStore.Write(r, w, nil, h.oauth2SessionOption(r)); err != nil {
+	if err := session.OAuth2SessionStore.Write(r, w, nil, oauth2SessionOption(h.ExternalURL, r)); err != nil {
 		slog.ErrorContext(r.Context(), "failed to delete session", "error", errors.WithStack(err))
 		h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorServerError)
 		return
@@ -240,14 +210,14 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	if user != nil {
 		// 登録済み
 		userSess := &session.UserSession{UserID: uuid.UUID(user.ID())}
-		if err := session.UserSessionStore.Write(r, w, userSess, h.userSessionOption(r)); err != nil {
+		if err := session.UserSessionStore.Write(r, w, userSess, userSessionOption(h.ExternalURL, r)); err != nil {
 			slog.ErrorContext(r.Context(), "failed to write user session", "error", err)
 			h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorServerError)
 			return
 		}
 	} else {
 		signUpSess := &session.SignUpSession{Discord: identity.Data()}
-		if err := session.SignUpSessionStore.Write(r, w, signUpSess, h.signUpSessionOption(r)); err != nil {
+		if err := session.SignUpSessionStore.Write(r, w, signUpSess, signUpSessionOption(h.ExternalURL, r)); err != nil {
 			slog.ErrorContext(r.Context(), "failed to write signup session", "error", err)
 			h.errorRedirect(w, r, oauthSess.NextPath, oauthErrorServerError)
 			return
@@ -258,52 +228,18 @@ func (h *AuthHandler) handleCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthHandler) handleSignOut(w http.ResponseWriter, r *http.Request) {
-	if err := session.UserSessionStore.Write(r, w, nil, h.userSessionOption(r)); err != nil {
+	if err := session.UserSessionStore.Write(r, w, nil, userSessionOption(h.ExternalURL, r)); err != nil {
 		slog.ErrorContext(r.Context(), "failed to delete user session", "error", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	if err := session.SignUpSessionStore.Write(r, w, nil, h.signUpSessionOption(r)); err != nil {
+	if err := session.SignUpSessionStore.Write(r, w, nil, signUpSessionOption(h.ExternalURL, r)); err != nil {
 		slog.ErrorContext(r.Context(), "failed to delete signup session", "error", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-}
-
-func (h *AuthHandler) oauth2SessionOption(r *http.Request) *sessions.Options {
-	opt := h.sessionOption(r)
-	opt.MaxAge = int(authCookieAge.Seconds())
-	opt.Path = h.externalURL(r).JoinPath("./auth").Path
-	opt.SameSite = http.SameSiteLaxMode
-	return opt
-}
-
-func (h *AuthHandler) userSessionOption(r *http.Request) *sessions.Options {
-	opt := h.sessionOption(r)
-	opt.MaxAge = int(userCookieAge.Seconds())
-	return opt
-}
-
-func (h *AuthHandler) signUpSessionOption(r *http.Request) *sessions.Options {
-	opt := h.sessionOption(r)
-	opt.MaxAge = int(signUpCookieAge.Seconds())
-	return opt
-}
-
-func (h *AuthHandler) sessionOption(r *http.Request) *sessions.Options {
-	externalURL := h.externalURL(r)
-	path := externalURL.Path
-	if path == "" {
-		path = "/"
-	}
-	return &sessions.Options{
-		Path:     path,
-		Secure:   externalURL.Scheme == "https",
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-	}
 }
 
 func (h *AuthHandler) errorRedirect(w http.ResponseWriter, r *http.Request, nextPath *url.URL, errCode oauthErrorCode) {

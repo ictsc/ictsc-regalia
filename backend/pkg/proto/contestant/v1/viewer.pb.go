@@ -25,9 +25,10 @@ const (
 type ViewerType int32
 
 const (
-	ViewerType_VIEWER_TYPE_UNSPECIFIED ViewerType = 0
-	ViewerType_VIEWER_TYPE_CONTESTANT  ViewerType = 1
-	ViewerType_VIEWER_TYPE_SIGN_UP     ViewerType = 2
+	ViewerType_VIEWER_TYPE_UNSPECIFIED     ViewerType = 0
+	ViewerType_VIEWER_TYPE_CONTESTANT      ViewerType = 1
+	ViewerType_VIEWER_TYPE_SIGN_UP         ViewerType = 2
+	ViewerType_VIEWER_TYPE_UNAUTHENTICATED ViewerType = 3
 )
 
 // Enum value maps for ViewerType.
@@ -36,11 +37,13 @@ var (
 		0: "VIEWER_TYPE_UNSPECIFIED",
 		1: "VIEWER_TYPE_CONTESTANT",
 		2: "VIEWER_TYPE_SIGN_UP",
+		3: "VIEWER_TYPE_UNAUTHENTICATED",
 	}
 	ViewerType_value = map[string]int32{
-		"VIEWER_TYPE_UNSPECIFIED": 0,
-		"VIEWER_TYPE_CONTESTANT":  1,
-		"VIEWER_TYPE_SIGN_UP":     2,
+		"VIEWER_TYPE_UNSPECIFIED":     0,
+		"VIEWER_TYPE_CONTESTANT":      1,
+		"VIEWER_TYPE_SIGN_UP":         2,
+		"VIEWER_TYPE_UNAUTHENTICATED": 3,
 	}
 )
 
@@ -79,7 +82,9 @@ type Viewer struct {
 	//
 	//	*Viewer_Contestant
 	//	*Viewer_SignUp
+	//	*Viewer_Unauthenticated
 	Viewer        isViewer_Viewer `protobuf_oneof:"viewer"`
+	Admin         *ViewerAdmin    `protobuf:"bytes,6,opt,name=admin,proto3" json:"admin,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -153,6 +158,22 @@ func (x *Viewer) GetSignUp() *SignUpViewer {
 	return nil
 }
 
+func (x *Viewer) GetUnauthenticated() *UnauthenticatedViewer {
+	if x != nil {
+		if x, ok := x.Viewer.(*Viewer_Unauthenticated); ok {
+			return x.Unauthenticated
+		}
+	}
+	return nil
+}
+
+func (x *Viewer) GetAdmin() *ViewerAdmin {
+	if x != nil {
+		return x.Admin
+	}
+	return nil
+}
+
 type isViewer_Viewer interface {
 	isViewer_Viewer()
 }
@@ -165,14 +186,21 @@ type Viewer_SignUp struct {
 	SignUp *SignUpViewer `protobuf:"bytes,4,opt,name=sign_up,json=signUp,proto3,oneof"`
 }
 
+type Viewer_Unauthenticated struct {
+	Unauthenticated *UnauthenticatedViewer `protobuf:"bytes,5,opt,name=unauthenticated,proto3,oneof"`
+}
+
 func (*Viewer_Contestant) isViewer_Viewer() {}
 
 func (*Viewer_SignUp) isViewer_Viewer() {}
+
+func (*Viewer_Unauthenticated) isViewer_Viewer() {}
 
 type ContestantViewer struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	DisplayName   string                 `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	Impersonation *Impersonation         `protobuf:"bytes,3,opt,name=impersonation,proto3" json:"impersonation,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -221,6 +249,57 @@ func (x *ContestantViewer) GetDisplayName() string {
 	return ""
 }
 
+func (x *ContestantViewer) GetImpersonation() *Impersonation {
+	if x != nil {
+		return x.Impersonation
+	}
+	return nil
+}
+
+type Impersonation struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AdminName     string                 `protobuf:"bytes,1,opt,name=admin_name,json=adminName,proto3" json:"admin_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Impersonation) Reset() {
+	*x = Impersonation{}
+	mi := &file_contestant_v1_viewer_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Impersonation) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Impersonation) ProtoMessage() {}
+
+func (x *Impersonation) ProtoReflect() protoreflect.Message {
+	mi := &file_contestant_v1_viewer_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Impersonation.ProtoReflect.Descriptor instead.
+func (*Impersonation) Descriptor() ([]byte, []int) {
+	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Impersonation) GetAdminName() string {
+	if x != nil {
+		return x.AdminName
+	}
+	return ""
+}
+
 // サインアップ中のユーザ
 type SignUpViewer struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -232,7 +311,7 @@ type SignUpViewer struct {
 
 func (x *SignUpViewer) Reset() {
 	*x = SignUpViewer{}
-	mi := &file_contestant_v1_viewer_proto_msgTypes[2]
+	mi := &file_contestant_v1_viewer_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -244,7 +323,7 @@ func (x *SignUpViewer) String() string {
 func (*SignUpViewer) ProtoMessage() {}
 
 func (x *SignUpViewer) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_viewer_proto_msgTypes[2]
+	mi := &file_contestant_v1_viewer_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -257,7 +336,7 @@ func (x *SignUpViewer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SignUpViewer.ProtoReflect.Descriptor instead.
 func (*SignUpViewer) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{2}
+	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *SignUpViewer) GetName() string {
@@ -274,6 +353,162 @@ func (x *SignUpViewer) GetDisplayName() string {
 	return ""
 }
 
+type UnauthenticatedViewer struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UnauthenticatedViewer) Reset() {
+	*x = UnauthenticatedViewer{}
+	mi := &file_contestant_v1_viewer_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UnauthenticatedViewer) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UnauthenticatedViewer) ProtoMessage() {}
+
+func (x *UnauthenticatedViewer) ProtoReflect() protoreflect.Message {
+	mi := &file_contestant_v1_viewer_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UnauthenticatedViewer.ProtoReflect.Descriptor instead.
+func (*UnauthenticatedViewer) Descriptor() ([]byte, []int) {
+	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{4}
+}
+
+type ViewerAdmin struct {
+	state                     protoimpl.MessageState `protogen:"open.v1"`
+	CanListContestants        bool                   `protobuf:"varint,1,opt,name=can_list_contestants,json=canListContestants,proto3" json:"can_list_contestants,omitempty"`
+	CanImpersonateContestants bool                   `protobuf:"varint,2,opt,name=can_impersonate_contestants,json=canImpersonateContestants,proto3" json:"can_impersonate_contestants,omitempty"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
+}
+
+func (x *ViewerAdmin) Reset() {
+	*x = ViewerAdmin{}
+	mi := &file_contestant_v1_viewer_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ViewerAdmin) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ViewerAdmin) ProtoMessage() {}
+
+func (x *ViewerAdmin) ProtoReflect() protoreflect.Message {
+	mi := &file_contestant_v1_viewer_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ViewerAdmin.ProtoReflect.Descriptor instead.
+func (*ViewerAdmin) Descriptor() ([]byte, []int) {
+	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ViewerAdmin) GetCanListContestants() bool {
+	if x != nil {
+		return x.CanListContestants
+	}
+	return false
+}
+
+func (x *ViewerAdmin) GetCanImpersonateContestants() bool {
+	if x != nil {
+		return x.CanImpersonateContestants
+	}
+	return false
+}
+
+type ContestantSummary struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	DisplayName   string                 `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	TeamName      string                 `protobuf:"bytes,3,opt,name=team_name,json=teamName,proto3" json:"team_name,omitempty"`
+	TeamCode      int64                  `protobuf:"varint,4,opt,name=team_code,json=teamCode,proto3" json:"team_code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ContestantSummary) Reset() {
+	*x = ContestantSummary{}
+	mi := &file_contestant_v1_viewer_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ContestantSummary) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ContestantSummary) ProtoMessage() {}
+
+func (x *ContestantSummary) ProtoReflect() protoreflect.Message {
+	mi := &file_contestant_v1_viewer_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ContestantSummary.ProtoReflect.Descriptor instead.
+func (*ContestantSummary) Descriptor() ([]byte, []int) {
+	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ContestantSummary) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ContestantSummary) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *ContestantSummary) GetTeamName() string {
+	if x != nil {
+		return x.TeamName
+	}
+	return ""
+}
+
+func (x *ContestantSummary) GetTeamCode() int64 {
+	if x != nil {
+		return x.TeamCode
+	}
+	return 0
+}
+
 type GetViewerRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -282,7 +517,7 @@ type GetViewerRequest struct {
 
 func (x *GetViewerRequest) Reset() {
 	*x = GetViewerRequest{}
-	mi := &file_contestant_v1_viewer_proto_msgTypes[3]
+	mi := &file_contestant_v1_viewer_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -294,7 +529,7 @@ func (x *GetViewerRequest) String() string {
 func (*GetViewerRequest) ProtoMessage() {}
 
 func (x *GetViewerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_viewer_proto_msgTypes[3]
+	mi := &file_contestant_v1_viewer_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -307,7 +542,7 @@ func (x *GetViewerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetViewerRequest.ProtoReflect.Descriptor instead.
 func (*GetViewerRequest) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{3}
+	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{7}
 }
 
 type GetViewerResponse struct {
@@ -319,7 +554,7 @@ type GetViewerResponse struct {
 
 func (x *GetViewerResponse) Reset() {
 	*x = GetViewerResponse{}
-	mi := &file_contestant_v1_viewer_proto_msgTypes[4]
+	mi := &file_contestant_v1_viewer_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -331,7 +566,7 @@ func (x *GetViewerResponse) String() string {
 func (*GetViewerResponse) ProtoMessage() {}
 
 func (x *GetViewerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_viewer_proto_msgTypes[4]
+	mi := &file_contestant_v1_viewer_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -344,12 +579,92 @@ func (x *GetViewerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetViewerResponse.ProtoReflect.Descriptor instead.
 func (*GetViewerResponse) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{4}
+	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetViewerResponse) GetViewer() *Viewer {
 	if x != nil {
 		return x.Viewer
+	}
+	return nil
+}
+
+type ListContestantsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListContestantsRequest) Reset() {
+	*x = ListContestantsRequest{}
+	mi := &file_contestant_v1_viewer_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListContestantsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListContestantsRequest) ProtoMessage() {}
+
+func (x *ListContestantsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_contestant_v1_viewer_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListContestantsRequest.ProtoReflect.Descriptor instead.
+func (*ListContestantsRequest) Descriptor() ([]byte, []int) {
+	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{9}
+}
+
+type ListContestantsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Contestants   []*ContestantSummary   `protobuf:"bytes,1,rep,name=contestants,proto3" json:"contestants,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListContestantsResponse) Reset() {
+	*x = ListContestantsResponse{}
+	mi := &file_contestant_v1_viewer_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListContestantsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListContestantsResponse) ProtoMessage() {}
+
+func (x *ListContestantsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_contestant_v1_viewer_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListContestantsResponse.ProtoReflect.Descriptor instead.
+func (*ListContestantsResponse) Descriptor() ([]byte, []int) {
+	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ListContestantsResponse) GetContestants() []*ContestantSummary {
+	if x != nil {
+		return x.Contestants
 	}
 	return nil
 }
@@ -365,7 +680,7 @@ type SignUpRequest struct {
 
 func (x *SignUpRequest) Reset() {
 	*x = SignUpRequest{}
-	mi := &file_contestant_v1_viewer_proto_msgTypes[5]
+	mi := &file_contestant_v1_viewer_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -377,7 +692,7 @@ func (x *SignUpRequest) String() string {
 func (*SignUpRequest) ProtoMessage() {}
 
 func (x *SignUpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_viewer_proto_msgTypes[5]
+	mi := &file_contestant_v1_viewer_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -390,7 +705,7 @@ func (x *SignUpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SignUpRequest.ProtoReflect.Descriptor instead.
 func (*SignUpRequest) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{5}
+	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *SignUpRequest) GetName() string {
@@ -422,7 +737,7 @@ type SignUpResponse struct {
 
 func (x *SignUpResponse) Reset() {
 	*x = SignUpResponse{}
-	mi := &file_contestant_v1_viewer_proto_msgTypes[6]
+	mi := &file_contestant_v1_viewer_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -434,7 +749,7 @@ func (x *SignUpResponse) String() string {
 func (*SignUpResponse) ProtoMessage() {}
 
 func (x *SignUpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_contestant_v1_viewer_proto_msgTypes[6]
+	mi := &file_contestant_v1_viewer_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -447,43 +762,63 @@ func (x *SignUpResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SignUpResponse.ProtoReflect.Descriptor instead.
 func (*SignUpResponse) Descriptor() ([]byte, []int) {
-	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{6}
+	return file_contestant_v1_viewer_proto_rawDescGZIP(), []int{12}
 }
 
 var File_contestant_v1_viewer_proto protoreflect.FileDescriptor
 
 const file_contestant_v1_viewer_proto_rawDesc = "" +
 	"\n" +
-	"\x1acontestant/v1/viewer.proto\x12\rcontestant.v1\x1a\x1bbuf/validate/validate.proto\"\xd0\x01\n" +
+	"\x1acontestant/v1/viewer.proto\x12\rcontestant.v1\x1a\x1bbuf/validate/validate.proto\"\xd4\x02\n" +
 	"\x06Viewer\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12-\n" +
 	"\x04type\x18\x02 \x01(\x0e2\x19.contestant.v1.ViewerTypeR\x04type\x12A\n" +
 	"\n" +
 	"contestant\x18\x03 \x01(\v2\x1f.contestant.v1.ContestantViewerH\x00R\n" +
 	"contestant\x126\n" +
-	"\asign_up\x18\x04 \x01(\v2\x1b.contestant.v1.SignUpViewerH\x00R\x06signUpB\b\n" +
-	"\x06viewer\"I\n" +
+	"\asign_up\x18\x04 \x01(\v2\x1b.contestant.v1.SignUpViewerH\x00R\x06signUp\x12P\n" +
+	"\x0funauthenticated\x18\x05 \x01(\v2$.contestant.v1.UnauthenticatedViewerH\x00R\x0funauthenticated\x120\n" +
+	"\x05admin\x18\x06 \x01(\v2\x1a.contestant.v1.ViewerAdminR\x05adminB\b\n" +
+	"\x06viewer\"\x8d\x01\n" +
 	"\x10ContestantViewer\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12!\n" +
-	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\"E\n" +
+	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12B\n" +
+	"\rimpersonation\x18\x03 \x01(\v2\x1c.contestant.v1.ImpersonationR\rimpersonation\".\n" +
+	"\rImpersonation\x12\x1d\n" +
+	"\n" +
+	"admin_name\x18\x01 \x01(\tR\tadminName\"E\n" +
 	"\fSignUpViewer\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12!\n" +
-	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\"\x12\n" +
+	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\"\x17\n" +
+	"\x15UnauthenticatedViewer\"\x7f\n" +
+	"\vViewerAdmin\x120\n" +
+	"\x14can_list_contestants\x18\x01 \x01(\bR\x12canListContestants\x12>\n" +
+	"\x1bcan_impersonate_contestants\x18\x02 \x01(\bR\x19canImpersonateContestants\"\x84\x01\n" +
+	"\x11ContestantSummary\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12!\n" +
+	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x1b\n" +
+	"\tteam_name\x18\x03 \x01(\tR\bteamName\x12\x1b\n" +
+	"\tteam_code\x18\x04 \x01(\x03R\bteamCode\"\x12\n" +
 	"\x10GetViewerRequest\"J\n" +
 	"\x11GetViewerResponse\x125\n" +
-	"\x06viewer\x18\x01 \x01(\v2\x15.contestant.v1.ViewerB\x06\xbaH\x03\xc8\x01\x01R\x06viewer\"o\n" +
+	"\x06viewer\x18\x01 \x01(\v2\x15.contestant.v1.ViewerB\x06\xbaH\x03\xc8\x01\x01R\x06viewer\"\x18\n" +
+	"\x16ListContestantsRequest\"]\n" +
+	"\x17ListContestantsResponse\x12B\n" +
+	"\vcontestants\x18\x01 \x03(\v2 .contestant.v1.ContestantSummaryR\vcontestants\"o\n" +
 	"\rSignUpRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12!\n" +
 	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12'\n" +
 	"\x0finvitation_code\x18\x03 \x01(\tR\x0einvitationCode\"\x10\n" +
-	"\x0eSignUpResponse*^\n" +
+	"\x0eSignUpResponse*\x7f\n" +
 	"\n" +
 	"ViewerType\x12\x1b\n" +
 	"\x17VIEWER_TYPE_UNSPECIFIED\x10\x00\x12\x1a\n" +
 	"\x16VIEWER_TYPE_CONTESTANT\x10\x01\x12\x17\n" +
-	"\x13VIEWER_TYPE_SIGN_UP\x10\x022\xa6\x01\n" +
+	"\x13VIEWER_TYPE_SIGN_UP\x10\x02\x12\x1f\n" +
+	"\x1bVIEWER_TYPE_UNAUTHENTICATED\x10\x032\x88\x02\n" +
 	"\rViewerService\x12N\n" +
-	"\tGetViewer\x12\x1f.contestant.v1.GetViewerRequest\x1a .contestant.v1.GetViewerResponse\x12E\n" +
+	"\tGetViewer\x12\x1f.contestant.v1.GetViewerRequest\x1a .contestant.v1.GetViewerResponse\x12`\n" +
+	"\x0fListContestants\x12%.contestant.v1.ListContestantsRequest\x1a&.contestant.v1.ListContestantsResponse\x12E\n" +
 	"\x06SignUp\x12\x1c.contestant.v1.SignUpRequest\x1a\x1d.contestant.v1.SignUpResponseBMZKgithub.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1;contestantv1b\x06proto3"
 
 var (
@@ -499,31 +834,43 @@ func file_contestant_v1_viewer_proto_rawDescGZIP() []byte {
 }
 
 var file_contestant_v1_viewer_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_contestant_v1_viewer_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_contestant_v1_viewer_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_contestant_v1_viewer_proto_goTypes = []any{
-	(ViewerType)(0),           // 0: contestant.v1.ViewerType
-	(*Viewer)(nil),            // 1: contestant.v1.Viewer
-	(*ContestantViewer)(nil),  // 2: contestant.v1.ContestantViewer
-	(*SignUpViewer)(nil),      // 3: contestant.v1.SignUpViewer
-	(*GetViewerRequest)(nil),  // 4: contestant.v1.GetViewerRequest
-	(*GetViewerResponse)(nil), // 5: contestant.v1.GetViewerResponse
-	(*SignUpRequest)(nil),     // 6: contestant.v1.SignUpRequest
-	(*SignUpResponse)(nil),    // 7: contestant.v1.SignUpResponse
+	(ViewerType)(0),                 // 0: contestant.v1.ViewerType
+	(*Viewer)(nil),                  // 1: contestant.v1.Viewer
+	(*ContestantViewer)(nil),        // 2: contestant.v1.ContestantViewer
+	(*Impersonation)(nil),           // 3: contestant.v1.Impersonation
+	(*SignUpViewer)(nil),            // 4: contestant.v1.SignUpViewer
+	(*UnauthenticatedViewer)(nil),   // 5: contestant.v1.UnauthenticatedViewer
+	(*ViewerAdmin)(nil),             // 6: contestant.v1.ViewerAdmin
+	(*ContestantSummary)(nil),       // 7: contestant.v1.ContestantSummary
+	(*GetViewerRequest)(nil),        // 8: contestant.v1.GetViewerRequest
+	(*GetViewerResponse)(nil),       // 9: contestant.v1.GetViewerResponse
+	(*ListContestantsRequest)(nil),  // 10: contestant.v1.ListContestantsRequest
+	(*ListContestantsResponse)(nil), // 11: contestant.v1.ListContestantsResponse
+	(*SignUpRequest)(nil),           // 12: contestant.v1.SignUpRequest
+	(*SignUpResponse)(nil),          // 13: contestant.v1.SignUpResponse
 }
 var file_contestant_v1_viewer_proto_depIdxs = []int32{
-	0, // 0: contestant.v1.Viewer.type:type_name -> contestant.v1.ViewerType
-	2, // 1: contestant.v1.Viewer.contestant:type_name -> contestant.v1.ContestantViewer
-	3, // 2: contestant.v1.Viewer.sign_up:type_name -> contestant.v1.SignUpViewer
-	1, // 3: contestant.v1.GetViewerResponse.viewer:type_name -> contestant.v1.Viewer
-	4, // 4: contestant.v1.ViewerService.GetViewer:input_type -> contestant.v1.GetViewerRequest
-	6, // 5: contestant.v1.ViewerService.SignUp:input_type -> contestant.v1.SignUpRequest
-	5, // 6: contestant.v1.ViewerService.GetViewer:output_type -> contestant.v1.GetViewerResponse
-	7, // 7: contestant.v1.ViewerService.SignUp:output_type -> contestant.v1.SignUpResponse
-	6, // [6:8] is the sub-list for method output_type
-	4, // [4:6] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	0,  // 0: contestant.v1.Viewer.type:type_name -> contestant.v1.ViewerType
+	2,  // 1: contestant.v1.Viewer.contestant:type_name -> contestant.v1.ContestantViewer
+	4,  // 2: contestant.v1.Viewer.sign_up:type_name -> contestant.v1.SignUpViewer
+	5,  // 3: contestant.v1.Viewer.unauthenticated:type_name -> contestant.v1.UnauthenticatedViewer
+	6,  // 4: contestant.v1.Viewer.admin:type_name -> contestant.v1.ViewerAdmin
+	3,  // 5: contestant.v1.ContestantViewer.impersonation:type_name -> contestant.v1.Impersonation
+	1,  // 6: contestant.v1.GetViewerResponse.viewer:type_name -> contestant.v1.Viewer
+	7,  // 7: contestant.v1.ListContestantsResponse.contestants:type_name -> contestant.v1.ContestantSummary
+	8,  // 8: contestant.v1.ViewerService.GetViewer:input_type -> contestant.v1.GetViewerRequest
+	10, // 9: contestant.v1.ViewerService.ListContestants:input_type -> contestant.v1.ListContestantsRequest
+	12, // 10: contestant.v1.ViewerService.SignUp:input_type -> contestant.v1.SignUpRequest
+	9,  // 11: contestant.v1.ViewerService.GetViewer:output_type -> contestant.v1.GetViewerResponse
+	11, // 12: contestant.v1.ViewerService.ListContestants:output_type -> contestant.v1.ListContestantsResponse
+	13, // 13: contestant.v1.ViewerService.SignUp:output_type -> contestant.v1.SignUpResponse
+	11, // [11:14] is the sub-list for method output_type
+	8,  // [8:11] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_contestant_v1_viewer_proto_init() }
@@ -534,6 +881,7 @@ func file_contestant_v1_viewer_proto_init() {
 	file_contestant_v1_viewer_proto_msgTypes[0].OneofWrappers = []any{
 		(*Viewer_Contestant)(nil),
 		(*Viewer_SignUp)(nil),
+		(*Viewer_Unauthenticated)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -541,7 +889,7 @@ func file_contestant_v1_viewer_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_contestant_v1_viewer_proto_rawDesc), len(file_contestant_v1_viewer_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   7,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

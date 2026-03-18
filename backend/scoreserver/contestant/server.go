@@ -10,6 +10,7 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/pkg/connectutil"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/proto/contestant/v1/contestantv1connect"
 	"github.com/ictsc/ictsc-regalia/backend/pkg/ratelimiter"
+	adminauth "github.com/ictsc/ictsc-regalia/backend/scoreserver/admin/auth"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/config"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/connectdomain"
 	"github.com/ictsc/ictsc-regalia/backend/scoreserver/contestant/session"
@@ -27,6 +28,7 @@ import (
 func New(
 	ctx context.Context,
 	cfg config.ContestantAPI,
+	adminCfg config.AdminAPI,
 	db *sqlx.DB,
 	rdb redis.UniversalClient,
 	scheduler domain.ScheduleReader,
@@ -38,6 +40,14 @@ func New(
 	}
 	sessionStore.KeyPrefix("contestant-session:")
 	rateLimiter := ratelimiter.NewRedisRateLimiter(rdb, "contestant-rate-limiter:")
+	adminAuthenticator, err := adminauth.NewJWTAuthenticator(ctx, adminCfg.Authn)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create admin authenticator")
+	}
+	adminEnforcer, err := adminauth.NewEnforcer(adminCfg.Authz)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create admin enforcer")
+	}
 
 	interceptors := []connect.Interceptor{
 		connectutil.NewOtelInterceptor(),
@@ -47,7 +57,7 @@ func New(
 
 	mux := http.NewServeMux()
 
-	var authHandler http.Handler = newAuthHandler(cfg.Auth, repo, rateLimiter)
+	var authHandler http.Handler = newAuthHandler(cfg.Auth, repo, rateLimiter, adminEnforcer)
 	authHandler = sloghttp.Recovery(authHandler)
 	authHandler = sloghttp.NewWithConfig(slog.Default(), sloghttp.Config{
 		WithRequestID: false,
@@ -58,7 +68,7 @@ func New(
 	mux.Handle("/auth/", authHandler)
 
 	mux.Handle(contestantv1connect.NewViewerServiceHandler(
-		newViewerServiceHandler(repo),
+		newViewerServiceHandler(repo, adminEnforcer),
 		connect.WithInterceptors(interceptors...),
 	))
 	mux.Handle(contestantv1connect.NewProfileServiceHandler(
@@ -88,6 +98,7 @@ func New(
 
 	handler := http.Handler(mux)
 	handler = session.NewHandler(sessionStore)(handler)
+	handler = adminauth.WithAuthn(handler, adminAuthenticator)
 	handler = http.NewCrossOriginProtection().Handler(handler)
 	handler = h2c.NewHandler(handler, &http2.Server{})
 

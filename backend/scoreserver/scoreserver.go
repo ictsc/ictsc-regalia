@@ -64,7 +64,7 @@ func New(ctx context.Context, cfg *config.Config) (*ScoreServer, error) {
 		MaxHeaderBytes:    maxHeaderBytes,
 	}
 
-	contestantHandler, err := contestant.New(ctx, cfg.ContestantAPI, db, rdb, scheduleReader)
+	contestantHandler, err := contestant.New(ctx, cfg.ContestantAPI, cfg.AdminAPI, db, rdb, scheduleReader)
 	if err != nil {
 		return nil, err
 	}

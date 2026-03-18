@@ -39,7 +39,18 @@ export declare type Viewer = Message<"contestant.v1.Viewer"> & {
      */
     value: SignUpViewer;
     case: "signUp";
+  } | {
+    /**
+     * @generated from field: contestant.v1.UnauthenticatedViewer unauthenticated = 5;
+     */
+    value: UnauthenticatedViewer;
+    case: "unauthenticated";
   } | { case: undefined; value?: undefined };
+
+  /**
+   * @generated from field: contestant.v1.ViewerAdmin admin = 6;
+   */
+  admin?: ViewerAdmin;
 };
 
 /**
@@ -58,12 +69,17 @@ export declare type ContestantViewer = Message<"contestant.v1.ContestantViewer">
   name: string;
 
   /**
-   * TODO: チームに関する情報が必要
-   * コードかチーム自体か
-   *
    * @generated from field: string display_name = 2;
    */
   displayName: string;
+
+  /**
+   * TODO: チームに関する情報が必要
+   * コードかチーム自体か
+   *
+   * @generated from field: contestant.v1.Impersonation impersonation = 3;
+   */
+  impersonation?: Impersonation;
 };
 
 /**
@@ -71,6 +87,22 @@ export declare type ContestantViewer = Message<"contestant.v1.ContestantViewer">
  * Use `create(ContestantViewerSchema)` to create a new message.
  */
 export declare const ContestantViewerSchema: GenMessage<ContestantViewer>;
+
+/**
+ * @generated from message contestant.v1.Impersonation
+ */
+export declare type Impersonation = Message<"contestant.v1.Impersonation"> & {
+  /**
+   * @generated from field: string admin_name = 1;
+   */
+  adminName: string;
+};
+
+/**
+ * Describes the message contestant.v1.Impersonation.
+ * Use `create(ImpersonationSchema)` to create a new message.
+ */
+export declare const ImpersonationSchema: GenMessage<Impersonation>;
 
 /**
  * サインアップ中のユーザ
@@ -94,6 +126,70 @@ export declare type SignUpViewer = Message<"contestant.v1.SignUpViewer"> & {
  * Use `create(SignUpViewerSchema)` to create a new message.
  */
 export declare const SignUpViewerSchema: GenMessage<SignUpViewer>;
+
+/**
+ * @generated from message contestant.v1.UnauthenticatedViewer
+ */
+export declare type UnauthenticatedViewer = Message<"contestant.v1.UnauthenticatedViewer"> & {
+};
+
+/**
+ * Describes the message contestant.v1.UnauthenticatedViewer.
+ * Use `create(UnauthenticatedViewerSchema)` to create a new message.
+ */
+export declare const UnauthenticatedViewerSchema: GenMessage<UnauthenticatedViewer>;
+
+/**
+ * @generated from message contestant.v1.ViewerAdmin
+ */
+export declare type ViewerAdmin = Message<"contestant.v1.ViewerAdmin"> & {
+  /**
+   * @generated from field: bool can_list_contestants = 1;
+   */
+  canListContestants: boolean;
+
+  /**
+   * @generated from field: bool can_impersonate_contestants = 2;
+   */
+  canImpersonateContestants: boolean;
+};
+
+/**
+ * Describes the message contestant.v1.ViewerAdmin.
+ * Use `create(ViewerAdminSchema)` to create a new message.
+ */
+export declare const ViewerAdminSchema: GenMessage<ViewerAdmin>;
+
+/**
+ * @generated from message contestant.v1.ContestantSummary
+ */
+export declare type ContestantSummary = Message<"contestant.v1.ContestantSummary"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string display_name = 2;
+   */
+  displayName: string;
+
+  /**
+   * @generated from field: string team_name = 3;
+   */
+  teamName: string;
+
+  /**
+   * @generated from field: int64 team_code = 4;
+   */
+  teamCode: bigint;
+};
+
+/**
+ * Describes the message contestant.v1.ContestantSummary.
+ * Use `create(ContestantSummarySchema)` to create a new message.
+ */
+export declare const ContestantSummarySchema: GenMessage<ContestantSummary>;
 
 /**
  * @generated from message contestant.v1.GetViewerRequest
@@ -122,6 +218,34 @@ export declare type GetViewerResponse = Message<"contestant.v1.GetViewerResponse
  * Use `create(GetViewerResponseSchema)` to create a new message.
  */
 export declare const GetViewerResponseSchema: GenMessage<GetViewerResponse>;
+
+/**
+ * @generated from message contestant.v1.ListContestantsRequest
+ */
+export declare type ListContestantsRequest = Message<"contestant.v1.ListContestantsRequest"> & {
+};
+
+/**
+ * Describes the message contestant.v1.ListContestantsRequest.
+ * Use `create(ListContestantsRequestSchema)` to create a new message.
+ */
+export declare const ListContestantsRequestSchema: GenMessage<ListContestantsRequest>;
+
+/**
+ * @generated from message contestant.v1.ListContestantsResponse
+ */
+export declare type ListContestantsResponse = Message<"contestant.v1.ListContestantsResponse"> & {
+  /**
+   * @generated from field: repeated contestant.v1.ContestantSummary contestants = 1;
+   */
+  contestants: ContestantSummary[];
+};
+
+/**
+ * Describes the message contestant.v1.ListContestantsResponse.
+ * Use `create(ListContestantsResponseSchema)` to create a new message.
+ */
+export declare const ListContestantsResponseSchema: GenMessage<ListContestantsResponse>;
 
 /**
  * @generated from message contestant.v1.SignUpRequest
@@ -179,6 +303,11 @@ export enum ViewerType {
    * @generated from enum value: VIEWER_TYPE_SIGN_UP = 2;
    */
   SIGN_UP = 2,
+
+  /**
+   * @generated from enum value: VIEWER_TYPE_UNAUTHENTICATED = 3;
+   */
+  UNAUTHENTICATED = 3,
 }
 
 /**
@@ -197,6 +326,14 @@ export declare const ViewerService: GenService<{
     methodKind: "unary";
     input: typeof GetViewerRequestSchema;
     output: typeof GetViewerResponseSchema;
+  },
+  /**
+   * @generated from rpc contestant.v1.ViewerService.ListContestants
+   */
+  listContestants: {
+    methodKind: "unary";
+    input: typeof ListContestantsRequestSchema;
+    output: typeof ListContestantsResponseSchema;
   },
   /**
    * @generated from rpc contestant.v1.ViewerService.SignUp
