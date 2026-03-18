@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createConnectTransport } from "@connectrpc/connect-web";
 import { setupMSW } from "@app/__test__/msw/node";
 import { connect } from "@app/__test__/msw/connect";
 import { ViewerService } from "@ictsc/proto/contestant/v1";
@@ -20,8 +21,11 @@ describe("listImpersonationCandidates", () => {
         ],
       })),
     );
+    const transport = createConnectTransport({
+      baseUrl: "http://example.test",
+    });
 
-    await expect(listImpersonationCandidates()).resolves.toEqual([
+    await expect(listImpersonationCandidates(transport)).resolves.toEqual([
       {
         name: "alice",
         displayName: "Alice",

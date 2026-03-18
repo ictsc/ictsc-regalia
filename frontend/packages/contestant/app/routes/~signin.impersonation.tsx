@@ -15,8 +15,8 @@ import { ImpersonationPage } from "./impersonation.page";
 export const Route = createFileRoute("/signin/impersonation")({
   component: RouteComponent,
   validateSearch: validateSignInSearch,
-  loader: () => ({
-    candidates: listImpersonationCandidates(),
+  loader: ({ context: { transport } }) => ({
+    candidates: listImpersonationCandidates(transport),
   }),
 });
 

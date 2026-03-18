@@ -1,5 +1,8 @@
-import { createClient, ConnectError } from "@connectrpc/connect";
-import { createConnectTransport } from "@connectrpc/connect-web";
+import {
+  type Transport,
+  createClient,
+  ConnectError,
+} from "@connectrpc/connect";
 import { ViewerService } from "@ictsc/proto/contestant/v1";
 
 export type ImpersonationCandidate = {
@@ -13,16 +16,10 @@ function candidateRequestError(action: string): Error {
   return new Error(`成り代わり${action}に失敗しました`);
 }
 
-function createContestantTransport() {
-  return createConnectTransport({
-    baseUrl: typeof window === "undefined" ? "http://localhost" : "/api",
-  });
-}
-
-export async function listImpersonationCandidates(): Promise<
-  ImpersonationCandidate[]
-> {
-  const client = createClient(ViewerService, createContestantTransport());
+export async function listImpersonationCandidates(
+  transport: Transport,
+): Promise<ImpersonationCandidate[]> {
+  const client = createClient(ViewerService, transport);
   try {
     const { contestants } = await client.listContestants({});
     return contestants.map((contestant) => ({
