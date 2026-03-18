@@ -97,6 +97,7 @@ func New(
 	))
 
 	handler := http.Handler(mux)
+	handler = withImpersonationAuth(cfg.Auth.ExternalURL, adminEnforcer)(handler)
 	handler = session.NewHandler(sessionStore)(handler)
 	handler = adminauth.WithAuthn(handler, adminAuthenticator)
 	handler = http.NewCrossOriginProtection().Handler(handler)
