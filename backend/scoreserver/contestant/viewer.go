@@ -121,7 +121,7 @@ func (h *ViewerServiceHandler) ListContestants(
 	ctx context.Context,
 	_ *connect.Request[contestantv1.ListContestantsRequest],
 ) (*connect.Response[contestantv1.ListContestantsResponse], error) {
-	ok, err := h.AdminEnforcer.Enforce(adminauth.GetViewer(ctx), "contestants", "impersonate")
+	ok, err := h.AdminEnforcer.Enforce(adminauth.GetViewer(ctx), "contestants", "list")
 	if err != nil {
 		return nil, err
 	}
