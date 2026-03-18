@@ -82,7 +82,7 @@ func NewJWTAuthenticator(ctx context.Context, cfg config.AdminAuthn) (*JWTAuthen
 		if err != nil {
 			return nil, err
 		}
-		issuers[iss.name] = append(issuers[iss.name], iss)
+		issuers[issuerCfg.Issuer] = append(issuers[issuerCfg.Issuer], iss)
 	}
 
 	return &JWTAuthenticator{issuers: issuers}, nil

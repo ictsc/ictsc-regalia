@@ -57,7 +57,7 @@ func TestJWTAuthenticator_HandleRequest_UsesOnlyMatchingIssuer(t *testing.T) {
 }
 
 func jwtWithIssuer(issuer string) string {
-	header := base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"none","typ":"JWT"}`))
+	header := base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"RS256","typ":"JWT"}`))
 	payload := base64.RawURLEncoding.EncodeToString([]byte(fmt.Sprintf(`{"iss":%q}`, issuer)))
 	return header + "." + payload + ".signature"
 }
