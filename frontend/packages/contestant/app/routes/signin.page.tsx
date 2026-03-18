@@ -1,5 +1,4 @@
 import { Button, type ButtonProps } from "@headlessui/react";
-import { Link } from "@tanstack/react-router";
 import clydeIcon from "../../assets/icon_clyde_white_RGB.svg";
 import { Logo } from "../components/logo";
 import { Title } from "../components/title";
@@ -7,9 +6,14 @@ import { Title } from "../components/title";
 type Props = {
   signInURL: string;
   adminTokenAvailable: boolean;
+  impersonationURL: string;
 };
 
-export function SignInPage({ signInURL, adminTokenAvailable }: Props) {
+export function SignInPage({
+  signInURL,
+  adminTokenAvailable,
+  impersonationURL,
+}: Props) {
   return (
     <>
       <Title>ログイン</Title>
@@ -19,8 +23,8 @@ export function SignInPage({ signInURL, adminTokenAvailable }: Props) {
           <DiscordLoginButton href={signInURL} />
           {adminTokenAvailable ? (
             <Button
-              as={Link}
-              to="/signin/impersonation"
+              as="a"
+              href={impersonationURL}
               className="text-16 text-text border-disabled rounded-16 data-hover:bg-surface-1 border px-20 py-12"
             >
               Admin としてログイン

@@ -9,10 +9,12 @@ import {
   startImpersonation,
   type ImpersonationCandidate,
 } from "@app/features/viewer";
+import { validateSignInSearch } from "./~signin";
 import { ImpersonationPage } from "./impersonation.page";
 
 export const Route = createFileRoute("/signin/impersonation")({
   component: RouteComponent,
+  validateSearch: validateSignInSearch,
   loader: () => ({
     candidates: listImpersonationCandidates(),
   }),
@@ -20,6 +22,7 @@ export const Route = createFileRoute("/signin/impersonation")({
 
 function RouteComponent() {
   const { candidates: candidatesPromise } = Route.useLoaderData();
+  const { next: nextPath = "/" } = Route.useSearch();
   const candidates = use(useDeferredValue(candidatesPromise));
   const [selectedKey, setSelectedKey] = useState(() =>
     candidateKey(candidates[0]),
@@ -41,7 +44,7 @@ function RouteComponent() {
         teamCode: selected.teamCode,
       });
       await router.invalidate();
-      startTransition(() => navigate({ to: "/" }));
+      startTransition(() => navigate({ to: nextPath }));
     } catch (err) {
       setError(err instanceof Error ? err.message : "偽装の開始に失敗しました");
     } finally {

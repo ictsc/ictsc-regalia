@@ -41,11 +41,17 @@ function Page({ viewerPromise }: { viewerPromise: Promise<User> }) {
 
   const authURL = new URL("/api/auth/signin", window.location.origin);
   authURL.searchParams.set("next", nextPath);
+  const impersonationURL = new URL(
+    "/signin/impersonation",
+    window.location.origin,
+  );
+  impersonationURL.searchParams.set("next", nextPath);
 
   return (
     <SignInPage
       signInURL={authURL.toString()}
       adminTokenAvailable={viewer?.admin.canImpersonateContestants ?? false}
+      impersonationURL={impersonationURL.toString()}
     />
   );
 }
