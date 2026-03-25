@@ -201,8 +201,8 @@ github.com/samber/slog-formatter v1.2.2 h1:/JSzXcF0TUA1GRt/4g1AJc7h0ofyn7wx21oUj
 github.com/samber/slog-formatter v1.2.2/go.mod h1:zBYmoFkeV2LT3tyiaAehpJ1pOI+CtQz/xjXvbedx26Q=
 github.com/samber/slog-http v1.12.0 h1:Vbk9G9my//+GkY8Bc1FEviumgnxmmPaG6qyF4FX4rb0=
 github.com/samber/slog-http v1.12.0/go.mod h1:PAcQQrYFo5KM7Qbk50gNNwKEAMGCyfsw6GN5dI0iv9g=
-github.com/samber/slog-multi v1.7.1 h1:aCLXHRxgU+2v0PVlEOh7phynzM7CRo89ZgFtOwaqVEE=
-github.com/samber/slog-multi v1.7.1/go.mod h1:A4KQC99deqfkCDJcL/cO3kX6McX7FffQAx/8QHink+c=
+github.com/samber/slog-multi v1.8.0 h1:E05c1wnQ+8M58oQDBABlJ4TEIJWssNgtckso3zlaLlI=
+github.com/samber/slog-multi v1.8.0/go.mod h1:6+3j/ILxDvAcLD75YdQAm6iKWu6AmwlohLgQxL/2aiI=
 github.com/shirou/gopsutil/v4 v4.26.2 h1:X8i6sicvUFih4BmYIGT1m2wwgw2VG9YgrDTi7cIRGUI=
 github.com/shirou/gopsutil/v4 v4.26.2/go.mod h1:LZ6ewCSkBqUpvSOf+LsTGnRinC6iaNUNMGBtDkJBaLQ=
 github.com/sirupsen/logrus v1.9.4 h1:TsZE7l11zFCLZnZ+teH4Umoq5BhEIfIzfRDZ1Uzql2w=
