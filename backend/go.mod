@@ -27,7 +27,7 @@ require (
 	github.com/rbcervilla/redisstore/v9 v9.0.0
 	github.com/redis/go-redis/extra/redisotel/v9 v9.18.0
 	github.com/redis/go-redis/v9 v9.18.0
-	github.com/samber/slog-formatter v1.2.2
+	github.com/samber/slog-formatter v1.3.0
 	github.com/samber/slog-http v1.12.0
 	github.com/testcontainers/testcontainers-go v0.41.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.41.0
