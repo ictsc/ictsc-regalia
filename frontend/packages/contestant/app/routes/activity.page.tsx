@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import { useEffect, useRef, type ComponentProps } from "react";
 import { clsx } from "clsx";
 import { Link } from "@tanstack/react-router";
 import { Title } from "../components/title";
@@ -24,6 +24,88 @@ const formatter = new Intl.DateTimeFormat("ja-JP", {
 });
 
 export function ActivityPage(props: ActivityPageProps) {
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const listEl = listRef.current;
+    if (!listEl) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    // Find nearest scrollable ancestor
+    let scrollContainer: HTMLElement | null = listEl.parentElement;
+    while (scrollContainer) {
+      const style = getComputedStyle(scrollContainer);
+      if (
+        style.overflowY === "auto" ||
+        style.overflowY === "scroll" ||
+        style.overflow === "auto" ||
+        style.overflow === "scroll"
+      ) {
+        break;
+      }
+      scrollContainer = scrollContainer.parentElement;
+    }
+    const scrollTarget: HTMLElement | Window = scrollContainer ?? window;
+    const containerEl = scrollContainer ?? document.documentElement;
+
+    function update() {
+      if (!listEl) return;
+      const containerRect = containerEl.getBoundingClientRect();
+      const containerCenter = containerRect.top + containerEl.clientHeight / 2;
+      const halfHeight = containerEl.clientHeight / 2;
+
+      const rows = listEl.children;
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i] as HTMLElement;
+        const rowRect = row.getBoundingClientRect();
+        const itemCenter = rowRect.top + row.offsetHeight / 2;
+        const distance = Math.abs(itemCenter - containerCenter);
+        const t = Math.min(distance / halfHeight, 1);
+        const scale = 1 - t * 0.5;
+        const opacity = 1 - t * 0.7;
+        // 縦線(child[0])はスキップし、時刻・矢印・カードだけにエフェクトを適用
+        for (let j = 1; j < row.children.length; j++) {
+          const child = row.children[j] as HTMLElement;
+          child.style.transform = `scale(${scale})`;
+          // opacity-50 クラス（未採点カード）の場合は元の 0.5 を掛け合わせる
+          const baseOpacity = child.classList.contains("opacity-50") ? 0.5 : 1;
+          child.style.opacity = `${opacity * baseOpacity}`;
+        }
+      }
+    }
+
+    function updatePadding() {
+      if (!listEl || listEl.children.length === 0) return;
+      const half = containerEl.clientHeight / 2;
+      const firstRow = listEl.children[0] as HTMLElement;
+      const lastRow = listEl.children[
+        listEl.children.length - 1
+      ] as HTMLElement;
+      listEl.style.paddingTop = `${Math.max(0, half - firstRow.offsetHeight / 2)}px`;
+      listEl.style.paddingBottom = `${Math.max(0, half - lastRow.offsetHeight / 2)}px`;
+    }
+
+    updatePadding();
+    update();
+
+    scrollTarget.addEventListener("scroll", update, { passive: true });
+    const observer = new ResizeObserver(() => {
+      updatePadding();
+      update();
+    });
+    observer.observe(containerEl);
+
+    return () => {
+      scrollTarget.removeEventListener("scroll", update);
+      observer.disconnect();
+      if (listEl) {
+        listEl.style.paddingTop = "";
+        listEl.style.paddingBottom = "";
+      }
+    };
+  }, [props.entries]);
+
   return (
     <>
       <Title>アクティビティ</Title>
@@ -31,7 +113,7 @@ export function ActivityPage(props: ActivityPageProps) {
         {props.entries.length === 0 ? (
           <p className="text-16 text-text mt-64">提出履歴がありません</p>
         ) : (
-          <div className="flex w-full max-w-screen-md flex-col">
+          <div ref={listRef} className="flex w-full max-w-screen-md flex-col">
             {props.entries.map((entry, index) => (
               <div
                 key={`${entry.problemCode}-${entry.answerId}`}
