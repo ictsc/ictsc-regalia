@@ -36,7 +36,7 @@ type (
 )
 
 const (
-	AnswerInterval = 20 * time.Minute
+	AnswerInterval = 1 * time.Millisecond
 )
 
 func ListAnswersForAdmin(ctx context.Context, eff AnswerReader) ([]*Answer, error) {
