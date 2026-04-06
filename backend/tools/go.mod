@@ -252,7 +252,7 @@ require (
 	github.com/uudashr/gocognit v1.2.1 // indirect
 	github.com/uudashr/iface v1.4.1 // indirect
 	github.com/vbatts/tar-split v0.12.2 // indirect
-	github.com/wasilibs/go-pgquery v0.0.0-20260402081456-4f3ceb8ef86c // indirect
+	github.com/wasilibs/go-pgquery v0.0.0-20260406132815-2d1882eb027f // indirect
 	github.com/wasilibs/wazero-helpers v0.0.0-20250123031827-cd30c44769bb // indirect
 	github.com/xen0n/gosmopolitan v1.3.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
