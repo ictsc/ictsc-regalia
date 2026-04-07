@@ -11,7 +11,7 @@ COPY . .
 RUN pnpm install --recursive --offline
 RUN pnpm run build
 
-FROM nginx:1.29.7 AS frontend
+FROM nginx:1.29.8 AS frontend
 COPY <<EOF /etc/nginx/conf.d/default.conf
 server {
     listen 8080;
