@@ -8,7 +8,7 @@ runs:
       with:
         node-version-file: frontend/.node-version
     - name: Install pnpm
-      uses: pnpm/action-setup@v5
+      uses: pnpm/action-setup@v6
       with:
         version: "10" # >=10 is required for bootstrapping
     - name: Get pnpm store path
