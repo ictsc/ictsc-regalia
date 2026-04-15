@@ -116,8 +116,8 @@ github.com/breml/errchkjson v0.4.1 h1:keFSS8D7A2T0haP9kzZTi7o26r7kE3vymjZNeNDRDw
 github.com/breml/errchkjson v0.4.1/go.mod h1:a23OvR6Qvcl7DG/Z4o0el6BRAjKnaReoPQFciAl9U3s=
 github.com/brianvoe/gofakeit/v6 v6.28.0 h1:Xib46XXuQfmlLS2EXRuJpqcw8St6qSZz75OUo0tgAW4=
 github.com/brianvoe/gofakeit/v6 v6.28.0/go.mod h1:Xj58BMSnFqcn/fAQeSK+/PLtC5kSb7FJIq4JyGa8vEs=
-github.com/bufbuild/buf v1.68.0 h1:mk2Z5UcHbywzu537u63hOMjvCAux16bv4EGXLULrdHQ=
-github.com/bufbuild/buf v1.68.0/go.mod h1:O17Pu398p9ubur71hxFXyHccudObFRe+UTF8lpEw7Cg=
+github.com/bufbuild/buf v1.68.1 h1:+6uBl5SJhZ3YbHSJ6p1ws/uKxC2SLD+97VObeLKfp6A=
+github.com/bufbuild/buf v1.68.1/go.mod h1:V/TNu6qoHCwVbAVM9rj3LcPCiJwNg0g8HBXW041eD34=
 github.com/bufbuild/protocompile v0.14.2-0.20260414204819-0b1a6cd46bcb h1:jdS2S8gfhRe0KGzvVbysqIsobREx4dDq9e1hppy4a6A=
 github.com/bufbuild/protocompile v0.14.2-0.20260414204819-0b1a6cd46bcb/go.mod h1:DhgqsRznX/F0sGkUYtTQJRP+q8xMReQRQ3qr+n1opWU=
 github.com/bufbuild/protoplugin v0.0.0-20260414125817-25d1d281b46b h1:b7wvo9ZhjLzCp7tGbOUMvgtYTnd33zGSAmMxcdxMnhQ=
