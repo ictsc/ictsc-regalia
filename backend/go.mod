@@ -15,7 +15,7 @@ require (
 	github.com/casbin/casbin/v3 v3.10.0
 	github.com/cockroachdb/errors v1.12.0
 	github.com/coreos/go-oidc/v3 v3.18.0
-	github.com/docker/go-connections v0.6.0
+	github.com/docker/go-connections v0.7.0
 	github.com/go-slog/otelslog v0.3.0
 	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/google/go-cmp v0.7.0
