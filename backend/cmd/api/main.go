@@ -1,53 +1,28 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
-	"time"
 
-	"github.com/danielgtaylor/huma/v2"
-	"github.com/danielgtaylor/huma/v2/adapters/humachi"
-	"github.com/go-chi/chi/v5"
+	"github.com/ictsc/ictsc-regalia/backend/internal/config"
+	"github.com/ictsc/ictsc-regalia/backend/internal/handler"
 )
 
-type HealthOutput struct {
-	Body struct {
-		Status string `json:"status"`
-	}
-}
-
-func health(
-	ctx context.Context,
-	input *struct{},
-) (*HealthOutput, error) {
-	output := &HealthOutput{}
-	output.Body.Status = "ok"
-
-	return output, nil
-}
-
 func main() {
-	// chiルータの初期化
-	router := chi.NewRouter()
+	// 環境変数からサーバーの設定を読み込む
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// humaのAPIインスタンスを作成
-	api := humachi.New(
-		router,
-		huma.DefaultConfig(
-			"ICTSC 2026 Score Server API",
-			"0.0.1",
-		),
-	)
+	// Huma APIとHTTPルーターを作成する
+	app := handler.New()
 
-	// ヘルスチェックエンドポイントの定義
-	huma.Get(api, "/health", health)
-
-	// サーバの設定と起動
+	// HTTPサーバーを起動する
 	server := &http.Server{
-		Addr:              ":8080",
-		Handler:           router,
-		ReadHeaderTimeout: 5 * time.Second,
+		Addr:              cfg.Address,
+		Handler:           app.Router,
+		ReadHeaderTimeout: cfg.ReadHeaderTimeout,
 	}
 
 	log.Printf("Starting server on %s", server.Addr)

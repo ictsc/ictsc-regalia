@@ -1,5 +1,11 @@
 version: 3
 tasks:
+  dev-backend:
+    desc: バックエンドをホットリロード付きで起動
+    dir: backend
+    cmds:
+      - go tool air -c .air.toml
+
   generate:
     desc: 自動生成ファイルをすべて生成
     cmds:
