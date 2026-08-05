@@ -1,0 +1,43 @@
+name: OpenAPI CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - backend/**/*.go
+      - backend/go.mod
+      - backend/go.sum
+      - backend/openapi.json
+      - .github/workflows/openapi-ci.yaml
+  pull_request:
+    paths:
+      - backend/**/*.go
+      - backend/go.mod
+      - backend/go.sum
+      - backend/openapi.json
+      - .github/workflows/openapi-ci.yaml
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  generate:
+    name: Generate OpenAPI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      - name: Generate OpenAPI
+        run: go generate -x ./scripts/export-openapi
+
+      - name: Check Generated File
+        run: git diff --exit-code -- openapi.json
