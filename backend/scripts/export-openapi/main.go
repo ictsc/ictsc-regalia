@@ -1,3 +1,5 @@
+//go:generate go run . -output ../../openapi.json
+
 package main
 
 import (
