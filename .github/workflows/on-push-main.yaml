@@ -5,9 +5,17 @@ on:
     branches: [main]
 
 jobs:
-  build:
-    name: Build
+  backend:
+    name: Build Backend
     uses: ./.github/workflows/wf-docker-build.yaml
     with:
+      target: backend
+      push-ghcr: true
+      save-cache: true
+  frontend:
+    name: Build Frontend
+    uses: ./.github/workflows/wf-docker-build.yaml
+    with:
+      target: frontend
       push-ghcr: true
       save-cache: true

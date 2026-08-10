@@ -1,141 +1,47 @@
-name: Backend CI Pipeline
+name: Backend CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 defaults:
   run:
     working-directory: backend
 
 jobs:
-  lint:
-    name: Lint
+  backend:
+    name: Backend CI
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-      - name: Setup Go
-        uses: ./.github/actions/setup-go
-      - name: Restore Build Cache
-        id: golangci-lint-build-cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.cache/go-build
-          key: golangci-lint-build-${{ hashFiles('backend/tools/go.sum') }}
-          restore-keys: golangci-lint-build-
-      - name: Restore golangci-lint cache
-        id: golangci-lint-cache
-        uses: actions/cache/restore@v5
-        with:
-          path: ~/.cache/golangci-lint
-          key: golangci-lint-cache-${{ hashFiles('backend/**/*.go') }}
-          restore-keys: golangci-lint-cache-
-      - name: Run golangci-lint
-        run: ./tools/run github.com/golangci/golangci-lint/v2/cmd/golangci-lint run --timeout=10m --path-prefix=backend --issues-exit-code=0
-        working-directory: backend
-      - name: Save Build Cache
-        uses: actions/cache/save@v5
-        if: >-
-          always() && steps.golangci-lint-build-cache.outputs.cache-hit != 'true'
-          && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        with:
-          path: ~/.cache/go-build
-          key: ${{ steps.golangci-lint-build-cache.outputs.cache-primary-key }}
-      - name: Save golangci-lint cache
-        uses: actions/cache/save@v5
-        if: >-
-          always() && steps.golangci-lint-cache.outputs.cache-hit != 'true'
-          && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        with:
-          path: ~/.cache/golangci-lint
-          key: ${{ steps.golangci-lint-cache.outputs.cache-primary-key }}
-  test:
-    name: Test
-    needs: [test-go, test-schema]
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo
-        working-directory: /
-  test-go:
-    name: Test Go
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Setup Go
-        uses: ./.github/actions/setup-go
-      - uses: actions/cache/restore@v5
-        id: go-build-cache
-        with:
-          path: ~/.cache/go-build
-          key: go-build-${{ hashFiles('backend/go.sum') }}
-          restore-keys: |
-            go-build-
-      - name: Run Test
-        run: go test -race -shuffle on -parallel 8 -v ./...
-      - uses: actions/cache/save@v5
-        if: >-
-          always() && steps.go-build-cache.outputs.cache-hit != 'true'
-          && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        with:
-          path: ~/.cache/go-build
-          key: ${{ steps.go-build-cache.outputs.cache-primary-key }}
-  test-schema:
-    name: Test Schema
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:18
-        env:
-          POSTGRES_PASSWORD: password
-          POSTGRES_USER: ictsc
-          POSTGRES_DB: ictscore
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-    env:
-      PGHOST: localhost
-      PGPORT: "5432"
-      PGUSER: ictsc
-      PGPASSWORD: password
-      PGDATABASE: ictscore
-    steps:
-      - name: Checkout Default Branch
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.repository.default_branch }}
-      - name: Init DB
-        run: cat schema.sql view.sql seed.sql | psql
 
-      - name: Checkout
-        uses: actions/checkout@v6
       - name: Setup Go
-        uses: ./.github/actions/setup-go
-      - name: Restore Cache
-        id: sqldef-cache
-        uses: actions/cache/restore@v5
+        uses: actions/setup-go@v6
         with:
-          path: ~/.cache/go-build
-          key: sqldef-cache-${{ hashFiles('backend/tools/go.sum') }}
-          restore-keys: sqldef-cache-
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
 
-      - name: Run Migration
-        run: ./scripts/migrate
+      - name: Test
+        run: go test -race ./...
 
-      - name: Save Cache
-        uses: actions/cache/save@v5
-        if: >-
-          always() && steps.sqldef-cache.outputs.cache-hit != 'true'
-          && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+      - name: Generate OpenAPI
+        run: go generate -x ./scripts/export-openapi
+
+      - name: Check OpenAPI
+        run: git diff --exit-code -- openapi.json
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build Backend Image
+        uses: docker/bake-action@v7
         with:
-          path: ~/.cache/go-build
-          key: ${{ steps.sqldef-cache.outputs.cache-primary-key }}
+          source: .
+          files: docker-bake.hcl
+          targets: backend

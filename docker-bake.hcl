@@ -15,16 +15,8 @@ target "base" {
 target "backend" {
   inherits = ["base"]
   context = "./backend"
-  matrix = {
-    image = [
-      "backend",
-      "batch",
-      "toolbox"
-    ]
-  }
-  name = "${image}"
-  tags = make_tags(target.docker-metadata-action.tags, "${image}")
-  target = "${image}"
+  tags = make_tags(target.docker-metadata-action.tags, "backend")
+  target = "production"
 }
 
 target "frontend" {
