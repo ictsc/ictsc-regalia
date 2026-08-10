@@ -3,7 +3,15 @@ name: Frontend CI
 on:
   push:
     branches: [main]
+    paths:
+      - frontend/**
+      - .github/actions/setup-node/**
+      - .github/workflows/frontend-ci.yml
   pull_request:
+    paths:
+      - frontend/**
+      - .github/actions/setup-node/**
+      - .github/workflows/frontend-ci.yml
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -14,6 +22,23 @@ defaults:
     working-directory: frontend
 
 jobs:
+  generation:
+    name: Generation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
+      - name: Generate
+        run: pnpm run generate
+      - name: Check generated files
+        run: |
+          if ! git diff --quiet || test -n "$(git ls-files --others --exclude-standard)"; then
+            git status --short
+            git diff
+            exit 1
+          fi
   lint:
     name: Lint
     runs-on: ubuntu-latest

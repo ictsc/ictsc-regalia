@@ -4,13 +4,42 @@ on:
   push:
     branches:
       - main
+    paths:
+      - backend/**
+      - .github/actions/setup-go/**
+      - .github/workflows/backend-ci.yml
   pull_request:
+    paths:
+      - backend/**
+      - .github/actions/setup-go/**
+      - .github/workflows/backend-ci.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 defaults:
   run:
     working-directory: backend
 
 jobs:
+  generation:
+    name: Generation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Go
+        uses: ./.github/actions/setup-go
+      - name: Generate
+        run: go generate -x ./...
+      - name: Check generated files
+        run: |
+          if ! git diff --quiet || test -n "$(git ls-files --others --exclude-standard)"; then
+            git status --short
+            git diff
+            exit 1
+          fi
   lint:
     name: Lint
     runs-on: ubuntu-latest
