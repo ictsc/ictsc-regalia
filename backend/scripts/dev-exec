@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -eu
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+compose_file="$script_dir/../compose.yaml"
+
+postgres_address=$(docker compose -f "$compose_file" port postgres 5432)
+redis_address=$(docker compose -f "$compose_file" port redis 6379)
+
+if [ -z "$postgres_address" ] || [ -z "$redis_address" ]; then
+    echo "開発用サービスが起動していません。docker compose -f backend/compose.yaml up -d --waitを実行してください。" >&2
+    exit 1
+fi
+
+export PGHOST=127.0.0.1
+export PGPORT=${postgres_address##*:}
+export PGUSER=ictsc
+export PGPASSWORD=password
+export PGDATABASE=ictscore
+export PGSSLMODE=disable
+export REDIS_URL="redis://127.0.0.1:${redis_address##*:}/0"
+
+exec "$@"

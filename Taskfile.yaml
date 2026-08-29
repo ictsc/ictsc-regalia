@@ -1,5 +1,33 @@
 version: 3
 tasks:
+  dev-services:
+    desc: バックエンド開発用のPostgreSQLとRedisを起動
+    cmds:
+      - docker compose -f backend/compose.yaml up -d --wait postgres redis
+
+  dev-services-down:
+    desc: バックエンド開発用のPostgreSQLとRedisを停止
+    cmds:
+      - docker compose -f backend/compose.yaml down
+
+  dev-backend:
+    desc: バックエンドと依存サービスをDockerで起動
+    cmds:
+      - docker compose -f backend/compose.yaml up --build api
+
+  dev-backend-local:
+    desc: 依存サービスだけをDockerで起動してバックエンドはホストで起動
+    dir: backend
+    deps:
+      - dev-services
+    cmds:
+      - ./scripts/dev-exec go tool air -c .air.toml
+
+  dev-db:
+    desc: 開発用PostgreSQLへpsqlで接続
+    cmds:
+      - docker compose -f backend/compose.yaml exec postgres psql -U ictsc -d ictscore
+
   generate:
     desc: 自動生成ファイルをすべて生成
     cmds:

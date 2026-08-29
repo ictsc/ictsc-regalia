@@ -3,6 +3,9 @@ name: Build Docker Images
 on:
   workflow_call:
     inputs:
+      target:
+        type: string
+        required: true
       push-ghcr:
         type: boolean
         default: false
@@ -54,6 +57,7 @@ jobs:
           files: |
             docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
+          targets: ${{ inputs.target }}
           # 基本的に main ブランチのキャッシュしか共有できないのでキャッシュの保存はオプトインにしておく
           set: |
             *.cache-from=type=gha
