@@ -10,7 +10,7 @@
   "devDependencies": {
     "@tsconfig/vite-react": "^7.0.0",
     "pnpm": "10.33.0",
-    "typescript": "^6.0.0"
+    "typescript": "^7.0.0"
   },
   "packageManager": "pnpm@10.33.0",
   "engines": {
