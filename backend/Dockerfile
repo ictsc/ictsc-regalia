@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.26.5-bookworm AS base
+FROM golang:1.27.0-bookworm AS base
 
 ENV GOTOOLCHAIN=auto
 WORKDIR /workspace
