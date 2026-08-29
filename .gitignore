@@ -3,3 +3,5 @@
 !/.vscode/settings-sample.json
 !*/.vscode/settings-sample.json
 /backend/.air/
+
+.history/
