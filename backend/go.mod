@@ -22,7 +22,7 @@ require (
 	github.com/mattn/go-isatty v0.0.23 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.4.3 // indirect
-	github.com/spf13/afero v1.14.0 // indirect
+	github.com/spf13/afero v1.15.0 // indirect
 	github.com/spf13/cast v1.9.2 // indirect
 	github.com/tdewolff/parse/v2 v2.8.3 // indirect
 	golang.org/x/sys v0.47.0 // indirect
