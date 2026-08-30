@@ -45,9 +45,9 @@
     "@connectrpc/connect-web": "2.1.1",
     "@headlessui/react": "^2.1.2",
     "@ictsc/proto": "workspace:*",
-    "@shikijs/langs": "^3.2.1",
-    "@shikijs/rehype": "^3.2.1",
-    "@shikijs/themes": "^3.2.1",
+    "@shikijs/langs": "^4.0.0",
+    "@shikijs/rehype": "^4.0.0",
+    "@shikijs/themes": "^4.0.0",
     "@tanstack/react-router": "^1.49.2",
     "@tanstack/router-devtools": "^1.49.2",
     "clsx": "^2.1.1",
@@ -63,7 +63,7 @@
     "remark-math": "^6.0.0",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.1",
-    "shiki": "^3.2.1",
+    "shiki": "^4.0.0",
     "unified": "^11.0.5"
   }
 }
