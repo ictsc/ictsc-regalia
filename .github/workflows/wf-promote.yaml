@@ -1,0 +1,69 @@
+name: Promote Image
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      tag:
+        type: string
+        required: true
+    secrets:
+      K8S_CONFIG_APP_PRIVATE_KEY:
+        required: true
+
+jobs:
+  promote:
+    name: Update Deployment Config
+    runs-on: ubuntu-latest
+    concurrency:
+      group: regalia-config-promotion
+      cancel-in-progress: false
+    steps:
+      - name: Create config repository token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.K8S_CONFIG_APP_CLIENT_ID }}
+          private-key: ${{ secrets.K8S_CONFIG_APP_PRIVATE_KEY }}
+          owner: ictsc
+          repositories: ictsc-k8s-dev
+          permission-contents: write
+
+      - name: Check out deployment config
+        uses: actions/checkout@v7
+        with:
+          repository: ictsc/ictsc-k8s-dev
+          ref: main
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Update image versions
+        env:
+          DEPLOY_ENV: ${{ inputs.environment }}
+          IMAGE_TAG: ${{ inputs.tag }}
+        run: |
+          case "${DEPLOY_ENV}" in
+            dev|prod) ;;
+            *) echo "unsupported environment: ${DEPLOY_ENV}" >&2; exit 1 ;;
+          esac
+
+          file="manifest/base/apps/regalia/workload/overlays/${DEPLOY_ENV}/kustomization.yaml"
+          sed -i -E "s/^    newTag: .*/    newTag: ${IMAGE_TAG}/" "${file}"
+
+          if [ "$(grep -Fxc "    newTag: ${IMAGE_TAG}" "${file}")" -ne 2 ]; then
+            echo "failed to update both Regalia images in ${file}" >&2
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "${file}"
+
+          if git diff --cached --quiet; then
+            echo "${DEPLOY_ENV} already uses ${IMAGE_TAG}"
+            exit 0
+          fi
+
+          git commit -m "Deploy Regalia ${IMAGE_TAG} to ${DEPLOY_ENV}"
+          git push origin HEAD:main

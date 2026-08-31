@@ -12,7 +12,6 @@ jobs:
       target: backend
       push-ghcr: true
       save-cache: true
-      channel: dev
   frontend:
     name: Build Frontend
     uses: ./.github/workflows/wf-docker-build.yaml
@@ -20,4 +19,12 @@ jobs:
       target: frontend
       push-ghcr: true
       save-cache: true
-      channel: dev
+
+  promote:
+    name: Deploy to Dev
+    needs: [backend, frontend]
+    uses: ./.github/workflows/wf-promote.yaml
+    with:
+      environment: dev
+      tag: sha-${{ github.sha }}
+    secrets: inherit
