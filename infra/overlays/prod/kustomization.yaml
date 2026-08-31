@@ -1,0 +1,14 @@
+resources:
+  - ../../base
+
+images:
+  - name: ghcr.io/ictsc/ictsc-regalia/backend
+    newTag: prod
+  - name: ghcr.io/ictsc/ictsc-regalia/frontend
+    newTag: prod
+
+replicas:
+  - name: scoreserver-backend
+    count: 2
+  - name: scoreserver-frontend
+    count: 2

@@ -12,6 +12,7 @@ jobs:
       target: backend
       push-ghcr: true
       save-cache: true
+      channel: dev
   frontend:
     name: Build Frontend
     uses: ./.github/workflows/wf-docker-build.yaml
@@ -19,3 +20,4 @@ jobs:
       target: frontend
       push-ghcr: true
       save-cache: true
+      channel: dev

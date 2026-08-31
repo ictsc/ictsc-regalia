@@ -1,0 +1,39 @@
+name: On Version Tag
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  validate:
+    name: Validate Stable Version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          if [[ ! "${TAG}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::tag must be a stable semantic version such as v1.2.3"
+            exit 1
+          fi
+
+  backend:
+    name: Build Backend
+    needs: validate
+    uses: ./.github/workflows/wf-docker-build.yaml
+    with:
+      target: backend
+      push-ghcr: true
+      save-cache: true
+      channel: prod
+
+  frontend:
+    name: Build Frontend
+    needs: validate
+    uses: ./.github/workflows/wf-docker-build.yaml
+    with:
+      target: frontend
+      push-ghcr: true
+      save-cache: true
+      channel: prod

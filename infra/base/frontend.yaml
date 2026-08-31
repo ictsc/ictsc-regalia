@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scoreserver-frontend
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: scoreserver-frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: scoreserver-frontend
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: scoreserver
+          image: ghcr.io/ictsc/ictsc-regalia/frontend
+          imagePullPolicy: Always
+          ports:
+            - name: contestant
+              containerPort: 8080
+            - name: admin
+              containerPort: 8081
+          volumeMounts:
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: contestant
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: contestant
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scoreserver-frontend
+spec:
+  selector:
+    app.kubernetes.io/name: scoreserver-frontend
+  ports:
+    - name: contestant
+      port: 8080
+      targetPort: contestant
+    - name: admin
+      port: 8081
+      targetPort: admin

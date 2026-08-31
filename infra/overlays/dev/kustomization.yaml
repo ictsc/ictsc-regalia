@@ -1,0 +1,8 @@
+resources:
+  - ../../base
+
+images:
+  - name: ghcr.io/ictsc/ictsc-regalia/backend
+    newTag: dev
+  - name: ghcr.io/ictsc/ictsc-regalia/frontend
+    newTag: dev

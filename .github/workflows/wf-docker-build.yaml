@@ -12,6 +12,9 @@ on:
       save-cache:
         type: boolean
         default: false
+      channel:
+        type: string
+        default: ""
     outputs:
       result:
         value: ${{ jobs.build_and_push.outputs.result }}
@@ -46,6 +49,8 @@ jobs:
             ${{ inputs.push-ghcr && format('ghcr.io/{0}', github.repository) || '' }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=${{ inputs.channel }},enable=${{ inputs.channel != '' }}
+            type=semver,pattern={{version}}
             type=ref,event=pr
             type=sha
       - name: Build and Push Artifacts

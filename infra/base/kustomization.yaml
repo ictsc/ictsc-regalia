@@ -1,0 +1,7 @@
+resources:
+  - ./backend.yaml
+  - ./frontend.yaml
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: regalia
