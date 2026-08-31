@@ -1,6 +1,7 @@
 resources:
   - ./backend.yaml
   - ./frontend.yaml
+  - ./httproute.yaml
 
 labels:
   - pairs:

@@ -1,0 +1,51 @@
+- op: add
+  path: /spec/rules/0
+  value:
+    matches:
+      - path:
+          type: PathPrefix
+          value: /oauth2
+    backendRefs:
+      - name: oauth2-proxy
+        namespace: oauth2-proxy
+        port: 80
+- op: add
+  path: /spec/rules/1/filters/-
+  value:
+    type: ExternalAuth
+    externalAuth:
+      protocol: HTTP
+      backendRef:
+        kind: Service
+        name: oauth2-proxy
+        namespace: oauth2-proxy
+        port: 80
+      http:
+        allowedHeaders:
+          - Cookie
+          - X-Forwarded-Proto
+          - X-Forwarded-Host
+        allowedResponseHeaders:
+          - Set-Cookie
+          - X-Auth-Request-User
+          - X-Auth-Request-Email
+- op: add
+  path: /spec/rules/2/filters
+  value:
+    - type: ExternalAuth
+      externalAuth:
+        protocol: HTTP
+        backendRef:
+          kind: Service
+          name: oauth2-proxy
+          namespace: oauth2-proxy
+          port: 80
+        http:
+          allowedHeaders:
+            - Cookie
+            - X-Forwarded-Proto
+            - X-Forwarded-Host
+          allowedResponseHeaders:
+            - Set-Cookie
+            - X-Auth-Request-User
+            - X-Auth-Request-Email

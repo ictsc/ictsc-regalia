@@ -1,11 +1,18 @@
 resources:
   - ../../base
 
+namespace: scoreserver
+
 images:
-  - name: ghcr.io/ictsc/ictsc-regalia/backend
+  - name: backend
+    newName: ghcr.io/ictsc/ictsc-regalia/backend
     newTag: prod
-  - name: ghcr.io/ictsc/ictsc-regalia/frontend
+  - name: frontend
+    newName: ghcr.io/ictsc/ictsc-regalia/frontend
     newTag: prod
+
+patches:
+  - path: httproute-patch.yaml
 
 replicas:
   - name: scoreserver-backend

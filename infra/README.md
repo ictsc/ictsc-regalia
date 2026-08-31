@@ -11,6 +11,11 @@ stable semantic-version tag.
 Argo CD adds the resolved Git commit as a common annotation, so advancing either
 revision rolls the Deployments even though the channel image tag is stable.
 
+Each overlay also publishes the contestant and admin frontends through the
+cluster's `gateway/external` Gateway. Requests under `/api` are sent to the
+backend after removing the prefix. The dev routes use the cluster's
+oauth2-proxy ExternalAuth flow; the prod routes do not.
+
 The previous deployment in `ictsc-regalia-release` also contained PostgreSQL,
-Valkey, batch workers, secrets, and HTTPRoutes. They are intentionally not copied
-here until the rewritten application needs them.
+Valkey, batch workers, and secrets. They are intentionally not copied here until
+the rewritten application needs them.

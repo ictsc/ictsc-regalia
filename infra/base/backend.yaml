@@ -13,30 +13,41 @@ spec:
       labels:
         app.kubernetes.io/name: scoreserver-backend
     spec:
+      automountServiceAccountToken: false
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: scoreserver-backend
+                topologyKey: kubernetes.io/hostname
       securityContext:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
       containers:
         - name: scoreserver
-          image: ghcr.io/ictsc/ictsc-regalia/backend
+          image: backend
           imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 8080
           readinessProbe:
             httpGet:
-              path: /healthz
+              path: /health
               port: http
           livenessProbe:
             httpGet:
-              path: /healthz
+              path: /health
               port: http
           resources:
             requests:
               cpu: 50m
               memory: 64Mi
             limits:
+              cpu: 500m
               memory: 256Mi
           securityContext:
             allowPrivilegeEscalation: false

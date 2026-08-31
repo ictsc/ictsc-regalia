@@ -1,0 +1,67 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: scoreserver-contestant
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: external
+      namespace: gateway
+      sectionName: https
+  hostnames:
+    - contestant.invalid
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: scoreserver-backend
+          port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: scoreserver-frontend
+          port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: scoreserver-admin
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: external
+      namespace: gateway
+      sectionName: https
+  hostnames:
+    - admin.invalid
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: scoreserver-backend
+          port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: scoreserver-frontend
+          port: 8081
