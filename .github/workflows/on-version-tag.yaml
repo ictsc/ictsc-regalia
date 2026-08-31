@@ -35,12 +35,3 @@ jobs:
       target: frontend
       push-ghcr: true
       save-cache: true
-
-  promote:
-    name: Deploy to Prod
-    needs: [backend, frontend]
-    uses: ./.github/workflows/wf-promote.yaml
-    with:
-      environment: prod
-      tag: ${{ github.ref_name }}
-    secrets: inherit

@@ -19,12 +19,3 @@ jobs:
       target: frontend
       push-ghcr: true
       save-cache: true
-
-  promote:
-    name: Deploy to Dev
-    needs: [backend, frontend]
-    uses: ./.github/workflows/wf-promote.yaml
-    with:
-      environment: dev
-      tag: sha-${{ github.sha }}
-    secrets: inherit
