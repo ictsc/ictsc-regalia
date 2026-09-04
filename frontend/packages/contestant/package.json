@@ -37,7 +37,7 @@
     "tailwindcss": "^4.1.18",
     "vite": "^8.0.0",
     "vite-tsconfig-paths": "^6.0.0",
-    "vitest": "^4.0.0"
+    "vitest": "^5.0.0"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.0.0",
