@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ICTSC 2026 REGALIA 競技用スコアサーバーの問題一覧プロトタイプ">
+    <title>問題一覧 / ICTSC 2026 Regalia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+JP:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20260830-6">
+    <script src="filters.js" defer></script>
+  </head>
+  <body>
+    <header class="competition-header">
+      <a class="brand" href="problems.html" aria-label="ICTSC 2026 REGALIA ホーム">
+        <span class="brand-name">ICTSC</span>
+        <span class="brand-edition">2026<br>REGALIA</span>
+      </a>
+
+      <div class="header-performance" aria-label="チームの成績">
+        <a class="header-solved" href="submissions.html" aria-label="11問中4問解答済み 提出履歴を見る"><span class="header-solved-value"><strong>4</strong><span>/ 11問</span></span><small>提出履歴を見る →</small></a>
+        <a class="header-ranking" href="ranking.html" aria-label="現在12位 2450点中1230点 順位表を見る">
+          <span class="header-neighbors"><span><small>1位</small><b>2,130</b></span><i aria-hidden="true">…</i><span><small>11位</small><b>1,290</b></span><span class="is-team"><small>12位</small><b><strong>1,230</strong><em>/ 2,450</em></b></span><span><small>13位</small><b>1,180</b></span></span>
+          <span class="header-ranking-link">順位表を見る →</span>
+        </a>
+      </div>
+
+      <div class="competition-clock">
+        <time datetime="PT2H13M48S">02:13:48</time>
+        <span>残り時間</span>
+      </div>
+      <aside class="competition-notice" aria-label="お知らせ">
+        <strong>お知らせ</strong><time datetime="2026-08-12T14:30:00+09:00">14:30</time><p>競技終了30分前です。回答の保存と提出状況を確認してください。</p><a href="notices.html">お知らせを確認する →</a>
+      </aside>
+      <details class="mobile-menu"><summary><span aria-hidden="true"></span><b class="visually-hidden">メニューを開く</b></summary><nav aria-label="モバイルメニュー"><a href="problems.html" aria-current="page">問題一覧</a><a href="submissions.html">提出履歴</a><a href="ranking.html">順位表</a><a href="notices.html">お知らせ</a></nav></details>
+    </header>
+
+    <main>
+      <div class="table-tools">
+          <details class="filters-panel">
+            <summary>絞り込み</summary>
+            <div class="filters-panel-content">
+              <label for="status-filter">採点状況</label>
+              <select id="status-filter"><option value="all">すべて</option><option value="unanswered">未回答</option><option value="zero">0点</option><option value="partial">部分点</option><option value="pending">採点中</option><option value="complete">満点</option></select>
+              <label for="day-filter">出題日</label>
+              <select id="day-filter"><option value="all">すべて</option><option value="day1">1日目</option><option value="day2">2日目</option><option value="both">両日</option></select>
+              <label for="category-filter">カテゴリ</label>
+              <select id="category-filter"><option value="all">すべて</option><option value="network">ネットワーク</option><option value="server">サーバー</option><option value="wireless">無線</option><option value="other">その他</option></select>
+            </div>
+          </details>
+      </div>
+
+      <section class="problem-table" data-day-group="day2" aria-labelledby="day2-heading">
+        <h1 class="problem-day-heading" id="day2-heading">2日目の問題</h1>
+        <div class="problem-row problem-heading">
+          <span>問題ID / 状態</span>
+          <span>カテゴリ</span>
+          <span>問題</span><span>得点</span>
+        </div>
+        <a class="problem-row" href="problem-simple.html" data-status="pending" data-day="day2" data-category="wireless" aria-label="A04 2日目 無線 無線LANに接続できない 採点中">
+          <span class="problem-id status-pending" title="A04 / 採点中"><b>A04</b><span class="visually-hidden">採点中</span></span>
+          <span class="problem-category">無線</span><span class="problem-title"><span>無線LANに接続できない</span></span><span class="problem-score is-pending"><b>—</b><small>採点中 / 200</small></span>
+        </a>
+        <a class="problem-row" href="problem.html" data-status="complete" data-day="day2" data-category="server" aria-label="B02 2日目 サーバー コンテナが起動を繰り返す 300点中300点 満点">
+          <span class="problem-id status-complete" title="B02 / 満点"><b>B02</b><span class="visually-hidden">満点</span></span>
+          <span class="problem-category">サーバー</span><span class="problem-title">コンテナが起動を繰り返す</span><span class="problem-score"><b>300</b><small>/ 300</small></span>
+        </a>
+        <a class="problem-row" href="problem.html" data-status="partial" data-day="day2" data-category="network" aria-label="B04 2日目 ネットワーク VPNトンネルが確立しない 200点中70点 部分点">
+          <span class="problem-id status-partial" title="B04 / 部分点"><b>B04</b><span class="visually-hidden">部分点</span></span>
+          <span class="problem-category">ネットワーク</span><span class="problem-title">VPNトンネルが確立しない</span><span class="problem-score"><b>070</b><small>/ 200</small></span>
+        </a>
+      </section>
+
+      <section class="problem-table" data-day-group="both" aria-labelledby="both-heading">
+        <h1 class="problem-day-heading" id="both-heading">両日の問題</h1>
+        <div class="problem-row problem-heading">
+          <span>問題ID / 状態</span><span>カテゴリ</span><span>問題</span><span>得点</span>
+        </div>
+        <a class="problem-row" href="problem.html" data-status="pending" data-day="both" data-category="server" aria-label="A02 両日 サーバー Webサーバーに接続できない 150点中80点 採点中 再提出まで14分">
+          <span class="problem-id status-pending is-cooldown" data-cooldown="14分" title="A02 / 採点中 / 再提出まで14分"><b>A02</b><span class="visually-hidden">採点中 再提出まで14分</span></span>
+          <span class="problem-category">サーバー</span><span class="problem-title">Webサーバーに接続できない</span><span class="problem-score is-pending"><b>080</b><small>採点中 / 150</small></span>
+        </a>
+        <a class="problem-row" href="problem.html" data-status="complete" data-day="both" data-category="server" aria-label="A05 両日 サーバー ログが保存されていない 200点中200点 満点">
+          <span class="problem-id status-complete" title="A05 / 満点"><b>A05</b><span class="visually-hidden">満点</span></span>
+          <span class="problem-category">サーバー</span><span class="problem-title">ログが保存されていない</span><span class="problem-score"><b>200</b><small>/ 200</small></span>
+        </a>
+        <a class="problem-row" href="problem.html" data-status="pending" data-day="both" data-category="wireless" aria-label="B03 両日 無線 AP間でローミングできない 採点中 再提出まで9分">
+          <span class="problem-id status-pending is-cooldown" data-cooldown="9分" title="B03 / 採点中 / 再提出まで9分"><b>B03</b><span class="visually-hidden">採点中 再提出まで9分</span></span>
+          <span class="problem-category">無線</span><span class="problem-title">AP間でローミングできない</span><span class="problem-score is-pending"><b>—</b><small>採点中 / 250</small></span>
+        </a>
+        <a class="problem-row" href="problem.html" data-status="complete" data-day="both" data-category="other" aria-label="B05 両日 その他 時刻同期がずれている 150点中150点 満点">
+          <span class="problem-id status-complete" title="B05 / 満点"><b>B05</b><span class="visually-hidden">満点</span></span>
+          <span class="problem-category">その他</span><span class="problem-title">時刻同期がずれている</span><span class="problem-score"><b>150</b><small>/ 150</small></span>
+        </a>
+      </section>
+
+      <section class="problem-table" data-day-group="day1" aria-labelledby="day1-heading">
+        <h1 class="problem-day-heading" id="day1-heading">1日目の問題</h1>
+        <div class="problem-row problem-heading">
+          <span>問題ID / 状態</span><span>カテゴリ</span><span>問題</span><span>得点</span>
+        </div>
+        <a class="problem-row is-answer-closed" href="problem.html" data-status="complete" data-day="day1" data-category="network" data-answer="closed" aria-label="A01 1日目 ネットワーク DNSの名前解決ができない 回答終了 閲覧のみ 300点中300点 満点">
+          <span class="problem-id status-complete" title="A01 / 満点 / 回答終了"><b>A01</b><span class="visually-hidden">満点 回答終了</span></span>
+          <span class="problem-category">ネットワーク</span><span class="problem-title"><small class="answer-closed-label">回答終了</small><span>DNSの名前解決ができない</span></span><span class="problem-score"><b>300</b><small>/ 300</small></span>
+        </a>
+        <a class="problem-row is-answer-closed" href="problem.html" data-status="pending" data-day="day1" data-category="network" data-answer="closed" aria-label="A03 1日目 ネットワーク BGP経路が広報されない 回答終了 閲覧のみ 350点中0点 採点中">
+          <span class="problem-id status-pending" title="A03 / 採点中 / 回答終了"><b>A03</b><span class="visually-hidden">採点中 回答終了</span></span>
+          <span class="problem-category">ネットワーク</span><span class="problem-title"><small class="answer-closed-label">回答終了</small><span>BGP経路が広報されない</span></span><span class="problem-score is-pending"><b>000</b><small>採点中 / 350</small></span>
+        </a>
+        <a class="problem-row is-answer-closed" href="problem.html" data-status="unanswered" data-day="day1" data-category="other" data-answer="closed" aria-label="A06 1日目 その他 監視通知が届かない 回答終了 閲覧のみ 100点 未回答">
+          <span class="problem-id status-unanswered" title="A06 / 未回答 / 回答終了"><b>A06</b><span class="visually-hidden">未回答 回答終了</span></span>
+          <span class="problem-category">その他</span><span class="problem-title"><small class="answer-closed-label">回答終了</small><span>監視通知が届かない</span></span><span class="problem-score is-unanswered"><b>—</b><small>未回答 / 100</small></span>
+        </a>
+        <a class="problem-row is-answer-closed" href="problem.html" data-status="partial" data-day="day1" data-category="network" data-answer="closed" aria-label="B01 1日目 ネットワーク IPv6で外部へ通信できない 回答終了 閲覧のみ 250点中130点 部分点">
+          <span class="problem-id status-partial" title="B01 / 部分点 / 回答終了"><b>B01</b><span class="visually-hidden">部分点 回答終了</span></span>
+          <span class="problem-category">ネットワーク</span><span class="problem-title"><small class="answer-closed-label">回答終了</small><span>IPv6で外部へ通信できない</span></span><span class="problem-score"><b>130</b><small>/ 250</small></span>
+        </a>
+      </section>
+    </main>
+
+    <footer class="site-footer"><span>ICTSC 2026 / REGALIA</span><span>競技システム <b>稼働中</b></span></footer>
+  </body>
+</html>

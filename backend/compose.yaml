@@ -8,22 +8,65 @@ services:
       - 127.0.0.1:8080:8080
     environment:
       ICTSC_API_ADDRESS: ":8080"
-      PGHOST: postgres
-      PGPORT: 5432
-      PGUSER: ictsc
-      PGPASSWORD: password
-      PGDATABASE: ictscore
-      PGSSLMODE: disable
-      REDIS_URL: redis://redis:6379/0
+      ICTSC_DATABASE_URL: postgres://ictsc:password@postgres:5432/ictscore?sslmode=disable
+      ICTSC_REDIS_URL: redis://redis:6379/0
+      ICTSC_ALLOWED_ORIGINS: ${ICTSC_ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000,http://localhost:8080,http://127.0.0.1:8080}
+      ICTSC_DEV_FAKE_MODE: ${ICTSC_DEV_FAKE_MODE:-true}
+      ICTSC_SECURE_COOKIES: ${ICTSC_SECURE_COOKIES:-false}
+      ICTSC_ALLOW_INSECURE_UPSTREAMS: ${ICTSC_ALLOW_INSECURE_UPSTREAMS:-false}
+      ICTSC_DISCORD_CLIENT_ID: ${ICTSC_DISCORD_CLIENT_ID:-}
+      ICTSC_DISCORD_CLIENT_SECRET: ${ICTSC_DISCORD_CLIENT_SECRET:-}
+      ICTSC_DISCORD_CONTESTANT_REDIRECT_URI: ${ICTSC_DISCORD_CONTESTANT_REDIRECT_URI:-}
+      ICTSC_DISCORD_ADMIN_REDIRECT_URI: ${ICTSC_DISCORD_ADMIN_REDIRECT_URI:-}
+      ICTSC_DISCORD_ADMIN_GUILD_ID: ${ICTSC_DISCORD_ADMIN_GUILD_ID:-}
+      ICTSC_DISCORD_ADMIN_ROLE_IDS: ${ICTSC_DISCORD_ADMIN_ROLE_IDS:-}
+      ICTSC_GITHUB_API_BASE_URL: ${ICTSC_GITHUB_API_BASE_URL:-https://api.github.com}
+      ICTSC_GITHUB_API_TOKEN: ${ICTSC_GITHUB_API_TOKEN:-}
+      ICTSC_GITHUB_OIDC_ISSUER: ${ICTSC_GITHUB_OIDC_ISSUER:-https://token.actions.githubusercontent.com}
+      ICTSC_GITHUB_OIDC_AUDIENCE: ${ICTSC_GITHUB_OIDC_AUDIENCE:-}
+      ICTSC_GITHUB_REPOSITORY_ID: ${ICTSC_GITHUB_REPOSITORY_ID:-}
+      ICTSC_GITHUB_REPOSITORY: ${ICTSC_GITHUB_REPOSITORY:-}
+      ICTSC_GITHUB_REF: ${ICTSC_GITHUB_REF:-}
+      ICTSC_GITHUB_WORKFLOW_REF: ${ICTSC_GITHUB_WORKFLOW_REF:-}
+      ICTSC_GITHUB_MANIFEST_PATH: ${ICTSC_GITHUB_MANIFEST_PATH:-content/manifest.yaml}
+      ICTSC_GITHUB_OIDC_DISCOVERY_URL: ${ICTSC_GITHUB_OIDC_DISCOVERY_URL:-}
+      ICTSC_SSTATE_BASE_URL: ${ICTSC_SSTATE_BASE_URL:-}
+      ICTSC_SSTATE_REQUEST_TOKEN: ${ICTSC_SSTATE_REQUEST_TOKEN:-}
+      ICTSC_SSTATE_CALLBACK_TOKEN: ${ICTSC_SSTATE_CALLBACK_TOKEN:-}
+      ICTSC_CALLBACK_BASE_URL: ${ICTSC_CALLBACK_BASE_URL:-}
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - /bin/bash
+        - -c
+        - >-
+          exec 3<>/dev/tcp/127.0.0.1/8080;
+          printf 'GET /api/v1/health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3;
+          read -r status <&3;
+          [[ "$$status" == *" 200 "* ]]
+      interval: 2s
+      timeout: 3s
+      retries: 30
     volumes:
       - .:/workspace
       - go-mod-cache:/go/pkg/mod
       - go-build-cache:/root/.cache/go-build
+
+  frontend:
+    build:
+      context: ../frontend
+      target: frontend
+    init: true
+    ports:
+      - 127.0.0.1:3000:8080
+    depends_on:
+      api:
+        condition: service_healthy
 
   postgres:
     image: postgres:18
@@ -40,9 +83,8 @@ services:
       timeout: 3s
       retries: 15
     volumes:
-      - postgres-data:/var/lib/postgresql
-      - ./db/schema.sql:/docker-entrypoint-initdb.d/10-schema.sql:ro
-      - ./db/seed.sql:/docker-entrypoint-initdb.d/20-seed.sql:ro
+      - postgres-openapi-data:/var/lib/postgresql
+      - ./db/migrations:/docker-entrypoint-initdb.d:ro
 
   redis:
     image: redis:8
@@ -55,10 +97,10 @@ services:
       timeout: 3s
       retries: 15
     volumes:
-      - redis-data:/data
+      - redis-openapi-data:/data
 
 volumes:
   go-mod-cache:
   go-build-cache:
-  postgres-data:
-  redis-data:
+  postgres-openapi-data:
+  redis-openapi-data:

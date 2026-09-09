@@ -1,0 +1,234 @@
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+.button-primary,
+.button-secondary {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.workspace {
+  padding-top: 36px;
+}
+.workspace h1 {
+  margin: 0 0 28px;
+  font-size: 30px;
+  letter-spacing: -0.04em;
+}
+.workspace h2 {
+  margin-top: 32px;
+  font-size: 20px;
+}
+.form-grid {
+  display: grid;
+  gap: 20px;
+  max-width: 720px;
+  margin: 24px 0;
+}
+.form-grid label {
+  display: grid;
+  gap: 8px;
+  font-weight: 500;
+}
+.form-grid input,
+.form-grid select,
+.form-grid textarea,
+.field {
+  border: 1px solid var(--ink);
+  padding: 10px 12px;
+  background: white;
+  color: var(--ink);
+  min-width: 0;
+}
+.form-grid textarea {
+  min-height: 160px;
+}
+.actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 20px 0;
+}
+.actions a,
+.text-link {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.data-table {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: left;
+  margin: 24px 0;
+}
+.data-table th,
+.data-table td {
+  border-bottom: 1px solid var(--ink);
+  padding: 16px 12px;
+  vertical-align: top;
+}
+.data-table th {
+  font-size: 12px;
+  font-weight: 500;
+}
+.data-table a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+.state-message {
+  padding: 24px;
+  border: 1px solid var(--ink);
+  margin: 24px 0;
+}
+.error-message {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 80px;
+  border-bottom: 1px solid var(--ink);
+  padding-right: 24px;
+}
+.admin-nav,
+.account-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--ink);
+  font-size: 13px;
+}
+.admin-nav .router-link-exact-active {
+  color: var(--accent);
+}
+.account-nav {
+  justify-content: flex-end;
+  align-items: center;
+}
+.account-nav button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+.team-badge {
+  padding: 8px 16px;
+  background: var(--team-color);
+  color: var(--team-text);
+}
+.markdown {
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+.markdown a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.markdown pre {
+  padding: 20px;
+  overflow: auto;
+  border: 1px solid var(--ink);
+  line-height: 1.6;
+}
+.markdown img {
+  max-width: 100%;
+}
+.markdown table {
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+}
+.markdown td,
+.markdown th {
+  border: 1px solid var(--ink);
+  padding: 8px 12px;
+}
+.markdown blockquote {
+  border-left: 3px solid var(--accent);
+  margin-left: 0;
+  padding-left: 20px;
+}
+.mono {
+  font-family: var(--mono);
+}
+.muted {
+  font-size: 12px;
+}
+.content-section {
+  border-top: 1px solid var(--ink);
+  padding: 24px 0;
+}
+.problem-rail a {
+  position: relative;
+}
+.problem-preview {
+  pointer-events: none;
+}
+.problem-rail a:focus-visible .problem-preview {
+  opacity: 1;
+  visibility: visible;
+}
+@media (max-width: 760px) {
+  .workspace {
+    padding-top: 24px;
+  }
+  .account-nav {
+    gap: 14px;
+    padding: 12px;
+  }
+  .admin-header {
+    flex-wrap: wrap;
+  }
+  .data-table th,
+  .data-table td {
+    padding: 12px 8px;
+  }
+}
+
+.header-neighbors {
+  display: flex;
+  gap: 22px;
+}
+.header-neighbors > span {
+  min-width: 50px;
+}
+.header-neighbors > .is-team {
+  min-width: 130px;
+}
+.content-grid > .content-section {
+  grid-column: 1;
+  padding: 28px 46px;
+}
+.actions > .button-primary,
+.form-grid > .button-primary {
+  width: auto;
+  min-height: 44px;
+  padding: 12px 24px;
+  justify-content: center;
+}
+.form-grid .button-secondary {
+  min-height: 40px;
+}
+@media (max-width: 760px) {
+  .content-grid > .content-section {
+    padding: 28px 18px;
+  }
+  .competition-clock time {
+    font-size: 15px;
+  }
+}

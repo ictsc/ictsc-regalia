@@ -44,5 +44,4 @@ tasks:
     internal: true
     dir: frontend
     cmds:
-      - pnpm install
-      - pnpm run --recursive --parallel --aggregate-output generate
+      - pnpm generate

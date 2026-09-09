@@ -1,47 +1,34 @@
-# Development Commands
+# Frontend development
 
-## Monorepo (run from root)
-- `pnpm install` - Install dependencies
-- `pnpm build` - Build all packages
-- `pnpm ci:test` - Run all tests
-- `pnpm ci:lint` - Run all lints
-- `pnpm generate` - Generate protobuf code from backend definitions
+The frontend is a pnpm workspace containing two Nuxt 4 / Vue / TypeScript SPAs.
 
-## Contestant Dashboard (packages/contestant/)
-- `pnpm dev` - Dev server on localhost:3000, proxies `/api` to localhost:8080
-- `pnpm lint` - Check TypeScript, ESLint, and Prettier
-- `pnpm lint-fix` - Auto-fix linting issues
-- `pnpm story` - Run Storybook on localhost:6006
+## Commands (from frontend/)
 
-## Admin Dashboard (packages/admin/)
-- `pnpm dev` - Dev server
-- `pnpm lint` / `pnpm lint-fix` - Linting
+- `pnpm install --frozen-lockfile`: install and prepare Nuxt types.
+- `pnpm build`: check API types and generate both static SPAs.
+- `pnpm ci:test`: run Vitest tests across API, UI, and both applications.
+- `pnpm ci:lint`: typecheck, ESLint, and Prettier checks.
+- `pnpm e2e`: contestant and admin Chromium tests with mocked APIs.
+- `pnpm --filter @ictsc/ui story` / `story:build`: Vue Storybook.
+- `pnpm --filter @ictsc/competition dev`: localhost:3000.
+- `pnpm --filter @ictsc/admin dev`: localhost:3001/admin/.
 
-# Architecture
+## Architecture
 
-ICTSC competition platform frontend monorepo (pnpm workspaces).
+- `packages/api/`: generated OpenAPI types, typed REST client, ApiError, mappers, SSE.
+- `packages/ui/`: copied design assets and shared Vue components; no dependency on reference directories.
+- `packages/contestant/nuxt/` and `packages/admin/nuxt/`: Nuxt source directories.
+- Use Nuxt `pages/` routing, Vue composables and middleware, not React or TanStack routes.
+- Both apps use `ssr: false`; deployment artifacts are `.output/public/`.
 
-## Package Structure
-- `packages/contestant/` - Participant dashboard (Tailwind CSS)
-  - `app/components/` - UI components
-  - `app/features/` - Business logic and API calls
-  - `app/routes/` - TanStack Router pages
-- `packages/admin/` - Admin dashboard (Mantine UI)
-- `packages/proto/` - Generated Connect RPC code
-  - Exports: `@ictsc/proto/admin/v1` and `@ictsc/proto/contestant/v1`
-  - Generated from backend proto files
-- `packages/config/` - Shared ESLint/Prettier configs
+## Contracts and conventions
 
-## Important Conventions
-- **File-based routing**: Route files in `app/routes/` MUST be prefixed with `~` (e.g., `~index.tsx`)
-- **API proxy**: Dev server proxies `/api` requests to `localhost:8080` backend
-- **Proto imports**: Use `@ictsc/proto/contestant/v1` or `@ictsc/proto/admin/v1` for type-safe API calls
-
-## Backend Integration
-- Backend runs on `localhost:8080` (see `@../backend/CLAUDE.md`)
-- Uses Connect RPC protocol (gRPC-Web compatible)
-- Auth: Discord OAuth2 with session management
-
-# Workflow
-- Always run linting after making code changes
-- Regenerate proto code after backend proto changes with `pnpm generate`
+- `backend/openapi.json` is canonical. Run `task generate` at repository root after contract changes and include generated Go and TypeScript outputs.
+- Public API is REST under `/api/v1`; no Connect RPC or Protocol Buffers.
+- All REST requests use `@ictsc/api` with credentials enabled.
+- Proxy `/api` unchanged to localhost:8080; never prepend the admin base path or strip `/api`.
+- Deployment updates use SSE and unsubscribe on unmount. Do not add polling or refetch intervals.
+- Nuxt AsyncData is shallow by default: replace the root object or use `deep: true` when updating nested SSE state.
+- Convert snake_case only at mapper / feature boundaries.
+- Draft storage must be scoped to contestant, team, and problem; do not migrate unowned legacy drafts.
+- Team colors must be selected from the contract palette and edited only through admin APIs.
