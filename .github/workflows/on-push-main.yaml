@@ -3,6 +3,7 @@ name: On Push Main
 on:
   push:
     branches: [main, codex/openapi-contract-rebuild]
+    tags: ["preview-*"]
 
 jobs:
   backend:
