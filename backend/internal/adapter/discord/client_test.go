@@ -183,3 +183,45 @@ func writeJSON(t *testing.T, writer http.ResponseWriter, value any) {
 		t.Fatal(err)
 	}
 }
+
+func TestContestantGuildMembership(t *testing.T) {
+	for _, status := range []int{http.StatusOK, http.StatusNotFound, http.StatusServiceUnavailable} {
+		t.Run(http.StatusText(status), func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/oauth2/token":
+					writeJSON(t, w, map[string]any{"access_token": "access-token", "token_type": "Bearer"})
+				case "/api/users/@me":
+					writeJSON(t, w, map[string]any{"id": "123456789012345678", "username": "contestant"})
+				case "/api/users/@me/guilds/987654321098765432/member":
+					if status != http.StatusOK {
+						w.WriteHeader(status)
+						return
+					}
+					writeJSON(t, w, map[string]any{"roles": []string{}})
+				default:
+					t.Errorf("unexpected path %s", r.URL.Path)
+					w.WriteHeader(404)
+				}
+			}))
+			defer server.Close()
+			client := newTestClient(t, server.URL, server.Client())
+			client.contestantGuildID = "987654321098765432"
+			u, err := url.Parse(client.AuthorizationURL("state", "challenge", "https://score.example/callback", false))
+			if err != nil {
+				t.Fatal(err)
+			}
+			assertQueryValue(t, u.Query(), "scope", "identify guilds.members.read")
+			result, err := client.Exchange(context.Background(), "code", "verifier", "https://score.example/callback", false)
+			if status == http.StatusOK {
+				if err != nil || result.GuildID != client.contestantGuildID || len(result.RoleIDs) != 0 {
+					t.Fatalf("membership without admin role must pass: %#v %v", result, err)
+				}
+			} else if err == nil {
+				t.Fatal("failed membership lookup must reject login")
+			} else if status == http.StatusNotFound && !errors.Is(err, ErrGuildMembership) {
+				t.Fatalf("wrong membership error: %v", err)
+			}
+		})
+	}
+}

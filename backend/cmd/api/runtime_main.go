@@ -50,6 +50,7 @@ func run() error {
 		ContentRef:            cfg.GitHubRef,
 		CallbackBaseURL:       cfg.CallbackBaseURL,
 		AdminGuildID:          cfg.DiscordAdminGuildID,
+		ContestantGuildID:     cfg.DiscordContestantGuildID,
 		AdminRoleIDs:          roles,
 	})
 	svc.Discord, svc.Content, svc.Deployments, svc.Events = discordClient, contentClient, deploymentClient, events
@@ -115,7 +116,7 @@ func runtimeAdapters(cfg config.Runtime) (service.Discord, service.ContentSource
 	if !cfg.DevFakeMode || cfg.DiscordClientID != "" || cfg.DiscordClientSecret != "" {
 		client, err := discord.New(discord.Config{
 			ClientID: cfg.DiscordClientID, ClientSecret: cfg.DiscordClientSecret,
-			AdminGuildID: cfg.DiscordAdminGuildID, AllowedAdminRoleIDs: cfg.DiscordAdminRoleIDs,
+			AdminGuildID: cfg.DiscordAdminGuildID, ContestantGuildID: cfg.DiscordContestantGuildID, AllowedAdminRoleIDs: cfg.DiscordAdminRoleIDs,
 		})
 		if err != nil {
 			return nil, nil, nil, fmt.Errorf("configure Discord: %w", err)

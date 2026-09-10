@@ -79,3 +79,12 @@ contestant/admin redirect URI を設定すると、開発専用の仮ログイ�
 外部公開時は必ず運営だけを許可する認証 Gateway で全経路を保護すること。
 仮ユーザーは `preview-admin` / `preview-contestant` の共有IDで、実際のDiscord認証、
 GitHubコンテンツ同期、SState操作は行わない。本番では利用しない。
+
+## 参加者のDiscordサーバー所属制限
+
+`ICTSC_DISCORD_CONTESTANT_GUILD_ID` にサーバーIDを設定すると、参加者ログインでも
+`guilds.members.read` を要求し、そのサーバーへの所属を確認する。非所属やDiscord APIの
+取得失敗ではログインさせない。空の場合は従来どおり参加者の所属を制限しない。
+運営ログインは引き続き admin guild と運営ロールの両方を要求する。
+これはログインの制限で、チーム紐付けや登録時の招待コード要件は変更しない。
+所属はログイン時に確認するため、脱退しても発行済みセッションは期限まで有効。
