@@ -35,11 +35,6 @@ func run() error {
 		return err
 	}
 	defer cleanup()
-	if cfg.DevSeedContent {
-		if err := seedDevContent(ctx, store); err != nil {
-			return fmt.Errorf("seed development content: %w", err)
-		}
-	}
 	discordClient, contentClient, deploymentClient, err := runtimeAdapters(cfg)
 	if err != nil {
 		return err

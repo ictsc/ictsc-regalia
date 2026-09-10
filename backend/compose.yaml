@@ -11,7 +11,6 @@ services:
       ICTSC_DATABASE_URL: postgres://ictsc:password@postgres:5432/ictscore?sslmode=disable
       ICTSC_REDIS_URL: redis://redis:6379/0
       ICTSC_ALLOWED_ORIGINS: ${ICTSC_ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000,http://localhost:8080,http://127.0.0.1:8080}
-      ICTSC_DEV_SEED_CONTENT: ${ICTSC_DEV_SEED_CONTENT:-false}
       ICTSC_DEV_FAKE_MODE: ${ICTSC_DEV_FAKE_MODE:-true}
       ICTSC_SECURE_COOKIES: ${ICTSC_SECURE_COOKIES:-false}
       ICTSC_ALLOW_INSECURE_UPSTREAMS: ${ICTSC_ALLOW_INSECURE_UPSTREAMS:-false}

@@ -19,7 +19,6 @@ type Runtime struct {
 	SecureCookies     bool
 	AllowedOrigins    []string
 	DevFakeMode       bool
-	DevSeedContent    bool
 
 	DiscordClientID          string
 	DiscordClientSecret      string
@@ -53,13 +52,6 @@ func LoadRuntime() (Runtime, error) {
 	if err != nil {
 		return Runtime{}, err
 	}
-	seed, err := boolEnv("ICTSC_DEV_SEED_CONTENT", false)
-	if err != nil {
-		return Runtime{}, err
-	}
-	if seed && !dev {
-		return Runtime{}, fmt.Errorf("ICTSC_DEV_SEED_CONTENT requires ICTSC_DEV_FAKE_MODE")
-	}
 	secure, err := boolEnv("ICTSC_SECURE_COOKIES", !dev)
 	if err != nil {
 		return Runtime{}, err
@@ -71,7 +63,7 @@ func LoadRuntime() (Runtime, error) {
 	if insecure && !dev {
 		return Runtime{}, fmt.Errorf("ICTSC_ALLOW_INSECURE_UPSTREAMS is only allowed with ICTSC_DEV_FAKE_MODE")
 	}
-	cfg := Runtime{DevSeedContent: seed,
+	cfg := Runtime{
 		Address:                  envOrDefault("ICTSC_API_ADDRESS", defaultAddress),
 		ReadHeaderTimeout:        defaultReadHeaderTimeout,
 		ShutdownTimeout:          15 * time.Second,
