@@ -39,6 +39,7 @@ type Config struct {
 	ClientID              string
 	ClientSecret          string
 	AdminGuildID          string
+	ContestantGuildID     string
 	AllowedAdminRoleIDs   []string
 	AuthorizationEndpoint string
 	TokenEndpoint         string
@@ -50,6 +51,7 @@ type Client struct {
 	clientID              string
 	clientSecret          string
 	adminGuildID          string
+	contestantGuildID     string
 	allowedAdminRoleIDs   map[string]struct{}
 	authorizationEndpoint string
 	tokenEndpoint         string
@@ -109,6 +111,9 @@ func New(config Config) (*Client, error) {
 	if config.AdminGuildID != "" && !isSnowflake(config.AdminGuildID) {
 		return nil, errors.New("discord admin guild ID must be a numeric snowflake")
 	}
+	if config.ContestantGuildID != "" && !isSnowflake(config.ContestantGuildID) {
+		return nil, errors.New("discord contestant guild ID must be a numeric snowflake")
+	}
 	allowedRoles := make(map[string]struct{}, len(config.AllowedAdminRoleIDs))
 	for _, roleID := range config.AllowedAdminRoleIDs {
 		if !isSnowflake(roleID) {
@@ -124,6 +129,7 @@ func New(config Config) (*Client, error) {
 		clientID:              config.ClientID,
 		clientSecret:          config.ClientSecret,
 		adminGuildID:          config.AdminGuildID,
+		contestantGuildID:     config.ContestantGuildID,
 		allowedAdminRoleIDs:   allowedRoles,
 		authorizationEndpoint: strings.TrimRight(config.AuthorizationEndpoint, "/"),
 		tokenEndpoint:         config.TokenEndpoint,
@@ -137,7 +143,7 @@ func (c *Client) AuthorizationURL(state, codeChallenge, redirectURI string, admi
 		"client_id":             {c.clientID},
 		"redirect_uri":          {redirectURI},
 		"response_type":         {"code"},
-		"scope":                 {strings.Join(scopes(admin), " ")},
+		"scope":                 {strings.Join(scopes(admin || c.contestantGuildID != ""), " ")},
 		"state":                 {state},
 		"code_challenge":        {codeChallenge},
 		"code_challenge_method": {"S256"},
@@ -158,13 +164,17 @@ func (c *Client) Exchange(ctx context.Context, code, codeVerifier, redirectURI s
 		return service.DiscordResult{}, err
 	}
 	result := service.DiscordResult{Identity: identity}
-	if !admin {
+	guildID := c.contestantGuildID
+	if admin {
+		guildID = c.adminGuildID
+	}
+	if !admin && guildID == "" {
 		return result, nil
 	}
-	if c.adminGuildID == "" {
+	if guildID == "" {
 		return service.DiscordResult{}, errors.New("discord admin guild ID is not configured")
 	}
-	member, err := c.GuildMember(ctx, token.AccessToken, c.adminGuildID)
+	member, err := c.GuildMember(ctx, token.AccessToken, guildID)
 	if err != nil {
 		var httpErr *HTTPError
 		if errors.As(err, &httpErr) && httpErr.StatusCode == http.StatusNotFound {

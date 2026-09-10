@@ -19,12 +19,13 @@ type Runtime struct {
 	AllowedOrigins    []string
 	DevFakeMode       bool
 
-	DiscordClientID       string
-	DiscordClientSecret   string
-	ContestantRedirectURI string
-	AdminRedirectURI      string
-	DiscordAdminGuildID   string
-	DiscordAdminRoleIDs   []string
+	DiscordClientID          string
+	DiscordClientSecret      string
+	ContestantRedirectURI    string
+	AdminRedirectURI         string
+	DiscordAdminGuildID      string
+	DiscordContestantGuildID string
+	DiscordAdminRoleIDs      []string
 
 	GitHubAPIBaseURL   string
 	GitHubAPIToken     string
@@ -61,35 +62,36 @@ func LoadRuntime() (Runtime, error) {
 		return Runtime{}, fmt.Errorf("ICTSC_ALLOW_INSECURE_UPSTREAMS is only allowed with ICTSC_DEV_FAKE_MODE")
 	}
 	cfg := Runtime{
-		Address:               envOrDefault("ICTSC_API_ADDRESS", defaultAddress),
-		ReadHeaderTimeout:     defaultReadHeaderTimeout,
-		ShutdownTimeout:       15 * time.Second,
-		DatabaseURL:           strings.TrimSpace(os.Getenv("ICTSC_DATABASE_URL")),
-		RedisURL:              strings.TrimSpace(os.Getenv("ICTSC_REDIS_URL")),
-		SecureCookies:         secure,
-		AllowedOrigins:        csvEnv("ICTSC_ALLOWED_ORIGINS"),
-		DevFakeMode:           dev,
-		DiscordClientID:       strings.TrimSpace(os.Getenv("ICTSC_DISCORD_CLIENT_ID")),
-		DiscordClientSecret:   strings.TrimSpace(os.Getenv("ICTSC_DISCORD_CLIENT_SECRET")),
-		ContestantRedirectURI: strings.TrimSpace(os.Getenv("ICTSC_DISCORD_CONTESTANT_REDIRECT_URI")),
-		AdminRedirectURI:      strings.TrimSpace(os.Getenv("ICTSC_DISCORD_ADMIN_REDIRECT_URI")),
-		DiscordAdminGuildID:   strings.TrimSpace(os.Getenv("ICTSC_DISCORD_ADMIN_GUILD_ID")),
-		DiscordAdminRoleIDs:   csvEnv("ICTSC_DISCORD_ADMIN_ROLE_IDS"),
-		GitHubAPIBaseURL:      envOrDefault("ICTSC_GITHUB_API_BASE_URL", "https://api.github.com"),
-		GitHubAPIToken:        strings.TrimSpace(os.Getenv("ICTSC_GITHUB_API_TOKEN")),
-		GitHubOIDCIssuer:      envOrDefault("ICTSC_GITHUB_OIDC_ISSUER", "https://token.actions.githubusercontent.com"),
-		GitHubOIDCAudience:    strings.TrimSpace(os.Getenv("ICTSC_GITHUB_OIDC_AUDIENCE")),
-		GitHubRepositoryID:    strings.TrimSpace(os.Getenv("ICTSC_GITHUB_REPOSITORY_ID")),
-		GitHubRepository:      strings.TrimSpace(os.Getenv("ICTSC_GITHUB_REPOSITORY")),
-		GitHubRef:             strings.TrimSpace(os.Getenv("ICTSC_GITHUB_REF")),
-		GitHubWorkflowRef:     strings.TrimSpace(os.Getenv("ICTSC_GITHUB_WORKFLOW_REF")),
-		GitHubManifestPath:    envOrDefault("ICTSC_GITHUB_MANIFEST_PATH", "content/manifest.yaml"),
-		GitHubDiscoveryURL:    strings.TrimSpace(os.Getenv("ICTSC_GITHUB_OIDC_DISCOVERY_URL")),
-		SStateBaseURL:         strings.TrimSpace(os.Getenv("ICTSC_SSTATE_BASE_URL")),
-		SStateRequestToken:    strings.TrimSpace(os.Getenv("ICTSC_SSTATE_REQUEST_TOKEN")),
-		SStateCallbackToken:   strings.TrimSpace(os.Getenv("ICTSC_SSTATE_CALLBACK_TOKEN")),
-		CallbackBaseURL:       strings.TrimSpace(os.Getenv("ICTSC_CALLBACK_BASE_URL")),
-		AllowInsecureHTTP:     insecure,
+		Address:                  envOrDefault("ICTSC_API_ADDRESS", defaultAddress),
+		ReadHeaderTimeout:        defaultReadHeaderTimeout,
+		ShutdownTimeout:          15 * time.Second,
+		DatabaseURL:              strings.TrimSpace(os.Getenv("ICTSC_DATABASE_URL")),
+		RedisURL:                 strings.TrimSpace(os.Getenv("ICTSC_REDIS_URL")),
+		SecureCookies:            secure,
+		AllowedOrigins:           csvEnv("ICTSC_ALLOWED_ORIGINS"),
+		DevFakeMode:              dev,
+		DiscordClientID:          strings.TrimSpace(os.Getenv("ICTSC_DISCORD_CLIENT_ID")),
+		DiscordClientSecret:      strings.TrimSpace(os.Getenv("ICTSC_DISCORD_CLIENT_SECRET")),
+		ContestantRedirectURI:    strings.TrimSpace(os.Getenv("ICTSC_DISCORD_CONTESTANT_REDIRECT_URI")),
+		AdminRedirectURI:         strings.TrimSpace(os.Getenv("ICTSC_DISCORD_ADMIN_REDIRECT_URI")),
+		DiscordAdminGuildID:      strings.TrimSpace(os.Getenv("ICTSC_DISCORD_ADMIN_GUILD_ID")),
+		DiscordContestantGuildID: strings.TrimSpace(os.Getenv("ICTSC_DISCORD_CONTESTANT_GUILD_ID")),
+		DiscordAdminRoleIDs:      csvEnv("ICTSC_DISCORD_ADMIN_ROLE_IDS"),
+		GitHubAPIBaseURL:         envOrDefault("ICTSC_GITHUB_API_BASE_URL", "https://api.github.com"),
+		GitHubAPIToken:           strings.TrimSpace(os.Getenv("ICTSC_GITHUB_API_TOKEN")),
+		GitHubOIDCIssuer:         envOrDefault("ICTSC_GITHUB_OIDC_ISSUER", "https://token.actions.githubusercontent.com"),
+		GitHubOIDCAudience:       strings.TrimSpace(os.Getenv("ICTSC_GITHUB_OIDC_AUDIENCE")),
+		GitHubRepositoryID:       strings.TrimSpace(os.Getenv("ICTSC_GITHUB_REPOSITORY_ID")),
+		GitHubRepository:         strings.TrimSpace(os.Getenv("ICTSC_GITHUB_REPOSITORY")),
+		GitHubRef:                strings.TrimSpace(os.Getenv("ICTSC_GITHUB_REF")),
+		GitHubWorkflowRef:        strings.TrimSpace(os.Getenv("ICTSC_GITHUB_WORKFLOW_REF")),
+		GitHubManifestPath:       envOrDefault("ICTSC_GITHUB_MANIFEST_PATH", "content/manifest.yaml"),
+		GitHubDiscoveryURL:       strings.TrimSpace(os.Getenv("ICTSC_GITHUB_OIDC_DISCOVERY_URL")),
+		SStateBaseURL:            strings.TrimSpace(os.Getenv("ICTSC_SSTATE_BASE_URL")),
+		SStateRequestToken:       strings.TrimSpace(os.Getenv("ICTSC_SSTATE_REQUEST_TOKEN")),
+		SStateCallbackToken:      strings.TrimSpace(os.Getenv("ICTSC_SSTATE_CALLBACK_TOKEN")),
+		CallbackBaseURL:          strings.TrimSpace(os.Getenv("ICTSC_CALLBACK_BASE_URL")),
+		AllowInsecureHTTP:        insecure,
 	}
 	if raw := os.Getenv("ICTSC_API_READ_HEADER_TIMEOUT"); raw != "" {
 		cfg.ReadHeaderTimeout, err = positiveDuration("ICTSC_API_READ_HEADER_TIMEOUT", raw)

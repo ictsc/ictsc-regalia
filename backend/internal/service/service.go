@@ -35,6 +35,7 @@ type Config struct {
 	ContentRef            string
 	CallbackBaseURL       string
 	AdminGuildID          string
+	ContestantGuildID     string
 	AdminRoleIDs          map[string]struct{}
 }
 
@@ -163,6 +164,9 @@ func (s *Service) CompleteDiscord(ctx context.Context, admin bool, oauthToken, c
 			GuildID: result.GuildID, RoleIDs: append([]string(nil), result.RoleIDs...),
 		}, AdminTTL)
 		return AuthComplete{Next: oauthData.Next, SessionToken: token, SessionKind: session.KindAdmin, Result: result}, createErr
+	}
+	if s.Config.ContestantGuildID != "" && result.GuildID != s.Config.ContestantGuildID {
+		return AuthComplete{}, core.NewError(http.StatusForbidden, "guild_membership_required", "Configured Discord guild membership is required")
 	}
 	contestant, contestantErr := s.Store.GetContestantByDiscord(ctx, result.Identity.ID)
 	if contestantErr == nil {
