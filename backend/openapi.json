@@ -1680,6 +1680,7 @@
         "required": ["state", "discord"],
         "properties": {
           "state": { "type": "string", "const": "DISCORD_AUTHENTICATED" },
+          "registration_team": { "$ref": "#/components/schemas/Team", "description": "Discordロールで確定した登録先。この場合、招待コードは不要。" },
           "discord": { "$ref": "#/components/schemas/DiscordIdentity" }
         }
       },
@@ -1777,7 +1778,7 @@
       "SignUpRequest": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "display_name", "invitation_code"],
+        "required": ["name", "display_name"],
         "properties": {
           "name": { "type": "string", "minLength": 1, "maxLength": 32 },
           "display_name": { "type": "string", "minLength": 1, "maxLength": 255 },

@@ -450,3 +450,26 @@ func (s *CompetitionStore) RevealFinal(_ context.Context, at time.Time, actor st
 }
 
 var _ core.Store = (*CompetitionStore)(nil)
+
+func (s *CompetitionStore) RegisterContestant(_ context.Context, contestant core.Contestant) (core.Contestant, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	team, ok := s.teams[contestant.TeamCode]
+	if !ok {
+		return core.Contestant{}, core.NewError(http.StatusNotFound, "team_not_found", "Team was not found")
+	}
+	count := int32(0)
+	for _, existing := range s.contestants {
+		if existing.Name == contestant.Name || existing.DiscordID == contestant.DiscordID {
+			return core.Contestant{}, core.NewError(http.StatusConflict, "contestant_already_registered", "Contestant already exists")
+		}
+		if existing.TeamCode == contestant.TeamCode {
+			count++
+		}
+	}
+	if count >= team.MemberLimit {
+		return core.Contestant{}, core.NewError(http.StatusConflict, "team_full", "Team member limit has been reached")
+	}
+	s.contestants[contestant.Name] = contestant
+	return contestant, nil
+}

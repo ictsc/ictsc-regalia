@@ -1084,6 +1084,8 @@ export interface components {
              * @enum {string}
              */
             state: "DISCORD_AUTHENTICATED";
+            /** @description Discordロールで確定した登録先。この場合、招待コードは不要。 */
+            registration_team?: components["schemas"]["Team"];
             discord: components["schemas"]["DiscordIdentity"];
         };
         ContestantViewer: {
@@ -1157,7 +1159,7 @@ export interface components {
         SignUpRequest: {
             name: string;
             display_name: string;
-            invitation_code: string;
+            invitation_code?: string;
         };
         ImpersonationRequest: {
             contestant_name: string;

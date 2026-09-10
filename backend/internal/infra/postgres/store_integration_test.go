@@ -469,3 +469,37 @@ func assertCoreErrorCode(t *testing.T, err error, status int, code string) {
 		t.Fatalf("error status/code = %d/%s, want %d/%s", domainErr.Status, domainErr.Code, status, code)
 	}
 }
+
+func TestRoleRegistrationCapacityIntegration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires PostgreSQL")
+	}
+	f := newPostgresFixture(t)
+	ctx := t.Context()
+	_, err := f.store.CreateTeam(ctx, core.Team{Code: 2, Name: "Role Team", Organization: "ICTSC", MemberLimit: 1})
+	if err != nil {
+		t.Fatal(err)
+	}
+	results := make(chan error, 2)
+	for i := 0; i < 2; i++ {
+		go func(i int) {
+			_, err := f.store.RegisterContestant(ctx, core.Contestant{Name: fmt.Sprintf("member%d", i), DiscordID: fmt.Sprintf("123%d", i), DisplayName: "Member", TeamCode: 2})
+			results <- err
+		}(i)
+	}
+	successes := 0
+	for i := 0; i < 2; i++ {
+		err := <-results
+		if err == nil {
+			successes++
+		} else {
+			var e *core.Error
+			if !errors.As(err, &e) || e.Code != "team_full" {
+				t.Fatalf("unexpected error: %v", err)
+			}
+		}
+	}
+	if successes != 1 {
+		t.Fatalf("concurrent registrations succeeded=%d", successes)
+	}
+}

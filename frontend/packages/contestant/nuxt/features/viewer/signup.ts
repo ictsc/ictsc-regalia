@@ -1,7 +1,7 @@
 import { api, ApiError, expectNoContent } from "@ictsc/api";
 
 export type SignUpRequest = {
-  invitationCode: string;
+  invitationCode?: string;
   name: string;
   displayName: string;
 };

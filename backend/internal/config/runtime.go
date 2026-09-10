@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"os"
@@ -25,6 +26,7 @@ type Runtime struct {
 	AdminRedirectURI         string
 	DiscordAdminGuildID      string
 	DiscordContestantGuildID string
+	DiscordRoleTeams         map[string]int64
 	DiscordAdminRoleIDs      []string
 
 	GitHubAPIBaseURL   string
@@ -103,6 +105,21 @@ func LoadRuntime() (Runtime, error) {
 		cfg.ShutdownTimeout, err = positiveDuration("ICTSC_API_SHUTDOWN_TIMEOUT", raw)
 		if err != nil {
 			return Runtime{}, err
+		}
+	}
+	if raw := os.Getenv("ICTSC_DISCORD_ROLE_TEAMS"); raw != "" {
+		if err := json.Unmarshal([]byte(raw), &cfg.DiscordRoleTeams); err != nil {
+			return Runtime{}, fmt.Errorf("invalid ICTSC_DISCORD_ROLE_TEAMS: %w", err)
+		}
+	}
+	if len(cfg.DiscordRoleTeams) > 0 {
+		if cfg.DiscordContestantGuildID == "" {
+			return Runtime{}, fmt.Errorf("ICTSC_DISCORD_CONTESTANT_GUILD_ID is required with team role mapping")
+		}
+		for role, team := range cfg.DiscordRoleTeams {
+			if _, err := strconv.ParseUint(role, 10, 64); err != nil || team < 2 || team > 99 {
+				return Runtime{}, fmt.Errorf("invalid Discord team role mapping")
+			}
 		}
 	}
 	if err := cfg.Validate(); err != nil {

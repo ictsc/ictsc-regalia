@@ -2,6 +2,11 @@
 import { signUp } from "~/features/viewer/signup";
 useHead({ title: "参加登録" });
 const { viewer } = useSession();
+const registrationTeam = computed(() =>
+  viewer.value?.state === "DISCORD_AUTHENTICATED"
+    ? viewer.value.registration_team
+    : undefined,
+);
 const form = reactive({
     invitationCode: "",
     name:
@@ -18,7 +23,10 @@ const form = reactive({
 async function submit() {
   pending.value = true;
   try {
-    const result = await signUp(form);
+    const result = await signUp({
+      ...form,
+      invitationCode: registrationTeam.value ? undefined : form.invitationCode,
+    });
     if (result.error) {
       message.value = `登録できませんでした: ${result.invitationCodeError ?? result.nameError ?? result.displayNameError ?? result.error}`;
       return;
@@ -36,7 +44,9 @@ async function submit() {
   <main class="workspace">
     <h1>参加登録</h1>
     <form class="form-grid" @submit.prevent="submit">
-      <label>招待コード<input v-model="form.invitationCode" required /></label
+      <p v-if="registrationTeam">参加チーム: {{ registrationTeam.name }}</p>
+      <label v-else
+        >招待コード<input v-model="form.invitationCode" required /></label
       ><label>競技者名<input v-model="form.name" required /></label
       ><label
         >表示名<input v-model="form.displayName" required maxlength="255"

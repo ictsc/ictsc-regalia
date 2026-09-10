@@ -36,6 +36,7 @@ type Config struct {
 	CallbackBaseURL       string
 	AdminGuildID          string
 	ContestantGuildID     string
+	DiscordRoleTeams      map[string]int64
 	AdminRoleIDs          map[string]struct{}
 }
 
@@ -168,8 +169,18 @@ func (s *Service) CompleteDiscord(ctx context.Context, admin bool, oauthToken, c
 	if s.Config.ContestantGuildID != "" && result.GuildID != s.Config.ContestantGuildID {
 		return AuthComplete{}, core.NewError(http.StatusForbidden, "guild_membership_required", "Configured Discord guild membership is required")
 	}
+	var registrationTeam int64
+	if len(s.Config.DiscordRoleTeams) > 0 {
+		registrationTeam, err = s.TeamFromDiscordRoles(result.RoleIDs)
+		if err != nil {
+			return AuthComplete{}, err
+		}
+	}
 	contestant, contestantErr := s.Store.GetContestantByDiscord(ctx, result.Identity.ID)
 	if contestantErr == nil {
+		if registrationTeam != 0 && contestant.TeamCode != registrationTeam {
+			return AuthComplete{}, core.NewError(http.StatusForbidden, "team_role_mismatch", "Discord team role does not match the registered team")
+		}
 		token, createErr := s.Sessions.Create(ctx, session.Data{
 			Kind: session.KindContestant, ContestantName: contestant.Name, Discord: result.Identity,
 		}, ContestantTTL)
@@ -179,7 +190,7 @@ func (s *Service) CompleteDiscord(ctx context.Context, admin bool, oauthToken, c
 	if !errors.As(contestantErr, &notFound) || notFound.Status != http.StatusNotFound {
 		return AuthComplete{}, contestantErr
 	}
-	token, createErr := s.Sessions.Create(ctx, session.Data{Kind: session.KindSignup, Discord: result.Identity}, SignupTTL)
+	token, createErr := s.Sessions.Create(ctx, session.Data{Kind: session.KindSignup, Discord: result.Identity, GuildID: result.GuildID, RoleIDs: result.RoleIDs}, SignupTTL)
 	return AuthComplete{Next: oauthData.Next, SessionToken: token, SessionKind: session.KindSignup, Result: result}, createErr
 }
 
@@ -192,9 +203,23 @@ func (s *Service) SignUp(ctx context.Context, signupToken, name, displayName, in
 		return core.Contestant{}, "", core.WrapError(http.StatusInternalServerError, "internal_error", "Could not consume signup session", err)
 	}
 
-	contestant, err := s.Store.ConsumeInvitation(ctx, invitationCode, s.Now(), core.Contestant{
-		Name: name, DisplayName: displayName, DiscordID: signup.Discord.ID,
-	})
+	input := core.Contestant{Name: name, DisplayName: displayName, DiscordID: signup.Discord.ID}
+	var contestant core.Contestant
+	if len(s.Config.DiscordRoleTeams) > 0 {
+		if s.Config.ContestantGuildID == "" || signup.GuildID != s.Config.ContestantGuildID {
+			return core.Contestant{}, "", core.NewError(http.StatusForbidden, "guild_membership_required", "Discord guild membership is required")
+		}
+		input.TeamCode, err = s.TeamFromDiscordRoles(signup.RoleIDs)
+		if err != nil {
+			return core.Contestant{}, "", err
+		}
+		contestant, err = s.Store.RegisterContestant(ctx, input)
+	} else {
+		if invitationCode == "" {
+			return core.Contestant{}, "", core.NewError(http.StatusUnprocessableEntity, "invitation_required", "Invitation code is required")
+		}
+		contestant, err = s.Store.ConsumeInvitation(ctx, invitationCode, s.Now(), input)
+	}
 	if err != nil {
 		return core.Contestant{}, "", err
 	}
@@ -632,4 +657,22 @@ func randomUUID() (string, error) {
 	value[8] = (value[8] & 0x3f) | 0x80
 	hexValue := hex.EncodeToString(value)
 	return hexValue[0:8] + "-" + hexValue[8:12] + "-" + hexValue[12:16] + "-" + hexValue[16:20] + "-" + hexValue[20:], nil
+}
+
+func (s *Service) TeamFromDiscordRoles(roles []string) (int64, error) {
+	var team int64
+	for _, role := range roles {
+		code, ok := s.Config.DiscordRoleTeams[role]
+		if !ok {
+			continue
+		}
+		if team != 0 && team != code {
+			return 0, core.NewError(http.StatusForbidden, "ambiguous_team_roles", "Multiple team roles are assigned; contact staff")
+		}
+		team = code
+	}
+	if team == 0 {
+		return 0, core.NewError(http.StatusForbidden, "team_role_required", "A registered team role is required")
+	}
+	return team, nil
 }

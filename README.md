@@ -40,3 +40,20 @@ task dev-backend
 詳細は [backend/README.md](backend/README.md)、
 [frontend/README.md](frontend/README.md)、
 [docs/architecture.md](docs/architecture.md) を参照してください。
+
+## Discordロールによるチーム登録
+
+`ICTSC_DISCORD_CONTESTANT_GUILD_ID` と `ICTSC_DISCORD_ROLE_TEAMS`
+（例: `{"1547264645960695871":2}`）を設定すると、招待コードの代わりに
+Discordロールから登録チームを決定します。管理APIでチームを先に作成してください。
+登録画面にはチーム名を表示し、競技者名・表示名のみを入力します。
+対応するロールがない場合、複数チームに対応する場合、登録済みチームと違う場合は拒否します。
+上限人数と競技者名・Discordアカウントの重複チェックは招待登録と共通です。
+マッピング未設定の場合は従来の招待コード登録を使用します。
+
+管理者は `ICTSC_DISCORD_ADMIN_GUILD_ID` / `ICTSC_DISCORD_ADMIN_ROLE_IDS` で別途判定します。
+OAuthのリダイレクトURIは `/api/v1/auth/discord/callback` と
+`/api/v1/admin/auth/discord/callback` をDiscord側にも登録してください。
+開発環境では `ICTSC_DEV_FAKE_MODE=true` のままDiscord資格情報を設定すると、
+Discord認証のみ実接続になり、GitHubコンテンツ/SStateは無効のままです。
+仮認証から切り替える場合は既存の仮セッションを無効にしてください。

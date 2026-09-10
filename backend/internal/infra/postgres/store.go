@@ -657,3 +657,39 @@ func conflictError(err error, code, message string) error {
 }
 
 var _ core.Store = (*Store)(nil)
+
+// RegisterContestant serializes membership capacity checks on the team row.
+func (s *Store) RegisterContestant(ctx context.Context, contestant core.Contestant) (core.Contestant, error) {
+	tx, err := s.pool.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.ReadCommitted})
+	if err != nil {
+		return core.Contestant{}, dbError(err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+	teamCode := contestant.TeamCode
+	var memberLimit int32
+	err = tx.QueryRow(ctx, `
+		SELECT member_limit FROM teams WHERE code=$1 FOR UPDATE`, teamCode).Scan(&memberLimit)
+	if err != nil {
+		return core.Contestant{}, dbError(err)
+	}
+	var memberCount int32
+	err = tx.QueryRow(ctx, `SELECT count(*)::int FROM contestants WHERE team_code=$1`, teamCode).Scan(&memberCount)
+	if err != nil {
+		return core.Contestant{}, dbError(err)
+	}
+	if memberCount >= memberLimit {
+		return core.Contestant{}, core.NewError(http.StatusConflict, "team_full", "Team member limit has been reached")
+	}
+	contestant.TeamCode = teamCode
+	_, err = tx.Exec(ctx, `
+		INSERT INTO contestants(name,display_name,self_introduction,discord_id,team_code)
+		VALUES($1,$2,$3,$4,$5)`, contestant.Name, contestant.DisplayName, contestant.SelfIntroduction, contestant.DiscordID, contestant.TeamCode)
+	if err != nil {
+		return core.Contestant{}, conflictError(err, "contestant_already_registered", "Contestant name or Discord account is already registered")
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return core.Contestant{}, dbError(err)
+	}
+	return contestant, nil
+}

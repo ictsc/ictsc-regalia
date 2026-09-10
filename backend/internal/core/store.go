@@ -15,6 +15,7 @@ type Store interface {
 	ListInvitations(ctx context.Context) ([]Invitation, error)
 	CreateInvitation(ctx context.Context, invitation Invitation) (Invitation, error)
 	ConsumeInvitation(ctx context.Context, code string, now time.Time, contestant Contestant) (Contestant, error)
+	RegisterContestant(ctx context.Context, contestant Contestant) (Contestant, error)
 	ListContestants(ctx context.Context) ([]Contestant, error)
 	GetContestant(ctx context.Context, name string) (Contestant, error)
 	GetContestantByDiscord(ctx context.Context, discordID string) (Contestant, error)

@@ -75,7 +75,7 @@ func (h *Handler) SignUpContestant(ctx context.Context, request api.SignUpContes
 		return nil, core.NewError(http.StatusUnprocessableEntity, "validation_error", "Request body is required")
 	}
 	signupToken := cookieToken(requestFrom(ctx), "signup-session")
-	_, token, err := h.service.SignUp(ctx, signupToken, request.Body.Name, request.Body.DisplayName, request.Body.InvitationCode)
+	_, token, err := h.service.SignUp(ctx, signupToken, request.Body.Name, request.Body.DisplayName, stringValue(request.Body.InvitationCode))
 	if err != nil {
 		return nil, err
 	}
@@ -162,8 +162,22 @@ func (h *Handler) GetViewer(ctx context.Context, _ api.GetViewerRequestObject) (
 	}
 	if token := cookieToken(r, "signup-session"); token != "" {
 		if data, err := h.service.Sessions.Get(ctx, token, session.KindSignup); err == nil {
+			var registrationTeam *api.Team
+			if len(h.service.Config.DiscordRoleTeams) > 0 {
+				code, err := h.service.TeamFromDiscordRoles(data.RoleIDs)
+				if err != nil {
+					return nil, err
+				}
+				team, err := h.service.Store.GetTeam(ctx, code)
+				if err != nil {
+					return nil, err
+				}
+				value := toAPITeam(team)
+				registrationTeam = &value
+			}
 			_ = viewer.FromDiscordAuthenticatedViewer(api.DiscordAuthenticatedViewer{
-				State: api.DISCORDAUTHENTICATED, Discord: api.DiscordIdentity{
+				RegistrationTeam: registrationTeam,
+				State:            api.DISCORDAUTHENTICATED, Discord: api.DiscordIdentity{
 					Id: data.Discord.ID, Username: data.Discord.Username, DisplayName: data.Discord.DisplayName,
 				},
 			})

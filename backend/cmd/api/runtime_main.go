@@ -51,6 +51,7 @@ func run() error {
 		CallbackBaseURL:       cfg.CallbackBaseURL,
 		AdminGuildID:          cfg.DiscordAdminGuildID,
 		ContestantGuildID:     cfg.DiscordContestantGuildID,
+		DiscordRoleTeams:      cfg.DiscordRoleTeams,
 		AdminRoleIDs:          roles,
 	})
 	svc.Discord, svc.Content, svc.Deployments, svc.Events = discordClient, contentClient, deploymentClient, events
