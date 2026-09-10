@@ -37,12 +37,12 @@ func (h *Handler) CompleteDiscordAuthentication(ctx context.Context, request api
 	}
 	cookieName, ttl := "signup-session", service.SignupTTL
 	if completed.SessionKind == session.KindContestant {
-		cookieName, ttl = "user-session", service.ContestantTTL
+		cookieName, ttl = "regalia-user-session", service.ContestantTTL
 	} else if completed.SessionKind == session.KindAdmin {
 		cookieName, ttl = "admin-session", service.AdminTTL
 	}
 	location, cookie := completed.Next, cookieValue(cookieName, completed.SessionToken, ttl, h.options.SecureCookies, http.SameSiteStrictMode)
-	addCookies(ctx, clearCookie("oauth2-session", h.options.SecureCookies, http.SameSiteLaxMode), cookie)
+	addCookies(ctx, clearCookie("oauth2-session", h.options.SecureCookies, http.SameSiteLaxMode), clearLegacyUserCookie(h.options.SecureCookies), cookie)
 	return api.CompleteDiscordAuthentication302Response{Headers: api.OAuthRedirectResponseHeaders{Location: &location}}, nil
 }
 
@@ -82,22 +82,22 @@ func (h *Handler) SignUpContestant(ctx context.Context, request api.SignUpContes
 	if err != nil {
 		return nil, err
 	}
-	cookie := cookieValue("user-session", token, service.ContestantTTL, h.options.SecureCookies, http.SameSiteStrictMode)
-	addCookies(ctx, clearCookie("signup-session", h.options.SecureCookies, http.SameSiteStrictMode), cookie)
+	cookie := cookieValue("regalia-user-session", token, service.ContestantTTL, h.options.SecureCookies, http.SameSiteStrictMode)
+	addCookies(ctx, clearCookie("signup-session", h.options.SecureCookies, http.SameSiteStrictMode), clearLegacyUserCookie(h.options.SecureCookies), cookie)
 	return api.SignUpContestant204Response{}, nil
 }
 
 func (h *Handler) SignOutContestant(ctx context.Context, _ api.SignOutContestantRequestObject) (api.SignOutContestantResponseObject, error) {
 	r := requestFrom(ctx)
 	var deleteErr error
-	for _, name := range []string{"user-session", "signup-session", "oauth2-session"} {
+	for _, name := range []string{"regalia-user-session", "signup-session", "oauth2-session"} {
 		if token := cookieToken(r, name); token != "" {
 			if err := h.service.Sessions.Delete(ctx, token); err != nil && deleteErr == nil {
 				deleteErr = err
 			}
 		}
 	}
-	addCookies(ctx, clearCookie("user-session", h.options.SecureCookies, http.SameSiteStrictMode),
+	addCookies(ctx, clearCookie("regalia-user-session", h.options.SecureCookies, http.SameSiteStrictMode),
 		clearCookie("signup-session", h.options.SecureCookies, http.SameSiteStrictMode),
 		clearCookie("oauth2-session", h.options.SecureCookies, http.SameSiteLaxMode))
 	if deleteErr != nil {
@@ -132,14 +132,15 @@ func (h *Handler) CreateContestantImpersonation(ctx context.Context, request api
 	if err != nil {
 		return nil, err
 	}
-	cookie := cookieValue("user-session", token, service.AdminTTL, h.options.SecureCookies, http.SameSiteStrictMode)
-	return api.CreateContestantImpersonation204Response{Headers: api.CreateContestantImpersonation204ResponseHeaders{SetCookie: &cookie}}, nil
+	cookie := cookieValue("regalia-user-session", token, service.AdminTTL, h.options.SecureCookies, http.SameSiteStrictMode)
+	addCookies(ctx, clearLegacyUserCookie(h.options.SecureCookies), cookie)
+	return api.CreateContestantImpersonation204Response{}, nil
 }
 
 func (h *Handler) GetViewer(ctx context.Context, _ api.GetViewerRequestObject) (api.GetViewerResponseObject, error) {
 	viewer := api.Viewer{}
 	r := requestFrom(ctx)
-	if token := cookieToken(r, "user-session"); token != "" {
+	if token := cookieToken(r, "regalia-user-session"); token != "" {
 		if data, err := h.service.Sessions.Get(ctx, token, session.KindContestant); err == nil {
 			contestant, getErr := h.service.Store.GetContestant(ctx, data.ContestantName)
 			if getErr == nil {
@@ -164,14 +165,14 @@ func (h *Handler) GetViewer(ctx context.Context, _ api.GetViewerRequestObject) (
 		} else {
 			count := 0
 			for _, cookie := range r.Cookies() {
-				if cookie.Name == "user-session" {
+				if cookie.Name == "regalia-user-session" {
 					count++
 				}
 			}
 			log.Printf("viewer session not found: user_cookie_count=%d", count)
 		}
 	} else if cookieToken(r, "admin-session") != "" {
-		log.Print("viewer anonymous: user-session cookie absent")
+		log.Print("viewer anonymous: regalia-user-session cookie absent")
 	}
 	if token := cookieToken(r, "signup-session"); token != "" {
 		if data, err := h.service.Sessions.Get(ctx, token, session.KindSignup); err == nil {

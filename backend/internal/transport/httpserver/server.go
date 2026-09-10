@@ -108,7 +108,7 @@ func (s *Server) authenticate(ctx context.Context, input *openapi3filter.Authent
 	principal := Principal{}
 	switch input.SecuritySchemeName {
 	case "ContestantSession":
-		data, err := s.cookieSession(ctx, r, "user-session", session.KindContestant)
+		data, err := s.cookieSession(ctx, r, "regalia-user-session", session.KindContestant)
 		if err != nil {
 			return input.NewError(sessionAuthenticationError(err, "invalid_session", "Contestant session is invalid or expired"))
 		}
@@ -303,6 +303,12 @@ func cookieValue(name, value string, ttl time.Duration, secure bool, sameSite ht
 		Name: name, Value: value, Path: "/", MaxAge: int(ttl / time.Second), Expires: time.Now().Add(ttl),
 		HttpOnly: true, Secure: secure, SameSite: sameSite,
 	}).String()
+}
+
+// The previous application scoped its contestant cookie to /api. Browsers
+// send it before a same-name root cookie, so expire that exact legacy scope.
+func clearLegacyUserCookie(secure bool) string {
+	return (&http.Cookie{Name: "user-session", Value: "", Path: "/api", MaxAge: -1, Expires: time.Unix(1, 0), HttpOnly: true, Secure: secure, SameSite: http.SameSiteStrictMode}).String()
 }
 
 func clearCookie(name string, secure bool, sameSite http.SameSite) string {

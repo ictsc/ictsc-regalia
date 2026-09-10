@@ -59,3 +59,12 @@ OAuthのリダイレクトURIは `/api/v1/auth/discord/callback` と
 開発環境では `ICTSC_DEV_FAKE_MODE=true` のままDiscord資格情報を設定すると、
 Discord認証のみ実接続になり、GitHubコンテンツ/SStateは無効のままです。
 仮認証から切り替える場合は既存の仮セッションを無効にしてください。
+
+参加者Cookieは `regalia-user-session` を使用し、旧版の `user-session` は参照しません。
+旧Cookieがドメイン違いで複数存在していても、通常ログイン・代理ログインで新Cookieを発行します。
+管理者Cookieは変更しないため、更新後も代理ログインを再実行できます。
+
+開発用に `ICTSC_DEV_SEED_CONTENT=true` を設定すると、有効なsnapshotがない場合のみ
+モックの記述問題3問を登録します。`ICTSC_DEV_FAKE_MODE=true` が必須です。
+問題はM01〜M03、各100点、実機環境なしで、2026年9月1日〜2027年1月1日UTCの確認期間です。
+既存snapshotは上書きせず、通常の問題snapshotがある環境には追加しません。

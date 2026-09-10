@@ -32,15 +32,25 @@ func TestAdminImpersonationSessionContract(t *testing.T) {
 			t.Fatalf("impersonation: %d %s", w.Code, w.Body.String())
 		}
 		var user *http.Cookie
+		legacyCleared := false
 		for _, cookie := range w.Result().Cookies() {
-			if cookie.Name == "user-session" {
+			if cookie.Name == "user-session" && cookie.Path == "/api" && cookie.MaxAge < 0 {
+				legacyCleared = true
+			}
+			if cookie.Name == "regalia-user-session" {
 				user = cookie
 			}
+		}
+		if !legacyCleared {
+			t.Fatal("legacy /api cookie was not expired")
 		}
 		if user == nil || !user.Secure || !user.HttpOnly || user.Path != "/" || user.Domain != "" {
 			t.Fatalf("invalid impersonation cookie flags")
 		}
-		viewer := f.request(t, "GET", "/api/v1/viewer", "", user)
+		// Legacy host/domain cookies can coexist. Neither may shadow the new session.
+		viewer := f.request(t, "GET", "/api/v1/viewer", "",
+			&http.Cookie{Name: "user-session", Value: "stale-domain-session"},
+			&http.Cookie{Name: "user-session", Value: "stale-host-session"}, user)
 		if viewer.Code != 200 || !strings.Contains(viewer.Body.String(), `"impersonated_by":"staff"`) || !strings.Contains(viewer.Body.String(), `"name":"alice"`) {
 			t.Fatalf("viewer: %d %s", viewer.Code, viewer.Body.String())
 		}

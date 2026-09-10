@@ -105,7 +105,7 @@ func (f *contractFixture) createSession(t *testing.T, data session.Data, ttl tim
 		t.Fatalf("create session: %v", err)
 	}
 	name := map[session.Kind]string{
-		session.KindContestant: "user-session",
+		session.KindContestant: "regalia-user-session",
 		session.KindAdmin:      "admin-session",
 		session.KindSignup:     "signup-session",
 	}[data.Kind]
@@ -163,7 +163,7 @@ func TestAnonymousSignoutIsIdempotentAndClearsAllTransientCookies(t *testing.T) 
 		cookies map[string]http.SameSite
 	}{
 		{name: "contestant", path: "/api/v1/auth/signout", cookies: map[string]http.SameSite{
-			"oauth2-session": http.SameSiteLaxMode, "signup-session": http.SameSiteStrictMode, "user-session": http.SameSiteStrictMode,
+			"oauth2-session": http.SameSiteLaxMode, "signup-session": http.SameSiteStrictMode, "regalia-user-session": http.SameSiteStrictMode,
 		}},
 		{name: "admin", path: "/api/v1/admin/auth/signout", cookies: map[string]http.SameSite{
 			"admin-oauth2-session": http.SameSiteLaxMode, "admin-session": http.SameSiteStrictMode,
@@ -247,7 +247,7 @@ func TestOAuthCookiesHaveProductionAttributesAndContractTTL(t *testing.T) {
 	}{
 		{
 			name: "contestant", startPath: "/api/v1/auth/discord", callbackPath: "/api/v1/auth/discord/callback",
-			transientName: "oauth2-session", sessionName: "user-session", sessionTTL: service.ContestantTTL,
+			transientName: "oauth2-session", sessionName: "regalia-user-session", sessionTTL: service.ContestantTTL,
 			seedContestant: true, wantCallbackClear: []string{"oauth2-session"},
 		},
 		{

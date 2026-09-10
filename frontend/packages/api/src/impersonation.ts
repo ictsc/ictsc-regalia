@@ -7,7 +7,7 @@ export async function impersonateContestant(client: ApiClient, name: string) {
   }));
   const { viewer } = expectData(await client.GET("/api/v1/viewer", { cache: "no-store" }));
   if (viewer.state !== "CONTESTANT" || viewer.profile.name !== name || !viewer.impersonated_by) {
-    throw new Error("代理ログインのセッションを確認できませんでした。ブラウザのCookie設定を確認して再試行してください。");
+    throw new Error("代理ログインのセッションを確認できませんでした。ページを再読み込みして再試行してください。");
   }
   return viewer;
 }
