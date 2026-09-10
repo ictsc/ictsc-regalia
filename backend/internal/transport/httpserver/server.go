@@ -272,6 +272,7 @@ func normalizeErrorCode(code string) string {
 		"invitation_expired": {}, "oauth_state_invalid": {}, "origin_forbidden": {}, "permission_denied": {},
 		"resource_not_found": {}, "submission_closed": {}, "team_code_conflict": {}, "team_full": {},
 		"upstream_unavailable": {}, "validation_error": {},
+		"team_role_required": {}, "ambiguous_team_roles": {}, "team_role_mismatch": {},
 	}
 	if _, ok := allowed[code]; ok {
 		return code

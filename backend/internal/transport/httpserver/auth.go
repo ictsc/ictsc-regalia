@@ -37,6 +37,8 @@ func (h *Handler) CompleteDiscordAuthentication(ctx context.Context, request api
 	cookieName, ttl := "signup-session", service.SignupTTL
 	if completed.SessionKind == session.KindContestant {
 		cookieName, ttl = "user-session", service.ContestantTTL
+	} else if completed.SessionKind == session.KindAdmin {
+		cookieName, ttl = "admin-session", service.AdminTTL
 	}
 	location, cookie := completed.Next, cookieValue(cookieName, completed.SessionToken, ttl, h.options.SecureCookies, http.SameSiteStrictMode)
 	addCookies(ctx, clearCookie("oauth2-session", h.options.SecureCookies, http.SameSiteLaxMode), cookie)

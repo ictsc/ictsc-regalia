@@ -84,7 +84,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 招待コードを使って競技者登録する */
+        /** Discordチームロールまたは招待コードで競技者登録する */
         post: operations["signUpContestant"];
         delete?: never;
         options?: never;
@@ -1055,7 +1055,7 @@ export interface components {
          * @description クライアントが分岐に利用できる後方互換なRFC 9457 code。各responseのx-error-codesがそのstatusで返り得る値を示す。
          * @enum {string}
          */
-        ErrorCode: "authentication_required" | "invalid_session" | "oauth_state_invalid" | "invalid_machine_token" | "permission_denied" | "origin_forbidden" | "admin_role_required" | "guild_membership_required" | "resource_not_found" | "content_not_found" | "validation_error" | "conflict" | "team_code_conflict" | "invitation_expired" | "invitation_already_used" | "team_full" | "contestant_already_registered" | "answer_rate_limited" | "submission_closed" | "deployment_not_allowed" | "deployment_in_progress" | "invalid_deployment_transition" | "duplicate_event_mismatch" | "content_rollback_rejected" | "content_refresh_in_progress" | "upstream_unavailable" | "content_not_available" | "content_invalid" | "internal_error";
+        ErrorCode: "authentication_required" | "invalid_session" | "oauth_state_invalid" | "invalid_machine_token" | "permission_denied" | "origin_forbidden" | "admin_role_required" | "guild_membership_required" | "team_role_required" | "ambiguous_team_roles" | "team_role_mismatch" | "resource_not_found" | "content_not_found" | "validation_error" | "conflict" | "team_code_conflict" | "invitation_expired" | "invitation_already_used" | "team_full" | "contestant_already_registered" | "answer_rate_limited" | "submission_closed" | "deployment_not_allowed" | "deployment_in_progress" | "invalid_deployment_transition" | "duplicate_event_mismatch" | "content_rollback_rejected" | "content_refresh_in_progress" | "upstream_unavailable" | "content_not_available" | "content_invalid" | "internal_error";
         ErrorDetail: {
             location: string;
             message: string;
@@ -1904,6 +1904,7 @@ export interface operations {
         responses: {
             302: components["responses"]["OAuthRedirect"];
             401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
             422: components["responses"]["ValidationError"];
             500: components["responses"]["InternalServerError"];
             502: components["responses"]["BadGateway"];

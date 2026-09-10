@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"context"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -62,5 +63,52 @@ func TestDiscordRoleSignup(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestDiscordCallbackRejectsMissingTeamRole(t *testing.T) {
+	f := newContractFixture(t)
+	f.service.Config.AdminRoleIDs = map[string]struct{}{"other-role": {}}
+	f.service.Config.ContestantGuildID = "guild-1"
+	f.service.Config.DiscordRoleTeams = map[string]int64{"team-role": 2}
+	token, err := f.sessions.Create(context.Background(), session.Data{Kind: session.KindOAuth, OAuthState: "test-state", PKCEVerifier: "verifier", Next: "/"}, time.Hour)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := httptest.NewRequest("GET", "/api/v1/auth/discord/callback?code=test&state=test-state", nil)
+	r.AddCookie(&http.Cookie{Name: "oauth2-session", Value: token})
+	w := httptest.NewRecorder()
+	f.handler.ServeHTTP(w, r)
+	if w.Code != 403 || !strings.Contains(w.Body.String(), "team_role_required") {
+		t.Fatalf("callback: %d %s", w.Code, w.Body.String())
+	}
+}
+
+func TestStaffContestantLoginRedirectsToAdmin(t *testing.T) {
+	f := newContractFixture(t)
+	f.service.Config.ContestantGuildID = "guild-1"
+	f.service.Config.DiscordRoleTeams = map[string]int64{"team-role": 2}
+	token, err := f.sessions.Create(context.Background(), session.Data{Kind: session.KindOAuth, OAuthState: "test-state", PKCEVerifier: "verifier", Next: "/"}, time.Hour)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := httptest.NewRequest("GET", "/api/v1/auth/discord/callback?code=test&state=test-state", nil)
+	r.AddCookie(&http.Cookie{Name: "oauth2-session", Value: token})
+	w := httptest.NewRecorder()
+	f.handler.ServeHTTP(w, r)
+	if w.Code != 302 || w.Header().Get("Location") != "/admin/" {
+		t.Fatalf("callback: %d %s", w.Code, w.Body.String())
+	}
+	var admin *http.Cookie
+	for _, cookie := range w.Result().Cookies() {
+		if cookie.Name == "admin-session" {
+			admin = cookie
+		}
+	}
+	if admin == nil {
+		t.Fatal("missing admin cookie")
+	}
+	if _, err := f.sessions.Get(context.Background(), admin.Value, session.KindAdmin); err != nil {
+		t.Fatal(err)
 	}
 }

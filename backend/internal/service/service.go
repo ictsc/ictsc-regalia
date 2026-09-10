@@ -146,7 +146,19 @@ func (s *Service) CompleteDiscord(ctx context.Context, admin bool, oauthToken, c
 		}
 		return AuthComplete{}, core.WrapError(http.StatusBadGateway, "upstream_unavailable", "Discord authentication failed", err)
 	}
-	if admin {
+	staff := false
+	if len(s.Config.DiscordRoleTeams) > 0 && result.GuildID == s.Config.AdminGuildID {
+		for _, role := range result.RoleIDs {
+			if _, ok := s.Config.AdminRoleIDs[role]; ok {
+				staff = true
+				break
+			}
+		}
+	}
+	if admin || staff {
+		if !admin {
+			oauthData.Next = "/admin/"
+		}
 		if result.GuildID != s.Config.AdminGuildID {
 			return AuthComplete{}, core.NewError(http.StatusForbidden, "guild_membership_required", "Configured Discord guild membership is required")
 		}
@@ -216,7 +228,7 @@ func (s *Service) SignUp(ctx context.Context, signupToken, name, displayName, in
 		contestant, err = s.Store.RegisterContestant(ctx, input)
 	} else {
 		if invitationCode == "" {
-			return core.Contestant{}, "", core.NewError(http.StatusUnprocessableEntity, "invitation_required", "Invitation code is required")
+			return core.Contestant{}, "", core.NewError(http.StatusUnprocessableEntity, "validation_error", "Invitation code is required")
 		}
 		contestant, err = s.Store.ConsumeInvitation(ctx, invitationCode, s.Now(), input)
 	}

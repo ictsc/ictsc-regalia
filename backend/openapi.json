@@ -104,6 +104,7 @@
         "responses": {
           "302": { "$ref": "#/components/responses/OAuthRedirect" },
           "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
           "422": { "$ref": "#/components/responses/ValidationError" },
           "502": { "$ref": "#/components/responses/BadGateway" },
           "500": { "$ref": "#/components/responses/InternalServerError" }
@@ -113,7 +114,7 @@
     "/api/v1/auth/signup": {
       "post": {
         "tags": ["Authentication"],
-        "summary": "招待コードを使って競技者登録する",
+        "summary": "Discordチームロールまたは招待コードで競技者登録する",
         "operationId": "signUpContestant",
         "security": [
           { "SignupSession": [] }
@@ -1518,7 +1519,7 @@
       },
       "Forbidden": {
         "description": "現在のユーザー状態または権限では実行できない",
-        "x-error-codes": ["permission_denied", "origin_forbidden", "admin_role_required", "guild_membership_required"],
+        "x-error-codes": ["permission_denied", "origin_forbidden", "admin_role_required", "guild_membership_required", "team_role_required", "ambiguous_team_roles", "team_role_mismatch"],
         "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetails" } } }
       },
       "NotFound": {
@@ -1609,6 +1610,9 @@
           "origin_forbidden",
           "admin_role_required",
           "guild_membership_required",
+          "team_role_required",
+          "ambiguous_team_roles",
+          "team_role_mismatch",
           "resource_not_found",
           "content_not_found",
           "validation_error",

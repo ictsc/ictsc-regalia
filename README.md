@@ -51,6 +51,7 @@ Discordロールから登録チームを決定します。管理APIでチーム�
 上限人数と競技者名・Discordアカウントの重複チェックは招待登録と共通です。
 マッピング未設定の場合は従来の招待コード登録を使用します。
 
+参加者の入口からログインしたStaffも管理者セッションを発行し、`/admin/` へ移動します。
 管理者は `ICTSC_DISCORD_ADMIN_GUILD_ID` / `ICTSC_DISCORD_ADMIN_ROLE_IDS` で別途判定します。
 OAuthのリダイレクトURIは `/api/v1/auth/discord/callback` と
 `/api/v1/admin/auth/discord/callback` をDiscord側にも登録してください。
