@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { api } from "@ictsc/api";
+import { api, ApiError } from "@ictsc/api";
 import {
   listImpersonationCandidates,
   startImpersonation,
@@ -7,7 +7,20 @@ import {
 useHead({ title: "代理ログイン" });
 const { data, error, pending, refresh } = await useAsyncData(
   "impersonations",
-  () => listImpersonationCandidates(api),
+  async () => {
+    try {
+      return await listImpersonationCandidates(api);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        await navigateTo(
+          "/api/v1/admin/auth/discord?next=/signin/impersonation",
+          { external: true },
+        );
+        return [];
+      }
+      throw error;
+    }
+  },
 );
 const message = ref("");
 async function start(candidate: NonNullable<typeof data.value>[number]) {
