@@ -1,6 +1,6 @@
 module github.com/ictsc/ictsc-regalia/backend
 
-go 1.26.5
+go 1.27.0
 
 require (
 	github.com/danielgtaylor/huma/v2 v2.39.1
@@ -13,13 +13,14 @@ require (
 	github.com/andybalholm/brotli v1.2.3 // indirect
 	github.com/bep/godartsass/v2 v2.5.0 // indirect
 	github.com/bep/golibsass v1.2.0 // indirect
+	github.com/bep/helpers v0.12.0 // indirect
 	github.com/bits-and-blooms/bitset v1.25.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/fatih/color v1.19.0 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
-	github.com/gobwas/glob v0.2.3 // indirect
+	github.com/gobwas/glob v1.0.0 // indirect
 	github.com/gohugoio/hashstructure v1.1.0 // indirect
-	github.com/gohugoio/hugo v0.165.0 // indirect
+	github.com/gohugoio/hugo v0.166.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
