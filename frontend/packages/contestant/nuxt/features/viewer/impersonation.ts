@@ -1,4 +1,9 @@
-import { api, expectData, expectNoContent, type ApiClient } from "@ictsc/api";
+import {
+  api,
+  expectData,
+  impersonateContestant,
+  type ApiClient,
+} from "@ictsc/api";
 
 export type ImpersonationCandidate = {
   name: string;
@@ -32,10 +37,6 @@ export async function listImpersonationCandidates(
 export async function startImpersonation(candidate: {
   name: string;
   teamCode: number;
-}): Promise<void> {
-  expectNoContent(
-    await api.POST("/api/v1/admin/impersonations", {
-      body: { contestant_name: candidate.name },
-    }),
-  );
+}) {
+  return impersonateContestant(api, candidate.name);
 }

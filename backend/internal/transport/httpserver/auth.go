@@ -3,6 +3,7 @@ package httpserver
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 	"sort"
 
@@ -160,7 +161,17 @@ func (h *Handler) GetViewer(ctx context.Context, _ api.GetViewerRequestObject) (
 			}
 		} else if !errors.Is(err, session.ErrNotFound) {
 			return nil, err
+		} else {
+			count := 0
+			for _, cookie := range r.Cookies() {
+				if cookie.Name == "user-session" {
+					count++
+				}
+			}
+			log.Printf("viewer session not found: user_cookie_count=%d", count)
 		}
+	} else if cookieToken(r, "admin-session") != "" {
+		log.Print("viewer anonymous: user-session cookie absent")
 	}
 	if token := cookieToken(r, "signup-session"); token != "" {
 		if data, err := h.service.Sessions.Get(ctx, token, session.KindSignup); err == nil {

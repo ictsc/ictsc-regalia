@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
+	"github.com/ictsc/ictsc-regalia/backend/internal/service"
 	"github.com/ictsc/ictsc-regalia/backend/internal/session"
 )
 
@@ -110,5 +111,59 @@ func TestStaffContestantLoginRedirectsToAdmin(t *testing.T) {
 	}
 	if _, err := f.sessions.Get(context.Background(), admin.Value, session.KindAdmin); err != nil {
 		t.Fatal(err)
+	}
+}
+
+type roleDiscord struct {
+	fakeDiscord
+	roles []string
+}
+
+func (d roleDiscord) Exchange(context.Context, string, string, string, bool) (service.DiscordResult, error) {
+	return service.DiscordResult{Identity: core.DiscordIdentity{ID: "123", Username: "alice", DisplayName: "Alice"}, GuildID: "guild-1", RoleIDs: d.roles}, nil
+}
+func TestContestantTeamRolePrecedesStaff(t *testing.T) {
+	for _, tc := range []struct {
+		name             string
+		roles            []string
+		admin            bool
+		status           int
+		cookie, location string
+	}{
+		{"staff and team", []string{"admin-role", "team-role"}, false, 302, "signup-session", "/"},
+		{"team only", []string{"team-role"}, false, 302, "signup-session", "/"},
+		{"staff only", []string{"admin-role"}, false, 302, "admin-session", "/admin/"},
+		{"ambiguous teams even staff", []string{"admin-role", "team-role", "team-b"}, false, 403, "", ""},
+		{"explicit admin", []string{"admin-role", "team-role"}, true, 302, "admin-session", "/admin/"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			f := newContractFixture(t)
+			f.service.Config.ContestantGuildID = "guild-1"
+			f.service.Config.DiscordRoleTeams = map[string]int64{"team-role": 2, "team-b": 3}
+			f.service.Discord = roleDiscord{roles: tc.roles}
+			kind, path, cookie, next := session.KindOAuth, "/api/v1/auth/discord/callback", "oauth2-session", "/"
+			if tc.admin {
+				kind, path, cookie, next = session.KindAdminOAuth, "/api/v1/admin/auth/discord/callback", "admin-oauth2-session", "/admin/"
+			}
+			token, err := f.sessions.Create(context.Background(), session.Data{Kind: kind, OAuthState: "state", PKCEVerifier: "verifier", Next: next}, time.Hour)
+			if err != nil {
+				t.Fatal(err)
+			}
+			w := f.request(t, "GET", path+"?code=test&state=state", "", &http.Cookie{Name: cookie, Value: token})
+			if w.Code != tc.status {
+				t.Fatalf("callback: %d %s", w.Code, w.Body.String())
+			}
+			if tc.cookie != "" {
+				found := false
+				for _, c := range w.Result().Cookies() {
+					if c.Name == tc.cookie && c.Value != "" {
+						found = true
+					}
+				}
+				if !found || w.Header().Get("Location") != tc.location {
+					t.Fatalf("missing session or wrong redirect: %s", w.Header().Get("Location"))
+				}
+			}
+		})
 	}
 }

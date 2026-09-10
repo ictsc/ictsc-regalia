@@ -204,6 +204,16 @@ describe("Admin mutation actions", () => {
           { status: 201 },
         );
       }),
+      http.get(`${origin}/api/v1/viewer`, () =>
+        HttpResponse.json({
+          viewer: {
+            state: "CONTESTANT",
+            profile: { name: "alice" },
+            team,
+            impersonated_by: "staff",
+          },
+        }),
+      ),
       http.post(
         `${origin}/api/v1/admin/impersonations`,
         () => new HttpResponse(null, { status: 204 }),

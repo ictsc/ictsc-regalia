@@ -1,5 +1,6 @@
 import {
   expectData,
+  impersonateContestant,
   expectNoContent,
   type AdminDeployment,
   type AdminDeploymentStreamMessage,
@@ -109,12 +110,8 @@ export function createAdminActions(api: ApiClient) {
           body: { team_code: teamCode, expires_at: expiresAt },
         }),
       ),
-    impersonate: async (contestantName: string) =>
-      expectNoContent(
-        await api.POST("/api/v1/admin/impersonations", {
-          body: { contestant_name: contestantName },
-        }),
-      ),
+    impersonate: (contestantName: string) =>
+      impersonateContestant(api, contestantName),
     recalculate: async () =>
       expectNoContent(
         await api.POST("/api/v1/admin/scores/actions/recalculate"),

@@ -5,7 +5,9 @@ export function useSession() {
     () => null,
   );
   async function refresh() {
-    viewer.value = expectData(await api.GET("/api/v1/viewer")).viewer;
+    viewer.value = expectData(
+      await api.GET("/api/v1/viewer", { cache: "no-store" }),
+    ).viewer;
   }
   async function signOut() {
     expectNoContent(await api.POST("/api/v1/auth/signout"));

@@ -155,7 +155,18 @@ func (s *Service) CompleteDiscord(ctx context.Context, admin bool, oauthToken, c
 			}
 		}
 	}
-	if admin || staff {
+	// A mapped team takes precedence only at the contestant entry point.
+	// Explicit admin login continues to require the configured staff role.
+	hasTeamRole := false
+	if result.GuildID == s.Config.ContestantGuildID {
+		for _, role := range result.RoleIDs {
+			if _, ok := s.Config.DiscordRoleTeams[role]; ok {
+				hasTeamRole = true
+				break
+			}
+		}
+	}
+	if admin || (staff && !hasTeamRole) {
 		if !admin {
 			oauthData.Next = "/admin/"
 		}

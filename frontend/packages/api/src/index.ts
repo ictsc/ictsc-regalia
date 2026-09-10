@@ -16,3 +16,5 @@ export {
   type AdminDeploymentStreamMessage,
 } from "./sse";
 export type { paths, components, operations } from "./schema";
+
+export { impersonateContestant } from "./impersonation";

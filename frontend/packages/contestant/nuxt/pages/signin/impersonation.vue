@@ -23,11 +23,12 @@ const { data, error, pending, refresh } = await useAsyncData(
   },
 );
 const message = ref("");
+const session = useSession();
 async function start(candidate: NonNullable<typeof data.value>[number]) {
   try {
-    await startImpersonation(candidate);
+    const viewer = await startImpersonation(candidate);
     clearNuxtData();
-    await useSession().refresh();
+    session.viewer.value = viewer;
     await navigateTo("/problems");
   } catch (e) {
     message.value = e instanceof Error ? e.message : String(e);
