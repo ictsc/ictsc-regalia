@@ -107,6 +107,9 @@ func runtimeStores(ctx context.Context, cfg config.Runtime) (core.Store, session
 
 func runtimeAdapters(cfg config.Runtime) (service.Discord, service.ContentSource, service.DeploymentGateway, error) {
 	var discordClient service.Discord = disabledDiscord{}
+	if cfg.DevFakeMode && cfg.DiscordClientID == "" && cfg.DiscordClientSecret == "" && cfg.DiscordAdminGuildID != "" && len(cfg.DiscordAdminRoleIDs) > 0 {
+		discordClient = previewDiscord{guildID: cfg.DiscordAdminGuildID, roleIDs: cfg.DiscordAdminRoleIDs}
+	}
 	var contentClient service.ContentSource = disabledContent{}
 	var deploymentClient service.DeploymentGateway = disabledDeployments{}
 	if !cfg.DevFakeMode || cfg.DiscordClientID != "" || cfg.DiscordClientSecret != "" {

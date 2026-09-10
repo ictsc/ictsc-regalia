@@ -71,3 +71,11 @@ Dockerなしでunit/contract testだけを実行する場合は `go test -short 
 既存DBにはAPI更新前に `db/migrations/0002_team_color.sql` を適用します。新規Compose DBは `db/migrations/` のSQLを番号順に実行します。`Team.color` は管理画面から17色のパレットで設定し、未設定時は `#A6E35F` です。
 
 PostgreSQL統合テストは通常Dockerを起動します。Dockerを使用できない場合は、空の使い捨てDBのURLを `ICTSC_TEST_DATABASE_URL` に設定して `go test ./internal/infra/postgres -count=1` を実行できます。指定DBに全マイグレーションとテストデータを作成します。
+
+## 保護された開発プレビュー
+
+fake mode で Discord client ID/secret を空にし、admin guild/role ID と
+contestant/admin redirect URI を設定すると、開発専用の仮ログインを利用できる。
+外部公開時は必ず運営だけを許可する認証 Gateway で全経路を保護すること。
+仮ユーザーは `preview-admin` / `preview-contestant` の共有IDで、実際のDiscord認証、
+GitHubコンテンツ同期、SState操作は行わない。本番では利用しない。
