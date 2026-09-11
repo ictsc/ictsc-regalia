@@ -12,8 +12,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.2
       pnpm:
-        specifier: 10.33.0
-        version: 10.33.0
+        specifier: 10.34.5
+        version: 10.34.5
       typescript:
         specifier: ^6.0.0
         version: 6.0.3
@@ -3660,8 +3660,8 @@ packages:
     engines: {node: '>=0.10'}
     hasBin: true
 
-  pnpm@10.33.0:
-    resolution: {integrity: sha512-EFaLtKavtYyes2MNqQzJUWQXq+vT+rvmc58K55VyjaFJHp21pUTHatjrdXD1xLs9bGN7LLQb/c20f6gjyGSTGQ==}
+  pnpm@10.34.5:
+    resolution: {integrity: sha512-pO4F8vc2WCVb1qiYWcBlpFwopX2u+uLIk6Fo7itzFow3uR6D5X6mdlStA/AwMXRkMOi84442LgQmBfuKvIAZLg==}
     engines: {node: '>=18.12'}
     hasBin: true
 
@@ -8193,7 +8193,7 @@ snapshots:
 
   pidtree@0.6.0: {}
 
-  pnpm@10.33.0: {}
+  pnpm@10.34.5: {}
 
   possible-typed-array-names@1.1.0: {}
 
