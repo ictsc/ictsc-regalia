@@ -22,13 +22,13 @@ importers:
     dependencies:
       '@bufbuild/protobuf':
         specifier: ^2.0.0
-        version: 2.14.1
+        version: 2.15.0
       '@connectrpc/connect':
         specifier: 2.2.0
-        version: 2.2.0(@bufbuild/protobuf@2.14.1)
+        version: 2.2.0(@bufbuild/protobuf@2.15.0)
       '@connectrpc/connect-web':
         specifier: 2.2.0
-        version: 2.2.0(@bufbuild/protobuf@2.14.1)(@connectrpc/connect@2.2.0(@bufbuild/protobuf@2.14.1))
+        version: 2.2.0(@bufbuild/protobuf@2.15.0)(@connectrpc/connect@2.2.0(@bufbuild/protobuf@2.15.0))
       '@ictsc/proto':
         specifier: workspace:*
         version: link:../proto
@@ -198,13 +198,13 @@ importers:
     dependencies:
       '@bufbuild/protobuf':
         specifier: ^2.0.0
-        version: 2.14.1
+        version: 2.15.0
       '@connectrpc/connect':
         specifier: 2.2.0
-        version: 2.2.0(@bufbuild/protobuf@2.14.1)
+        version: 2.2.0(@bufbuild/protobuf@2.15.0)
       '@connectrpc/connect-web':
         specifier: 2.2.0
-        version: 2.2.0(@bufbuild/protobuf@2.14.1)(@connectrpc/connect@2.2.0(@bufbuild/protobuf@2.14.1))
+        version: 2.2.0(@bufbuild/protobuf@2.15.0)(@connectrpc/connect@2.2.0(@bufbuild/protobuf@2.15.0))
       '@headlessui/react':
         specifier: ^2.1.2
         version: 2.2.10(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -340,14 +340,14 @@ importers:
     dependencies:
       '@bufbuild/protobuf':
         specifier: ^2.0.0
-        version: 2.14.1
+        version: 2.15.0
     devDependencies:
       '@bufbuild/buf':
         specifier: ^1.38.0
         version: 1.72.0
       '@bufbuild/protoc-gen-es':
         specifier: ^2.0.0
-        version: 2.11.0(@bufbuild/protobuf@2.14.1)
+        version: 2.11.0(@bufbuild/protobuf@2.15.0)
       '@ictsc/config':
         specifier: workspace:*
         version: link:../config
@@ -494,8 +494,8 @@ packages:
   '@bufbuild/protobuf@2.11.0':
     resolution: {integrity: sha512-sBXGT13cpmPR5BMgHE6UEEfEaShh5Ror6rfN3yEK5si7QVrtZg8LEPQb0VVhiLRUslD2yLnXtnRzG035J/mZXQ==}
 
-  '@bufbuild/protobuf@2.14.1':
-    resolution: {integrity: sha512-agRJn3+EJDUe8AvxTx/LnHA/GErvLE62pSaSk7+MwFOtOv8eWBu/qCq2qoZjBjVZ3C2aiFJCveuSs17KMkYGOw==}
+  '@bufbuild/protobuf@2.15.0':
+    resolution: {integrity: sha512-DAheWUkVr/SJTWCc+lg9dhY0eN4SaWlf4+bG1KzHeXbnqt0AfB/NX0Z+VunGlM1ki1B4zVvye27MpKh/svySUA==}
 
   '@bufbuild/protoc-gen-es@2.11.0':
     resolution: {integrity: sha512-VzQuwEQDXipbZ1soWUuAWm1Z0C3B/IDWGeysnbX6ogJ6As91C2mdvAND/ekQ4YIWgen4d5nqLfIBOWLqCCjYUA==}
@@ -4841,13 +4841,13 @@ snapshots:
 
   '@bufbuild/protobuf@2.11.0': {}
 
-  '@bufbuild/protobuf@2.14.1': {}
+  '@bufbuild/protobuf@2.15.0': {}
 
-  '@bufbuild/protoc-gen-es@2.11.0(@bufbuild/protobuf@2.14.1)':
+  '@bufbuild/protoc-gen-es@2.11.0(@bufbuild/protobuf@2.15.0)':
     dependencies:
       '@bufbuild/protoplugin': 2.11.0
     optionalDependencies:
-      '@bufbuild/protobuf': 2.14.1
+      '@bufbuild/protobuf': 2.15.0
     transitivePeerDependencies:
       - supports-color
 
@@ -4859,14 +4859,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@connectrpc/connect-web@2.2.0(@bufbuild/protobuf@2.14.1)(@connectrpc/connect@2.2.0(@bufbuild/protobuf@2.14.1))':
+  '@connectrpc/connect-web@2.2.0(@bufbuild/protobuf@2.15.0)(@connectrpc/connect@2.2.0(@bufbuild/protobuf@2.15.0))':
     dependencies:
-      '@bufbuild/protobuf': 2.14.1
-      '@connectrpc/connect': 2.2.0(@bufbuild/protobuf@2.14.1)
+      '@bufbuild/protobuf': 2.15.0
+      '@connectrpc/connect': 2.2.0(@bufbuild/protobuf@2.15.0)
 
-  '@connectrpc/connect@2.2.0(@bufbuild/protobuf@2.14.1)':
+  '@connectrpc/connect@2.2.0(@bufbuild/protobuf@2.15.0)':
     dependencies:
-      '@bufbuild/protobuf': 2.14.1
+      '@bufbuild/protobuf': 2.15.0
 
   '@emnapi/core@1.10.0':
     dependencies:
