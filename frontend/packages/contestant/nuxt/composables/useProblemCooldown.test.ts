@@ -54,17 +54,17 @@ describe("useProblemCooldown", () => {
     ).toBe(20 * 60);
   });
 
-  it("未回答のデモ問題は2問が提出可能、2問が待機中になる", () => {
+  it("デモの状態サンプルに合わせて待ち時間を固定する", () => {
     const cooldown = useProblemCooldown();
     expect(
       ["R00", "R01", "R02", "R03"].map((code) =>
         cooldown.remainingSeconds(code, undefined, 0),
       ),
-    ).toEqual([0, 0, 480, 900]);
-    expect(cooldown.remainingSeconds("R02", undefined, 999999)).toBe(480);
+    ).toEqual([0, 0, 0, 900]);
+    expect(cooldown.remainingSeconds("R03", undefined, 999999)).toBe(900);
     states.clear();
-    expect(useProblemCooldown().remainingSeconds("R02", undefined, 0)).toBe(
-      480,
+    expect(useProblemCooldown().remainingSeconds("R03", undefined, 0)).toBe(
+      900,
     );
   });
 

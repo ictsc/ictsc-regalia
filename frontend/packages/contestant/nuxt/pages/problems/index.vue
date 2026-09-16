@@ -13,6 +13,7 @@ const status = ref("all"),
   category = ref("all");
 const now = useClock();
 const problemCooldown = useProblemCooldown();
+const demoMode = useDemoMode();
 const cooldownMinutes = (
   problem: NonNullable<typeof data.value>["problems"][number],
 ) =>
@@ -27,6 +28,7 @@ const state = (p: NonNullable<typeof data.value>["problems"][number]) =>
     activity.value?.some((a) => a.problemCode === p.code),
     activity.value?.find((a) => a.problemCode === p.code)?.score ===
       undefined && !!activity.value?.some((a) => a.problemCode === p.code),
+    demoMode.value,
   );
 const groups = computed(() =>
   groupProblems(data.value?.problems ?? [])

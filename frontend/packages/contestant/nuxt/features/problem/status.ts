@@ -1,11 +1,16 @@
+import { demoProblemState } from "./demo";
 import type { Problem } from "../models";
 export function problemStatus(
   problem: Problem,
   submitted = false,
   pending = false,
+  demoMode = false,
 ) {
   if (pending) return "pending";
-  if (!problem.score) return submitted ? "pending" : "unanswered";
+  if (!problem.score) {
+    if (submitted) return "pending";
+    return demoMode ? demoProblemState(problem.code).status : "unanswered";
+  }
   if (problem.score.score >= problem.maxScore) return "complete";
   return problem.score.score > 0 ? "partial" : "zero";
 }

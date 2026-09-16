@@ -60,6 +60,7 @@ const rail = ref(true),
 const now = useClock(),
   retryAt = ref(0);
 const problemCooldown = useProblemCooldown();
+const demoMode = useDemoMode();
 const key = computed(() =>
   viewer.value?.state === "CONTESTANT"
     ? draftKey(viewer.value.profile.name, viewer.value.team.code, code)
@@ -128,7 +129,12 @@ const statusOf = (
   const latest = activity.value?.find(
     (answer) => answer.problemCode === problem.code,
   );
-  return problemStatus(problem, !!latest, !!latest && latest.score == null);
+  return problemStatus(
+    problem,
+    !!latest,
+    !!latest && latest.score == null,
+    demoMode.value,
+  );
 };
 const open = computed(() => {
   const s = data.value?.problem.submissionStatus;
