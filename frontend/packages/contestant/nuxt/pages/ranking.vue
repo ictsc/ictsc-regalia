@@ -31,7 +31,15 @@ const { data, error, pending, refresh } = await useAsyncData("ranking", () =>
           <span class="ranking-position">{{ r.rank }}</span
           ><span class="ranking-team"
             ><strong>{{ r.teamName }}</strong
-            ><small>{{ r.organization }}</small></span
+            ><small>{{ r.organization }}</small
+            ><span
+              v-if="
+                viewer?.state === 'CONTESTANT' &&
+                r.teamCode === viewer.team.code
+              "
+              class="ranking-own-marker"
+              >自チーム</span
+            ></span
           ><span class="ranking-score">{{ r.score.toLocaleString() }}</span>
         </div>
       </section>

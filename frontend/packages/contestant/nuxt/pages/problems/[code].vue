@@ -340,14 +340,14 @@ const score = computed(
                   </p>
                   <div class="answer-actions">
                     <button
-                      class="button-primary"
+                      class="button-primary button-submit"
                       :disabled="
                         !open || cooldown > 0 || sending || !body.trim()
                       "
                     >
-                      {{ sending ? "提出中…" : "回答を提出" }} ↗</button
+                      {{ sending ? "提出中…" : "回答を提出" }}</button
                     ><button
-                      class="button-secondary"
+                      class="button-secondary button-reset"
                       type="button"
                       :disabled="!data.problem.redeployable || deploymentBusy"
                       @click="redeploy"

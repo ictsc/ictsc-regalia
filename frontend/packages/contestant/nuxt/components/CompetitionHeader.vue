@@ -138,9 +138,11 @@ const clock = computed(() => {
     </nav>
     <div class="competition-clock">
       <time>{{ clock.text }}</time
-      ><span>{{ demoMode ? "デモモード" : clock.label }}</span>
+      ><span :class="{ 'is-demo': demoMode }">{{
+        demoMode ? "デモモード" : clock.label
+      }}</span>
     </div>
-    <aside class="competition-notice">
+    <NuxtLink class="competition-notice" to="/announces">
       <strong>お知らせ</strong
       ><time>{{
         notice
@@ -151,8 +153,8 @@ const clock = computed(() => {
           : "—"
       }}</time>
       <p>{{ notice?.title ?? "現在お知らせはありません" }}</p>
-      <NuxtLink to="/announces">お知らせを確認する →</NuxtLink>
-    </aside>
+      <span class="notice-link-label">お知らせを確認する →</span>
+    </NuxtLink>
     <details class="mobile-menu">
       <summary>
         <span aria-hidden="true" /><b class="visually-hidden">メニューを開く</b>

@@ -87,6 +87,7 @@ button {
 .brand-name {
   font-size: 20px;
   font-weight: 700;
+  line-height: 1;
   letter-spacing: -0.05em;
 }
 .brand-edition {
@@ -96,6 +97,11 @@ button {
   font-weight: 600;
   line-height: 1.35;
   letter-spacing: 0.1em;
+}
+.brand:hover .brand-name,
+.brand:focus-visible .brand-name {
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 .header-performance {
   min-width: 0;
@@ -186,6 +192,10 @@ button {
 .header-neighbors .is-team small {
   color: var(--accent);
 }
+.header-neighbors .is-team small {
+  font-size: var(--header-value-size);
+  font-weight: 700;
+}
 .header-neighbors .is-team {
   width: 82px;
 }
@@ -193,17 +203,20 @@ button {
   display: flex;
   align-items: baseline;
   gap: 5px;
+  font-size: var(--header-primary-size);
+  font-weight: 700;
+  line-height: 1;
 }
 .header-neighbors .is-team strong {
   font-size: var(--header-primary-size);
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: -0.05em;
 }
 .header-neighbors .is-team em {
   font-family: var(--sans-id);
   font-size: var(--header-value-size);
   font-style: normal;
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 .header-neighbors .is-tie {
@@ -266,6 +279,8 @@ button {
 .header-account button:hover,
 .header-account button:focus-visible {
   color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .simple-header-nav {
   display: none;
@@ -296,6 +311,8 @@ button {
 .simple-header-nav a:hover,
 .simple-header-nav a:focus-visible {
   color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .simple-header-nav > .header-account {
   flex: 1;
@@ -351,6 +368,11 @@ button {
 .global-nav a.is-current {
   color: var(--accent);
 }
+.global-nav a:hover,
+.global-nav a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .team-identity {
   display: flex;
   flex-direction: column;
@@ -403,10 +425,15 @@ button {
   letter-spacing: 0.04em;
 }
 .competition-clock span {
-  color: var(--accent-light);
+  color: white;
   font-family: var(--sans-id);
   font-size: var(--header-label-size);
   letter-spacing: 0.15em;
+}
+.competition-clock span.is-demo {
+  padding: 2px 5px;
+  background: var(--accent);
+  color: white;
 }
 .competition-notice {
   grid-column: 1 / -1;
@@ -422,28 +449,30 @@ button {
 .competition-notice strong {
   color: var(--accent);
   font-size: var(--header-label-size);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.1em;
 }
 .competition-notice time {
   color: var(--muted);
   font-family: var(--mono);
   font-size: var(--header-label-size);
+  font-weight: 500;
 }
 .competition-notice p {
   margin: 0;
   overflow: hidden;
+  font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.competition-notice a {
+.competition-notice .notice-link-label {
   color: var(--accent);
   font-size: var(--header-label-size);
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
 }
-.competition-notice a:hover,
-.competition-notice a:focus-visible {
+.competition-notice:hover,
+.competition-notice:focus-visible {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -471,18 +500,6 @@ button {
   }
   .detail-page .competition-notice {
     font-size: 10px;
-  }
-  .detail-page .competition-header > * {
-    opacity: 0.58;
-  }
-  .detail-page .competition-header > a:hover,
-  .detail-page .competition-header > a:focus-visible,
-  .detail-page .competition-header > div:hover,
-  .detail-page .competition-header > aside:hover {
-    opacity: 0.82;
-  }
-  .detail-page .competition-header > .team-identity {
-    opacity: 1;
   }
 }
 main {
@@ -637,7 +654,9 @@ main {
   letter-spacing: -0.03em;
 }
 .table-tools {
-  min-height: 36px;
+  position: relative;
+  z-index: 40;
+  height: 0;
   display: flex;
   justify-content: flex-end;
 }
@@ -647,11 +666,16 @@ main {
   font-family: var(--sans-id);
 }
 .filters-panel summary {
-  padding: 6px 0 6px 18px;
+  min-height: 53px;
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  padding: 0;
   color: var(--muted);
   cursor: pointer;
-  font-size: 11px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   list-style: none;
 }
 .filters-panel summary::-webkit-details-marker {
@@ -659,16 +683,17 @@ main {
 }
 .filters-panel summary::before {
   content: "+";
-  margin-right: 7px;
+  margin-right: 9px;
   color: var(--accent);
   font-family: var(--mono);
+  font-size: 18px;
 }
 .filters-panel[open] summary::before {
   content: "−";
 }
 .filters-panel-content {
   position: absolute;
-  top: 100%;
+  top: 61px;
   right: 0;
   width: 240px;
   display: grid;
@@ -707,8 +732,10 @@ a.problem-row {
   border-bottom: 1px solid var(--line-light);
   background: transparent;
 }
-a.problem-row:hover {
-  opacity: 0.68;
+a.problem-row:hover .problem-title,
+a.problem-row:focus-visible .problem-title {
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 a.problem-row:focus-visible {
   outline: 2px solid var(--accent);
@@ -718,7 +745,6 @@ a.problem-row.is-answer-closed {
   color: #6f767c;
 }
 a.problem-row.is-answer-closed:hover {
-  opacity: 1;
   color: #545b61;
 }
 a.problem-row.is-answer-closed .problem-id,
@@ -1083,6 +1109,8 @@ a.problem-row.is-answer-closed .problem-id::before {
 .linked-page-heading a:hover,
 .linked-page-heading a:focus-visible {
   color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 .linked-page-heading h1 {
   margin: 0;
@@ -1131,8 +1159,34 @@ a.problem-row.is-answer-closed .problem-id::before {
   text-align: right;
 }
 .ranking-row.is-team {
+  position: relative;
   background: var(--team-color);
   color: var(--team-text);
+}
+.ranking-row.is-team::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 5px;
+  background: currentColor;
+}
+.ranking-row.is-team .ranking-team > strong {
+  font-size: 18px;
+  font-weight: 700;
+}
+.ranking-own-marker {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.ranking-own-marker::before {
+  content: "◆";
+  font-size: 9px;
 }
 .ranking-gap {
   padding: 20px 18px;
@@ -1157,6 +1211,11 @@ a.problem-row.is-answer-closed .problem-id::before {
   font-family: var(--sans-id);
   font-size: 15px;
   font-weight: 600;
+}
+.notice-entry h2 a:hover,
+.notice-entry h2 a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 .notice-entry p {
   margin: 0;
@@ -1202,7 +1261,7 @@ a.problem-row.is-answer-closed .problem-id::before {
   height: 14px;
   display: block;
   border: 1px solid currentColor;
-  opacity: 0.58;
+  opacity: 1;
 }
 .problem-rail-toggle-icon::before {
   content: "";
@@ -1271,7 +1330,6 @@ a.problem-row.is-answer-closed .problem-id::before {
   font-size: 9px;
   font-weight: 400;
   letter-spacing: 0.04em;
-  opacity: 0.78;
 }
 .problem-rail a {
   position: relative;
@@ -1286,7 +1344,6 @@ a.problem-row.is-answer-closed .problem-id::before {
 .problem-rail b {
   font-size: 15px;
   font-weight: 500;
-  opacity: 0.58;
 }
 .problem-rail a.is-answer-closed {
   color: #6f767c;
@@ -1295,7 +1352,12 @@ a.problem-row.is-answer-closed .problem-id::before {
   color: inherit;
 }
 .problem-rail a:hover b {
-  opacity: 0.82;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.problem-rail a:focus-visible b {
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 .problem-rail a:focus-visible {
   outline: 2px solid var(--ink);
@@ -1408,7 +1470,9 @@ a.problem-row.is-answer-closed .problem-id::before {
   display: inline-block;
   min-width: 2ch;
   margin-left: 6px;
-  color: var(--accent);
+  padding: 1px 4px;
+  background: var(--accent);
+  color: white;
   font-family: var(--mono);
   font-size: 16px;
   font-weight: 500;
@@ -1692,6 +1756,31 @@ textarea:focus-visible {
   background: var(--accent);
   color: white;
 }
+.button-primary:hover,
+.button-primary:focus-visible,
+.button-secondary:hover,
+.button-secondary:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.button-primary::after,
+.button-secondary::after {
+  content: "↗";
+  min-width: 1em;
+  margin-left: 12px;
+  opacity: 0;
+  visibility: hidden;
+}
+.button-primary:hover::after,
+.button-primary:focus-visible::after,
+.button-secondary:hover::after,
+.button-secondary:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+}
+.button-reset::after {
+  content: "↻";
+}
 .button-primary span {
   font-size: 17px;
 }
@@ -1805,7 +1894,17 @@ textarea:focus-visible {
     text-align: left;
   }
   .mobile-menu nav a[aria-current="page"] {
-    color: var(--accent);
+    background: var(--accent);
+    color: white;
+    font-weight: 700;
+    box-shadow: inset 4px 0 0 white;
+  }
+  .mobile-menu nav a:hover,
+  .mobile-menu nav a:focus-visible,
+  .mobile-menu nav button:hover,
+  .mobile-menu nav button:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
   .mobile-menu summary:focus-visible,
   .mobile-menu nav a:focus-visible,
@@ -1917,10 +2016,10 @@ textarea:focus-visible {
   .competition-notice p {
     font-size: 10px;
   }
-  .competition-notice a {
+  .competition-notice .notice-link-label {
     font-size: 0;
   }
-  .competition-notice a::after {
+  .competition-notice .notice-link-label::after {
     content: "確認 →";
     font-size: var(--header-label-size);
   }
