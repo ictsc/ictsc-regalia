@@ -100,11 +100,11 @@ button {
 .header-performance {
   min-width: 0;
   display: grid;
-  grid-template-columns: 110px max-content max-content;
+  grid-template-columns: 110px 288px minmax(0, 1fr);
   align-items: stretch;
   justify-content: start;
   gap: 18px;
-  padding: 0 20px;
+  padding: 0 16px 0 20px;
 }
 .header-performance a {
   min-width: 0;
@@ -150,6 +150,8 @@ button {
   white-space: nowrap;
 }
 .header-ranking {
+  width: 288px;
+  min-width: 0;
   display: grid;
   grid-template-rows: 1fr auto;
   align-items: center;
@@ -157,28 +159,17 @@ button {
   padding: 10px 0 9px;
 }
 .header-neighbors {
-  width: max-content;
-  display: grid;
-  grid-template-columns: 60px 14px 60px 130px 60px;
+  width: 100%;
+  display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
 }
 .header-neighbors > span {
+  width: 42px;
+  min-width: 0;
   display: grid;
   align-content: center;
   gap: 3px;
-}
-.header-neighbors > i {
-  align-self: end;
-  padding-bottom: 0;
-  color: var(--ink);
-  font-family: var(--mono);
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: 1;
-  text-align: center;
-  letter-spacing: 0.08em;
 }
 .header-neighbors small {
   color: var(--muted);
@@ -194,6 +185,9 @@ button {
 .header-neighbors .is-team,
 .header-neighbors .is-team small {
   color: var(--accent);
+}
+.header-neighbors .is-team {
+  width: 82px;
 }
 .header-neighbors .is-team b {
   display: flex;
@@ -211,6 +205,22 @@ button {
   font-style: normal;
   font-weight: 500;
   letter-spacing: -0.02em;
+}
+.header-neighbors .is-tie {
+  width: 88px;
+  min-width: 0;
+  padding-left: 10px;
+  border-left: 1px solid var(--line-light);
+}
+.header-neighbors .is-tie small {
+  color: var(--accent);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.header-neighbors .is-tie b {
+  font-family: var(--sans-id);
+  font-size: var(--header-label-size);
+  font-weight: 500;
 }
 .header-ranking-link {
   justify-self: start;
@@ -1719,7 +1729,7 @@ textarea:focus-visible {
     display: none;
   }
   .header-performance {
-    grid-template-columns: 96px max-content max-content;
+    grid-template-columns: 96px 288px minmax(0, 1fr);
     gap: 10px;
     padding: 0 12px;
   }

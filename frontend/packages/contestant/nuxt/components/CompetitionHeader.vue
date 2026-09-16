@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { headerRankingItems } from "~/features/ranking";
+
 const { data, refresh } = await useCompetition();
 const { viewer } = useSession();
 const emit = defineEmits<{ logout: [] }>();
@@ -27,12 +29,8 @@ const own = computed(() =>
       r.teamCode === viewer.value.team.code,
   ),
 );
-const neighbors = computed(
-  () =>
-    data.value?.ranking.ranking.filter(
-      (r) =>
-        r.rank === 1 || (own.value && Math.abs(r.rank - own.value.rank) <= 1),
-    ) ?? [],
+const rankingItems = computed(() =>
+  headerRankingItems(data.value?.ranking.ranking ?? [], own.value?.teamCode),
 );
 const maxScore = computed(
   () => data.value?.problems.reduce((sum, p) => sum + p.maxScore, 0) ?? 0,
@@ -89,17 +87,27 @@ const clock = computed(() => {
         ><small>提出履歴を見る →</small></NuxtLink
       ><NuxtLink class="header-ranking" to="/ranking"
         ><span class="header-neighbors"
-          ><span
-            v-for="r in neighbors"
-            :key="r.teamCode"
-            :class="{ 'is-team': r.teamCode === own?.teamCode }"
-            ><small>{{ r.rank }}位</small
-            ><b
-              >{{ r.score.toLocaleString()
-              }}<em v-if="r.teamCode === own?.teamCode">
-                / {{ maxScore.toLocaleString() }}</em
-              ></b
-            ></span
+          ><template
+            v-for="item in rankingItems"
+            :key="
+              item.kind === 'rank'
+                ? `rank-${item.entry.teamCode}`
+                : `tie-${item.rank}`
+            "
+            ><span v-if="item.kind === 'tie'" class="is-tie"
+              ><small>同率チームあり</small
+              ><b>{{ item.count }}チーム同率</b></span
+            ><span
+              v-else
+              :class="{ 'is-team': item.entry.teamCode === own?.teamCode }"
+              ><small>{{ item.entry.rank }}位</small
+              ><b
+                >{{ item.entry.score.toLocaleString()
+                }}<em v-if="item.entry.teamCode === own?.teamCode">
+                  / {{ maxScore.toLocaleString() }}</em
+                ></b
+              ></span
+            ></template
           ></span
         ><span class="header-ranking-link">順位表を見る →</span></NuxtLink
       >

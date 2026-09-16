@@ -206,16 +206,6 @@ button:disabled {
   }
 }
 
-.header-neighbors {
-  display: flex;
-  gap: 22px;
-}
-.header-neighbors > span {
-  min-width: 50px;
-}
-.header-neighbors > .is-team {
-  min-width: 130px;
-}
 .content-grid > .content-section {
   grid-column: 1;
   padding: 28px 46px;
