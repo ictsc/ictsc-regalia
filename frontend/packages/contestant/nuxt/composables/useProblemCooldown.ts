@@ -1,4 +1,5 @@
 import {
+  demoCooldownSeconds,
   remainingCooldownMinutes,
   remainingCooldownSeconds,
 } from "../features/problem/cooldown";
@@ -49,7 +50,7 @@ export function useProblemCooldown() {
     loadSnapshots,
   );
 
-  const remainingSeconds = (
+  const submissionRemainingSeconds = (
     problemCode: string,
     nextSubmittableAt: string | number | undefined,
     now: number,
@@ -68,6 +69,18 @@ export function useProblemCooldown() {
     saveSnapshots(snapshots.value);
     return seconds;
   };
+
+  const remainingSeconds = (
+    problemCode: string,
+    nextSubmittableAt: string | number | undefined,
+    now: number,
+  ) =>
+    demoMode.value
+      ? Math.max(
+          demoCooldownSeconds(problemCode),
+          submissionRemainingSeconds(problemCode, nextSubmittableAt, now),
+        )
+      : submissionRemainingSeconds(problemCode, nextSubmittableAt, now);
 
   const remainingMinutes = (
     problemCode: string,

@@ -29,6 +29,8 @@ docker compose -f backend/compose.yaml up --build --wait
 ICTSC_DEMO_MODE=true docker compose -f backend/compose.yaml up -d --build --wait
 ```
 
+デモ中の問題別待ち時間は、問題コード末尾の番号に応じて「待ちなし・待ちなし・8分・15分」を繰り返します。番号がないコードは文字コードの合計で割り当てます。実際の提出履歴に基づく待ち時間が長い場合は、そちらを優先します。表示と提出ボタンは同じ待ち時間を使用します。
+
 無効に戻す場合は`ICTSC_DEMO_MODE=false`で同じコマンドを実行します。この設定は
 frontendコンテナの起動時に反映されるため、値を変えた場合はコンテナを再作成して
 ください。URLのクエリでは切り替わりません。
