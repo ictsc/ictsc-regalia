@@ -394,7 +394,7 @@ test("回答429のRetry-Afterをcountdownへ反映する", async ({ page }) => {
   await page.getByLabel("回答", { exact: true }).fill("設定を修正しました");
   await page.getByRole("button", { name: "回答を提出 ↗" }).click();
   await expect(
-    page.getByRole("status").filter({ hasText: /再提出まで/ }),
+    page.getByRole("status").filter({ hasText: /再回答可能まで/ }),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "回答を提出 ↗" }),
