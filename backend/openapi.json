@@ -2161,7 +2161,7 @@
       "ProblemSummary": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["code", "title", "max_score", "category", "section_slug", "score", "deployment", "submission_status"],
+        "required": ["code", "title", "max_score", "category", "section_slug", "score", "deployment", "submission_status", "next_submittable_at"],
         "properties": {
           "code": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" },
           "title": { "type": "string", "minLength": 1, "maxLength": 255 },
@@ -2175,7 +2175,12 @@
             ]
           },
           "deployment": { "$ref": "#/components/schemas/ContestantProblemDeploymentState" },
-          "submission_status": { "$ref": "#/components/schemas/SubmissionStatus" }
+          "submission_status": { "$ref": "#/components/schemas/SubmissionStatus" },
+          "next_submittable_at": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "最後の回答を基準にした次回回答可能時刻。回答履歴がない場合はnull"
+          }
         }
       },
       "ProblemDetail": {

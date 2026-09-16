@@ -33,6 +33,7 @@ export type Problem = {
   score?: ScoreModel;
   submissionableSchedules: ScheduleEntry[];
   submissionStatus?: SubmissionStatus;
+  nextSubmittableAt?: string;
 };
 
 export type ContestantProfile = {

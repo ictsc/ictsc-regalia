@@ -1,8 +1,10 @@
 <script setup lang="ts">
 const { data, refresh } = await useCompetition();
 const { viewer } = useSession();
+const emit = defineEmits<{ logout: [] }>();
 const route = useRoute();
 const now = useClock();
+const demoMode = useDemoMode();
 const boundary = computed(
   () =>
     data.value?.schedule?.entries
@@ -101,14 +103,34 @@ const clock = computed(() => {
           ></span
         ><span class="header-ranking-link">順位表を見る →</span></NuxtLink
       >
+      <nav class="header-account" aria-label="アカウント">
+        <span v-if="viewer?.state === 'CONTESTANT' && viewer.impersonated_by"
+          >{{ viewer.impersonated_by }} による代理操作中</span
+        ><span v-if="viewer?.state === 'CONTESTANT'" class="team-badge">{{
+          viewer.team.name
+        }}</span
+        ><NuxtLink to="/teams">チーム</NuxtLink
+        ><NuxtLink to="/rule">ルール</NuxtLink
+        ><NuxtLink to="/profile">プロフィール</NuxtLink
+        ><button @click="emit('logout')">ログアウト</button>
+      </nav>
     </div>
     <nav v-else class="simple-header-nav" aria-label="メインメニュー">
       <NuxtLink to="/activity">提出履歴</NuxtLink
-      ><NuxtLink to="/ranking">順位表</NuxtLink>
+      ><NuxtLink to="/ranking">順位表</NuxtLink
+      ><span class="header-account">
+        <span v-if="viewer?.state === 'CONTESTANT'" class="team-badge">{{
+          viewer.team.name
+        }}</span
+        ><NuxtLink to="/teams">チーム</NuxtLink
+        ><NuxtLink to="/rule">ルール</NuxtLink
+        ><NuxtLink to="/profile">プロフィール</NuxtLink
+        ><button @click="emit('logout')">ログアウト</button>
+      </span>
     </nav>
     <div class="competition-clock">
       <time>{{ clock.text }}</time
-      ><span>{{ clock.label }}</span>
+      ><span>{{ demoMode ? "デモモード" : clock.label }}</span>
     </div>
     <aside class="competition-notice">
       <strong>お知らせ</strong
@@ -128,10 +150,15 @@ const clock = computed(() => {
         <span aria-hidden="true" /><b class="visually-hidden">メニューを開く</b>
       </summary>
       <nav aria-label="モバイルメニュー">
-        <NuxtLink to="/problems">問題一覧</NuxtLink
-        ><NuxtLink to="/activity">提出履歴</NuxtLink
-        ><NuxtLink to="/ranking">順位表</NuxtLink
-        ><NuxtLink to="/announces">お知らせ</NuxtLink>
+        <NuxtLink class="mobile-menu-primary" to="/problems">問題一覧</NuxtLink
+        ><NuxtLink class="mobile-menu-primary" to="/activity">提出履歴</NuxtLink
+        ><NuxtLink class="mobile-menu-primary" to="/ranking">順位表</NuxtLink
+        ><NuxtLink class="mobile-menu-primary" to="/announces"
+          >お知らせ</NuxtLink
+        ><NuxtLink to="/teams">チーム</NuxtLink
+        ><NuxtLink to="/rule">ルール</NuxtLink
+        ><NuxtLink to="/profile">プロフィール</NuxtLink
+        ><button @click="emit('logout')">ログアウト</button>
       </nav>
     </details>
   </header>

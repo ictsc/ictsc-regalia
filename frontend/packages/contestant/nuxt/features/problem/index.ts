@@ -34,6 +34,7 @@ export async function fetchProblems(client: ApiClient): Promise<Problem[]> {
       ? [schedules.get(problem.section_slug)!]
       : [],
     submissionStatus: mapSubmissionStatus(problem.submission_status),
+    nextSubmittableAt: problem.next_submittable_at ?? undefined,
   }));
 }
 

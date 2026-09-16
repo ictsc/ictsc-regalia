@@ -1385,6 +1385,11 @@ export interface components {
             score: components["schemas"]["Score"] | null;
             deployment: components["schemas"]["ContestantProblemDeploymentState"];
             submission_status: components["schemas"]["SubmissionStatus"];
+            /**
+             * Format: date-time
+             * @description 最後の回答を基準にした次回回答可能時刻。回答履歴がない場合はnull
+             */
+            next_submittable_at: string | null;
         };
         ProblemDetail: {
             code: string;

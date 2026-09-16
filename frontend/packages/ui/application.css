@@ -135,6 +135,9 @@ button:disabled {
   line-height: 1.9;
   overflow-wrap: anywhere;
 }
+.reading-copy > .markdown {
+  line-height: inherit;
+}
 .markdown a {
   color: var(--accent);
   text-decoration: underline;
@@ -172,6 +175,9 @@ button:disabled {
 .content-section {
   border-top: 1px solid var(--ink);
   padding: 24px 0;
+}
+.detail-page .content-section {
+  border-top: 0;
 }
 .problem-rail a {
   position: relative;

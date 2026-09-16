@@ -22,6 +22,24 @@ Go側の生成物は `internal/transport/api/api.gen.go`、TypeScript側は
 docker compose -f backend/compose.yaml up --build --wait
 ```
 
+競技時間と再回答可能までの時間を固定するデモモードは、起動時に環境変数で
+切り替えます。
+
+```sh
+ICTSC_DEMO_MODE=true docker compose -f backend/compose.yaml up -d --build --wait
+```
+
+無効に戻す場合は`ICTSC_DEMO_MODE=false`で同じコマンドを実行します。この設定は
+frontendコンテナの起動時に反映されるため、値を変えた場合はコンテナを再作成して
+ください。URLのクエリでは切り替わりません。
+
+frontendをローカルで起動する場合も同じ環境変数を使用できます。
+
+```sh
+cd frontend
+ICTSC_DEMO_MODE=true pnpm --filter @ictsc/competition dev
+```
+
 - 競技者SPA: <http://localhost:3000/>
 - Admin SPA: <http://localhost:3000/admin/>
 - API: <http://localhost:8080/api/v1/health>

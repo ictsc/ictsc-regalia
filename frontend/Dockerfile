@@ -14,6 +14,19 @@ RUN pnpm run build
 FROM nginx:1.31.4 AS frontend
 ENV API_UPSTREAM=http://api:8080
 ENV NGINX_RESOLVER=127.0.0.11
+ENV ICTSC_DEMO_MODE=false
+COPY --chmod=755 <<'EOF' /docker-entrypoint.d/10-runtime-config.sh
+#!/bin/sh
+set -eu
+
+case "${ICTSC_DEMO_MODE:-false}" in
+    1 | true | TRUE | yes | YES | on | ON) demo_mode=true ;;
+    *) demo_mode=false ;;
+esac
+
+printf 'window.__ICTSC_RUNTIME_CONFIG__={demoMode:%s};\n' "$demo_mode" \
+    > /var/www/contestant/runtime-config.js
+EOF
 COPY <<EOF /etc/nginx/templates/default.conf.template
 server {
     listen 8080;

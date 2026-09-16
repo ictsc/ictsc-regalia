@@ -123,6 +123,17 @@ func (h *Handler) ListContestantProblems(ctx context.Context, _ api.ListContesta
 	if err != nil {
 		return nil, err
 	}
+	answers, err := h.service.Store.ListAnswers(ctx, core.AnswerFilter{TeamCode: &contestant.TeamCode})
+	if err != nil {
+		return nil, err
+	}
+	nextSubmittableAt := make(map[string]time.Time)
+	for _, answer := range answers {
+		next := answer.SubmittedAt.Add(core.AnswerInterval)
+		if current, ok := nextSubmittableAt[answer.ProblemCode]; !ok || next.After(current) {
+			nextSubmittableAt[answer.ProblemCode] = next
+		}
+	}
 	now := h.service.Now()
 	started := make(map[string]bool)
 	for _, section := range snapshot.Manifest.Sections {
@@ -139,10 +150,14 @@ func (h *Handler) ListContestantProblems(ctx context.Context, _ api.ListContesta
 		if selected, ok := scores[contestant.TeamCode][problem.Code]; ok {
 			score = toAPIScore(selected)
 		}
+		var next *time.Time
+		if value, ok := nextSubmittableAt[problem.Code]; ok {
+			next = &value
+		}
 		problems = append(problems, api.ProblemSummary{
 			Code: problem.Code, Title: problem.Title, MaxScore: problem.MaxScore, Category: problem.Category,
 			SectionSlug: problem.SectionSlug, Score: score, SubmissionStatus: submissionStatus(snapshot, problem, now),
-			Deployment: contestantDeploymentState(problem),
+			Deployment: contestantDeploymentState(problem), NextSubmittableAt: next,
 		})
 	}
 	return api.ListContestantProblems200JSONResponse{Problems: problems}, nil

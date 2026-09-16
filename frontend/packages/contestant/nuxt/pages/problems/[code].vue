@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { api, ApiError } from "@ictsc/api";
 import { fetchProblem } from "~/features/problem";
-import { fetchAnswers, fetchAnswer, submitAnswer } from "~/features/answer";
+import { fetchAnswer, fetchAnswers, submitAnswer } from "~/features/answer";
 import {
   fetchDeployments,
   deploy,
@@ -9,20 +9,41 @@ import {
   mapDeployment,
 } from "~/features/deployment";
 import { draftKey, loadDraft, saveDraft } from "~/features/draft";
-import { problemStatus } from "~/features/problem/status";
+import { fetchActivity } from "~/features/activity";
+import {
+  remainingCooldownMinutes,
+  remainingCooldownSeconds,
+} from "~/features/problem/cooldown";
+import { problemStatus, statusLabels } from "~/features/problem/status";
 definePageMeta({ key: (route) => route.fullPath });
-const code = String(useRoute().params.code);
+const route = useRoute();
+const code = String(route.params.code);
+const requestedAnswer = Array.isArray(route.query.answer)
+  ? route.query.answer[0]
+  : route.query.answer;
+const selectedAnswerNumber =
+  typeof requestedAnswer === "string" &&
+  Number.isSafeInteger(Number(requestedAnswer)) &&
+  Number(requestedAnswer) > 0
+    ? Number(requestedAnswer)
+    : null;
 const { viewer } = useSession();
 const { data: competition } = await useCompetition();
+const { data: activity } = await useAsyncData("activity", () =>
+  fetchActivity(api),
+);
 const { data, error, pending, refresh } = await useAsyncData(
-  `problem:${code}`,
+  `problem:${code}:answer:${selectedAnswerNumber ?? "none"}`,
   async () => {
-    const [problem, answers, deployments] = await Promise.all([
+    const [problem, answers, deployments, selectedAnswer] = await Promise.all([
       fetchProblem(api, code),
       fetchAnswers(api, code),
       fetchDeployments(api, code),
+      selectedAnswerNumber == null
+        ? Promise.resolve(null)
+        : fetchAnswer(api, code, selectedAnswerNumber),
     ]);
-    return { problem, answers, deployments };
+    return { problem, answers, deployments, selectedAnswer };
   },
   { deep: true },
 );
@@ -39,8 +60,7 @@ const rail = ref(true),
   actionError = ref<unknown>(),
   sending = ref(false),
   deploying = ref(false),
-  submitted = ref(false),
-  selectedAnswer = ref("");
+  submitted = ref(false);
 const now = useClock(),
   retryAt = ref(0);
 const key = computed(() =>
@@ -82,6 +102,27 @@ const cooldown = computed(() => {
     Math.ceil((Math.max(intervalEnd, retryAt.value) - now.value) / 1000),
   );
 });
+const cooldownMinutes = computed(() => Math.ceil(cooldown.value / 60));
+const cooldownSecondsFor = (
+  problem: NonNullable<typeof competition.value>["problems"][number],
+) => {
+  const listed = remainingCooldownSeconds(problem.nextSubmittableAt, now.value);
+  return problem.code === code ? Math.max(listed, cooldown.value) : listed;
+};
+const cooldownMinutesFor = (
+  problem: NonNullable<typeof competition.value>["problems"][number],
+) =>
+  problem.code === code
+    ? Math.ceil(cooldownSecondsFor(problem) / 60)
+    : remainingCooldownMinutes(problem.nextSubmittableAt, now.value);
+const statusOf = (
+  problem: NonNullable<typeof competition.value>["problems"][number],
+) => {
+  const latest = activity.value?.find(
+    (answer) => answer.problemCode === problem.code,
+  );
+  return problemStatus(problem, !!latest, !!latest && latest.score == null);
+};
 const open = computed(() => {
   const s = data.value?.problem.submissionStatus;
   return (
@@ -97,6 +138,8 @@ async function submit() {
     await submitAnswer(api, code, body.value);
     submitted.value = true;
     await refresh();
+    const lastSubmittedAt = data.value?.answers.metadata.lastSubmittedAt;
+    setDemoClock(lastSubmittedAt ?? Date.now());
     await refreshNuxtData(["competition", "activity"]);
   } catch (e) {
     actionError.value = e;
@@ -159,13 +202,6 @@ async function redeploy() {
     deploying.value = false;
   }
 }
-async function viewAnswer(id: number) {
-  try {
-    selectedAnswer.value = (await fetchAnswer(api, code, id)).answerBody;
-  } catch (e) {
-    actionError.value = e;
-  }
-}
 const deploymentBusy = computed(
   () =>
     deploying.value ||
@@ -203,17 +239,37 @@ const score = computed(
               ><NuxtLink
                 :to="`/problems/${p.code}`"
                 :class="[
-                  `status-${problemStatus(p)}`,
-                  { 'is-active': p.code === code },
+                  `status-${statusOf(p)}`,
+                  {
+                    'is-active': p.code === code,
+                    'is-cooldown': cooldownSecondsFor(p) > 0,
+                    'is-answer-closed': !p.submissionStatus?.isSubmittable,
+                  },
                 ]"
+                :data-cooldown="
+                  cooldownSecondsFor(p)
+                    ? `${cooldownMinutesFor(p)}分`
+                    : undefined
+                "
                 :aria-current="p.code === code ? 'page' : undefined"
-                :aria-label="`${p.code} ${p.title}`"
+                :aria-label="`${p.code} ${p.title} ${statusLabels[statusOf(p)]}${cooldownSecondsFor(p) ? ` 再提出可能まで${cooldownMinutesFor(p)}分` : ''}`"
                 ><b>{{ p.code }}</b
                 ><span class="problem-preview"
                   ><strong>{{ p.title }}</strong
                   ><small>{{ p.category }}</small
+                  ><span class="preview-status" :class="`is-${statusOf(p)}`">{{
+                    statusLabels[statusOf(p)]
+                  }}</span
+                  ><span class="preview-score"
+                    >{{ p.score ? `${p.score.score}点` : "未確定" }} /
+                    {{ p.maxScore }}点満点</span
+                  ><span v-if="cooldownSecondsFor(p)" class="preview-cooldown"
+                    >再提出可能まで <b>{{ cooldownMinutesFor(p) }}</b
+                    >分</span
                   ><span
-                    >{{ p.score?.score ?? "—" }} / {{ p.maxScore }}点</span
+                    v-else-if="!p.submissionStatus?.isSubmittable"
+                    class="preview-closed"
+                    >回答終了 / 閲覧のみ</span
                   ></span
                 ></NuxtLink
               ></template
@@ -225,23 +281,25 @@ const score = computed(
                 <h1>{{ code }}:{{ data.problem.title }}.</h1>
                 <p>{{ data.problem.category }}</p>
               </div>
-              <div class="problem-score-summary">
-                <strong>{{ score?.score ?? "—" }}</strong
-                ><span>/ {{ data.problem.maxScore }}点満点</span>
-              </div>
-              <div class="problem-cooldown">
-                <template v-if="cooldown"
-                  ><span>再提出まで</span
-                  ><strong>{{ Math.ceil(cooldown / 60) }}</strong
-                  ><small>分</small></template
-                ><span v-else>{{
-                  open ? "回答受付中" : "受付時間外 / 閲覧のみ"
-                }}</span>
+              <div class="problem-summary-side">
+                <p class="problem-score-summary">
+                  <strong>{{ score ? `${score.score}点` : "—" }}</strong
+                  ><span>/ {{ data.problem.maxScore }}点満点</span>
+                </p>
+                <p
+                  class="problem-cooldown"
+                  :class="{ 'is-answer-closed': !open && !cooldown }"
+                >
+                  <template v-if="cooldown"
+                    ><span>再回答可能まで</span
+                    ><strong>{{ cooldownMinutes }}</strong
+                    ><small>分</small></template
+                  ><span v-else>{{ open ? "回答受付中" : "回答終了" }}</span>
+                </p>
               </div>
             </header>
             <div class="content-grid">
               <section class="reading-section">
-                <h2>問題</h2>
                 <div class="reading-copy">
                   <MarkdownContent :source="data.problem.body" />
                 </div>
@@ -269,7 +327,7 @@ const score = computed(
                   />
                   <p v-if="submitted" role="status">回答を提出しました</p>
                   <p v-if="cooldown" role="status">
-                    再提出まで {{ Math.floor(cooldown / 60) }}分{{
+                    再回答可能まで {{ Math.floor(cooldown / 60) }}分{{
                       cooldown % 60
                     }}秒
                   </p>
@@ -318,8 +376,12 @@ const score = computed(
                   </li>
                 </ul>
               </section>
-              <section class="content-section">
-                <h2>提出履歴</h2>
+              <section
+                id="answer-history"
+                class="content-section"
+                aria-labelledby="answer-history-heading"
+              >
+                <h2 id="answer-history-heading">提出履歴</h2>
                 <p v-if="!data.answers.answers.length">提出はありません。</p>
                 <table v-else class="data-table">
                   <thead>
@@ -332,12 +394,19 @@ const score = computed(
                   <tbody>
                     <tr v-for="a in data.answers.answers" :key="a.id">
                       <td>
-                        <button
-                          class="button-secondary"
-                          @click="viewAnswer(a.id)"
+                        <NuxtLink
+                          :to="{
+                            path: `/problems/${code}`,
+                            query: { answer: String(a.id) },
+                            hash: '#answer-history',
+                          }"
+                          :aria-label="`回答 #${a.id} の内容を確認する`"
+                          :aria-current="
+                            selectedAnswerNumber === a.id ? 'true' : undefined
+                          "
                         >
-                          #{{ a.id }}
-                        </button>
+                          #{{ a.id }} を見る
+                        </NuxtLink>
                       </td>
                       <td>
                         {{ new Date(a.submittedAt).toLocaleString("ja-JP") }}
@@ -346,10 +415,13 @@ const score = computed(
                     </tr>
                   </tbody>
                 </table>
-                <MarkdownContent
-                  v-if="selectedAnswer"
-                  :source="selectedAnswer"
-                />
+                <div
+                  v-if="data.selectedAnswer"
+                  class="reading-copy"
+                  aria-live="polite"
+                >
+                  <MarkdownContent :source="data.selectedAnswer.answerBody" />
+                </div>
               </section>
             </div>
           </article></div></template
