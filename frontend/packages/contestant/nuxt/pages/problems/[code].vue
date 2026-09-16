@@ -10,10 +10,6 @@ import {
 } from "~/features/deployment";
 import { draftKey, loadDraft, saveDraft } from "~/features/draft";
 import { fetchActivity } from "~/features/activity";
-import {
-  remainingCooldownMinutes,
-  remainingCooldownSeconds,
-} from "~/features/problem/cooldown";
 import { problemStatus, statusLabels } from "~/features/problem/status";
 definePageMeta({ key: (route) => route.fullPath });
 const route = useRoute();
@@ -63,6 +59,7 @@ const rail = ref(true),
   submitted = ref(false);
 const now = useClock(),
   retryAt = ref(0);
+const problemCooldown = useProblemCooldown();
 const key = computed(() =>
   viewer.value?.state === "CONTESTANT"
     ? draftKey(viewer.value.profile.name, viewer.value.team.code, code)
@@ -97,16 +94,22 @@ const cooldown = computed(() => {
     ? Date.parse(metadata.lastSubmittedAt) +
       metadata.submitIntervalSeconds * 1000
     : 0;
-  return Math.max(
-    0,
-    Math.ceil((Math.max(intervalEnd, retryAt.value) - now.value) / 1000),
+  const nextSubmittableAt = Math.max(intervalEnd, retryAt.value);
+  return problemCooldown.remainingSeconds(
+    code,
+    nextSubmittableAt || undefined,
+    now.value,
   );
 });
 const cooldownMinutes = computed(() => Math.ceil(cooldown.value / 60));
 const cooldownSecondsFor = (
   problem: NonNullable<typeof competition.value>["problems"][number],
 ) => {
-  const listed = remainingCooldownSeconds(problem.nextSubmittableAt, now.value);
+  const listed = problemCooldown.remainingSeconds(
+    problem.code,
+    problem.nextSubmittableAt,
+    now.value,
+  );
   return problem.code === code ? Math.max(listed, cooldown.value) : listed;
 };
 const cooldownMinutesFor = (
@@ -114,7 +117,11 @@ const cooldownMinutesFor = (
 ) =>
   problem.code === code
     ? Math.ceil(cooldownSecondsFor(problem) / 60)
-    : remainingCooldownMinutes(problem.nextSubmittableAt, now.value);
+    : problemCooldown.remainingMinutes(
+        problem.code,
+        problem.nextSubmittableAt,
+        now.value,
+      );
 const statusOf = (
   problem: NonNullable<typeof competition.value>["problems"][number],
 ) => {
@@ -144,7 +151,7 @@ async function submit() {
   } catch (e) {
     actionError.value = e;
     if (e instanceof ApiError && e.status === 429)
-      retryAt.value = Date.now() + (e.retryAfterSeconds ?? 0) * 1000;
+      retryAt.value = now.value + (e.retryAfterSeconds ?? 0) * 1000;
   } finally {
     sending.value = false;
   }

@@ -2,7 +2,6 @@
 import { api } from "@ictsc/api";
 import { groupProblems } from "~/features/problem/group";
 import { fetchActivity } from "~/features/activity";
-import { remainingCooldownMinutes } from "~/features/problem/cooldown";
 import { problemStatus, statusLabels } from "~/features/problem/status";
 useHead({ title: "問題一覧" });
 const { data, pending, error, refresh } = await useCompetition();
@@ -13,9 +12,15 @@ const status = ref("all"),
   day = ref("all"),
   category = ref("all");
 const now = useClock();
+const problemCooldown = useProblemCooldown();
 const cooldownMinutes = (
   problem: NonNullable<typeof data.value>["problems"][number],
-) => remainingCooldownMinutes(problem.nextSubmittableAt, now.value);
+) =>
+  problemCooldown.remainingMinutes(
+    problem.code,
+    problem.nextSubmittableAt,
+    now.value,
+  );
 const state = (p: NonNullable<typeof data.value>["problems"][number]) =>
   problemStatus(
     p,
