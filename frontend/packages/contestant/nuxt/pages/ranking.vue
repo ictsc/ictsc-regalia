@@ -11,7 +11,7 @@ const { data, error, pending, refresh } = await useAsyncData("ranking", () =>
   <main>
     <header class="linked-page-heading">
       <NuxtLink to="/problems">← 問題一覧へ</NuxtLink>
-      <h1>順位表</h1>
+      <h1 class="page-title">順位表</h1>
       <p v-if="data?.frozen">順位表は凍結中です {{ data.frozenAt }}</p>
     </header>
     <RequestState :error="error" :pending="pending" @retry="refresh"

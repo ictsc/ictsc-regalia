@@ -8,7 +8,7 @@ const { data, error, pending, refresh } = await useAsyncData("teams", () =>
 </script>
 <template>
   <main class="workspace">
-    <h1>チーム</h1>
+    <h1 class="page-title">チーム</h1>
     <RequestState :error="error" :pending="pending" @retry="refresh"
       ><section v-for="team in data" :key="team.code" class="content-section">
         <h2>{{ team.name }}</h2>

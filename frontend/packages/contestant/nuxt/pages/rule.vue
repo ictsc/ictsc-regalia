@@ -8,7 +8,7 @@ const { data, error, pending, refresh } = await useAsyncData("rule", () =>
 </script>
 <template>
   <main class="workspace">
-    <h1>ルール</h1>
+    <h1 class="page-title">ルール</h1>
     <RequestState :error="error" :pending="pending" @retry="refresh"
       ><MarkdownContent v-if="data" :source="data.markdown"
     /></RequestState>

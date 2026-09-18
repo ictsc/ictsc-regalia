@@ -583,6 +583,29 @@ main {
   margin: 0 auto;
   padding: 0 34px 72px;
 }
+.page-title {
+  margin: 0;
+  font-family: var(--sans-id);
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+}
+main.workspace {
+  padding-top: 0;
+}
+.workspace > .page-title {
+  margin: 0;
+  padding: 40px 0 32px;
+  font-size: 36px;
+  letter-spacing: -0.05em;
+}
+.workspace > .page-title + * {
+  margin-top: 0;
+}
+.workspace > .page-title + .markdown > :first-child {
+  margin-top: 0;
+}
 .page-intro {
   min-height: 250px;
   display: flex;
@@ -719,15 +742,13 @@ main {
   display: none;
 }
 .problem-table:first-of-type {
-  margin-top: 8px;
+  margin-top: 0;
 }
 .problem-day-heading {
-  margin: 0;
-  padding: 0 0 16px;
-  font-family: var(--sans-id);
-  font-size: 25px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  padding: 0 0 32px;
+}
+.problem-table:first-of-type .problem-day-heading {
+  padding-top: 40px;
 }
 .table-tools {
   position: relative;
@@ -745,7 +766,7 @@ main {
   min-height: 53px;
   display: flex;
   align-items: center;
-  margin-top: 8px;
+  margin-top: 40px;
   padding: 0;
   color: var(--muted);
   cursor: pointer;
@@ -769,7 +790,7 @@ main {
 }
 .filters-panel-content {
   position: absolute;
-  top: 61px;
+  top: 93px;
   right: 0;
   width: 240px;
   display: grid;
@@ -1169,15 +1190,18 @@ a.problem-row.is-answer-closed .problem-id::before {
   padding-top: 40px;
 }
 .linked-page-heading {
-  min-height: 150px;
+  position: relative;
   display: grid;
   grid-template-columns: 1fr auto;
-  align-content: space-between;
-  padding-bottom: 28px;
+  align-items: end;
+  gap: 24px;
+  padding: 40px 0 32px;
   font-family: var(--sans-id);
 }
 .linked-page-heading a {
-  grid-column: 1 / -1;
+  position: absolute;
+  top: 14px;
+  left: 0;
   width: max-content;
   font-size: 10px;
   font-weight: 600;
@@ -1189,11 +1213,14 @@ a.problem-row.is-answer-closed .problem-id::before {
   text-underline-offset: 4px;
 }
 .linked-page-heading h1 {
-  margin: 0;
-  font-size: 44px;
+  grid-column: 1;
+}
+.linked-page-heading .page-title {
+  font-size: 36px;
   letter-spacing: -0.05em;
 }
 .linked-page-heading p {
+  grid-column: 2;
   align-self: end;
   margin: 0;
   color: var(--muted);
@@ -2055,10 +2082,30 @@ textarea:focus-visible {
     padding-top: 26px;
   }
   .linked-page-heading {
-    min-height: 120px;
+    gap: 16px;
+    padding: 32px 0 24px;
   }
-  .linked-page-heading h1 {
-    font-size: 34px;
+  .page-title {
+    font-size: 30px;
+  }
+  .workspace > .page-title {
+    padding: 32px 0 24px;
+    font-size: 30px;
+  }
+  .linked-page-heading .page-title {
+    font-size: 30px;
+  }
+  .problem-table:first-of-type .problem-day-heading {
+    padding-top: 32px;
+  }
+  .problem-day-heading {
+    padding-bottom: 24px;
+  }
+  .filters-panel summary {
+    margin-top: 32px;
+  }
+  .filters-panel-content {
+    top: 85px;
   }
   .history-list,
   .ranking-list {

@@ -90,7 +90,9 @@ const sectionName = (slug?: string) =>
         </details>
       </div>
       <section v-for="group in groups" :key="group.slug" class="problem-table">
-        <h2 class="problem-day-heading">{{ sectionName(group.slug) }}の問題</h2>
+        <h2 class="problem-day-heading page-title">
+          {{ sectionName(group.slug) }}の問題
+        </h2>
         <div class="problem-row problem-heading">
           <span>問題ID / 状態</span><span>カテゴリ</span><span>問題</span
           ><span>得点</span>

@@ -42,7 +42,7 @@ async function submit() {
 </script>
 <template>
   <main class="workspace">
-    <h1>参加登録</h1>
+    <h1 class="page-title">参加登録</h1>
     <form class="form-grid" @submit.prevent="submit">
       <p v-if="registrationTeam">参加チーム: {{ registrationTeam.name }}</p>
       <label v-else

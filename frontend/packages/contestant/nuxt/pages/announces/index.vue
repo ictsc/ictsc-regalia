@@ -13,8 +13,7 @@ const { data, error, pending, refresh } = await useAsyncData("notices", () =>
   <main>
     <header class="linked-page-heading">
       <NuxtLink to="/problems">← 問題一覧へ</NuxtLink>
-      <h1>お知らせ</h1>
-      <p>競技運営からのお知らせ</p>
+      <h1 class="page-title">お知らせ</h1>
     </header>
     <RequestState :error="error" :pending="pending" @retry="refresh"
       ><div class="actions">

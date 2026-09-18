@@ -37,7 +37,7 @@ async function start(candidate: NonNullable<typeof data.value>[number]) {
 </script>
 <template>
   <main class="workspace">
-    <h1>代理ログイン</h1>
+    <h1 class="page-title">代理ログイン</h1>
     <p role="alert">{{ message }}</p>
     <RequestState :error="error" :pending="pending" @retry="refresh"
       ><table class="data-table">

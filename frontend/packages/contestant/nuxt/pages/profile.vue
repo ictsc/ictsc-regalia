@@ -26,7 +26,7 @@ async function save() {
 </script>
 <template>
   <main class="workspace">
-    <h1>プロフィール</h1>
+    <h1 class="page-title">プロフィール</h1>
     <RequestState :error="error" :pending="pending" @retry="refresh"
       ><form class="form-grid" @submit.prevent="save">
         <label>競技者名<input :value="data?.name" disabled /></label

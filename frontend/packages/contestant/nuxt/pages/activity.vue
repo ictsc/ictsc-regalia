@@ -10,7 +10,7 @@ const { data, error, pending, refresh } = await useAsyncData("activity", () =>
   <main>
     <header class="linked-page-heading">
       <NuxtLink to="/problems">← 問題一覧へ</NuxtLink>
-      <h1>提出履歴</h1>
+      <h1 class="page-title">提出履歴</h1>
       <p>チームの回答と採点状況</p>
     </header>
     <RequestState :error="error" :pending="pending" @retry="refresh"
