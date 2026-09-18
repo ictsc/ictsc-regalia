@@ -318,6 +318,7 @@ test("profile更新と凍結rankingを表示する", async ({ page }) => {
 });
 
 test("回答429のRetry-Afterをcountdownへ反映する", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-09-02T12:00:00+09:00"));
   await page.route("**/api/v1/**", async (route) => {
     const request = route.request();
     const path = new URL(request.url()).pathname;
@@ -424,13 +425,17 @@ test("回答429のRetry-Afterをcountdownへ反映する", async ({ page }) => {
 
   await page.goto("/problems/A01");
   await page.getByLabel("回答", { exact: true }).fill("設定を修正しました");
-  await page.getByRole("button", { name: "回答を提出 ↗" }).click();
+  await page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }).click();
   await expect(
-    page.getByRole("status").filter({ hasText: /再提出まで/ }),
+    page.getByRole("status").filter({ hasText: /再回答可能まで/ }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "回答を提出 ↗" }),
+    page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }),
   ).toBeDisabled();
+  await page.clock.setFixedTime(new Date("2026-09-02T12:00:03+09:00"));
+  await expect(
+    page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }),
+  ).toBeEnabled();
 });
 
 test("Nuxtの問題一覧、下書き復元、利用者分離とモバイル表示", async ({
@@ -466,7 +471,7 @@ test("Nuxtの問題一覧、下書き復元、利用者分離とモバイル表�
   await expect(page.getByLabel("回答", { exact: true })).toHaveValue(
     "原因: 設定の不整合\n復旧確認済み",
   );
-  await page.getByRole("button", { name: "回答を提出 ↗" }).click();
+  await page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }).click();
   await expect(
     page.getByText("回答を提出しました", { exact: true }),
   ).toBeVisible();
@@ -488,7 +493,7 @@ test("Nuxtの問題一覧、下書き復元、利用者分離とモバイル表�
   ).toBeLessThanOrEqual(390);
   await page.goto("/problems/A01");
   await expect(
-    page.getByRole("button", { name: "回答を提出 ↗" }),
+    page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }),
   ).toBeDisabled();
   await page.goto("/ranking");
   await expect(page.locator(".ranking-row.is-team")).toContainText(
