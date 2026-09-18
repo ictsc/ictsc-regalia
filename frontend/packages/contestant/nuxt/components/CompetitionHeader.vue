@@ -45,6 +45,9 @@ const notice = computed(
     )[0],
 );
 const clock = computed(() => {
+  // Keep the demo presentation independent of the schedule and page-load time.
+  if (demoMode.value) return { label: "デモモード", text: "02:00:00" };
+
   const sections = data.value?.schedule?.entries ?? [];
   const active = sections.find(
     (s) =>
@@ -138,9 +141,7 @@ const clock = computed(() => {
     </nav>
     <div class="competition-clock">
       <time>{{ clock.text }}</time
-      ><span :class="{ 'is-demo': demoMode }">{{
-        demoMode ? "デモモード" : clock.label
-      }}</span>
+      ><span :class="{ 'is-demo': demoMode }">{{ clock.label }}</span>
     </div>
     <NuxtLink class="competition-notice" to="/announces">
       <strong>お知らせ</strong
