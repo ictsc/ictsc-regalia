@@ -7,6 +7,21 @@ const emit = defineEmits<{ logout: [] }>();
 const route = useRoute();
 const now = useClock();
 const demoMode = useDemoMode();
+const isImpersonating = computed(
+  () =>
+    viewer.value?.state === "CONTESTANT" &&
+    viewer.value.impersonated_by != null,
+);
+const accountActionLabel = computed(() =>
+  viewer.value?.state === "CONTESTANT" && viewer.value.impersonated_by
+    ? "代"
+    : "ログアウト",
+);
+const accountActionAriaLabel = computed(() =>
+  viewer.value?.state === "CONTESTANT" && viewer.value.impersonated_by
+    ? `${viewer.value.impersonated_by}による代理操作を終了`
+    : "ログアウト",
+);
 const boundary = computed(
   () =>
     data.value?.schedule?.entries
@@ -112,28 +127,32 @@ const clock = computed(() => {
         ><span class="header-ranking-link">順位表を見る →</span></NuxtLink
       >
       <nav class="header-account" aria-label="アカウント">
-        <span v-if="viewer?.state === 'CONTESTANT' && viewer.impersonated_by"
-          >{{ viewer.impersonated_by }} による代理操作中</span
-        ><span v-if="viewer?.state === 'CONTESTANT'" class="team-badge">{{
-          viewer.team.name
-        }}</span
-        ><NuxtLink to="/teams">チーム</NuxtLink
+        <NuxtLink to="/teams">チーム</NuxtLink
         ><NuxtLink to="/rule">ルール</NuxtLink
         ><NuxtLink to="/profile">プロフィール</NuxtLink
-        ><button @click="emit('logout')">ログアウト</button>
+        ><button
+          :aria-label="accountActionAriaLabel"
+          :class="{ 'is-impersonating': isImpersonating }"
+          @click="emit('logout')"
+        >
+          {{ accountActionLabel }}
+        </button>
       </nav>
     </div>
     <nav v-else class="simple-header-nav" aria-label="メインメニュー">
       <NuxtLink to="/activity">提出履歴</NuxtLink
       ><NuxtLink to="/ranking">順位表</NuxtLink
       ><span class="header-account">
-        <span v-if="viewer?.state === 'CONTESTANT'" class="team-badge">{{
-          viewer.team.name
-        }}</span
-        ><NuxtLink to="/teams">チーム</NuxtLink
+        <NuxtLink to="/teams">チーム</NuxtLink
         ><NuxtLink to="/rule">ルール</NuxtLink
         ><NuxtLink to="/profile">プロフィール</NuxtLink
-        ><button @click="emit('logout')">ログアウト</button>
+        ><button
+          :aria-label="accountActionAriaLabel"
+          :class="{ 'is-impersonating': isImpersonating }"
+          @click="emit('logout')"
+        >
+          {{ accountActionLabel }}
+        </button>
       </span>
     </nav>
     <div class="competition-clock">
@@ -160,7 +179,10 @@ const clock = computed(() => {
         <span aria-hidden="true" /><b class="visually-hidden">メニューを開く</b>
       </summary>
       <nav aria-label="モバイルメニュー">
-        <NuxtLink class="mobile-menu-primary" to="/problems">問題一覧</NuxtLink
+        <span v-if="viewer?.state === 'CONTESTANT'" class="mobile-team-badge">{{
+          viewer.team.name
+        }}</span
+        ><NuxtLink class="mobile-menu-primary" to="/problems">問題一覧</NuxtLink
         ><NuxtLink class="mobile-menu-primary" to="/activity">提出履歴</NuxtLink
         ><NuxtLink class="mobile-menu-primary" to="/ranking">順位表</NuxtLink
         ><NuxtLink class="mobile-menu-primary" to="/announces"
@@ -168,7 +190,13 @@ const clock = computed(() => {
         ><NuxtLink to="/teams">チーム</NuxtLink
         ><NuxtLink to="/rule">ルール</NuxtLink
         ><NuxtLink to="/profile">プロフィール</NuxtLink
-        ><button @click="emit('logout')">ログアウト</button>
+        ><button
+          :aria-label="accountActionAriaLabel"
+          :class="{ 'is-impersonating': isImpersonating }"
+          @click="emit('logout')"
+        >
+          {{ accountActionLabel }}
+        </button>
       </nav>
     </details>
   </header>

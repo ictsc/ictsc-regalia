@@ -5,6 +5,7 @@ import {
   fulfillJson,
   installEventSourceMock,
 } from "./support/http";
+import { installCompetitionApi } from "./support/competition";
 
 const commit = "a".repeat(40);
 const requestedAt = "2026-09-01T12:00:00+09:00";
@@ -22,6 +23,49 @@ const completedDeployment = {
   ...queuedDeployment,
   status: "COMPLETED",
 };
+
+test("トップバーではチーム名を隠し、代理操作を短く表示する", async ({
+  page,
+}) => {
+  const state = await installCompetitionApi(page);
+  state.teamName = "千葉工大で、何を始めるつもりなのか。";
+  state.impersonatedBy = "ぽいど";
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/problems");
+
+  const header = page.locator(".competition-header");
+  const account = header.locator(".header-account");
+  await expect(account).toBeVisible();
+  expect(
+    await account.evaluate((element) => element.scrollWidth <= element.clientWidth),
+  ).toBe(true);
+  await expect(account).not.toContainText(
+    "千葉工大で、何を始めるつもりなのか。",
+  );
+  const proxyButton = account.getByRole("button", {
+    name: "ぽいどによる代理操作を終了",
+  });
+  await expect(proxyButton).toHaveText("代");
+  await expect(header.locator(".mobile-menu summary")).toBeHidden();
+
+  await page.setViewportSize({ width: 1360, height: 900 });
+  await expect(account).toBeVisible();
+  await expect(proxyButton).toHaveText("代");
+
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await header.locator(".mobile-menu summary").click();
+  await expect(header.locator(".mobile-menu nav")).toBeVisible();
+  await expect(
+    header
+      .locator(".mobile-menu")
+      .getByText("千葉工大で、何を始めるつもりなのか。", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    header
+      .locator(".mobile-menu")
+      .getByRole("button", { name: "ぽいどによる代理操作を終了" }),
+  ).toHaveText("代");
+});
 
 function requestBody(request: Request): unknown {
   const raw = request.postData();

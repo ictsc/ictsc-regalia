@@ -6,6 +6,8 @@ export async function installCompetitionApi(page: Page) {
   const state = {
     name: "alice",
     color: "#0083C3",
+    teamName: "KERNEL PANIC",
+    impersonatedBy: null as string | null,
     submissions: [] as string[],
   };
   const definitions = [
@@ -78,12 +80,12 @@ export async function installCompetitionApi(page: Page) {
           },
           team: {
             code: 12,
-            name: "KERNEL PANIC",
+            name: state.teamName,
             organization: "ICTSC University",
             member_limit: 4,
             color: state.color,
           },
-          impersonated_by: null,
+          impersonated_by: state.impersonatedBy,
         },
       });
     if (path === "/api/v1/contestant/problems")
