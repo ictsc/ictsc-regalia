@@ -1256,11 +1256,14 @@ a.problem-row.is-answer-closed .problem-id::before {
   font-weight: 500;
 }
 .history-row time,
-.history-row strong,
-.ranking-row strong,
-.ranking-row b {
+.history-row strong {
   font-family: var(--mono);
   font-weight: 500;
+}
+.ranking-position,
+.ranking-score {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
 }
 .history-row > :last-child,
 .ranking-row > :last-child {

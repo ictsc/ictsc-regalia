@@ -205,6 +205,10 @@ button:disabled {
 .mono {
   font-family: var(--mono);
 }
+.numeric {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
 .muted {
   font-size: 12px;
 }

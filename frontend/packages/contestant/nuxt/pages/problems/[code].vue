@@ -415,13 +415,17 @@ const score = computed(
                             selectedAnswerNumber === a.id ? 'true' : undefined
                           "
                         >
-                          #{{ a.id }} を見る
+                          <span class="numeric">#{{ a.id }}</span> を見る
                         </NuxtLink>
                       </td>
-                      <td>
+                      <td class="numeric">
                         {{ new Date(a.submittedAt).toLocaleString("ja-JP") }}
                       </td>
-                      <td>{{ a.score?.score ?? "採点中" }}</td>
+                      <td>
+                        <span class="numeric">{{
+                          a.score?.score ?? "採点中"
+                        }}</span>
+                      </td>
                     </tr>
                   </tbody>
                 </table>

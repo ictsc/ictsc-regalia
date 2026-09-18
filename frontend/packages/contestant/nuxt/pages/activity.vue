@@ -25,14 +25,20 @@ const { data, error, pending, refresh } = await useAsyncData("activity", () =>
           </thead>
           <tbody>
             <tr v-for="a in data" :key="`${a.problemCode}:${a.answerId}`">
-              <td>{{ new Date(a.submittedAt).toLocaleString("ja-JP") }}</td>
+              <td class="numeric">
+                {{ new Date(a.submittedAt).toLocaleString("ja-JP") }}
+              </td>
               <td>
                 <NuxtLink :to="`/problems/${a.problemCode}`"
-                  >{{ a.problemCode }} {{ a.problemTitle }}</NuxtLink
+                  ><span class="numeric">{{ a.problemCode }}</span>
+                  {{ a.problemTitle }}</NuxtLink
                 >
               </td>
-              <td>#{{ a.answerId }}</td>
-              <td>{{ a.score?.score ?? "採点中" }} / {{ a.maxScore }}</td>
+              <td class="numeric">#{{ a.answerId }}</td>
+              <td>
+                <span class="numeric">{{ a.score?.score ?? "採点中" }}</span>
+                / <span class="numeric">{{ a.maxScore }}</span>
+              </td>
             </tr>
           </tbody>
         </table>

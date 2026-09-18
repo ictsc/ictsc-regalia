@@ -104,8 +104,11 @@ const clock = computed(() => {
     <div v-if="!detail" class="header-performance">
       <NuxtLink class="header-solved" to="/activity"
         ><span class="header-solved-value"
-          ><strong>{{ solved }}</strong
-          ><span>/ {{ data?.problems.length ?? "—" }}問</span></span
+          ><strong class="numeric">{{ solved }}</strong
+          ><span
+            ><span class="numeric">/ {{ data?.problems.length ?? "—" }}</span
+            >問</span
+          ></span
         ><small>提出履歴を見る →</small></NuxtLink
       ><NuxtLink class="header-ranking" to="/ranking"
         ><span class="header-neighbors"
