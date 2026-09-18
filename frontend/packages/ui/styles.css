@@ -24,6 +24,12 @@
   --header-label-size: 9px;
   --header-value-size: 11px;
   --header-primary-size: 18px;
+  --page-max-width: 1480px;
+  --page-gutter: 34px;
+  --table-header-height: 46px;
+  --table-row-height: 58px;
+  --table-cell-padding: 18px;
+  --table-header-size: 11px;
 }
 
 * {
@@ -71,7 +77,10 @@ button {
 }
 
 .competition-header {
+  width: min(100%, var(--page-max-width));
   min-height: 120px;
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
   display: grid;
   grid-template-columns: 170px minmax(560px, 1fr) 150px;
   grid-template-rows: 84px 36px;
@@ -82,7 +91,7 @@ button {
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 0 20px;
+  padding: 0 20px 0 0;
 }
 .brand-name {
   font-size: 20px;
@@ -443,7 +452,7 @@ button {
   grid-template-columns: 86px 52px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  padding: 0 20px;
+  padding: 0;
   background: white;
   color: var(--ink);
   font-size: var(--header-value-size);
@@ -509,7 +518,7 @@ button {
   position: absolute;
   top: 84px;
   right: 0;
-  width: 200px;
+  width: 204px;
   display: grid;
   background: var(--ink);
   color: white;
@@ -557,11 +566,6 @@ button {
 }
 
 @media (min-width: 761px) {
-  .competition-header {
-    width: min(100%, 1480px);
-    margin-inline: auto;
-    padding-inline: 34px;
-  }
   .detail-page .competition-header {
     min-height: 92px;
     grid-template-rows: 64px 28px;
@@ -579,9 +583,9 @@ button {
   }
 }
 main {
-  max-width: 1480px;
+  max-width: var(--page-max-width);
   margin: 0 auto;
-  padding: 0 34px 72px;
+  padding: 0 var(--page-gutter) 72px;
 }
 .page-title {
   margin: 0;
@@ -822,7 +826,7 @@ main.workspace {
 .problem-row {
   display: grid;
   grid-template-columns: 150px 160px minmax(260px, 1fr) 170px;
-  min-height: 58px;
+  min-height: var(--table-row-height);
   align-items: stretch;
 }
 a.problem-row {
@@ -860,19 +864,19 @@ a.problem-row.is-answer-closed .problem-id::before {
   padding: 0 20px;
 }
 .problem-heading {
-  min-height: 46px;
+  min-height: var(--table-header-height);
   border-bottom: 1px solid var(--line);
   color: var(--muted);
   font-family: var(--sans-id);
-  font-size: 11px;
+  font-size: var(--table-header-size);
   font-weight: 500;
   letter-spacing: 0;
 }
 .problem-heading > span {
-  padding: 0 20px;
+  padding: 0 var(--table-cell-padding);
 }
 .problem-heading > span:first-child {
-  padding-left: 16px;
+  padding-left: var(--table-cell-padding);
 }
 .problem-id {
   position: relative;
@@ -1160,10 +1164,10 @@ a.problem-row.is-answer-closed .problem-id::before {
 }
 
 .site-footer {
-  max-width: 1480px;
+  max-width: var(--page-max-width);
   min-height: 56px;
   margin: 0 auto;
-  padding: 0 34px;
+  padding: 0 var(--page-gutter);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1228,7 +1232,7 @@ a.problem-row.is-answer-closed .problem-id::before {
 }
 .history-row,
 .ranking-row {
-  min-height: 58px;
+  min-height: var(--table-row-height);
   display: grid;
   align-items: center;
   border-bottom: 1px solid var(--line-light);
@@ -1242,13 +1246,14 @@ a.problem-row.is-answer-closed .problem-id::before {
 }
 .history-row > *,
 .ranking-row > * {
-  padding: 0 18px;
+  padding: 0 var(--table-cell-padding);
 }
 .history-heading,
 .ranking-heading {
-  min-height: 42px;
+  min-height: var(--table-header-height);
   color: var(--muted);
-  font-size: 10px;
+  font-size: var(--table-header-size);
+  font-weight: 500;
 }
 .history-row time,
 .history-row strong,
@@ -1263,27 +1268,33 @@ a.problem-row.is-answer-closed .problem-id::before {
 }
 .ranking-row.is-team {
   position: relative;
-  background: var(--team-color);
-  color: var(--team-text);
+  min-height: 70px;
+  background: var(--accent);
+  color: white;
 }
-.ranking-row.is-team::before {
-  content: "";
-  position: absolute;
-  inset-block: 0;
-  left: 0;
-  width: 5px;
-  background: currentColor;
+.ranking-team {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
-.ranking-row.is-team .ranking-team > strong {
+.ranking-row.is-team .ranking-position,
+.ranking-row.is-team .ranking-score {
   font-size: 18px;
   font-weight: 700;
+}
+.ranking-row.is-team .ranking-team > strong {
+  font-size: 22px;
+  font-weight: 700;
+}
+.ranking-row.is-team .ranking-team > small {
+  font-size: 13px;
 }
 .ranking-own-marker {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  margin-left: 12px;
-  font-size: 11px;
+  margin-left: 4px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -1340,8 +1351,8 @@ a.problem-row.is-answer-closed .problem-id::before {
   color: var(--muted);
 }
 .problem-rail-toggle {
-  width: 17px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
   padding: 0;
@@ -1360,8 +1371,8 @@ a.problem-row.is-answer-closed .problem-id::before {
 }
 .problem-rail-toggle-icon {
   position: relative;
-  width: 17px;
-  height: 14px;
+  width: 24px;
+  height: 18px;
   display: block;
   border: 1px solid currentColor;
   opacity: 1;
@@ -1371,16 +1382,16 @@ a.problem-row.is-answer-closed .problem-id::before {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 5px;
+  left: 7px;
   border-left: 1px solid currentColor;
 }
 .problem-rail-toggle-icon::after {
   content: "‹";
   position: absolute;
   top: 50%;
-  right: 2px;
+  right: 3px;
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 13px;
   line-height: 1;
   transform: translateY(-56%);
 }
@@ -1395,6 +1406,9 @@ a.problem-row.is-answer-closed .problem-id::before {
   display: grid;
   grid-template-columns: 128px minmax(0, 1fr);
 }
+.detail-page .actions {
+  margin: 8px 0;
+}
 .detail-page .actions,
 .detail-page .detail-layout,
 .detail-page .problem-hero,
@@ -1404,6 +1418,12 @@ a.problem-row.is-answer-closed .problem-id::before {
 }
 .detail-layout.is-rail-hidden {
   grid-template-columns: minmax(0, 1fr);
+}
+.detail-layout.is-rail-hidden .problem-hero,
+.detail-layout.is-rail-hidden .reading-section,
+.detail-layout.is-rail-hidden .environment-section,
+.detail-layout.is-rail-hidden .content-grid > .content-section {
+  padding-left: 0;
 }
 .problem-rail {
   position: relative;
@@ -1633,6 +1653,9 @@ a.problem-row.is-answer-closed .problem-id::before {
   z-index: 2;
   padding: 0;
 }
+.hero-copy p {
+  margin: 8px 0 0;
+}
 .hero-copy h1 {
   max-width: 850px;
   margin: 0;
@@ -1735,6 +1758,7 @@ a.problem-row.is-answer-closed .problem-id::before {
 .reading-section {
   grid-column: 1;
   display: block;
+  padding-top: 16px;
   padding-right: 34px;
 }
 .problem-content h2 {
@@ -1751,6 +1775,9 @@ a.problem-row.is-answer-closed .problem-id::before {
   line-height: 2;
 }
 .reading-copy:first-child {
+  margin-top: 0;
+}
+.reading-copy > .markdown > :first-child {
   margin-top: 0;
 }
 .reading-copy p {
@@ -1912,7 +1939,7 @@ textarea:focus-visible {
     grid-template-columns: 140px minmax(0, 1fr) 150px 54px;
   }
   .brand {
-    padding: 0 14px;
+    padding: 0 14px 0 0;
   }
   .brand-edition {
     display: none;
@@ -1967,6 +1994,8 @@ textarea:focus-visible {
   }
   .problem-hero {
     grid-template-columns: 150px minmax(0, 1fr);
+    padding-right: 26px;
+    padding-left: 26px;
   }
   .content-grid {
     grid-template-columns: minmax(0, 1fr) 360px;
@@ -1984,6 +2013,10 @@ textarea:focus-visible {
 }
 
 @media (max-width: 760px) {
+  :root {
+    --page-gutter: 14px;
+    --table-cell-padding: 12px;
+  }
   .competition-header {
     min-width: 0;
     min-height: 100px;
@@ -1994,7 +2027,7 @@ textarea:focus-visible {
     grid-column: 1;
     grid-row: 1;
     min-height: 64px;
-    padding: 0 14px;
+    padding: 0;
   }
   .brand-name {
     font-size: 18px;
@@ -2063,14 +2096,15 @@ textarea:focus-visible {
   }
   .mobile-menu nav {
     top: 64px;
+    width: 170px;
   }
   .mobile-menu-primary {
     display: block;
   }
   main,
   .site-footer {
-    padding-right: 14px;
-    padding-left: 14px;
+    padding-right: var(--page-gutter);
+    padding-left: var(--page-gutter);
   }
   .problem-table {
     overflow-x: auto;

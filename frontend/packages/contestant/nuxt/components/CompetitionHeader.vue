@@ -5,6 +5,7 @@ const { data, refresh } = await useCompetition();
 const { viewer } = useSession();
 const emit = defineEmits<{ logout: [] }>();
 const route = useRoute();
+const mobileMenu = ref<HTMLDetailsElement | null>(null);
 const now = useClock();
 const demoMode = useDemoMode();
 const isImpersonating = computed(
@@ -37,6 +38,12 @@ watch(now, (value) => {
   } else if (nextBoundary == null) nextBoundary = boundary.value;
 });
 const detail = computed(() => /^\/problems\/.+/.test(route.path));
+watch(
+  () => route.fullPath,
+  () => {
+    if (mobileMenu.value) mobileMenu.value.open = false;
+  },
+);
 const own = computed(() =>
   data.value?.ranking.ranking.find(
     (r) =>
@@ -174,7 +181,7 @@ const clock = computed(() => {
       <p>{{ notice?.title ?? "現在お知らせはありません" }}</p>
       <span class="notice-link-label">お知らせを確認する →</span>
     </NuxtLink>
-    <details class="mobile-menu">
+    <details ref="mobileMenu" class="mobile-menu">
       <summary>
         <span aria-hidden="true" /><b class="visually-hidden">メニューを開く</b>
       </summary>

@@ -76,18 +76,24 @@ button:disabled {
 .data-table {
   border-collapse: collapse;
   width: 100%;
-  text-align: left;
   margin: 24px 0;
+  font-family: var(--sans-id);
+  text-align: left;
 }
 .data-table th,
 .data-table td {
   border-bottom: 1px solid var(--ink);
-  padding: 16px 12px;
-  vertical-align: top;
+  padding: 0 var(--table-cell-padding);
+  vertical-align: middle;
 }
 .data-table th {
-  font-size: 12px;
+  height: var(--table-header-height);
+  color: var(--muted);
+  font-size: var(--table-header-size);
   font-weight: 500;
+}
+.data-table td {
+  height: var(--table-row-height);
 }
 .data-table a {
   text-decoration: none;
@@ -110,12 +116,17 @@ button:disabled {
   color: var(--accent);
 }
 .admin-header {
+  width: min(100%, var(--page-max-width));
+  margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   min-height: 80px;
   border-bottom: 1px solid var(--ink);
-  padding-right: 24px;
+  padding-inline: var(--page-gutter);
+}
+.admin-header .brand {
+  padding: 0;
 }
 .admin-nav,
 .account-nav {
@@ -166,12 +177,25 @@ button:disabled {
 .markdown table {
   border-collapse: collapse;
   display: block;
+  width: 100%;
   overflow-x: auto;
+  font-family: var(--sans-id);
 }
 .markdown td,
 .markdown th {
-  border: 1px solid var(--ink);
-  padding: 8px 12px;
+  min-width: 120px;
+  height: var(--table-row-height);
+  padding: 0 var(--table-cell-padding);
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  vertical-align: middle;
+}
+.markdown th {
+  height: var(--table-header-height);
+  color: var(--muted);
+  font-size: var(--table-header-size);
+  font-weight: 500;
+  text-align: left;
 }
 .markdown blockquote {
   border-left: 3px solid var(--accent);
@@ -214,13 +238,20 @@ button:disabled {
   }
   .data-table th,
   .data-table td {
-    padding: 12px 8px;
+    padding-right: var(--table-cell-padding);
+    padding-left: var(--table-cell-padding);
   }
 }
 
 .content-grid > .content-section {
   grid-column: 1;
   padding: 28px 46px;
+}
+@media (max-width: 1280px) {
+  .content-grid > .content-section {
+    padding-right: 26px;
+    padding-left: 26px;
+  }
 }
 .actions > .button-primary,
 .form-grid > .button-primary {

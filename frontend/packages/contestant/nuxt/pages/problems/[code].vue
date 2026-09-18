@@ -225,14 +225,17 @@ const score = computed(
     <RequestState :pending="pending" :error="error" @retry="refresh"
       ><template v-if="data"
         ><div class="actions">
-          <NuxtLink to="/problems">← 問題一覧へ</NuxtLink
-          ><button
-            class="button-secondary"
+          <button
+            class="problem-rail-toggle"
             :aria-expanded="rail"
+            :aria-label="rail ? '問題リンクを隠す' : '問題リンクを表示'"
             aria-controls="problem-rail"
             @click="rail = !rail"
           >
-            {{ rail ? "問題リンクを隠す" : "問題リンクを表示" }}
+            <span class="problem-rail-toggle-icon" aria-hidden="true" />
+            <span class="visually-hidden">{{
+              rail ? "問題リンクを隠す" : "問題リンクを表示"
+            }}</span>
           </button>
         </div>
         <div class="detail-layout" :class="{ 'is-rail-hidden': !rail }">
