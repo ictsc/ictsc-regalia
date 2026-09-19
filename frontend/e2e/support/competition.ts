@@ -1,6 +1,9 @@
 import type { Page } from "@playwright/test";
 import { fulfillJson, installEventSourceMock } from "./http";
-export async function installCompetitionApi(page: Page) {
+export async function installCompetitionApi(
+  page: Page,
+  demoProblemCode = "A04",
+) {
   await page.clock.setFixedTime(new Date("2026-09-02T12:00:00+09:00"));
   await installEventSourceMock(page);
   const state = {
@@ -9,12 +12,13 @@ export async function installCompetitionApi(page: Page) {
     teamName: "KERNEL PANIC",
     impersonatedBy: null as string | null,
     submissions: [] as string[],
+    cooldownUntil: null as string | null,
   };
   const definitions = [
     ["A01", "DNSの名前解決ができない", "ネットワーク", 300, "day1", 300],
     ["A02", "Webサーバーに接続できない", "サーバー", 150, "both", 80],
     ["A03", "BGP経路が広報されない", "ネットワーク", 350, "day1", 0],
-    ["A04", "無線LANに接続できない", "無線", 200, "day2", null],
+    [demoProblemCode, "無線LANに接続できない", "無線", 200, "day2", null],
     ["A05", "ログが保存されていない", "サーバー", 200, "both", 200],
     ["A06", "監視通知が届かない", "その他", 100, "day1", null],
     ["B01", "IPv6で外部へ通信できない", "ネットワーク", 250, "day1", 130],
@@ -89,7 +93,13 @@ export async function installCompetitionApi(page: Page) {
         },
       });
     if (path === "/api/v1/contestant/problems")
-      return fulfillJson(route, { problems });
+      return fulfillJson(route, {
+        problems: problems.map((problem) => ({
+          ...problem,
+          next_submittable_at:
+            problem.code === demoProblemCode ? state.cooldownUntil : null,
+        })),
+      });
     if (
       ["/api/v1/contestant/sections", "/api/v1/contestant/schedule"].includes(
         path,

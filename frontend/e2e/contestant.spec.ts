@@ -10,6 +10,54 @@ import { installCompetitionApi } from "./support/competition";
 const commit = "a".repeat(40);
 const requestedAt = "2026-09-01T12:00:00+09:00";
 
+test("デモ時計は再読み込み後も固定し、実際の再回答待ちは進む", async ({
+  page,
+}) => {
+  const state = await installCompetitionApi(page, "R03");
+  state.cooldownUntil = "2026-09-02T12:10:00+09:00";
+  await page.route("**/runtime-config.js", (route) =>
+    route.fulfill({
+      contentType: "application/javascript",
+      body: "window.__ICTSC_RUNTIME_CONFIG__={demoMode:true};",
+    }),
+  );
+  await page.route("**/api/v1/contestant/problems/R03/answers", (route) => {
+    if (route.request().method() !== "GET") return route.fallback();
+    return fulfillJson(route, {
+      answers: [],
+      last_submitted_at: "2026-09-02T11:50:00+09:00",
+      submit_interval_seconds: 1200,
+    });
+  });
+  await page.goto("/problems");
+  await expect(
+    page.locator('a.problem-row[href="/problems/R03"] .problem-id'),
+  ).toHaveAttribute("data-cooldown", "10分");
+  await page.goto("/problems/R03");
+  const display = page.locator(".problem-cooldown strong");
+  const submit = page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ });
+  await page
+    .getByLabel("回答", { exact: true })
+    .fill("デモ表示とは別に受付を確認");
+  await expect(display).toHaveText("10");
+  await expect(submit).toBeDisabled();
+  await page.clock.setFixedTime(new Date("2026-09-02T12:11:00+09:00"));
+  await expect(submit).toBeEnabled();
+  await expect(display).toHaveText("10");
+  await submit.click();
+  await expect(
+    page.getByText("回答を提出しました", { exact: true }),
+  ).toBeVisible();
+  expect(state.submissions).toEqual(["デモ表示とは別に受付を確認"]);
+  await page.reload();
+  await expect(display).toHaveText("10");
+  await expect(submit).toBeEnabled();
+  await page.goto("/problems");
+  await expect(
+    page.locator('a.problem-row[href="/problems/R03"] .problem-id'),
+  ).toHaveAttribute("data-cooldown", "10分");
+});
+
 const queuedDeployment = {
   revision: 1,
   status: "QUEUED",
@@ -37,7 +85,9 @@ test("トップバーではチーム名を隠し、代理操作を短く表示�
   const account = header.locator(".header-account");
   await expect(account).toBeVisible();
   expect(
-    await account.evaluate((element) => element.scrollWidth <= element.clientWidth),
+    await account.evaluate(
+      (element) => element.scrollWidth <= element.clientWidth,
+    ),
   ).toBe(true);
   await expect(account).not.toContainText(
     "千葉工大で、何を始めるつもりなのか。",

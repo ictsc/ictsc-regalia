@@ -11,6 +11,7 @@ import {
 import { draftKey, loadDraft, saveDraft } from "~/features/draft";
 import { fetchActivity } from "~/features/activity";
 import { problemStatus, statusLabels } from "~/features/problem/status";
+import { remainingCooldownSeconds } from "~/features/problem/cooldown";
 definePageMeta({ key: (route) => route.fullPath });
 const route = useRoute();
 const code = String(route.params.code);
@@ -57,8 +58,9 @@ const rail = ref(true),
   sending = ref(false),
   deploying = ref(false),
   submitted = ref(false);
-const now = useClock(),
+const now = useClock(false),
   retryAt = ref(0);
+const displayNow = useClock();
 const problemCooldown = useProblemCooldown();
 const key = computed(() =>
   viewer.value?.state === "CONTESTANT"
@@ -88,29 +90,34 @@ watch(body, (value) => {
     }
   }
 });
-const cooldown = computed(() => {
+const nextSubmittableAt = computed(() => {
   const metadata = data.value?.answers.metadata;
   const intervalEnd = metadata?.lastSubmittedAt
     ? Date.parse(metadata.lastSubmittedAt) +
       metadata.submitIntervalSeconds * 1000
     : 0;
-  const nextSubmittableAt = Math.max(intervalEnd, retryAt.value);
-  return problemCooldown.remainingSeconds(
-    code,
-    nextSubmittableAt || undefined,
-    now.value,
-  );
+  return Math.max(intervalEnd, retryAt.value) || undefined;
 });
-const cooldownMinutes = computed(() => Math.ceil(cooldown.value / 60));
+const cooldown = computed(() =>
+  remainingCooldownSeconds(nextSubmittableAt.value, now.value),
+);
+const displayCooldown = computed(() =>
+  problemCooldown.remainingSeconds(
+    code,
+    nextSubmittableAt.value,
+    displayNow.value,
+  ),
+);
+const cooldownMinutes = computed(() => Math.ceil(displayCooldown.value / 60));
 const cooldownSecondsFor = (
   problem: NonNullable<typeof competition.value>["problems"][number],
 ) => {
   const listed = problemCooldown.remainingSeconds(
     problem.code,
     problem.nextSubmittableAt,
-    now.value,
+    displayNow.value,
   );
-  return problem.code === code ? Math.max(listed, cooldown.value) : listed;
+  return problem.code === code ? displayCooldown.value : listed;
 };
 const cooldownMinutesFor = (
   problem: NonNullable<typeof competition.value>["problems"][number],
@@ -120,7 +127,7 @@ const cooldownMinutesFor = (
     : problemCooldown.remainingMinutes(
         problem.code,
         problem.nextSubmittableAt,
-        now.value,
+        displayNow.value,
       );
 const statusOf = (
   problem: NonNullable<typeof competition.value>["problems"][number],
@@ -145,8 +152,6 @@ async function submit() {
     await submitAnswer(api, code, body.value);
     submitted.value = true;
     await refresh();
-    const lastSubmittedAt = data.value?.answers.metadata.lastSubmittedAt;
-    setDemoClock(lastSubmittedAt ?? Date.now());
     await refreshNuxtData(["competition", "activity"]);
   } catch (e) {
     actionError.value = e;
@@ -298,9 +303,9 @@ const score = computed(
                 </p>
                 <p
                   class="problem-cooldown"
-                  :class="{ 'is-answer-closed': !open && !cooldown }"
+                  :class="{ 'is-answer-closed': !open && !displayCooldown }"
                 >
-                  <template v-if="cooldown"
+                  <template v-if="displayCooldown"
                     ><span>再回答可能まで</span
                     ><strong>{{ cooldownMinutes }}</strong
                     ><small>分</small></template

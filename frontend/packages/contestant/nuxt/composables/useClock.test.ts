@@ -1,29 +1,33 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { remainingCooldownSeconds } from "../features/problem/cooldown";
-import { setDemoClock } from "./useClock";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { loadDemoClock } from "./useClock";
 
 describe("demo clock", () => {
-  const states = new Map<string, { value: unknown }>();
-
   beforeEach(() => {
-    states.clear();
-    states.set("demo-mode", { value: true });
-    vi.stubGlobal("useState", (key: string, init: () => unknown) => {
-      if (!states.has(key)) states.set(key, { value: init() });
-      return states.get(key);
-    });
+    localStorage.clear();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-19T03:00:00Z"));
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
-  it("提出時刻を基準に再回答までの20分を固定する", () => {
-    const submittedAt = "2026-09-16T03:00:00.000Z";
-    const nextSubmittableAt = "2026-09-16T03:20:00.000Z";
+  it("restores the same reference time after real time advances", () => {
+    const first = loadDemoClock();
+    vi.setSystemTime(new Date("2026-09-20T03:00:00Z"));
+    expect(loadDemoClock()).toBe(first);
+  });
 
-    setDemoClock(submittedAt);
+  it("replaces an invalid stored reference", () => {
+    localStorage.setItem("ictsc-demo-now", "invalid");
+    expect(loadDemoClock()).toBe(Date.now());
+    expect(localStorage.getItem("ictsc-demo-now")).toBe(String(Date.now()));
+  });
 
-    const demoNow = states.get("demo-now")?.value;
-    expect(demoNow).toBe(Date.parse(submittedAt));
-    expect(remainingCooldownSeconds(nextSubmittableAt, demoNow as number)).toBe(
-      20 * 60,
-    );
+  it("falls back to the page clock when storage is blocked", () => {
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new Error("storage blocked");
+    });
+    expect(loadDemoClock()).toBe(Date.now());
   });
 });
