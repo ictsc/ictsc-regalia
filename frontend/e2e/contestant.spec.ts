@@ -72,6 +72,38 @@ function requestBody(request: Request): unknown {
   return raw == null ? null : JSON.parse(raw);
 }
 
+for (const demoMode of [true, false]) {
+  test(`ヘッダーの残り時間: ${demoMode ? "デモでは再読み込み後も固定" : "通常は開催期間から計算"}`, async ({
+    page,
+  }) => {
+    const { installCompetitionApi } = await import("./support/competition");
+    await installCompetitionApi(page);
+    await page.route("**/runtime-config.js", (route) =>
+      route.fulfill({
+        contentType: "application/javascript",
+        body: `window.__ICTSC_RUNTIME_CONFIG__={demoMode:${demoMode}};`,
+      }),
+    );
+    await page.goto("/problems");
+    const clock = page.locator(".competition-clock");
+    await expect(clock.locator("span")).toHaveText(
+      demoMode ? "デモモード" : "残り時間",
+    );
+    await expect(clock.locator("time")).toHaveText(
+      demoMode ? "02:00:00" : "02:13:48",
+    );
+
+    await page.clock.setFixedTime(new Date("2026-09-02T13:00:00+09:00"));
+    await expect(clock.locator("time")).toHaveText(
+      demoMode ? "02:00:00" : "01:13:48",
+    );
+    await page.reload();
+    await expect(clock.locator("time")).toHaveText(
+      demoMode ? "02:00:00" : "01:13:48",
+    );
+  });
+}
+
 test("viewerから問題を開き、再展開のQUEUED表示をSSEで完了へ更新する", async ({
   page,
 }) => {
@@ -330,6 +362,7 @@ test("profile更新と凍結rankingを表示する", async ({ page }) => {
 });
 
 test("回答429のRetry-Afterをcountdownへ反映する", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-09-02T12:00:00+09:00"));
   await page.route("**/api/v1/**", async (route) => {
     const request = route.request();
     const path = new URL(request.url()).pathname;
@@ -436,13 +469,17 @@ test("回答429のRetry-Afterをcountdownへ反映する", async ({ page }) => {
 
   await page.goto("/problems/A01");
   await page.getByLabel("回答", { exact: true }).fill("設定を修正しました");
-  await page.getByRole("button", { name: "回答を提出 ↗" }).click();
+  await page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }).click();
   await expect(
-    page.getByRole("status").filter({ hasText: /再提出まで/ }),
+    page.getByRole("status").filter({ hasText: /再回答可能まで/ }),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "回答を提出 ↗" }),
+    page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }),
   ).toBeDisabled();
+  await page.clock.setFixedTime(new Date("2026-09-02T12:00:03+09:00"));
+  await expect(
+    page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }),
+  ).toBeEnabled();
 });
 
 test("Nuxtの問題一覧、下書き復元、利用者分離とモバイル表示", async ({
@@ -478,7 +515,7 @@ test("Nuxtの問題一覧、下書き復元、利用者分離とモバイル表�
   await expect(page.getByLabel("回答", { exact: true })).toHaveValue(
     "原因: 設定の不整合\n復旧確認済み",
   );
-  await page.getByRole("button", { name: "回答を提出 ↗" }).click();
+  await page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }).click();
   await expect(
     page.getByText("回答を提出しました", { exact: true }),
   ).toBeVisible();
@@ -500,7 +537,7 @@ test("Nuxtの問題一覧、下書き復元、利用者分離とモバイル表�
   ).toBeLessThanOrEqual(390);
   await page.goto("/problems/A01");
   await expect(
-    page.getByRole("button", { name: "回答を提出 ↗" }),
+    page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }),
   ).toBeDisabled();
   await page.goto("/ranking");
   await expect(page.locator(".ranking-row.is-team")).toContainText(
