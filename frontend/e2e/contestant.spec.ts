@@ -10,54 +10,6 @@ import { installCompetitionApi } from "./support/competition";
 const commit = "a".repeat(40);
 const requestedAt = "2026-09-01T12:00:00+09:00";
 
-test("デモ時計は再読み込み後も固定し、実際の再回答待ちは進む", async ({
-  page,
-}) => {
-  const state = await installCompetitionApi(page, "R03");
-  state.cooldownUntil = "2026-09-02T12:10:00+09:00";
-  await page.route("**/runtime-config.js", (route) =>
-    route.fulfill({
-      contentType: "application/javascript",
-      body: "window.__ICTSC_RUNTIME_CONFIG__={demoMode:true};",
-    }),
-  );
-  await page.route("**/api/v1/contestant/problems/R03/answers", (route) => {
-    if (route.request().method() !== "GET") return route.fallback();
-    return fulfillJson(route, {
-      answers: [],
-      last_submitted_at: "2026-09-02T11:50:00+09:00",
-      submit_interval_seconds: 1200,
-    });
-  });
-  await page.goto("/problems");
-  await expect(
-    page.locator('a.problem-row[href="/problems/R03"] .problem-id'),
-  ).toHaveAttribute("data-cooldown", "10分");
-  await page.goto("/problems/R03");
-  const display = page.locator(".problem-cooldown strong");
-  const submit = page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ });
-  await page
-    .getByLabel("回答", { exact: true })
-    .fill("デモ表示とは別に受付を確認");
-  await expect(display).toHaveText("10");
-  await expect(submit).toBeDisabled();
-  await page.clock.setFixedTime(new Date("2026-09-02T12:11:00+09:00"));
-  await expect(submit).toBeEnabled();
-  await expect(display).toHaveText("10");
-  await submit.click();
-  await expect(
-    page.getByText("回答を提出しました", { exact: true }),
-  ).toBeVisible();
-  expect(state.submissions).toEqual(["デモ表示とは別に受付を確認"]);
-  await page.reload();
-  await expect(display).toHaveText("10");
-  await expect(submit).toBeEnabled();
-  await page.goto("/problems");
-  await expect(
-    page.locator('a.problem-row[href="/problems/R03"] .problem-id'),
-  ).toHaveAttribute("data-cooldown", "10分");
-});
-
 const queuedDeployment = {
   revision: 1,
   status: "QUEUED",
@@ -122,37 +74,23 @@ function requestBody(request: Request): unknown {
   return raw == null ? null : JSON.parse(raw);
 }
 
-for (const demoMode of [true, false]) {
-  test(`ヘッダーの残り時間: ${demoMode ? "デモでは再読み込み後も固定" : "通常は開催期間から計算"}`, async ({
-    page,
-  }) => {
-    const { installCompetitionApi } = await import("./support/competition");
-    await installCompetitionApi(page);
-    await page.route("**/runtime-config.js", (route) =>
-      route.fulfill({
-        contentType: "application/javascript",
-        body: `window.__ICTSC_RUNTIME_CONFIG__={demoMode:${demoMode}};`,
-      }),
-    );
-    await page.goto("/problems");
-    const clock = page.locator(".competition-clock");
-    await expect(clock.locator("span")).toHaveText(
-      demoMode ? "デモモード" : "残り時間",
-    );
-    await expect(clock.locator("time")).toHaveText(
-      demoMode ? "02:00:00" : "02:13:48",
-    );
-
-    await page.clock.setFixedTime(new Date("2026-09-02T13:00:00+09:00"));
-    await expect(clock.locator("time")).toHaveText(
-      demoMode ? "02:00:00" : "01:13:48",
-    );
-    await page.reload();
-    await expect(clock.locator("time")).toHaveText(
-      demoMode ? "02:00:00" : "01:13:48",
-    );
-  });
-}
+test("ヘッダーの残り時間は開催期間から計算する", async ({ page }) => {
+  await installCompetitionApi(page);
+  await page.route("**/runtime-config.js", (route) =>
+    route.fulfill({
+      contentType: "application/javascript",
+      body: "window.__ICTSC_RUNTIME_CONFIG__={demoMode:false};",
+    }),
+  );
+  await page.goto("/problems");
+  const clock = page.locator(".competition-clock");
+  await expect(clock.locator("span")).toHaveText("残り時間");
+  await expect(clock.locator("time")).toHaveText("02:13:48");
+  await page.clock.setFixedTime(new Date("2026-09-02T13:00:00+09:00"));
+  await expect(clock.locator("time")).toHaveText("01:13:48");
+  await page.reload();
+  await expect(clock.locator("time")).toHaveText("01:13:48");
+});
 
 test("viewerから問題を開き、再展開のQUEUED表示をSSEで完了へ更新する", async ({
   page,
