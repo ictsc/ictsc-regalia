@@ -35,11 +35,14 @@ const links = [
         ><span class="brand-name">ICTSC</span
         ><span class="brand-edition">REGALIA<br />ADMIN</span></NuxtLink
       >
-      <div v-if="viewer?.state !== 'ANONYMOUS'" class="actions">
-        <span>{{
-          viewer?.state === "ADMIN" ? viewer.admin.discord.display_name : ""
-        }}</span
-        ><button class="button-secondary" @click="logout">ログアウト</button>
+      <div class="actions">
+        <ThemeToggle />
+        <template v-if="viewer?.state !== 'ANONYMOUS'">
+          <span>{{
+            viewer?.state === "ADMIN" ? viewer.admin.discord.display_name : ""
+          }}</span
+          ><button class="button-secondary" @click="logout">ログアウト</button>
+        </template>
       </div>
     </header>
     <RequestState :error="error" @retry="load"

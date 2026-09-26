@@ -46,7 +46,7 @@ button:disabled {
 .field {
   border: 1px solid var(--ink);
   padding: 10px 12px;
-  background: white;
+  background: var(--paper);
   color: var(--ink);
   min-width: 0;
 }
@@ -60,9 +60,11 @@ button:disabled {
   align-items: center;
   margin: 20px 0;
 }
-.actions a,
-.text-link {
-  text-decoration: none;
+.actions a:not(.button-primary):not(.button-secondary),
+.text-link,
+.workspace > a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 .actions a:hover,
 .actions a:focus-visible,
@@ -96,7 +98,8 @@ button:disabled {
   height: var(--table-row-height);
 }
 .data-table a {
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 .data-table a:hover,
 .data-table a:focus-visible {

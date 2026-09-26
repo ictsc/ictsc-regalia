@@ -8,9 +8,18 @@ const { data, pending, error, refresh } = await useCompetition();
 const { data: activity } = await useAsyncData("activity", () =>
   fetchActivity(api),
 );
-const status = ref("all"),
-  day = ref("all"),
-  category = ref("all");
+const selectedStatuses = ref<string[]>([]);
+const selectedCategories = ref<string[]>([]);
+const selectedScores = ref<string[]>([]);
+const scoreOptions = {
+  full: "満点",
+  partial: "部分点",
+  zero: "0点",
+  unscored: "未採点",
+};
+const categories = computed(() =>
+  [...new Set((data.value?.problems ?? []).map((p) => p.category))].sort(),
+);
 const now = useClock();
 const problemCooldown = useProblemCooldown();
 const cooldownMinutes = (
@@ -28,15 +37,33 @@ const state = (p: NonNullable<typeof data.value>["problems"][number]) =>
     activity.value?.find((a) => a.problemCode === p.code)?.score ===
       undefined && !!activity.value?.some((a) => a.problemCode === p.code),
   );
+const matchesScore = (
+  problem: NonNullable<typeof data.value>["problems"][number],
+) => {
+  if (!selectedScores.value.length) return true;
+  return selectedScores.value.some((filter) => {
+    if (filter === "unscored") return problem.score == null;
+    if (filter === "full")
+      return problem.score != null && problem.score.score >= problem.maxScore;
+    if (filter === "partial")
+      return (
+        (problem.score?.score ?? 0) > 0 &&
+        (problem.score?.score ?? 0) < problem.maxScore
+      );
+    return problem.score?.score === 0;
+  });
+};
 const groups = computed(() =>
   groupProblems(data.value?.problems ?? [])
     .map((g) => ({
       slug: g.key,
       problems: g.problems.filter(
         (p) =>
-          (day.value === "all" || p.sectionSlug === day.value) &&
-          (category.value === "all" || p.category === category.value) &&
-          (status.value === "all" || state(p) === status.value),
+          (!selectedCategories.value.length ||
+            selectedCategories.value.includes(p.category)) &&
+          (!selectedStatuses.value.length ||
+            selectedStatuses.value.includes(state(p))) &&
+          matchesScore(p),
       ),
     }))
     .filter((g) => g.problems.length),
@@ -47,55 +74,90 @@ const sectionName = (slug?: string) =>
     : /^day\d+$/.test(slug ?? "")
       ? `${slug!.slice(3)}日目`
       : slug;
+const hasFilters = computed(
+  () =>
+    selectedStatuses.value.length > 0 ||
+    selectedCategories.value.length > 0 ||
+    selectedScores.value.length > 0,
+);
+function resetFilters() {
+  selectedStatuses.value = [];
+  selectedCategories.value = [];
+  selectedScores.value = [];
+}
 </script>
 <template>
   <main>
     <RequestState :pending="pending" :error="error" @retry="refresh"
       ><h1 class="visually-hidden">問題一覧</h1>
-      <div class="table-tools">
-        <details class="filters-panel">
-          <summary>絞り込み</summary>
-          <div class="filters-panel-content">
-            <label for="status-filter">採点状況</label
-            ><select id="status-filter" v-model="status">
-              <option value="all">すべて</option>
-              <option
-                v-for="(label, key) in statusLabels"
-                :key="key"
-                :value="key"
-              >
-                {{ label }}
-              </option></select
-            ><label for="day-filter">出題日</label
-            ><select id="day-filter" v-model="day">
-              <option value="all">すべて</option>
-              <option
-                v-for="s in new Set(data?.problems.map((p) => p.sectionSlug))"
-                :key="s"
-                :value="s"
-              >
-                {{ sectionName(s) }}
-              </option></select
-            ><label for="category-filter">カテゴリ</label
-            ><select id="category-filter" v-model="category">
-              <option value="all">すべて</option>
-              <option
-                v-for="c in new Set(data?.problems.map((p) => p.category))"
-                :key="c"
-              >
-                {{ c }}
-              </option>
-            </select>
-          </div>
-        </details>
+      <div v-if="hasFilters" class="table-tools">
+        <button type="button" class="filter-reset" @click="resetFilters">
+          絞り込みを解除
+        </button>
       </div>
       <section v-for="group in groups" :key="group.slug" class="problem-table">
         <h2 class="problem-day-heading page-title">
           {{ sectionName(group.slug) }}の問題
         </h2>
         <div class="problem-row problem-heading">
-          <span>問題ID / 状態</span><span>カテゴリ</span><span>問題</span
-          ><span>得点</span>
+          <span class="problem-heading-filter"
+            ><details class="column-filter">
+              <summary :class="{ 'is-filtered': selectedStatuses.length }">
+                問題ID / 状態
+              </summary>
+              <div class="column-filter-menu">
+                <fieldset>
+                  <legend>状態で絞り込む</legend>
+                  <label v-for="(label, key) in statusLabels" :key="key">
+                    <input
+                      v-model="selectedStatuses"
+                      type="checkbox"
+                      :value="key"
+                    />
+                    <span>{{ label }}</span>
+                  </label>
+                </fieldset>
+              </div>
+            </details></span
+          ><span class="problem-heading-filter score-filter"
+            ><details class="column-filter">
+              <summary :class="{ 'is-filtered': selectedScores.length }">
+                得点
+              </summary>
+              <div class="column-filter-menu">
+                <fieldset>
+                  <legend>得点で絞り込む</legend>
+                  <label v-for="(label, key) in scoreOptions" :key="key">
+                    <input
+                      v-model="selectedScores"
+                      type="checkbox"
+                      :value="key"
+                    />
+                    <span>{{ label }}</span>
+                  </label>
+                </fieldset>
+              </div>
+            </details></span
+          ><span class="problem-heading-filter"
+            ><details class="column-filter">
+              <summary :class="{ 'is-filtered': selectedCategories.length }">
+                カテゴリ
+              </summary>
+              <div class="column-filter-menu">
+                <fieldset>
+                  <legend>カテゴリで絞り込む</legend>
+                  <label v-for="categoryName in categories" :key="categoryName">
+                    <input
+                      v-model="selectedCategories"
+                      type="checkbox"
+                      :value="categoryName"
+                    />
+                    <span>{{ categoryName }}</span>
+                  </label>
+                </fieldset>
+              </div>
+            </details></span
+          ><span>問題</span>
         </div>
         <NuxtLink
           v-for="p in group.problems"
@@ -118,6 +180,9 @@ const sectionName = (slug?: string) =>
                 ? `${statusLabels[state(p)]} / 再提出可能まで${cooldownMinutes(p)}分`
                 : statusLabels[state(p)]
             }}</span></span
+          ><span class="problem-score"
+            ><b>{{ p.score?.score ?? "—" }}</b
+            ><small>/ {{ p.maxScore }}</small></span
           ><span class="problem-category">{{ p.category }}</span
           ><span class="problem-title"
             ><small
@@ -125,14 +190,6 @@ const sectionName = (slug?: string) =>
               class="answer-closed-label"
               >受付時間外</small
             >{{ p.title }}</span
-          ><span
-            class="problem-score"
-            :class="{ 'is-pending': state(p) === 'pending' }"
-            ><b>{{ p.score?.score ?? "—" }}</b
-            ><small
-              >{{ state(p) === "pending" ? "採点中 / " : "/ "
-              }}{{ p.maxScore }}</small
-            ></span
           ></NuxtLink
         >
       </section>

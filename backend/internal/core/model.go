@@ -79,6 +79,15 @@ type Announcement struct {
 	EffectiveFrom time.Time `json:"effective_from" yaml:"effective_from"`
 }
 
+type WebPushSubscription struct {
+	ContestantName string
+	Endpoint       string
+	P256DH         string
+	Auth           string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+}
+
 type Manifest struct {
 	Version       int            `json:"version" yaml:"version"`
 	Sections      []Section      `json:"sections" yaml:"sections"`

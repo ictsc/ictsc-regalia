@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { headerRankingItems } from "~/features/ranking";
+import { useReadAnnouncements } from "~/features/announce-read-status";
 
 const { data, refresh } = await useCompetition();
 const { viewer } = useSession();
@@ -38,6 +39,10 @@ watch(now, (value) => {
   } else if (nextBoundary == null) nextBoundary = boundary.value;
 });
 const detail = computed(() => /^\/problems\/.+/.test(route.path));
+const { getUnreadNotices } = useReadAnnouncements();
+const hasUnreadNotices = computed(
+  () => getUnreadNotices(data.value?.notices ?? []).length > 0,
+);
 watch(
   () => route.fullPath,
   () => {
@@ -56,15 +61,6 @@ const rankingItems = computed(() =>
 );
 const maxScore = computed(
   () => data.value?.problems.reduce((sum, p) => sum + p.maxScore, 0) ?? 0,
-);
-const solved = computed(
-  () => data.value?.problems.filter((p) => p.score != null).length ?? 0,
-);
-const notice = computed(
-  () =>
-    data.value?.notices.toSorted(
-      (a, b) => Date.parse(b.effectiveFrom) - Date.parse(a.effectiveFrom),
-    )[0],
 );
 const clock = computed(() => {
   // Keep the demo presentation independent of the schedule and page-load time.
@@ -101,49 +97,59 @@ const clock = computed(() => {
       class="brand"
       to="/problems"
       aria-label="ICTSC 2026 REGALIA ホーム"
-      ><span class="brand-name">ICTSC</span
-      ><span class="brand-edition">2026<br />REGALIA</span></NuxtLink
     >
+      <AsciiLogo />
+    </NuxtLink>
     <div v-if="!detail" class="header-performance">
-      <NuxtLink class="header-solved" to="/activity"
-        ><span class="header-solved-value"
-          ><strong class="numeric">{{ solved }}</strong
-          ><span
-            ><span class="numeric">/ {{ data?.problems.length ?? "—" }}</span
-            >問</span
-          ></span
-        ><small>提出履歴を見る →</small></NuxtLink
-      ><NuxtLink class="header-ranking" to="/ranking"
-        ><span class="header-neighbors"
-          ><template
+      <div class="header-ranking" aria-label="現在の順位">
+        <small class="header-ranking-label">順位</small>
+        <span class="header-neighbors">
+          <template
             v-for="item in rankingItems"
             :key="
               item.kind === 'rank'
                 ? `rank-${item.entry.teamCode}`
                 : `tie-${item.rank}`
             "
-            ><span v-if="item.kind === 'tie'" class="is-tie"
-              ><small>同率チームあり</small
-              ><b>{{ item.count }}チーム同率</b></span
-            ><span
+          >
+            <span v-if="item.kind === 'tie'" class="is-tie">
+              <small>同率チームあり</small>
+              <b>{{ item.count }}チーム同率</b>
+            </span>
+            <span
               v-else
               :class="{ 'is-team': item.entry.teamCode === own?.teamCode }"
-              ><small>{{ item.entry.rank }}位</small
-              ><b
-                >{{ item.entry.score.toLocaleString()
+            >
+              <small>{{ item.entry.rank }}位</small>
+              <b>
+                {{ item.entry.score.toLocaleString()
                 }}<em v-if="item.entry.teamCode === own?.teamCode">
                   / {{ maxScore.toLocaleString() }}</em
-                ></b
-              ></span
-            ></template
-          ></span
-        ><span class="header-ranking-link">順位表を見る →</span></NuxtLink
-      >
-      <nav class="header-account" aria-label="アカウント">
-        <NuxtLink to="/teams">チーム</NuxtLink
-        ><NuxtLink to="/rule">ルール</NuxtLink
-        ><NuxtLink to="/profile">プロフィール</NuxtLink
-        ><button
+                >
+              </b>
+            </span>
+          </template>
+        </span>
+      </div>
+      <nav class="header-account" aria-label="メインメニュー">
+        <NuxtLink class="header-nav-primary" to="/problems">問題一覧</NuxtLink>
+        <NuxtLink class="header-nav-primary" to="/activity">提出履歴</NuxtLink>
+        <NuxtLink class="header-nav-primary" to="/ranking">順位表</NuxtLink>
+        <NuxtLink
+          class="header-nav-primary header-notifications"
+          to="/announces"
+          >通知<span v-if="hasUnreadNotices" class="notification-dot"
+            ><span class="visually-hidden">未読の通知あり</span></span
+          ></NuxtLink
+        >
+        <NuxtLink class="header-nav-secondary" to="/teams">チーム</NuxtLink>
+        <NuxtLink class="header-nav-secondary" to="/rule">ルール</NuxtLink>
+        <NuxtLink class="header-nav-secondary" to="/profile"
+          >プロフィール</NuxtLink
+        >
+        <ThemeToggle class="header-nav-secondary" />
+        <button
+          class="header-nav-secondary"
           :aria-label="accountActionAriaLabel"
           :class="{ 'is-impersonating': isImpersonating }"
           @click="emit('logout')"
@@ -152,39 +158,38 @@ const clock = computed(() => {
         </button>
       </nav>
     </div>
-    <nav v-else class="simple-header-nav" aria-label="メインメニュー">
-      <NuxtLink to="/activity">提出履歴</NuxtLink
-      ><NuxtLink to="/ranking">順位表</NuxtLink
-      ><span class="header-account">
-        <NuxtLink to="/teams">チーム</NuxtLink
-        ><NuxtLink to="/rule">ルール</NuxtLink
-        ><NuxtLink to="/profile">プロフィール</NuxtLink
-        ><button
-          :aria-label="accountActionAriaLabel"
-          :class="{ 'is-impersonating': isImpersonating }"
-          @click="emit('logout')"
-        >
-          {{ accountActionLabel }}
-        </button>
-      </span>
+    <nav
+      v-else
+      class="simple-header-nav header-account"
+      aria-label="メインメニュー"
+    >
+      <NuxtLink class="header-nav-primary" to="/problems">問題一覧</NuxtLink>
+      <NuxtLink class="header-nav-primary" to="/activity">提出履歴</NuxtLink>
+      <NuxtLink class="header-nav-primary" to="/ranking">順位表</NuxtLink>
+      <NuxtLink class="header-nav-primary header-notifications" to="/announces"
+        >通知<span v-if="hasUnreadNotices" class="notification-dot"
+          ><span class="visually-hidden">未読の通知あり</span></span
+        ></NuxtLink
+      >
+      <NuxtLink class="header-nav-secondary" to="/teams">チーム</NuxtLink>
+      <NuxtLink class="header-nav-secondary" to="/rule">ルール</NuxtLink>
+      <NuxtLink class="header-nav-secondary" to="/profile"
+        >プロフィール</NuxtLink
+      >
+      <ThemeToggle class="header-nav-secondary" />
+      <button
+        class="header-nav-secondary"
+        :aria-label="accountActionAriaLabel"
+        :class="{ 'is-impersonating': isImpersonating }"
+        @click="emit('logout')"
+      >
+        {{ accountActionLabel }}
+      </button>
     </nav>
     <div class="competition-clock">
       <time>{{ clock.text }}</time
       ><span :class="{ 'is-demo': demoMode }">{{ clock.label }}</span>
     </div>
-    <NuxtLink class="competition-notice" to="/announces">
-      <strong>お知らせ</strong
-      ><time>{{
-        notice
-          ? new Date(notice.effectiveFrom).toLocaleTimeString("ja-JP", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })
-          : "—"
-      }}</time>
-      <p>{{ notice?.title ?? "現在お知らせはありません" }}</p>
-      <span class="notice-link-label">お知らせを確認する →</span>
-    </NuxtLink>
     <details ref="mobileMenu" class="mobile-menu">
       <summary>
         <span aria-hidden="true" /><b class="visually-hidden">メニューを開く</b>
@@ -196,12 +201,17 @@ const clock = computed(() => {
         ><NuxtLink class="mobile-menu-primary" to="/problems">問題一覧</NuxtLink
         ><NuxtLink class="mobile-menu-primary" to="/activity">提出履歴</NuxtLink
         ><NuxtLink class="mobile-menu-primary" to="/ranking">順位表</NuxtLink
-        ><NuxtLink class="mobile-menu-primary" to="/announces"
-          >お知らせ</NuxtLink
+        ><NuxtLink
+          class="mobile-menu-primary mobile-notifications"
+          to="/announces"
+          >通知<span v-if="hasUnreadNotices" class="notification-dot"
+            ><span class="visually-hidden">未読の通知あり</span></span
+          ></NuxtLink
         ><NuxtLink to="/teams">チーム</NuxtLink
         ><NuxtLink to="/rule">ルール</NuxtLink
-        ><NuxtLink to="/profile">プロフィール</NuxtLink
-        ><button
+        ><NuxtLink to="/profile">プロフィール</NuxtLink>
+        <ThemeToggle />
+        <button
           :aria-label="accountActionAriaLabel"
           :class="{ 'is-impersonating': isImpersonating }"
           @click="emit('logout')"

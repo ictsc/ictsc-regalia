@@ -18,10 +18,10 @@ async function logout() {
   >
     <CompetitionHeader v-if="viewer?.state === 'CONTESTANT'" @logout="logout" />
     <header v-else class="admin-header">
-      <NuxtLink class="brand" to="/"
-        ><span class="brand-name">ICTSC</span
-        ><span class="brand-edition">2026<br />REGALIA</span></NuxtLink
-      >
+      <NuxtLink class="brand" to="/" aria-label="ICTSC 2026 REGALIA ホーム">
+        <AsciiLogo />
+      </NuxtLink>
+      <ThemeToggle />
     </header>
     <RequestState v-if="error" :error="error" @retry="logout" /><slot />
     <footer class="site-footer">

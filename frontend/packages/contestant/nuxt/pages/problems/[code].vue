@@ -50,7 +50,7 @@ useHead({
   ),
   bodyAttrs: { class: "detail-page" },
 });
-const rail = ref(true),
+const rail = useState<boolean>("problem-rail-open", () => true),
   body = ref(""),
   savedAt = ref(""),
   saveError = ref(""),
@@ -250,6 +250,7 @@ const score = computed(
             class="problem-rail"
             aria-label="問題ナビゲーション"
           >
+            <span class="problem-rail-label">出題中の問題</span>
             <template v-for="p in competition?.problems" :key="p.code"
               ><NuxtLink
                 :to="`/problems/${p.code}`"

@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"path"
 	"regexp"
 	"sort"
@@ -41,17 +42,131 @@ type Config struct {
 }
 
 type Service struct {
-	Store       core.Store
-	Sessions    session.Store
-	Discord     Discord
-	Content     ContentSource
-	Deployments DeploymentGateway
-	Events      EventBus
-	Config      Config
-	Now         Clock
+	Store          core.Store
+	Sessions       session.Store
+	Discord        Discord
+	Content        ContentSource
+	Deployments    DeploymentGateway
+	Events         EventBus
+	WebPush        WebPushSender
+	VAPIDPublicKey string
+	Config         Config
+	Now            Clock
 
 	statusMu      sync.RWMutex
 	contentStatus ContentStatus
+}
+
+func (s *Service) WebPushConfig() (bool, string) {
+	return s.WebPush != nil && s.VAPIDPublicKey != "", s.VAPIDPublicKey
+}
+
+func (s *Service) RegisterWebPush(ctx context.Context, contestantName, endpoint, p256dh, auth string) error {
+	if s.WebPush == nil {
+		return core.NewError(http.StatusServiceUnavailable, "web_push_unavailable", "Web Push is not configured")
+	}
+	if err := validateWebPushSubscription(endpoint, p256dh, auth); err != nil {
+		return core.WrapError(http.StatusUnprocessableEntity, "validation_error", "Web Push subscription is invalid", err)
+	}
+	now := s.Now()
+	return s.Store.UpsertWebPushSubscription(ctx, core.WebPushSubscription{
+		ContestantName: contestantName,
+		Endpoint:       endpoint,
+		P256DH:         p256dh,
+		Auth:           auth,
+		CreatedAt:      now,
+		UpdatedAt:      now,
+	})
+}
+
+func (s *Service) DeleteWebPush(ctx context.Context, contestantName, endpoint string) error {
+	if err := validateWebPushEndpoint(endpoint); err != nil {
+		return core.WrapError(http.StatusUnprocessableEntity, "validation_error", "Web Push endpoint is invalid", err)
+	}
+	return s.Store.DeleteWebPushSubscription(ctx, contestantName, endpoint)
+}
+
+func (s *Service) DispatchAnnouncementPushes(ctx context.Context) error {
+	if s.WebPush == nil {
+		return nil
+	}
+	snapshot, err := s.Store.ActiveContent(ctx)
+	if err != nil {
+		return err
+	}
+	subscriptions, err := s.Store.ListWebPushSubscriptions(ctx)
+	if err != nil {
+		return err
+	}
+	now := s.Now()
+	var dispatchErrors []error
+	for _, announcement := range snapshot.Manifest.Announcements {
+		if announcement.EffectiveFrom.After(now) {
+			continue
+		}
+		payload, err := json.Marshal(map[string]string{
+			"title": announcement.Title,
+			"body":  "新しい通知があります",
+			"url":   "/announces/" + announcement.Slug,
+		})
+		if err != nil {
+			return err
+		}
+		for _, subscription := range subscriptions {
+			if announcement.EffectiveFrom.Before(subscription.CreatedAt) {
+				continue
+			}
+			claimed, err := s.Store.ClaimAnnouncementPush(ctx, announcement.Slug, subscription.Endpoint, now)
+			if err != nil {
+				dispatchErrors = append(dispatchErrors, err)
+				continue
+			}
+			if !claimed {
+				continue
+			}
+			expired, sendErr := s.WebPush.Send(ctx, subscription, payload)
+			if sendErr == nil {
+				continue
+			}
+			if expired {
+				if err := s.Store.DeleteWebPushSubscription(ctx, subscription.ContestantName, subscription.Endpoint); err != nil {
+					dispatchErrors = append(dispatchErrors, err)
+				}
+				continue
+			}
+			if err := s.Store.ReleaseAnnouncementPush(ctx, announcement.Slug, subscription.Endpoint); err != nil {
+				dispatchErrors = append(dispatchErrors, err)
+			}
+			dispatchErrors = append(dispatchErrors, sendErr)
+		}
+	}
+	return errors.Join(dispatchErrors...)
+}
+
+func validateWebPushSubscription(endpoint, p256dh, auth string) error {
+	if err := validateWebPushEndpoint(endpoint); err != nil {
+		return err
+	}
+	for name, value := range map[string]string{"p256dh": p256dh, "auth": auth} {
+		if value == "" || len(value) > 512 {
+			return fmt.Errorf("%s is invalid", name)
+		}
+		if _, err := base64.RawURLEncoding.DecodeString(value); err != nil {
+			return fmt.Errorf("%s is not base64url", name)
+		}
+	}
+	return nil
+}
+
+func validateWebPushEndpoint(endpoint string) error {
+	if endpoint == "" || len(endpoint) > 4096 {
+		return fmt.Errorf("endpoint is invalid")
+	}
+	parsed, err := url.Parse(endpoint)
+	if err != nil || parsed.Scheme != "https" || parsed.Host == "" || parsed.User != nil {
+		return fmt.Errorf("endpoint must be an HTTPS URL")
+	}
+	return nil
 }
 
 type ContentStatus struct {

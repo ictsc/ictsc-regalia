@@ -24,7 +24,7 @@ useHead({ title: computed(() => notice.value?.title ?? "お知らせ") });
     <RequestState :error="error" :pending="pending" @retry="refresh"
       ><template v-if="notice"
         ><header class="linked-page-heading">
-          <NuxtLink to="/announces">← お知らせ一覧へ</NuxtLink>
+          <NuxtLink to="/announces">お知らせ一覧へ戻る</NuxtLink>
           <h1 class="page-title">{{ notice.title }}</h1>
         </header>
         <MarkdownContent :source="notice.markdown"

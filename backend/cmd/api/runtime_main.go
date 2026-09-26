@@ -4,14 +4,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/ictsc/ictsc-regalia/backend/internal/adapter/discord"
 	githubadapter "github.com/ictsc/ictsc-regalia/backend/internal/adapter/github"
 	"github.com/ictsc/ictsc-regalia/backend/internal/adapter/sstate"
+	webpushadapter "github.com/ictsc/ictsc-regalia/backend/internal/adapter/webpush"
 	"github.com/ictsc/ictsc-regalia/backend/internal/config"
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
 	"github.com/ictsc/ictsc-regalia/backend/internal/infra/memory"
@@ -55,6 +58,13 @@ func run() error {
 		AdminRoleIDs:          roles,
 	})
 	svc.Discord, svc.Content, svc.Deployments, svc.Events = discordClient, contentClient, deploymentClient, events
+	if cfg.WebPushVAPIDPublicKey != "" {
+		svc.WebPush = webpushadapter.New(webpushadapter.Config{
+			Subject: cfg.WebPushVAPIDSubject, PublicKey: cfg.WebPushVAPIDPublicKey, PrivateKey: cfg.WebPushVAPIDPrivateKey,
+		})
+		svc.VAPIDPublicKey = cfg.WebPushVAPIDPublicKey
+		go runAnnouncementPushDispatcher(ctx, svc)
+	}
 	handler, err := httpserver.New(svc, httpserver.Options{
 		SecureCookies: cfg.SecureCookies, AllowedOrigins: cfg.AllowedOrigins,
 		SStateCallbackToken: cfg.SStateCallbackToken, ReadTimeout: cfg.ReadHeaderTimeout,
@@ -82,6 +92,25 @@ func run() error {
 		return fmt.Errorf("shutdown HTTP server: %w", err)
 	}
 	return nil
+}
+
+func runAnnouncementPushDispatcher(ctx context.Context, svc *service.Service) {
+	dispatch := func() {
+		if err := svc.DispatchAnnouncementPushes(ctx); err != nil && ctx.Err() == nil {
+			log.Printf("dispatch announcement Web Push: %v", err)
+		}
+	}
+	dispatch()
+	ticker := time.NewTicker(15 * time.Second)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			dispatch()
+		}
+	}
 }
 
 func runtimeStores(ctx context.Context, cfg config.Runtime) (core.Store, session.Store, service.EventBus, func(), error) {

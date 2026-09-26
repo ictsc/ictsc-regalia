@@ -45,6 +45,10 @@ type Runtime struct {
 	SStateCallbackToken string
 	CallbackBaseURL     string
 	AllowInsecureHTTP   bool
+
+	WebPushVAPIDPublicKey  string
+	WebPushVAPIDPrivateKey string
+	WebPushVAPIDSubject    string
 }
 
 func LoadRuntime() (Runtime, error) {
@@ -94,6 +98,9 @@ func LoadRuntime() (Runtime, error) {
 		SStateCallbackToken:      strings.TrimSpace(os.Getenv("ICTSC_SSTATE_CALLBACK_TOKEN")),
 		CallbackBaseURL:          strings.TrimSpace(os.Getenv("ICTSC_CALLBACK_BASE_URL")),
 		AllowInsecureHTTP:        insecure,
+		WebPushVAPIDPublicKey:    strings.TrimSpace(os.Getenv("ICTSC_WEB_PUSH_VAPID_PUBLIC_KEY")),
+		WebPushVAPIDPrivateKey:   strings.TrimSpace(os.Getenv("ICTSC_WEB_PUSH_VAPID_PRIVATE_KEY")),
+		WebPushVAPIDSubject:      strings.TrimSpace(os.Getenv("ICTSC_WEB_PUSH_VAPID_SUBJECT")),
 	}
 	if raw := os.Getenv("ICTSC_API_READ_HEADER_TIMEOUT"); raw != "" {
 		cfg.ReadHeaderTimeout, err = positiveDuration("ICTSC_API_READ_HEADER_TIMEOUT", raw)
@@ -187,6 +194,22 @@ func (c Runtime) Validate() error {
 	if c.GitHubDiscoveryURL != "" {
 		if err := validateAbsoluteURL("GitHub discovery URL", c.GitHubDiscoveryURL, true, c.DevFakeMode && c.AllowInsecureHTTP); err != nil {
 			return err
+		}
+	}
+	webPushValues := []string{c.WebPushVAPIDPublicKey, c.WebPushVAPIDPrivateKey, c.WebPushVAPIDSubject}
+	configuredWebPushValues := 0
+	for _, value := range webPushValues {
+		if value != "" {
+			configuredWebPushValues++
+		}
+	}
+	if configuredWebPushValues != 0 && configuredWebPushValues != len(webPushValues) {
+		return fmt.Errorf("ICTSC_WEB_PUSH_VAPID_PUBLIC_KEY, ICTSC_WEB_PUSH_VAPID_PRIVATE_KEY and ICTSC_WEB_PUSH_VAPID_SUBJECT must be configured together")
+	}
+	if c.WebPushVAPIDSubject != "" {
+		parsed, err := url.Parse(c.WebPushVAPIDSubject)
+		if err != nil || (parsed.Scheme != "mailto" && parsed.Scheme != "https") {
+			return fmt.Errorf("ICTSC_WEB_PUSH_VAPID_SUBJECT must be a mailto or HTTPS URL")
 		}
 	}
 	return nil

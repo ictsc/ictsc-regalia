@@ -1,4 +1,5 @@
 import { fileURLToPath } from "node:url";
+import { themeInitScript } from "../ui/theme-init";
 export default defineNuxtConfig({
   compatibilityDate: "2026-09-05",
   srcDir: "nuxt/",
@@ -22,6 +23,7 @@ export default defineNuxtConfig({
           href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;600;700;900&display=swap",
         },
       ],
+      script: [{ innerHTML: themeInitScript, tagPosition: "head" }],
     },
   },
   css: [

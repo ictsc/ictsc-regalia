@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -11,33 +12,95 @@ import (
 )
 
 type CompetitionStore struct {
-	mu               sync.RWMutex
-	teams            map[int64]core.Team
-	invitations      map[string]core.Invitation
-	usedInvites      map[string]bool
-	contestants      map[string]core.Contestant
-	contents         map[string]core.ContentSnapshot
-	active           string
-	answers          []core.Answer
-	markings         []core.MarkingResult
-	scoreSelections  map[int64]map[string]core.Score
-	rankingSnapshots map[string]core.RankingSnapshot
-	deployments      map[string]core.Deployment
-	state            core.CompetitionState
+	mu                sync.RWMutex
+	teams             map[int64]core.Team
+	invitations       map[string]core.Invitation
+	usedInvites       map[string]bool
+	contestants       map[string]core.Contestant
+	contents          map[string]core.ContentSnapshot
+	active            string
+	answers           []core.Answer
+	markings          []core.MarkingResult
+	scoreSelections   map[int64]map[string]core.Score
+	rankingSnapshots  map[string]core.RankingSnapshot
+	deployments       map[string]core.Deployment
+	state             core.CompetitionState
+	pushSubscriptions map[string]core.WebPushSubscription
+	pushDeliveries    map[string]bool
 }
 
 func NewCompetitionStore() *CompetitionStore {
 	return &CompetitionStore{
-		teams:            make(map[int64]core.Team),
-		invitations:      make(map[string]core.Invitation),
-		usedInvites:      make(map[string]bool),
-		contestants:      make(map[string]core.Contestant),
-		contents:         make(map[string]core.ContentSnapshot),
-		scoreSelections:  make(map[int64]map[string]core.Score),
-		rankingSnapshots: make(map[string]core.RankingSnapshot),
-		deployments:      make(map[string]core.Deployment),
-		state:            core.CompetitionState{UpdatedAt: time.Now().UTC(), UpdatedBy: "system"},
+		teams:             make(map[int64]core.Team),
+		invitations:       make(map[string]core.Invitation),
+		usedInvites:       make(map[string]bool),
+		contestants:       make(map[string]core.Contestant),
+		contents:          make(map[string]core.ContentSnapshot),
+		scoreSelections:   make(map[int64]map[string]core.Score),
+		rankingSnapshots:  make(map[string]core.RankingSnapshot),
+		deployments:       make(map[string]core.Deployment),
+		pushSubscriptions: make(map[string]core.WebPushSubscription),
+		pushDeliveries:    make(map[string]bool),
+		state:             core.CompetitionState{UpdatedAt: time.Now().UTC(), UpdatedBy: "system"},
 	}
+}
+
+func (s *CompetitionStore) UpsertWebPushSubscription(_ context.Context, subscription core.WebPushSubscription) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if existing, ok := s.pushSubscriptions[subscription.Endpoint]; ok {
+		subscription.CreatedAt = existing.CreatedAt
+	}
+	s.pushSubscriptions[subscription.Endpoint] = subscription
+	return nil
+}
+
+func (s *CompetitionStore) DeleteWebPushSubscription(_ context.Context, contestantName, endpoint string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if subscription, ok := s.pushSubscriptions[endpoint]; ok && subscription.ContestantName == contestantName {
+		delete(s.pushSubscriptions, endpoint)
+		for key := range s.pushDeliveries {
+			if strings.HasSuffix(key, "\x00"+endpoint) {
+				delete(s.pushDeliveries, key)
+			}
+		}
+	}
+	return nil
+}
+
+func (s *CompetitionStore) ListWebPushSubscriptions(context.Context) ([]core.WebPushSubscription, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	result := make([]core.WebPushSubscription, 0, len(s.pushSubscriptions))
+	for _, subscription := range s.pushSubscriptions {
+		result = append(result, subscription)
+	}
+	sort.Slice(result, func(i, j int) bool {
+		if result[i].CreatedAt.Equal(result[j].CreatedAt) {
+			return result[i].Endpoint < result[j].Endpoint
+		}
+		return result[i].CreatedAt.Before(result[j].CreatedAt)
+	})
+	return result, nil
+}
+
+func (s *CompetitionStore) ClaimAnnouncementPush(_ context.Context, announcementSlug, endpoint string, _ time.Time) (bool, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	key := announcementSlug + "\x00" + endpoint
+	if s.pushDeliveries[key] {
+		return false, nil
+	}
+	s.pushDeliveries[key] = true
+	return true, nil
+}
+
+func (s *CompetitionStore) ReleaseAnnouncementPush(_ context.Context, announcementSlug, endpoint string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	delete(s.pushDeliveries, announcementSlug+"\x00"+endpoint)
+	return nil
 }
 
 func (s *CompetitionStore) Ping(context.Context) error { return nil }

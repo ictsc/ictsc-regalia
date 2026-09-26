@@ -1,7 +1,8 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import type { Notice } from "./models";
+const sharedSlugs = ref<string[]>([]);
 export function useReadAnnouncements() {
-  const slugs = ref<string[]>([]);
+  const slugs = sharedSlugs;
   const load = () => {
     try {
       const parsed: unknown = JSON.parse(

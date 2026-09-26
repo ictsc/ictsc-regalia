@@ -469,6 +469,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/contestant/web-push/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Web Pushの利用可否とVAPID公開鍵を取得する */
+        get: operations["getContestantWebPushConfig"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contestant/web-push/subscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Web Push購読を登録または更新する */
+        put: operations["putContestantWebPushSubscription"];
+        post?: never;
+        /** Web Push購読を解除する */
+        delete: operations["deleteContestantWebPushSubscription"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/contestant/ranking": {
         parameters: {
             query?: never;
@@ -1513,6 +1548,23 @@ export interface components {
         AnnouncementsResponse: {
             announcements: components["schemas"]["Announcement"][];
         };
+        WebPushConfig: {
+            enabled: boolean;
+            vapid_public_key?: string;
+        };
+        WebPushSubscriptionKeys: {
+            p256dh: string;
+            auth: string;
+        };
+        WebPushSubscriptionRequest: {
+            /** Format: uri */
+            endpoint: string;
+            keys: components["schemas"]["WebPushSubscriptionKeys"];
+        };
+        DeleteWebPushSubscriptionRequest: {
+            /** Format: uri */
+            endpoint: string;
+        };
         AnnouncementResponse: {
             announcement: components["schemas"]["Announcement"];
         };
@@ -2490,6 +2542,80 @@ export interface operations {
             422: components["responses"]["ValidationError"];
             500: components["responses"]["InternalServerError"];
             502: components["responses"]["BadGateway"];
+        };
+    };
+    getContestantWebPushConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Web Push設定 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebPushConfig"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    putContestantWebPushSubscription: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WebPushSubscriptionRequest"];
+            };
+        };
+        responses: {
+            /** @description 購読登録完了 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    deleteContestantWebPushSubscription: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteWebPushSubscriptionRequest"];
+            };
+        };
+        responses: {
+            /** @description 購読解除完了 */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalServerError"];
         };
     };
     getContestantRanking: {

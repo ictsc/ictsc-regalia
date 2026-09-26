@@ -18,15 +18,24 @@ Go側の生成物は `internal/transport/api/api.gen.go`、TypeScript側は
 
 ## Docker Composeで起動
 
+`.env.example`をコピーして、ローカル用の設定を用意します。
+
 ```sh
-docker compose -f backend/compose.yaml up --build --wait
+cp backend/.env.example backend/.env.local
+```
+
+Discord認証を使用する場合は、`.env.local`にclient ID、client secret、
+contestant/adminのredirect URIを設定します。`.env.local`はGitの管理対象外です。
+
+```sh
+docker compose --env-file backend/.env.local -f backend/compose.yaml up --build --wait
 ```
 
 競技時間と再回答可能までの時間を固定するデモモードは、起動時に環境変数で
 切り替えます。
 
 ```sh
-ICTSC_DEMO_MODE=true docker compose -f backend/compose.yaml up -d --build --wait
+ICTSC_DEMO_MODE=true docker compose --env-file backend/.env.local -f backend/compose.yaml up -d --build --wait
 ```
 
 無効に戻す場合は`ICTSC_DEMO_MODE=false`で同じコマンドを実行します。この設定は
@@ -89,6 +98,19 @@ Dockerなしでunit/contract testだけを実行する場合は `go test -short 
 既存DBにはAPI更新前に `db/migrations/0002_team_color.sql` を適用します。新規Compose DBは `db/migrations/` のSQLを番号順に実行します。`Team.color` は管理画面から17色のパレットで設定し、未設定時は `#A6E35F` です。
 
 PostgreSQL統合テストは通常Dockerを起動します。Dockerを使用できない場合は、空の使い捨てDBのURLを `ICTSC_TEST_DATABASE_URL` に設定して `go test ./internal/infra/postgres -count=1` を実行できます。指定DBに全マイグレーションとテストデータを作成します。
+
+## Web Push
+
+競技者向けのお知らせはWeb Pushで配信できます。VAPID鍵は一度だけ生成し、公開鍵と秘密鍵を同じ組み合わせのまま使います。
+
+```sh
+cd backend
+go run ./cmd/vapid-keygen
+```
+
+出力された値を`ICTSC_WEB_PUSH_VAPID_PUBLIC_KEY`と`ICTSC_WEB_PUSH_VAPID_PRIVATE_KEY`へ設定し、連絡先を`ICTSC_WEB_PUSH_VAPID_SUBJECT`へ`mailto:admin@example.com`の形式で設定します。秘密鍵はSecretで管理し、Gitへ追加しません。
+
+APIは公開時刻を迎えたお知らせを15秒ごとに確認し、購読後に公開されたものを各ブラウザへ一度だけ配信します。
 
 ## 保護された開発プレビュー
 

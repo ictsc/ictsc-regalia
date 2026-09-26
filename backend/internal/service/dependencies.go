@@ -58,4 +58,8 @@ type EventBus interface {
 	Subscribe(ctx context.Context) (Subscription, error)
 }
 
+type WebPushSender interface {
+	Send(ctx context.Context, subscription core.WebPushSubscription, payload []byte) (expired bool, err error)
+}
+
 type Clock func() time.Time

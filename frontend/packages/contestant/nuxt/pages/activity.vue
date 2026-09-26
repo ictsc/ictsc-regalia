@@ -29,12 +29,21 @@ const { data, error, pending, refresh } = await useAsyncData("activity", () =>
                 {{ new Date(a.submittedAt).toLocaleString("ja-JP") }}
               </td>
               <td>
-                <NuxtLink :to="`/problems/${a.problemCode}`"
-                  ><span class="numeric">{{ a.problemCode }}</span>
-                  {{ a.problemTitle }}</NuxtLink
-                >
+                <span class="numeric">{{ a.problemCode }}</span>
+                {{ a.problemTitle }}
               </td>
-              <td class="numeric">#{{ a.answerId }}</td>
+              <td>
+                <NuxtLink
+                  :to="{
+                    path: `/problems/${a.problemCode}`,
+                    query: { answer: String(a.answerId) },
+                    hash: '#answer-history',
+                  }"
+                  :aria-label="`${a.problemCode}の回答 #${a.answerId} を見る`"
+                >
+                  <span class="numeric">回答 #{{ a.answerId }}</span> を見る
+                </NuxtLink>
+              </td>
               <td>
                 <span class="numeric">{{ a.score?.score ?? "採点中" }}</span>
                 / <span class="numeric">{{ a.maxScore }}</span>

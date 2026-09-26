@@ -52,9 +52,20 @@ test("トップバーではチーム名を隠し、代理操作を短く表示�
 
   await page.setViewportSize({ width: 1360, height: 900 });
   await expect(account).toBeVisible();
-  await expect(proxyButton).toHaveText("代");
+  await expect(proxyButton).toBeHidden();
+  await expect(header.locator(".mobile-menu summary")).toBeVisible();
+  expect(
+    await header.evaluate(
+      (element) => element.scrollWidth <= element.clientWidth,
+    ),
+  ).toBe(true);
 
   await page.setViewportSize({ width: 1024, height: 768 });
+  expect(
+    await header.evaluate(
+      (element) => element.scrollWidth <= element.clientWidth,
+    ),
+  ).toBe(true);
   await header.locator(".mobile-menu summary").click();
   await expect(header.locator(".mobile-menu nav")).toBeVisible();
   await expect(
@@ -479,17 +490,27 @@ test("Nuxtの問題一覧、下書き復元、利用者分離とモバイル表�
   await expect(page.locator(".problem-row:not(.problem-heading)")).toHaveCount(
     11,
   );
-  await page.getByText("絞り込み", { exact: true }).click();
-  await page
-    .getByRole("combobox", { name: "カテゴリ", exact: true })
-    .selectOption("無線");
-  await expect(page.locator(".problem-row:not(.problem-heading)")).toHaveCount(
-    2,
+  await expect(page.locator(".problem-score").first()).not.toContainText(
+    "採点中",
   );
   await page
-    .getByRole("combobox", { name: "カテゴリ", exact: true })
-    .selectOption("all");
-  await page.getByText("絞り込み", { exact: true }).click();
+    .locator(".problem-heading")
+    .first()
+    .locator("summary")
+    .nth(2)
+    .click();
+  await page.getByRole("checkbox", { name: "ネットワーク" }).first().check();
+  await expect(page.locator(".problem-row:not(.problem-heading)")).toHaveCount(
+    4,
+  );
+  await page.getByRole("checkbox", { name: "サーバー" }).first().check();
+  await expect(page.locator(".problem-row:not(.problem-heading)")).toHaveCount(
+    7,
+  );
+  await page.getByRole("button", { name: "絞り込みを解除" }).click();
+  await expect(page.locator(".problem-row:not(.problem-heading)")).toHaveCount(
+    11,
+  );
   await page.screenshot({
     path: testInfo.outputPath("problems-desktop.png"),
     fullPage: true,

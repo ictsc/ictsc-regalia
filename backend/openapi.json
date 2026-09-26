@@ -602,6 +602,58 @@
         }
       }
     },
+    "/api/v1/contestant/web-push/config": {
+      "get": {
+        "tags": ["Contestant Content"],
+        "summary": "Web Pushの利用可否とVAPID公開鍵を取得する",
+        "operationId": "getContestantWebPushConfig",
+        "security": [{ "ContestantSession": [] }],
+        "responses": {
+          "200": {
+            "description": "Web Push設定",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WebPushConfig" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/api/v1/contestant/web-push/subscription": {
+      "put": {
+        "tags": ["Contestant Content"],
+        "summary": "Web Push購読を登録または更新する",
+        "operationId": "putContestantWebPushSubscription",
+        "security": [{ "ContestantSession": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WebPushSubscriptionRequest" } } }
+        },
+        "responses": {
+          "204": { "description": "購読登録完了" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "delete": {
+        "tags": ["Contestant Content"],
+        "summary": "Web Push購読を解除する",
+        "operationId": "deleteContestantWebPushSubscription",
+        "security": [{ "ContestantSession": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DeleteWebPushSubscriptionRequest" } } }
+        },
+        "responses": {
+          "204": { "description": "購読解除完了" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
     "/api/v1/contestant/ranking": {
       "get": {
         "tags": ["Contestant Competition"],
@@ -2380,6 +2432,41 @@
         "required": ["announcements"],
         "properties": {
           "announcements": { "type": "array", "items": { "$ref": "#/components/schemas/Announcement" } }
+        }
+      },
+      "WebPushConfig": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["enabled"],
+        "properties": {
+          "enabled": { "type": "boolean" },
+          "vapid_public_key": { "type": "string", "minLength": 1, "maxLength": 512 }
+        }
+      },
+      "WebPushSubscriptionKeys": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["p256dh", "auth"],
+        "properties": {
+          "p256dh": { "type": "string", "minLength": 1, "maxLength": 512 },
+          "auth": { "type": "string", "minLength": 1, "maxLength": 512 }
+        }
+      },
+      "WebPushSubscriptionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["endpoint", "keys"],
+        "properties": {
+          "endpoint": { "type": "string", "format": "uri", "minLength": 1, "maxLength": 4096 },
+          "keys": { "$ref": "#/components/schemas/WebPushSubscriptionKeys" }
+        }
+      },
+      "DeleteWebPushSubscriptionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["endpoint"],
+        "properties": {
+          "endpoint": { "type": "string", "format": "uri", "minLength": 1, "maxLength": 4096 }
         }
       },
       "AnnouncementResponse": {

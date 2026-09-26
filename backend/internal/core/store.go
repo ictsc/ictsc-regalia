@@ -39,6 +39,11 @@ type Store interface {
 	ReplaceRule(ctx context.Context, markdown, actor string) (CompetitionState, error)
 	ReplaceFreezeAt(ctx context.Context, freezeAt *time.Time, actor string) (CompetitionState, error)
 	RevealFinal(ctx context.Context, at time.Time, actor string) (CompetitionState, error)
+	UpsertWebPushSubscription(ctx context.Context, subscription WebPushSubscription) error
+	DeleteWebPushSubscription(ctx context.Context, contestantName, endpoint string) error
+	ListWebPushSubscriptions(ctx context.Context) ([]WebPushSubscription, error)
+	ClaimAnnouncementPush(ctx context.Context, announcementSlug, endpoint string, at time.Time) (bool, error)
+	ReleaseAnnouncementPush(ctx context.Context, announcementSlug, endpoint string) error
 }
 
 type TeamPatch struct {

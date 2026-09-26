@@ -13,7 +13,12 @@ tasks:
   dev-backend:
     desc: バックエンドと依存サービスをDockerで起動
     cmds:
-      - docker compose -f backend/compose.yaml up --build api
+      - |
+        if [ -f backend/.env.local ]; then
+          docker compose --env-file backend/.env.local -f backend/compose.yaml up --build api
+        else
+          docker compose -f backend/compose.yaml up --build api
+        fi
 
   dev-backend-local:
     desc: 依存サービスだけをDockerで起動してバックエンドはホストで起動

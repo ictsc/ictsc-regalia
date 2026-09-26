@@ -49,6 +49,8 @@ func TestPostgresStoreIntegration(t *testing.T) {
 			"competition_state",
 			"ranking_snapshots",
 			"audit_log",
+			"web_push_subscriptions",
+			"announcement_push_deliveries",
 		}
 		for _, table := range tables {
 			var relation *string
