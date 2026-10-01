@@ -104,7 +104,7 @@ importers:
         version: 9.39.5(jiti@2.7.0)
       globals:
         specifier: ^17.0.0
-        version: 17.12.0
+        version: 17.13.0
       npm-run-all2:
         specifier: ^8.0.0
         version: 8.0.4
@@ -179,7 +179,7 @@ importers:
         version: 10.6.1(eslint@9.39.5(jiti@2.7.0))(typescript@6.0.3)
       globals:
         specifier: ^17.0.0
-        version: 17.12.0
+        version: 17.13.0
       prettier-plugin-tailwindcss:
         specifier: ^0.7.0
         version: 0.7.2(prettier@3.9.9)
@@ -304,7 +304,7 @@ importers:
         version: 9.39.5(jiti@2.7.0)
       globals:
         specifier: ^17.0.0
-        version: 17.12.0
+        version: 17.13.0
       msw:
         specifier: ^3.0.0
         version: 3.0.1(@types/node@26.6.3)(graphql@16.14.2)(typescript@6.0.3)(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.28))(tsx@4.23.15))
@@ -2774,8 +2774,8 @@ packages:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}
     engines: {node: '>=18'}
 
-  globals@17.12.0:
-    resolution: {integrity: sha512-cezEd/DTyyht9cvSSURyygXPfy04GtWO/5e6ZPvH7fCtjKz9PYOmuawphw1Ctd1f6C+5JypXfGD7ahNMXvevBA==}
+  globals@17.13.0:
+    resolution: {integrity: sha512-RwMTC61u7hrG3ZJMkZQOK4JLJrKS8QtoTii63EmWvFXHqycY9FObBJQCbsLxSO8kjKhWE5kV1GC+Vb1g3RI0Zg==}
     engines: {node: '>=18'}
 
   globalthis@1.0.4:
@@ -7047,7 +7047,7 @@ snapshots:
 
   globals@14.0.0: {}
 
-  globals@17.12.0: {}
+  globals@17.13.0: {}
 
   globalthis@1.0.4:
     dependencies:
