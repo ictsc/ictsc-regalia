@@ -2,6 +2,7 @@ package memory
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"sort"
 	"strings"
@@ -21,6 +22,7 @@ type CompetitionStore struct {
 	active            string
 	answers           []core.Answer
 	markings          []core.MarkingResult
+	workflows         map[string]core.AnswerWorkflow
 	scoreSelections   map[int64]map[string]core.Score
 	rankingSnapshots  map[string]core.RankingSnapshot
 	deployments       map[string]core.Deployment
@@ -36,6 +38,7 @@ func NewCompetitionStore() *CompetitionStore {
 		usedInvites:       make(map[string]bool),
 		contestants:       make(map[string]core.Contestant),
 		contents:          make(map[string]core.ContentSnapshot),
+		workflows:         make(map[string]core.AnswerWorkflow),
 		scoreSelections:   make(map[int64]map[string]core.Score),
 		rankingSnapshots:  make(map[string]core.RankingSnapshot),
 		deployments:       make(map[string]core.Deployment),
@@ -406,8 +409,107 @@ func (s *CompetitionStore) ListMarkingResults(context.Context) ([]core.MarkingRe
 func (s *CompetitionStore) CreateMarkingResult(_ context.Context, result core.MarkingResult) (core.MarkingResult, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if result.LineComments == nil {
+		result.LineComments = []core.AnswerLineComment{}
+	}
+	result.LineComments = append([]core.AnswerLineComment(nil), result.LineComments...)
 	s.markings = append(s.markings, result)
+	key := workflowKey(result.TeamCode, result.ProblemCode, result.AnswerNumber)
+	workflow := s.workflows[key]
+	workflow.Status = core.AnswerCompleted
+	workflow.Revision++
+	s.workflows[key] = workflow
 	return result, nil
+}
+
+func (s *CompetitionStore) DeleteMarkingLineComment(_ context.Context, markingID string, commentIndex int32, actor string, at time.Time) (core.MarkingResult, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for i := range s.markings {
+		if s.markings[i].ID != markingID {
+			continue
+		}
+		if commentIndex < 0 || int(commentIndex) >= len(s.markings[i].LineComments) {
+			return core.MarkingResult{}, core.NewError(http.StatusNotFound, "line_comment_not_found", "Line comment was not found")
+		}
+		comment := &s.markings[i].LineComments[commentIndex]
+		if comment.DeletedAt != nil {
+			return core.MarkingResult{}, core.NewError(http.StatusConflict, "line_comment_deleted", "Line comment was already deleted")
+		}
+		comment.DeletedAt = &at
+		comment.DeletedBy = &actor
+		result := s.markings[i]
+		result.LineComments = append([]core.AnswerLineComment(nil), result.LineComments...)
+		return result, nil
+	}
+	return core.MarkingResult{}, core.NewError(http.StatusNotFound, "marking_result_not_found", "Marking result was not found")
+}
+
+func workflowKey(teamCode int64, problemCode string, answerNumber int32) string {
+	return fmt.Sprintf("%d:%s:%d", teamCode, problemCode, answerNumber)
+}
+
+func (s *CompetitionStore) answerWorkflowLocked(teamCode int64, problemCode string, answerNumber int32) core.AnswerWorkflow {
+	if workflow, ok := s.workflows[workflowKey(teamCode, problemCode, answerNumber)]; ok {
+		return workflow
+	}
+	workflow := core.AnswerWorkflow{Status: core.AnswerWaiting}
+	for _, marking := range s.markings {
+		if marking.TeamCode == teamCode && marking.ProblemCode == problemCode && marking.AnswerNumber == answerNumber {
+			workflow.Status = core.AnswerCompleted
+			break
+		}
+	}
+	return workflow
+}
+
+func (s *CompetitionStore) GetAnswerWorkflow(_ context.Context, teamCode int64, problemCode string, answerNumber int32) (core.AnswerWorkflow, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.answerWorkflowLocked(teamCode, problemCode, answerNumber), nil
+}
+
+func (s *CompetitionStore) UpdateAnswerWorkflow(_ context.Context, teamCode int64, problemCode string, answerNumber int32, update core.WorkflowUpdate) (core.AnswerWorkflow, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	found := false
+	for _, answer := range s.answers {
+		if answer.TeamCode == teamCode && answer.ProblemCode == problemCode && answer.Number == answerNumber {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return core.AnswerWorkflow{}, core.NewError(http.StatusNotFound, "answer_not_found", "Answer was not found")
+	}
+	workflow := s.answerWorkflowLocked(teamCode, problemCode, answerNumber)
+	if workflow.Revision != update.ExpectedRevision {
+		return core.AnswerWorkflow{}, core.NewError(http.StatusConflict, "workflow_conflict", "Answer workflow changed; reload and retry")
+	}
+	if update.Status != nil {
+		workflow.Status = *update.Status
+	}
+	if workflow.Status == core.AnswerCompleted {
+		marked := false
+		for _, marking := range s.markings {
+			if marking.TeamCode == teamCode && marking.ProblemCode == problemCode && marking.AnswerNumber == answerNumber {
+				marked = true
+				break
+			}
+		}
+		if !marked {
+			return core.AnswerWorkflow{}, core.NewError(http.StatusConflict, "marking_required", "A score is required before completion")
+		}
+	}
+	switch update.Assignment {
+	case "CLAIM_SELF":
+		workflow.ClaimedBy = update.ActorDiscordID
+	case "RESET_TO_DEFAULT":
+		workflow.ClaimedBy = ""
+	}
+	workflow.Revision++
+	s.workflows[workflowKey(teamCode, problemCode, answerNumber)] = workflow
+	return workflow, nil
 }
 
 func (s *CompetitionStore) ListDeployments(_ context.Context, filter core.DeploymentFilter) ([]core.Deployment, error) {

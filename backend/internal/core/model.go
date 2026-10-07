@@ -51,17 +51,18 @@ type RedeployRule struct {
 }
 
 type Problem struct {
-	Code            string       `json:"code" yaml:"code"`
-	Title           string       `json:"title" yaml:"title"`
-	MaxScore        int32        `json:"max_score" yaml:"max_score"`
-	Category        string       `json:"category" yaml:"category"`
-	SectionSlug     string       `json:"section_slug" yaml:"section_slug"`
-	Type            string       `json:"type" yaml:"type"`
-	Body            string       `json:"body" yaml:"-"`
-	Explanation     string       `json:"explanation" yaml:"-"`
-	BodyPath        string       `json:"body_path,omitempty" yaml:"body_path"`
-	ExplanationPath string       `json:"explanation_path,omitempty" yaml:"explanation_path"`
-	Redeploy        RedeployRule `json:"redeploy_rule" yaml:"redeploy_rule"`
+	Code                   string       `json:"code" yaml:"code"`
+	Title                  string       `json:"title" yaml:"title"`
+	MaxScore               int32        `json:"max_score" yaml:"max_score"`
+	Category               string       `json:"category" yaml:"category"`
+	SectionSlug            string       `json:"section_slug" yaml:"section_slug"`
+	Type                   string       `json:"type" yaml:"type"`
+	Body                   string       `json:"body" yaml:"-"`
+	Explanation            string       `json:"explanation" yaml:"-"`
+	BodyPath               string       `json:"body_path,omitempty" yaml:"body_path"`
+	ExplanationPath        string       `json:"explanation_path,omitempty" yaml:"explanation_path"`
+	Redeploy               RedeployRule `json:"redeploy_rule" yaml:"redeploy_rule"`
+	DefaultGraderDiscordID string       `json:"default_grader_discord_id,omitempty" yaml:"default_grader_discord_id,omitempty"`
 }
 
 type Section struct {
@@ -153,8 +154,38 @@ type MarkingResult struct {
 	Judge        string
 	MarkedScore  int32
 	Rationale    string
+	LineComments []AnswerLineComment
 	CreatedAt    time.Time
 	Visibility   Visibility
+}
+
+type AnswerLineComment struct {
+	LineNumber    int32      `json:"line_number"`
+	EndLineNumber *int32     `json:"end_line_number,omitempty"`
+	Body          string     `json:"body"`
+	DeletedAt     *time.Time `json:"deleted_at,omitempty"`
+	DeletedBy     *string    `json:"deleted_by,omitempty"`
+}
+
+type AnswerWorkflowStatus string
+
+const (
+	AnswerWaiting    AnswerWorkflowStatus = "WAITING"
+	AnswerInProgress AnswerWorkflowStatus = "IN_PROGRESS"
+	AnswerCompleted  AnswerWorkflowStatus = "COMPLETED"
+)
+
+type AnswerWorkflow struct {
+	Status    AnswerWorkflowStatus
+	ClaimedBy string
+	Revision  int64
+}
+
+type WorkflowUpdate struct {
+	ExpectedRevision int64
+	Status           *AnswerWorkflowStatus
+	Assignment       string
+	ActorDiscordID   string
 }
 
 type Score struct {

@@ -823,6 +823,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/answers/{team_code}/{problem_code}/{answer_number}/workflow": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description チーム番号 */
+                team_code: components["parameters"]["TeamCodePath"];
+                /** @description 問題コード */
+                problem_code: components["parameters"]["ProblemCodePath"];
+                /** @description チーム・問題内で採番された回答番号 */
+                answer_number: components["parameters"]["AnswerNumberPath"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** 回答の採点作業状態と担当を更新する */
+        patch: operations["updateAdminAnswerWorkflow"];
+        trace?: never;
+    };
     "/api/v1/admin/marking-results": {
         parameters: {
             query?: never;
@@ -842,6 +866,30 @@ export interface paths {
          */
         post: operations["createAdminMarkingResult"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/marking-results/{marking_result_id}/line-comments/{comment_index}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                marking_result_id: string;
+                /** @description 保存時の行コメント配列の0始まりの位置。削除後も位置は変わらない。 */
+                comment_index: number;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * 保存済みの行コメントをソフト削除する
+         * @description コメント本文は監査用に保持する。採点結果の得点と全体コメントは変えない。
+         */
+        delete: operations["deleteAdminMarkingLineComment"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1454,6 +1502,7 @@ export interface components {
             explanation: string;
             redeploy_rule: components["schemas"]["RedeployRule"];
             content_commit: components["schemas"]["ContentCommit"];
+            default_grader_discord_id: string | null;
         };
         ProblemsResponse: {
             problems: components["schemas"]["ProblemSummary"][];
@@ -1655,6 +1704,24 @@ export interface components {
             submitted_at: string;
             score: components["schemas"]["MarkingScore"] | null;
             content_commit: components["schemas"]["ContentCommit"];
+            workflow: components["schemas"]["AdminAnswerWorkflow"];
+        };
+        AdminAnswerWorkflow: {
+            /** @enum {string} */
+            status: "WAITING" | "IN_PROGRESS" | "COMPLETED";
+            assignee_discord_id: string | null;
+            /** @enum {string} */
+            assignment_source: "DEFAULT" | "CLAIMED";
+            /** Format: int64 */
+            revision: number;
+        };
+        UpdateAdminAnswerWorkflowRequest: {
+            /** Format: int64 */
+            expected_revision: number;
+            /** @enum {string} */
+            status?: "WAITING" | "IN_PROGRESS" | "COMPLETED";
+            /** @enum {string} */
+            assignment?: "CLAIM_SELF" | "RESET_TO_DEFAULT";
         };
         AdminAnswersResponse: {
             answers: components["schemas"]["AdminAnswer"][];
@@ -1678,9 +1745,25 @@ export interface components {
             /** Format: int32 */
             score: number;
             rationale: string;
+            line_comments: components["schemas"]["AnswerLineComment"][];
             /** Format: date-time */
             created_at: string;
             visibility: components["schemas"]["MarkingVisibility"];
+        };
+        /** @description 回答Markdownの原文を改行で分けた1始まりの行範囲に付けるコメント。end_line_number省略時は単一行。 */
+        AnswerLineComment: {
+            /** Format: int32 */
+            line_number: number;
+            /** Format: int32 */
+            end_line_number?: number;
+            body: string;
+            /**
+             * Format: date-time
+             * @description 削除済みの場合のみ設定される。
+             */
+            deleted_at?: string;
+            /** @description 削除操作をした管理者名。 */
+            deleted_by?: string;
         };
         /** @description visibilityはクライアントから指定せず、サーバーが競技状態から決定する。 */
         CreateMarkingResultRequest: {
@@ -1688,6 +1771,7 @@ export interface components {
             /** Format: int32 */
             score: number;
             rationale: string;
+            line_comments?: components["schemas"]["AnswerLineComment"][];
         };
         MarkingResultsResponse: {
             marking_results: components["schemas"]["MarkingResult"][];
@@ -3104,6 +3188,8 @@ export interface operations {
             query?: {
                 /** @description 採点済み回答を含める */
                 include_marked?: boolean;
+                team_code?: number;
+                problem_code?: string;
             };
             header?: never;
             path?: never;
@@ -3160,6 +3246,43 @@ export interface operations {
             502: components["responses"]["BadGateway"];
         };
     };
+    updateAdminAnswerWorkflow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description チーム番号 */
+                team_code: components["parameters"]["TeamCodePath"];
+                /** @description 問題コード */
+                problem_code: components["parameters"]["ProblemCodePath"];
+                /** @description チーム・問題内で採番された回答番号 */
+                answer_number: components["parameters"]["AnswerNumberPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAdminAnswerWorkflowRequest"];
+            };
+        };
+        responses: {
+            /** @description 更新後の回答 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminAnswerResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
     listAdminMarkingResults: {
         parameters: {
             query?: {
@@ -3201,6 +3324,36 @@ export interface operations {
         responses: {
             /** @description 登録された採点結果 */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarkingResultResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    deleteAdminMarkingLineComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                marking_result_id: string;
+                /** @description 保存時の行コメント配列の0始まりの位置。削除後も位置は変わらない。 */
+                comment_index: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 更新後の採点結果 */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

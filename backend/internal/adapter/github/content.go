@@ -31,6 +31,7 @@ var (
 	commitPattern      = regexp.MustCompile(`^[0-9a-f]{40,64}$`)
 	identifierPattern  = regexp.MustCompile(`^[A-Za-z0-9_-]+$`)
 	repositoryPart     = regexp.MustCompile(`^[A-Za-z0-9_.-]+$`)
+	discordIDPattern   = regexp.MustCompile(`^[0-9]+$`)
 )
 
 type HTTPError struct {
@@ -233,6 +234,9 @@ func validateManifest(manifest core.Manifest) error {
 		}
 		if problem.MaxScore <= 0 || problem.Type != "DESCRIPTIVE" {
 			return invalidManifest("problem %q max_score or type is invalid", problem.Code)
+		}
+		if problem.DefaultGraderDiscordID != "" && !discordIDPattern.MatchString(problem.DefaultGraderDiscordID) {
+			return invalidManifest("problem %q default_grader_discord_id is invalid", problem.Code)
 		}
 		if _, exists := sectionBySlug[problem.SectionSlug]; !exists {
 			return invalidManifest("problem %q references unknown section %q", problem.Code, problem.SectionSlug)

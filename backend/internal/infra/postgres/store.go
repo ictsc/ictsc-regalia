@@ -423,7 +423,7 @@ func (s *Store) SubmitAnswer(ctx context.Context, answer core.Answer, interval t
 
 func (s *Store) ListMarkingResults(ctx context.Context) ([]core.MarkingResult, error) {
 	rows, err := s.pool.Query(ctx, `
-		SELECT id::text,team_code,problem_code,answer_number,judge,marked_score,rationale,created_at,visibility
+		SELECT id::text,team_code,problem_code,answer_number,judge,marked_score,rationale,line_comments,created_at,visibility
 		FROM marking_results ORDER BY created_at DESC,id ASC`)
 	if err != nil {
 		return nil, dbError(err)
@@ -432,24 +432,172 @@ func (s *Store) ListMarkingResults(ctx context.Context) ([]core.MarkingResult, e
 	results := make([]core.MarkingResult, 0)
 	for rows.Next() {
 		var result core.MarkingResult
+		var lineComments []byte
 		if err := rows.Scan(&result.ID, &result.TeamCode, &result.ProblemCode, &result.AnswerNumber, &result.Judge,
-			&result.MarkedScore, &result.Rationale, &result.CreatedAt, &result.Visibility); err != nil {
+			&result.MarkedScore, &result.Rationale, &lineComments, &result.CreatedAt, &result.Visibility); err != nil {
 			return nil, dbError(err)
+		}
+		if err := json.Unmarshal(lineComments, &result.LineComments); err != nil {
+			return nil, err
 		}
 		results = append(results, result)
 	}
 	return results, dbError(rows.Err())
 }
 
+func (s *Store) DeleteMarkingLineComment(ctx context.Context, markingID string, commentIndex int32, actor string, at time.Time) (core.MarkingResult, error) {
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return core.MarkingResult{}, dbError(err)
+	}
+	defer tx.Rollback(ctx)
+	var result core.MarkingResult
+	var encoded []byte
+	err = tx.QueryRow(ctx, `
+		SELECT id::text,team_code,problem_code,answer_number,judge,marked_score,rationale,line_comments,created_at,visibility
+		FROM marking_results WHERE id=$1 FOR UPDATE`, markingID).Scan(
+		&result.ID, &result.TeamCode, &result.ProblemCode, &result.AnswerNumber, &result.Judge,
+		&result.MarkedScore, &result.Rationale, &encoded, &result.CreatedAt, &result.Visibility)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return core.MarkingResult{}, core.NewError(http.StatusNotFound, "marking_result_not_found", "Marking result was not found")
+	}
+	if err != nil {
+		return core.MarkingResult{}, dbError(err)
+	}
+	if err := json.Unmarshal(encoded, &result.LineComments); err != nil {
+		return core.MarkingResult{}, err
+	}
+	if commentIndex < 0 || int(commentIndex) >= len(result.LineComments) {
+		return core.MarkingResult{}, core.NewError(http.StatusNotFound, "line_comment_not_found", "Line comment was not found")
+	}
+	comment := &result.LineComments[commentIndex]
+	if comment.DeletedAt != nil {
+		return core.MarkingResult{}, core.NewError(http.StatusConflict, "line_comment_deleted", "Line comment was already deleted")
+	}
+	comment.DeletedAt = &at
+	comment.DeletedBy = &actor
+	encoded, err = json.Marshal(result.LineComments)
+	if err != nil {
+		return core.MarkingResult{}, err
+	}
+	if _, err = tx.Exec(ctx, `UPDATE marking_results SET line_comments=$2 WHERE id=$1`, markingID, encoded); err != nil {
+		return core.MarkingResult{}, dbError(err)
+	}
+	return result, dbError(tx.Commit(ctx))
+}
+
 func (s *Store) CreateMarkingResult(ctx context.Context, result core.MarkingResult) (core.MarkingResult, error) {
-	err := s.pool.QueryRow(ctx, `
-		INSERT INTO marking_results(id,team_code,problem_code,answer_number,judge,marked_score,rationale,created_at,visibility)
-		VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
+	if result.LineComments == nil {
+		result.LineComments = []core.AnswerLineComment{}
+	}
+	lineComments, err := json.Marshal(result.LineComments)
+	if err != nil {
+		return result, err
+	}
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return result, dbError(err)
+	}
+	defer tx.Rollback(ctx)
+	// Serialize workflow changes and markings for this answer.
+	var locked int32
+	if err = tx.QueryRow(ctx, `SELECT number FROM answers WHERE team_code=$1 AND problem_code=$2 AND number=$3 FOR UPDATE`, result.TeamCode, result.ProblemCode, result.AnswerNumber).Scan(&locked); err != nil {
+		return result, dbError(err)
+	}
+	err = tx.QueryRow(ctx, `
+		INSERT INTO marking_results(id,team_code,problem_code,answer_number,judge,marked_score,rationale,line_comments,created_at,visibility)
+		VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
 		RETURNING id::text,team_code,problem_code,answer_number,judge,marked_score,rationale,created_at,visibility`,
 		result.ID, result.TeamCode, result.ProblemCode, result.AnswerNumber, result.Judge, result.MarkedScore,
-		result.Rationale, result.CreatedAt, result.Visibility).Scan(&result.ID, &result.TeamCode, &result.ProblemCode,
+		result.Rationale, lineComments, result.CreatedAt, result.Visibility).Scan(&result.ID, &result.TeamCode, &result.ProblemCode,
 		&result.AnswerNumber, &result.Judge, &result.MarkedScore, &result.Rationale, &result.CreatedAt, &result.Visibility)
-	return result, conflictError(err, "marking_conflict", "Marking result could not be saved")
+	if err != nil {
+		return result, conflictError(err, "marking_conflict", "Marking result could not be saved")
+	}
+	_, err = tx.Exec(ctx, `INSERT INTO answer_workflows(team_code,problem_code,answer_number,status,revision)
+		VALUES($1,$2,$3,'COMPLETED',1)
+		ON CONFLICT(team_code,problem_code,answer_number) DO UPDATE SET status='COMPLETED',revision=answer_workflows.revision+1`, result.TeamCode, result.ProblemCode, result.AnswerNumber)
+	if err != nil {
+		return result, dbError(err)
+	}
+	return result, dbError(tx.Commit(ctx))
+}
+
+func (s *Store) GetAnswerWorkflow(ctx context.Context, teamCode int64, problemCode string, answerNumber int32) (core.AnswerWorkflow, error) {
+	var workflow core.AnswerWorkflow
+	err := s.pool.QueryRow(ctx, `SELECT status,COALESCE(claimed_by_discord_id,''),revision FROM answer_workflows WHERE team_code=$1 AND problem_code=$2 AND answer_number=$3`, teamCode, problemCode, answerNumber).Scan(&workflow.Status, &workflow.ClaimedBy, &workflow.Revision)
+	if err == nil {
+		return workflow, nil
+	}
+	if !errors.Is(err, pgx.ErrNoRows) {
+		return workflow, dbError(err)
+	}
+	workflow.Status = core.AnswerWaiting
+	var marked bool
+	err = s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM marking_results WHERE team_code=$1 AND problem_code=$2 AND answer_number=$3)`, teamCode, problemCode, answerNumber).Scan(&marked)
+	if marked {
+		workflow.Status = core.AnswerCompleted
+	}
+	return workflow, dbError(err)
+}
+
+func (s *Store) UpdateAnswerWorkflow(ctx context.Context, teamCode int64, problemCode string, answerNumber int32, update core.WorkflowUpdate) (core.AnswerWorkflow, error) {
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return core.AnswerWorkflow{}, dbError(err)
+	}
+	defer tx.Rollback(ctx)
+	var locked int32
+	err = tx.QueryRow(ctx, `SELECT number FROM answers WHERE team_code=$1 AND problem_code=$2 AND number=$3 FOR UPDATE`, teamCode, problemCode, answerNumber).Scan(&locked)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return core.AnswerWorkflow{}, core.NewError(http.StatusNotFound, "answer_not_found", "Answer was not found")
+	}
+	if err != nil {
+		return core.AnswerWorkflow{}, dbError(err)
+	}
+	var workflow core.AnswerWorkflow
+	err = tx.QueryRow(ctx, `SELECT status,COALESCE(claimed_by_discord_id,''),revision FROM answer_workflows WHERE team_code=$1 AND problem_code=$2 AND answer_number=$3`, teamCode, problemCode, answerNumber).Scan(&workflow.Status, &workflow.ClaimedBy, &workflow.Revision)
+	if errors.Is(err, pgx.ErrNoRows) {
+		workflow.Status = core.AnswerWaiting
+		var marked bool
+		err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM marking_results WHERE team_code=$1 AND problem_code=$2 AND answer_number=$3)`, teamCode, problemCode, answerNumber).Scan(&marked)
+		if marked {
+			workflow.Status = core.AnswerCompleted
+		}
+	}
+	if err != nil {
+		return core.AnswerWorkflow{}, dbError(err)
+	}
+	if workflow.Revision != update.ExpectedRevision {
+		return core.AnswerWorkflow{}, core.NewError(http.StatusConflict, "workflow_conflict", "Answer workflow changed; reload and retry")
+	}
+	if update.Status != nil {
+		workflow.Status = *update.Status
+	}
+	if workflow.Status == core.AnswerCompleted {
+		var marked bool
+		err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM marking_results WHERE team_code=$1 AND problem_code=$2 AND answer_number=$3)`, teamCode, problemCode, answerNumber).Scan(&marked)
+		if err != nil {
+			return core.AnswerWorkflow{}, dbError(err)
+		}
+		if !marked {
+			return core.AnswerWorkflow{}, core.NewError(http.StatusConflict, "marking_required", "A score is required before completion")
+		}
+	}
+	switch update.Assignment {
+	case "CLAIM_SELF":
+		workflow.ClaimedBy = update.ActorDiscordID
+	case "RESET_TO_DEFAULT":
+		workflow.ClaimedBy = ""
+	}
+	workflow.Revision++
+	_, err = tx.Exec(ctx, `INSERT INTO answer_workflows(team_code,problem_code,answer_number,status,claimed_by_discord_id,revision)
+		VALUES($1,$2,$3,$4,NULLIF($5,''),$6)
+		ON CONFLICT(team_code,problem_code,answer_number) DO UPDATE SET status=EXCLUDED.status,claimed_by_discord_id=EXCLUDED.claimed_by_discord_id,revision=EXCLUDED.revision`, teamCode, problemCode, answerNumber, workflow.Status, workflow.ClaimedBy, workflow.Revision)
+	if err != nil {
+		return core.AnswerWorkflow{}, dbError(err)
+	}
+	return workflow, dbError(tx.Commit(ctx))
 }
 
 func (s *Store) ListDeployments(ctx context.Context, filter core.DeploymentFilter) ([]core.Deployment, error) {

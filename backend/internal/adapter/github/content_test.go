@@ -118,6 +118,28 @@ announcements:`, 1),
 	}
 }
 
+func TestManifestDefaultGraderIsOptionalAndValidated(t *testing.T) {
+	manifest, err := ParseManifest([]byte(validManifest()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if manifest.Problems[0].DefaultGraderDiscordID != "" {
+		t.Fatal("old manifest should have no default grader")
+	}
+	withGrader := strings.Replace(validManifest(), "    body_path: problems/A01.md", "    default_grader_discord_id: \"123456789012345678\"\n    body_path: problems/A01.md", 1)
+	manifest, err = ParseManifest([]byte(withGrader))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if manifest.Problems[0].DefaultGraderDiscordID != "123456789012345678" {
+		t.Fatalf("grader = %q", manifest.Problems[0].DefaultGraderDiscordID)
+	}
+	invalid := strings.Replace(withGrader, "123456789012345678", "not-a-discord-id", 1)
+	if _, err := ParseManifest([]byte(invalid)); !errors.Is(err, ErrInvalidManifest) {
+		t.Fatalf("invalid grader error = %v", err)
+	}
+}
+
 func TestFetchRejectsCommitMismatch(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		writeTestJSON(t, w, map[string]any{"sha": strings.Repeat("f", 40)})
