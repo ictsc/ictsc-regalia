@@ -267,7 +267,7 @@ func TestOAuthCookiesHaveProductionAttributesAndContractTTL(t *testing.T) {
 			if test.seedContestant {
 				fixture.seedContestant(t)
 			}
-			start := fixture.request(t, http.MethodGet, test.startPath, "")
+			start := fixture.request(t, http.MethodGet, testOrigin+test.startPath, "")
 			if start.Code != http.StatusFound {
 				t.Fatalf("start status = %d, want 302; body = %s", start.Code, start.Body.String())
 			}
@@ -304,6 +304,30 @@ func TestOAuthCookiesHaveProductionAttributesAndContractTTL(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestOAuthStartMovesToCallbackHostBeforeSettingCookie(t *testing.T) {
+	fixture := newContractFixture(t)
+	for _, path := range []string{
+		"/api/v1/auth/discord?next=%2Fproblems",
+		"/api/v1/admin/auth/discord?next=%2Fadmin%2Fsubmissions",
+	} {
+		start := fixture.request(t, http.MethodGet, "http://localhost:3000"+path, "")
+		if start.Code != http.StatusFound || start.Header().Get("Location") != testOrigin+path {
+			t.Fatalf("start on wrong host: status=%d location=%q", start.Code, start.Header().Get("Location"))
+		}
+		if len(start.Result().Cookies()) != 0 {
+			t.Fatalf("state cookie was set before canonical redirect: %v", start.Result().Cookies())
+		}
+		canonical := fixture.request(t, http.MethodGet, testOrigin+path, "")
+		if canonical.Code != http.StatusFound || !strings.HasPrefix(canonical.Header().Get("Location"), "https://discord.example.test/") || len(canonical.Result().Cookies()) != 1 {
+			t.Fatalf("canonical OAuth start: status=%d location=%q cookies=%d", canonical.Code, canonical.Header().Get("Location"), len(canonical.Result().Cookies()))
+		}
+		otherPort := fixture.request(t, http.MethodGet, "https://score.example.test:8443"+path, "")
+		if otherPort.Code != http.StatusFound || len(otherPort.Result().Cookies()) != 1 {
+			t.Fatalf("same callback host with another port: status=%d cookies=%d", otherPort.Code, len(otherPort.Result().Cookies()))
+		}
 	}
 }
 
@@ -500,8 +524,8 @@ func TestGeneratedRouterRegistersEveryOpenAPIOperation(t *testing.T) {
 
 	missing := setDifference(want, got)
 	extra := setDifference(got, want)
-	if len(want) != 64 {
-		t.Errorf("OpenAPI operation count = %d, want 64", len(want))
+	if len(want) != 66 {
+		t.Errorf("OpenAPI operation count = %d, want 66", len(want))
 	}
 	if len(missing) != 0 || len(extra) != 0 {
 		t.Errorf("generated route mismatch\nmissing: %v\nextra: %v", missing, extra)

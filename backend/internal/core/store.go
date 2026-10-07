@@ -29,6 +29,9 @@ type Store interface {
 	SubmitAnswer(ctx context.Context, answer Answer, interval time.Duration) (Answer, time.Duration, error)
 	ListMarkingResults(ctx context.Context) ([]MarkingResult, error)
 	CreateMarkingResult(ctx context.Context, result MarkingResult) (MarkingResult, error)
+	DeleteMarkingLineComment(ctx context.Context, markingID string, commentIndex int32, actor string, at time.Time) (MarkingResult, error)
+	GetAnswerWorkflow(ctx context.Context, teamCode int64, problemCode string, answerNumber int32) (AnswerWorkflow, error)
+	UpdateAnswerWorkflow(ctx context.Context, teamCode int64, problemCode string, answerNumber int32, update WorkflowUpdate) (AnswerWorkflow, error)
 	RecalculateScores(ctx context.Context, selections map[int64]map[string]Score, actor string) error
 	GetRankingSnapshot(ctx context.Context, frozenAt time.Time) (RankingSnapshot, bool, error)
 	PutRankingSnapshot(ctx context.Context, snapshot RankingSnapshot, actor string) (RankingSnapshot, error)

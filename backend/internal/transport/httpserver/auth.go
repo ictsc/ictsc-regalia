@@ -5,7 +5,9 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"net/url"
 	"sort"
+	"strings"
 
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
 	"github.com/ictsc/ictsc-regalia/backend/internal/service"
@@ -14,6 +16,9 @@ import (
 )
 
 func (h *Handler) StartDiscordAuthentication(ctx context.Context, request api.StartDiscordAuthenticationRequestObject) (api.StartDiscordAuthenticationResponseObject, error) {
+	if location, redirect := oauthStartOnCallbackHost(ctx, h.service.Config.ContestantRedirectURI); redirect {
+		return api.StartDiscordAuthentication302Response{Headers: api.OAuthRedirectResponseHeaders{Location: &location}}, nil
+	}
 	next := "/"
 	if request.Params.Next != nil {
 		next = *request.Params.Next
@@ -47,6 +52,9 @@ func (h *Handler) CompleteDiscordAuthentication(ctx context.Context, request api
 }
 
 func (h *Handler) StartAdminDiscordAuthentication(ctx context.Context, request api.StartAdminDiscordAuthenticationRequestObject) (api.StartAdminDiscordAuthenticationResponseObject, error) {
+	if location, redirect := oauthStartOnCallbackHost(ctx, h.service.Config.AdminRedirectURI); redirect {
+		return api.StartAdminDiscordAuthentication302Response{Headers: api.OAuthRedirectResponseHeaders{Location: &location}}, nil
+	}
 	next := "/admin/"
 	if request.Params.Next != nil {
 		next = *request.Params.Next
@@ -57,6 +65,20 @@ func (h *Handler) StartAdminDiscordAuthentication(ctx context.Context, request a
 	}
 	location, cookie := started.URL, cookieValue("admin-oauth2-session", started.SessionToken, service.OAuthTTL, h.options.SecureCookies, http.SameSiteLaxMode)
 	return api.StartAdminDiscordAuthentication302Response{Headers: api.OAuthRedirectResponseHeaders{Location: &location, SetCookie: &cookie}}, nil
+}
+
+// Start OAuth on the callback host so its host-only state cookie reaches the callback.
+func oauthStartOnCallbackHost(ctx context.Context, redirectURI string) (string, bool) {
+	callback, err := url.Parse(redirectURI)
+	if err != nil || callback.Host == "" {
+		return "", false
+	}
+	r := requestFrom(ctx)
+	requestHost := (&url.URL{Host: r.Host}).Hostname()
+	if strings.EqualFold(requestHost, callback.Hostname()) {
+		return "", false
+	}
+	return callback.Scheme + "://" + callback.Host + r.URL.RequestURI(), true
 }
 
 func (h *Handler) CompleteAdminDiscordAuthentication(ctx context.Context, request api.CompleteAdminDiscordAuthenticationRequestObject) (api.CompleteAdminDiscordAuthenticationResponseObject, error) {

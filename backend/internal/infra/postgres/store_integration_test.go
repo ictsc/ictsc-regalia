@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sort"
+	"strings"
 	"testing"
 	"time"
 
@@ -469,6 +470,67 @@ func assertCoreErrorCode(t *testing.T, err error, status int, code string) {
 	}
 	if domainErr.Status != status || domainErr.Code != code {
 		t.Fatalf("error status/code = %d/%s, want %d/%s", domainErr.Status, domainErr.Code, status, code)
+	}
+}
+
+func TestAnswerWorkflowIntegration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires PostgreSQL")
+	}
+	fixture := newPostgresFixture(t)
+	ctx := t.Context()
+	commit := strings.Repeat("a", 40)
+	seedTeamContestantAndContent(t, fixture, 2, "workflow-user", "123456789", commit)
+	answer, _, err := fixture.store.SubmitAnswer(ctx, core.Answer{
+		TeamCode: 2, ProblemCode: "P1", AuthorName: "workflow-user", Body: "answer",
+		SubmittedAt: time.Now().UTC(), ContentCommit: commit, MaxScore: 100,
+		RedeployRule: core.RedeployRule{Type: core.RedeployManual},
+	}, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	workflow, err := fixture.store.GetAnswerWorkflow(ctx, 2, "P1", answer.Number)
+	if err != nil || workflow.Status != core.AnswerWaiting || workflow.Revision != 0 {
+		t.Fatalf("initial workflow: %#v %v", workflow, err)
+	}
+	completed := core.AnswerCompleted
+	_, err = fixture.store.UpdateAnswerWorkflow(ctx, 2, "P1", answer.Number, core.WorkflowUpdate{Status: &completed})
+	assertCoreErrorCode(t, err, http.StatusConflict, "marking_required")
+	progress := core.AnswerInProgress
+	workflow, err = fixture.store.UpdateAnswerWorkflow(ctx, 2, "P1", answer.Number, core.WorkflowUpdate{Status: &progress, Assignment: "CLAIM_SELF", ActorDiscordID: "987654321"})
+	if err != nil || workflow.Revision != 1 || workflow.ClaimedBy != "987654321" {
+		t.Fatalf("claim: %#v %v", workflow, err)
+	}
+	_, err = fixture.store.UpdateAnswerWorkflow(ctx, 2, "P1", answer.Number, core.WorkflowUpdate{ExpectedRevision: 0, Status: &completed})
+	assertCoreErrorCode(t, err, http.StatusConflict, "workflow_conflict")
+	endLine := int32(3)
+	_, err = fixture.store.CreateMarkingResult(ctx, core.MarkingResult{
+		ID: uuid.NewString(), TeamCode: 2, ProblemCode: "P1", AnswerNumber: answer.Number,
+		Judge: "Judge", MarkedScore: 80, CreatedAt: time.Now().UTC(), Visibility: core.VisibilityPrivate,
+		LineComments: []core.AnswerLineComment{{LineNumber: 1, EndLineNumber: &endLine, Body: "review this range"}},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	markings, err := fixture.store.ListMarkingResults(ctx)
+	if err != nil || len(markings) != 1 || len(markings[0].LineComments) != 1 || markings[0].LineComments[0].Body != "review this range" || markings[0].LineComments[0].EndLineNumber == nil || *markings[0].LineComments[0].EndLineNumber != 3 {
+		t.Fatalf("persisted line comments: %#v %v", markings, err)
+	}
+	deleted, err := fixture.store.DeleteMarkingLineComment(ctx, markings[0].ID, 0, "Judge", time.Now().UTC())
+	if err != nil || deleted.LineComments[0].DeletedAt == nil || deleted.MarkedScore != 80 {
+		t.Fatalf("delete line comment: %#v %v", deleted, err)
+	}
+	markings, err = fixture.store.ListMarkingResults(ctx)
+	if err != nil || markings[0].LineComments[0].DeletedAt == nil || markings[0].LineComments[0].Body != "review this range" {
+		t.Fatalf("persisted soft deletion: %#v %v", markings, err)
+	}
+	workflow, err = fixture.store.GetAnswerWorkflow(ctx, 2, "P1", answer.Number)
+	if err != nil || workflow.Status != completed || workflow.Revision != 2 || workflow.ClaimedBy != "987654321" {
+		t.Fatalf("completed: %#v %v", workflow, err)
+	}
+	workflow, err = fixture.store.UpdateAnswerWorkflow(ctx, 2, "P1", answer.Number, core.WorkflowUpdate{ExpectedRevision: 2, Status: &progress, Assignment: "RESET_TO_DEFAULT"})
+	if err != nil || workflow.Status != progress || workflow.ClaimedBy != "" {
+		t.Fatalf("reopened: %#v %v", workflow, err)
 	}
 }
 

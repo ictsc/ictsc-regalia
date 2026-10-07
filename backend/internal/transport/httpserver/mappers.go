@@ -61,10 +61,15 @@ func toAPISections(snapshot core.ContentSnapshot, now *time.Time) []api.Section 
 }
 
 func toAPIAdminProblem(problem core.Problem, commit string) api.AdminProblem {
+	var defaultGrader *string
+	if problem.DefaultGraderDiscordID != "" {
+		defaultGrader = &problem.DefaultGraderDiscordID
+	}
 	return api.AdminProblem{
 		Code: problem.Code, Title: problem.Title, MaxScore: problem.MaxScore, Category: problem.Category,
 		SectionSlug: problem.SectionSlug, Type: api.ProblemType(problem.Type), Body: problem.Body,
 		Explanation: problem.Explanation, RedeployRule: toAPIRedeploy(problem.Redeploy), ContentCommit: commit,
+		DefaultGraderDiscordId: defaultGrader,
 	}
 }
 
@@ -143,9 +148,13 @@ func toAPIEvent(event core.DeploymentEvent) api.DeploymentEvent {
 
 func toAPIMarking(result core.MarkingResult) api.MarkingResult {
 	id, _ := uuid.Parse(result.ID)
+	lineComments := make([]api.AnswerLineComment, 0, len(result.LineComments))
+	for _, comment := range result.LineComments {
+		lineComments = append(lineComments, api.AnswerLineComment{LineNumber: comment.LineNumber, EndLineNumber: comment.EndLineNumber, Body: comment.Body, DeletedAt: comment.DeletedAt, DeletedBy: comment.DeletedBy})
+	}
 	return api.MarkingResult{
 		Id: id, Answer: api.AdminAnswerReference{TeamCode: result.TeamCode, ProblemCode: result.ProblemCode, AnswerNumber: result.AnswerNumber},
-		Judge: api.AdminActor{Name: result.Judge}, Score: result.MarkedScore, Rationale: result.Rationale,
+		Judge: api.AdminActor{Name: result.Judge}, Score: result.MarkedScore, Rationale: result.Rationale, LineComments: lineComments,
 		CreatedAt: result.CreatedAt, Visibility: api.MarkingVisibility(result.Visibility),
 	}
 }

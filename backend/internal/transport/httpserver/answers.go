@@ -4,7 +4,9 @@ import (
 	"context"
 	"net/http"
 	"sort"
+	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/google/uuid"
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
@@ -72,7 +74,7 @@ func (h *Handler) GetContestantAnswer(ctx context.Context, request api.GetContes
 }
 
 func (h *Handler) ListAdminAnswers(ctx context.Context, request api.ListAdminAnswersRequestObject) (api.ListAdminAnswersResponseObject, error) {
-	answers, err := h.service.Store.ListAnswers(ctx, core.AnswerFilter{})
+	answers, err := h.service.Store.ListAnswers(ctx, core.AnswerFilter{TeamCode: request.Params.TeamCode, ProblemCode: request.Params.ProblemCode})
 	if err != nil {
 		return nil, err
 	}
@@ -144,12 +146,64 @@ func (h *Handler) toAdminAnswer(ctx context.Context, answer core.Answer, score *
 	if score != nil {
 		markingScore = &api.MarkingScore{Marked: score.MarkedScore, Penalty: score.Penalty, Total: score.EffectiveScore, Max: score.MaxScore}
 	}
+	workflow, err := h.service.Store.GetAnswerWorkflow(ctx, answer.TeamCode, answer.ProblemCode, answer.Number)
+	if err != nil {
+		return api.AdminAnswer{}, err
+	}
+	var assignee *string
+	source := api.AdminAnswerWorkflowAssignmentSource("DEFAULT")
+	if workflow.ClaimedBy != "" {
+		assignee = &workflow.ClaimedBy
+		source = api.AdminAnswerWorkflowAssignmentSource("CLAIMED")
+	} else if problem.DefaultGraderDiscordID != "" {
+		assignee = &problem.DefaultGraderDiscordID
+	}
 	return api.AdminAnswer{
 		Reference: api.AdminAnswerReference{TeamCode: answer.TeamCode, ProblemCode: answer.ProblemCode, AnswerNumber: answer.Number},
 		Team:      toAPITeam(team), Author: toAPIProfile(author), Problem: toAPICatalog(problem),
 		Body: api.AnswerBody{Type: api.AnswerBodyTypeDESCRIPTIVE, Body: answer.Body}, SubmittedAt: answer.SubmittedAt,
 		ContentCommit: answer.ContentCommit, Score: markingScore,
+		Workflow: api.AdminAnswerWorkflow{Status: api.AdminAnswerWorkflowStatus(workflow.Status), AssigneeDiscordId: assignee, AssignmentSource: source, Revision: workflow.Revision},
 	}, nil
+}
+
+func (h *Handler) UpdateAdminAnswerWorkflow(ctx context.Context, request api.UpdateAdminAnswerWorkflowRequestObject) (api.UpdateAdminAnswerWorkflowResponseObject, error) {
+	if request.Body == nil || (request.Body.Status == nil && request.Body.Assignment == nil) {
+		return nil, core.NewError(http.StatusUnprocessableEntity, "validation_error", "Status or assignment is required")
+	}
+	if request.Body.Status != nil && !request.Body.Status.Valid() {
+		return nil, core.NewError(http.StatusUnprocessableEntity, "validation_error", "Invalid workflow status")
+	}
+	if request.Body.Assignment != nil && !request.Body.Assignment.Valid() {
+		return nil, core.NewError(http.StatusUnprocessableEntity, "validation_error", "Invalid assignment action")
+	}
+	update := core.WorkflowUpdate{ExpectedRevision: request.Body.ExpectedRevision, ActorDiscordID: principal(ctx).Session.Discord.ID}
+	if request.Body.Status != nil {
+		status := core.AnswerWorkflowStatus(*request.Body.Status)
+		update.Status = &status
+	}
+	if request.Body.Assignment != nil {
+		update.Assignment = string(*request.Body.Assignment)
+	}
+	if update.Assignment == "CLAIM_SELF" && update.ActorDiscordID == "" {
+		return nil, core.NewError(http.StatusForbidden, "admin_identity_required", "Discord identity is required to claim an answer")
+	}
+	if _, err := h.service.Store.UpdateAnswerWorkflow(ctx, request.TeamCode, request.ProblemCode, request.AnswerNumber, update); err != nil {
+		return nil, err
+	}
+	answer, err := h.service.Store.GetAnswer(ctx, request.TeamCode, request.ProblemCode, request.AnswerNumber)
+	if err != nil {
+		return nil, err
+	}
+	score, err := h.scoreForAnswer(ctx, answer, false)
+	if err != nil {
+		return nil, err
+	}
+	mapped, err := h.toAdminAnswer(ctx, answer, score)
+	if err != nil {
+		return nil, err
+	}
+	return api.UpdateAdminAnswerWorkflow200JSONResponse{Answer: mapped}, nil
 }
 
 func (h *Handler) ListAdminMarkingResults(ctx context.Context, request api.ListAdminMarkingResultsRequestObject) (api.ListAdminMarkingResultsResponseObject, error) {
@@ -193,6 +247,20 @@ func (h *Handler) CreateAdminMarkingResult(ctx context.Context, request api.Crea
 	if request.Body.Score > answer.MaxScore {
 		return nil, core.NewError(http.StatusUnprocessableEntity, "validation_error", "Score cannot exceed the answer snapshot maximum")
 	}
+	lineComments := make([]core.AnswerLineComment, 0)
+	if request.Body.LineComments != nil {
+		lineCount := strings.Count(strings.ReplaceAll(answer.Body, "\r\n", "\n"), "\n") + 1
+		for _, comment := range *request.Body.LineComments {
+			endLine := comment.LineNumber
+			if comment.EndLineNumber != nil {
+				endLine = *comment.EndLineNumber
+			}
+			if comment.LineNumber < 1 || endLine < comment.LineNumber || int(endLine) > lineCount || strings.TrimSpace(comment.Body) == "" || utf8.RuneCountInString(comment.Body) > 2000 {
+				return nil, core.NewError(http.StatusUnprocessableEntity, "validation_error", "Line comment has an invalid line or body")
+			}
+			lineComments = append(lineComments, core.AnswerLineComment{LineNumber: comment.LineNumber, EndLineNumber: comment.EndLineNumber, Body: comment.Body})
+		}
+	}
 	state, err := h.service.Store.GetCompetitionState(ctx)
 	if err != nil {
 		return nil, err
@@ -200,13 +268,21 @@ func (h *Handler) CreateAdminMarkingResult(ctx context.Context, request api.Crea
 	visibility := core.MarkingVisibilityAt(answer.SubmittedAt, h.service.Now(), state.RankingFreezeAt, state.FinalRevealedAt)
 	result, err := h.service.Store.CreateMarkingResult(ctx, core.MarkingResult{
 		ID: uuid.NewString(), TeamCode: answer.TeamCode, ProblemCode: answer.ProblemCode, AnswerNumber: answer.Number,
-		Judge: principal(ctx).Session.AdminName, MarkedScore: request.Body.Score, Rationale: request.Body.Rationale,
+		Judge: principal(ctx).Session.AdminName, MarkedScore: request.Body.Score, Rationale: request.Body.Rationale, LineComments: lineComments,
 		CreatedAt: h.service.Now(), Visibility: visibility,
 	})
 	if err != nil {
 		return nil, err
 	}
 	return api.CreateAdminMarkingResult201JSONResponse{MarkingResult: toAPIMarking(result)}, nil
+}
+
+func (h *Handler) DeleteAdminMarkingLineComment(ctx context.Context, request api.DeleteAdminMarkingLineCommentRequestObject) (api.DeleteAdminMarkingLineCommentResponseObject, error) {
+	result, err := h.service.Store.DeleteMarkingLineComment(ctx, request.MarkingResultId.String(), request.CommentIndex, principal(ctx).Session.AdminName, h.service.Now())
+	if err != nil {
+		return nil, err
+	}
+	return api.DeleteAdminMarkingLineComment200JSONResponse{MarkingResult: toAPIMarking(result)}, nil
 }
 
 func (h *Handler) ListAdminScores(ctx context.Context, _ api.ListAdminScoresRequestObject) (api.ListAdminScoresResponseObject, error) {

@@ -1042,6 +1042,14 @@
             "required": false,
             "description": "採点済み回答を含める",
             "schema": { "type": "boolean", "default": false }
+          },
+          {
+            "name": "team_code", "in": "query", "required": false,
+            "schema": { "type": "integer", "format": "int64", "minimum": 2, "maximum": 99 }
+          },
+          {
+            "name": "problem_code", "in": "query", "required": false,
+            "schema": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" }
           }
         ],
         "responses": {
@@ -1079,6 +1087,32 @@
           "422": { "$ref": "#/components/responses/ValidationError" },
           "500": { "$ref": "#/components/responses/InternalServerError" },
           "502": { "$ref": "#/components/responses/BadGateway" }
+        }
+      }
+    },
+    "/api/v1/admin/answers/{team_code}/{problem_code}/{answer_number}/workflow": {
+      "parameters": [
+        { "$ref": "#/components/parameters/TeamCodePath" },
+        { "$ref": "#/components/parameters/ProblemCodePath" },
+        { "$ref": "#/components/parameters/AnswerNumberPath" }
+      ],
+      "patch": {
+        "tags": ["Admin Marking"],
+        "summary": "回答の採点作業状態と担当を更新する",
+        "operationId": "updateAdminAnswerWorkflow",
+        "security": [{ "AdminSession": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateAdminAnswerWorkflowRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "更新後の回答", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AdminAnswerResponse" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       }
     },
@@ -1123,6 +1157,28 @@
             "description": "登録された採点結果",
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MarkingResultResponse" } } }
           },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/api/v1/admin/marking-results/{marking_result_id}/line-comments/{comment_index}": {
+      "parameters": [
+        { "name": "marking_result_id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } },
+        { "name": "comment_index", "in": "path", "required": true, "description": "保存時の行コメント配列の0始まりの位置。削除後も位置は変わらない。", "schema": { "type": "integer", "format": "int32", "minimum": 0 } }
+      ],
+      "delete": {
+        "tags": ["Admin Marking"],
+        "summary": "保存済みの行コメントをソフト削除する",
+        "description": "コメント本文は監査用に保持する。採点結果の得点と全体コメントは変えない。",
+        "operationId": "deleteAdminMarkingLineComment",
+        "security": [{ "AdminSession": [] }],
+        "responses": {
+          "200": { "description": "更新後の採点結果", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MarkingResultResponse" } } } },
           "401": { "$ref": "#/components/responses/Unauthorized" },
           "403": { "$ref": "#/components/responses/Forbidden" },
           "404": { "$ref": "#/components/responses/NotFound" },
@@ -2260,7 +2316,7 @@
       "AdminProblem": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["code", "title", "max_score", "category", "section_slug", "type", "body", "explanation", "redeploy_rule", "content_commit"],
+        "required": ["code", "title", "max_score", "category", "section_slug", "type", "body", "explanation", "redeploy_rule", "content_commit", "default_grader_discord_id"],
         "properties": {
           "code": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" },
           "title": { "type": "string", "minLength": 1, "maxLength": 255 },
@@ -2271,7 +2327,8 @@
           "body": { "type": "string", "minLength": 1, "description": "Markdown形式の問題文" },
           "explanation": { "type": "string", "description": "Markdown形式の運営向け解説" },
           "redeploy_rule": { "$ref": "#/components/schemas/RedeployRule" },
-          "content_commit": { "$ref": "#/components/schemas/ContentCommit" }
+          "content_commit": { "$ref": "#/components/schemas/ContentCommit" },
+          "default_grader_discord_id": { "type": ["string", "null"], "pattern": "^[0-9]+$" }
         }
       },
       "ProblemsResponse": {
@@ -2592,7 +2649,7 @@
       "AdminAnswer": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["reference", "team", "author", "problem", "body", "submitted_at", "score", "content_commit"],
+        "required": ["reference", "team", "author", "problem", "body", "submitted_at", "score", "content_commit", "workflow"],
         "properties": {
           "reference": { "$ref": "#/components/schemas/AdminAnswerReference" },
           "team": { "$ref": "#/components/schemas/Team" },
@@ -2606,7 +2663,27 @@
               { "type": "null" }
             ]
           },
-          "content_commit": { "$ref": "#/components/schemas/ContentCommit" }
+          "content_commit": { "$ref": "#/components/schemas/ContentCommit" },
+          "workflow": { "$ref": "#/components/schemas/AdminAnswerWorkflow" }
+        }
+      },
+      "AdminAnswerWorkflow": {
+        "type": "object", "additionalProperties": false,
+        "required": ["status", "assignee_discord_id", "assignment_source", "revision"],
+        "properties": {
+          "status": { "type": "string", "enum": ["WAITING", "IN_PROGRESS", "COMPLETED"] },
+          "assignee_discord_id": { "type": ["string", "null"], "pattern": "^[0-9]+$" },
+          "assignment_source": { "type": "string", "enum": ["DEFAULT", "CLAIMED"] },
+          "revision": { "type": "integer", "format": "int64", "minimum": 0 }
+        }
+      },
+      "UpdateAdminAnswerWorkflowRequest": {
+        "type": "object", "additionalProperties": false,
+        "required": ["expected_revision"],
+        "properties": {
+          "expected_revision": { "type": "integer", "format": "int64", "minimum": 0 },
+          "status": { "type": "string", "enum": ["WAITING", "IN_PROGRESS", "COMPLETED"] },
+          "assignment": { "type": "string", "enum": ["CLAIM_SELF", "RESET_TO_DEFAULT"] }
         }
       },
       "AdminAnswersResponse": {
@@ -2641,15 +2718,29 @@
       "MarkingResult": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "answer", "judge", "score", "rationale", "created_at", "visibility"],
+        "required": ["id", "answer", "judge", "score", "rationale", "line_comments", "created_at", "visibility"],
         "properties": {
           "id": { "type": "string", "format": "uuid" },
           "answer": { "$ref": "#/components/schemas/AdminAnswerReference" },
           "judge": { "$ref": "#/components/schemas/AdminActor" },
           "score": { "type": "integer", "format": "int32", "minimum": 0 },
           "rationale": { "type": "string" },
+          "line_comments": { "type": "array", "items": { "$ref": "#/components/schemas/AnswerLineComment" } },
           "created_at": { "type": "string", "format": "date-time" },
           "visibility": { "$ref": "#/components/schemas/MarkingVisibility" }
+        }
+      },
+      "AnswerLineComment": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "回答Markdownの原文を改行で分けた1始まりの行範囲に付けるコメント。end_line_number省略時は単一行。",
+        "required": ["line_number", "body"],
+        "properties": {
+          "line_number": { "type": "integer", "format": "int32", "minimum": 1 },
+          "end_line_number": { "type": "integer", "format": "int32", "minimum": 1 },
+          "body": { "type": "string", "minLength": 1, "maxLength": 2000 },
+          "deleted_at": { "type": "string", "format": "date-time", "description": "削除済みの場合のみ設定される。" },
+          "deleted_by": { "type": "string", "description": "削除操作をした管理者名。" }
         }
       },
       "CreateMarkingResultRequest": {
@@ -2660,7 +2751,8 @@
         "properties": {
           "answer": { "$ref": "#/components/schemas/AdminAnswerReference" },
           "score": { "type": "integer", "format": "int32", "minimum": 0 },
-          "rationale": { "type": "string" }
+          "rationale": { "type": "string" },
+          "line_comments": { "type": "array", "items": { "$ref": "#/components/schemas/AnswerLineComment" } }
         }
       },
       "MarkingResultsResponse": {
