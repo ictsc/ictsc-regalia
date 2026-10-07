@@ -26,6 +26,6 @@ watch(
 </script>
 <template>
   <pre v-if="failed">{{ source }}</pre>
-  <!-- HTML is sanitized before trusted math/highlight transforms. -->
+  <!-- HTML is sanitized before math and syntax highlighting. -->
   <div v-else class="markdown" v-html="html" />
 </template>

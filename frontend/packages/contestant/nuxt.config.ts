@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { themeInitScript } from "../ui/theme-init";
+import { japaneseFontStylesheet, latinFontStylesheet } from "../ui/fonts";
 export default defineNuxtConfig({
   compatibilityDate: "2026-09-05",
   srcDir: "nuxt/",
@@ -25,8 +26,9 @@ export default defineNuxtConfig({
         },
         {
           rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;600;700;900&display=swap",
+          href: latinFontStylesheet,
         },
+        { rel: "stylesheet", href: japaneseFontStylesheet },
       ],
       script: [
         { innerHTML: themeInitScript, tagPosition: "head" },
@@ -52,7 +54,10 @@ export default defineNuxtConfig({
   vite: {
     server: {
       proxy: {
-        "/api": { target: "http://localhost:8080", changeOrigin: true },
+        "/api": {
+          target: process.env.ICTSC_API_PROXY_TARGET || "http://localhost:8080",
+          changeOrigin: true,
+        },
       },
     },
   },

@@ -2,7 +2,6 @@ import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
-import remarkBreaks from "remark-breaks";
 import remarkRehype from "remark-rehype";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeKatex from "rehype-katex";
@@ -13,7 +12,6 @@ const processor = unified()
   .use(remarkParse)
   .use(remarkGfm)
   .use(remarkMath)
-  .use(remarkBreaks)
   .use(remarkRehype)
   .use(rehypeSanitize, {
     ...defaultSchema,
