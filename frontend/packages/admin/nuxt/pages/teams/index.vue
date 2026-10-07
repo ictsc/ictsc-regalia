@@ -23,56 +23,72 @@ async function create() {
 <template>
   <main class="workspace">
     <h1>チーム</h1>
+    <p class="admin-lead">
+      競技チームの情報を確認・編集し、新しいチームを登録します。
+    </p>
     <p role="status">{{ message }}</p>
     <RequestState :error="error" :pending="pending" @retry="refresh"
-      ><table class="data-table">
-        <thead>
-          <tr>
-            <th>コード</th>
-            <th>チーム</th>
-            <th>所属</th>
-            <th>定員</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="t in data?.teams" :key="t.code">
-            <td>{{ t.code }}</td>
-            <td>
-              <NuxtLink :to="`/teams/${t.code}`">{{ t.name }}</NuxtLink>
-            </td>
-            <td>{{ t.organization }}</td>
-            <td>{{ t.member_limit }}</td>
-          </tr>
-        </tbody>
-      </table></RequestState
+      ><section class="admin-panel">
+        <div class="admin-panel-heading">
+          <h2>登録済みチーム</h2>
+          <span>{{ data?.teams.length ?? 0 }} チーム</span>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>コード</th>
+                <th>チーム</th>
+                <th>所属</th>
+                <th>定員</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="t in data?.teams" :key="t.code">
+                <td>{{ t.code }}</td>
+                <td>
+                  <NuxtLink :to="`/teams/${t.code}`">{{ t.name }}</NuxtLink>
+                </td>
+                <td>{{ t.organization }}</td>
+                <td>{{ t.member_limit }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p v-if="!data?.teams.length" class="admin-empty">
+          登録済みのチームはありません。
+        </p>
+      </section></RequestState
     >
-    <h2>チーム作成</h2>
-    <form class="form-grid" @submit.prevent="create">
-      <label
-        >チームコード<input
-          v-model.number="form.code"
-          type="number"
-          min="2"
-          max="99"
-          required /></label
-      ><label
-        >チーム名<input v-model="form.name" required maxlength="255" /></label
-      ><label
-        >所属<input
-          v-model="form.organization"
-          required
-          maxlength="255" /></label
-      ><label
-        >定員<input
-          v-model.number="form.member_limit"
-          type="number"
-          min="1"
-          required /></label
-      ><label
-        >チームカラー<select v-model="form.color">
-          <option v-for="c in teamColors" :key="c" :value="c">{{ c }}</option>
-        </select></label
-      ><button class="button-primary" :disabled="busy">チームを作成</button>
-    </form>
+    <section class="admin-panel">
+      <h2>チーム作成</h2>
+      <form class="form-grid" @submit.prevent="create">
+        <label
+          >チームコード<input
+            v-model.number="form.code"
+            type="number"
+            min="2"
+            max="99"
+            required /></label
+        ><label
+          >チーム名<input v-model="form.name" required maxlength="255" /></label
+        ><label
+          >所属<input
+            v-model="form.organization"
+            required
+            maxlength="255" /></label
+        ><label
+          >定員<input
+            v-model.number="form.member_limit"
+            type="number"
+            min="1"
+            required /></label
+        ><label
+          >チームカラー<select v-model="form.color">
+            <option v-for="c in teamColors" :key="c" :value="c">{{ c }}</option>
+          </select></label
+        ><button class="button-primary" :disabled="busy">チームを作成</button>
+      </form>
+    </section>
   </main>
 </template>

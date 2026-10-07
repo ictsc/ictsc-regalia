@@ -29,35 +29,49 @@ const actions = createAdminActions(api);
 <template>
   <main class="workspace">
     <h1>競技設定</h1>
+    <p class="admin-lead">
+      参加者に表示するルールと、ランキングの凍結時刻を管理します。
+    </p>
     <p role="status">{{ message }}</p>
     <RequestState :error="error" :pending="pending" @retry="refresh"
-      ><h2>ルール編集</h2>
-      <form
-        class="form-grid"
-        @submit.prevent="run('ルール更新', () => actions.replaceRule(markdown))"
-      >
-        <label>Markdown<textarea v-model="markdown" rows="18" /></label
-        ><button class="button-primary" :disabled="busy">ルールを更新</button>
-      </form>
-      <h2>プレビュー</h2>
-      <MarkdownContent :source="markdown" />
-      <h2>ランキング凍結</h2>
-      <p>
-        ブラウザのローカル時刻で入力します。空欄で保存すると凍結を解除します。
-      </p>
-      <form
-        class="form-grid"
-        @submit.prevent="
-          run('凍結時刻更新', () =>
-            actions.replaceFreeze(
-              freeze ? new Date(freeze).toISOString() : null,
-            ),
-          )
-        "
-      >
-        <label>凍結時刻<input v-model="freeze" type="datetime-local" /></label
-        ><button class="button-primary" :disabled="busy">凍結時刻を保存</button>
-      </form></RequestState
+      ><section class="admin-panel">
+        <h2>ルール編集</h2>
+        <p>Markdown で編集し、下のプレビューで表示を確認できます。</p>
+        <form
+          class="form-grid"
+          @submit.prevent="
+            run('ルール更新', () => actions.replaceRule(markdown))
+          "
+        >
+          <label>Markdown<textarea v-model="markdown" rows="18" /></label
+          ><button class="button-primary" :disabled="busy">ルールを更新</button>
+        </form>
+      </section>
+      <section class="admin-panel">
+        <h2>ルールのプレビュー</h2>
+        <MarkdownContent :source="markdown" />
+      </section>
+      <section class="admin-panel">
+        <h2>ランキング凍結</h2>
+        <p>
+          ブラウザのローカル時刻で入力します。空欄で保存すると凍結を解除します。
+        </p>
+        <form
+          class="form-grid"
+          @submit.prevent="
+            run('凍結時刻更新', () =>
+              actions.replaceFreeze(
+                freeze ? new Date(freeze).toISOString() : null,
+              ),
+            )
+          "
+        >
+          <label>凍結時刻<input v-model="freeze" type="datetime-local" /></label
+          ><button class="button-primary" :disabled="busy">
+            凍結時刻を保存
+          </button>
+        </form>
+      </section></RequestState
     >
   </main>
 </template>

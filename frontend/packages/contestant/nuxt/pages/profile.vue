@@ -11,6 +11,20 @@ const form = reactive({
 });
 const saving = ref(false),
   message = ref("");
+const { signOut } = useSession();
+const signingOut = ref(false);
+const signOutError = ref("");
+async function logout() {
+  signingOut.value = true;
+  signOutError.value = "";
+  try {
+    await signOut();
+  } catch (e) {
+    signOutError.value = e instanceof Error ? e.message : String(e);
+  } finally {
+    signingOut.value = false;
+  }
+}
 async function save() {
   saving.value = true;
   try {
@@ -42,5 +56,18 @@ async function save() {
         <button class="button-primary" :disabled="saving">更新する</button>
       </form></RequestState
     >
+    <section class="profile-account" aria-labelledby="profile-account-heading">
+      <h2 id="profile-account-heading">アカウント</h2>
+      <p v-if="signOutError" role="alert" class="error-message">
+        {{ signOutError }}
+      </p>
+      <button
+        class="button-secondary profile-logout"
+        :disabled="signingOut"
+        @click="logout"
+      >
+        {{ signingOut ? "処理中…" : "ログアウト" }}
+      </button>
+    </section>
   </main>
 </template>

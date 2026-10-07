@@ -12,11 +12,20 @@ useHead({
 </script>
 <template>
   <main class="workspace">
+    <NuxtLink class="text-link" to="/content">← コンテンツ一覧</NuxtLink>
     <RequestState :error="error" :pending="pending" @retry="refresh"
       ><template v-if="data"
         ><h1>{{ data.announcement.title }}</h1>
-        <time>{{ data.announcement.effective_from }}</time
-        ><MarkdownContent :source="data.announcement.markdown" /></template
+        <p class="admin-lead">
+          公開日時:
+          <time>{{
+            new Date(data.announcement.effective_from).toLocaleString("ja-JP")
+          }}</time>
+        </p>
+        <section class="admin-panel">
+          <MarkdownContent
+            :source="data.announcement.markdown"
+          /></section></template
     ></RequestState>
   </main>
 </template>

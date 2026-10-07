@@ -10,7 +10,7 @@ import {
 } from "~/features/deployment";
 import { draftKey, loadDraft, saveDraft } from "~/features/draft";
 import { fetchActivity } from "~/features/activity";
-import { problemStatus, statusLabels } from "~/features/problem/status";
+import { groupProblems } from "~/features/problem/group";
 import { remainingCooldownSeconds } from "~/features/problem/cooldown";
 definePageMeta({ key: (route) => route.fullPath });
 const route = useRoute();
@@ -51,13 +51,15 @@ useHead({
   bodyAttrs: { class: "detail-page" },
 });
 const rail = useState<boolean>("problem-rail-open", () => true),
+  problemRail = ref<HTMLElement | null>(null),
   body = ref(""),
   savedAt = ref(""),
   saveError = ref(""),
   actionError = ref<unknown>(),
   sending = ref(false),
   deploying = ref(false),
-  submitted = ref(false);
+  submitted = ref(false),
+  resetDialog = ref<HTMLDialogElement | null>(null);
 const now = useClock(false),
   retryAt = ref(0);
 const displayNow = useClock();
@@ -129,14 +131,21 @@ const cooldownMinutesFor = (
         problem.nextSubmittableAt,
         displayNow.value,
       );
-const statusOf = (
+const latestAnswerOf = (
+  problem: NonNullable<typeof competition.value>["problems"][number],
+) => activity.value?.find((answer) => answer.problemCode === problem.code);
+const pendingOf = (
   problem: NonNullable<typeof competition.value>["problems"][number],
 ) => {
-  const latest = activity.value?.find(
-    (answer) => answer.problemCode === problem.code,
-  );
-  return problemStatus(problem, !!latest, !!latest && latest.score == null);
+  const latest = latestAnswerOf(problem);
+  return !!latest && latest.score == null;
 };
+function openResetDialog() {
+  resetDialog.value?.showModal();
+}
+function onResetDialogBackdrop(event: MouseEvent) {
+  if (event.target === resetDialog.value) resetDialog.value?.close();
+}
 const open = computed(() => {
   const s = data.value?.problem.submissionStatus;
   return (
@@ -189,12 +198,7 @@ function connect() {
 onMounted(connect);
 onUnmounted(() => unsubscribe?.());
 async function redeploy() {
-  if (
-    !window.confirm(
-      "環境をリセットします。再展開ルールに応じて減点される場合があります。続行しますか？",
-    )
-  )
-    return;
+  resetDialog.value?.close();
   deploying.value = true;
   actionError.value = undefined;
   try {
@@ -224,12 +228,37 @@ const deploymentBusy = computed(
 const score = computed(
   () => competition.value?.problems.find((p) => p.code === code)?.score,
 );
+const problemGroups = computed(() =>
+  groupProblems(competition.value?.problems ?? []),
+);
+const sectionName = (slug?: string) =>
+  slug === "both"
+    ? "両日"
+    : /^day\d+$/.test(slug ?? "")
+      ? `${slug!.slice(3)}日目`
+      : slug;
+async function showCurrentRailItem() {
+  await nextTick();
+  if (!import.meta.client || !window.matchMedia("(max-width: 760px)").matches)
+    return;
+  const container = problemRail.value;
+  const active = container?.querySelector<HTMLElement>('[aria-current="page"]');
+  if (!container || !active) return;
+  const railBounds = container.getBoundingClientRect();
+  const activeBounds = active.getBoundingClientRect();
+  container.scrollLeft +=
+    activeBounds.left -
+    railBounds.left -
+    (railBounds.width - activeBounds.width) / 2;
+}
+onMounted(showCurrentRailItem);
+watch([problemGroups, rail], showCurrentRailItem, { flush: "post" });
 </script>
 <template>
   <main>
     <RequestState :pending="pending" :error="error" @retry="refresh"
       ><template v-if="data"
-        ><div class="actions">
+        ><div class="actions detail-toolbar">
           <button
             class="problem-rail-toggle"
             :aria-expanded="rail"
@@ -242,42 +271,65 @@ const score = computed(
               rail ? "問題リンクを隠す" : "問題リンクを表示"
             }}</span>
           </button>
+          <button
+            class="button-secondary button-reset detail-reset"
+            type="button"
+            :disabled="!data.problem.redeployable || deploymentBusy"
+            @click="openResetDialog"
+          >
+            環境をリセット
+          </button>
         </div>
         <div class="detail-layout" :class="{ 'is-rail-hidden': !rail }">
           <nav
             v-if="rail"
             id="problem-rail"
+            ref="problemRail"
             class="problem-rail"
             aria-label="問題ナビゲーション"
           >
-            <span class="problem-rail-label">出題中の問題</span>
-            <template v-for="p in competition?.problems" :key="p.code"
-              ><NuxtLink
+            <NuxtLink class="problem-rail-label" to="/problems"
+              >問題一覧</NuxtLink
+            >
+            <section
+              v-for="group in problemGroups"
+              :key="group.key"
+              class="problem-rail-group"
+            >
+              <h2>
+                <span class="visually-hidden">ステージ: </span>
+                <span class="rail-stage-label">{{
+                  sectionName(group.key)
+                }}</span>
+              </h2>
+              <NuxtLink
+                v-for="p in group.problems"
+                :key="p.code"
                 :to="`/problems/${p.code}`"
-                :class="[
-                  `status-${statusOf(p)}`,
-                  {
-                    'is-active': p.code === code,
-                    'is-cooldown': cooldownSecondsFor(p) > 0,
-                    'is-answer-closed': !p.submissionStatus?.isSubmittable,
-                  },
-                ]"
-                :data-cooldown="
-                  cooldownSecondsFor(p)
-                    ? `${cooldownMinutesFor(p)}分`
-                    : undefined
-                "
+                :class="{
+                  'is-active': p.code === code,
+                  'is-answer-closed': !p.submissionStatus?.isSubmittable,
+                }"
                 :aria-current="p.code === code ? 'page' : undefined"
-                :aria-label="`${p.code} ${p.title} ${statusLabels[statusOf(p)]}${cooldownSecondsFor(p) ? ` 再提出可能まで${cooldownMinutesFor(p)}分` : ''}`"
+                :aria-label="`${p.code} ${p.title} ${p.score ? `${p.score.score}点 / ${p.maxScore}点満点` : '得点未確定'}${pendingOf(p) ? ' 最新の提出を採点中' : ''}${cooldownSecondsFor(p) ? ` 再提出可能まで${cooldownMinutesFor(p)}分` : ''}`"
                 ><b>{{ p.code }}</b
+                ><span class="rail-score">
+                  <strong>{{ p.score ? p.score.score : "—" }}</strong>
+                  <small>/ {{ p.maxScore }}</small>
+                  <em v-if="pendingOf(p)" class="rail-pending">採点中</em></span
+                ><span class="rail-title">{{ p.title }}</span
                 ><span class="problem-preview"
                   ><strong>{{ p.title }}</strong
                   ><small>{{ p.category }}</small
-                  ><span class="preview-status" :class="`is-${statusOf(p)}`">{{
-                    statusLabels[statusOf(p)]
+                  ><span class="preview-status">{{
+                    pendingOf(p)
+                      ? "最新の提出を採点中"
+                      : p.score
+                        ? "採点済み"
+                        : "未回答"
                   }}</span
                   ><span class="preview-score"
-                    >{{ p.score ? `${p.score.score}点` : "未確定" }} /
+                    >{{ p.score ? `${p.score.score}点` : "—" }} /
                     {{ p.maxScore }}点満点</span
                   ><span v-if="cooldownSecondsFor(p)" class="preview-cooldown"
                     >再提出可能まで <b>{{ cooldownMinutesFor(p) }}</b
@@ -288,8 +340,8 @@ const score = computed(
                     >回答終了 / 閲覧のみ</span
                   ></span
                 ></NuxtLink
-              ></template
-            >
+              >
+            </section>
           </nav>
           <article class="problem-content">
             <header class="problem-hero">
@@ -325,12 +377,31 @@ const score = computed(
                   <div class="answer-heading-row">
                     <h2>回答</h2>
                     <p v-if="saveError" role="alert">{{ saveError }}</p>
-                    <p v-else-if="savedAt">
-                      このブラウザに保存済み
-                      <time>{{
-                        new Date(savedAt).toLocaleTimeString("ja-JP")
-                      }}</time>
-                    </p>
+                    <span v-else-if="savedAt" class="draft-save-status">
+                      <button
+                        class="draft-save-icon"
+                        type="button"
+                        :aria-label="`このブラウザに保存済み ${new Date(savedAt).toLocaleTimeString('ja-JP')}`"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <rect x="2.5" y="3.5" width="19" height="17" rx="2" />
+                          <path
+                            d="M2.5 8h19M7 5.75h.01M10 5.75h.01M8 14l2.5 2.5L16 11"
+                          />
+                        </svg>
+                      </button>
+                      <span class="draft-save-tooltip" role="tooltip">
+                        このブラウザに保存済み
+                        <time :datetime="savedAt">{{
+                          new Date(savedAt).toLocaleTimeString("ja-JP")
+                        }}</time>
+                      </span>
+                    </span>
                   </div>
                   <label class="visually-hidden" for="answer">回答</label
                   ><textarea
@@ -354,14 +425,7 @@ const score = computed(
                         !open || cooldown > 0 || sending || !body.trim()
                       "
                     >
-                      {{ sending ? "提出中…" : "回答を提出" }}</button
-                    ><button
-                      class="button-secondary button-reset"
-                      type="button"
-                      :disabled="!data.problem.redeployable || deploymentBusy"
-                      @click="redeploy"
-                    >
-                      環境をリセット
+                      {{ sending ? "提出中…" : "回答を提出" }}
                     </button>
                   </div>
                 </form>
@@ -446,5 +510,34 @@ const score = computed(
             </div>
           </article></div></template
     ></RequestState>
+    <dialog
+      ref="resetDialog"
+      class="reset-dialog confirmation-dialog"
+      aria-labelledby="reset-dialog-title"
+      aria-describedby="reset-dialog-message"
+      @click="onResetDialogBackdrop"
+    >
+      <p class="confirmation-dialog-eyebrow">操作の確認</p>
+      <h2 id="reset-dialog-title">環境をリセットしますか？</h2>
+      <p id="reset-dialog-message" class="confirmation-dialog-message">
+        この問題の環境を再展開します。再展開ルールに応じて減点される場合があります。
+      </p>
+      <p v-if="data" class="confirmation-dialog-note">
+        減点なしの上限: {{ data.problem.penaltyThreashold }}回
+      </p>
+      <div class="confirmation-dialog-actions">
+        <button
+          type="button"
+          class="button-secondary"
+          autofocus
+          @click="resetDialog?.close()"
+        >
+          キャンセル
+        </button>
+        <button type="button" class="button-primary" @click="redeploy">
+          環境をリセットする
+        </button>
+      </div>
+    </dialog>
   </main>
 </template>
