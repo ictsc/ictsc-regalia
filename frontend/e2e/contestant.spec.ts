@@ -24,7 +24,7 @@ const completedDeployment = {
   status: "COMPLETED",
 };
 
-test("トップバーではチーム名を隠し、代理操作を短く表示する", async ({
+test("トップバーではチーム名とログアウトを隠し、プロフィールへ案内する", async ({
   page,
 }) => {
   const state = await installCompetitionApi(page);
@@ -44,15 +44,19 @@ test("トップバーではチーム名を隠し、代理操作を短く表示�
   await expect(account).not.toContainText(
     "千葉工大で、何を始めるつもりなのか。",
   );
-  const proxyButton = account.getByRole("button", {
-    name: "ぽいどによる代理操作を終了",
-  });
-  await expect(proxyButton).toHaveText("代");
+  await expect(
+    account.getByRole("link", { name: "プロフィール" }),
+  ).toBeVisible();
+  await expect(
+    account.getByRole("button", { name: /ログアウト|代理操作を終了/ }),
+  ).toHaveCount(0);
   await expect(header.locator(".mobile-menu summary")).toBeHidden();
 
   await page.setViewportSize({ width: 1360, height: 900 });
   await expect(account).toBeVisible();
-  await expect(proxyButton).toBeHidden();
+  await expect(
+    account.getByRole("link", { name: "プロフィール" }),
+  ).toBeHidden();
   await expect(header.locator(".mobile-menu summary")).toBeVisible();
   expect(
     await header.evaluate(
@@ -74,10 +78,16 @@ test("トップバーではチーム名を隠し、代理操作を短く表示�
       .getByText("千葉工大で、何を始めるつもりなのか。", { exact: true }),
   ).toBeVisible();
   await expect(
+    header.locator(".mobile-menu").getByRole("link", { name: "プロフィール" }),
+  ).toBeVisible();
+  await expect(
     header
       .locator(".mobile-menu")
-      .getByRole("button", { name: "ぽいどによる代理操作を終了" }),
-  ).toHaveText("代");
+      .getByRole("button", { name: /ログアウト|代理操作を終了/ }),
+  ).toHaveCount(0);
+  await page.goto("/profile");
+  await expect(page.getByRole("button", { name: "ログアウト" })).toBeVisible();
+  await expect(page.getByText(/代理操作|代理ログイン/)).toHaveCount(0);
 });
 
 function requestBody(request: Request): unknown {
@@ -95,12 +105,82 @@ test("ヘッダーの残り時間は開催期間から計算する", async ({ pa
   );
   await page.goto("/problems");
   const clock = page.locator(".competition-clock");
-  await expect(clock.locator("span")).toHaveText("残り時間");
+  await expect(clock.locator("span")).toHaveText("本日の残り時間");
   await expect(clock.locator("time")).toHaveText("02:13:48");
   await page.clock.setFixedTime(new Date("2026-09-02T13:00:00+09:00"));
   await expect(clock.locator("time")).toHaveText("01:13:48");
   await page.reload();
   await expect(clock.locator("time")).toHaveText("01:13:48");
+});
+
+test("問題一覧と問題ナビゲーションは見出し・得点・問題名をコンパクトに表示する", async ({
+  page,
+}, testInfo) => {
+  await installCompetitionApi(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/problems");
+  const listRow = page.locator("a.problem-row").first();
+  await expect(listRow.locator(".problem-title")).toBeVisible();
+  expect(
+    await listRow
+      .locator(".problem-title")
+      .evaluate((element) => getComputedStyle(element).textDecorationLine),
+  ).toBe("none");
+  await listRow.hover();
+  expect(
+    await listRow
+      .locator(".problem-title-text")
+      .evaluate((element) => getComputedStyle(element).textDecorationLine),
+  ).toBe("underline");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+
+  await page.goto("/problems/B02");
+  const rail = page.getByRole("navigation", { name: "問題ナビゲーション" });
+  await expect(rail.getByRole("link", { name: "問題一覧" })).toBeVisible();
+  const stage = rail.getByRole("heading", { name: "ステージ: 2日目" });
+  await expect(stage).toBeVisible();
+  await expect(stage.locator(".rail-stage-label")).toHaveText("2日目");
+  const problemLink = rail.locator('a[href="/problems/B02"]');
+  await expect(problemLink.locator(".rail-title")).toHaveText(
+    "コンテナが起動を繰り返す",
+  );
+  await expect(problemLink.locator(".rail-score")).toContainText("300");
+  expect(
+    await problemLink
+      .locator("b")
+      .first()
+      .evaluate((element) => getComputedStyle(element).textDecorationLine),
+  ).toBe("none");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await expect
+    .poll(async () =>
+      rail.evaluate((container) => {
+        const active = container.querySelector('[aria-current="page"]');
+        if (!active) return false;
+        const railBounds = container.getBoundingClientRect();
+        const activeBounds = active.getBoundingClientRect();
+        return (
+          activeBounds.left >= railBounds.left &&
+          activeBounds.right <= railBounds.right
+        );
+      }),
+    )
+    .toBe(true);
+  await page.screenshot({
+    path: testInfo.outputPath("problem-rail-mobile.png"),
+  });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.screenshot({
+    path: testInfo.outputPath("problem-rail-desktop.png"),
+  });
 });
 
 test("viewerから問題を開き、再展開のQUEUED表示をSSEで完了へ更新する", async ({
@@ -220,9 +300,22 @@ test("viewerから問題を開き、再展開のQUEUED表示をSSEで完了へ�
     page.getByRole("heading", { name: "A01:Reliable DNS." }),
   ).toBeVisible();
   await expect(page.getByText("Keep DNS available.")).toBeVisible();
-  page.on("dialog", (dialog) => dialog.accept());
   const redeployButton = page.getByRole("button", { name: "環境をリセット" });
   await redeployButton.click();
+  const resetDialog = page.getByRole("dialog", {
+    name: "環境をリセットしますか？",
+  });
+  await expect(resetDialog).toBeVisible();
+  await expect(resetDialog).toHaveClass(/confirmation-dialog/);
+  await expect(resetDialog).toContainText("操作の確認");
+  await resetDialog.getByRole("button", { name: "キャンセル" }).click();
+  expect(deploymentRequests).toEqual([]);
+  await redeployButton.click();
+  await page.keyboard.press("Escape");
+  await expect(resetDialog).not.toBeVisible();
+  expect(deploymentRequests).toEqual([]);
+  await redeployButton.click();
+  await resetDialog.getByRole("button", { name: "環境をリセットする" }).click();
 
   await postStarted.promise;
   await expect(page.getByText("QUEUED — 再展開を要求中")).toBeVisible();
@@ -270,6 +363,9 @@ test("ANONYMOUSとDISCORD_AUTHENTICATEDをsignin/signupへ誘導する", async (
   await expect(
     page.getByRole("link", { name: /Discordでログイン/ }),
   ).toBeVisible();
+  await expect(page.getByText(/代理ログイン|運営/)).toHaveCount(0);
+  await page.goto("/signin/impersonation");
+  await expect(page).toHaveURL(/\/signin\/?$/);
 
   viewer = {
     state: "DISCORD_AUTHENTICATED",
@@ -348,6 +444,7 @@ test("profile更新と凍結rankingを表示する", async ({ page }) => {
   });
 
   await page.goto("/profile");
+  await expect(page.getByRole("button", { name: "ログアウト" })).toBeVisible();
   await page.getByLabel("表示名").fill("Alice Updated");
   await page.getByLabel("自己紹介").fill("after");
   await page.getByRole("button", { name: "更新する" }).click();
@@ -484,6 +581,7 @@ test("回答429のRetry-Afterをcountdownへ反映する", async ({ page }) => {
 test("Nuxtの問題一覧、下書き復元、利用者分離とモバイル表示", async ({
   page,
 }, testInfo) => {
+  test.setTimeout(90_000);
   const { installCompetitionApi } = await import("./support/competition");
   const state = await installCompetitionApi(page);
   await page.goto("/problems");
@@ -519,10 +617,27 @@ test("Nuxtの問題一覧、下書き復元、利用者分離とモバイル表�
   await page
     .getByLabel("回答", { exact: true })
     .fill("原因: 設定の不整合\n復旧確認済み");
-  await expect(page.getByText(/このブラウザに保存済み/)).toBeVisible();
+  const savedIcon = page.getByRole("button", {
+    name: /このブラウザに保存済み \d{1,2}:\d{2}:\d{2}/,
+  });
+  const savedTooltip = page.getByRole("tooltip");
+  await expect(savedIcon).toBeVisible();
+  await expect(savedTooltip).toBeHidden();
+  await savedIcon.hover();
+  await expect(savedTooltip).toContainText("このブラウザに保存済み");
+  const savedTime = await savedTooltip.locator("time").innerText();
+  expect(savedTime).toMatch(/^\d{1,2}:\d{2}:\d{2}$/);
+  await savedIcon.focus();
+  await page.mouse.move(0, 0);
+  await expect(savedTooltip).toBeVisible();
   await page.reload();
   await expect(page.getByLabel("回答", { exact: true })).toHaveValue(
     "原因: 設定の不整合\n復旧確認済み",
+  );
+  await expect(savedIcon).toBeVisible();
+  await expect(savedIcon).toHaveAttribute(
+    "aria-label",
+    `このブラウザに保存済み ${savedTime}`,
   );
   await page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }).click();
   await expect(
@@ -562,6 +677,59 @@ test("Nuxtの問題一覧、下書き復元、利用者分離とモバイル表�
   });
 });
 
+test("問題ナビゲーションのプレビューは採点状態を表示する", async ({ page }) => {
+  await installCompetitionApi(page);
+  await page.route("**/api/v1/contestant/problems/A02/answers", (route) =>
+    fulfillJson(route, {
+      answers: [
+        {
+          number: 2,
+          type: "DESCRIPTIVE",
+          submitted_at: requestedAt,
+          score: null,
+          content_commit: commit,
+        },
+      ],
+      submit_interval_seconds: 1200,
+      last_submitted_at: requestedAt,
+    }),
+  );
+  await page.goto("/problems/A04");
+  const rail = page.getByRole("navigation", { name: "問題ナビゲーション" });
+  for (const [problem, status] of [
+    ["A01", "採点済み"],
+    ["A02", "最新の提出を採点中"],
+    ["A04", "未回答"],
+  ]) {
+    const link = rail.locator(`a[href="/problems/${problem}"]`);
+    await link.hover();
+    await expect(link.locator(".problem-preview .preview-status")).toHaveText(
+      status,
+    );
+    await expect(link.locator(".problem-preview")).toBeVisible();
+  }
+});
+
+test.describe("タッチ操作での保存状態", () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+
+  test("保存アイコンをタップすると時刻を確認できる", async ({ page }) => {
+    await installCompetitionApi(page);
+    await page.goto("/problems/A04");
+    await page.getByLabel("回答", { exact: true }).fill("下書き");
+    const savedIcon = page.getByRole("button", {
+      name: /このブラウザに保存済み \d{1,2}:\d{2}:\d{2}/,
+    });
+    const savedTooltip = page.getByRole("tooltip");
+    await expect(savedTooltip).toBeHidden();
+    await savedIcon.tap();
+    await expect(savedTooltip).toBeVisible();
+    await expect(savedTooltip.locator("time")).not.toBeEmpty();
+    await page.getByLabel("回答", { exact: true }).tap();
+    await expect(savedTooltip).toBeHidden();
+  });
+});
+
 test("下書き保存に失敗した場合は保存済みと表示しない", async ({ page }) => {
   const { installCompetitionApi } = await import("./support/competition");
   await installCompetitionApi(page);
@@ -576,5 +744,7 @@ test("下書き保存に失敗した場合は保存済みと表示しない", as
   await expect(page.getByLabel("回答", { exact: true })).toHaveValue(
     "消してはいけない回答",
   );
-  await expect(page.getByText(/このブラウザに保存済み/)).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: /このブラウザに保存済み/ }),
+  ).toHaveCount(0);
 });

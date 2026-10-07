@@ -103,7 +103,8 @@ function resetFilters() {
           <span class="problem-heading-filter"
             ><details class="column-filter">
               <summary :class="{ 'is-filtered': selectedStatuses.length }">
-                問題ID / 状態
+                <span class="filter-label-desktop">問題ID / 状態</span>
+                <span class="filter-label-mobile">状態</span>
               </summary>
               <div class="column-filter-menu">
                 <fieldset>
@@ -189,7 +190,7 @@ function resetFilters() {
               v-if="!p.submissionStatus?.isSubmittable"
               class="answer-closed-label"
               >受付時間外</small
-            >{{ p.title }}</span
+            ><span class="problem-title-text">{{ p.title }}</span></span
           ></NuxtLink
         >
       </section>

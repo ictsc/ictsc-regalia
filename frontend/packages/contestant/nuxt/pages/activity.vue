@@ -13,7 +13,7 @@ const { data, error, pending, refresh } = await useAsyncData("activity", () =>
       <p>チームの回答と採点状況</p>
     </header>
     <RequestState :error="error" :pending="pending" @retry="refresh"
-      ><div class="table-scroll">
+      ><div class="table-scroll activity-table">
         <table class="data-table">
           <thead>
             <tr>
@@ -25,14 +25,14 @@ const { data, error, pending, refresh } = await useAsyncData("activity", () =>
           </thead>
           <tbody>
             <tr v-for="a in data" :key="`${a.problemCode}:${a.answerId}`">
-              <td class="numeric">
+              <td class="numeric" data-label="提出日時">
                 {{ new Date(a.submittedAt).toLocaleString("ja-JP") }}
               </td>
-              <td>
+              <td data-label="問題">
                 <span class="numeric">{{ a.problemCode }}</span>
                 {{ a.problemTitle }}
               </td>
-              <td>
+              <td data-label="回答">
                 <NuxtLink
                   :to="{
                     path: `/problems/${a.problemCode}`,
@@ -44,7 +44,7 @@ const { data, error, pending, refresh } = await useAsyncData("activity", () =>
                   <span class="numeric">回答 #{{ a.answerId }}</span> を見る
                 </NuxtLink>
               </td>
-              <td>
+              <td data-label="得点">
                 <span class="numeric">{{ a.score?.score ?? "採点中" }}</span>
                 / <span class="numeric">{{ a.maxScore }}</span>
               </td>

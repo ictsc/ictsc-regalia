@@ -13,6 +13,7 @@
   "dependencies": {
     "@ictsc/api": "workspace:*",
     "@ictsc/ui": "workspace:*",
+    "diff": "8.0.4",
     "nuxt": "^4.0.0",
     "vue": "^3.5.0",
     "vue-router": "^5.2.0",

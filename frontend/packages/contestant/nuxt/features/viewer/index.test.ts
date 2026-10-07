@@ -34,8 +34,6 @@ describe("fetchViewer", () => {
       type: "contestant",
       name: "alice",
       displayName: "Alice",
-      admin: { canListContestants: false, canImpersonateContestants: false },
-      impersonation: undefined,
     });
   });
 
@@ -48,7 +46,6 @@ describe("fetchViewer", () => {
     );
     await expect(fetchViewer(client)).resolves.toEqual({
       type: "unauthenticated",
-      admin: { canListContestants: false, canImpersonateContestants: false },
     });
   });
 });
