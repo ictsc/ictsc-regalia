@@ -33,6 +33,11 @@ tasks:
     cmds:
       - docker compose -f backend/compose.yaml exec postgres psql -U ictsc -d ictscore
 
+  dev-seed:
+    desc: 空の開発DBにデバッグ用のチーム・問題・回答・採点を投入
+    cmds:
+      - docker compose -f backend/compose.yaml exec -T postgres psql -v ON_ERROR_STOP=1 -U ictsc -d ictscore < backend/scripts/seed-dev.sql
+
   generate:
     desc: 自動生成ファイルをすべて生成
     cmds:

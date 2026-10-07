@@ -13,6 +13,8 @@
 
 デザインのコードはfrontend内で完結します。参照ディレクトリへのimportやコピー処理はありません。
 
+問題文、解説、告知、ルール、回答などのMarkdownは共通でGitHub Flavored Markdown（GFM）として表示します。段落内で明示的に改行する場合は、行末に半角スペース2個かバックスラッシュを入れます。GFMに加えて `$...$` と `$$...$$` の数式記法を表示できます。
+
 ## 開発
 
 Nodeは `.node-version`、pnpmは `package.json` の指定版を使用します。
@@ -25,6 +27,45 @@ pnpm --filter @ictsc/admin dev
 
 競技者用は `http://localhost:3000/`、運営用は `http://localhost:3001/admin/`。
 開発時の `/api` はprefixを保持したまま `localhost:8080` へproxyします。
+
+## ライブ開発プレビュー
+
+このマシンでは、リポジトリルートから次のCompose設定で起動します。
+Nuxt開発サーバーはDocker内部で動き、3000番が両画面とAPIの共通入口になります。
+保存したフロントエンドの変更はブラウザへ自動反映されます。
+初回は先に `frontend/` で `pnpm install --frozen-lockfile` を実行してください。
+
+```sh
+docker compose --env-file backend/.env.local -f backend/compose.yaml -f backend/compose.live-preview.yaml up -d --wait frontend
+```
+
+- 競技者画面: <http://100.96.0.22:3000/>
+- 運営画面: <http://100.96.0.22:3000/admin/>
+- API: <http://100.96.0.22:3000/api/v1/health>
+
+Discord認証の戻り先も3000番のままです。Nuxtの内部ポート3002/3003は
+外部公開しません。このマシン以外で実行するときは、必要に応じて
+`ICTSC_DEV_UID` と `ICTSC_DEV_GID` に作業ユーザーのIDを設定してください。
+
+## 静的な統合プレビュー
+
+ビルド済みの画面を確認する場合は、ライブ用の追加Compose設定を外し、
+リポジトリルートで次を実行します。
+
+```sh
+docker compose --env-file backend/.env.local -f backend/compose.yaml up -d --build --wait frontend
+```
+
+両画面のURLとAPIの経路はライブプレビューと同じです。静的プレビューでは
+コード変更の反映にフロントイメージの再ビルドが必要です。
+
+Discordを使う場合は、`backend/.env.local` とDiscord Developer Portalの
+リダイレクトURLを次の2件に揃えます。
+
+```text
+http://100.96.0.22:3000/api/v1/auth/discord/callback
+http://100.96.0.22:3000/api/v1/admin/auth/discord/callback
+```
 
 ## API生成とチームカラー
 
@@ -66,4 +107,4 @@ pnpm --filter @ictsc/ui story
 
 共通Vueコンポーネントを `http://localhost:6006/` で確認できます。
 
-既に配信中の静的生成物を検証する場合は `E2E_STATIC_ORIGIN=http://127.0.0.1:8080 pnpm e2e` を使用します。両アプリを同一originの `/` と `/admin/` で配信してください。
+統合プレビューを検証する場合は `E2E_STATIC_ORIGIN=http://100.96.0.22:3000 pnpm e2e` を使用します。

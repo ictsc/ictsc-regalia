@@ -1,0 +1,63 @@
+services:
+  contestant-dev:
+    image: node:24.13.0-slim
+    user: "${ICTSC_DEV_UID:-1002}:${ICTSC_DEV_GID:-1002}"
+    working_dir: /app
+    command:
+      - node
+      - node_modules/pnpm/bin/pnpm.cjs
+      - --filter
+      - "@ictsc/competition"
+      - dev
+      - --host
+      - 0.0.0.0
+      - --port
+      - "3002"
+    environment:
+      ICTSC_API_PROXY_TARGET: http://api:8080
+    volumes:
+      - ../frontend:/app
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3002/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  admin-dev:
+    image: node:24.13.0-slim
+    user: "${ICTSC_DEV_UID:-1002}:${ICTSC_DEV_GID:-1002}"
+    working_dir: /app
+    command:
+      - node
+      - node_modules/pnpm/bin/pnpm.cjs
+      - --filter
+      - "@ictsc/admin"
+      - dev
+      - --host
+      - 0.0.0.0
+      - --port
+      - "3003"
+    environment:
+      ICTSC_API_PROXY_TARGET: http://api:8080
+    volumes:
+      - ../frontend:/app
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3003/admin/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  frontend:
+    volumes:
+      - ../frontend/live-preview.nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+    depends_on:
+      contestant-dev:
+        condition: service_healthy
+      admin-dev:
+        condition: service_healthy
