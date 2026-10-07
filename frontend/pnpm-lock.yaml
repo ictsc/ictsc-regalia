@@ -29,6 +29,9 @@ importers:
       '@ictsc/ui':
         specifier: workspace:*
         version: link:../ui
+      diff:
+        specifier: 8.0.4
+        version: 8.0.4
       katex:
         specifier: ^0.16.0
         version: 0.16.47
@@ -201,9 +204,6 @@ importers:
       rehype-stringify:
         specifier: ^10.0.0
         version: 10.0.1
-      remark-breaks:
-        specifier: ^4.0.0
-        version: 4.0.0
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1

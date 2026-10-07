@@ -24,10 +24,12 @@ button:disabled {
   margin: 0 0 28px;
   font-size: 30px;
   letter-spacing: -0.04em;
+  font-family: var(--sans-id);
 }
 .workspace h2 {
   margin-top: 32px;
   font-size: 20px;
+  font-family: var(--sans-id);
 }
 .form-grid {
   display: grid;
@@ -52,6 +54,7 @@ button:disabled {
 }
 .form-grid textarea {
   min-height: 160px;
+  font-family: var(--sans-read);
 }
 .actions {
   display: flex;
@@ -109,6 +112,71 @@ button:disabled {
 .table-scroll {
   overflow-x: auto;
 }
+@media (max-width: 760px) {
+  .activity-table {
+    overflow-x: visible;
+  }
+  .activity-table .data-table,
+  .activity-table tbody {
+    display: block;
+    width: 100%;
+  }
+  .activity-table .data-table {
+    margin: 0;
+  }
+  .activity-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .activity-table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "date date"
+      "problem problem"
+      "score answer";
+    gap: 10px 12px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line-light);
+  }
+  .activity-table tbody td {
+    display: block;
+    min-width: 0;
+    height: auto;
+    padding: 0;
+    border: 0;
+    overflow-wrap: anywhere;
+  }
+  .activity-table tbody td:nth-child(1) {
+    grid-area: date;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .activity-table tbody td:nth-child(2) {
+    grid-area: problem;
+    font-weight: 600;
+    line-height: 1.6;
+  }
+  .activity-table tbody td:nth-child(3) {
+    grid-area: answer;
+    align-self: end;
+    text-align: right;
+  }
+  .activity-table tbody td:nth-child(4) {
+    grid-area: score;
+    align-self: end;
+    white-space: nowrap;
+  }
+  .activity-table tbody td:nth-child(4)::before {
+    content: attr(data-label) " ";
+    color: var(--muted);
+    font-size: 12px;
+  }
+}
 .state-message {
   padding: 24px;
   border: 1px solid var(--ink);
@@ -158,8 +226,20 @@ button:disabled {
   color: var(--team-text);
 }
 .markdown {
+  font-family: var(--sans-read);
   line-height: 1.9;
   overflow-wrap: anywhere;
+}
+.profile-account {
+  max-width: 720px;
+  margin: 48px 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-light);
+}
+.profile-logout {
+  min-height: 44px;
+  padding: 0 20px;
+  font-family: var(--sans-id);
 }
 .reading-copy > .markdown {
   line-height: inherit;
@@ -182,7 +262,7 @@ button:disabled {
   display: block;
   width: 100%;
   overflow-x: auto;
-  font-family: var(--sans-id);
+  font-family: var(--sans-read);
 }
 .markdown td,
 .markdown th {

@@ -29,8 +29,8 @@
   --preview-foreground: #ffffff;
   --team-color: var(--paper);
   --team-text: var(--ink);
-  --sans-id: "Noto Sans", sans-serif;
-  --sans-read: "Noto Sans", sans-serif;
+  --sans-id: "IBM Plex Sans JP", "Zen Maru Gothic", sans-serif;
+  --sans-read: "Noto Sans JP", sans-serif;
   --mono: "IBM Plex Mono", monospace;
   --header-label-size: 12px;
   --header-value-size: 13px;
@@ -88,7 +88,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--sans-read);
+  font-family: var(--sans-id);
   font-size: 15px;
 }
 a {
@@ -300,13 +300,6 @@ button {
   border: 0;
   background: transparent;
   cursor: pointer;
-}
-.header-account button.is-impersonating,
-.mobile-menu nav button.is-impersonating {
-  padding: 7px 10px;
-  border: 1px solid currentColor;
-  background: transparent;
-  color: inherit;
 }
 .theme-toggle {
   min-width: 42px;
@@ -783,6 +776,7 @@ main.workspace {
   align-items: stretch;
 }
 a.problem-row {
+  min-height: 50px;
   border-bottom: 1px solid var(--line-light);
   background: transparent;
   cursor: pointer;
@@ -791,9 +785,11 @@ a.problem-row:hover,
 a.problem-row:focus-visible {
   background: var(--surface-hover);
 }
-a.problem-row:hover .problem-title,
-a.problem-row:focus-visible .problem-title {
-  text-decoration-thickness: 2px;
+a.problem-row:hover .problem-title-text,
+a.problem-row:focus-visible .problem-title-text {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
 }
 a.problem-row:focus-visible {
   outline: 2px solid var(--accent);
@@ -858,6 +854,9 @@ a.problem-row.is-answer-closed .problem-id::before {
   white-space: nowrap;
 }
 .column-filter summary::-webkit-details-marker {
+  display: none;
+}
+.filter-label-mobile {
   display: none;
 }
 .column-filter summary::after {
@@ -966,9 +965,6 @@ a.problem-row.is-answer-closed .problem-id::before {
   font-family: var(--sans-id);
   font-size: 19px;
   font-weight: 800;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
   word-break: auto-phrase;
 }
 .problem-title .answer-closed-label {
@@ -1510,7 +1506,7 @@ a.problem-row.is-answer-closed .problem-id::before {
 }
 .detail-layout {
   display: grid;
-  grid-template-columns: 128px minmax(0, 1fr);
+  grid-template-columns: 204px minmax(0, 1fr);
 }
 .detail-page .actions {
   margin: 8px 0;
@@ -1539,15 +1535,19 @@ a.problem-row.is-answer-closed .problem-id::before {
   padding-right: 4px;
 }
 .problem-rail-label {
-  min-height: 32px;
+  min-height: 36px;
   display: flex;
   align-items: center;
-  padding: 0 12px;
+  padding: 0 10px;
   color: var(--muted);
   font-family: var(--sans-id);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
+}
+.problem-rail > a.problem-rail-label:hover,
+.problem-rail > a.problem-rail-label:focus-visible {
+  color: var(--accent);
 }
 .problem-rail[hidden] {
   display: none;
@@ -1557,27 +1557,41 @@ a.problem-row.is-answer-closed .problem-id::before {
   flex-direction: column;
 }
 .problem-rail-group + .problem-rail-group {
-  margin-top: 3px;
+  margin-top: 12px;
 }
 .problem-rail-group > h2 {
-  min-height: 20px;
-  display: flex;
-  align-items: center;
-  margin: 0;
-  padding: 0;
-  color: var(--muted);
+  min-height: 32px;
+  display: grid;
+  align-content: center;
+  margin: 6px 0 2px;
+  padding: 4px 10px;
+  color: var(--ink);
   font-family: var(--sans-id);
   font-size: 12px;
-  font-weight: 400;
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
-.problem-rail a {
+.rail-stage-label {
+  justify-self: start;
+  padding: 3px 7px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--paper));
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.problem-rail-group > a {
   position: relative;
   isolation: isolate;
-  min-height: 52px;
-  display: flex;
-  align-items: center;
-  padding: 0 12px 0 54px;
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "code score" "title title";
+  align-content: center;
+  column-gap: 8px;
+  padding: 5px 10px 6px;
+  border-bottom: 1px solid var(--line-light);
   overflow: visible;
   font-family: var(--sans-id);
 }
@@ -1586,19 +1600,52 @@ a.problem-row.is-answer-closed .problem-id::before {
   font-weight: 500;
 }
 .problem-rail a > b:first-child {
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
+  grid-area: code;
+  align-self: center;
+}
+.rail-title {
+  grid-area: title;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rail-score {
+  grid-area: score;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  gap: 0 3px;
+  margin-left: auto;
+  font-family: var(--mono);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.rail-score strong {
+  font-size: 14px;
+  font-weight: 500;
+}
+.rail-score small {
+  color: var(--muted);
+  font-size: 10px;
+}
+.rail-pending {
+  grid-column: 1 / -1;
+  justify-self: end;
+  color: var(--accent);
+  font-family: var(--sans-id);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 .problem-rail a.is-answer-closed {
   color: var(--disabled);
 }
 .problem-rail a.is-answer-closed::before {
   color: inherit;
-}
-.problem-rail a:hover > b:first-child,
-.problem-rail a:focus-visible > b:first-child {
-  text-decoration-thickness: 2px;
 }
 .problem-rail a:focus-visible {
   outline: 2px solid var(--ink);
@@ -1890,6 +1937,7 @@ a.problem-row.is-answer-closed .problem-id::before {
 .reading-copy {
   max-width: 820px;
   margin-top: 22px;
+  font-family: var(--sans-read);
   font-size: 16px;
   line-height: 2;
 }
@@ -1944,6 +1992,51 @@ a.problem-row.is-answer-closed .problem-id::before {
   font-family: var(--mono);
   font-size: 12px;
   letter-spacing: 0.08em;
+}
+.draft-save-status {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.draft-save-icon {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: help;
+}
+.draft-save-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.draft-save-tooltip {
+  position: absolute;
+  z-index: 30;
+  right: 0;
+  bottom: calc(100% + 6px);
+  padding: 8px 10px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--sans-id);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.draft-save-status:hover .draft-save-tooltip,
+.draft-save-status:focus-within .draft-save-tooltip {
+  opacity: 1;
+  visibility: visible;
 }
 .answer-heading-row p i {
   width: 7px;
@@ -2016,6 +2109,70 @@ textarea:focus-visible {
   content: "↻";
   min-width: 1em;
   margin-left: 12px;
+}
+.detail-toolbar {
+  justify-content: space-between;
+  min-height: 46px;
+}
+.detail-reset {
+  min-height: 38px;
+  padding: 0 14px;
+  font-family: var(--sans-id);
+  font-size: 12px;
+  font-weight: 600;
+}
+.confirmation-dialog {
+  width: min(460px, calc(100vw - 32px));
+  max-height: min(80vh, 640px);
+  margin: auto;
+  padding: 28px;
+  overflow: auto;
+  border: 1px solid var(--line-light);
+  border-top: 4px solid var(--accent);
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 24px 72px rgb(0 0 0 / 25%);
+}
+.confirmation-dialog::backdrop {
+  background: rgb(10 13 20 / 55%);
+}
+.confirmation-dialog-eyebrow {
+  margin: 0 0 12px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+dialog.confirmation-dialog h2 {
+  margin: 0 0 14px;
+  font-size: 21px;
+}
+.confirmation-dialog-message {
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.75;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.confirmation-dialog-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.confirmation-dialog-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 28px;
+}
+.confirmation-dialog-actions button {
+  min-width: 0;
+}
+@media (max-width: 480px) {
+  .confirmation-dialog {
+    padding: 22px;
+  }
 }
 .button-primary span {
   font-size: 17px;
@@ -2095,7 +2252,7 @@ textarea:focus-visible {
     grid-template-columns: 130px 130px 140px minmax(230px, 1fr);
   }
   .detail-layout {
-    grid-template-columns: 125px minmax(0, 1fr);
+    grid-template-columns: 192px minmax(0, 1fr);
   }
   .problem-hero {
     grid-template-columns: 150px minmax(0, 1fr);
@@ -2127,6 +2284,32 @@ textarea:focus-visible {
   .header-performance .header-account,
   .simple-header-version .simple-header-nav {
     display: none;
+  }
+}
+
+@media (max-width: 1000px) and (min-width: 761px) {
+  .content-grid {
+    display: block;
+  }
+  .answer-section {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 860px) and (min-width: 761px) {
+  .competition-header {
+    grid-template-columns: minmax(0, 1fr) 150px 54px;
+  }
+  .header-performance {
+    display: none;
+  }
+  .competition-clock {
+    grid-column: 2;
+  }
+  .mobile-menu {
+    grid-column: 3;
   }
 }
 
@@ -2201,10 +2384,77 @@ textarea:focus-visible {
     padding-left: var(--page-gutter);
   }
   .problem-table {
-    overflow-x: auto;
+    min-width: 0;
   }
-  .problem-row {
-    min-width: 660px;
+  .problem-heading {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .problem-heading > :last-child {
+    display: none;
+  }
+  .filter-label-desktop {
+    display: none;
+  }
+  .filter-label-mobile {
+    display: inline;
+  }
+  .column-filter summary {
+    justify-content: center;
+    gap: 4px;
+    padding: 0 4px;
+    font-size: 12px;
+  }
+  .problem-heading-filter:nth-child(2) .column-filter-menu {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .problem-heading-filter:nth-child(3) .column-filter-menu {
+    right: 0;
+    left: auto;
+  }
+  .column-filter-menu {
+    width: min(220px, calc(100vw - 28px));
+  }
+  a.problem-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "id score"
+      "title title"
+      "category category";
+    gap: 4px 8px;
+    min-width: 0;
+    padding: 10px 0 12px;
+  }
+  a.problem-row .problem-id {
+    grid-area: id;
+    min-width: 0;
+    min-height: 28px;
+    padding-left: 32px;
+  }
+  a.problem-row .problem-id::before {
+    left: 0;
+    width: 26px;
+  }
+  a.problem-row > .problem-score {
+    grid-area: score;
+    justify-content: end;
+    padding: 0;
+  }
+  a.problem-row > .problem-title {
+    grid-area: title;
+    display: block;
+    min-width: 0;
+    padding: 0;
+    font-size: 17px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+  }
+  a.problem-row > .problem-category {
+    grid-area: category;
+    padding: 0;
+    font-size: 12px;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
   .linked-page {
     padding-top: 26px;
@@ -2230,7 +2480,11 @@ textarea:focus-visible {
     padding-bottom: 24px;
   }
   .filter-reset {
-    margin-top: 32px;
+    margin-top: 12px;
+  }
+  .table-tools {
+    height: auto;
+    justify-content: flex-start;
   }
   .history-list,
   .ranking-list {
@@ -2240,7 +2494,64 @@ textarea:focus-visible {
     min-width: 830px;
   }
   .ranking-row {
-    min-width: 750px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "position score"
+      "team team";
+    gap: 8px 12px;
+    min-width: 0;
+    padding: 15px 0;
+  }
+  .ranking-heading {
+    display: none;
+  }
+  .ranking-row > * {
+    min-width: 0;
+    padding: 0;
+  }
+  .ranking-position {
+    grid-area: position;
+  }
+  .ranking-position::before {
+    content: "順位 ";
+    color: var(--muted);
+    font-family: var(--sans-id);
+    font-size: 12px;
+  }
+  .ranking-score {
+    grid-area: score;
+  }
+  .ranking-score::before {
+    content: "得点 ";
+    color: var(--muted);
+    font-family: var(--sans-id);
+    font-size: 12px;
+  }
+  .ranking-row.is-team .ranking-position::before,
+  .ranking-row.is-team .ranking-score::before {
+    color: inherit;
+  }
+  .ranking-team {
+    grid-area: team;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    overflow-wrap: anywhere;
+  }
+  .ranking-team > strong {
+    width: 100%;
+    font-size: 17px;
+  }
+  .ranking-row.is-team {
+    padding: 15px 12px;
+  }
+  .ranking-row.is-team .ranking-team > strong {
+    font-size: 19px;
+  }
+  .linked-page-heading {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .linked-page-heading p {
+    grid-column: 1;
   }
   .notice-entry {
     grid-template-columns: 58px minmax(0, 1fr);
@@ -2264,14 +2575,20 @@ textarea:focus-visible {
   .detail-layout {
     display: block;
   }
+  .detail-layout.is-rail-hidden .problem-hero,
+  .detail-layout.is-rail-hidden .reading-section,
+  .detail-layout.is-rail-hidden .environment-section,
+  .detail-layout.is-rail-hidden .content-grid > .content-section {
+    padding-left: 18px;
+  }
   .problem-rail {
     flex-direction: row;
     overflow-x: auto;
     padding: 0 14px;
   }
   .problem-rail-label {
-    flex: 0 0 88px;
-    min-height: 54px;
+    flex: 0 0 72px;
+    min-height: 52px;
     padding: 0;
     white-space: nowrap;
   }
@@ -2285,21 +2602,21 @@ textarea:focus-visible {
     margin-left: 10px;
   }
   .problem-rail-group > h2 {
-    flex: 0 0 42px;
-    min-height: 54px;
-    justify-content: flex-start;
-    padding: 0;
+    flex: 0 0 94px;
+    min-height: 52px;
+    margin: 0 8px 0 0;
+    padding: 4px 8px;
   }
-  .problem-rail a {
-    flex: 0 0 104px;
-    min-height: 54px;
-    padding: 0 8px 0 46px;
+  .problem-rail-group > a {
+    flex: 0 0 176px;
+    min-height: 52px;
+    padding: 4px 8px;
   }
   .problem-rail a::before {
     left: 4px;
   }
   .problem-rail a.is-active {
-    padding-left: 46px;
+    padding-left: 8px;
   }
   .problem-rail b {
     font-size: 14px;
@@ -2316,6 +2633,7 @@ textarea:focus-visible {
   }
   .hero-copy h1 {
     font-size: 26px;
+    overflow-wrap: anywhere;
   }
   .problem-summary-side {
     justify-items: start;
