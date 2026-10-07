@@ -19,6 +19,7 @@ const problem = {
   category: "Network",
   section_slug: "day1",
   type: "DESCRIPTIVE",
+  default_grader_discord_id: "123456789012345678",
   body: "# Restore service",
   explanation: "# 解説\n\nDNSを復旧します。",
   redeploy_rule: {
@@ -46,6 +47,12 @@ const answer = {
   submitted_at: now,
   score: { total: 72, marked: 82, penalty: 10, max: 100 },
   content_commit: submittedCommit,
+  workflow: {
+    status: "COMPLETED",
+    assignee_discord_id: "123456789012345678",
+    assignment_source: "DEFAULT",
+    revision: 1,
+  },
 };
 const existingMark = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -53,6 +60,7 @@ const existingMark = {
   judge: { name: "judge-a" },
   score: 82,
   rationale: "初回採点",
+  line_comments: [],
   created_at: now,
   visibility: "PRIVATE",
 };
@@ -91,6 +99,7 @@ function requestBody(request: Request): unknown {
 }
 
 type ApiState = {
+  answers: Array<Record<string, unknown>>;
   teams: Array<typeof team>;
   invitations: Array<Record<string, unknown>>;
   marks: Array<Record<string, unknown>>;
@@ -106,6 +115,7 @@ type ApiState = {
 
 async function installAdminApi(page: Page): Promise<ApiState> {
   const state: ApiState = {
+    answers: [structuredClone(answer)],
     teams: [team],
     invitations: [],
     marks: [existingMark],
@@ -258,10 +268,60 @@ async function installAdminApi(page: Page): Promise<ApiState> {
       });
     }
     if (path === "/api/v1/admin/answers" && method === "GET") {
-      return fulfillJson(route, { answers: [answer] });
+      const teamCode = url.searchParams.get("team_code");
+      const problemCode = url.searchParams.get("problem_code");
+      return fulfillJson(route, {
+        answers: state.answers.filter((item) => {
+          const ref = item.reference as typeof answer.reference;
+          return (
+            (!teamCode || ref.team_code === Number(teamCode)) &&
+            (!problemCode || ref.problem_code === problemCode)
+          );
+        }),
+      });
     }
     if (path === "/api/v1/admin/answers/12/A01/1") {
-      return fulfillJson(route, { answer });
+      return fulfillJson(route, { answer: state.answers[0] });
+    }
+    if (path === "/api/v1/admin/answers/12/A01/2") {
+      return fulfillJson(route, { answer: state.answers[1] });
+    }
+    if (path === "/api/v1/admin/answers/12/A01/3") {
+      return fulfillJson(route, { answer: state.answers[2] });
+    }
+    if (path.endsWith("/workflow") && method === "PATCH") {
+      const input = body as {
+        expected_revision: number;
+        status?: string;
+        assignment?: string;
+      };
+      const index = Number(path.split("/")[7]) - 1;
+      const current = state.answers[index]!;
+      const workflow = current.workflow as typeof answer.workflow;
+      if (workflow.revision !== input.expected_revision)
+        return fulfillJson(
+          route,
+          { title: "Conflict", status: 409, code: "workflow_conflict" },
+          409,
+        );
+      current.workflow = {
+        ...workflow,
+        revision: workflow.revision + 1,
+        status: input.status ?? workflow.status,
+        assignee_discord_id:
+          input.assignment === "CLAIM_SELF"
+            ? "123456789012345678"
+            : input.assignment === "RESET_TO_DEFAULT"
+              ? "123456789012345678"
+              : workflow.assignee_discord_id,
+        assignment_source:
+          input.assignment === "CLAIM_SELF"
+            ? "CLAIMED"
+            : input.assignment === "RESET_TO_DEFAULT"
+              ? "DEFAULT"
+              : workflow.assignment_source,
+      };
+      return fulfillJson(route, { answer: current });
     }
     if (path.startsWith("/api/v1/admin/answers/") && path.endsWith("/999")) {
       return fulfillJson(
@@ -279,11 +339,31 @@ async function installAdminApi(page: Page): Promise<ApiState> {
     if (path === "/api/v1/admin/marking-results" && method === "GET") {
       return fulfillJson(route, { marking_results: state.marks });
     }
+    const deletedComment = path.match(
+      /^\/api\/v1\/admin\/marking-results\/([^/]+)\/line-comments\/(\d+)$/,
+    );
+    if (deletedComment && method === "DELETE") {
+      const mark = state.marks.find((item) => item.id === deletedComment[1]);
+      const comments = mark?.line_comments as
+        | Array<{ body: string; deleted_at?: string; deleted_by?: string }>
+        | undefined;
+      const note = comments?.[Number(deletedComment[2])];
+      if (!note) return fulfillJson(route, { status: 404 }, 404);
+      if (note.deleted_at) return fulfillJson(route, { status: 409 }, 409);
+      note.deleted_at = "2026-09-01T12:30:00+09:00";
+      note.deleted_by = "ops-admin";
+      return fulfillJson(route, { marking_result: mark });
+    }
     if (path === "/api/v1/admin/marking-results" && method === "POST") {
       const input = body as {
         answer: typeof answer.reference;
         score: number;
         rationale: string;
+        line_comments?: Array<{
+          line_number: number;
+          end_line_number?: number;
+          body: string;
+        }>;
       };
       const mark = {
         id: "44444444-4444-4444-8444-444444444444",
@@ -291,10 +371,26 @@ async function installAdminApi(page: Page): Promise<ApiState> {
         judge: { name: "ops-admin" },
         score: input.score,
         rationale: input.rationale,
+        line_comments: input.line_comments ?? [],
         created_at: "2026-09-01T12:10:00+09:00",
         visibility: "PRIVATE",
       };
       state.marks.push(mark);
+      const current = state.answers[input.answer.answer_number - 1];
+      if (current) {
+        const workflow = current.workflow as typeof answer.workflow;
+        current.workflow = {
+          ...workflow,
+          status: "COMPLETED",
+          revision: workflow.revision + 1,
+        };
+        current.score = {
+          total: input.score,
+          marked: input.score,
+          penalty: 0,
+          max: 100,
+        };
+      }
       return fulfillJson(route, { marking_result: mark }, 201);
     }
     if (path === "/api/v1/admin/scores" && method === "GET") {
@@ -412,39 +508,147 @@ test("Admin navigation、team・招待・参加者・content履歴を操作す�
 
   await page.getByRole("link", { name: "参加者", exact: true }).click();
   await page.getByLabel("検索").fill("Alice");
-  page.once("dialog", (dialog) => dialog.dismiss());
   await page.getByRole("button", { name: "代理ログイン" }).click();
+  const impersonationConfirm = page.getByRole("dialog", {
+    name: "代理ログイン",
+  });
+  await expect(impersonationConfirm).toBeVisible();
+  await expect(impersonationConfirm).toHaveClass(/confirmation-dialog/);
+  await impersonationConfirm
+    .getByRole("button", { name: "キャンセル" })
+    .click();
+  await expect(impersonationConfirm).not.toBeVisible();
+  expect(
+    state.requests.some((item) => item.path === "/api/v1/admin/impersonations"),
+  ).toBe(false);
 });
 
 test("回答詳細・再採点・得点操作・freeze・404を検証する", async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.setViewportSize({ width: 1800, height: 900 });
   const state = await installAdminApi(page);
   await page.goto("/admin/submissions/");
-  await expect(page.getByRole("heading", { name: "採点" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "採点", exact: true }),
+  ).toBeVisible();
   await page.getByRole("link", { name: /A01: Reliable DNS/ }).click();
 
-  await expect(page.getByText(/回答者: Alice/)).toBeVisible();
-  await expect(page.getByText("現行commitと異なります")).toBeVisible();
+  await expect(page.locator(".grading-pane")).toHaveCount(3);
+  await expect(page.getByRole("heading", { name: "過去の回答" })).toHaveCount(
+    0,
+  );
+  expect(
+    (await page.locator(".grading-panes").boundingBox())!.width,
+  ).toBeGreaterThan(1400);
+
+  await expect(page.getByText(/Existing Team · Alice/)).toBeVisible();
+  await expect(page.getByText("提出時点の版を表示中")).toBeVisible();
   await expect(page.getByText("初回採点")).toBeVisible();
-  await page.getByLabel("得点").fill("88");
-  await page.getByLabel("コメント").fill("再採点");
-  page.on("dialog", (dialog) => dialog.accept());
-  await page.getByRole("button", { name: "送信" }).click();
+  await page.getByRole("button", { name: "行 1 を選択" }).click();
+  await expect(page.getByLabel("1 行目へのコメント")).toBeVisible();
+  await page.locator(".grading-line-text").first().click();
+  await expect(page.getByLabel("1 行目へのコメント")).toHaveCount(0);
+  await page.getByRole("button", { name: "行 1 を選択" }).click();
+  await page
+    .getByRole("button", { name: "行 3 を選択" })
+    .click({ modifiers: ["Shift"] });
+  await page.getByLabel("1〜3 行目へのコメント").fill("DNS設定を確認");
+  await expect(page.locator(".grading-line-source.is-selected")).toHaveCount(3);
+  await page.getByRole("button", { name: "行 2 を選択" }).click();
+  await expect(page.getByLabel("1〜3 行目へのコメント")).toHaveCount(0);
   await expect(
-    page.locator("tbody").getByText("再採点", { exact: true }),
+    page.getByRole("button", { name: "1〜3 行目の下書き" }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "行 2 を選択" }).click();
+  await expect(page.getByLabel("1〜3 行目へのコメント")).toHaveValue(
+    "DNS設定を確認",
+  );
+  await page.getByLabel("得点").fill("88");
+  await page.getByLabel("全体コメント").fill("再採点");
+  await page.getByRole("button", { name: "採点結果を送信" }).click();
+  const markingConfirm = page.getByRole("dialog", {
+    name: "採点結果を保存",
+  });
+  await expect(markingConfirm).toContainText("行コメント: 1件");
+  await markingConfirm.getByRole("button", { name: "キャンセル" }).click();
+  expect(
+    state.requests.some(
+      (item) =>
+        item.path === "/api/v1/admin/marking-results" && item.method === "POST",
+    ),
+  ).toBe(false);
+  await page.getByRole("button", { name: "採点結果を送信" }).click();
+  await markingConfirm.getByRole("button", { name: "採点結果を保存" }).click();
+  await expect(page.getByText("再採点", { exact: true })).toBeVisible();
+  await expect(page.locator(".grading-line-history")).toContainText(
+    "DNS設定を確認",
+  );
+  await expect(page.locator(".grading-line-source.has-history")).toHaveCount(3);
+  const historyComments = page.locator(".grading-history-comments");
+  await historyComments.getByText("行コメント 1 件").click();
+  await expect(historyComments).toContainText("DNS設定を確認");
+  await historyComments
+    .getByRole("button", { name: "1〜3 行目のコメントを削除" })
+    .click();
+  const deleteConfirm = page.getByRole("dialog", { name: "行コメントを削除" });
+  await deleteConfirm.getByRole("button", { name: "キャンセル" }).click();
+  await expect(page.locator(".grading-line-history")).toContainText(
+    "DNS設定を確認",
+  );
+  await historyComments
+    .getByRole("button", { name: "1〜3 行目のコメントを削除" })
+    .click();
+  await deleteConfirm.getByRole("button", { name: "行コメントを削除" }).click();
+  await expect(page.locator(".grading-line-history")).toHaveCount(0);
+  await expect(historyComments).toContainText("削除済み 1 件");
+  await expect(historyComments).not.toContainText("DNS設定を確認");
+  expect(
+    state.requests.some(
+      (item) =>
+        item.method === "DELETE" && item.path.endsWith("/line-comments/0"),
+    ),
+  ).toBe(true);
   expect(
     state.requests.some(
       (item) =>
         item.method === "POST" &&
         item.path === "/api/v1/admin/marking-results" &&
-        (item.body as { score?: number })?.score === 88,
+        (item.body as { score?: number; line_comments?: unknown[] })?.score ===
+          88 &&
+        (
+          item.body as {
+            line_comments?: Array<{
+              line_number: number;
+              end_line_number?: number;
+              body: string;
+            }>;
+          }
+        )?.line_comments?.[0]?.line_number === 1 &&
+        (
+          item.body as {
+            line_comments?: Array<{ end_line_number?: number }>;
+          }
+        )?.line_comments?.[0]?.end_line_number === 3,
     ),
   ).toBe(true);
 
   await page.goto("/admin/scores");
   await expect(page.getByText("凍結中")).toBeVisible();
   await page.getByRole("button", { name: "得点を再計算" }).click();
+  await page
+    .getByRole("dialog", { name: "得点再計算" })
+    .getByRole("button", { name: "得点再計算" })
+    .click();
   await expect(page.getByText("得点再計算しました")).toBeVisible();
+  await page.getByRole("button", { name: "最終得点を公開" }).click();
+  const revealConfirm = page.getByRole("dialog", { name: "最終得点公開" });
+  await expect(revealConfirm).toContainText("取り消せない操作");
+  await revealConfirm.getByRole("button", { name: "キャンセル" }).click();
+  expect(
+    state.requests.some(
+      (item) => item.path === "/api/v1/admin/scores/actions/reveal-final",
+    ),
+  ).toBe(false);
 
   await page.goto("/admin/settings");
   await page.getByLabel("Markdown").fill("# Updated rule");
@@ -456,6 +660,126 @@ test("回答詳細・再採点・得点操作・freeze・404を検証する", as
 
   await page.goto("/admin/submissions/A01/12/999");
   await expect(page.getByText("指定された回答は存在しません")).toBeVisible();
+});
+
+test("採点看板の担当・移動と過去回答の比較", async ({ page }) => {
+  const state = await installAdminApi(page);
+  await page.clock.install({ time: new Date("2026-09-01T12:25:00+09:00") });
+  state.answers.push({
+    ...structuredClone(answer),
+    reference: { ...answer.reference, answer_number: 2 },
+    body: {
+      type: "DESCRIPTIVE",
+      body: "# 2回目の回答\n\n設定を修正しました。\n追記しました。",
+    },
+    score: null,
+    workflow: {
+      status: "WAITING",
+      assignee_discord_id: null,
+      assignment_source: "DEFAULT",
+      revision: 0,
+    },
+  });
+  state.answers.push({
+    ...structuredClone(answer),
+    reference: { ...answer.reference, answer_number: 3 },
+    submitted_at: "2026-09-01T12:20:00+09:00",
+    score: null,
+    workflow: {
+      status: "WAITING",
+      assignee_discord_id: null,
+      assignment_source: "DEFAULT",
+      revision: 0,
+    },
+  });
+  await page.goto("/admin/submissions/");
+  const waiting = page.getByRole("region", { name: "採点待ち" });
+  const inProgress = page.getByRole("region", { name: "採点中" });
+  await expect(waiting.getByText("Existing Team / #2")).toBeVisible();
+  const secondCard = waiting
+    .locator(".grading-card")
+    .filter({ hasText: "Existing Team / #2" });
+  await expect(secondCard).toContainText("提出から 25 分");
+  await page.clock.fastForward(60_000);
+  await expect(secondCard).toContainText("提出から 26 分");
+  await secondCard.getByRole("button", { name: "自分が引き受ける" }).click();
+  await expect(secondCard.getByText("自分の担当")).toBeVisible();
+  await expect(waiting.locator(".grading-card").first()).toContainText(
+    "Existing Team / #2",
+  );
+  await secondCard.dragTo(inProgress);
+  await expect(inProgress.getByText("Existing Team / #2")).toBeVisible();
+  await inProgress.getByRole("link", { name: /A01: Reliable DNS/ }).click();
+  await expect(page.locator(".grading-detail-age")).toHaveText(
+    "提出から 26 分",
+  );
+  await expect(
+    page.locator(".grading-line-text").getByText("# 2回目の回答"),
+  ).toBeVisible();
+  await expect(page.locator(".grading-pane")).toHaveCount(3);
+  await expect(page.getByLabel("比較する回答")).toHaveValue("1");
+  await expect(page.locator(".grading-diff-hunk")).toContainText(
+    "@@ -1,3 +1,4 @@",
+  );
+  await expect(page.locator(".grading-answer-line.is-removed")).toContainText(
+    "# 回答",
+  );
+  await expect(
+    page
+      .locator(".grading-answer-line.is-added")
+      .filter({ hasText: "# 2回目の回答" }),
+  ).toBeVisible();
+  await expect(
+    page
+      .locator(".grading-answer-line.is-added")
+      .filter({ hasText: "追記しました。" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "今回の回答のみ" }).click();
+  await expect(page.locator(".grading-answer-line.is-removed")).toHaveCount(0);
+  await expect(page.locator(".grading-line-source")).toHaveCount(4);
+  await page.getByRole("button", { name: "差分", exact: true }).click();
+  await page.getByRole("button", { name: "行 4 を選択" }).click();
+  await expect(page.getByLabel("4 行目へのコメント")).toBeVisible();
+  const problemPane = page.locator(".grading-pane").first();
+  const initialWidth = (await problemPane.boundingBox())!.width;
+  const divider = (await page
+    .locator(".grading-resizer")
+    .first()
+    .boundingBox())!;
+  const dragY = Math.max(100, divider.y + 30);
+  await page.mouse.move(divider.x + divider.width / 2, dragY);
+  await page.mouse.down();
+  await page.mouse.move(divider.x + divider.width / 2 + 70, dragY);
+  await page.mouse.up();
+  expect((await problemPane.boundingBox())!.width).toBeGreaterThan(
+    initialWidth + 30,
+  );
+  await page.getByRole("button", { name: "回答を折りたたむ" }).click();
+  await page.getByRole("button", { name: "回答を展開" }).click();
+  await expect(page.getByLabel("比較する回答")).toHaveValue("1");
+  await page.goto("/admin/submissions/A01/12/3");
+  await expect(page.getByLabel("比較する回答")).toHaveValue("2");
+  await expect(page.locator(".grading-answer-line.is-removed")).toHaveCount(2);
+  await page.getByLabel("比較する回答").selectOption("1");
+  await expect(page.locator(".grading-no-diff")).toBeVisible();
+  await expect(page.locator(".grading-answer-line.is-added")).toHaveCount(0);
+  await page.getByRole("button", { name: "今回の回答のみ" }).click();
+  await expect(page.getByRole("button", { name: "行 3 を選択" })).toBeVisible();
+
+  const longLines = Array.from(
+    { length: 20 },
+    (_, index) => `line ${index + 1}`,
+  );
+  state.answers[0]!.body = { type: "DESCRIPTIVE", body: longLines.join("\n") };
+  longLines[9] = "changed line 10";
+  state.answers[1]!.body = { type: "DESCRIPTIVE", body: longLines.join("\n") };
+  await page.goto("/admin/submissions/A01/12/2");
+  await expect(page.locator(".grading-diff-omitted").first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "行 1 を選択" })).toHaveCount(
+    0,
+  );
+  await page.locator(".grading-diff-omitted").first().click();
+  await expect(page.getByRole("button", { name: "行 1 を選択" })).toBeVisible();
 });
 
 test("redeployはQUEUEDを楽観表示しSSE更新・履歴・一回syncのみを使う", async ({
@@ -473,20 +797,23 @@ test("redeployはQUEUEDを楽観表示しSSE更新・履歴・一回syncのみ�
   await page
     .getByRole("button", { name: "選択した組み合わせを再展開" })
     .click();
-  await expect(page.getByText("QUEUED", { exact: true })).toBeVisible();
+  await expect(page.getByText("待機中", { exact: true })).toBeVisible();
 
   const getsBeforeSse = state.deploymentGets;
   await emitSse(page, "/api/v1/admin/deployments/stream", "deployment", {
     deployment: completedDeployment,
   });
-  await expect(page.getByText("COMPLETED", { exact: true })).toBeVisible();
+  await expect(page.getByText("完了", { exact: true })).toBeVisible();
   expect(state.deploymentGets).toBe(getsBeforeSse);
 
   await page.getByRole("button", { name: "履歴" }).click();
   await expect(page.getByText("ready", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "閉じる" }).click();
-  page.on("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "一回同期" }).click();
+  await page
+    .getByRole("dialog", { name: "手動同期" })
+    .getByRole("button", { name: "手動同期" })
+    .click();
   await expect(page.getByText("手動同期しました")).toBeVisible();
   expect(
     state.requests.filter(

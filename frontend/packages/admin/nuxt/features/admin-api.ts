@@ -44,12 +44,57 @@ export async function createAdminMarkingResult(
   answer: components["schemas"]["AdminAnswerReference"],
   score: number,
   rationale: string,
+  lineComments: components["schemas"]["AnswerLineComment"][] = [],
 ) {
   return expectData(
     await api.POST("/api/v1/admin/marking-results", {
-      body: { answer, score, rationale },
+      body: {
+        answer,
+        score,
+        rationale,
+        ...(lineComments.length ? { line_comments: lineComments } : {}),
+      },
     }),
   ).marking_result;
+}
+
+export async function deleteAdminMarkingLineComment(
+  api: ApiClient,
+  markingResultId: string,
+  commentIndex: number,
+) {
+  return expectData(
+    await api.DELETE(
+      "/api/v1/admin/marking-results/{marking_result_id}/line-comments/{comment_index}",
+      {
+        params: {
+          path: {
+            marking_result_id: markingResultId,
+            comment_index: commentIndex,
+          },
+        },
+      },
+    ),
+  ).marking_result;
+}
+
+export async function updateAdminAnswerWorkflow(
+  api: ApiClient,
+  answer: components["schemas"]["AdminAnswer"],
+  change: {
+    status?: "WAITING" | "IN_PROGRESS" | "COMPLETED";
+    assignment?: "CLAIM_SELF" | "RESET_TO_DEFAULT";
+  },
+) {
+  return expectData(
+    await api.PATCH(
+      "/api/v1/admin/answers/{team_code}/{problem_code}/{answer_number}/workflow",
+      {
+        params: { path: answer.reference },
+        body: { expected_revision: answer.workflow.revision, ...change },
+      },
+    ),
+  ).answer;
 }
 
 export function createAdminActions(api: ApiClient) {
