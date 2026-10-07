@@ -49,9 +49,22 @@ cd frontend
 ICTSC_DEMO_MODE=true pnpm --filter @ictsc/competition dev
 ```
 
-- 競技者SPA: <http://localhost:3000/>
-- Admin SPA: <http://localhost:3000/admin/>
-- API: <http://localhost:8080/api/v1/health>
+- 競技者SPA: <http://100.96.0.22:3000/>
+- Admin SPA: <http://100.96.0.22:3000/admin/>
+- API: <http://100.96.0.22:8080/api/v1/health>
+
+空の開発DBにサンプル大会（3チーム、4参加者、4問題、5回答、3採点）を投入するには、
+リポジトリルートで `task dev-seed` を実行します。既存のチーム・問題・回答があるDBでは
+エラーになり、データを変更しません。開発fake modeの仮ログインを設定している場合、
+`preview-contestant` でチーム・アルファの参加者画面を確認できます。
+Discord認証を設定している場合、投入した仮Discord IDでは直接ログインできません。
+運営画面の参加者一覧から代理ログインしてください。
+
+`task` がない環境では、リポジトリルートで次を実行できます。
+
+```sh
+docker compose -f backend/compose.yaml exec -T postgres psql -v ON_ERROR_STOP=1 -U ictsc -d ictscore < backend/scripts/seed-dev.sql
+```
 
 ComposeのAPIは開発fake modeで外部Discord/GitHub/SState adapterを無効化しますが、
 PostgreSQLとRedisは実サービスを使用します。旧schema用volumeは削除せず、
@@ -98,6 +111,12 @@ Dockerなしでunit/contract testだけを実行する場合は `go test -short 
 既存DBにはAPI更新前に `db/migrations/0002_team_color.sql` を適用します。新規Compose DBは `db/migrations/` のSQLを番号順に実行します。`Team.color` は管理画面から17色のパレットで設定し、未設定時は `#A6E35F` です。
 
 PostgreSQL統合テストは通常Dockerを起動します。Dockerを使用できない場合は、空の使い捨てDBのURLを `ICTSC_TEST_DATABASE_URL` に設定して `go test ./internal/infra/postgres -count=1` を実行できます。指定DBに全マイグレーションとテストデータを作成します。
+
+## 採点ワークフロー
+
+既存DBにはAPI更新前に `db/migrations/0004_answer_workflow.sql` を適用します。既存の採点済み回答は「採点完了」として移行します。問題 manifest の `default_grader_discord_id` は任意の Discord ID 文字列で、回答の担当には提出時点の問題版にある値を使います。採点画面で担当を自分に変更した回答は、その上書きが優先されます。
+
+回答の行ごとの採点コメントを使う場合は、続けて `db/migrations/0005_marking_line_comments.sql` を適用します。行番号は回答Markdownの原文を改行で分けた1始まりの番号です。既存の採点履歴は行コメントなしで保持します。
 
 ## Web Push
 

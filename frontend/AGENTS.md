@@ -12,6 +12,7 @@ The frontend is a pnpm workspace containing two Nuxt 4 / Vue / TypeScript SPAs.
 - `pnpm --filter @ictsc/ui story` / `story:build`: Vue Storybook.
 - `pnpm --filter @ictsc/competition dev`: localhost:3000.
 - `pnpm --filter @ictsc/admin dev`: localhost:3001/admin/.
+- This machine's combined live preview serves contestant at `100.96.0.22:3000/` and admin at `100.96.0.22:3000/admin/` through `backend/compose.live-preview.yaml`; see `frontend/README.md`.
 
 ## Architecture
 
@@ -26,7 +27,7 @@ The frontend is a pnpm workspace containing two Nuxt 4 / Vue / TypeScript SPAs.
 - `backend/openapi.json` is canonical. Run `task generate` at repository root after contract changes and include generated Go and TypeScript outputs.
 - Public API is REST under `/api/v1`; no Connect RPC or Protocol Buffers.
 - All REST requests use `@ictsc/api` with credentials enabled.
-- Proxy `/api` unchanged to localhost:8080; never prepend the admin base path or strip `/api`.
+- Proxy `/api` unchanged to localhost:8080 by default. The combined live preview sets `ICTSC_API_PROXY_TARGET=http://api:8080` inside Docker; never prepend the admin base path or strip `/api`.
 - Deployment updates use SSE and unsubscribe on unmount. Do not add polling or refetch intervals.
 - Nuxt AsyncData is shallow by default: replace the root object or use `deep: true` when updating nested SSE state.
 - Convert snake_case only at mapper / feature boundaries.

@@ -5,12 +5,12 @@ services:
       target: development
     init: true
     ports:
-      - 127.0.0.1:8080:8080
+      - ${ICTSC_BIND_ADDRESS:-100.96.0.22}:8080:8080
     environment:
       ICTSC_API_ADDRESS: ":8080"
       ICTSC_DATABASE_URL: postgres://ictsc:password@postgres:5432/ictscore?sslmode=disable
       ICTSC_REDIS_URL: redis://redis:6379/0
-      ICTSC_ALLOWED_ORIGINS: ${ICTSC_ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000,http://localhost:8080,http://127.0.0.1:8080}
+      ICTSC_ALLOWED_ORIGINS: ${ICTSC_ALLOWED_ORIGINS:-http://100.96.0.22:3000,http://100.96.0.22:8080}
       ICTSC_DEV_FAKE_MODE: ${ICTSC_DEV_FAKE_MODE:-true}
       ICTSC_SECURE_COOKIES: ${ICTSC_SECURE_COOKIES:-false}
       ICTSC_ALLOW_INSECURE_UPSTREAMS: ${ICTSC_ALLOW_INSECURE_UPSTREAMS:-false}
@@ -70,7 +70,7 @@ services:
     environment:
       ICTSC_DEMO_MODE: ${ICTSC_DEMO_MODE:-false}
     ports:
-      - 127.0.0.1:3000:8080
+      - ${ICTSC_BIND_ADDRESS:-100.96.0.22}:3000:8080
     depends_on:
       api:
         condition: service_healthy
@@ -79,7 +79,7 @@ services:
     image: postgres:18
     restart: unless-stopped
     ports:
-      - 127.0.0.1::5432
+      - ${ICTSC_BIND_ADDRESS:-100.96.0.22}::5432
     environment:
       POSTGRES_USER: ictsc
       POSTGRES_PASSWORD: password
@@ -97,7 +97,7 @@ services:
     image: redis:8
     restart: unless-stopped
     ports:
-      - 127.0.0.1::6379
+      - ${ICTSC_BIND_ADDRESS:-100.96.0.22}::6379
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 2s
