@@ -11,7 +11,7 @@ COPY . .
 RUN pnpm install --recursive --offline
 RUN pnpm run build
 
-FROM nginx:1.31.4 AS frontend
+FROM nginx:1.31.6 AS frontend
 ENV API_UPSTREAM=http://api:8080
 ENV NGINX_RESOLVER=127.0.0.11
 ENV ICTSC_DEMO_MODE=false
