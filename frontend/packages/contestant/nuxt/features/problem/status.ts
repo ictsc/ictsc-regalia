@@ -3,7 +3,7 @@ export function problemStatus(
   problem: Problem,
   submitted = false,
   pending = false,
-) {
+): ProblemStatus {
   if (pending) return "pending";
   if (!problem.score) return submitted ? "pending" : "unanswered";
   if (problem.score.score >= problem.maxScore) return "complete";
@@ -16,3 +16,4 @@ export const statusLabels = {
   partial: "部分点",
   zero: "0点",
 };
+export type ProblemStatus = keyof typeof statusLabels;

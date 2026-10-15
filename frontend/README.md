@@ -127,5 +127,9 @@ Cloudflare Pages（`ictsc-regalia-story`）はmainとPRごとにStorybookをビ�
   `parameters.route` で現在のURL、`parameters.bodyClass` で `<body>` のクラスを指定できます。
 - Storybookは素のViteで動くため、Nuxtの自動importは使えません。Storybookに載せる
   コンポーネントは `vue` のAPIと共通部品を明示的にimportし、API呼び出しやSSEは持たせません。
+- アプリの画面は、データ取得をページ（`pages/`）に残し、表示だけを
+  `nuxt/components/<領域>/XxxView.vue` に切り出してストーリー化します。ストーリーは部品の隣に
+  `*.stories.ts` で置き、架空のテストデータとデコレーターは `nuxt/stories/` に置きます。
+  ESLintが `components/` と `stories/` からのNuxt専用importとAPI呼び出しを禁止します。
 
 統合プレビューを検証する場合は `E2E_STATIC_ORIGIN=http://100.96.0.22:3000 pnpm e2e` を使用します。
