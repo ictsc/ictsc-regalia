@@ -23,6 +23,7 @@ const { data, error, pending, refresh } = await useAsyncData(
 );
 const commit = ref(data.value?.status.active_commit ?? "");
 const { busy, message, run } = useMutation(refresh);
+const actions = createAdminActions(api);
 const stateLabels: Record<string, string> = {
   NEVER: "未配信",
   REFRESHING: "更新中",
@@ -69,9 +70,7 @@ const stateLabels: Record<string, string> = {
           <form
             class="form-grid"
             @submit.prevent="
-              run('コンテンツ更新', () =>
-                createAdminActions(api).refreshContent(commit.trim()),
-              )
+              run('コンテンツ更新', () => actions.refreshContent(commit.trim()))
             "
           >
             <label
