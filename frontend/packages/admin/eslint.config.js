@@ -1,6 +1,2 @@
-import config from "@ictsc/config/eslint";
-
-export default [
-  { ignores: ["dist"] },
-  ...config({ react: true, storybook: true }),
-];
+import withNuxt from "./.nuxt/eslint.config.mjs";
+export default withNuxt({rules: {"vue/multi-word-component-names": "off", "vue/html-self-closing": "off"}});

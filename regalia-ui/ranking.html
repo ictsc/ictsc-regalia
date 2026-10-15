@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ICTSC 2026 REGALIA 順位表プロトタイプ">
+    <title>順位表 / ICTSC 2026 Regalia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+JP:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20260830-6">
+  </head>
+  <body>
+    <header class="competition-header">
+      <a class="brand" href="problems.html" aria-label="ICTSC 2026 REGALIA ホーム"><span class="brand-name">ICTSC</span><span class="brand-edition">2026<br>REGALIA</span></a>
+      <div class="header-performance" aria-label="チームの成績">
+        <a class="header-solved" href="submissions.html" aria-label="11問中4問解答済み 提出履歴を見る"><span class="header-solved-value"><strong>4</strong><span>/ 11問</span></span><small>提出履歴を見る →</small></a>
+        <a class="header-ranking" href="ranking.html" aria-label="現在12位 2450点中1230点 順位表を見る"><span class="header-neighbors"><span><small>1位</small><b>2,130</b></span><i aria-hidden="true">…</i><span><small>11位</small><b>1,290</b></span><span class="is-team"><small>12位</small><b><strong>1,230</strong><em>/ 2,450</em></b></span><span><small>13位</small><b>1,180</b></span></span><span class="header-ranking-link">順位表を見る →</span></a>
+      </div>
+      <div class="competition-clock"><time datetime="PT2H13M48S">02:13:48</time><span>残り時間</span></div>
+      <aside class="competition-notice" aria-label="お知らせ"><strong>お知らせ</strong><time datetime="2026-08-12T14:30:00+09:00">14:30</time><p>競技終了30分前です。回答の保存と提出状況を確認してください。</p><a href="notices.html">お知らせを確認する →</a></aside>
+      <details class="mobile-menu"><summary><span aria-hidden="true"></span><b class="visually-hidden">メニューを開く</b></summary><nav aria-label="モバイルメニュー"><a href="problems.html">問題一覧</a><a href="submissions.html">提出履歴</a><a href="ranking.html" aria-current="page">順位表</a><a href="notices.html">お知らせ</a></nav></details>
+    </header>
+    <main class="linked-page">
+      <header class="linked-page-heading"><a href="problems.html">← 問題一覧へ</a><h1>順位表</h1><p>現在12位 / 1,230点</p></header>
+      <section class="ranking-list" aria-label="順位表">
+        <div class="ranking-row ranking-heading"><span>順位</span><span>チーム</span><span>解答済み</span><span>得点</span></div>
+        <div class="ranking-row" data-team="01"><strong>1位</strong><span>SEGV</span><span>8 / 11問</span><b>2,130点</b></div>
+        <div class="ranking-row" data-team="02"><strong>2位</strong><span>ROUTE REFLECTOR</span><span>8 / 11問</span><b>2,050点</b></div>
+        <div class="ranking-row" data-team="03"><strong>3位</strong><span>NO CARRIER</span><span>7 / 11問</span><b>1,920点</b></div>
+        <div class="ranking-row" data-team="04"><strong>4位</strong><span>STACK OVERFLOW</span><span>7 / 11問</span><b>1,850点</b></div>
+        <div class="ranking-row" data-team="05"><strong>5位</strong><span>DEFAULT GATEWAY</span><span>7 / 11問</span><b>1,780点</b></div>
+        <div class="ranking-row" data-team="06"><strong>6位</strong><span>LOOPBACK</span><span>6 / 11問</span><b>1,690点</b></div>
+        <div class="ranking-row" data-team="07"><strong>7位</strong><span>TIMEOUT</span><span>6 / 11問</span><b>1,610点</b></div>
+        <div class="ranking-row" data-team="08"><strong>8位</strong><span>ROOT PRIVILEGES</span><span>6 / 11問</span><b>1,520点</b></div>
+        <div class="ranking-row" data-team="09"><strong>9位</strong><span>BLUE SCREEN</span><span>5 / 11問</span><b>1,440点</b></div>
+        <div class="ranking-row" data-team="10"><strong>10位</strong><span>ARP CACHE</span><span>5 / 11問</span><b>1,360点</b></div>
+        <div class="ranking-row" data-team="11"><strong>11位</strong><span>PACKET DROPS</span><span>5 / 11問</span><b>1,290点</b></div>
+        <div class="ranking-row is-team" data-team="12" aria-current="true"><strong>12位</strong><span>KERNEL PANIC</span><span>4 / 11問</span><b>1,230点</b></div>
+        <div class="ranking-row" data-team="13"><strong>13位</strong><span>NULL ROUTE</span><span>4 / 11問</span><b>1,180点</b></div>
+        <div class="ranking-row" data-team="14"><strong>14位</strong><span>BAD REQUEST</span><span>4 / 11問</span><b>1,090点</b></div>
+        <div class="ranking-row" data-team="15"><strong>15位</strong><span>LINK DOWN</span><span>3 / 11問</span><b>980点</b></div>
+      </section>
+    </main>
+  </body>
+</html>

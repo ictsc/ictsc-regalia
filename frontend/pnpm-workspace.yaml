@@ -1,5 +1,7 @@
 packages:
   - packages/contestant
   - packages/admin
-  - packages/proto
+  - packages/api
   - packages/config
+
+  - packages/ui

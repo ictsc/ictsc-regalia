@@ -1,9 +1,1 @@
-{
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "paths": {
-      "@app/*": ["./app/*"],
-      "@assets/*": ["./assets/*"]
-    }
-  }
-}
+{"extends":"./.nuxt/tsconfig.json","exclude":["app",".storybook","vite.config.ts"]}

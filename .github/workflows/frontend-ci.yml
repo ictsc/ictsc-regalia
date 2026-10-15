@@ -5,11 +5,15 @@ on:
     branches: [main]
     paths:
       - frontend/**
+      - backend/openapi.json
       - .github/actions/setup-node/**
+      - .github/workflows/frontend-ci.yml
   pull_request:
     paths:
       - frontend/**
+      - backend/openapi.json
       - .github/actions/setup-node/**
+      - .github/workflows/frontend-ci.yml
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,6 +24,19 @@ defaults:
     working-directory: frontend
 
 jobs:
+  contract:
+    name: Generated API contract
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
+      - name: Generate API types
+        run: pnpm run generate
+      - name: Check generated files
+        run: git diff --exit-code -- packages/api
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -30,6 +47,10 @@ jobs:
         uses: ./.github/actions/setup-node
       - name: Lint
         run: pnpm run ci:lint
+      - name: Build both Nuxt SPAs
+        run: pnpm run build
+      - name: Build Vue Storybook
+        run: pnpm --filter @ictsc/ui story:build
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -40,6 +61,20 @@ jobs:
         uses: ./.github/actions/setup-node
       - name: Test
         run: pnpm run ci:test
+
+  e2e:
+    name: Browser E2E
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Test contestant and Admin browser flows
+        run: pnpm run e2e
+
   docker:
     name: Build Frontend Image
     runs-on: ubuntu-latest

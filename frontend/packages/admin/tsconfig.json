@@ -1,3 +1,1 @@
-{
-  "extends": "../../tsconfig.base.json"
-}
+{"extends":"./.nuxt/tsconfig.json","exclude":["app",".storybook","vite.config.ts"]}

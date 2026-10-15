@@ -1,5 +1,9 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# generated Nuxt/Nitro artifacts (keep local copies, never commit them)
+/.nuxt/
+/.output/
+
 # dependencies
 node_modules
 /.pnp
@@ -45,3 +49,7 @@ next-env.d.ts
 
 # turborepo
 .turbo
+
+.nuxt/
+.output/
+storybook-static/

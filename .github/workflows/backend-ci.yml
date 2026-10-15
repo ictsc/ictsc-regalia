@@ -30,11 +30,11 @@ jobs:
       - name: Test
         run: go test -race ./...
 
-      - name: Generate OpenAPI
-        run: go generate -x ./scripts/export-openapi
+      - name: Generate transport
+        run: go generate -x ./...
 
-      - name: Check OpenAPI
-        run: git diff --exit-code -- openapi.json
+      - name: Check generated files
+        run: git diff --exit-code -- .
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v4

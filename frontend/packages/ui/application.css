@@ -1,0 +1,360 @@
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+.button-primary,
+.button-secondary {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.workspace {
+  padding-top: 36px;
+}
+.workspace h1 {
+  margin: 0 0 28px;
+  font-size: 30px;
+  letter-spacing: -0.04em;
+  font-family: var(--sans-id);
+}
+.workspace h2 {
+  margin-top: 32px;
+  font-size: 20px;
+  font-family: var(--sans-id);
+}
+.form-grid {
+  display: grid;
+  gap: 20px;
+  max-width: 720px;
+  margin: 24px 0;
+}
+.form-grid label {
+  display: grid;
+  gap: 8px;
+  font-weight: 500;
+}
+.form-grid input,
+.form-grid select,
+.form-grid textarea,
+.field {
+  border: 1px solid var(--ink);
+  padding: 10px 12px;
+  background: var(--paper);
+  color: var(--ink);
+  min-width: 0;
+}
+.form-grid textarea {
+  min-height: 160px;
+  font-family: var(--sans-read);
+}
+.actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 20px 0;
+}
+.actions a:not(.button-primary):not(.button-secondary),
+.text-link,
+.workspace > a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.actions a:hover,
+.actions a:focus-visible,
+.text-link:hover,
+.text-link:focus-visible,
+.workspace > a:hover,
+.workspace > a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.data-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 24px 0;
+  font-family: var(--sans-id);
+  text-align: left;
+}
+.data-table th,
+.data-table td {
+  border-bottom: 1px solid var(--ink);
+  padding: 0 var(--table-cell-padding);
+  vertical-align: middle;
+}
+.data-table th {
+  height: var(--table-header-height);
+  color: var(--muted);
+  font-size: var(--table-header-size);
+  font-weight: 500;
+}
+.data-table td {
+  height: var(--table-row-height);
+}
+.data-table a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.data-table a:hover,
+.data-table a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.table-scroll {
+  overflow-x: auto;
+}
+@media (max-width: 760px) {
+  .activity-table {
+    overflow-x: visible;
+  }
+  .activity-table .data-table,
+  .activity-table tbody {
+    display: block;
+    width: 100%;
+  }
+  .activity-table .data-table {
+    margin: 0;
+  }
+  .activity-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .activity-table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "date date"
+      "problem problem"
+      "score answer";
+    gap: 10px 12px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line-light);
+  }
+  .activity-table tbody td {
+    display: block;
+    min-width: 0;
+    height: auto;
+    padding: 0;
+    border: 0;
+    overflow-wrap: anywhere;
+  }
+  .activity-table tbody td:nth-child(1) {
+    grid-area: date;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .activity-table tbody td:nth-child(2) {
+    grid-area: problem;
+    font-weight: 600;
+    line-height: 1.6;
+  }
+  .activity-table tbody td:nth-child(3) {
+    grid-area: answer;
+    align-self: end;
+    text-align: right;
+  }
+  .activity-table tbody td:nth-child(4) {
+    grid-area: score;
+    align-self: end;
+    white-space: nowrap;
+  }
+  .activity-table tbody td:nth-child(4)::before {
+    content: attr(data-label) " ";
+    color: var(--muted);
+    font-size: 12px;
+  }
+}
+.state-message {
+  padding: 24px;
+  border: 1px solid var(--ink);
+  margin: 24px 0;
+}
+.error-message {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.admin-header {
+  width: min(100%, var(--page-max-width));
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 80px;
+  border-bottom: 1px solid var(--ink);
+  padding-inline: var(--page-gutter);
+}
+.admin-header .brand {
+  padding: 0;
+}
+.admin-nav,
+.account-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--ink);
+  font-size: 13px;
+}
+.admin-nav .router-link-exact-active {
+  color: var(--accent);
+}
+.account-nav {
+  justify-content: flex-end;
+  align-items: center;
+}
+.account-nav button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+.team-badge {
+  padding: 8px 16px;
+  background: var(--team-color);
+  color: var(--team-text);
+}
+.markdown {
+  font-family: var(--sans-read);
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+.profile-account {
+  max-width: 720px;
+  margin: 48px 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-light);
+}
+.profile-logout {
+  min-height: 44px;
+  padding: 0 20px;
+  font-family: var(--sans-id);
+}
+.reading-copy > .markdown {
+  line-height: inherit;
+}
+.markdown a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.markdown pre {
+  padding: 20px;
+  overflow: auto;
+  border: 1px solid var(--ink);
+  line-height: 1.6;
+}
+.markdown img {
+  max-width: 100%;
+}
+.markdown table {
+  border-collapse: collapse;
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  font-family: var(--sans-read);
+}
+.markdown td,
+.markdown th {
+  min-width: 120px;
+  height: var(--table-row-height);
+  padding: 0 var(--table-cell-padding);
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  vertical-align: middle;
+}
+.markdown th {
+  height: var(--table-header-height);
+  color: var(--muted);
+  font-size: var(--table-header-size);
+  font-weight: 500;
+  text-align: left;
+}
+.markdown blockquote {
+  border-left: 3px solid var(--accent);
+  margin-left: 0;
+  padding-left: 20px;
+}
+.mono {
+  font-family: var(--mono);
+}
+.numeric {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.muted {
+  font-size: 12px;
+}
+.content-section {
+  border-top: 1px solid var(--ink);
+  padding: 24px 0;
+}
+.detail-page .content-section {
+  border-top: 0;
+}
+.problem-rail a {
+  position: relative;
+}
+.problem-preview {
+  pointer-events: none;
+}
+.problem-rail a:focus-visible .problem-preview {
+  opacity: 1;
+  visibility: visible;
+}
+@media (max-width: 760px) {
+  .workspace {
+    padding-top: 24px;
+  }
+  .account-nav {
+    gap: 14px;
+    padding: 12px;
+  }
+  .admin-header {
+    flex-wrap: wrap;
+  }
+  .data-table th,
+  .data-table td {
+    padding-right: var(--table-cell-padding);
+    padding-left: var(--table-cell-padding);
+  }
+}
+
+.content-grid > .content-section {
+  grid-column: 1;
+  padding: 28px 46px;
+}
+@media (max-width: 1280px) {
+  .content-grid > .content-section {
+    padding-right: 26px;
+    padding-left: 26px;
+  }
+}
+.actions > .button-primary,
+.form-grid > .button-primary {
+  width: auto;
+  min-height: 44px;
+  padding: 12px 24px;
+  justify-content: center;
+}
+.form-grid .button-secondary {
+  min-height: 40px;
+}
+@media (max-width: 760px) {
+  .content-grid > .content-section {
+    padding: 28px 18px;
+  }
+  .competition-clock time {
+    font-size: 15px;
+  }
+}

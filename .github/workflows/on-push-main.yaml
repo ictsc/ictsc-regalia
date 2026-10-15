@@ -2,11 +2,15 @@ name: On Push Main
 
 on:
   push:
-    branches: [main]
+    branches: [main, codex/openapi-contract-rebuild]
+    tags: ["preview-*"]
 
 jobs:
   backend:
     name: Build Backend
+    permissions:
+      contents: read
+      packages: write
     uses: ./.github/workflows/wf-docker-build.yaml
     with:
       target: backend
@@ -14,6 +18,9 @@ jobs:
       save-cache: true
   frontend:
     name: Build Frontend
+    permissions:
+      contents: read
+      packages: write
     uses: ./.github/workflows/wf-docker-build.yaml
     with:
       target: frontend

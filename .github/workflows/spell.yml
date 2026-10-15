@@ -21,10 +21,12 @@ jobs:
           exclude: |
             Dockerfile
             *.svg
-            ./frontend/packages/proto
+            ./backend/internal/transport/api/api.gen.go
+            ./backend/openapi.json
             package.json
             ./frontend/pnpm-lock.yaml
-            ./backend/pkg/proto
+            ./frontend/bun.lock
+            ./frontend/packages/api/src/schema.d.ts
             ./backend/.golangci.yaml
             **/go.mod
             **/go.sum

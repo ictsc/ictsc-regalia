@@ -1,19 +1,23 @@
 {
   "name": "frontend",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "build": "pnpm run --recursive --parallel --aggregate-output build",
-    "generate": "pnpm run --recursive --parallel --aggregate-output generate",
-    "ci:lint": "pnpm run --recursive --parallel --aggregate-output --reporter-hide-prefix lint",
-    "ci:test": "CI=true pnpm run --recursive --parallel --aggregate-output --reporter-hide-prefix test",
-    "preinstall": "npx only-allow pnpm"
+    "build": "pnpm --filter @ictsc/api build && pnpm --filter @ictsc/competition --filter @ictsc/admin --parallel build",
+    "generate": "pnpm --filter './packages/**' --parallel --aggregate-output run generate",
+    "ci:lint": "pnpm --filter './packages/**' --parallel --aggregate-output --reporter-hide-prefix run lint",
+    "ci:test": "CI=true pnpm --filter './packages/**' --parallel --aggregate-output --reporter-hide-prefix run test",
+    "e2e": "tsc --noEmit -p e2e/tsconfig.json && playwright test"
   },
   "devDependencies": {
-    "@tsconfig/vite-react": "^7.0.0",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.4.0",
     "pnpm": "10.33.0",
     "typescript": "^6.0.0"
   },
   "packageManager": "pnpm@10.33.0",
   "engines": {
-    "node": ">=18"
+    "node": ">=24"
   }
 }

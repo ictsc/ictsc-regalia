@@ -13,12 +13,10 @@ if [ -z "$postgres_address" ] || [ -z "$redis_address" ]; then
     exit 1
 fi
 
-export PGHOST=127.0.0.1
-export PGPORT=${postgres_address##*:}
-export PGUSER=ictsc
-export PGPASSWORD=password
-export PGDATABASE=ictscore
-export PGSSLMODE=disable
-export REDIS_URL="redis://127.0.0.1:${redis_address##*:}/0"
+export ICTSC_DATABASE_URL="postgres://ictsc:password@127.0.0.1:${postgres_address##*:}/ictscore?sslmode=disable"
+export ICTSC_REDIS_URL="redis://127.0.0.1:${redis_address##*:}/0"
+export ICTSC_ALLOWED_ORIGINS=${ICTSC_ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000,http://localhost:8080,http://127.0.0.1:8080}
+export ICTSC_DEV_FAKE_MODE=${ICTSC_DEV_FAKE_MODE:-true}
+export ICTSC_SECURE_COOKIES=${ICTSC_SECURE_COOKIES:-false}
 
 exec "$@"
