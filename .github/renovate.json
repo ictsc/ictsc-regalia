@@ -18,6 +18,13 @@
   ],
   "packageRules": [
     {
+      "description": "kin-openapi v0.150.0 leaves nested component $refs unresolved in OpenAPI 3.1 response validation",
+      "matchPackageNames": [
+        "github.com/getkin/kin-openapi"
+      ],
+      "allowedVersions": "!/^v?0\\.150\\.0$/"
+    },
+    {
       "description": "Upgrade go indirect dependencies",
       "matchManagers": [
         "gomod"
