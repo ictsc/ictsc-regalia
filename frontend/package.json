@@ -5,6 +5,8 @@
   ],
   "scripts": {
     "build": "pnpm --filter @ictsc/api build && pnpm --filter @ictsc/competition --filter @ictsc/admin --parallel build",
+    "story": "pnpm --filter @ictsc/ui story",
+    "story:build": "pnpm --filter @ictsc/ui story:build",
     "generate": "pnpm --filter './packages/**' --parallel --aggregate-output run generate",
     "ci:lint": "pnpm --filter './packages/**' --parallel --aggregate-output --reporter-hide-prefix run lint",
     "ci:test": "CI=true pnpm --filter './packages/**' --parallel --aggregate-output --reporter-hide-prefix run test",

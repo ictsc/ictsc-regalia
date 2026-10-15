@@ -30,6 +30,7 @@
     "storybook": "10.6.0",
     "vitest": "^4.0.0",
     "vite": "^8.0.0",
+    "vue-router": "^5.2.0",
     "@vitejs/plugin-vue": "^6.0.0",
     "prettier": "^3.3.3",
     "vue-tsc": "^3.0.0",
