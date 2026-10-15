@@ -9,7 +9,7 @@ The frontend is a pnpm workspace containing two Nuxt 4 / Vue / TypeScript SPAs.
 - `pnpm ci:test`: run Vitest tests across API, UI, and both applications.
 - `pnpm ci:lint`: typecheck, ESLint, and Prettier checks.
 - `pnpm e2e`: contestant and admin Chromium tests with mocked APIs.
-- `pnpm --filter @ictsc/ui story` / `story:build`: Vue Storybook.
+- `pnpm story` / `pnpm story:build`: Vue Storybook (output `packages/ui/storybook-static/`, deployed per PR by Cloudflare Pages).
 - `pnpm --filter @ictsc/competition dev`: localhost:3000.
 - `pnpm --filter @ictsc/admin dev`: localhost:3001/admin/.
 - This machine's combined live preview serves contestant at `100.96.0.22:3000/` and admin at `100.96.0.22:3000/admin/` through `backend/compose.live-preview.yaml`; see `frontend/README.md`.

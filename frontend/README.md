@@ -87,7 +87,7 @@ pnpm ci:test
 pnpm build
 pnpm exec playwright install chromium
 pnpm e2e
-pnpm --filter @ictsc/ui story:build
+pnpm story:build
 ```
 
 PlaywrightはAPIをmockし、認証、回答、下書き、採点、カラー設定、SSE、モバイル表示を確認します。
@@ -102,9 +102,30 @@ APIは同一originの `/api/v1`、認証はCookie、再展開更新はSSEです�
 ## Storybook
 
 ```sh
-pnpm --filter @ictsc/ui story
+pnpm story
 ```
 
 共通Vueコンポーネントを `http://localhost:6006/` で確認できます。
+Storybook本体は `packages/ui/.storybook/` にあり、`pnpm story:build` で
+`packages/ui/storybook-static/` を生成します。
+
+Cloudflare Pages（`ictsc-regalia-story`）はmainとPRごとにStorybookをビルドして公開します。
+設定はCloudflareのダッシュボード側にあり、リポジトリには含まれません。
+
+| 項目 | 値 |
+| --- | --- |
+| ルートディレクトリ | （空欄） |
+| ビルドコマンド | `cd frontend && pnpm install --frozen-lockfile && pnpm --filter @ictsc/ui story:build` |
+| 出力ディレクトリ | `frontend/packages/ui/storybook-static` |
+| 環境変数 | `NODE_VERSION=24.22.0`、`PNPM_VERSION=10.33.0`、`SKIP_DEPENDENCY_INSTALL=1` |
+
+`SKIP_DEPENDENCY_INSTALL` はリポジトリ直下での自動 `pnpm install` を止めるために必要です。
+`.node-version` やpnpmのバージョンを上げた場合は環境変数も合わせて更新してください。
+
+- ツールバーの Theme でライト・ダークを切り替えます。
+- `NuxtLink` は vue-router の `RouterLink` として登録済みです。ストーリーの
+  `parameters.route` で現在のURL、`parameters.bodyClass` で `<body>` のクラスを指定できます。
+- Storybookは素のViteで動くため、Nuxtの自動importは使えません。Storybookに載せる
+  コンポーネントは `vue` のAPIと共通部品を明示的にimportし、API呼び出しやSSEは持たせません。
 
 統合プレビューを検証する場合は `E2E_STATIC_ORIGIN=http://100.96.0.22:3000 pnpm e2e` を使用します。

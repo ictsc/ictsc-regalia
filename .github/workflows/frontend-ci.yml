@@ -50,7 +50,7 @@ jobs:
       - name: Build both Nuxt SPAs
         run: pnpm run build
       - name: Build Vue Storybook
-        run: pnpm --filter @ictsc/ui story:build
+        run: pnpm story:build
   test:
     name: Test
     runs-on: ubuntu-latest

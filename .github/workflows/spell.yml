@@ -25,7 +25,6 @@ jobs:
             ./backend/openapi.json
             package.json
             ./frontend/pnpm-lock.yaml
-            ./frontend/bun.lock
             ./frontend/packages/api/src/schema.d.ts
             ./backend/.golangci.yaml
             **/go.mod
