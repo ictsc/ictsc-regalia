@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM --platform=$BUILDPLATFORM node:24.21.0-slim AS builder
+FROM --platform=$BUILDPLATFORM node:24.22.0-slim AS builder
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN npm install -g pnpm@10.33.0
@@ -11,7 +11,7 @@ COPY . .
 RUN pnpm install --recursive --offline
 RUN pnpm run build
 
-FROM nginx:1.31.6 AS frontend
+FROM nginx:1.31.7 AS frontend
 ENV API_UPSTREAM=http://api:8080
 ENV NGINX_RESOLVER=127.0.0.11
 ENV ICTSC_DEMO_MODE=false
