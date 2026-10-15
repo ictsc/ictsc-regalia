@@ -808,9 +808,6 @@ a.problem-row.is-answer-closed .problem-score,
 a.problem-row.is-answer-closed .problem-score small {
   color: inherit;
 }
-a.problem-row.is-answer-closed .problem-id::before {
-  color: inherit;
-}
 .problem-row > span:not(.problem-id) {
   display: flex;
   align-items: center;
@@ -939,7 +936,7 @@ a.problem-row.is-answer-closed .problem-id::before {
   isolation: isolate;
   display: flex;
   align-items: center;
-  padding: 0 var(--table-cell-padding) 0 50px;
+  padding: 0 var(--table-cell-padding);
   overflow: hidden;
   font-family: var(--sans-id);
 }
@@ -980,12 +977,19 @@ a.problem-row.is-answer-closed .problem-id::before {
   margin-right: 5px;
   font-family: var(--mono);
 }
-.problem-row > .problem-score {
+.problem-row > span.problem-score {
   display: flex;
-  justify-content: start;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
   font-family: var(--mono);
   text-align: left;
+}
+.problem-score-value {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
 .problem-score b {
   font-size: 19px;
@@ -1002,6 +1006,40 @@ a.problem-row.is-answer-closed .problem-id::before {
 .problem-score.is-pending small {
   color: var(--status-pending);
   letter-spacing: 0.05em;
+}
+.problem-score .problem-pending {
+  color: var(--accent);
+  font-family: var(--sans-id);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.problem-score .problem-cooldown-badge {
+  display: inline-flex;
+  align-items: baseline;
+  padding: 0 5px;
+  background: var(--accent-surface);
+  color: white;
+  font-family: var(--sans-id);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.problem-score .problem-cooldown-badge b {
+  margin: 0 1px 0 4px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+a.problem-row.is-answer-closed .problem-score .problem-pending,
+a.problem-row.is-answer-closed .problem-score .problem-cooldown-badge {
+  background: none;
+  color: inherit;
 }
 .problem-score.is-unanswered {
   color: var(--muted);
@@ -1119,12 +1157,7 @@ a.problem-row.is-answer-closed .problem-id::before {
   inset: 0 46% 0 0;
 }
 
-/* 一覧では状態の色と形を小さな記号に限定する */
-.problem-id.status-unanswered,
-.problem-id.status-zero,
-.problem-id.status-partial,
-.problem-id.status-pending,
-.problem-id.status-complete,
+/* 問題ナビゲーションでは状態の色と形を小さな記号に限定する */
 .problem-rail a.status-unanswered,
 .problem-rail a.status-zero,
 .problem-rail a.status-partial,
@@ -1134,16 +1167,6 @@ a.problem-row.is-answer-closed .problem-id::before {
   background-image: none;
 }
 
-.problem-id.status-unanswered::before,
-.problem-id.status-unanswered::after,
-.problem-id.status-zero::before,
-.problem-id.status-zero::after,
-.problem-id.status-partial::before,
-.problem-id.status-partial::after,
-.problem-id.status-pending::before,
-.problem-id.status-pending::after,
-.problem-id.status-complete::before,
-.problem-id.status-complete::after,
 .problem-rail a.status-unanswered::before,
 .problem-rail a.status-unanswered::after,
 .problem-rail a.status-zero::before,
@@ -1157,15 +1180,10 @@ a.problem-row.is-answer-closed .problem-id::before {
   content: none;
 }
 
-.problem-id.status-unanswered::before,
 .problem-rail a.status-unanswered::before,
-.problem-id.status-zero::before,
 .problem-rail a.status-zero::before,
-.problem-id.status-partial::before,
 .problem-rail a.status-partial::before,
-.problem-id.status-pending::before,
 .problem-rail a.status-pending::before,
-.problem-id.status-complete::before,
 .problem-rail a.status-complete::before {
   position: absolute;
   left: 10px;
@@ -1187,33 +1205,27 @@ a.problem-row.is-answer-closed .problem-id::before {
   transform: none;
 }
 
-.problem-id.status-unanswered::before,
 .problem-rail a.status-unanswered::before {
   content: "—";
   color: var(--muted);
   font-weight: 500;
 }
-.problem-id.status-zero::before,
 .problem-rail a.status-zero::before {
   content: "×";
   color: var(--status-zero);
 }
-.problem-id.status-partial::before,
 .problem-rail a.status-partial::before {
   content: "◐";
   color: var(--ink);
 }
-.problem-id.status-pending::before,
 .problem-rail a.status-pending::before {
   content: "…";
   color: var(--status-pending);
 }
-.problem-id.status-complete::before,
 .problem-rail a.status-complete::before {
   content: "✓";
   color: var(--status-complete);
 }
-.problem-id.is-cooldown::before,
 .problem-rail a.is-cooldown::before {
   content: attr(data-cooldown);
   width: 38px;
@@ -1589,11 +1601,15 @@ a.problem-row.is-answer-closed .problem-id::before {
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas: "code score" "title title";
   align-content: center;
+  align-items: center;
   column-gap: 8px;
   padding: 5px 10px 6px;
   border-bottom: 1px solid var(--line-light);
   overflow: visible;
   font-family: var(--sans-id);
+}
+.problem-rail-group > a.has-status {
+  grid-template-areas: "code score" "title status";
 }
 .problem-rail b {
   font-size: 15px;
@@ -1602,6 +1618,31 @@ a.problem-row.is-answer-closed .problem-id::before {
 .problem-rail a > b:first-child {
   grid-area: code;
   align-self: center;
+}
+.rail-cooldown {
+  grid-area: status;
+  justify-self: end;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1px;
+  padding: 0 5px;
+  background: var(--accent-surface);
+  color: white;
+  font-family: var(--sans-id);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.problem-rail .rail-cooldown b {
+  margin-left: 4px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.problem-rail a.is-answer-closed .rail-cooldown {
+  background: none;
+  color: inherit;
 }
 .rail-title {
   grid-area: title;
@@ -1632,7 +1673,7 @@ a.problem-row.is-answer-closed .problem-id::before {
   font-size: 10px;
 }
 .rail-pending {
-  grid-column: 1 / -1;
+  grid-area: status;
   justify-self: end;
   color: var(--accent);
   font-family: var(--sans-id);
@@ -2429,15 +2470,11 @@ dialog.confirmation-dialog h2 {
     grid-area: id;
     min-width: 0;
     min-height: 28px;
-    padding-left: 32px;
-  }
-  a.problem-row .problem-id::before {
-    left: 0;
-    width: 26px;
+    padding-left: 0;
   }
   a.problem-row > .problem-score {
     grid-area: score;
-    justify-content: end;
+    align-items: flex-end;
     padding: 0;
   }
   a.problem-row > .problem-title {

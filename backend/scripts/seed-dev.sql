@@ -17,7 +17,7 @@ BEGIN
         'version', 1,
         'sections', jsonb_build_array(
             jsonb_build_object('slug', 'practice', 'beginning', now() - interval '1 day',
-                'ending', now() + interval '30 days', 'problem_codes', jsonb_build_array('NET1', 'WEB1', 'DB1', 'OPS1'))
+                'ending', now() + interval '30 days', 'problem_codes', jsonb_build_array('NET1', 'WEB1', 'DB1', 'OPS1', 'SEC1', 'LNX1'))
         ),
         'problems', jsonb_build_array(
             jsonb_build_object('code', 'NET1', 'title', 'DNS の名前解決', 'max_score', 100,
@@ -39,6 +39,16 @@ BEGIN
                 'category', 'Operations', 'section_slug', 'practice', 'type', 'DESCRIPTIVE',
                 'body', 'API の障害を検知するためのメトリクスと通知条件を提案してください。',
                 'explanation', 'エラー率、レイテンシ、稼働率を組み合わせます。',
+                'redeploy_rule', jsonb_build_object('type', 'MANUAL')),
+            jsonb_build_object('code', 'SEC1', 'title', 'SSH への不審なログイン', 'max_score', 100,
+                'category', 'Security', 'section_slug', 'practice', 'type', 'DESCRIPTIVE',
+                'body', 'SSH の認証失敗が急増しています。調査手順と対策を説明してください。',
+                'explanation', '認証ログと接続元を確認し、鍵認証と接続制限を設定します。',
+                'redeploy_rule', jsonb_build_object('type', 'MANUAL')),
+            jsonb_build_object('code', 'LNX1', 'title', 'ディスク容量の枯渇', 'max_score', 120,
+                'category', 'Linux', 'section_slug', 'practice', 'type', 'DESCRIPTIVE',
+                'body', 'ルートパーティションが 100% になりました。原因の特定と復旧方法を示してください。',
+                'explanation', '大きなファイルと削除済みで開かれたままのファイルを確認します。',
                 'redeploy_rule', jsonb_build_object('type', 'MANUAL'))
         ),
         'announcements', jsonb_build_array(
@@ -62,8 +72,23 @@ BEGIN
     INSERT INTO content_snapshots (commit_sha, repository, git_ref, manifest, fetched_at, activated_at, active)
     VALUES (sample_commit, 'local/dev-seed', 'refs/heads/dev', sample_manifest, now(), now(), true);
 
+    -- チーム・アルファ (preview-contestant) の問題一覧で確認できる状態:
+    --   NET1: 部分点 (採点済み)
+    --   WEB1: 提出から20分以上経っても未採点 → 採点中
+    --   DB1 : 0点の後に再提出して5分 → 再提出まで15分 (得点は前回の0点)
+    --   OPS1: 初回提出から10分 → 再提出まで10分
+    --   SEC1: 満点 (採点済み)
+    --   LNX1: 未回答
     INSERT INTO answers (team_code, problem_code, number, author_name, body, submitted_at,
                          content_commit, max_score, redeploy_rule, deployments_before) VALUES
+        (2, 'DB1', 1, 'alice', 'スロークエリログから該当クエリを探します。', now() - interval '2 hours', sample_commit, 200,
+            '{"type":"UNREDEPLOYABLE"}', 0),
+        (2, 'DB1', 2, 'preview-contestant', 'EXPLAIN ANALYZE で Seq Scan を確認し、索引を追加します。', now() - interval '5 minutes', sample_commit, 200,
+            '{"type":"UNREDEPLOYABLE"}', 0),
+        (2, 'OPS1', 1, 'preview-contestant', '5xx エラー率と p95 レイテンシにしきい値を設定します。', now() - interval '10 minutes', sample_commit, 100,
+            '{"type":"MANUAL"}', 0),
+        (2, 'SEC1', 1, 'alice', '認証ログから接続元を特定し、パスワード認証を無効化します。', now() - interval '50 minutes', sample_commit, 100,
+            '{"type":"MANUAL"}', 0),
         (2, 'NET1', 1, 'preview-contestant', 'リゾルバの参照先とゾーン設定を確認します。', now() - interval '4 hours', sample_commit, 100,
             '{"type":"PERCENTAGE_PENALTY","penalty_threshold":1,"penalty_percentage":10}', 0),
         (2, 'WEB1', 1, 'alice', 'upstream のプロセスとポートを確認し、設定を修正します。', now() - interval '3 hours', sample_commit, 150,
@@ -81,8 +106,14 @@ BEGIN
 
     INSERT INTO marking_results (team_code, problem_code, answer_number, judge, marked_score, rationale, created_at, visibility) VALUES
         (2, 'NET1', 1, 'preview-admin', 80, '原因の特定と修正方針が明確です。', now() - interval '3 hours', 'PUBLIC'),
+        (2, 'DB1', 1, 'preview-admin', 0, '原因の特定まで至っていません。', now() - interval '90 minutes', 'PUBLIC'),
+        (2, 'SEC1', 1, 'preview-admin', 100, '調査と対策が十分です。', now() - interval '30 minutes', 'PUBLIC'),
         (3, 'NET1', 1, 'preview-admin', 60, '確認手順は適切ですが修正方針を補足してください。', now() - interval '4 hours', 'TEAM'),
         (3, 'DB1', 1, 'preview-admin', 120, '実行計画を使った調査ができています。', now() - interval '1 hour', 'PUBLIC');
+
+    INSERT INTO answer_workflows (team_code, problem_code, answer_number, status)
+    SELECT DISTINCT team_code, problem_code, answer_number, 'COMPLETED'
+    FROM marking_results;
 
     UPDATE competition_state
     SET rule_markdown = '## サンプル大会\n回答・採点・ランキング表示の確認に利用してください。',

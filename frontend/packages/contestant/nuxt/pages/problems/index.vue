@@ -166,24 +166,29 @@ function resetFilters() {
           class="problem-row"
           :to="`/problems/${p.code}`"
           :class="{ 'is-answer-closed': !p.submissionStatus?.isSubmittable }"
-          ><span
-            class="problem-id"
-            :class="[
-              `status-${state(p)}`,
-              { 'is-cooldown': cooldownMinutes(p) > 0 },
-            ]"
-            :data-cooldown="
-              cooldownMinutes(p) ? `${cooldownMinutes(p)}分` : undefined
-            "
+          ><span class="problem-id"
             ><b>{{ p.code }}</b
             ><span class="visually-hidden">{{
               cooldownMinutes(p)
-                ? `${statusLabels[state(p)]} / 再提出可能まで${cooldownMinutes(p)}分`
+                ? `再提出可能まで${cooldownMinutes(p)}分`
                 : statusLabels[state(p)]
             }}</span></span
           ><span class="problem-score"
-            ><b>{{ p.score?.score ?? "—" }}</b
-            ><small>/ {{ p.maxScore }}</small></span
+            ><span class="problem-score-value"
+              ><b>{{ p.score?.score ?? "—" }}</b
+              ><small>/ {{ p.maxScore }}</small></span
+            ><em
+              v-if="cooldownMinutes(p) > 0"
+              class="problem-cooldown-badge"
+              aria-hidden="true"
+              >再提出まで<b>{{ cooldownMinutes(p) }}</b
+              >分</em
+            ><em
+              v-else-if="state(p) === 'pending'"
+              class="problem-pending"
+              aria-hidden="true"
+              >採点中</em
+            ></span
           ><span class="problem-category">{{ p.category }}</span
           ><span class="problem-title"
             ><small

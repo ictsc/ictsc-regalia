@@ -53,7 +53,7 @@ ICTSC_DEMO_MODE=true pnpm --filter @ictsc/competition dev
 - Admin SPA: <http://100.96.0.22:3000/admin/>
 - API: <http://100.96.0.22:8080/api/v1/health>
 
-空の開発DBにサンプル大会（3チーム、4参加者、4問題、5回答、3採点）を投入するには、
+空の開発DBにサンプル大会（3チーム、4参加者、6問題、9回答、5採点）を投入するには、
 リポジトリルートで `task dev-seed` を実行します。既存のチーム・問題・回答があるDBでは
 エラーになり、データを変更しません。開発fake modeの仮ログインを設定している場合、
 `preview-contestant` でチーム・アルファの参加者画面を確認できます。

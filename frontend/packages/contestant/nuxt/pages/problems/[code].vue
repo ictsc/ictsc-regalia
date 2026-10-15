@@ -309,15 +309,26 @@ watch([problemGroups, rail], showCurrentRailItem, { flush: "post" });
                 :class="{
                   'is-active': p.code === code,
                   'is-answer-closed': !p.submissionStatus?.isSubmittable,
+                  'has-status': cooldownSecondsFor(p) > 0 || pendingOf(p),
                 }"
                 :aria-current="p.code === code ? 'page' : undefined"
-                :aria-label="`${p.code} ${p.title} ${p.score ? `${p.score.score}点 / ${p.maxScore}点満点` : '得点未確定'}${pendingOf(p) ? ' 最新の提出を採点中' : ''}${cooldownSecondsFor(p) ? ` 再提出可能まで${cooldownMinutesFor(p)}分` : ''}`"
+                :aria-label="`${p.code} ${p.title} ${p.score ? `${p.score.score}点 / ${p.maxScore}点満点` : '得点未確定'}${cooldownSecondsFor(p) ? ` 再提出可能まで${cooldownMinutesFor(p)}分` : pendingOf(p) ? ' 最新の提出を採点中' : ''}`"
                 ><b>{{ p.code }}</b
                 ><span class="rail-score">
                   <strong>{{ p.score ? p.score.score : "—" }}</strong>
-                  <small>/ {{ p.maxScore }}</small>
-                  <em v-if="pendingOf(p)" class="rail-pending">採点中</em></span
+                  <small>/ {{ p.maxScore }}</small></span
                 ><span class="rail-title">{{ p.title }}</span
+                ><span
+                  v-if="cooldownSecondsFor(p)"
+                  class="rail-cooldown"
+                  aria-hidden="true"
+                  >あと<b>{{ cooldownMinutesFor(p) }}</b
+                  >分</span
+                ><em
+                  v-else-if="pendingOf(p)"
+                  class="rail-pending"
+                  aria-hidden="true"
+                  >採点中</em
                 ><span class="problem-preview"
                   ><strong>{{ p.title }}</strong
                   ><small>{{ p.category }}</small

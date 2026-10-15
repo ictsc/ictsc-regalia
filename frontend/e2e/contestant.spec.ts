@@ -710,6 +710,73 @@ test("問題ナビゲーションのプレビューは採点状態を表示す�
   }
 });
 
+test("問題一覧は採点中の問題に採点中と表示する", async ({ page }) => {
+  await installCompetitionApi(page);
+  await page.route("**/api/v1/contestant/problems/A02/answers", (route) =>
+    fulfillJson(route, {
+      answers: [
+        {
+          number: 2,
+          type: "DESCRIPTIVE",
+          submitted_at: requestedAt,
+          score: null,
+          content_commit: commit,
+        },
+      ],
+      submit_interval_seconds: 1200,
+      last_submitted_at: requestedAt,
+    }),
+  );
+  await page.goto("/problems");
+  const row = (code: string) =>
+    page.locator(`a.problem-row[href="/problems/${code}"]`);
+  await expect(row("A02").locator(".problem-pending")).toHaveText("採点中");
+  await expect(row("A04").locator(".problem-pending")).toHaveCount(0);
+});
+
+test("再提出待ちの間は採点中ではなく待ち時間を表示する", async ({ page }) => {
+  await installCompetitionApi(page, {
+    nextSubmittableAt: { A02: "2026-09-02T12:10:00+09:00" },
+  });
+  await page.route("**/api/v1/contestant/problems/A02/answers", (route) =>
+    fulfillJson(route, {
+      answers: [
+        {
+          number: 2,
+          type: "DESCRIPTIVE",
+          submitted_at: "2026-09-02T11:50:00+09:00",
+          score: null,
+          content_commit: commit,
+        },
+      ],
+      submit_interval_seconds: 1200,
+      last_submitted_at: "2026-09-02T11:50:00+09:00",
+    }),
+  );
+  await page.goto("/problems");
+  const row = page.locator('a.problem-row[href="/problems/A02"]');
+  await expect(row.locator(".problem-cooldown-badge")).toHaveText(
+    "再提出まで10分",
+  );
+  await expect(row.locator(".problem-pending")).toHaveCount(0);
+  await expect(
+    page.locator('a.problem-row[href="/problems/A04"] .problem-cooldown-badge'),
+  ).toHaveCount(0);
+
+  await page.goto("/problems/A04");
+  const link = page
+    .getByRole("navigation", { name: "問題ナビゲーション" })
+    .locator('a[href="/problems/A02"]');
+  await expect(link.locator(".rail-cooldown")).toHaveText("あと10分");
+  await expect(link.locator(".rail-pending")).toHaveCount(0);
+  const plain = page
+    .getByRole("navigation", { name: "問題ナビゲーション" })
+    .locator('a[href="/problems/B02"]');
+  expect((await link.boundingBox())?.height).toBe(
+    (await plain.boundingBox())?.height,
+  );
+});
+
 test.describe("タッチ操作での保存状態", () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
 

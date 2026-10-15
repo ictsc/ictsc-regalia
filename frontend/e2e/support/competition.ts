@@ -1,6 +1,9 @@
 import type { Page } from "@playwright/test";
 import { fulfillJson, installEventSourceMock } from "./http";
-export async function installCompetitionApi(page: Page) {
+export async function installCompetitionApi(
+  page: Page,
+  options: { nextSubmittableAt?: Record<string, string> } = {},
+) {
   await page.clock.setFixedTime(new Date("2026-09-02T12:00:00+09:00"));
   await installEventSourceMock(page);
   const state = {
@@ -57,6 +60,7 @@ export async function installCompetitionApi(page: Page) {
           ? null
           : { marked_score: score, penalty: 0, score, max_score },
       deployment: { redeployable: true, penalty_threshold: 2 },
+      next_submittable_at: options.nextSubmittableAt?.[code] ?? null,
       submission_status: {
         is_submittable: section_slug !== "day1",
         submittable_from: "2026-09-01T00:00:00+09:00",
