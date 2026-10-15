@@ -50,7 +50,7 @@ require (
 	github.com/gobwas/glob v1.0.0 // indirect
 	github.com/gohugoio/hashstructure v1.1.0 // indirect
 	github.com/gohugoio/hugo v0.168.0 // indirect
-	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
