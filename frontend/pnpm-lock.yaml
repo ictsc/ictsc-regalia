@@ -53,7 +53,7 @@ importers:
         version: 1.17.0(@typescript-eslint/utils@8.68.0(eslint@10.10.0(jiti@2.7.0))(typescript@6.0.3))(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(eslint-import-resolver-node@0.3.10)(eslint@10.10.0(jiti@2.7.0))(magic-string@1.2.3)(magicast@0.5.4)(rolldown@1.2.6)(rollup@4.63.1)(srvx@0.11.22)(typescript@6.0.3)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.6)(rollup@4.63.1)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0)))(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))
       '@vitejs/plugin-vue':
         specifier: ^6.0.0
-        version: 6.0.8(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
+        version: 6.0.10(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
       '@vue/test-utils':
         specifier: ^2.4.6
         version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@6.0.3))
@@ -161,7 +161,7 @@ importers:
         version: 1.17.0(@typescript-eslint/utils@8.68.0(eslint@10.10.0(jiti@2.7.0))(typescript@6.0.3))(@vue/compiler-sfc@3.5.42)(esbuild@0.28.2)(eslint-import-resolver-node@0.3.10)(eslint@10.10.0(jiti@2.7.0))(magic-string@1.2.3)(magicast@0.5.4)(rolldown@1.2.6)(rollup@4.63.1)(srvx@1.0.3)(typescript@6.0.3)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.6)(rollup@4.63.1)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0)))(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))
       '@vitejs/plugin-vue':
         specifier: ^6.0.0
-        version: 6.0.8(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
+        version: 6.0.10(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
       '@vue/test-utils':
         specifier: ^2.4.6
         version: 2.5.0(@vue/compiler-dom@3.5.42)(@vue/server-renderer@3.5.42)(vue@3.5.42(typescript@6.0.3))
@@ -228,7 +228,7 @@ importers:
         version: 10.6.0(storybook@10.6.0(@types/react@19.2.18)(prettier@3.9.6)(react@19.2.8))(typescript@6.0.3)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
       '@vitejs/plugin-vue':
         specifier: ^6.0.0
-        version: 6.0.8(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
+        version: 6.0.10(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
       prettier:
         specifier: ^3.3.3
         version: 3.9.6
@@ -2011,12 +2011,12 @@ packages:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
       vue: ^3.0.0
 
-  '@vitejs/plugin-vue@6.0.8':
-    resolution: {integrity: sha512-0ZjgOg7oO6farnNGup7yvoM/YXZV84OZxHAwtflItNa/6zzQyVb5LNxyea3FEKEX2XlagIKzrlH7wwxkKgtiew==}
+  '@vitejs/plugin-vue@6.0.10':
+    resolution: {integrity: sha512-b80aUQh3n+qEzzZm5oQp3rT2QImeCx58K6eFl/RkJ3d65KW0kTuv5lNsLRVAjbW9YRUpo/wzmvzMgV34bTAItA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
-      vue: ^3.2.25
+      vue: ^3.2.25 || ^3.6.0-rc.10
 
   '@vitest/expect@3.2.4':
     resolution: {integrity: sha512-Io0yyORnB6sikFlt8QW5K7slY4OjqNX9jmJQ02QDda8lyM6B5oNgVWoSoKPac8/kgnCUzuHQKrSLtu/uOqqrig==}
@@ -4162,9 +4162,6 @@ packages:
   mdast-util-math@3.0.0:
     resolution: {integrity: sha512-Tl9GBNeG/AhJnQM221bJR2HPvLOSnLE/T9cJI9tlc6zwQk2nPk/4f0cHkOdEixQPC/j8UtKDdITswvLAy1OZ1w==}
 
-  mdast-util-newline-to-break@2.0.0:
-    resolution: {integrity: sha512-MbgeFca0hLYIEx/2zGsszCSEJJ1JSCdiY5xQxRcLDDGa8EPvlLPupJ4DSajbMPAnC0je8jfb9TiUATnxxrHUog==}
-
   mdast-util-phrasing@4.1.0:
     resolution: {integrity: sha512-TqICwyvJJpBwvGAMZjj4J2n0X8QWp21b9l0o7eXyVJ25YNWYbJDVIyD1bZXE6WtV6RmKJVYmQAKWa0zWOABz2w==}
 
@@ -5071,9 +5068,6 @@ packages:
 
   rehype-stringify@10.0.1:
     resolution: {integrity: sha512-k9ecfXHmIPuFVI61B9DeLPN0qFHfawM6RsuX48hoqlaKSF61RskNjSm1lI8PhBEM0MRdLxVVm4WmTqJQccH9mA==}
-
-  remark-breaks@4.0.0:
-    resolution: {integrity: sha512-IjEjJOkH4FuJvHZVIW0QCDWxcG96kCq7An/KVH2NfJe6rKZU2AsHeB3OEjPNRxi4QC34Xdx7I2KGYn6IpT7gxQ==}
 
   remark-gfm@4.0.1:
     resolution: {integrity: sha512-1quofZ2RQ9EWdeN34S79+KExV1764+wCUGop5CPL1WGdD0ocPpu91lzPGbwWMECpEpd42kJGQwzRfyov9j4yNg==}
@@ -7488,7 +7482,7 @@ snapshots:
   '@nuxt/vite-builder@4.5.2(0ed41a78779e2254d3874d8c62dddca1)':
     dependencies:
       '@nuxt/kit': 4.5.2(magic-string@1.2.3)(magicast@0.5.4)(rolldown@1.2.6)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.6)(rollup@4.63.1)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0)))
-      '@vitejs/plugin-vue': 6.0.8(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
+      '@vitejs/plugin-vue': 6.0.10(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
       '@vitejs/plugin-vue-jsx': 5.1.6(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
       autoprefixer: 10.5.5(postcss@8.5.26)
       consola: 3.4.2
@@ -7551,7 +7545,7 @@ snapshots:
   '@nuxt/vite-builder@4.5.2(4315989a86c37449a2dc8210162e0707)':
     dependencies:
       '@nuxt/kit': 4.5.2(magic-string@1.2.3)(magicast@0.5.4)(rolldown@1.2.6)(unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.6)(rollup@4.63.1)(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0)))
-      '@vitejs/plugin-vue': 6.0.8(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
+      '@vitejs/plugin-vue': 6.0.10(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
       '@vitejs/plugin-vue-jsx': 5.1.6(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))
       autoprefixer: 10.5.5(postcss@8.5.26)
       consola: 3.4.2
@@ -8468,7 +8462,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-vue@6.0.8(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))':
+  '@vitejs/plugin-vue@6.0.10(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0))(vue@3.5.42(typescript@6.0.3))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
       vite: 8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(sugarss@5.0.1(postcss@8.5.26))(terser@5.51.2)(yaml@2.9.0)
@@ -10994,11 +10988,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  mdast-util-newline-to-break@2.0.0:
-    dependencies:
-      '@types/mdast': 4.0.4
-      mdast-util-find-and-replace: 3.0.2
-
   mdast-util-phrasing@4.1.0:
     dependencies:
       '@types/mdast': 4.0.4
@@ -12575,12 +12564,6 @@ snapshots:
     dependencies:
       '@types/hast': 3.0.5
       hast-util-to-html: 9.0.5
-      unified: 11.0.5
-
-  remark-breaks@4.0.0:
-    dependencies:
-      '@types/mdast': 4.0.4
-      mdast-util-newline-to-break: 2.0.0
       unified: 11.0.5
 
   remark-gfm@4.0.1:
