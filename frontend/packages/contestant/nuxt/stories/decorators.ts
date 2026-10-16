@@ -9,3 +9,8 @@ export function withContestantFrame(color: string = teamColor): Decorator {
     template: `<div :style="style"><story /><footer class="site-footer"><span>ICTSC 2026 / REGALIA</span><span>競技システム</span></footer></div>`,
   });
 }
+
+// Mirrors the problem detail page: sections live inside the content grid.
+export const withDetailContent: Decorator = () => ({
+  template: `<div class="detail-layout is-rail-hidden"><article class="problem-content"><div class="content-grid"><story /></div></article></div>`,
+});
