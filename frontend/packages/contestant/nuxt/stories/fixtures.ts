@@ -1,5 +1,7 @@
 // Fake data for Storybook. It mirrors e2e/support/competition.ts and must not
 // contain real participant names because the Storybook is published.
+import type { Answer } from "~/features/answer";
+import type { Deployment } from "~/features/deployment";
 import type { Problem, Rank, ScheduleEntry } from "~/features/models";
 
 export const fixedNow = Date.parse("2026-09-02T12:00:00+09:00");
@@ -96,3 +98,61 @@ export const ranking: Rank[] = teamNames.map((teamName, index) => {
     score: index === 0 ? 2130 : 1350 - index * 60,
   };
 });
+
+export const problemBody = `## 状況
+
+監視対象のコンテナ\`api-gateway\`が起動して数秒後に終了し、再起動を繰り返しています。利用者からは管理画面へ断続的に接続できないという報告があります。
+
+## 環境
+
+| ホスト | アドレス |
+| --- | --- |
+| router-a | 10.20.1.1 |
+| app-01 | 10.20.1.10 |
+
+\`\`\`bash
+docker compose ps
+docker compose logs api-gateway
+\`\`\`
+
+## 確認事項
+
+修正後はコンテナの状態とログを確認し、原因、実施した変更、復旧確認の結果を回答欄に記載してください。`;
+
+export function makeDeployment(
+  revision: number,
+  status: Deployment["status"],
+  overrides: Partial<Deployment> = {},
+): Deployment {
+  return {
+    revision,
+    status,
+    requestedAt: new Date(fixedNow - (10 - revision) * 600_000).toISOString(),
+    allowedDeploymentCount: Math.max(0, 3 - revision),
+    thresholdExceeded: revision > 3,
+    penalty: revision > 3 ? 10 * (revision - 3) : 0,
+    ...overrides,
+  };
+}
+
+export const answers: Answer[] = [3, 2, 1].map((id) => ({
+  id,
+  submittedAt: new Date(fixedNow - (4 - id) * 1_800_000).toISOString(),
+  contentCommit: "0f3c2a1",
+  score:
+    id === 3
+      ? undefined
+      : { markedScore: id * 60, penalty: 0, score: id * 60, maxScore: 300 },
+}));
+
+export const answerBody = `## 原因
+
+\`api-gateway\` の環境変数 \`UPSTREAM_URL\` が誤っていたため、起動直後の疎通確認に失敗して終了していました。
+
+## 対応
+
+\`compose.yaml\` の値を修正し、\`docker compose up -d\` で再作成しました。
+
+## 確認
+
+10分間再起動が発生しないこと、管理画面が200を返すことを確認しました。`;
