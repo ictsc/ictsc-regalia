@@ -11,6 +11,7 @@ import {
 import { draftKey, loadDraft, saveDraft } from "~/features/draft";
 import { fetchActivity } from "~/features/activity";
 import { groupProblems } from "~/features/problem/group";
+import { sectionLabel } from "~/features/problem/section";
 import { remainingCooldownSeconds } from "~/features/problem/cooldown";
 definePageMeta({ key: (route) => route.fullPath });
 const route = useRoute();
@@ -231,12 +232,6 @@ const score = computed(
 const problemGroups = computed(() =>
   groupProblems(competition.value?.problems ?? []),
 );
-const sectionName = (slug?: string) =>
-  slug === "both"
-    ? "両日"
-    : /^day\d+$/.test(slug ?? "")
-      ? `${slug!.slice(3)}日目`
-      : slug;
 async function showCurrentRailItem() {
   await nextTick();
   if (!import.meta.client || !window.matchMedia("(max-width: 760px)").matches)
@@ -299,7 +294,7 @@ watch([problemGroups, rail], showCurrentRailItem, { flush: "post" });
               <h2>
                 <span class="visually-hidden">ステージ: </span>
                 <span class="rail-stage-label">{{
-                  sectionName(group.key)
+                  sectionLabel(group.key)
                 }}</span>
               </h2>
               <NuxtLink

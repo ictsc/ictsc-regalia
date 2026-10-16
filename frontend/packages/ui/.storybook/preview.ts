@@ -37,10 +37,17 @@ const preview: Preview = {
   },
   decorators: [
     (_story, { globals, parameters }) => {
+      const theme = globals.theme as string;
       const root = document.documentElement;
       root.lang = "ja";
-      root.dataset.theme = globals.theme as string;
-      root.dataset.themePreference = globals.theme as string;
+      root.dataset.theme = theme;
+      root.dataset.themePreference = theme;
+      // ThemeToggle applies the stored preference on its first mount.
+      try {
+        localStorage.setItem("ictsc/theme", theme);
+      } catch {
+        // Storage may be unavailable; the dataset above still applies.
+      }
       document.body.className =
         (parameters.bodyClass as string | undefined) ?? "";
       return { template: "<story />" };

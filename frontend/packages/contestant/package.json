@@ -21,6 +21,7 @@
   "devDependencies": {
     "@ictsc/config": "workspace:*",
     "@nuxt/eslint": "^1.0.0",
+    "@storybook/vue3-vite": "^10.0.0",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vue/test-utils": "^2.4.6",
     "eslint": "^10.4.0",
@@ -29,7 +30,8 @@
     "vitest": "^4.0.0",
     "jsdom": "^30.0.1",
     "msw": "^2.4.6",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "storybook": "10.6.0"
   },
   "prettier": "@ictsc/config/prettier"
 }
