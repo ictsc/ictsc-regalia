@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@storybook/vue3-vite": "^10.0.0",
-    "storybook": "10.6.0",
+    "storybook": "10.6.2",
     "vitest": "^4.0.0",
     "vite": "^8.0.0",
     "vue-router": "^5.2.0",
