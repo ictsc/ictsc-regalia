@@ -1,8 +1,16 @@
 // Fake data for Storybook. It mirrors e2e/support/competition.ts and must not
 // contain real participant names because the Storybook is published.
+import type { ActivityEntry } from "~/features/activity";
 import type { Answer } from "~/features/answer";
 import type { Deployment } from "~/features/deployment";
-import type { Problem, Rank, ScheduleEntry } from "~/features/models";
+import type {
+  ContestantProfile,
+  Notice,
+  Problem,
+  Rank,
+  ScheduleEntry,
+  TeamProfile,
+} from "~/features/models";
 
 export const fixedNow = Date.parse("2026-09-02T12:00:00+09:00");
 export const teamColor = "#0083C3";
@@ -156,3 +164,82 @@ export const answerBody = `## 原因
 ## 確認
 
 10分間再起動が発生しないこと、管理画面が200を返すことを確認しました。`;
+
+export const notices: Notice[] = [
+  {
+    slug: "day2-start",
+    title: "2日目の競技を開始しました",
+    body: "",
+    markdown:
+      "2日目の問題を公開しました。問題一覧から確認してください。\n\n- 受付終了: **14:13**\n- 1日目の問題は閲覧のみです",
+    effectiveFrom: "2026-09-02T09:00:00+09:00",
+  },
+  {
+    slug: "b02-fix",
+    title: "B02 の問題文を修正しました",
+    body: "",
+    markdown: "環境表の `app-01` のアドレスを `10.20.1.10` に修正しました。",
+    effectiveFrom: "2026-09-01T15:30:00+09:00",
+  },
+  {
+    slug: "start",
+    title: "競技を開始しました",
+    body: "",
+    markdown: "問題一覧から問題を確認し、回答を提出してください。",
+    effectiveFrom: "2026-09-01T09:00:00+09:00",
+  },
+];
+
+const activityRows: [string, string, number, number, number | undefined][] = [
+  ["B02", "コンテナが起動を繰り返す", 300, 3, undefined],
+  ["A02", "Webサーバーに接続できない", 150, 2, 80],
+  ["B02", "コンテナが起動を繰り返す", 300, 2, 300],
+  ["A01", "DNSの名前解決ができない", 300, 1, 300],
+];
+
+export const activity: ActivityEntry[] = activityRows.map(
+  ([problemCode, problemTitle, maxScore, answerId, score], index) => ({
+    problemCode,
+    problemTitle,
+    maxScore,
+    answerId,
+    submittedAt: new Date(fixedNow - index * 2_700_000).toISOString(),
+    score:
+      score === undefined
+        ? undefined
+        : { markedScore: score, penalty: 0, score, maxScore },
+  }),
+);
+
+export const profile: ContestantProfile = {
+  name: "alice",
+  displayName: "Alice",
+  selfIntroduction: "ネットワークとLinuxが好きです。よろしくお願いします。",
+};
+
+const team = (
+  code: number,
+  name: string,
+  members: ContestantProfile[],
+): TeamProfile => ({
+  code,
+  name,
+  organization: "ICTSC University",
+  memberLimit: 4,
+  team: { code, name, organization: "ICTSC University", memberLimit: 4 },
+  members,
+});
+
+export const teams: TeamProfile[] = [
+  team(12, "KERNEL PANIC", [
+    profile,
+    {
+      name: "bob",
+      displayName: "Bob",
+      selfIntroduction: "**サーバー担当**です。\n\n- Docker\n- Kubernetes",
+    },
+  ]),
+  team(13, "ROUTE", [
+    { name: "carol", displayName: "Carol", selfIntroduction: "" },
+  ]),
+];
