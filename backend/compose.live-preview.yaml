@@ -1,6 +1,6 @@
 services:
   contestant-dev:
-    image: node:24.13.0-slim
+    image: node:24.22.0-slim
     user: "${ICTSC_DEV_UID:-1002}:${ICTSC_DEV_GID:-1002}"
     working_dir: /app
     command:
@@ -27,7 +27,7 @@ services:
       retries: 30
 
   admin-dev:
-    image: node:24.13.0-slim
+    image: node:24.22.0-slim
     user: "${ICTSC_DEV_UID:-1002}:${ICTSC_DEV_GID:-1002}"
     working_dir: /app
     command:
