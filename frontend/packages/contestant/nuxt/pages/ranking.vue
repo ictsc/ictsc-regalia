@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RankingView from "~/components/ranking/RankingView.vue";
 import { api } from "@ictsc/api";
 import { fetchRanking } from "~/features/ranking";
 useHead({ title: "順位表" });
@@ -9,42 +10,14 @@ const { data, error, pending, refresh } = await useAsyncData("ranking", () =>
 </script>
 <template>
   <main>
-    <header class="linked-page-heading">
-      <h1 class="page-title">順位表</h1>
-      <p v-if="data?.frozen">順位表は凍結中です {{ data.frozenAt }}</p>
-    </header>
-    <RequestState :error="error" :pending="pending" @retry="refresh"
-      ><section class="ranking-table">
-        <div class="ranking-row ranking-heading">
-          <span>順位</span><span>チーム</span><span>得点</span>
-        </div>
-        <div
-          v-for="r in data?.ranking"
-          :key="r.teamCode"
-          class="ranking-row"
-          :class="{
-            'is-team':
-              viewer?.state === 'CONTESTANT' && r.teamCode === viewer.team.code,
-          }"
-        >
-          <span class="ranking-position">{{ r.rank }}</span
-          ><span class="ranking-team"
-            ><strong>{{ r.teamName }}</strong
-            ><small>{{ r.organization }}</small
-            ><span
-              v-if="
-                viewer?.state === 'CONTESTANT' &&
-                r.teamCode === viewer.team.code
-              "
-              class="ranking-own-marker"
-              >自チーム</span
-            ></span
-          ><span class="ranking-score">{{ r.score.toLocaleString() }}</span>
-        </div>
-      </section>
-      <p v-if="!data?.ranking.length" class="state-message">
-        順位はまだありません。
-      </p></RequestState
-    >
+    <RankingView
+      :snapshot="data ?? undefined"
+      :own-team-code="
+        viewer?.state === 'CONTESTANT' ? viewer.team.code : undefined
+      "
+      :pending="pending"
+      :error="error"
+      @retry="refresh"
+    />
   </main>
 </template>
