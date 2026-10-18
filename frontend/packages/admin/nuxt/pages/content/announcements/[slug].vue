@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AnnouncementContentView from "~/components/content/AnnouncementContentView.vue";
 import { api } from "@ictsc/api";
 import { createAdminActions } from "~/features/admin-api";
 const route = useRoute();
@@ -12,20 +13,11 @@ useHead({
 </script>
 <template>
   <main class="workspace">
-    <NuxtLink class="text-link" to="/content">← コンテンツ一覧</NuxtLink>
-    <RequestState :error="error" :pending="pending" @retry="refresh"
-      ><template v-if="data"
-        ><h1>{{ data.announcement.title }}</h1>
-        <p class="admin-lead">
-          公開日時:
-          <time>{{
-            new Date(data.announcement.effective_from).toLocaleString("ja-JP")
-          }}</time>
-        </p>
-        <section class="admin-panel">
-          <MarkdownContent
-            :source="data.announcement.markdown"
-          /></section></template
-    ></RequestState>
+    <AnnouncementContentView
+      :announcement="data?.announcement"
+      :pending="pending"
+      :error="error"
+      @retry="refresh"
+    />
   </main>
 </template>
