@@ -281,3 +281,76 @@ export const answers: Schemas["AdminAnswer"][] = answerRows.map(
     };
   },
 );
+
+const previousBody = `## 原因
+
+api-gateway の設定を確認しました。
+
+## 対応
+
+コンテナを再起動しました。
+
+## 確認
+
+起動したことを確認しました。`;
+
+const currentBody = `## 原因
+
+api-gateway の環境変数 UPSTREAM_URL が誤っており、起動直後の疎通確認に失敗して終了していました。
+
+## 対応
+
+compose.yaml の UPSTREAM_URL を http://backend:8080 に修正し、docker compose up -d で再作成しました。
+
+## 確認
+
+10分間再起動が発生しないこと、管理画面が 200 を返すことを確認しました。`;
+
+const detailBase = answers.find((a) => a.reference.problem_code === "B02")!;
+
+export const detailAnswer: Schemas["AdminAnswer"] = {
+  ...detailBase,
+  reference: { team_code: 4, problem_code: "B02", answer_number: 3 },
+  team: teams[2]!,
+  body: { type: "DESCRIPTIVE", body: currentBody },
+  score: { total: 240, marked: 240, penalty: 0, max: 300 },
+  workflow: {
+    status: "IN_PROGRESS",
+    assignee_discord_id: myDiscordId,
+    assignment_source: "CLAIMED",
+    revision: 2,
+  },
+};
+
+export const previousAnswers: Schemas["AdminAnswer"][] = [2, 1].map(
+  (number) => ({
+    ...detailAnswer,
+    reference: { ...detailAnswer.reference, answer_number: number },
+    body: { type: "DESCRIPTIVE", body: previousBody },
+    submitted_at: new Date(fixedNow - (4 - number) * 1_800_000).toISOString(),
+    score:
+      number === 2 ? { total: 120, marked: 120, penalty: 0, max: 300 } : null,
+  }),
+);
+
+export const markings: Schemas["MarkingResult"][] = [
+  {
+    id: "mark-2",
+    answer: detailAnswer.reference,
+    judge: { name: adminName },
+    score: 240,
+    rationale: "原因と対応は正しい。復旧確認の根拠をもう少し具体的に。",
+    line_comments: [
+      { line_number: 3, body: "原因の特定は十分です" },
+      { line_number: 7, end_line_number: 7, body: "修正値の根拠も書くとよい" },
+      {
+        line_number: 11,
+        body: "古いコメント",
+        deleted_at: "2026-09-02T11:50:00+09:00",
+        deleted_by: adminName,
+      },
+    ],
+    created_at: "2026-09-02T11:45:00+09:00",
+    visibility: "TEAM",
+  },
+];
