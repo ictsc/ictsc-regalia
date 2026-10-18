@@ -4,9 +4,23 @@ import {
   answerSourceLines,
   buildAnswerDiffHunks,
   compareAnswerSources,
-  type AnswerDiffRow,
-  type AnswerDiffHunk,
 } from "~/features/answer-diff";
+import { buildDisplayItems } from "~/features/answer-display";
+import {
+  defaultPaneLayout,
+  resizePaneWidths,
+  restorePaneLayout,
+} from "~/features/grading-panes";
+import {
+  activeCommentCount,
+  clearLineDrafts,
+  draftLineComments as toLineComments,
+  emptyLineDraftState,
+  lineHistory as groupLineHistory,
+  rangeLabel,
+  removeDraft as withoutDraft,
+  selectLine as withSelectedLine,
+} from "~/features/line-drafts";
 import {
   getAdminAnswer,
   listAdminMarkingResults,
@@ -84,16 +98,14 @@ const previousAnswer = computed(() =>
 const score = ref<number | null>(null);
 const comment = ref("");
 const { elapsedMinutes } = useSubmissionAge();
-type LineDraft = {
-  id: number;
-  startLine: number;
-  endLine: number;
-  body: string;
-};
-const lineDrafts = ref<LineDraft[]>([]);
-const activeDraftId = ref<number | null>(null);
-const selectionAnchor = ref<number | null>(null);
-let nextDraftId = 1;
+const draftState = ref(emptyLineDraftState());
+const lineDrafts = computed(() => draftState.value.drafts);
+const activeDraftId = computed({
+  get: () => draftState.value.activeId,
+  set: (activeId) => {
+    draftState.value = { ...draftState.value, activeId };
+  },
+});
 const answerLines = computed(() =>
   answerSourceLines(data.value?.answer.body.body ?? ""),
 );
@@ -118,139 +130,30 @@ const diffHunks = computed(() =>
       )
     : [],
 );
-type DisplayItem =
-  | { type: "line"; row: AnswerDiffRow; key: string }
-  | { type: "hunk"; hunk: AnswerDiffHunk; key: string }
-  | { type: "omitted"; count: number; key: string };
-const displayedItems = computed<DisplayItem[]>(() => {
-  if (!isDiffView.value || !comparison.value) {
-    return answerLines.value.map((text, index) => ({
-      type: "line",
-      key: `current-${index + 1}`,
-      row: { kind: "same", previousLine: null, currentLine: index + 1, text },
-    }));
-  }
-  if (!diffHunks.value.length) return [];
-  const items: DisplayItem[] = [];
-  let shown = 0;
-  for (const hunk of diffHunks.value) {
-    if (hunk.omittedBefore) {
-      items.push({
-        type: "omitted",
-        count: hunk.omittedBefore,
-        key: `omitted-${shown}`,
-      });
-      shown += hunk.omittedBefore;
-    }
-    items.push({ type: "hunk", hunk, key: `hunk-${shown}` });
-    for (const row of hunk.rows) {
-      items.push({ type: "line", row, key: `diff-${shown++}` });
-    }
-  }
-  const omittedAfter = comparison.value.rows.length - shown;
-  if (omittedAfter)
-    items.push({
-      type: "omitted",
-      count: omittedAfter,
-      key: `omitted-${shown}`,
-    });
-  return items;
-});
+const displayedItems = computed(() =>
+  buildDisplayItems(
+    answerLines.value,
+    comparison.value,
+    diffHunks.value,
+    isDiffView.value,
+  ),
+);
 watch(selectedPrevious, () => {
   showAllContext.value = false;
 });
-const lineHistory = computed(() => {
-  const byLine: Record<
-    number,
-    {
-      id: string;
-      judge: string;
-      body: string;
-      startLine: number;
-      endLine: number;
-    }[]
-  > = {};
-  for (const mark of data.value?.marks ?? []) {
-    for (const note of mark.line_comments ?? []) {
-      if (note.deleted_at) continue;
-      const endLine = note.end_line_number ?? note.line_number;
-      (byLine[endLine] ??= []).push({
-        id: mark.id,
-        judge: mark.judge.name,
-        body: note.body,
-        startLine: note.line_number,
-        endLine,
-      });
-    }
-  }
-  return byLine;
-});
+const lineHistory = computed(() => groupLineHistory(data.value?.marks ?? []));
 const savedRanges = computed(() => Object.values(lineHistory.value).flat());
-const draftLineComments = computed(() =>
-  lineDrafts.value
-    .filter((draft) => draft.body.trim())
-    .map((draft) => ({
-      line_number: draft.startLine,
-      ...(draft.endLine > draft.startLine
-        ? { end_line_number: draft.endLine }
-        : {}),
-      body: draft.body.trim(),
-    }))
-    .toSorted((a, b) => a.line_number - b.line_number),
-);
-function rangeLabel(startLine: number, endLine: number) {
-  return startLine === endLine
-    ? `${startLine} 行目`
-    : `${startLine}〜${endLine} 行目`;
-}
+const draftLineComments = computed(() => toLineComments(lineDrafts.value));
 function draftsAtLine(line: number) {
   return lineDrafts.value.filter((draft) => draft.endLine === line);
 }
 function selectLine(line: number, extend: boolean) {
-  const active = lineDrafts.value.find(
-    (draft) => draft.id === activeDraftId.value,
-  );
-  if (extend && active && selectionAnchor.value !== null) {
-    active.startLine = Math.min(selectionAnchor.value, line);
-    active.endLine = Math.max(selectionAnchor.value, line);
-    return;
-  }
-  if (!extend && active && line >= active.startLine && line <= active.endLine) {
-    if (!active.body.trim()) removeDraft(active.id);
-    else {
-      activeDraftId.value = null;
-      selectionAnchor.value = null;
-    }
-    return;
-  }
-  const closed = lineDrafts.value.findLast(
-    (draft) =>
-      draft.body.trim() && line >= draft.startLine && line <= draft.endLine,
-  );
-  if (!extend && closed) {
-    activeDraftId.value = closed.id;
-    selectionAnchor.value = closed.startLine;
-    return;
-  }
-  lineDrafts.value = lineDrafts.value.filter((draft) => draft.body.trim());
-  const id = nextDraftId++;
-  lineDrafts.value.push({ id, startLine: line, endLine: line, body: "" });
-  activeDraftId.value = id;
-  selectionAnchor.value = line;
+  draftState.value = withSelectedLine(draftState.value, line, extend);
 }
 function removeDraft(id: number) {
-  lineDrafts.value = lineDrafts.value.filter((draft) => draft.id !== id);
-  if (activeDraftId.value === id) {
-    activeDraftId.value = null;
-    selectionAnchor.value = null;
-  }
+  draftState.value = withoutDraft(draftState.value, id);
 }
 const { busy, message, run } = useMutation(refresh);
-function activeCommentCount(
-  marking: NonNullable<typeof data.value>["marks"][number],
-) {
-  return marking.line_comments.filter((note) => !note.deleted_at).length;
-}
 async function deleteLineComment(markingId: string, commentIndex: number) {
   await run(
     "行コメントを削除",
@@ -277,11 +180,7 @@ async function mark() {
       ),
     `得点: ${score.value}\n全体コメント: ${comment.value}\n行コメント: ${draftLineComments.value.length}件\nこの採点結果を送信しますか？`,
   );
-  if (saved) {
-    lineDrafts.value = [];
-    activeDraftId.value = null;
-    selectionAnchor.value = null;
-  }
+  if (saved) draftState.value = clearLineDrafts(draftState.value);
 }
 async function assignment(action: "CLAIM_SELF" | "RESET_TO_DEFAULT") {
   if (!data.value) return;
@@ -303,47 +202,18 @@ async function assignment(action: "CLAIM_SELF" | "RESET_TO_DEFAULT") {
 
 const paneLabels = ["提出時点の問題", "回答", "採点"];
 const visiblePaneIndices = computed(() => [0, 1, 2]);
-const collapsed = ref([false, false, false]);
-const widths = ref([23, 55, 22]);
+const collapsed = ref(defaultPaneLayout().collapsed);
+const widths = ref(defaultPaneLayout().widths);
 const paneContainer = ref<HTMLElement | null>(null);
 onMounted(() => {
   try {
-    const saved = JSON.parse(
-      localStorage.getItem("regalia/admin/grading-panes-v2") ?? "null",
+    const layout = restorePaneLayout(
+      localStorage.getItem("regalia/admin/grading-panes-v2"),
+      localStorage.getItem("regalia/admin/grading-panes"),
+      { collapsed: collapsed.value, widths: widths.value },
     );
-    if (Array.isArray(saved?.collapsed) && saved.collapsed.length === 3)
-      collapsed.value = saved.collapsed.map(Boolean);
-    if (
-      Array.isArray(saved?.widths) &&
-      saved.widths.length === 3 &&
-      saved.widths.every(
-        (n: unknown) => typeof n === "number" && n >= 10 && n <= 75,
-      )
-    )
-      widths.value = saved.widths;
-    if (!saved) {
-      const old = JSON.parse(
-        localStorage.getItem("regalia/admin/grading-panes") ?? "null",
-      );
-      if (Array.isArray(old?.collapsed) && old.collapsed.length === 4)
-        collapsed.value = [
-          old.collapsed[0],
-          old.collapsed[2],
-          old.collapsed[3],
-        ].map(Boolean);
-      if (
-        Array.isArray(old?.widths) &&
-        old.widths.length === 4 &&
-        old.widths.every(
-          (n: unknown) => typeof n === "number" && Number.isFinite(n),
-        )
-      )
-        widths.value = [
-          old.widths[0],
-          old.widths[1] + old.widths[2],
-          old.widths[3],
-        ];
-    }
+    collapsed.value = layout.collapsed;
+    widths.value = layout.widths;
   } catch {
     /* Default pane layout remains available. */
   }
@@ -390,17 +260,7 @@ function startResize(
     visiblePaneIndices.value.filter((i) => collapsed.value[i]).length * 46;
   const move = (moveEvent: PointerEvent) => {
     const delta = ((moveEvent.clientX - startX) / available) * openWeight;
-    const bounded = Math.max(
-      12 - start[leftIndex]!,
-      Math.min(start[rightIndex]! - 12, delta),
-    );
-    widths.value = start.map((value, i) =>
-      i === leftIndex
-        ? value + bounded
-        : i === rightIndex
-          ? value - bounded
-          : value,
-    );
+    widths.value = resizePaneWidths(start, leftIndex, rightIndex, delta);
   };
   const stop = () => {
     window.removeEventListener("pointermove", move);
