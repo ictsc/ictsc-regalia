@@ -3,6 +3,8 @@ import { setup } from "@storybook/vue3-vite";
 import { createMemoryHistory, createRouter, RouterLink } from "vue-router";
 import "../styles.css";
 import "../application.css";
+// Admin styles are all scoped to .admin-* classes, so loading them globally is safe.
+import "../../admin/nuxt/assets/admin.css";
 import "katex/dist/katex.min.css";
 
 const router = createRouter({
