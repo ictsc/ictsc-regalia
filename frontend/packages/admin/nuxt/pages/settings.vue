@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SettingsView from "~/components/settings/SettingsView.vue";
 import { api, expectData } from "@ictsc/api";
 import { createAdminActions } from "~/features/admin-api";
 useHead({ title: "競技設定" });
@@ -12,66 +13,35 @@ const { data, error, pending, refresh } = await useAsyncData(
     return { rule: rule.rule, schedule: schedule.dashboard_schedule };
   },
 );
-const markdown = ref(data.value?.rule.markdown ?? "");
-const freeze = ref(
-  data.value?.schedule.ranking_freeze_at
-    ? new Date(
-        Date.parse(data.value.schedule.ranking_freeze_at) -
-          new Date().getTimezoneOffset() * 60000,
-      )
-        .toISOString()
-        .slice(0, 16)
-    : "",
-);
+const initialFreeze = data.value?.schedule.ranking_freeze_at
+  ? new Date(
+      Date.parse(data.value.schedule.ranking_freeze_at) -
+        new Date().getTimezoneOffset() * 60000,
+    )
+      .toISOString()
+      .slice(0, 16)
+  : "";
 const { busy, message, run } = useMutation(refresh);
 const actions = createAdminActions(api);
+const saveRule = (markdown: string) =>
+  run("ルール更新", () => actions.replaceRule(markdown));
+const saveFreeze = (freeze: string) =>
+  run("凍結時刻更新", () =>
+    actions.replaceFreeze(freeze ? new Date(freeze).toISOString() : null),
+  );
 </script>
 <template>
   <main class="workspace">
-    <h1>競技設定</h1>
-    <p class="admin-lead">
-      参加者に表示するルールと、ランキングの凍結時刻を管理します。
-    </p>
-    <p role="status">{{ message }}</p>
-    <RequestState :error="error" :pending="pending" @retry="refresh"
-      ><section class="admin-panel">
-        <h2>ルール編集</h2>
-        <p>Markdown で編集し、下のプレビューで表示を確認できます。</p>
-        <form
-          class="form-grid"
-          @submit.prevent="
-            run('ルール更新', () => actions.replaceRule(markdown))
-          "
-        >
-          <label>Markdown<textarea v-model="markdown" rows="18" /></label
-          ><button class="button-primary" :disabled="busy">ルールを更新</button>
-        </form>
-      </section>
-      <section class="admin-panel">
-        <h2>ルールのプレビュー</h2>
-        <MarkdownContent :source="markdown" />
-      </section>
-      <section class="admin-panel">
-        <h2>ランキング凍結</h2>
-        <p>
-          ブラウザのローカル時刻で入力します。空欄で保存すると凍結を解除します。
-        </p>
-        <form
-          class="form-grid"
-          @submit.prevent="
-            run('凍結時刻更新', () =>
-              actions.replaceFreeze(
-                freeze ? new Date(freeze).toISOString() : null,
-              ),
-            )
-          "
-        >
-          <label>凍結時刻<input v-model="freeze" type="datetime-local" /></label
-          ><button class="button-primary" :disabled="busy">
-            凍結時刻を保存
-          </button>
-        </form>
-      </section></RequestState
-    >
+    <SettingsView
+      :initial-markdown="data?.rule.markdown ?? ''"
+      :initial-freeze="initialFreeze"
+      :pending="pending"
+      :error="error"
+      :busy="busy"
+      :message="message"
+      @save-rule="saveRule"
+      @save-freeze="saveFreeze"
+      @retry="refresh"
+    />
   </main>
 </template>

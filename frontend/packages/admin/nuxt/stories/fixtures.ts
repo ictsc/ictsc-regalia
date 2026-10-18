@@ -17,3 +17,214 @@ export const contentStatus: Schemas["ContentStatus"] = {
   last_error: null,
   serving_last_known_good: false,
 };
+
+const teamNames = [
+  "NETWORK LAB",
+  "PACKET",
+  "KERNEL PANIC",
+  "ROUTE",
+  "SUBNET",
+  "LOOPBACK",
+];
+const colors = [
+  "#0083C3",
+  "#FF6C2F",
+  "#397E58",
+  "#BF53B6",
+  "#FAAF3F",
+  "#00CDC2",
+] as const;
+
+export const teams: Schemas["Team"][] = teamNames.map((name, index) => ({
+  code: index + 2,
+  name,
+  organization: index % 2 ? "ICTSC University" : "ICTSC 高専",
+  member_limit: 4,
+  color: colors[index],
+}));
+
+const memberNames = ["alice", "bob", "carol", "dave", "erin", "frank"];
+
+export const contestants: Schemas["AdminContestant"][] = memberNames.map(
+  (name, index) => ({
+    profile: {
+      name,
+      display_name: name[0]!.toUpperCase() + name.slice(1),
+      self_introduction: "",
+    },
+    team: teams[index % 3]!,
+    discord_id: `11000000000000000${index}`,
+  }),
+);
+
+export const invitations: Schemas["Invitation"][] = [
+  {
+    code: "KP-7Q2M-9XAD",
+    team_code: 4,
+    created_at: "2026-08-20T10:00:00+09:00",
+    expires_at: "2026-09-10T23:59:00+09:00",
+  },
+  {
+    code: "KP-3RZK-1BCE",
+    team_code: 4,
+    created_at: "2026-08-01T10:00:00+09:00",
+    expires_at: "2026-08-15T23:59:00+09:00",
+  },
+];
+
+export const catalog: Schemas["ProblemCatalogEntry"][] = [
+  {
+    code: "A01",
+    title: "DNSの名前解決ができない",
+    max_score: 300,
+    category: "ネットワーク",
+  },
+  {
+    code: "A02",
+    title: "Webサーバーに接続できない",
+    max_score: 150,
+    category: "サーバー",
+  },
+  {
+    code: "B02",
+    title: "コンテナが起動を繰り返す",
+    max_score: 300,
+    category: "サーバー",
+  },
+  {
+    code: "B04",
+    title: "VPNトンネルが確立しない",
+    max_score: 200,
+    category: "ネットワーク",
+  },
+];
+
+export const sections: Schemas["Section"][] = [
+  {
+    slug: "day1",
+    beginning: "2026-09-01T00:00:00+09:00",
+    ending: "2026-09-02T00:00:00+09:00",
+    problems: catalog.slice(0, 2),
+  },
+  {
+    slug: "day2",
+    beginning: "2026-09-02T00:00:00+09:00",
+    ending: "2026-09-02T14:13:48+09:00",
+    problems: catalog.slice(2),
+  },
+];
+
+export const announcements: Schemas["Announcement"][] = [
+  {
+    slug: "day2-start",
+    title: "2日目の競技を開始しました",
+    markdown:
+      "2日目の問題を公開しました。\n\n- 受付終了: **14:13**\n- 1日目の問題は閲覧のみです",
+    effective_from: "2026-09-02T09:00:00+09:00",
+  },
+  {
+    slug: "start",
+    title: "競技を開始しました",
+    markdown: "問題一覧から問題を確認し、回答を提出してください。",
+    effective_from: "2026-09-01T09:00:00+09:00",
+  },
+];
+
+export const adminProblem: Schemas["AdminProblem"] = {
+  code: "B02",
+  title: "コンテナが起動を繰り返す",
+  max_score: 300,
+  category: "サーバー",
+  section_slug: "day2",
+  type: "DESCRIPTIVE",
+  body: "## 状況\n\n監視対象のコンテナ`api-gateway`が起動して数秒後に終了し、再起動を繰り返しています。\n\n| ホスト | アドレス |\n| --- | --- |\n| app-01 | 10.20.1.10 |",
+  explanation:
+    "## 想定解\n\n`UPSTREAM_URL` の誤りを修正し、`docker compose up -d` で再作成する。\n\n## 採点基準\n\n- 原因の特定: 150点\n- 復旧と確認: 150点",
+  redeploy_rule: {
+    type: "PERCENTAGE_PENALTY",
+    penalty_threshold: 2,
+    penalty_percentage: 10,
+  },
+  content_commit: contentStatus.active_commit!,
+  default_grader_discord_id: null,
+};
+
+export const ranking: Schemas["RankingResponse"] = {
+  ranking: teams.map((team, index) => ({
+    rank: index + 1,
+    team_code: team.code,
+    team_name: team.name,
+    organization: team.organization,
+    score: 2100 - index * 230,
+    last_effective_submission_at: null,
+  })),
+  frozen: false,
+  frozen_at: null,
+};
+
+export const scores: Schemas["AdminScore"][] = teams
+  .slice(0, 3)
+  .flatMap((team, t) =>
+    catalog.slice(0, 2).map((problem, p) => ({
+      team,
+      problem,
+      marked_score: problem.max_score - (t + p) * 30,
+      penalty: t === 1 && p === 0 ? 30 : 0,
+      score: problem.max_score - (t + p) * 30 - (t === 1 && p === 0 ? 30 : 0),
+    })),
+  );
+
+const event = (
+  id: number,
+  status: Schemas["DeploymentStatus"],
+  minutesAgo: number,
+  message: string | null = null,
+): Schemas["DeploymentEvent"] => ({
+  event_id: `evt-${id}`,
+  occurred_at: new Date(fixedNow - minutesAgo * 60_000).toISOString(),
+  status,
+  message,
+});
+
+export const deployments: Schemas["AdminDeployment"][] = [
+  {
+    team_code: 4,
+    problem_code: "B02",
+    revision: 2,
+    latest_status: "DEPLOYING",
+    events: [event(4, "DEPLOYING", 2), event(3, "QUEUED", 3)],
+    content_commit: contentStatus.active_commit!,
+  },
+  {
+    team_code: 3,
+    problem_code: "A02",
+    revision: 1,
+    latest_status: "FAILED",
+    events: [
+      event(2, "FAILED", 20, "VM の起動がタイムアウトしました"),
+      event(1, "QUEUED", 25),
+    ],
+    content_commit: contentStatus.active_commit!,
+  },
+  {
+    team_code: 4,
+    problem_code: "B02",
+    revision: 1,
+    latest_status: "COMPLETED",
+    events: [event(0, "COMPLETED", 60)],
+    content_commit: contentStatus.active_commit!,
+  },
+];
+
+export const ruleMarkdown = `# 競技ルール
+
+## 回答
+
+- 回答は問題ごとに **20分に1回** まで提出できます
+- 再展開は減点なしで2回まで行えます
+
+| 区分 | 減点 |
+| --- | --- |
+| 3回目以降の再展開 | 10% |
+
+得点は $score = marked - penalty$ で計算します。`;
