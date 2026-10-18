@@ -64,6 +64,37 @@ const { data, error, pending, refresh } = await useAsyncData(
   },
 );
 
+// Another operator's assignment change or marking updates this answer in
+// place; the marking form keeps whatever the grader is typing.
+useRealtime(async (event) => {
+  if (
+    event.type !== "answer" ||
+    event.reason === "SUBMITTED" ||
+    event.teamCode !== reference.team_code ||
+    event.problemCode !== reference.problem_code ||
+    event.answerNumber !== reference.answer_number
+  )
+    return;
+  try {
+    const [answer, marks] = await Promise.all([
+      getAdminAnswer(api, reference),
+      listAdminMarkingResults(api),
+    ]);
+    if (data.value)
+      data.value = {
+        ...data.value,
+        answer,
+        marks: marks.filter(
+          (m) =>
+            m.answer.problem_code === reference.problem_code &&
+            m.answer.team_code === reference.team_code &&
+            m.answer.answer_number === reference.answer_number,
+        ),
+      };
+  } catch {
+    await refresh();
+  }
+});
 const { elapsedMinutes } = useSubmissionAge();
 const { busy, message, run } = useMutation(refresh);
 async function deleteLineComment(markingId: string, commentIndex: number) {

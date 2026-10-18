@@ -6,6 +6,7 @@ import {
   defaultGradingFilters,
   filterAnswers,
   minutesSince,
+  upsertAnswer,
   type GradingAnswer,
 } from "./grading";
 
@@ -90,5 +91,29 @@ describe("columnAnswers", () => {
     expect(columnAnswers(answers, "WAITING", "").map(answerKey)[0]).toBe(
       "3:A01:1",
     );
+  });
+});
+
+describe("upsertAnswer", () => {
+  it("replaces a changed answer in place", () => {
+    const list = [answer(2, "A", 2, 1), answer(2, "A", 1, 30)];
+    const claimed = answer(2, "A", 1, 30, { status: "IN_PROGRESS" });
+    expect(upsertAnswer(list, claimed).map((a) => a.workflow.status)).toEqual([
+      "WAITING",
+      "IN_PROGRESS",
+    ]);
+  });
+  it("inserts a new answer by submission time, newest first", () => {
+    const list = [answer(2, "A", 2, 1), answer(3, "B", 1, 30)];
+    expect(upsertAnswer(list, answer(4, "C", 1, 10)).map(answerKey)).toEqual([
+      "2:A:2",
+      "4:C:1",
+      "3:B:1",
+    ]);
+    expect(upsertAnswer(list, answer(4, "C", 1, 60)).map(answerKey)).toEqual([
+      "2:A:2",
+      "3:B:1",
+      "4:C:1",
+    ]);
   });
 });

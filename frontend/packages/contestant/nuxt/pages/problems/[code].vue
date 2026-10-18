@@ -11,6 +11,7 @@ import {
 import { draftKey, loadDraft, saveDraft } from "~/features/draft";
 import { fetchActivity } from "~/features/activity";
 import { remainingCooldownSeconds } from "~/features/problem/cooldown";
+import { affectsProblem } from "~/features/realtime";
 import AnswerForm from "~/components/problem/AnswerForm.vue";
 import AnswerHistory from "~/components/problem/AnswerHistory.vue";
 import DeploymentHistory from "~/components/problem/DeploymentHistory.vue";
@@ -57,6 +58,10 @@ useHead({
     data.value ? `${code} ${data.value.problem.title}` : code,
   ),
   bodyAttrs: { class: "detail-page" },
+});
+// Teammates' submissions and newly visible scores update this page in place.
+useRealtime((event) => {
+  if (affectsProblem(event, code)) void refresh();
 });
 const rail = useState<boolean>("problem-rail-open", () => true),
   body = ref(""),

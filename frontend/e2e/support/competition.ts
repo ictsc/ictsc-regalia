@@ -12,6 +12,11 @@ export async function installCompetitionApi(
     teamName: "KERNEL PANIC",
     impersonatedBy: null as string | null,
     submissions: [] as string[],
+    /** Answers returned per problem, e.g. a teammate's submission. */
+    answers: {} as Record<
+      string,
+      Array<{ number: number; submitted_at: string; content_commit: string }>
+    >,
   };
   const definitions = [
     ["A01", "DNSの名前解決ができない", "ネットワーク", 300, "day1", 300],
@@ -162,9 +167,10 @@ export async function installCompetitionApi(
           state.submissions.push(route.request().postDataJSON().body);
           return fulfillJson(route, { answer: { number: 1 } }, 201);
         }
+        const answers = state.answers[match[1]!] ?? [];
         return fulfillJson(route, {
-          answers: [],
-          last_submitted_at: null,
+          answers,
+          last_submitted_at: answers[0]?.submitted_at ?? null,
           submit_interval_seconds: 1200,
         });
       }
