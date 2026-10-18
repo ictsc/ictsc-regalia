@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import SignupView, {
+  type SignupForm,
+} from "~/components/signup/SignupView.vue";
 import { signUp } from "~/features/viewer/signup";
 useHead({ title: "参加登録" });
 const { viewer } = useSession();
@@ -7,20 +10,9 @@ const registrationTeam = computed(() =>
     ? viewer.value.registration_team
     : undefined,
 );
-const form = reactive({
-    invitationCode: "",
-    name:
-      viewer.value?.state === "DISCORD_AUTHENTICATED"
-        ? viewer.value.discord.username
-        : "",
-    displayName:
-      viewer.value?.state === "DISCORD_AUTHENTICATED"
-        ? viewer.value.discord.display_name
-        : "",
-  }),
-  message = ref(""),
+const message = ref(""),
   pending = ref(false);
-async function submit() {
+async function submit(form: SignupForm) {
   pending.value = true;
   try {
     const result = await signUp({
@@ -42,17 +34,19 @@ async function submit() {
 </script>
 <template>
   <main class="workspace">
-    <h1 class="page-title">参加登録</h1>
-    <form class="form-grid" @submit.prevent="submit">
-      <p v-if="registrationTeam">参加チーム: {{ registrationTeam.name }}</p>
-      <label v-else
-        >招待コード<input v-model="form.invitationCode" required /></label
-      ><label>競技者名<input v-model="form.name" required /></label
-      ><label
-        >表示名<input v-model="form.displayName" required maxlength="255"
-      /></label>
-      <p v-if="message" role="alert">{{ message }}</p>
-      <button class="button-primary" :disabled="pending">登録する</button>
-    </form>
+    <SignupView
+      :registration-team-name="registrationTeam?.name"
+      :initial-name="
+        viewer?.state === 'DISCORD_AUTHENTICATED' ? viewer.discord.username : ''
+      "
+      :initial-display-name="
+        viewer?.state === 'DISCORD_AUTHENTICATED'
+          ? viewer.discord.display_name
+          : ''
+      "
+      :pending="pending"
+      :message="message"
+      @submit="submit"
+    />
   </main>
 </template>

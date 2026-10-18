@@ -1,14 +1,13 @@
 <script setup lang="ts">
+import ProfileView, {
+  type ProfileForm,
+} from "~/components/profile/ProfileView.vue";
 import { api } from "@ictsc/api";
 import { fetchProfile, updateProfile } from "~/features/profile";
 useHead({ title: "プロフィール" });
 const { data, error, pending, refresh } = await useAsyncData("profile", () =>
   fetchProfile(api),
 );
-const form = reactive({
-  displayName: data.value?.displayName ?? "",
-  selfIntroduction: data.value?.selfIntroduction ?? "",
-});
 const saving = ref(false),
   message = ref("");
 const { signOut } = useSession();
@@ -25,7 +24,7 @@ async function logout() {
     signingOut.value = false;
   }
 }
-async function save() {
+async function save(form: ProfileForm) {
   saving.value = true;
   try {
     await updateProfile(api, form);
@@ -40,34 +39,17 @@ async function save() {
 </script>
 <template>
   <main class="workspace">
-    <h1 class="page-title">プロフィール</h1>
-    <RequestState :error="error" :pending="pending" @retry="refresh"
-      ><form class="form-grid" @submit.prevent="save">
-        <label>競技者名<input :value="data?.name" disabled /></label
-        ><label
-          >表示名<input
-            v-model="form.displayName"
-            required
-            maxlength="255" /></label
-        ><label
-          >自己紹介<textarea v-model="form.selfIntroduction" maxlength="2000" />
-        </label>
-        <p role="status">{{ message }}</p>
-        <button class="button-primary" :disabled="saving">更新する</button>
-      </form></RequestState
-    >
-    <section class="profile-account" aria-labelledby="profile-account-heading">
-      <h2 id="profile-account-heading">アカウント</h2>
-      <p v-if="signOutError" role="alert" class="error-message">
-        {{ signOutError }}
-      </p>
-      <button
-        class="button-secondary profile-logout"
-        :disabled="signingOut"
-        @click="logout"
-      >
-        {{ signingOut ? "処理中…" : "ログアウト" }}
-      </button>
-    </section>
+    <ProfileView
+      :profile="data ?? undefined"
+      :pending="pending"
+      :error="error"
+      :saving="saving"
+      :message="message"
+      :signing-out="signingOut"
+      :sign-out-error="signOutError"
+      @save="save"
+      @logout="logout"
+      @retry="refresh"
+    />
   </main>
 </template>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import NoticeListView from "~/components/announce/NoticeListView.vue";
+import WebPushSettings from "~/components/announce/WebPushSettings.vue";
 import { api } from "@ictsc/api";
 import { fetchNotices } from "~/features/announce";
 import { useReadAnnouncements } from "~/features/announce-read-status";
@@ -10,6 +12,13 @@ import {
 } from "~/features/web-push";
 const { isRead, markAsRead, markAsUnread, markAllAsRead } =
   useReadAnnouncements();
+const readSlugs = computed(() =>
+  (data.value ?? []).filter((n) => isRead(n.slug)).map((n) => n.slug),
+);
+function toggleRead(slug: string) {
+  if (isRead(slug)) markAsUnread(slug);
+  else markAsRead(slug);
+}
 useHead({ title: "お知らせ" });
 const { data, error, pending, refresh } = await useAsyncData("notices", () =>
   fetchNotices(api),
@@ -86,65 +95,26 @@ async function disablePush() {
 </script>
 <template>
   <main>
-    <header class="linked-page-heading">
-      <h1 class="page-title">お知らせ</h1>
-    </header>
-    <RequestState :error="error" :pending="pending" @retry="refresh"
-      ><section
-        class="notification-settings"
-        aria-labelledby="notification-settings-title"
-      >
-        <div>
-          <h2 id="notification-settings-title">Web Push通知</h2>
-          <p v-if="pushSubscribed">このブラウザで通知を受け取ります。</p>
-          <p v-else-if="!pushSupported">
-            このブラウザはWeb Pushに対応していません。
-          </p>
-          <p v-else-if="pushConfig && !pushConfig.enabled">
-            サーバー側のWeb Push設定が必要です。
-          </p>
-          <p v-else>新しいお知らせをブラウザの通知で受け取れます。</p>
-        </div>
-        <button
-          v-if="pushSubscribed"
-          class="button-secondary"
-          :disabled="pushBusy"
-          @click="disablePush"
-        >
-          通知を停止する
-        </button>
-        <button
-          v-else
-          class="button-secondary"
-          :disabled="pushBusy || !pushSupported || !pushConfig?.enabled"
-          @click="enablePush"
-        >
-          通知を有効にする
-        </button>
-        <p v-if="pushError || pushConfigError" class="form-error" role="alert">
-          {{ String(pushError ?? pushConfigError) }}
-        </p>
-      </section>
-      <div class="actions">
-        <button class="button-secondary" @click="markAllAsRead(data ?? [])">
-          すべて既読にする
-        </button>
-      </div>
-      <article v-for="n in data" :key="n.slug" class="notice-entry">
-        <time>{{ new Date(n.effectiveFrom).toLocaleString("ja-JP") }}</time>
-        <div>
-          <h2>
-            <NuxtLink :to="`/announces/${n.slug}`">{{ n.title }}</NuxtLink>
-          </h2>
-          <MarkdownContent :source="n.markdown" /><button
-            class="button-secondary"
-            @click="isRead(n.slug) ? markAsUnread(n.slug) : markAsRead(n.slug)"
-          >
-            {{ isRead(n.slug) ? "未読に戻す" : "既読にする" }}
-          </button>
-        </div>
-      </article>
-      <p v-if="!data?.length">現在お知らせはありません。</p></RequestState
+    <NoticeListView
+      :notices="data ?? undefined"
+      :read-slugs="readSlugs"
+      :pending="pending"
+      :error="error"
+      @toggle-read="toggleRead"
+      @mark-all-read="markAllAsRead(data ?? [])"
+      @retry="refresh"
     >
+      <template #settings>
+        <WebPushSettings
+          :subscribed="pushSubscribed"
+          :supported="pushSupported"
+          :server-enabled="pushConfig?.enabled"
+          :busy="pushBusy"
+          :error="pushError ?? pushConfigError ?? undefined"
+          @enable="enablePush"
+          @disable="disablePush"
+        />
+      </template>
+    </NoticeListView>
   </main>
 </template>
