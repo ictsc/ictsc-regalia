@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { api, expectData } from "@ictsc/api";
+import OverviewView, {
+  type OverviewCard,
+} from "~/components/overview/OverviewView.vue";
 useHead({ title: "概要" });
 async function settled<T>(p: Promise<T>) {
   try {
@@ -22,7 +25,7 @@ const { data, error, pending, refresh } = await useAsyncData(
     return { teams, contestants, answers, deployments, content };
   },
 );
-const cards = computed(() =>
+const cards = computed<OverviewCard[]>(() =>
   data.value
     ? [
         {
@@ -58,63 +61,16 @@ const cards = computed(() =>
       ]
     : [],
 );
-const stateLabels: Record<string, string> = {
-  NEVER: "未配信",
-  REFRESHING: "更新中",
-  SUCCEEDED: "配信中",
-  FAILED: "更新失敗",
-};
 </script>
 <template>
   <main class="workspace">
-    <h1>概要</h1>
-    <p class="admin-lead">競技運営の状況を確認し、各管理画面へ移動できます。</p>
-    <RequestState :error="error" :pending="pending" @retry="refresh"
-      ><div class="admin-summary-grid">
-        <NuxtLink
-          v-for="card in cards"
-          :key="card.to"
-          :to="card.to"
-          class="admin-summary-card"
-        >
-          <span class="admin-summary-label">{{ card.label }}</span>
-          <span class="admin-summary-number">{{
-            card.error ? "—" : (card.count ?? 0)
-          }}</span>
-          <span class="admin-summary-footer"
-            >{{ card.error ? "取得できませんでした" : card.detail }} →</span
-          >
-        </NuxtLink>
-      </div>
-      <section class="admin-panel">
-        <div class="admin-panel-heading">
-          <h2>配信コンテンツ</h2>
-          <NuxtLink class="text-link" to="/content">管理画面へ →</NuxtLink>
-        </div>
-        <RequestState :error="data?.content.error" @retry="refresh">
-          <div class="admin-meta">
-            <span
-              class="admin-badge"
-              :class="{
-                'is-active': data?.content.data?.content.state === 'SUCCEEDED',
-              }"
-              >{{
-                stateLabels[data?.content.data?.content.state ?? ""] ??
-                "状態不明"
-              }}</span
-            >
-            <span
-              v-if="data?.content.data?.content.serving_last_known_good"
-              class="admin-badge"
-              >最終正常版を配信中</span
-            >
-          </div>
-          <p class="admin-code">
-            有効な commit:
-            {{ data?.content.data?.content.active_commit ?? "未設定" }}
-          </p>
-        </RequestState>
-      </section></RequestState
-    >
+    <OverviewView
+      :cards="cards"
+      :content="data?.content.data?.content"
+      :content-error="data?.content.error"
+      :pending="pending"
+      :error="error"
+      @retry="refresh"
+    />
   </main>
 </template>

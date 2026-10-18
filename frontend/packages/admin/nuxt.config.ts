@@ -32,6 +32,7 @@ export default defineNuxtConfig({
     "@ictsc/ui/styles.css",
     "@ictsc/ui/application.css",
     "katex/dist/katex.min.css",
+    "~/assets/admin.css",
   ],
   components: [
     { path: "~/components" },

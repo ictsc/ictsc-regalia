@@ -32,6 +32,7 @@ const config: StorybookConfig = {
   stories: [
     "../components/**/*.stories.ts",
     "../../contestant/nuxt/**/*.stories.ts",
+    "../../admin/nuxt/**/*.stories.ts",
   ],
   framework: "@storybook/vue3-vite",
   core: { disableTelemetry: true },
