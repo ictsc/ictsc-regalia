@@ -191,6 +191,9 @@ func (h *Handler) UpdateAdminAnswerWorkflow(ctx context.Context, request api.Upd
 	if _, err := h.service.Store.UpdateAnswerWorkflow(ctx, request.TeamCode, request.ProblemCode, request.AnswerNumber, update); err != nil {
 		return nil, err
 	}
+	h.service.PublishRealtime(ctx, core.RealtimeEvent{
+		Kind: core.RealtimeAnswerWorkflowUpdated, TeamCode: request.TeamCode, ProblemCode: request.ProblemCode, AnswerNumber: request.AnswerNumber,
+	})
 	answer, err := h.service.Store.GetAnswer(ctx, request.TeamCode, request.ProblemCode, request.AnswerNumber)
 	if err != nil {
 		return nil, err
@@ -274,6 +277,7 @@ func (h *Handler) CreateAdminMarkingResult(ctx context.Context, request api.Crea
 	if err != nil {
 		return nil, err
 	}
+	h.service.PublishRealtime(ctx, core.RealtimeEvent{Kind: core.RealtimeMarkingUpdated, TeamCode: result.TeamCode, ProblemCode: result.ProblemCode, AnswerNumber: result.AnswerNumber})
 	return api.CreateAdminMarkingResult201JSONResponse{MarkingResult: toAPIMarking(result)}, nil
 }
 
@@ -282,6 +286,7 @@ func (h *Handler) DeleteAdminMarkingLineComment(ctx context.Context, request api
 	if err != nil {
 		return nil, err
 	}
+	h.service.PublishRealtime(ctx, core.RealtimeEvent{Kind: core.RealtimeMarkingUpdated, TeamCode: result.TeamCode, ProblemCode: result.ProblemCode, AnswerNumber: result.AnswerNumber})
 	return api.DeleteAdminMarkingLineComment200JSONResponse{MarkingResult: toAPIMarking(result)}, nil
 }
 
@@ -328,6 +333,7 @@ func (h *Handler) RecalculateAdminScores(ctx context.Context, _ api.RecalculateA
 	if err := h.service.Store.RecalculateScores(ctx, scores, principal(ctx).Session.AdminName); err != nil {
 		return nil, err
 	}
+	h.service.PublishRealtime(ctx, core.RealtimeEvent{Kind: core.RealtimeScoresRecalculated})
 	return api.RecalculateAdminScores204Response{}, nil
 }
 
@@ -335,5 +341,6 @@ func (h *Handler) RevealAdminFinalScores(ctx context.Context, _ api.RevealAdminF
 	if _, err := h.service.Store.RevealFinal(ctx, h.service.Now(), principal(ctx).Session.AdminName); err != nil {
 		return nil, err
 	}
+	h.service.PublishRealtime(ctx, core.RealtimeEvent{Kind: core.RealtimeCompetitionUpdated})
 	return api.RevealAdminFinalScores204Response{}, nil
 }

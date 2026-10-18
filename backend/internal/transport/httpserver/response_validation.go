@@ -59,7 +59,7 @@ func validateOpenAPIResponses(spec *openapi3.T, next http.Handler) (http.Handler
 	)
 	validated := validator.Middleware(next)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if isDeploymentSSEPath(r.URL.Path) {
+		if isSSEPath(r.URL.Path) {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -68,8 +68,9 @@ func validateOpenAPIResponses(spec *openapi3.T, next http.Handler) (http.Handler
 	}), nil
 }
 
-func isDeploymentSSEPath(path string) bool {
-	if path == "/api/v1/admin/deployments/stream" {
+func isSSEPath(path string) bool {
+	switch path {
+	case "/api/v1/admin/deployments/stream", "/api/v1/admin/events/stream", "/api/v1/contestant/events/stream":
 		return true
 	}
 	return strings.HasPrefix(path, "/api/v1/contestant/problems/") && strings.HasSuffix(path, "/deployments/stream")

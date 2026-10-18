@@ -55,6 +55,7 @@ func (h *Handler) ReplaceAdminRule(ctx context.Context, request api.ReplaceAdmin
 	if err != nil {
 		return nil, err
 	}
+	h.service.PublishRealtime(ctx, core.RealtimeEvent{Kind: core.RealtimeCompetitionUpdated})
 	return api.ReplaceAdminRule200JSONResponse{Rule: api.Rule{Markdown: state.RuleMarkdown}}, nil
 }
 
@@ -82,5 +83,6 @@ func (h *Handler) ReplaceAdminDashboardSchedule(ctx context.Context, request api
 	if err != nil {
 		return nil, err
 	}
+	h.service.PublishRealtime(ctx, core.RealtimeEvent{Kind: core.RealtimeCompetitionUpdated})
 	return api.ReplaceAdminDashboardSchedule200JSONResponse{DashboardSchedule: api.DashboardSchedule{RankingFreezeAt: state.RankingFreezeAt}}, nil
 }

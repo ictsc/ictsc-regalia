@@ -429,6 +429,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/contestant/events/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 自チームの画面に関わる変更通知をSSEで購読する
+         * @description 接続時と再接続時にreadyイベントを送り、以後は変更の種類だけを通知する。イベントは得点や回答本文を含まないため、クライアントは該当するREST APIを取り直す。自チームの回答提出はanswers、自チームの採点結果が見えるようになり得る時点（提出から公開遅延が経過した時点、公開遅延経過後の採点、最終公開）はscoresで通知する。公開遅延中の採点は通知しない。15秒間隔でkeepaliveコメントを送る。ブラウザからの状態ポーリングには使用しない。
+         */
+        get: operations["streamContestantEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/contestant/announcements": {
         parameters: {
             query?: never;
@@ -964,6 +984,26 @@ export interface paths {
         put?: never;
         /** 指定チームの問題を展開する */
         post: operations["createAdminDeployment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/events/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 運営画面に関わる変更通知をSSEで購読する
+         * @description 接続時と再接続時にreadyイベントを送り、以後は変更の種類と対象の回答参照だけを通知する。クライアントは該当するREST APIを取り直す。15秒間隔でkeepaliveコメントを送る。ブラウザからの状態ポーリングには使用しない。
+         */
+        get: operations["streamAdminEvents"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1586,6 +1626,18 @@ export interface components {
         };
         ContestantDeploymentResponse: {
             deployment: components["schemas"]["ContestantDeployment"];
+        };
+        /** @description 対象を持たない変更通知。クライアントはイベント名に対応するREST APIを取り直す。 */
+        RealtimeNotice: Record<string, never>;
+        /** @description 自チームの特定の問題に関する変更通知。 */
+        ContestantRealtimeProblemEvent: {
+            problem_code: string;
+        };
+        /** @description 回答に関する変更通知。SUBMITTEDは新着、WORKFLOW_UPDATEDは担当・ステータス変更、MARKING_UPDATEDは採点結果の作成・変更、PUBLICATION_DELAY_ELAPSEDは公開遅延の経過による採点結果の可視性変化を表す。 */
+        AdminRealtimeAnswerEvent: {
+            /** @enum {string} */
+            reason: "SUBMITTED" | "WORKFLOW_UPDATED" | "MARKING_UPDATED" | "PUBLICATION_DELAY_ELAPSED";
+            answer: components["schemas"]["AdminAnswerReference"];
         };
         Announcement: {
             slug: string;
@@ -2575,6 +2627,46 @@ export interface operations {
             500: components["responses"]["InternalServerError"];
         };
     };
+    streamContestantEvents: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description EventSource再接続時にブラウザが送る最後のSSE event ID。サーバーはこれに依存せずDBの最新snapshotから復元する。 */
+                "Last-Event-ID"?: components["parameters"]["LastEventIdHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 変更通知イベントのストリーム。各data行はx-sse-eventsに示すJSON。readyとcompetitionを受け取ったクライアントは表示中のデータをすべて取り直す。 */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["SSECacheControl"];
+                    "X-Accel-Buffering": components["headers"]["SSEBuffering"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example event: ready
+                     *     id: 8bd91aa8-4c57-4ed5-85bf-b829a4cd5571
+                     *     data: {}
+                     *
+                     *     event: answers
+                     *     id: 0b7e1c55-3f7d-4a43-9d0e-3a0f61c1f1b2
+                     *     data: {"problem_code":"ABC"}
+                     *
+                     *     : keepalive
+                     */
+                    "text/event-stream": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
     listContestantAnnouncements: {
         parameters: {
             query?: never;
@@ -3497,6 +3589,46 @@ export interface operations {
             422: components["responses"]["ValidationError"];
             500: components["responses"]["InternalServerError"];
             502: components["responses"]["BadGateway"];
+        };
+    };
+    streamAdminEvents: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description EventSource再接続時にブラウザが送る最後のSSE event ID。サーバーはこれに依存せずDBの最新snapshotから復元する。 */
+                "Last-Event-ID"?: components["parameters"]["LastEventIdHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 変更通知イベントのストリーム。各data行はx-sse-eventsに示すJSON。readyとcompetitionを受け取ったクライアントは表示中のデータをすべて取り直す。 */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["SSECacheControl"];
+                    "X-Accel-Buffering": components["headers"]["SSEBuffering"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example event: ready
+                     *     id: 8bd91aa8-4c57-4ed5-85bf-b829a4cd5571
+                     *     data: {}
+                     *
+                     *     event: answer
+                     *     id: 0b7e1c55-3f7d-4a43-9d0e-3a0f61c1f1b2
+                     *     data: {"reason":"SUBMITTED","answer":{"team_code":2,"problem_code":"ABC","answer_number":1}}
+                     *
+                     *     : keepalive
+                     */
+                    "text/event-stream": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalServerError"];
         };
     };
     streamAdminDeployments: {
