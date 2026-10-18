@@ -1,4 +1,5 @@
 import { onMounted, onUnmounted, ref } from "vue";
+import { minutesSince } from "~/features/grading";
 
 export function useSubmissionAge() {
   const now = ref(Date.now());
@@ -18,10 +19,7 @@ export function useSubmissionAge() {
   });
 
   function elapsedMinutes(submittedAt: string) {
-    return Math.max(
-      0,
-      Math.floor((now.value - Date.parse(submittedAt)) / 60_000),
-    );
+    return minutesSince(submittedAt, now.value);
   }
   return { now, elapsedMinutes };
 }

@@ -228,3 +228,56 @@ export const ruleMarkdown = `# 競技ルール
 | 3回目以降の再展開 | 10% |
 
 得点は $score = marked - penalty$ で計算します。`;
+
+export const myDiscordId = "110000000000000099";
+
+const answerRows: [
+  team: number,
+  problem: number,
+  number: number,
+  minutesAgo: number,
+  status: Schemas["AdminAnswerWorkflow"]["status"],
+  assignee: string | null,
+  claimed: boolean,
+  score: number | null,
+][] = [
+  [4, 2, 3, 2, "WAITING", myDiscordId, false, null],
+  [2, 0, 1, 6, "WAITING", "110000000000000001", false, null],
+  [3, 1, 2, 14, "WAITING", null, false, null],
+  [5, 3, 1, 33, "IN_PROGRESS", myDiscordId, true, null],
+  [6, 2, 1, 48, "IN_PROGRESS", "110000000000000002", true, null],
+  [2, 2, 1, 75, "COMPLETED", "110000000000000001", false, 300],
+  [3, 0, 1, 120, "COMPLETED", myDiscordId, false, 180],
+];
+
+export const answers: Schemas["AdminAnswer"][] = answerRows.map(
+  ([team, problem, number, minutesAgo, status, assignee, claimed, score]) => {
+    const p = catalog[problem]!;
+    return {
+      reference: {
+        team_code: team,
+        problem_code: p.code,
+        answer_number: number,
+      },
+      team: teams[team - 2]!,
+      author: contestants[0]!.profile,
+      problem: p,
+      body: {
+        type: "DESCRIPTIVE",
+        body: "## 原因\n\n設定ファイルの値が誤っていました。\n\n## 対応\n\n値を修正して再起動しました。",
+      },
+      submitted_at: new Date(fixedNow - minutesAgo * 60_000).toISOString(),
+      score:
+        score === null
+          ? null
+          : { total: score, marked: score, penalty: 0, max: p.max_score },
+      content_commit: contentStatus.active_commit!,
+      workflow: {
+        status,
+        assignee_discord_id: assignee,
+        assignment_source: claimed ? "CLAIMED" : "DEFAULT",
+        revision: 1,
+      },
+    };
+  },
+);
