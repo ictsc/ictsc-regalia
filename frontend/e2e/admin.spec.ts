@@ -782,6 +782,53 @@ test("採点看板の担当・移動と過去回答の比較", async ({ page }) 
   await expect(page.getByRole("button", { name: "行 1 を選択" })).toBeVisible();
 });
 
+test("採点看板は新着回答と他の運営の担当変更をリアルタイムに反映する", async ({
+  page,
+}) => {
+  await installEventSourceMock(page);
+  const state = await installAdminApi(page);
+  await page.goto("/admin/submissions/");
+  const waiting = page.getByRole("region", { name: "採点待ち" });
+  const inProgress = page.getByRole("region", { name: "採点中" });
+  await expect(page.getByText("Existing Team / #1")).toBeVisible();
+  await expect(page.getByText("Existing Team / #2")).toHaveCount(0);
+  await emitSse(page, "/api/v1/admin/events/stream", "ready", {});
+
+  state.answers.push({
+    ...structuredClone(answer),
+    reference: { ...answer.reference, answer_number: 2 },
+    score: null,
+    workflow: {
+      status: "WAITING",
+      assignee_discord_id: null,
+      assignment_source: "DEFAULT",
+      revision: 0,
+    },
+  });
+  const reference = { team_code: 12, problem_code: "A01", answer_number: 2 };
+  await emitSse(page, "/api/v1/admin/events/stream", "answer", {
+    reason: "SUBMITTED",
+    answer: reference,
+  });
+  await expect(waiting.getByText("Existing Team / #2")).toBeVisible();
+
+  state.answers[1] = {
+    ...state.answers[1]!,
+    workflow: {
+      status: "IN_PROGRESS",
+      assignee_discord_id: "other-operator",
+      assignment_source: "CLAIMED",
+      revision: 1,
+    },
+  };
+  await emitSse(page, "/api/v1/admin/events/stream", "answer", {
+    reason: "WORKFLOW_UPDATED",
+    answer: reference,
+  });
+  await expect(inProgress.getByText("Existing Team / #2")).toBeVisible();
+  await expect(waiting.getByText("Existing Team / #2")).toHaveCount(0);
+});
+
 test("redeployはQUEUEDを楽観表示しSSE更新・履歴・一回syncのみを使う", async ({
   page,
 }) => {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { teamStyle } from "@ictsc/ui/colors";
+import RealtimeSync from "~/components/realtime/RealtimeSync.vue";
 const { viewer } = useSession();
 </script>
 <template>
@@ -9,6 +10,7 @@ const { viewer } = useSession();
     "
   >
     <CompetitionHeader v-if="viewer?.state === 'CONTESTANT'" />
+    <RealtimeSync v-if="viewer?.state === 'CONTESTANT'" />
     <header v-else class="admin-header">
       <NuxtLink class="brand" to="/" aria-label="ICTSC 2026 REGALIA ホーム">
         <AsciiLogo />

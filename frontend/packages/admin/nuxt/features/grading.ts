@@ -36,6 +36,25 @@ export function answerKey(answer: GradingAnswer) {
   return `${r.team_code}:${r.problem_code}:${r.answer_number}`;
 }
 
+/**
+ * Replaces the answer with the same reference, or inserts a new one keeping
+ * the server order (newest submission first).
+ */
+export function upsertAnswer(
+  answers: GradingAnswer[],
+  answer: GradingAnswer,
+): GradingAnswer[] {
+  const key = answerKey(answer);
+  if (answers.some((a) => answerKey(a) === key))
+    return answers.map((a) => (answerKey(a) === key ? answer : a));
+  const index = answers.findIndex(
+    (a) => Date.parse(a.submitted_at) < Date.parse(answer.submitted_at),
+  );
+  return index < 0
+    ? [...answers, answer]
+    : [...answers.slice(0, index), answer, ...answers.slice(index)];
+}
+
 export function answerPath(answer: GradingAnswer) {
   const r = answer.reference;
   return `/submissions/${r.problem_code}/${r.team_code}/${r.answer_number}`;

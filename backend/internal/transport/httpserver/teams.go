@@ -37,6 +37,7 @@ func (h *Handler) CreateAdminTeam(ctx context.Context, request api.CreateAdminTe
 	if err != nil {
 		return nil, err
 	}
+	h.service.PublishRealtime(ctx, core.RealtimeEvent{Kind: core.RealtimeTeamsUpdated, TeamCode: team.Code})
 	return api.CreateAdminTeam201JSONResponse{Team: toAPITeam(team)}, nil
 }
 
@@ -64,6 +65,7 @@ func (h *Handler) UpdateAdminTeam(ctx context.Context, request api.UpdateAdminTe
 	if err != nil {
 		return nil, err
 	}
+	h.service.PublishRealtime(ctx, core.RealtimeEvent{Kind: core.RealtimeTeamsUpdated, TeamCode: team.Code})
 	return api.UpdateAdminTeam200JSONResponse{Team: toAPITeam(team)}, nil
 }
 
@@ -71,6 +73,7 @@ func (h *Handler) DeleteAdminTeam(ctx context.Context, request api.DeleteAdminTe
 	if err := h.service.Store.DeleteTeam(ctx, request.TeamCode); err != nil {
 		return nil, err
 	}
+	h.service.PublishRealtime(ctx, core.RealtimeEvent{Kind: core.RealtimeTeamsUpdated, TeamCode: request.TeamCode})
 	return api.DeleteAdminTeam204Response{}, nil
 }
 
@@ -154,6 +157,7 @@ func (h *Handler) UpdateContestantProfile(ctx context.Context, request api.Updat
 	if err != nil {
 		return nil, err
 	}
+	h.service.PublishRealtime(ctx, core.RealtimeEvent{Kind: core.RealtimeTeamsUpdated, TeamCode: contestant.TeamCode})
 	return api.UpdateContestantProfile200JSONResponse{Profile: toAPIProfile(contestant)}, nil
 }
 

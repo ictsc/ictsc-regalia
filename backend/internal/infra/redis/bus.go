@@ -6,32 +6,41 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/internal/service"
 )
 
-const deploymentChannel = "ictsc:deployment-events"
+const (
+	deploymentChannel = "ictsc:deployment-events"
+	realtimeChannel   = "ictsc:realtime-events"
+)
 
-type DeploymentBus struct{ store *Store }
-
-func NewDeploymentBus(store *Store) *DeploymentBus { return &DeploymentBus{store: store} }
-
-func (b *DeploymentBus) Publish(ctx context.Context, event []byte) error {
-	return b.store.Publish(ctx, deploymentChannel, event)
+// Bus is a Redis Pub/Sub channel shared by every API instance.
+type Bus struct {
+	store   *Store
+	channel string
 }
 
-func (b *DeploymentBus) Subscribe(ctx context.Context) (service.Subscription, error) {
-	inner, err := b.store.Subscribe(ctx, deploymentChannel)
+func NewDeploymentBus(store *Store) *Bus { return &Bus{store: store, channel: deploymentChannel} }
+
+func NewRealtimeBus(store *Store) *Bus { return &Bus{store: store, channel: realtimeChannel} }
+
+func (b *Bus) Publish(ctx context.Context, event []byte) error {
+	return b.store.Publish(ctx, b.channel, event)
+}
+
+func (b *Bus) Subscribe(ctx context.Context) (service.Subscription, error) {
+	inner, err := b.store.Subscribe(ctx, b.channel)
 	if err != nil {
 		return nil, err
 	}
-	subscription := &deploymentSubscription{inner: inner, messages: make(chan []byte, 64)}
+	subscription := &busSubscription{inner: inner, messages: make(chan []byte, 64)}
 	go subscription.forward(ctx)
 	return subscription, nil
 }
 
-type deploymentSubscription struct {
+type busSubscription struct {
 	inner    *Subscription
 	messages chan []byte
 }
 
-func (s *deploymentSubscription) forward(ctx context.Context) {
+func (s *busSubscription) forward(ctx context.Context) {
 	defer close(s.messages)
 	for {
 		select {
@@ -51,7 +60,7 @@ func (s *deploymentSubscription) forward(ctx context.Context) {
 	}
 }
 
-func (s *deploymentSubscription) Messages() <-chan []byte { return s.messages }
-func (s *deploymentSubscription) Close() error            { return s.inner.Close() }
+func (s *busSubscription) Messages() <-chan []byte { return s.messages }
+func (s *busSubscription) Close() error            { return s.inner.Close() }
 
-var _ service.EventBus = (*DeploymentBus)(nil)
+var _ service.EventBus = (*Bus)(nil)

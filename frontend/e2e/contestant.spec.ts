@@ -336,6 +336,32 @@ test("viewerから問題を開き、再展開のQUEUED表示をSSEで完了へ�
   expect(deploymentListRequests).toBe(1);
 });
 
+test("チームメイトの回答提出がリアルタイムに残り時間と提出履歴へ反映される", async ({
+  page,
+}) => {
+  const state = await installCompetitionApi(page);
+  await page.goto("/problems/A02");
+  const history = page.locator("#answer-history");
+  await expect(history).toContainText("提出はありません。");
+  await emitSse(page, "/api/v1/contestant/events/stream", "ready", {});
+
+  state.answers.A02 = [
+    {
+      number: 1,
+      submitted_at: "2026-09-02T11:55:00+09:00",
+      content_commit: commit,
+    },
+  ];
+  await emitSse(page, "/api/v1/contestant/events/stream", "answers", {
+    problem_code: "A02",
+  });
+  await expect(history.getByText("#1")).toBeVisible();
+  await expect(page.getByText(/再回答可能まで 15分/)).toBeVisible();
+  await expect(
+    page.getByRole("status").filter({ hasText: "読み込み中" }),
+  ).toHaveCount(0);
+});
+
 test("ANONYMOUSとDISCORD_AUTHENTICATEDをsignin/signupへ誘導する", async ({
   page,
 }) => {
