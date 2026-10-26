@@ -4,7 +4,8 @@
   "type": "module",
   "exports": {
     "./*": "./*",
-    "./colors": "./colors.ts"
+    "./colors": "./colors.ts",
+    "./markdown": "./markdown.ts"
   },
   "scripts": {
     "test": "vitest run",

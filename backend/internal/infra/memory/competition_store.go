@@ -29,6 +29,7 @@ type CompetitionStore struct {
 	state             core.CompetitionState
 	pushSubscriptions map[string]core.WebPushSubscription
 	pushDeliveries    map[string]bool
+	assets            map[string]core.ContentAsset
 }
 
 func NewCompetitionStore() *CompetitionStore {
@@ -44,6 +45,7 @@ func NewCompetitionStore() *CompetitionStore {
 		deployments:       make(map[string]core.Deployment),
 		pushSubscriptions: make(map[string]core.WebPushSubscription),
 		pushDeliveries:    make(map[string]bool),
+		assets:            make(map[string]core.ContentAsset),
 		state:             core.CompetitionState{UpdatedAt: time.Now().UTC(), UpdatedBy: "system"},
 	}
 }
@@ -341,9 +343,23 @@ func (s *CompetitionStore) ActivateContent(_ context.Context, snapshot core.Cont
 		return core.ContentSnapshot{}, core.NewError(http.StatusConflict, "content_refresh_in_progress", "Active content changed while refresh was in progress")
 	}
 	snapshot.ActivatedAt = time.Now().UTC()
+	for _, asset := range snapshot.Assets {
+		s.assets[snapshot.CommitSHA+"/"+asset.Name] = asset
+	}
+	snapshot.Assets = nil
 	s.contents[snapshot.CommitSHA] = snapshot
 	s.active = snapshot.CommitSHA
 	return snapshot, nil
+}
+
+func (s *CompetitionStore) GetContentAsset(_ context.Context, commit, name string) (core.ContentAsset, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	asset, ok := s.assets[commit+"/"+name]
+	if !ok {
+		return core.ContentAsset{}, core.NewError(http.StatusNotFound, "resource_not_found", "Image was not found")
+	}
+	return asset, nil
 }
 
 func (s *CompetitionStore) ListAnswers(_ context.Context, filter core.AnswerFilter) ([]core.Answer, error) {

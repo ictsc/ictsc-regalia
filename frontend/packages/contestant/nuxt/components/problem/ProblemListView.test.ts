@@ -104,4 +104,29 @@ describe("ProblemListView", () => {
     await failed.find("button").trigger("click");
     expect(failed.emitted("retry")).toHaveLength(1);
   });
+
+  it("shows submissions as submitted while results are hidden", () => {
+    const hidden = problem("A03", day2);
+    const wrapper = mountList({
+      resultsHidden: true,
+      items: [
+        {
+          problem: hidden,
+          status: problemStatus(hidden, true, true, true),
+          cooldownMinutes: 0,
+        },
+      ],
+    });
+    expect(row(wrapper, "A03").find(".problem-pending").text()).toBe(
+      "提出済み",
+    );
+    expect(wrapper.text()).not.toContain("採点中");
+    expect(wrapper.find(".score-filter details").exists()).toBe(false);
+    expect(
+      wrapper
+        .findAll(".column-filter-menu fieldset")[0]!
+        .findAll("label")
+        .map((l) => l.text()),
+    ).toEqual(["未回答", "提出済み"]);
+  });
 });

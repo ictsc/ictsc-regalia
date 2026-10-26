@@ -4,7 +4,11 @@ import RequestState from "@ictsc/ui/components/RequestState.vue";
 import type { Problem } from "~/features/models";
 import { groupProblems } from "~/features/problem/group";
 import { sectionLabel } from "~/features/problem/section";
-import { statusLabels, type ProblemStatus } from "~/features/problem/status";
+import {
+  statusLabels,
+  statusOptions,
+  type ProblemStatus,
+} from "~/features/problem/status";
 
 export type ProblemListItem = {
   problem: Problem;
@@ -15,6 +19,8 @@ export type ProblemListItem = {
 
 const props = defineProps<{
   items: ProblemListItem[];
+  /** 二次予選モードで最終公開前。得点の絞り込みと採点中表示を出さない。 */
+  resultsHidden?: boolean;
   pending?: boolean;
   error?: unknown;
 }>();
@@ -29,6 +35,7 @@ const scoreOptions = {
   zero: "0点",
   unscored: "未採点",
 };
+const visibleStatuses = computed(() => statusOptions(!!props.resultsHidden));
 const categories = computed(() =>
   [...new Set(props.items.map((item) => item.problem.category))].sort(),
 );
@@ -98,7 +105,7 @@ function resetFilters() {
             <div class="column-filter-menu">
               <fieldset>
                 <legend>状態で絞り込む</legend>
-                <label v-for="(label, key) in statusLabels" :key="key">
+                <label v-for="(label, key) in visibleStatuses" :key="key">
                   <input
                     v-model="selectedStatuses"
                     type="checkbox"
@@ -109,7 +116,9 @@ function resetFilters() {
               </fieldset>
             </div>
           </details></span
-        ><span class="problem-heading-filter score-filter"
+        ><span v-if="resultsHidden" class="problem-heading-filter score-filter"
+          >得点</span
+        ><span v-else class="problem-heading-filter score-filter"
           ><details class="column-filter">
             <summary :class="{ 'is-filtered': selectedScores.length }">
               得点
@@ -177,6 +186,11 @@ function resetFilters() {
             class="problem-pending"
             aria-hidden="true"
             >採点中</em
+          ><em
+            v-else-if="status === 'submitted'"
+            class="problem-pending"
+            aria-hidden="true"
+            >提出済み</em
           ></span
         ><span class="problem-category">{{ p.category }}</span
         ><span class="problem-title"

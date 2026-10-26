@@ -114,9 +114,17 @@ PostgreSQL統合テストは通常Dockerを起動します。Dockerを使用で�
 
 ## 採点ワークフロー
 
-既存DBにはAPI更新前に `db/migrations/0004_answer_workflow.sql` を適用します。既存の採点済み回答は「採点完了」として移行します。問題 manifest の `default_grader_discord_id` は任意の Discord ID 文字列で、回答の担当には提出時点の問題版にある値を使います。採点画面で担当を自分に変更した回答は、その上書きが優先されます。
+既存DBにはAPI更新前に `db/migrations/0004_answer_workflow.sql` を適用します。既存の採点済み回答は「採点完了」として移行します。問題 frontmatter の `default_grader_discord_id` は任意の Discord ID 文字列で、回答の担当には提出時点の問題版にある値を使います。採点画面で担当を自分に変更した回答は、その上書きが優先されます。
 
 回答の行ごとの採点コメントを使う場合は、続けて `db/migrations/0005_marking_line_comments.sql` を適用します。行番号は回答Markdownの原文を改行で分けた1始まりの番号です。既存の採点履歴は行コメントなしで保持します。
+
+## コンテンツリポジトリと画像
+
+コンテンツはICTSCのマスタリポジトリと同じ配置（`schedule.yaml`・`problems/*.problem.md`・`notices/*.md`・`images/*`）から読みます。詳細は `docs/content-repository-contract.md` を参照してください。`schedule.yaml` の場所は `ICTSC_GITHUB_SCHEDULE_PATH` で変更できます（旧 `ICTSC_GITHUB_MANIFEST_PATH` は廃止）。画像を保存するため、既存DBには `db/migrations/0006_content_assets.sql` を適用します。
+
+## 二次予選モード
+
+`ICTSC_SECONDARY_QUALIFIER_MODE=true` で、競技終了後に各チーム・問題の最新回答だけを採点し、最終公開まで競技者に採点結果と順位を返しません。順位凍結は使わず、`schedule.yaml` はスケジュール1つ、問題は `submissionable_schedules` なしで書きます。開発モード（`ICTSC_DEV_FAKE_MODE=true`）では、管理画面の競技設定から競技前・競技中・競技後を切り替えられます。
 
 ## Web Push
 

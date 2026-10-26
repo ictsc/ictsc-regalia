@@ -52,6 +52,10 @@ const clock = computed(() => {
   <CompetitionHeaderView
     :compact="detail"
     :ranking-items="rankingItems"
+    :ranking-hidden="
+      (data?.ranking.hidden ?? false) ||
+      (data?.schedule?.secondaryQualifier ?? false)
+    "
     :own-team-code="own?.teamCode"
     :max-score="maxScore"
     :clock="clock"

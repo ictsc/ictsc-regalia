@@ -316,10 +316,23 @@ func (s *Store) ActivateContent(ctx context.Context, snapshot core.ContentSnapsh
 	if err != nil {
 		return core.ContentSnapshot{}, dbError(err)
 	}
+	for _, asset := range snapshot.Assets {
+		if _, err := tx.Exec(ctx, `INSERT INTO content_blobs(sha,data) VALUES($1,$2) ON CONFLICT(sha) DO NOTHING`,
+			asset.SHA, asset.Data); err != nil {
+			return core.ContentSnapshot{}, dbError(err)
+		}
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO content_assets(commit_sha,name,content_type,blob_sha) VALUES($1,$2,$3,$4)
+			ON CONFLICT(commit_sha,name) DO UPDATE SET content_type=excluded.content_type,blob_sha=excluded.blob_sha`,
+			snapshot.CommitSHA, asset.Name, asset.ContentType, asset.SHA); err != nil {
+			return core.ContentSnapshot{}, dbError(err)
+		}
+	}
 	if err := tx.Commit(ctx); err != nil {
 		return core.ContentSnapshot{}, conflictError(err, "content_refresh_in_progress", "Content activation conflicted with another refresh")
 	}
 	snapshot.ActivatedAt = activatedAt
+	snapshot.Assets = nil
 	return snapshot, nil
 }
 
@@ -840,4 +853,19 @@ func (s *Store) RegisterContestant(ctx context.Context, contestant core.Contesta
 		return core.Contestant{}, dbError(err)
 	}
 	return contestant, nil
+}
+
+func (s *Store) GetContentAsset(ctx context.Context, commit, name string) (core.ContentAsset, error) {
+	asset := core.ContentAsset{Name: name}
+	err := s.pool.QueryRow(ctx, `
+		SELECT a.content_type,a.blob_sha,b.data FROM content_assets a JOIN content_blobs b ON b.sha=a.blob_sha
+		WHERE a.commit_sha=$1 AND a.name=$2`, commit, name).
+		Scan(&asset.ContentType, &asset.SHA, &asset.Data)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return core.ContentAsset{}, core.NewError(http.StatusNotFound, "resource_not_found", "Image was not found")
+	}
+	if err != nil {
+		return core.ContentAsset{}, dbError(err)
+	}
+	return asset, nil
 }

@@ -82,6 +82,7 @@ export async function fetchSchedule(
       .sort((a, b) => Date.parse(a.startAt) - Date.parse(b.startAt));
     return {
       hasStarted: entries.some((entry) => Date.parse(entry.startAt) <= now),
+      secondaryQualifier: response.competition_mode === "SECONDARY_QUALIFIER",
       current: entries.find(
         (entry) =>
           Date.parse(entry.startAt) <= now && now < Date.parse(entry.endAt),

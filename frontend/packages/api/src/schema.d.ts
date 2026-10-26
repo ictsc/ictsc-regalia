@@ -862,7 +862,7 @@ export interface paths {
         put?: never;
         /**
          * 採点結果を登録する
-         * @description 全Adminが採点者として登録できる。judgeはBearer JWTから決定し、可視性と集計得点は競技ルール・凍結状態に基づいてサーバー内部で更新する。
+         * @description 全Adminが採点者として登録できる。judgeはBearer JWTから決定し、可視性と集計得点は競技ルール・凍結状態に基づいてサーバー内部で更新する。二次予選モードでは競技終了前（grading_not_started）と最新でない回答（answer_not_latest）への登録を409で拒否する。
          */
         post: operations["createAdminMarkingResult"];
         delete?: never;
@@ -1089,8 +1089,35 @@ export interface paths {
         };
         /** ランキング凍結時刻を取得する */
         get: operations["getAdminDashboardSchedule"];
-        /** ランキング凍結時刻を置換する */
+        /**
+         * ランキング凍結時刻を置換する
+         * @description 二次予選モードでは凍結を使わないため、凍結時刻の設定は409で拒否する（nullでの解除は可能）。
+         */
         put: operations["replaceAdminDashboardSchedule"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/dev/contest-phase": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 現在の競技状態を取得する
+         * @description BEFOREはどのセクションも始まっていない状態、DURINGはいずれかのセクション中、AFTERはセクション外でいずれかのセクションが始まったことがある状態（セクション間の休憩を含む）。enabledは開発モードかつ二次予選モードで切り替えが使えるときtrue。
+         */
+        get: operations["getAdminDevContestPhase"];
+        /**
+         * 開発用に競技状態を切り替える
+         * @description 開発モードかつ二次予選モードでのみ使える。セクションの数・長さ・間隔は保ったまま全体を現在時刻基準で平行移動し、有効なコンテンツの manifest を書き換える。BEFOREは最初のセクションが10分後に始まり、DURINGは最初のセクションが10分前に始まり、AFTERは最後のセクションが10分前に終わる。無効な環境では404。
+         */
+        put: operations["replaceAdminDevContestPhase"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1138,7 +1165,7 @@ export interface components {
          * @description クライアントが分岐に利用できる後方互換なRFC 9457 code。各responseのx-error-codesがそのstatusで返り得る値を示す。
          * @enum {string}
          */
-        ErrorCode: "authentication_required" | "invalid_session" | "oauth_state_invalid" | "invalid_machine_token" | "permission_denied" | "origin_forbidden" | "admin_role_required" | "guild_membership_required" | "team_role_required" | "ambiguous_team_roles" | "team_role_mismatch" | "resource_not_found" | "content_not_found" | "validation_error" | "conflict" | "team_code_conflict" | "invitation_expired" | "invitation_already_used" | "team_full" | "contestant_already_registered" | "answer_rate_limited" | "submission_closed" | "deployment_not_allowed" | "deployment_in_progress" | "invalid_deployment_transition" | "duplicate_event_mismatch" | "content_rollback_rejected" | "content_refresh_in_progress" | "upstream_unavailable" | "content_not_available" | "content_invalid" | "internal_error";
+        ErrorCode: "authentication_required" | "invalid_session" | "oauth_state_invalid" | "invalid_machine_token" | "permission_denied" | "origin_forbidden" | "admin_role_required" | "guild_membership_required" | "team_role_required" | "ambiguous_team_roles" | "team_role_mismatch" | "resource_not_found" | "content_not_found" | "validation_error" | "conflict" | "team_code_conflict" | "invitation_expired" | "invitation_already_used" | "team_full" | "contestant_already_registered" | "answer_rate_limited" | "submission_closed" | "deployment_not_allowed" | "grading_not_started" | "answer_not_latest" | "deployment_in_progress" | "invalid_deployment_transition" | "duplicate_event_mismatch" | "content_rollback_rejected" | "content_refresh_in_progress" | "upstream_unavailable" | "content_not_available" | "content_invalid" | "internal_error";
         ErrorDetail: {
             location: string;
             message: string;
@@ -1416,7 +1443,13 @@ export interface components {
         ContestantScheduleResponse: {
             /** @description beginning昇順、同時刻の場合slug辞書順。 */
             sections: components["schemas"]["ContestantScheduleSection"][];
+            competition_mode: components["schemas"]["CompetitionMode"];
         };
+        /**
+         * @description STANDARDは回答ごとに随時採点し、最高得点の回答を採用する。SECONDARY_QUALIFIERは競技終了後に各チーム・問題の最新回答だけを採点し、その得点を採用する。SECONDARY_QUALIFIERでは最終公開まで競技者に採点結果と順位を返さない。
+         * @enum {string}
+         */
+        CompetitionMode: "STANDARD" | "SECONDARY_QUALIFIER";
         /** @enum {string} */
         ProblemType: "DESCRIPTIVE";
         /** @enum {string} */
@@ -1638,8 +1671,24 @@ export interface components {
              */
             ranking_freeze_at: string | null;
         };
+        /** @enum {string} */
+        ContestPhase: "BEFORE" | "DURING" | "AFTER";
+        DevContestPhase: {
+            enabled: boolean;
+            phase: components["schemas"]["ContestPhase"];
+            /** @description beginning昇順、同時刻の場合slug辞書順。 */
+            sections: components["schemas"]["ContestantScheduleSection"][];
+        };
+        DevContestPhaseResponse: {
+            contest_phase: components["schemas"]["DevContestPhase"];
+        };
+        ReplaceDevContestPhaseRequest: {
+            phase: components["schemas"]["ContestPhase"];
+        };
+        /** @description SECONDARY_QUALIFIERでは順位は最終公開まで返さず、凍結は使わない。 */
         DashboardScheduleResponse: {
             dashboard_schedule: components["schemas"]["DashboardSchedule"];
+            competition_mode: components["schemas"]["CompetitionMode"];
         };
         Rank: {
             /** Format: int32 */
@@ -1654,7 +1703,7 @@ export interface components {
             last_effective_submission_at: string | null;
         };
         /**
-         * @description frozen=trueならfrozen_atはfreeze snapshotの基準時刻、frozen=falseならnull。
+         * @description frozen=trueならfrozen_atはfreeze snapshotの基準時刻、frozen=falseならnull。hidden=trueは二次予選モードで最終公開前のため順位を返さないことを示し、rankingは空配列になる。
          * @example {
          *       "ranking": [
          *         {
@@ -1667,7 +1716,8 @@ export interface components {
          *         }
          *       ],
          *       "frozen": true,
-         *       "frozen_at": "2026-08-30T15:00:00+09:00"
+         *       "frozen_at": "2026-08-30T15:00:00+09:00",
+         *       "hidden": false
          *     }
          */
         RankingResponse: {
@@ -1676,6 +1726,7 @@ export interface components {
             frozen: boolean;
             /** Format: date-time */
             frozen_at: string | null;
+            hidden: boolean;
         } & unknown;
         AdminAnswerReference: {
             /** Format: int64 */
@@ -1705,7 +1756,17 @@ export interface components {
             score: components["schemas"]["MarkingScore"] | null;
             content_commit: components["schemas"]["ContentCommit"];
             workflow: components["schemas"]["AdminAnswerWorkflow"];
+            competition_mode: components["schemas"]["CompetitionMode"];
+            /** @description 同じチーム・問題の回答の中で最新ならtrue。 */
+            latest: boolean;
+            /** @description nullなら採点結果を登録できる。 */
+            marking_blocked_reason: components["schemas"]["MarkingBlockedReason"] | null;
         };
+        /**
+         * @description 採点結果を登録できない理由。grading_not_startedは競技終了前、answer_not_latestは最新でない回答。いずれもSECONDARY_QUALIFIERでのみ発生する。
+         * @enum {string}
+         */
+        MarkingBlockedReason: "grading_not_started" | "answer_not_latest";
         AdminAnswerWorkflow: {
             /** @enum {string} */
             status: "WAITING" | "IN_PROGRESS" | "COMPLETED";
@@ -3738,6 +3799,59 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    getAdminDevContestPhase: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 競技状態 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DevContestPhaseResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    replaceAdminDevContestPhase: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplaceDevContestPhaseRequest"];
+            };
+        };
+        responses: {
+            /** @description 切り替え後の競技状態 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DevContestPhaseResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             422: components["responses"]["ValidationError"];
             500: components["responses"]["InternalServerError"];
         };

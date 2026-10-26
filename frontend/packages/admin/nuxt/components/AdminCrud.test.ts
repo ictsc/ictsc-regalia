@@ -123,17 +123,17 @@ describe("ScoresView", () => {
 });
 
 describe("SettingsView", () => {
-  it("saves the rule and the freeze time", async () => {
+  it("saves the rule and shows the freeze from schedule.yaml", async () => {
     const wrapper = mount(SettingsView, {
       props: { ...base, initialMarkdown: "# rule", initialFreeze: "" },
       global,
     });
     await wrapper.find("textarea").setValue("# new rule");
     const forms = wrapper.findAll("form");
+    expect(forms).toHaveLength(1);
     await forms[0]!.trigger("submit");
     expect(wrapper.emitted("saveRule")).toEqual([["# new rule"]]);
-    await forms[1]!.trigger("submit");
-    expect(wrapper.emitted("saveFreeze")).toEqual([[""]]);
+    expect(wrapper.text()).toContain("現在の凍結時刻: 未設定");
   });
 });
 

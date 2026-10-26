@@ -96,6 +96,9 @@ type Manifest struct {
 	Announcements []Announcement `json:"announcements" yaml:"announcements"`
 	RuleMarkdown  string         `json:"rule_markdown,omitempty" yaml:"rule_markdown,omitempty"`
 	RulePath      string         `json:"rule_path,omitempty" yaml:"rule_path,omitempty"`
+	// RankingFreezeAt comes from schedule.yaml and is applied to the
+	// competition state when the snapshot is activated.
+	RankingFreezeAt *time.Time `json:"ranking_freeze_at,omitempty" yaml:"-"`
 }
 
 type ContentSnapshot struct {
@@ -105,6 +108,20 @@ type ContentSnapshot struct {
 	Manifest    Manifest
 	FetchedAt   time.Time
 	ActivatedAt time.Time
+	// Assets are the images fetched with the snapshot. They are stored on
+	// activation and read back individually, never with the snapshot.
+	Assets []ContentAsset
+}
+
+// ContentAsset is an image from the content repository's images directory,
+// referenced from Markdown as /images/<Name>.
+type ContentAsset struct {
+	Name        string
+	ContentType string
+	// SHA is the Git blob SHA; identical images share storage and it doubles
+	// as the HTTP ETag.
+	SHA  string
+	Data []byte
 }
 
 func (s ContentSnapshot) Problem(code string) (Problem, bool) {

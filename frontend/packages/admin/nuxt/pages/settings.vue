@@ -6,11 +6,17 @@ useHead({ title: "競技設定" });
 const { data, error, pending, refresh } = await useAsyncData(
   "settings",
   async () => {
-    const [rule, schedule] = await Promise.all([
+    const [rule, schedule, phase] = await Promise.all([
       api.GET("/api/v1/admin/rule").then(expectData),
       api.GET("/api/v1/admin/dashboard-schedule").then(expectData),
+      api.GET("/api/v1/admin/dev/contest-phase").then(expectData),
     ]);
-    return { rule: rule.rule, schedule: schedule.dashboard_schedule };
+    return {
+      rule: rule.rule,
+      schedule: schedule.dashboard_schedule,
+      secondaryQualifier: schedule.competition_mode === "SECONDARY_QUALIFIER",
+      contestPhase: phase.contest_phase,
+    };
   },
 );
 const initialFreeze = data.value?.schedule.ranking_freeze_at
@@ -25,9 +31,12 @@ const { busy, message, run } = useMutation(refresh);
 const actions = createAdminActions(api);
 const saveRule = (markdown: string) =>
   run("ルール更新", () => actions.replaceRule(markdown));
-const saveFreeze = (freeze: string) =>
-  run("凍結時刻更新", () =>
-    actions.replaceFreeze(freeze ? new Date(freeze).toISOString() : null),
+const phaseLabels = { BEFORE: "競技前", DURING: "競技中", AFTER: "競技後" };
+const setPhase = (phase: keyof typeof phaseLabels) =>
+  run(
+    `競技状態を${phaseLabels[phase]}に切り替え`,
+    () => actions.setDevContestPhase(phase),
+    "有効なコンテンツのセクション時刻を、現在時刻を基準にずらして書き換えます。",
   );
 </script>
 <template>
@@ -39,8 +48,10 @@ const saveFreeze = (freeze: string) =>
       :error="error"
       :busy="busy"
       :message="message"
+      :contest-phase="data?.contestPhase"
+      :secondary-qualifier="data?.secondaryQualifier"
       @save-rule="saveRule"
-      @save-freeze="saveFreeze"
+      @set-phase="setPhase"
       @retry="refresh"
     />
   </main>

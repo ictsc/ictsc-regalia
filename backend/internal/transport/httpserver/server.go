@@ -273,6 +273,7 @@ func normalizeErrorCode(code string) string {
 		"resource_not_found": {}, "submission_closed": {}, "team_code_conflict": {}, "team_full": {},
 		"upstream_unavailable": {}, "validation_error": {},
 		"team_role_required": {}, "ambiguous_team_roles": {}, "team_role_mismatch": {},
+		"grading_not_started": {}, "answer_not_latest": {},
 	}
 	if _, ok := allowed[code]; ok {
 		return code

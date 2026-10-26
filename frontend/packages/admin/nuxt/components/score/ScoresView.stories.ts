@@ -31,7 +31,7 @@ export const Recalculated: Story = {
 
 export const Empty: Story = {
   args: {
-    ranking: { ranking: [], frozen: false, frozen_at: null },
+    ranking: { ranking: [], frozen: false, frozen_at: null, hidden: false },
     scores: [],
   },
 };

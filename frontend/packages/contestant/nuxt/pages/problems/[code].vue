@@ -118,6 +118,9 @@ const displayCooldown = computed(() =>
   ),
 );
 const cooldownMinutes = computed(() => Math.ceil(displayCooldown.value / 60));
+const resultsHidden = computed(
+  () => competition.value?.ranking.hidden ?? false,
+);
 const railItems = computed<ProblemRailItem[]>(() =>
   (competition.value?.problems ?? []).map((problem) => {
     const latest = activity.value?.find(
@@ -133,7 +136,8 @@ const railItems = computed<ProblemRailItem[]>(() =>
               problem.nextSubmittableAt,
               displayNow.value,
             ),
-      pending: !!latest && latest.score == null,
+      pending: !resultsHidden.value && !!latest && latest.score == null,
+      submitted: resultsHidden.value && !!latest,
     };
   }),
 );
@@ -266,6 +270,7 @@ const score = computed(
               <AnswerHistory
                 :problem-code="code"
                 :answers="data.answers.answers"
+                :results-hidden="resultsHidden"
                 :selected-answer-number="selectedAnswerNumber"
                 :selected-answer-body="data.selectedAnswer?.answerBody"
               />

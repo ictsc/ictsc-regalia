@@ -8,6 +8,8 @@ defineProps<{
   selectedAnswerNumber: number | null;
   /** Body of the answer chosen with `?answer=`; omitted when none is selected. */
   selectedAnswerBody?: string;
+  /** Results stay hidden until the final reveal (secondary qualifier mode). */
+  resultsHidden?: boolean;
 }>();
 </script>
 <template>
@@ -45,7 +47,9 @@ defineProps<{
             {{ new Date(a.submittedAt).toLocaleString("ja-JP") }}
           </td>
           <td>
-            <span class="numeric">{{ a.score?.score ?? "採点中" }}</span>
+            <span class="numeric">{{
+              a.score?.score ?? (resultsHidden ? "提出済み" : "採点中")
+            }}</span>
           </td>
         </tr>
       </tbody>

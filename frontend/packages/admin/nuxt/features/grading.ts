@@ -29,6 +29,14 @@ export const defaultGradingFilters = (): GradingFilters => ({
   unscored: false,
 });
 
+export const markingBlockedLabels: Record<
+  NonNullable<GradingAnswer["marking_blocked_reason"]>,
+  string
+> = {
+  grading_not_started: "競技終了後に採点",
+  answer_not_latest: "採点対象外（旧回答）",
+};
+
 const recentWindowMs = 20 * 60_000;
 
 export function answerKey(answer: GradingAnswer) {
@@ -43,6 +51,16 @@ export function answerPath(answer: GradingAnswer) {
 
 export function minutesSince(submittedAt: string, now: number) {
   return Math.max(0, Math.floor((now - Date.parse(submittedAt)) / 60_000));
+}
+
+/**
+ * Answers that belong on the grading board. Secondary qualifier mode grades
+ * only each team's final answer per problem, so earlier ones are left out.
+ */
+export function gradableAnswers(answers: readonly GradingAnswer[]) {
+  return answers.filter(
+    (a) => a.competition_mode !== "SECONDARY_QUALIFIER" || a.latest,
+  );
 }
 
 export function filterAnswers(

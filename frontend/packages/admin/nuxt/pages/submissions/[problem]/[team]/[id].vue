@@ -26,23 +26,27 @@ const { data, error, pending, refresh } = await useAsyncData(
   `admin-answer:${route.fullPath}`,
   async () => {
     const answer = await getAdminAnswer(api, reference);
+    // 二次予選モードは最新回答だけを採点するので、過去回答との差分は不要。
+    const comparesPrevious = answer.competition_mode === "STANDARD";
     const [problem, active, previous, marks] = await Promise.all([
       createAdminActions(api).getProblem(
         reference.problem_code,
         answer.content_commit,
       ),
       createAdminActions(api).getProblem(reference.problem_code),
-      api
-        .GET("/api/v1/admin/answers", {
-          params: {
-            query: {
-              include_marked: true,
-              team_code: reference.team_code,
-              problem_code: reference.problem_code,
-            },
-          },
-        })
-        .then(expectData),
+      comparesPrevious
+        ? api
+            .GET("/api/v1/admin/answers", {
+              params: {
+                query: {
+                  include_marked: true,
+                  team_code: reference.team_code,
+                  problem_code: reference.problem_code,
+                },
+              },
+            })
+            .then(expectData)
+        : { answers: [] },
       listAdminMarkingResults(api),
     ]);
     return {

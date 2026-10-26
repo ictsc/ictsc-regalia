@@ -2,7 +2,11 @@ import type { Page } from "@playwright/test";
 import { fulfillJson, installEventSourceMock } from "./http";
 export async function installCompetitionApi(
   page: Page,
-  options: { nextSubmittableAt?: Record<string, string> } = {},
+  options: {
+    nextSubmittableAt?: Record<string, string>;
+    /** Secondary qualifier mode before the final reveal. */
+    resultsHidden?: boolean;
+  } = {},
 ) {
   await page.clock.setFixedTime(new Date("2026-09-02T12:00:00+09:00"));
   await installEventSourceMock(page);
@@ -56,7 +60,7 @@ export async function installCompetitionApi(
           ? "## 状況\n\n監視対象のコンテナ`api-gateway`が起動して数秒後に終了し、再起動を繰り返しています。利用者からは管理画面へ断続的に接続できないという報告があり、障害発生後からリクエストの一部がタイムアウトしています。\n\n## 調査内容\n\nホストにはSSH接続できます。Docker Composeで構成されたサービスで、アプリケーションの設定ファイルと直近のログを確認できます。原因を特定し、サービスが安定して稼働するように必要な設定を修正してください。既存のデータを削除したり、構成全体を作り直したりする必要はありません。\n\n## 確認事項\n\n修正後はコンテナの状態とログを確認し、再起動が発生しないことを確認してください。管理画面へのHTTPアクセスが正常に応答することも確認したうえで、原因、実施した変更、復旧確認の結果を回答欄に記載してください。"
           : "## 状況\n\n指定されたサービスに接続できません。原因を特定し、必要な設定を修正してください。\n\n## 環境\n\n| ホスト | アドレス |\n| --- | --- |\n| router-a | 10.20.1.1 |\n\n```bash\nip route show\n```",
       score:
-        score === null
+        score === null || options.resultsHidden
           ? null
           : { marked_score: score, penalty: 0, score, max_score },
       deployment: { redeployable: true, penalty_threshold: 2 },
@@ -94,12 +98,22 @@ export async function installCompetitionApi(
       });
     if (path === "/api/v1/contestant/problems")
       return fulfillJson(route, { problems });
-    if (
-      ["/api/v1/contestant/sections", "/api/v1/contestant/schedule"].includes(
-        path,
-      )
-    )
+    if (path === "/api/v1/contestant/sections")
       return fulfillJson(route, { sections });
+    if (path === "/api/v1/contestant/schedule")
+      return fulfillJson(route, {
+        sections,
+        competition_mode: options.resultsHidden
+          ? "SECONDARY_QUALIFIER"
+          : "STANDARD",
+      });
+    if (path === "/api/v1/contestant/ranking" && options.resultsHidden)
+      return fulfillJson(route, {
+        ranking: [],
+        frozen: false,
+        frozen_at: null,
+        hidden: true,
+      });
     if (path === "/api/v1/contestant/ranking")
       return fulfillJson(route, {
         ranking: [
@@ -138,6 +152,7 @@ export async function installCompetitionApi(
         ],
         frozen: false,
         frozen_at: null,
+        hidden: false,
       });
     if (path === "/api/v1/contestant/announcements")
       return fulfillJson(route, {

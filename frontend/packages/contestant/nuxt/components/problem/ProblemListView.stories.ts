@@ -47,6 +47,26 @@ export const Pending: Story = {
   },
 };
 
+/** 二次予選モードで最終公開前。得点は返らず、提出済みの問題は「提出済み」。 */
+export const SecondaryQualifier: Story = {
+  args: {
+    resultsHidden: true,
+    items: problems.map((problem) => {
+      const hidden = { ...problem, score: undefined };
+      return {
+        problem: hidden,
+        status: problemStatus(
+          hidden,
+          ["A01", "A04", "B03"].includes(problem.code),
+          false,
+          true,
+        ),
+        cooldownMinutes: problem.code === "B03" ? 12 : 0,
+      };
+    }),
+  },
+};
+
 export const AllClosed: Story = {
   args: {
     items: toItems(

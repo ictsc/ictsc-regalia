@@ -39,6 +39,12 @@ type Config struct {
 	ContestantGuildID     string
 	DiscordRoleTeams      map[string]int64
 	AdminRoleIDs          map[string]struct{}
+	// SecondaryQualifierMode grades only each team's latest answer after the
+	// contest ends and keeps scores private until the final reveal.
+	SecondaryQualifierMode bool
+	// DevTools enables development-only operations such as moving the
+	// schedule. It is set only in development fake mode.
+	DevTools bool
 }
 
 type Service struct {
@@ -444,8 +450,27 @@ func (s *Service) RefreshContent(ctx context.Context, claims ActionsClaims, comm
 		s.setContentFailure(commit, err, activeErr == nil)
 		return core.ContentSnapshot{}, err
 	}
+	if err := s.applyContentFreeze(ctx, snapshot); err != nil {
+		s.setContentFailure(commit, err, true)
+		return core.ContentSnapshot{}, err
+	}
 	s.setContentSuccess(snapshot)
 	return snapshot, nil
+}
+
+// applyContentFreeze makes schedule.yaml the source of the ranking freeze:
+// activating content sets the freeze to its value, or clears it when absent.
+func (s *Service) applyContentFreeze(ctx context.Context, snapshot core.ContentSnapshot) error {
+	state, err := s.Store.GetCompetitionState(ctx)
+	if err != nil {
+		return err
+	}
+	current, next := state.RankingFreezeAt, snapshot.Manifest.RankingFreezeAt
+	if current == nil && next == nil || current != nil && next != nil && current.Equal(*next) {
+		return nil
+	}
+	_, err = s.Store.ReplaceFreezeAt(ctx, next, "content:"+snapshot.CommitSHA)
+	return err
 }
 
 func (s *Service) ContentStatus(ctx context.Context) ContentStatus {
@@ -621,7 +646,7 @@ func (s *Service) Scores(ctx context.Context, before *time.Time) (map[int64]map[
 		}
 		markings = filtered
 	}
-	return core.SelectBestScores(answers, markings), nil
+	return s.selectScores(answers, markings), nil
 }
 
 func (s *Service) Ranking(ctx context.Context, admin bool) ([]core.RankingEntry, bool, *time.Time, error) {
@@ -631,6 +656,9 @@ func (s *Service) Ranking(ctx context.Context, admin bool) ([]core.RankingEntry,
 	}
 	frozen := false
 	var before *time.Time
+	if !admin && s.ScoresHidden(state) {
+		return []core.RankingEntry{}, false, nil, nil
+	}
 	if !admin && state.FinalRevealedAt == nil && state.RankingFreezeAt != nil && !s.Now().Before(*state.RankingFreezeAt) {
 		frozen, before = true, state.RankingFreezeAt
 	}

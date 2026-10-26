@@ -81,7 +81,7 @@ func toAPIScore(score core.Score) *api.Score {
 	return &api.Score{MarkedScore: score.MarkedScore, Penalty: score.Penalty, Score: score.EffectiveScore, MaxScore: score.MaxScore}
 }
 
-func toAPIRanking(entries []core.RankingEntry, frozen bool, frozenAt *time.Time) api.RankingResponse {
+func toAPIRanking(entries []core.RankingEntry, frozen bool, frozenAt *time.Time, hidden bool) api.RankingResponse {
 	ranking := make([]api.Rank, 0, len(entries))
 	for _, entry := range entries {
 		ranking = append(ranking, api.Rank{
@@ -90,7 +90,7 @@ func toAPIRanking(entries []core.RankingEntry, frozen bool, frozenAt *time.Time)
 			LastEffectiveSubmissionAt: entry.LastEffectiveSubmissionAt,
 		})
 	}
-	return api.RankingResponse{Ranking: ranking, Frozen: frozen, FrozenAt: frozenAt}
+	return api.RankingResponse{Ranking: ranking, Frozen: frozen, FrozenAt: frozenAt, Hidden: hidden}
 }
 
 func toAPIAnswer(answer core.Answer, score *core.Score) api.Answer {
@@ -176,7 +176,7 @@ func (h *Handler) scoreForAnswer(ctx context.Context, answer core.Answer, contes
 	}
 	if contestant {
 		marking, hasMarking := core.LatestMarkingForAnswer(latest, answer.TeamCode, answer.ProblemCode, answer.Number)
-		visibility := core.MarkingVisibilityAt(answer.SubmittedAt, h.service.Now(), state.RankingFreezeAt, state.FinalRevealedAt)
+		visibility := h.service.MarkingVisibility(answer.SubmittedAt, state)
 		if !hasMarking || marking.ID == "" || visibility == core.VisibilityPrivate {
 			return nil, nil
 		}

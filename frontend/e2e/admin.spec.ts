@@ -52,7 +52,9 @@ const answer = {
     assignee_discord_id: "123456789012345678",
     assignment_source: "DEFAULT",
     revision: 1,
-  },
+  },  competition_mode: "STANDARD",
+  latest: true,
+  marking_blocked_reason: null,
 };
 const existingMark = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -420,6 +422,7 @@ async function installAdminApi(page: Page): Promise<ApiState> {
         ],
         frozen: true,
         frozen_at: now,
+        hidden: false,
       });
     }
     if (
@@ -452,6 +455,11 @@ async function installAdminApi(page: Page): Promise<ApiState> {
     }
     if (path === "/api/v1/admin/dashboard-schedule" && method === "PUT") {
       return fulfillJson(route, { dashboard_schedule: body });
+    }
+    if (path === "/api/v1/admin/dev/contest-phase" && method === "GET") {
+      return fulfillJson(route, {
+        contest_phase: { enabled: false, phase: "DURING", sections: [] },
+      });
     }
 
     return fulfillJson(
@@ -654,9 +662,7 @@ test("回答詳細・再採点・得点操作・freeze・404を検証する", as
   await page.getByLabel("Markdown").fill("# Updated rule");
   await page.getByRole("button", { name: "ルールを更新" }).click();
   await expect(page.getByText("ルール更新しました")).toBeVisible();
-  await page.getByLabel("凍結時刻").fill("");
-  await page.getByRole("button", { name: "凍結時刻を保存" }).click();
-  await expect(page.getByText("凍結時刻更新しました")).toBeVisible();
+  await expect(page.getByText("現在の凍結時刻:")).toBeVisible();
 
   await page.goto("/admin/submissions/A01/12/999");
   await expect(page.getByText("指定された回答は存在しません")).toBeVisible();

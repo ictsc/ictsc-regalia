@@ -186,17 +186,16 @@ button {
 .brand:focus-visible .ascii-logo-frame {
   box-shadow: inset 0 -1px currentColor;
 }
+/* Flex keeps the menu right-aligned whether or not the ranking is shown. */
 .header-performance {
   min-width: 0;
-  display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
+  display: flex;
   align-items: stretch;
-  justify-content: start;
   gap: 18px;
   padding: 0 16px 0 20px;
 }
 .header-ranking {
-  width: 300px;
+  flex: 0 1 300px;
   min-width: 0;
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr);
@@ -285,6 +284,7 @@ button {
   white-space: nowrap;
 }
 .header-account {
+  flex: 1 1 auto;
   min-width: 0;
   display: flex;
   align-items: center;
@@ -2259,9 +2259,11 @@ dialog.confirmation-dialog h2 {
     display: none;
   }
   .header-performance {
-    grid-template-columns: 320px minmax(0, 1fr);
     gap: 10px;
     padding: 0 12px;
+  }
+  .header-ranking {
+    flex-basis: 320px;
   }
   .header-account {
     gap: 12px;
@@ -2316,12 +2318,6 @@ dialog.confirmation-dialog h2 {
 }
 
 @media (max-width: 1120px) and (min-width: 761px) {
-  .header-performance {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .header-performance .header-ranking {
-    width: min(320px, 100%);
-  }
   .header-performance .header-account,
   .simple-header-version .simple-header-nav {
     display: none;

@@ -10,6 +10,8 @@ export type ProblemRailItem = {
   cooldownMinutes: number;
   /** The latest submission is waiting for grading. */
   pending: boolean;
+  /** Submitted while results stay hidden until the final reveal. */
+  submitted?: boolean;
 };
 
 const props = defineProps<{ items: ProblemRailItem[]; currentCode: string }>();
@@ -62,16 +64,21 @@ watch(groups, showCurrentRailItem, { flush: "post" });
         <span class="rail-stage-label">{{ sectionLabel(group.key) }}</span>
       </h2>
       <NuxtLink
-        v-for="{ problem: p, cooldownMinutes, pending } in group.items"
+        v-for="{
+          problem: p,
+          cooldownMinutes,
+          pending,
+          submitted,
+        } in group.items"
         :key="p.code"
         :to="`/problems/${p.code}`"
         :class="{
           'is-active': p.code === currentCode,
           'is-answer-closed': !p.submissionStatus?.isSubmittable,
-          'has-status': cooldownMinutes > 0 || pending,
+          'has-status': cooldownMinutes > 0 || pending || submitted,
         }"
         :aria-current="p.code === currentCode ? 'page' : undefined"
-        :aria-label="`${p.code} ${p.title} ${p.score ? `${p.score.score}点 / ${p.maxScore}点満点` : '得点未確定'}${cooldownMinutes ? ` 再提出可能まで${cooldownMinutes}分` : pending ? ' 最新の提出を採点中' : ''}`"
+        :aria-label="`${p.code} ${p.title} ${p.score ? `${p.score.score}点 / ${p.maxScore}点満点` : '得点未確定'}${cooldownMinutes ? ` 再提出可能まで${cooldownMinutes}分` : pending ? ' 最新の提出を採点中' : submitted ? ' 提出済み' : ''}`"
         ><b>{{ p.code }}</b
         ><span class="rail-score">
           <strong>{{ p.score ? p.score.score : "—" }}</strong>
@@ -82,11 +89,19 @@ watch(groups, showCurrentRailItem, { flush: "post" });
           >分</span
         ><em v-else-if="pending" class="rail-pending" aria-hidden="true"
           >採点中</em
+        ><em v-else-if="submitted" class="rail-pending" aria-hidden="true"
+          >提出済み</em
         ><span class="problem-preview"
           ><strong>{{ p.title }}</strong
           ><small>{{ p.category }}</small
           ><span class="preview-status">{{
-            pending ? "最新の提出を採点中" : p.score ? "採点済み" : "未回答"
+            pending
+              ? "最新の提出を採点中"
+              : submitted
+                ? "提出済み（競技終了後に採点）"
+                : p.score
+                  ? "採点済み"
+                  : "未回答"
           }}</span
           ><span class="preview-score"
             >{{ p.score ? `${p.score.score}点` : "—" }} /

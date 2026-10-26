@@ -77,3 +77,25 @@ export const DefaultAssignment: Story = {
     marks: [],
   },
 };
+
+/** 二次予選モード: 差分なしで最新回答だけを採点する。 */
+export const SecondaryQualifier: Story = {
+  args: {
+    answer: { ...detailAnswer, competition_mode: "SECONDARY_QUALIFIER" },
+    previous: [],
+  },
+};
+
+/** 二次予選モードで競技終了前。採点フォームの代わりに理由を表示する。 */
+export const SecondaryQualifierBeforeEnd: Story = {
+  args: {
+    answer: {
+      ...detailAnswer,
+      score: null,
+      competition_mode: "SECONDARY_QUALIFIER",
+      marking_blocked_reason: "grading_not_started",
+    },
+    previous: [],
+    marks: [],
+  },
+};

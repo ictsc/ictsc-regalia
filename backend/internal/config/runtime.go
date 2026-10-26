@@ -19,6 +19,9 @@ type Runtime struct {
 	SecureCookies     bool
 	AllowedOrigins    []string
 	DevFakeMode       bool
+	// SecondaryQualifierMode defers grading until the contest ends and hides
+	// every score from contestants until the final reveal.
+	SecondaryQualifierMode bool
 
 	DiscordClientID          string
 	DiscordClientSecret      string
@@ -37,7 +40,7 @@ type Runtime struct {
 	GitHubRepository   string
 	GitHubRef          string
 	GitHubWorkflowRef  string
-	GitHubManifestPath string
+	GitHubSchedulePath string
 	GitHubDiscoveryURL string
 
 	SStateBaseURL       string
@@ -67,6 +70,10 @@ func LoadRuntime() (Runtime, error) {
 	if insecure && !dev {
 		return Runtime{}, fmt.Errorf("ICTSC_ALLOW_INSECURE_UPSTREAMS is only allowed with ICTSC_DEV_FAKE_MODE")
 	}
+	secondaryQualifier, err := boolEnv("ICTSC_SECONDARY_QUALIFIER_MODE", false)
+	if err != nil {
+		return Runtime{}, err
+	}
 	cfg := Runtime{
 		Address:                  envOrDefault("ICTSC_API_ADDRESS", defaultAddress),
 		ReadHeaderTimeout:        defaultReadHeaderTimeout,
@@ -76,6 +83,7 @@ func LoadRuntime() (Runtime, error) {
 		SecureCookies:            secure,
 		AllowedOrigins:           csvEnv("ICTSC_ALLOWED_ORIGINS"),
 		DevFakeMode:              dev,
+		SecondaryQualifierMode:   secondaryQualifier,
 		DiscordClientID:          strings.TrimSpace(os.Getenv("ICTSC_DISCORD_CLIENT_ID")),
 		DiscordClientSecret:      strings.TrimSpace(os.Getenv("ICTSC_DISCORD_CLIENT_SECRET")),
 		ContestantRedirectURI:    strings.TrimSpace(os.Getenv("ICTSC_DISCORD_CONTESTANT_REDIRECT_URI")),
@@ -91,7 +99,7 @@ func LoadRuntime() (Runtime, error) {
 		GitHubRepository:         strings.TrimSpace(os.Getenv("ICTSC_GITHUB_REPOSITORY")),
 		GitHubRef:                strings.TrimSpace(os.Getenv("ICTSC_GITHUB_REF")),
 		GitHubWorkflowRef:        strings.TrimSpace(os.Getenv("ICTSC_GITHUB_WORKFLOW_REF")),
-		GitHubManifestPath:       envOrDefault("ICTSC_GITHUB_MANIFEST_PATH", "content/manifest.yaml"),
+		GitHubSchedulePath:       envOrDefault("ICTSC_GITHUB_SCHEDULE_PATH", "schedule.yaml"),
 		GitHubDiscoveryURL:       strings.TrimSpace(os.Getenv("ICTSC_GITHUB_OIDC_DISCOVERY_URL")),
 		SStateBaseURL:            strings.TrimSpace(os.Getenv("ICTSC_SSTATE_BASE_URL")),
 		SStateRequestToken:       strings.TrimSpace(os.Getenv("ICTSC_SSTATE_REQUEST_TOKEN")),

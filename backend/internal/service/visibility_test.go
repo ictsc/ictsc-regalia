@@ -63,3 +63,36 @@ func TestContestantAndPublicScoreVisibility(t *testing.T) {
 		t.Fatalf("final reveal did not bypass delay = %#v, err=%v", public, err)
 	}
 }
+
+type freezeStore struct {
+	core.Store
+	state core.CompetitionState
+	calls int
+}
+
+func (s *freezeStore) GetCompetitionState(context.Context) (core.CompetitionState, error) {
+	return s.state, nil
+}
+
+func (s *freezeStore) ReplaceFreezeAt(_ context.Context, freezeAt *time.Time, _ string) (core.CompetitionState, error) {
+	s.calls++
+	s.state.RankingFreezeAt = freezeAt
+	return s.state, nil
+}
+
+func TestContentActivationAppliesScheduleFreeze(t *testing.T) {
+	store := &freezeStore{}
+	service := New(store, nil, Config{})
+	freeze := time.Date(2026, 3, 15, 3, 0, 0, 0, time.UTC)
+	snapshot := core.ContentSnapshot{CommitSHA: "abc", Manifest: core.Manifest{RankingFreezeAt: &freeze}}
+	if err := service.applyContentFreeze(context.Background(), snapshot); err != nil || store.state.RankingFreezeAt == nil || !store.state.RankingFreezeAt.Equal(freeze) {
+		t.Fatalf("freeze = %v, err = %v", store.state.RankingFreezeAt, err)
+	}
+	if err := service.applyContentFreeze(context.Background(), snapshot); err != nil || store.calls != 1 {
+		t.Fatalf("unchanged freeze was rewritten: calls = %d, err = %v", store.calls, err)
+	}
+	snapshot.Manifest.RankingFreezeAt = nil
+	if err := service.applyContentFreeze(context.Background(), snapshot); err != nil || store.state.RankingFreezeAt != nil {
+		t.Fatalf("freeze was not cleared: %v, err = %v", store.state.RankingFreezeAt, err)
+	}
+}

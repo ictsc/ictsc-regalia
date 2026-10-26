@@ -8,6 +8,48 @@ import rehypeKatex from "rehype-katex";
 import rehypeShiki from "@shikijs/rehype";
 import rehypeStringify from "rehype-stringify";
 
+type HastNode = {
+  type: string;
+  tagName?: string;
+  properties?: Record<string, unknown>;
+  children?: HastNode[];
+};
+
+/** Maps a content image file name to the URL that serves it. */
+export type ImageUrl = (name: string) => string;
+
+// Content repositories reference their images as /images/<file>; each app
+// serves them from its own authenticated API path.
+let defaultImageUrl: ImageUrl | undefined;
+
+/** Sets how "/images/<file>" sources are rewritten when no per-render URL is given. */
+export function setMarkdownImageUrl(imageUrl: ImageUrl | undefined) {
+  defaultImageUrl = imageUrl;
+}
+
+export function rewriteImageSource(
+  src: string,
+  imageUrl = defaultImageUrl,
+): string {
+  return imageUrl && src.startsWith("/images/")
+    ? imageUrl(decodeURIComponent(src.slice("/images/".length)))
+    : src;
+}
+
+function rehypeContentImages() {
+  return (tree: HastNode, file: { data: Record<string, unknown> }) => {
+    const imageUrl =
+      (file.data.imageUrl as ImageUrl | undefined) ?? defaultImageUrl;
+    const visit = (node: HastNode) => {
+      if (node.tagName === "img" && typeof node.properties?.src === "string") {
+        node.properties.src = rewriteImageSource(node.properties.src, imageUrl);
+      }
+      node.children?.forEach(visit);
+    };
+    visit(tree);
+  };
+}
+
 const processor = unified()
   .use(remarkParse)
   .use(remarkGfm)
@@ -20,6 +62,7 @@ const processor = unified()
       code: [["className", /^language-./, "math-inline", "math-display"]],
     },
   })
+  .use(rehypeContentImages)
   .use(rehypeKatex, { trust: false })
   .use(rehypeShiki, {
     theme: "github-light",
@@ -39,6 +82,14 @@ const processor = unified()
     fallbackLanguage: "text",
   })
   .use(rehypeStringify);
-export async function renderMarkdown(markdown: string): Promise<string> {
-  return String(await processor.process(markdown));
+export async function renderMarkdown(
+  markdown: string,
+  options: { imageUrl?: ImageUrl } = {},
+): Promise<string> {
+  return String(
+    await processor.process({
+      value: markdown,
+      data: { imageUrl: options.imageUrl },
+    }),
+  );
 }

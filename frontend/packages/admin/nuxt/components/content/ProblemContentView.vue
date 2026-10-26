@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import MarkdownContent from "@ictsc/ui/components/MarkdownContent.vue";
+import { adminImageUrl } from "~/features/admin-images";
 import RequestState from "@ictsc/ui/components/RequestState.vue";
 import type { components } from "@ictsc/api";
 
@@ -47,10 +48,16 @@ const commit = ref(props.initialCommit);
       </section>
       <section class="admin-panel">
         <h2>問題本文</h2>
-        <MarkdownContent :source="problem.body" />
+        <MarkdownContent
+          :source="problem.body"
+          :image-url="adminImageUrl(problem.content_commit)"
+        />
       </section>
       <section class="admin-panel">
         <h2>問題解説</h2>
-        <MarkdownContent :source="problem.explanation" /></section></template
+        <MarkdownContent
+          :source="problem.explanation"
+          :image-url="adminImageUrl(problem.content_commit)"
+        /></section></template
   ></RequestState>
 </template>

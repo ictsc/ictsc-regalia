@@ -13,6 +13,8 @@ export type ScheduleEntry = {
 
 export type Schedule = {
   hasStarted: boolean;
+  /** Secondary qualifier mode never shows the ranking in the top bar. */
+  secondaryQualifier?: boolean;
   current?: ScheduleEntry;
   next?: ScheduleEntry;
   entries: ScheduleEntry[];

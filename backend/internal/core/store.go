@@ -24,6 +24,11 @@ type Store interface {
 	GetContent(ctx context.Context, commit string) (ContentSnapshot, error)
 	ContentAt(ctx context.Context, at time.Time) (ContentSnapshot, error)
 	ActivateContent(ctx context.Context, snapshot ContentSnapshot, expectedCurrentCommit string) (ContentSnapshot, error)
+	// GetContentAsset reads one image stored with the snapshot at commit.
+	GetContentAsset(ctx context.Context, commit, name string) (ContentAsset, error)
+	// ReplaceActiveSections rewrites the active snapshot's section intervals.
+	// It exists for development tooling only.
+	ReplaceActiveSections(ctx context.Context, sections []Section) (ContentSnapshot, error)
 	ListAnswers(ctx context.Context, filter AnswerFilter) ([]Answer, error)
 	GetAnswer(ctx context.Context, teamCode int64, problemCode string, number int32) (Answer, error)
 	SubmitAnswer(ctx context.Context, answer Answer, interval time.Duration) (Answer, time.Duration, error)

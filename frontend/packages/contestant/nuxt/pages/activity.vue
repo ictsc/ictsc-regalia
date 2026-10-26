@@ -6,11 +6,13 @@ useHead({ title: "提出履歴" });
 const { data, error, pending, refresh } = await useAsyncData("activity", () =>
   fetchActivity(api),
 );
+const { data: competition } = await useCompetition();
 </script>
 <template>
   <main>
     <ActivityView
       :entries="data ?? undefined"
+      :results-hidden="competition?.ranking.hidden ?? false"
       :pending="pending"
       :error="error"
       @retry="refresh"

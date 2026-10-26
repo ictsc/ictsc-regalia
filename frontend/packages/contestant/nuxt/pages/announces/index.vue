@@ -53,10 +53,9 @@ async function enablePush() {
     if (permission !== "granted") {
       throw new Error("ブラウザで通知が許可されていません");
     }
-    const registration = await navigator.serviceWorker.register(
-      "/web-push-sw.js",
-      { scope: "/" },
-    );
+    await navigator.serviceWorker.register("/web-push-sw.js", { scope: "/" });
+    // subscribe() は有効化済みの Service Worker が必要。登録直後は installing のため待つ。
+    const registration = await navigator.serviceWorker.ready;
     const existing = await registration.pushManager.getSubscription();
     const subscription =
       existing ??

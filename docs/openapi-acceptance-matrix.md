@@ -65,6 +65,10 @@
 | `replaceAdminRule` | `PUT /api/v1/admin/rule` | strict handler ✓ | service + store/adapter ✓ | Admin /settings | contract + service/PostgreSQL + E2E |
 | `getAdminDashboardSchedule` | `GET /api/v1/admin/dashboard-schedule` | strict handler ✓ | service + store/adapter ✓ | Admin /settings | contract + service/PostgreSQL + E2E |
 | `replaceAdminDashboardSchedule` | `PUT /api/v1/admin/dashboard-schedule` | strict handler ✓ | service + store/adapter ✓ | Admin /settings | contract + service/PostgreSQL + E2E |
+| `getContestantImage` | `GET /api/v1/contestant/images/{image_name}` | strict handler ✓ | service + store/adapter ✓ | Contestant Markdown images | contract |
+| `getAdminImage` | `GET /api/v1/admin/images/{image_name}` | strict handler ✓ | service + store/adapter ✓ | Admin Markdown images | contract |
+| `getAdminDevContestPhase` | `GET /api/v1/admin/dev/contest-phase` | strict handler ✓ | service + store/adapter ✓ | Admin /settings（開発用） | contract |
+| `replaceAdminDevContestPhase` | `PUT /api/v1/admin/dev/contest-phase` | strict handler ✓ | service + store/adapter ✓ | Admin /settings（開発用） | contract |
 
 ## Cross-cutting acceptance gates
 

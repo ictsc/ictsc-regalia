@@ -77,7 +77,7 @@ func (h *Handler) GetContestantSchedule(ctx context.Context, _ api.GetContestant
 		}
 		return sections[i].Beginning.Before(sections[j].Beginning)
 	})
-	return api.GetContestantSchedule200JSONResponse{Sections: sections}, nil
+	return api.GetContestantSchedule200JSONResponse{Sections: sections, CompetitionMode: api.CompetitionMode(h.service.CompetitionMode())}, nil
 }
 
 func (h *Handler) ListAdminProblems(ctx context.Context, _ api.ListAdminProblemsRequestObject) (api.ListAdminProblemsResponseObject, error) {

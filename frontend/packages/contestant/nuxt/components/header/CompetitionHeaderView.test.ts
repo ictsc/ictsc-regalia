@@ -47,6 +47,12 @@ describe("CompetitionHeaderView", () => {
     );
   });
 
+  it("leaves out the ranking but keeps the menu when the ranking is hidden", () => {
+    const wrapper = mountHeader({ rankingHidden: true });
+    expect(wrapper.find(".header-ranking").exists()).toBe(false);
+    expect(wrapper.find(".header-account").exists()).toBe(true);
+  });
+
   it("uses the simplified navigation in compact mode", () => {
     const wrapper = mountHeader({ compact: true });
     expect(wrapper.classes()).toContain("simple-header-version");

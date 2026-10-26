@@ -6,60 +6,92 @@ GitHub Actionsが指定した完全なcommit object IDから全fileを取得・�
 
 ## Repository layout
 
-既定のmanifestは`content/manifest.yaml`です。manifest内のMarkdown pathはmanifestが置かれた
-directory（既定では`content/`）からの相対pathです。
+ICTSCのマスタリポジトリ（例: `ictsc2025-final-master`）と同じ配置を読みます。パスはリポジトリ直下からです。
+`schedule.yaml` の場所だけは `ICTSC_GITHUB_SCHEDULE_PATH`（既定 `schedule.yaml`）で変更できます。
 
 ```text
-content/
-  manifest.yaml
-  rule.md
-  problems/A01.md
-  explanations/A01.md
-  announcements/welcome.md
+schedule.yaml
+rule.md                          （任意）
+problems/<name>.problem.md       （frontmatter + 問題文）
+problems/<name>.explanation.md   （任意。同じ <name> の問題の解説）
+notices/<slug>.md                （frontmatter + 本文。_template.md は読みません）
+images/<file>                    （png / jpg / jpeg / gif / webp）
 ```
 
-絶対path、`..`、`.` segment、backslash、正規化前後で変わるpathは拒否します。symlinkやdirectoryは
-利用せず、GitHub Contents APIが`type: file`として返すUTF-8 fileだけを取得します。
+上記以外のファイル（`sync/`、`image-downloader/`、README など）は無視します。指定commitのGit treeを
+再帰的に列挙し、`problems/`・`notices/`・`images/` は直下のファイルだけを対象にします。
 
-## Manifest version 1
+## schedule.yaml
 
 ```yaml
-version: 1
-sections:
-  - slug: day1-am
-    beginning: 2026-08-30T09:00:00+09:00
-    ending: 2026-08-30T12:00:00+09:00
-    problems: [A01]
-problems:
-  - code: A01
-    title: Example Problem
-    max_score: 100
-    category: Network
-    section_slug: day1-am
-    type: DESCRIPTIVE
-    body_path: problems/A01.md
-    explanation_path: explanations/A01.md
-    redeploy_rule:
-      type: PERCENTAGE_PENALTY
-      penalty_threshold: 1
-      penalty_percentage: 10
-announcements:
-  - slug: welcome
-    title: Welcome
-    markdown_path: announcements/welcome.md
-    effective_from: 2026-08-30T08:30:00+09:00
-rule_path: rule.md
+ranking_freeze_at: 2026-03-15T12:00:00+09:00   # 任意
+schedules:
+- name: day1-am
+  startAt: 2026-03-14T10:55:00+09:00
+  endAt: 2026-03-14T13:00:00+09:00
 ```
 
-- unknown field、複数YAML document、inlineの問題本文・解説・お知らせ・ruleは拒否します。
-- Section期間は`[beginning, ending)`で相互に重複できません。slugは全体で一意です。
-- problem codeは全体で一意で、1文字から8文字の英数字・`_`・`-`です。各problemはちょうど1つの
-  Sectionの`problems`へ記載し、`section_slug`も一致させます。
-- `max_score`は1以上、現行のproblem `type`は`DESCRIPTIVE`です。
-- `PERCENTAGE_PENALTY`は0以上の`penalty_threshold`と0から99の`penalty_percentage`を必須とします。
-  `UNREDEPLOYABLE`と`MANUAL`では両fieldを`null`または省略します。
-- announcement slugは一意で、`effective_from`はRFC 3339 date-timeです。
-- manifestは1 MiB、各Markdownは2 MiB以下のvalid UTF-8とします。問題本文は空白だけにできません。
+- `name` は一意で、英数字・`_`・`-` です。期間は `[startAt, endAt)` で、互いに重複できません。
+- `ranking_freeze_at` が正本です。コンテンツ更新時に順位凍結時刻へ反映し、書かれていなければ凍結を解除します。
+- 二次予選モードでは `schedules` はちょうど1つで、`ranking_freeze_at` は書けません。
+
+## 問題
+
+```markdown
+---
+code: 1234
+title: 前任者の悪意
+max_score: 100
+category: Server
+redeploy_rule:
+  type: PERCENTAGE_PENALTY
+  penalty_threshold: 1
+submissionable_schedules: [day2]
+---
+
+問題文
+```
+
+- `code` は大文字に変換し、1〜8文字の英数字・`_`・`-` です。`0000`（例題）と `draft: true` の問題は取り込みません。
+- `redeploy_rule.type` は `UNREDEPLOYABLE`・`PERCENTAGE_PENALTY`・`MANUAL` です。
+  - `redeploy_rule` を省略すると、`PERCENTAGE_PENALTY`・しきい値999・減点0%（実質無制限）になります。
+  - `PERCENTAGE_PENALTY` で `penalty_percentage` を省略（または0）すると10%、`penalty_threshold` を省略すると0です。
+  - `UNREDEPLOYABLE` と `MANUAL` では `penalty_*` は無視します。
+- `submissionable_schedules` は通常モードでは必須で、現在は1つだけ指定できます。二次予選モードでは書けず、
+  全問題がその1つのスケジュールに属します。
+- 任意で `default_grader_discord_id`（Discord IDの数字文字列）を指定できます。
+- 問題文は空白だけにできません。未知のfrontmatter fieldは拒否します。
+
+## お知らせ
+
+```markdown
+---
+title: "お知らせタイトル"
+from: "2026-03-14T10:00:00+09:00"
+---
+
+本文
+```
+
+ファイル名（`.md` を除く）がslugです。`from` はRFC 3339のdate-timeで、この時刻から表示します。
+
+## 画像
+
+`images/` 直下の画像（png / jpg / jpeg / gif / webp、ファイル名は英数字・`.`・`_`・`-`）を取り込み、Markdownからは
+`/images/<file>` として参照します。サブディレクトリや未対応の形式のファイルが `images/` にあると、取り込みを
+エラーにします。1ファイル10 MiB、合計100 MiBまでです。
+
+- 画像の中身はGit blob SHA単位で1回だけ保存し、各commitはファイル名とblobの対応だけを持ちます。
+- 競技者画面では `/api/v1/contestant/images/<file>` に置き換えます。返すのは、開始済みの問題文・表示中の
+  お知らせ・ルールから参照されている画像だけで、開始前の問題や解説だけで使う画像は404です。
+- 運営画面では `/api/v1/admin/images/<file>` に置き換え、過去commitの問題を表示するときはそのcommitの画像を
+  `?commit=` で取得します。
+- 応答には `ETag`（blob SHA）と `X-Content-Type-Options: nosniff` を付け、`If-None-Match` が一致すれば304を返します。
+
+## 共通
+
+- 各Markdownは2 MiB、`schedule.yaml` は1 MiB以下のvalid UTF-8とします。
+- frontmatterはファイル先頭の `---` で始まり `---` で閉じるYAMLで、複数documentは拒否します。
 
 ## GitHub Actions OIDC
 
@@ -84,9 +116,9 @@ workflowではcheckout結果の短縮SHAではなく`${{ github.sha }}`の完全
 Regalia adapterは次の順でGitHub APIを呼びます。
 
 1. Git commit endpointで指定object IDが存在し、response SHAが完全一致することを確認する。
-2. Contents APIの`ref`へ同じcommit IDを指定してmanifestを取得する。
-3. manifest metadataと全参照pathを先に検証する。
-4. 同じcommit IDから全Markdownを取得し、全て成功した場合だけsnapshotを返す。
+2. Git tree APIで同じcommit IDのファイル一覧を取得する。
+3. Contents APIの`ref`へ同じcommit IDを指定して `schedule.yaml`・`rule.md`・問題・お知らせを取得し、検証する。
+4. 画像はtreeのblob SHAからGit blob APIで取得し、全て成功した場合だけsnapshotを返す。
 5. active commitとの前後関係はCompare APIで確認し、古いまたはdivergeしたworkflowによる巻き戻しを拒否する。
 
 取得途中の値は配信しません。DBへの原子的なactive切替はbackend service/repositoryが担当します。同じ

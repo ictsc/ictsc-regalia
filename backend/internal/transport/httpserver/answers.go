@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
+	"github.com/ictsc/ictsc-regalia/backend/internal/service"
 	api "github.com/ictsc/ictsc-regalia/backend/internal/transport/api"
 )
 
@@ -150,6 +151,15 @@ func (h *Handler) toAdminAnswer(ctx context.Context, answer core.Answer, score *
 	if err != nil {
 		return api.AdminAnswer{}, err
 	}
+	latest, blocked, err := h.service.AnswerGrading(ctx, answer)
+	if err != nil {
+		return api.AdminAnswer{}, err
+	}
+	var blockedReason *api.MarkingBlockedReason
+	if blocked != "" {
+		reason := api.MarkingBlockedReason(blocked)
+		blockedReason = &reason
+	}
 	var assignee *string
 	source := api.AdminAnswerWorkflowAssignmentSource("DEFAULT")
 	if workflow.ClaimedBy != "" {
@@ -163,7 +173,8 @@ func (h *Handler) toAdminAnswer(ctx context.Context, answer core.Answer, score *
 		Team:      toAPITeam(team), Author: toAPIProfile(author), Problem: toAPICatalog(problem),
 		Body: api.AnswerBody{Type: api.AnswerBodyTypeDESCRIPTIVE, Body: answer.Body}, SubmittedAt: answer.SubmittedAt,
 		ContentCommit: answer.ContentCommit, Score: markingScore,
-		Workflow: api.AdminAnswerWorkflow{Status: api.AdminAnswerWorkflowStatus(workflow.Status), AssigneeDiscordId: assignee, AssignmentSource: source, Revision: workflow.Revision},
+		Workflow:        api.AdminAnswerWorkflow{Status: api.AdminAnswerWorkflowStatus(workflow.Status), AssigneeDiscordId: assignee, AssignmentSource: source, Revision: workflow.Revision},
+		CompetitionMode: api.CompetitionMode(h.service.CompetitionMode()), Latest: latest, MarkingBlockedReason: blockedReason,
 	}, nil
 }
 
@@ -221,7 +232,7 @@ func (h *Handler) ListAdminMarkingResults(ctx context.Context, request api.ListA
 		if err != nil {
 			return nil, err
 		}
-		result.Visibility = core.MarkingVisibilityAt(answer.SubmittedAt, h.service.Now(), state.RankingFreezeAt, state.FinalRevealedAt)
+		result.Visibility = h.service.MarkingVisibility(answer.SubmittedAt, state)
 		if request.Params.Visibility != nil && core.Visibility(*request.Params.Visibility) != result.Visibility {
 			continue
 		}
@@ -244,6 +255,13 @@ func (h *Handler) CreateAdminMarkingResult(ctx context.Context, request api.Crea
 	if err != nil {
 		return nil, err
 	}
+	if _, blocked, err := h.service.AnswerGrading(ctx, answer); err != nil {
+		return nil, err
+	} else if blocked == service.MarkingBlockedContestRunning {
+		return nil, core.NewError(http.StatusConflict, blocked, "Grading starts after the contest ends")
+	} else if blocked == service.MarkingBlockedNotLatest {
+		return nil, core.NewError(http.StatusConflict, blocked, "Only the latest answer can be graded")
+	}
 	if request.Body.Score > answer.MaxScore {
 		return nil, core.NewError(http.StatusUnprocessableEntity, "validation_error", "Score cannot exceed the answer snapshot maximum")
 	}
@@ -265,7 +283,7 @@ func (h *Handler) CreateAdminMarkingResult(ctx context.Context, request api.Crea
 	if err != nil {
 		return nil, err
 	}
-	visibility := core.MarkingVisibilityAt(answer.SubmittedAt, h.service.Now(), state.RankingFreezeAt, state.FinalRevealedAt)
+	visibility := h.service.MarkingVisibility(answer.SubmittedAt, state)
 	result, err := h.service.Store.CreateMarkingResult(ctx, core.MarkingResult{
 		ID: uuid.NewString(), TeamCode: answer.TeamCode, ProblemCode: answer.ProblemCode, AnswerNumber: answer.Number,
 		Judge: principal(ctx).Session.AdminName, MarkedScore: request.Body.Score, Rationale: request.Body.Rationale, LineComments: lineComments,

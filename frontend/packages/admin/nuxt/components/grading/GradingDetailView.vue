@@ -8,6 +8,7 @@ import {
   compareAnswerSources,
 } from "~/features/answer-diff";
 import { buildDisplayItems } from "~/features/answer-display";
+import { adminImageUrl } from "~/features/admin-images";
 import { resizePaneWidths } from "~/features/grading-panes";
 import {
   activeCommentCount,
@@ -118,8 +119,26 @@ function selectLine(line: number, extend: boolean) {
 function removeDraft(id: number) {
   draftState.value = withoutDraft(draftState.value, id);
 }
+// Images follow the problem version the answer was submitted against.
+const problemImageUrl = computed(() =>
+  adminImageUrl(props.problem.content_commit),
+);
+// 二次予選は最終答案だけを採点し比較もしないので、回答は Markdown で読むだけにする。
+const markdownOnly = computed(
+  () => props.answer.competition_mode === "SECONDARY_QUALIFIER",
+);
+const blockedMessages: Record<Schemas["MarkingBlockedReason"], string> = {
+  grading_not_started: "二次予選モードでは競技終了後に採点できます。",
+  answer_not_latest:
+    "二次予選モードでは最新の回答だけを採点します。この回答は採点対象外です。",
+};
+const blockedMessage = computed(() =>
+  props.answer.marking_blocked_reason
+    ? blockedMessages[props.answer.marking_blocked_reason]
+    : "",
+);
 async function mark() {
-  if (score.value == null) return;
+  if (score.value == null || blockedMessage.value) return;
   const saved = await props.submitMarking({
     score: score.value,
     comment: comment.value,
@@ -236,10 +255,16 @@ function startResize(
             >
               提出時点の版を表示中
             </p>
-            <MarkdownContent :source="problem.body" />
+            <MarkdownContent
+              :source="problem.body"
+              :image-url="problemImageUrl"
+            />
             <details v-if="problem.explanation">
               <summary>問題解説</summary>
-              <MarkdownContent :source="problem.explanation" />
+              <MarkdownContent
+                :source="problem.explanation"
+                :image-url="problemImageUrl"
+              />
             </details>
             <details>
               <summary>提出時の commit</summary>
@@ -247,7 +272,10 @@ function startResize(
             </details>
           </template>
           <template v-else-if="index === 1">
-            <div class="grading-answer-toolbar">
+            <div
+              class="grading-answer-toolbar"
+              :class="{ 'is-plain': markdownOnly }"
+            >
               <div class="grading-answer-toolbar-top">
                 <div>
                   <small class="grading-answer-eyebrow">提出された回答</small>
@@ -306,181 +334,190 @@ function startResize(
                 </p>
               </div>
             </div>
-            <div v-if="isDiffView && comparison" class="grading-diff-filebar">
-              <span
-                >過去 #{{ previousAnswer?.reference.answer_number }} → 今回 #{{
-                  answer.reference.answer_number
-                }}</span
-              >
-              <span class="grading-diff-stats"
-                ><b>+{{ comparison.addedLines }}</b
-                ><b>−{{ comparison.removedLines }}</b></span
-              >
-            </div>
-            <p
-              v-if="isDiffView && comparison && !diffHunks.length"
-              class="grading-no-diff"
-            >
-              選択した過去回答から変更はありません。「今回の回答のみ」で全文を確認できます。
-            </p>
-            <div
-              v-else
-              class="grading-answer-lines"
-              :class="{ 'is-unified-diff': isDiffView }"
-            >
-              <template v-for="item in displayedItems" :key="item.key">
-                <button
-                  v-if="item.type === 'omitted'"
-                  type="button"
-                  class="grading-diff-omitted"
-                  @click="showAllContext = true"
+            <MarkdownContent
+              v-if="markdownOnly"
+              class="grading-markdown-answer"
+              :source="answer.body.body"
+            />
+            <template v-else>
+              <div v-if="isDiffView && comparison" class="grading-diff-filebar">
+                <span
+                  >過去 #{{ previousAnswer?.reference.answer_number }} → 今回
+                  #{{ answer.reference.answer_number }}</span
                 >
-                  … {{ item.count }} 行を展開
-                </button>
-                <div v-else-if="item.type === 'hunk'" class="grading-diff-hunk">
-                  @@ -{{ item.hunk.previousStart }},{{
-                    item.hunk.previousCount
-                  }}
-                  +{{ item.hunk.currentStart }},{{ item.hunk.currentCount }}
-                  @@
-                </div>
-                <div
-                  v-else
-                  class="grading-answer-line"
-                  :class="`is-${item.row.kind}`"
+                <span class="grading-diff-stats"
+                  ><b>+{{ comparison.addedLines }}</b
+                  ><b>−{{ comparison.removedLines }}</b></span
                 >
-                  <div
-                    v-if="item.row.currentLine === null"
-                    class="grading-line-source is-removed"
+              </div>
+              <p
+                v-if="isDiffView && comparison && !diffHunks.length"
+                class="grading-no-diff"
+              >
+                選択した過去回答から変更はありません。「今回の回答のみ」で全文を確認できます。
+              </p>
+              <div
+                v-else
+                class="grading-answer-lines"
+                :class="{ 'is-unified-diff': isDiffView }"
+              >
+                <template v-for="item in displayedItems" :key="item.key">
+                  <button
+                    v-if="item.type === 'omitted'"
+                    type="button"
+                    class="grading-diff-omitted"
+                    @click="showAllContext = true"
                   >
-                    <span class="grading-old-line-number">{{
-                      item.row.previousLine
-                    }}</span>
-                    <span class="grading-empty-line-number" />
-                    <span class="grading-current-marker" aria-hidden="true"
-                      >−</span
-                    >
-                    <span class="grading-line-text">{{
-                      item.row.text || " "
-                    }}</span>
+                    … {{ item.count }} 行を展開
+                  </button>
+                  <div
+                    v-else-if="item.type === 'hunk'"
+                    class="grading-diff-hunk"
+                  >
+                    @@ -{{ item.hunk.previousStart }},{{
+                      item.hunk.previousCount
+                    }}
+                    +{{ item.hunk.currentStart }},{{ item.hunk.currentCount }}
+                    @@
                   </div>
                   <div
                     v-else
-                    class="grading-line-source"
-                    :class="{
-                      'is-selected': lineDrafts.some(
-                        (draft) =>
-                          draft.id === activeDraftId &&
-                          item.row.currentLine! >= draft.startLine &&
-                          item.row.currentLine! <= draft.endLine,
-                      ),
-                      'has-draft': lineDrafts.some(
-                        (draft) =>
-                          draft.body.trim() &&
-                          item.row.currentLine! >= draft.startLine &&
-                          item.row.currentLine! <= draft.endLine,
-                      ),
-                      'has-history': savedRanges.some(
-                        (note) =>
-                          item.row.currentLine! >= note.startLine &&
-                          item.row.currentLine! <= note.endLine,
-                      ),
-                    }"
-                    @click="selectLine(item.row.currentLine!, $event.shiftKey)"
+                    class="grading-answer-line"
+                    :class="`is-${item.row.kind}`"
                   >
-                    <span v-if="isDiffView" class="grading-old-line-number">{{
-                      item.row.previousLine ?? ""
-                    }}</span>
-                    <button
-                      type="button"
-                      class="grading-line-number"
-                      :aria-label="`行 ${item.row.currentLine} を選択`"
-                      @click.stop="
+                    <div
+                      v-if="item.row.currentLine === null"
+                      class="grading-line-source is-removed"
+                    >
+                      <span class="grading-old-line-number">{{
+                        item.row.previousLine
+                      }}</span>
+                      <span class="grading-empty-line-number" />
+                      <span class="grading-current-marker" aria-hidden="true"
+                        >−</span
+                      >
+                      <span class="grading-line-text">{{
+                        item.row.text || " "
+                      }}</span>
+                    </div>
+                    <div
+                      v-else
+                      class="grading-line-source"
+                      :class="{
+                        'is-selected': lineDrafts.some(
+                          (draft) =>
+                            draft.id === activeDraftId &&
+                            item.row.currentLine! >= draft.startLine &&
+                            item.row.currentLine! <= draft.endLine,
+                        ),
+                        'has-draft': lineDrafts.some(
+                          (draft) =>
+                            draft.body.trim() &&
+                            item.row.currentLine! >= draft.startLine &&
+                            item.row.currentLine! <= draft.endLine,
+                        ),
+                        'has-history': savedRanges.some(
+                          (note) =>
+                            item.row.currentLine! >= note.startLine &&
+                            item.row.currentLine! <= note.endLine,
+                        ),
+                      }"
+                      @click="
                         selectLine(item.row.currentLine!, $event.shiftKey)
                       "
                     >
-                      {{ item.row.currentLine }}
-                    </button>
-                    <span
-                      v-if="isDiffView"
-                      class="grading-current-marker"
-                      aria-hidden="true"
-                      >{{ item.row.kind === "added" ? "+" : " " }}</span
-                    >
-                    <span class="grading-line-text">{{
-                      item.row.text || " "
-                    }}</span>
-                  </div>
-                  <div
-                    v-for="draft in item.row.currentLine === null
-                      ? []
-                      : draftsAtLine(item.row.currentLine)"
-                    :key="draft.id"
-                    class="grading-line-editor"
-                  >
-                    <template v-if="draft.id === activeDraftId">
-                      <label :for="`line-comment-${draft.id}`"
-                        >{{
-                          rangeLabel(draft.startLine, draft.endLine)
-                        }}へのコメント</label
-                      >
-                      <textarea
-                        :id="`line-comment-${draft.id}`"
-                        v-model="draft.body"
-                        maxlength="2000"
-                        rows="3"
-                        placeholder="この行についてコメント"
-                      />
+                      <span v-if="isDiffView" class="grading-old-line-number">{{
+                        item.row.previousLine ?? ""
+                      }}</span>
                       <button
                         type="button"
-                        class="button-secondary"
-                        @click="removeDraft(draft.id)"
+                        class="grading-line-number"
+                        :aria-label="`行 ${item.row.currentLine} を選択`"
+                        @click.stop="
+                          selectLine(item.row.currentLine!, $event.shiftKey)
+                        "
                       >
-                        コメントを破棄
+                        {{ item.row.currentLine }}
                       </button>
-                    </template>
-                    <button
-                      v-else
-                      type="button"
-                      class="grading-line-draft"
-                      @click="activeDraftId = draft.id"
-                    >
-                      <strong
-                        >{{
-                          rangeLabel(draft.startLine, draft.endLine)
-                        }}の下書き</strong
+                      <span
+                        v-if="isDiffView"
+                        class="grading-current-marker"
+                        aria-hidden="true"
+                        >{{ item.row.kind === "added" ? "+" : " " }}</span
                       >
-                      <span>{{ draft.body }}</span>
-                    </button>
+                      <span class="grading-line-text">{{
+                        item.row.text || " "
+                      }}</span>
+                    </div>
+                    <div
+                      v-for="draft in item.row.currentLine === null
+                        ? []
+                        : draftsAtLine(item.row.currentLine)"
+                      :key="draft.id"
+                      class="grading-line-editor"
+                    >
+                      <template v-if="draft.id === activeDraftId">
+                        <label :for="`line-comment-${draft.id}`"
+                          >{{
+                            rangeLabel(draft.startLine, draft.endLine)
+                          }}へのコメント</label
+                        >
+                        <textarea
+                          :id="`line-comment-${draft.id}`"
+                          v-model="draft.body"
+                          maxlength="2000"
+                          rows="3"
+                          placeholder="この行についてコメント"
+                        />
+                        <button
+                          type="button"
+                          class="button-secondary"
+                          @click="removeDraft(draft.id)"
+                        >
+                          コメントを破棄
+                        </button>
+                      </template>
+                      <button
+                        v-else
+                        type="button"
+                        class="grading-line-draft"
+                        @click="activeDraftId = draft.id"
+                      >
+                        <strong
+                          >{{
+                            rangeLabel(draft.startLine, draft.endLine)
+                          }}の下書き</strong
+                        >
+                        <span>{{ draft.body }}</span>
+                      </button>
+                    </div>
+                    <div
+                      v-for="(note, noteIndex) in item.row.currentLine === null
+                        ? []
+                        : (lineHistory[item.row.currentLine] ?? [])"
+                      :key="`${note.id}-${noteIndex}`"
+                      class="grading-line-history"
+                    >
+                      <small>{{
+                        rangeLabel(note.startLine, note.endLine)
+                      }}</small
+                      ><br /><strong>{{ note.judge }}</strong
+                      >: {{ note.body }}
+                    </div>
                   </div>
-                  <div
-                    v-for="(note, noteIndex) in item.row.currentLine === null
-                      ? []
-                      : (lineHistory[item.row.currentLine] ?? [])"
-                    :key="`${note.id}-${noteIndex}`"
-                    class="grading-line-history"
-                  >
-                    <small>{{ rangeLabel(note.startLine, note.endLine) }}</small
-                    ><br /><strong>{{ note.judge }}</strong
-                    >: {{ note.body }}
-                  </div>
-                </div>
-              </template>
-            </div>
-            <details class="grading-markdown-preview">
-              <summary>今回の回答を Markdown で表示</summary>
-              <MarkdownContent :source="answer.body.body" />
-            </details>
-            <aside class="grading-line-help" aria-label="行コメントの操作方法">
-              <strong>行コメントの操作方法</strong>
-              <p>
-                今回の回答の行番号をクリックするとコメント欄が開きます。同じ行をもう一度クリックすると閉じます。Shift
-                を押しながら別の行番号をクリックすると範囲を選べます。差分表示で省略された行には「今回の回答のみ」からコメントできます。コメントは採点結果の送信時に保存されます。
-              </p>
-            </aside>
+                </template>
+              </div>
+              <details class="grading-markdown-preview">
+                <summary>今回の回答を Markdown で表示</summary>
+                <MarkdownContent :source="answer.body.body" />
+              </details>
+            </template>
           </template>
           <template v-else>
-            <form class="form-grid" @submit.prevent="mark">
+            <p v-if="blockedMessage" class="grading-blocked" role="note">
+              {{ blockedMessage }}
+            </p>
+            <form v-else class="form-grid" @submit.prevent="mark">
               <label
                 >得点<input
                   v-model.number="score"
@@ -767,22 +804,13 @@ function startResize(
   color: var(--accent);
   background: var(--surface-hover);
 }
-.grading-line-help {
-  margin-top: 24px;
-  padding: 14px 16px;
-  border-top: 2px solid var(--line-light);
+.grading-blocked {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--accent);
   background: var(--surface-hover);
-  color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.6;
-}
-.grading-line-help strong {
-  display: block;
-  margin-bottom: 4px;
-  color: var(--ink);
-}
-.grading-line-help p {
-  margin: 0;
 }
 .grading-answer-line {
   border-bottom: 1px solid var(--line-light);
@@ -891,6 +919,15 @@ function startResize(
 }
 .grading-markdown-preview {
   margin-top: 20px;
+}
+/* Markdown-only answers sit directly in the pane without an inner box. */
+.grading-answer-toolbar.is-plain {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.grading-markdown-answer {
+  margin-top: 16px;
 }
 .grading-pane-content .form-grid {
   margin: 0 0 24px;

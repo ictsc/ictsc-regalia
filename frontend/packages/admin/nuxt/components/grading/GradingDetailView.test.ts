@@ -104,6 +104,29 @@ describe("GradingDetailView", () => {
     expect(wrapper.emitted("assignment")).toEqual([["RESET_TO_DEFAULT"]]);
   });
 
+  it("shows only the rendered Markdown in secondary qualifier mode", () => {
+    const wrapper = mountView({
+      answer: { ...detailAnswer, competition_mode: "SECONDARY_QUALIFIER" },
+      previous: [],
+    });
+    expect(wrapper.find(".grading-markdown-answer").exists()).toBe(true);
+    expect(wrapper.find(".grading-answer-lines").exists()).toBe(false);
+    expect(wrapper.find(".grading-markdown-preview").exists()).toBe(false);
+  });
+  it("replaces the marking form with the reason grading is blocked", () => {
+    const wrapper = mountView({
+      answer: {
+        ...detailAnswer,
+        competition_mode: "SECONDARY_QUALIFIER",
+        marking_blocked_reason: "grading_not_started",
+      },
+      previous: [],
+    });
+    expect(wrapper.find(".grading-blocked").text()).toContain(
+      "競技終了後に採点できます",
+    );
+    expect(wrapper.find('input[type="number"]').exists()).toBe(false);
+  });
   it("collapses panes through the model", async () => {
     const wrapper = mountView();
     await wrapper.find(".grading-pane-header button").trigger("click");

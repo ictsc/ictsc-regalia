@@ -1145,7 +1145,7 @@
       "post": {
         "tags": ["Admin Marking"],
         "summary": "採点結果を登録する",
-        "description": "全Adminが採点者として登録できる。judgeはBearer JWTから決定し、可視性と集計得点は競技ルール・凍結状態に基づいてサーバー内部で更新する。",
+        "description": "全Adminが採点者として登録できる。judgeはBearer JWTから決定し、可視性と集計得点は競技ルール・凍結状態に基づいてサーバー内部で更新する。二次予選モードでは競技終了前（grading_not_started）と最新でない回答（answer_not_latest）への登録を409で拒否する。",
         "operationId": "createAdminMarkingResult",
         "security": [{ "AdminSession": [] }],
         "requestBody": {
@@ -1454,6 +1454,7 @@
       "put": {
         "tags": ["Admin Competition"],
         "summary": "ランキング凍結時刻を置換する",
+        "description": "二次予選モードでは凍結を使わないため、凍結時刻の設定は409で拒否する（nullでの解除は可能）。",
         "operationId": "replaceAdminDashboardSchedule",
         "security": [{ "AdminSession": [] }],
         "requestBody": {
@@ -1467,6 +1468,118 @@
           },
           "401": { "$ref": "#/components/responses/Unauthorized" },
           "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/api/v1/contestant/images/{image_name}": {
+      "parameters": [{ "$ref": "#/components/parameters/ImageNamePath" }, { "$ref": "#/components/parameters/IfNoneMatchHeader" }],
+      "get": {
+        "tags": ["Contestant Content"],
+        "summary": "問題文・お知らせから参照される画像を取得する",
+        "description": "コンテンツリポジトリの images/ にあるファイルを、有効なコンテンツのものから返す。Markdown では /images/{image_name} として参照する。",
+        "operationId": "getContestantImage",
+        "security": [{ "ContestantSession": [] }],
+        "responses": {
+          "200": {
+            "description": "画像",
+            "headers": {
+              "Cache-Control": { "schema": { "type": "string" } },
+              "ETag": { "schema": { "type": "string" } },
+              "X-Content-Type-Options": { "schema": { "type": "string", "enum": ["nosniff"] } }
+            },
+            "content": {
+              "image/png": { "schema": { "type": "string", "format": "binary" } },
+              "image/jpeg": { "schema": { "type": "string", "format": "binary" } },
+              "image/gif": { "schema": { "type": "string", "format": "binary" } },
+              "image/webp": { "schema": { "type": "string", "format": "binary" } }
+            }
+          },
+          "304": {
+            "description": "If-None-Matchと一致した（画像は変わっていない）",
+            "headers": { "ETag": { "schema": { "type": "string" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/api/v1/admin/images/{image_name}": {
+      "parameters": [{ "$ref": "#/components/parameters/ImageNamePath" }, { "$ref": "#/components/parameters/IfNoneMatchHeader" }],
+      "get": {
+        "tags": ["Admin Content"],
+        "summary": "問題文・お知らせから参照される画像を取得する",
+        "description": "commitを省略すると有効なコンテンツの画像を返す。",
+        "operationId": "getAdminImage",
+        "security": [{ "AdminSession": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/ContentCommitQuery" }],
+        "responses": {
+          "200": {
+            "description": "画像",
+            "headers": {
+              "Cache-Control": { "schema": { "type": "string" } },
+              "ETag": { "schema": { "type": "string" } },
+              "X-Content-Type-Options": { "schema": { "type": "string", "enum": ["nosniff"] } }
+            },
+            "content": {
+              "image/png": { "schema": { "type": "string", "format": "binary" } },
+              "image/jpeg": { "schema": { "type": "string", "format": "binary" } },
+              "image/gif": { "schema": { "type": "string", "format": "binary" } },
+              "image/webp": { "schema": { "type": "string", "format": "binary" } }
+            }
+          },
+          "304": {
+            "description": "If-None-Matchと一致した（画像は変わっていない）",
+            "headers": { "ETag": { "schema": { "type": "string" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/api/v1/admin/dev/contest-phase": {
+      "get": {
+        "tags": ["Admin Competition"],
+        "summary": "現在の競技状態を取得する",
+        "description": "BEFOREはどのセクションも始まっていない状態、DURINGはいずれかのセクション中、AFTERはセクション外でいずれかのセクションが始まったことがある状態（セクション間の休憩を含む）。enabledは開発モードかつ二次予選モードで切り替えが使えるときtrue。",
+        "operationId": "getAdminDevContestPhase",
+        "security": [{ "AdminSession": [] }],
+        "responses": {
+          "200": {
+            "description": "競技状態",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DevContestPhaseResponse" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "put": {
+        "tags": ["Admin Competition"],
+        "summary": "開発用に競技状態を切り替える",
+        "description": "開発モードかつ二次予選モードでのみ使える。セクションの数・長さ・間隔は保ったまま全体を現在時刻基準で平行移動し、有効なコンテンツの manifest を書き換える。BEFOREは最初のセクションが10分後に始まり、DURINGは最初のセクションが10分前に始まり、AFTERは最後のセクションが10分前に終わる。無効な環境では404。",
+        "operationId": "replaceAdminDevContestPhase",
+        "security": [{ "AdminSession": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ReplaceDevContestPhaseRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "切り替え後の競技状態",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DevContestPhaseResponse" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
           "422": { "$ref": "#/components/responses/ValidationError" },
           "500": { "$ref": "#/components/responses/InternalServerError" }
         }
@@ -1561,6 +1674,20 @@
         "description": "チーム・問題内で採番された回答番号",
         "schema": { "type": "integer", "format": "int32", "minimum": 1 }
       },
+      "IfNoneMatchHeader": {
+        "name": "If-None-Match",
+        "in": "header",
+        "required": false,
+        "description": "以前に受け取ったETag。一致すれば304を返す。",
+        "schema": { "type": "string", "maxLength": 200 }
+      },
+      "ImageNamePath": {
+        "name": "image_name",
+        "in": "path",
+        "required": true,
+        "description": "images/ 直下のファイル名",
+        "schema": { "type": "string", "minLength": 1, "maxLength": 255, "pattern": "^[A-Za-z0-9._-]+$" }
+      },
       "AnnouncementSlugPath": {
         "name": "announcement_slug",
         "in": "path",
@@ -1637,7 +1764,7 @@
       },
       "Conflict": {
         "description": "重複、期間外操作、状態遷移違反などのドメイン競合",
-        "x-error-codes": ["conflict", "team_code_conflict", "invitation_expired", "invitation_already_used", "team_full", "contestant_already_registered", "submission_closed", "deployment_not_allowed", "deployment_in_progress", "invalid_deployment_transition", "duplicate_event_mismatch", "content_rollback_rejected", "content_refresh_in_progress"],
+        "x-error-codes": ["conflict", "team_code_conflict", "invitation_expired", "invitation_already_used", "team_full", "contestant_already_registered", "submission_closed", "deployment_not_allowed", "grading_not_started", "answer_not_latest", "deployment_in_progress", "invalid_deployment_transition", "duplicate_event_mismatch", "content_rollback_rejected", "content_refresh_in_progress"],
         "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/ProblemDetails" } } }
       },
       "ValidationError": {
@@ -1733,6 +1860,8 @@
           "answer_rate_limited",
           "submission_closed",
           "deployment_not_allowed",
+          "grading_not_started",
+          "answer_not_latest",
           "deployment_in_progress",
           "invalid_deployment_transition",
           "duplicate_event_mismatch",
@@ -2176,14 +2305,20 @@
       "ContestantScheduleResponse": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["sections"],
+        "required": ["sections", "competition_mode"],
         "properties": {
           "sections": {
             "type": "array",
             "description": "beginning昇順、同時刻の場合slug辞書順。",
             "items": { "$ref": "#/components/schemas/ContestantScheduleSection" }
-          }
+          },
+          "competition_mode": { "$ref": "#/components/schemas/CompetitionMode" }
         }
+      },
+      "CompetitionMode": {
+        "type": "string",
+        "description": "STANDARDは回答ごとに随時採点し、最高得点の回答を採用する。SECONDARY_QUALIFIERは競技終了後に各チーム・問題の最新回答だけを採点し、その得点を採用する。SECONDARY_QUALIFIERでは最終公開まで競技者に採点結果と順位を返さない。",
+        "enum": ["STANDARD", "SECONDARY_QUALIFIER"]
       },
       "ProblemType": {
         "type": "string",
@@ -2566,12 +2701,48 @@
           { "ranking_freeze_at": null }
         ]
       },
+      "ContestPhase": {
+        "type": "string",
+        "enum": ["BEFORE", "DURING", "AFTER"]
+      },
+      "DevContestPhase": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["enabled", "phase", "sections"],
+        "properties": {
+          "enabled": { "type": "boolean" },
+          "phase": { "$ref": "#/components/schemas/ContestPhase" },
+          "sections": {
+            "type": "array",
+            "description": "beginning昇順、同時刻の場合slug辞書順。",
+            "items": { "$ref": "#/components/schemas/ContestantScheduleSection" }
+          }
+        }
+      },
+      "DevContestPhaseResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["contest_phase"],
+        "properties": {
+          "contest_phase": { "$ref": "#/components/schemas/DevContestPhase" }
+        }
+      },
+      "ReplaceDevContestPhaseRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["phase"],
+        "properties": {
+          "phase": { "$ref": "#/components/schemas/ContestPhase" }
+        }
+      },
       "DashboardScheduleResponse": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["dashboard_schedule"],
+        "description": "SECONDARY_QUALIFIERでは順位は最終公開まで返さず、凍結は使わない。",
+        "required": ["dashboard_schedule", "competition_mode"],
         "properties": {
-          "dashboard_schedule": { "$ref": "#/components/schemas/DashboardSchedule" }
+          "dashboard_schedule": { "$ref": "#/components/schemas/DashboardSchedule" },
+          "competition_mode": { "$ref": "#/components/schemas/CompetitionMode" }
         }
       },
       "Rank": {
@@ -2590,8 +2761,8 @@
       "RankingResponse": {
         "type": "object",
         "additionalProperties": false,
-        "description": "frozen=trueならfrozen_atはfreeze snapshotの基準時刻、frozen=falseならnull。",
-        "required": ["ranking", "frozen", "frozen_at"],
+        "description": "frozen=trueならfrozen_atはfreeze snapshotの基準時刻、frozen=falseならnull。hidden=trueは二次予選モードで最終公開前のため順位を返さないことを示し、rankingは空配列になる。",
+        "required": ["ranking", "frozen", "frozen_at", "hidden"],
         "properties": {
           "ranking": {
             "type": "array",
@@ -2599,7 +2770,8 @@
             "items": { "$ref": "#/components/schemas/Rank" }
           },
           "frozen": { "type": "boolean" },
-          "frozen_at": { "type": ["string", "null"], "format": "date-time" }
+          "frozen_at": { "type": ["string", "null"], "format": "date-time" },
+          "hidden": { "type": "boolean" }
         },
         "allOf": [
           {
@@ -2621,7 +2793,8 @@
               }
             ],
             "frozen": true,
-            "frozen_at": "2026-08-30T15:00:00+09:00"
+            "frozen_at": "2026-08-30T15:00:00+09:00",
+            "hidden": false
           }
         ]
       },
@@ -2649,7 +2822,7 @@
       "AdminAnswer": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["reference", "team", "author", "problem", "body", "submitted_at", "score", "content_commit", "workflow"],
+        "required": ["reference", "team", "author", "problem", "body", "submitted_at", "score", "content_commit", "workflow", "competition_mode", "latest", "marking_blocked_reason"],
         "properties": {
           "reference": { "$ref": "#/components/schemas/AdminAnswerReference" },
           "team": { "$ref": "#/components/schemas/Team" },
@@ -2664,8 +2837,22 @@
             ]
           },
           "content_commit": { "$ref": "#/components/schemas/ContentCommit" },
-          "workflow": { "$ref": "#/components/schemas/AdminAnswerWorkflow" }
+          "workflow": { "$ref": "#/components/schemas/AdminAnswerWorkflow" },
+          "competition_mode": { "$ref": "#/components/schemas/CompetitionMode" },
+          "latest": { "type": "boolean", "description": "同じチーム・問題の回答の中で最新ならtrue。" },
+          "marking_blocked_reason": {
+            "description": "nullなら採点結果を登録できる。",
+            "oneOf": [
+              { "$ref": "#/components/schemas/MarkingBlockedReason" },
+              { "type": "null" }
+            ]
+          }
         }
+      },
+      "MarkingBlockedReason": {
+        "type": "string",
+        "description": "採点結果を登録できない理由。grading_not_startedは競技終了前、answer_not_latestは最新でない回答。いずれもSECONDARY_QUALIFIERでのみ発生する。",
+        "enum": ["grading_not_started", "answer_not_latest"]
       },
       "AdminAnswerWorkflow": {
         "type": "object", "additionalProperties": false,

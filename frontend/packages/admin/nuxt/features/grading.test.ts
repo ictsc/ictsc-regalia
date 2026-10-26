@@ -5,6 +5,7 @@ import {
   columnAnswers,
   defaultGradingFilters,
   filterAnswers,
+  gradableAnswers,
   minutesSince,
   type GradingAnswer,
 } from "./grading";
@@ -19,6 +20,7 @@ const answer = (
     status?: GradingAnswer["workflow"]["status"];
     assignee?: string | null;
     score?: { total: number; max: number } | null;
+    latest?: boolean;
   } = {},
 ): GradingAnswer => ({
   reference: { team_code: team, problem_code: problem, answer_number: number },
@@ -38,6 +40,9 @@ const answer = (
     assignment_source: "DEFAULT",
     revision: 1,
   },
+  competition_mode: "STANDARD",
+  latest: overrides.latest ?? true,
+  marking_blocked_reason: null,
 });
 
 describe("answer identity", () => {
@@ -90,5 +95,25 @@ describe("columnAnswers", () => {
     expect(columnAnswers(answers, "WAITING", "").map(answerKey)[0]).toBe(
       "3:A01:1",
     );
+  });
+});
+
+describe("gradableAnswers", () => {
+  it("keeps every answer in standard mode", () => {
+    const answers = [answer(2, "A01", 1, 5, { latest: false })];
+    expect(gradableAnswers(answers)).toHaveLength(1);
+  });
+  it("keeps only final answers in secondary qualifier mode", () => {
+    const answers = [
+      {
+        ...answer(2, "A01", 1, 30, { latest: false }),
+        competition_mode: "SECONDARY_QUALIFIER" as const,
+      },
+      {
+        ...answer(2, "A01", 2, 5),
+        competition_mode: "SECONDARY_QUALIFIER" as const,
+      },
+    ];
+    expect(gradableAnswers(answers).map(answerKey)).toEqual(["2:A01:2"]);
   });
 });
