@@ -5,7 +5,7 @@ const { data, error, pending, refresh } = await useCompetition();
 const now = useClock();
 </script>
 <template>
-  <main class="workspace">
+  <main>
     <ScheduleView
       :entries="data?.schedule?.entries"
       :now="now"

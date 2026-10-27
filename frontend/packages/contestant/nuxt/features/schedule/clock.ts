@@ -46,6 +46,18 @@ export function contestClock(
     };
   }
 
+  // A section that started on an earlier day and is still running.
+  const running = entries.find(
+    (entry) =>
+      Date.parse(entry.startAt) <= now && now < Date.parse(entry.endAt),
+  );
+  if (running) {
+    return {
+      label: "競技終了まで",
+      text: clockText(Math.floor((Date.parse(running.endAt) - now) / 1000)),
+    };
+  }
+
   const next = entries
     .filter((entry) => Date.parse(entry.startAt) > now)
     .sort((a, b) => Date.parse(a.startAt) - Date.parse(b.startAt))[0];

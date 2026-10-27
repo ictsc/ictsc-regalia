@@ -20,7 +20,7 @@ watch(
 useHead({ title: computed(() => notice.value?.title ?? "お知らせ") });
 </script>
 <template>
-  <main class="workspace">
+  <main>
     <RequestState :error="error" :pending="pending" @retry="refresh"
       ><template v-if="notice"
         ><header class="linked-page-heading">

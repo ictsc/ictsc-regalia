@@ -2,10 +2,17 @@
 .admin-app {
   min-height: 100vh;
 }
+/* Spans the same width as .admin-shell: the brand lines up with the nav
+   labels (14px nav padding + 3px marker + 12px link padding) and the
+   actions with the workspace's right edge. */
 .admin-app .admin-header {
-  max-width: none;
+  width: 100%;
+  max-width: 1680px;
   min-height: 72px;
-  padding-inline: clamp(16px, 3vw, 48px);
+  padding: 0 clamp(20px, 3vw, 48px) 0 29px;
+}
+.admin-app:has(.grading-detail-workspace) .admin-header {
+  max-width: none;
 }
 .admin-app .admin-header .actions {
   margin: 0;
@@ -53,12 +60,19 @@
   font-weight: 600;
   line-height: 1.4;
 }
-.admin-shell .admin-nav a:hover {
-  background: var(--surface-hover);
+/* Same states as the contestant top bar: hover is accent with an
+   underline, the current page is bold with a thicker underline. */
+.admin-shell .admin-nav a:hover,
+.admin-shell .admin-nav a:focus-visible {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 .admin-shell .admin-nav .is-current {
-  border-left-color: var(--accent);
-  background: var(--surface-hover);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
 }
 .admin-shell > .workspace {
   width: 100%;
@@ -81,9 +95,9 @@
 }
 .admin-panel {
   min-width: 0;
-  margin: 0 0 28px;
-  padding: 24px;
-  border: 1px solid var(--line-light);
+  margin: 0 0 48px;
+  padding: 20px 0 0;
+  border-top: 1px solid var(--line);
 }
 .admin-panel > :first-child {
   margin-top: 0;
@@ -143,10 +157,10 @@
   padding: 20px;
   border: 1px solid var(--line-light);
 }
-.admin-summary-card:hover,
-.admin-summary-card:focus-visible {
-  border-color: var(--accent);
-  background: var(--surface-hover);
+.admin-summary-card:hover .admin-summary-footer,
+.admin-summary-card:focus-visible .admin-summary-footer {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .admin-summary-label {
   font-size: 13px;
@@ -197,7 +211,8 @@
 .admin-grid-two {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
+  gap: 40px;
+  margin-bottom: 48px;
 }
 .admin-grid-two > .admin-panel {
   margin-bottom: 0;
@@ -233,6 +248,16 @@
 }
 .admin-panel .button-primary {
   width: fit-content;
+}
+/* Page-level actions above the panels, e.g. on the scores page. */
+.admin-shell > .workspace > .actions {
+  margin: 0 0 24px;
+}
+.admin-shell > .workspace > .actions .button-primary,
+.admin-shell > .workspace > .actions .button-secondary {
+  width: fit-content;
+  min-height: 42px;
+  padding: 9px 16px;
 }
 .admin-panel .form-grid label {
   min-width: 0;
@@ -272,7 +297,7 @@
   accent-color: var(--accent);
 }
 .admin-danger {
-  border-color: var(--accent);
+  border-top: 2px solid var(--accent);
 }
 .admin-danger h2 {
   color: var(--accent);
@@ -302,20 +327,20 @@
     border-left: 0;
     border-bottom: 3px solid transparent;
   }
-  .admin-shell .admin-nav .is-current {
-    border-bottom-color: var(--accent);
-  }
   .admin-nav-heading {
     display: none;
   }
   .admin-shell > .workspace {
     padding: 28px 20px 64px;
   }
+  .admin-app .admin-header {
+    padding-inline: 20px;
+  }
 }
 @media (max-width: 650px) {
   .admin-app .admin-header {
     gap: 8px;
-    padding-block: 10px;
+    padding: 10px 14px;
   }
   .admin-app .admin-header .actions {
     gap: 8px;
@@ -327,7 +352,8 @@
     padding: 24px 14px 60px;
   }
   .admin-panel {
-    padding: 18px 14px;
+    margin-bottom: 40px;
+    padding-top: 16px;
   }
   .admin-summary-grid,
   .admin-grid-two {

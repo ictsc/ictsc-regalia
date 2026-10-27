@@ -4,6 +4,7 @@ import {
   attachmentName,
   readAttachment,
   textAttachment,
+  uniqueAttachmentName,
 } from "./attachments";
 
 it("counts characters without line breaks", () => {
@@ -17,6 +18,14 @@ it("normalizes file names and keeps only .txt and .log", () => {
   expect(attachmentName("../../etc/passwd.txt")).toBe("_.._etc_passwd.txt");
   expect(attachmentName("run.sh")).toBeUndefined();
   expect(attachmentName("page.html")).toBeUndefined();
+});
+
+it("numbers a name that is already attached", () => {
+  expect(uniqueAttachmentName("app.log", [])).toBe("app.log");
+  expect(uniqueAttachmentName("app.log", ["app.log"])).toBe("app-2.log");
+  expect(uniqueAttachmentName("app.log", ["app.log", "app-2.log"])).toBe(
+    "app-3.log",
+  );
 });
 
 it("reads UTF-8 text and rejects binary files", async () => {

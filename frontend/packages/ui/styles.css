@@ -403,9 +403,14 @@ button {
   display: none;
 }
 .global-nav a:hover,
-.global-nav a:focus-visible,
-.global-nav a.is-current {
+.global-nav a:focus-visible {
   color: var(--accent);
+}
+.global-nav a.is-current {
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
 }
 .global-nav a:hover,
 .global-nav a:focus-visible {
@@ -540,11 +545,13 @@ button {
   border: 1px solid currentColor;
   text-align: center;
 }
+/* Same states as the top bar: hover underlines, the current page is bold
+   with a thicker underline. */
 .mobile-menu nav a[aria-current="page"] {
-  background: var(--accent-interactive);
-  color: var(--accent-interactive-text);
   font-weight: 700;
-  box-shadow: inset 4px 0 0 currentColor;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
 }
 .mobile-menu nav a:hover,
 .mobile-menu nav a:focus-visible,
@@ -770,6 +777,8 @@ main.workspace {
 .filter-reset:hover,
 .filter-reset:focus-visible {
   color: var(--accent);
+  /* Already underlined at rest; the thicker line is the non-color cue. */
+  text-decoration-thickness: 2px;
 }
 .filter-reset:focus-visible {
   outline: 2px solid var(--accent);
@@ -787,12 +796,9 @@ a.problem-row {
   background: transparent;
   cursor: pointer;
 }
-a.problem-row:hover,
-a.problem-row:focus-visible {
-  background: var(--surface-hover);
-}
 a.problem-row:hover .problem-title-text,
 a.problem-row:focus-visible .problem-title-text {
+  color: var(--accent);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
@@ -834,7 +840,10 @@ a.problem-row.is-answer-closed .problem-score small {
 .problem-heading > span:first-child {
   padding-left: var(--table-cell-padding);
 }
-.problem-heading > .problem-heading-filter {
+/* span.problem-heading-filter outranks `.problem-row > span:not(.problem-id)`;
+   the summary inside carries the cell padding, so the label lines up with
+   the column's values. */
+.problem-heading > span.problem-heading-filter {
   position: relative;
   display: block;
   padding: 0;
@@ -872,10 +881,16 @@ a.problem-row.is-answer-closed .problem-score small {
   content: "▴";
 }
 .column-filter summary:hover,
-.column-filter summary:focus-visible,
-.column-filter summary.is-filtered {
+.column-filter summary:focus-visible {
   color: var(--accent);
   text-decoration: underline;
+  text-underline-offset: 3px;
+}
+/* An applied filter is a selected state, like the top bar's current page. */
+.column-filter summary.is-filtered {
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
   text-underline-offset: 3px;
 }
 .column-filter summary:focus-visible {
@@ -1427,6 +1442,23 @@ a.problem-row.is-answer-closed .problem-score .problem-cooldown-badge {
   min-height: 40px;
   padding: 0 18px;
 }
+/* "Mark all read" sits right under the settings row; each entry's toggle
+   follows its body. Both are small, like the settings button. */
+.notice-actions {
+  justify-content: flex-end;
+  margin: 16px 0 0;
+}
+.notice-actions .button-secondary,
+.notice-entry .button-secondary {
+  min-height: 32px;
+  padding: 0 12px;
+  font-family: var(--sans-id);
+  font-size: 12px;
+  font-weight: 600;
+}
+.notice-entry .button-secondary {
+  margin-top: 12px;
+}
 .notification-settings .form-error {
   flex-basis: 100%;
   color: var(--accent);
@@ -1514,6 +1546,8 @@ a.problem-row.is-answer-closed .problem-score .problem-cooldown-badge {
 .problem-rail > a.problem-rail-label:hover,
 .problem-rail > a.problem-rail-label:focus-visible {
   color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .problem-rail[hidden] {
   display: none;
@@ -1598,6 +1632,9 @@ a.problem-row.is-answer-closed .problem-score .problem-cooldown-badge {
   background: none;
   color: inherit;
 }
+.problem-rail a.is-answer-closed .rail-pending {
+  color: inherit;
+}
 .rail-title {
   grid-area: title;
   overflow: hidden;
@@ -1646,17 +1683,27 @@ a.problem-row.is-answer-closed .problem-score .problem-cooldown-badge {
   outline: 2px solid var(--ink);
   outline-offset: -2px;
 }
-.problem-rail a.is-active {
-  box-shadow: inset 3px 0 0 var(--accent);
-}
-.problem-rail a.is-active b {
-  font-weight: 600;
+/* Same states as the top bar: hover underlines the title, the current
+   problem is bold with a thicker underline. */
+.problem-rail a.is-active b,
+.problem-rail a.is-active .rail-title {
+  font-weight: 700;
   opacity: 1;
+}
+.problem-rail a.is-active .rail-title {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
 }
 .problem-rail a:hover,
 .problem-rail a:focus-visible {
   z-index: 20;
-  background: var(--surface-hover);
+}
+.problem-rail a:hover .rail-title,
+.problem-rail a:focus-visible .rail-title {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .problem-preview {
   position: absolute;
@@ -2417,8 +2464,15 @@ dialog.confirmation-dialog h2 {
   .problem-heading {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .problem-heading > :last-child {
+  /* span: outranks the desktop `.problem-row > span:not(.problem-id)`. */
+  .problem-heading > span:last-child {
     display: none;
+  }
+  /* The score heading without a filter, centered like the summaries. */
+  .problem-heading > span.score-filter:not(.problem-heading-filter) {
+    justify-content: center;
+    padding: 0 4px;
+    font-size: 12px;
   }
   .filter-label-desktop {
     display: none;
@@ -2577,9 +2631,14 @@ dialog.confirmation-dialog h2 {
   .linked-page-heading p {
     grid-column: 1;
   }
+  /* The date and time do not fit beside the title on a phone. */
   .notice-entry {
-    grid-template-columns: 58px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
     padding: 20px 0;
+  }
+  .notification-settings {
+    padding-inline: 0;
   }
   .notice-entry h2 {
     font-size: 14px;

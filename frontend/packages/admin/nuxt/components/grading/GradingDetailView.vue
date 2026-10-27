@@ -814,7 +814,8 @@ function startResize(
 .grading-diff-omitted:hover,
 .grading-diff-omitted:focus-visible {
   color: var(--accent);
-  background: var(--surface-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .grading-blocked {
   margin: 0 0 16px;
@@ -866,6 +867,13 @@ function startResize(
 .grading-line-source.has-history,
 .grading-line-source:focus-within {
   background: var(--surface-hover);
+}
+/* Lines with a comment are underlined, not only shaded. */
+.grading-line-source.has-draft .grading-line-text,
+.grading-line-source.has-history .grading-line-text {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 4px;
 }
 .grading-line-source.is-selected {
   background: color-mix(in srgb, var(--accent) 16%, var(--paper));
@@ -985,7 +993,8 @@ function startResize(
 }
 .grading-history-comments > summary:hover,
 .grading-history-comments > summary:focus-visible {
-  background: var(--surface-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .grading-history-comments > ol {
   margin: 0;

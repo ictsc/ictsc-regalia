@@ -56,6 +56,10 @@ button:disabled {
   min-height: 160px;
   font-family: var(--sans-read);
 }
+/* An empty status line would add a second grid gap above the button. */
+.form-grid > p[role="status"]:empty {
+  display: none;
+}
 .actions {
   display: flex;
   gap: 16px;
@@ -213,7 +217,10 @@ button:disabled {
   font-size: 13px;
 }
 .admin-nav .router-link-exact-active {
-  color: var(--accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
 }
 .account-nav {
   justify-content: flex-end;

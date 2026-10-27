@@ -37,6 +37,22 @@ export function attachmentName(fileName: string): string | undefined {
 }
 
 /**
+ * Returns name, or name with -2, -3, … before the extension when it is
+ * already taken, e.g. "app.log" becomes "app-2.log".
+ */
+export function uniqueAttachmentName(
+  name: string,
+  takenNames: readonly string[],
+): string {
+  if (!takenNames.includes(name)) return name;
+  const dot = name.lastIndexOf(".");
+  for (let index = 2; ; index++) {
+    const candidate = `${name.slice(0, dot)}-${index}${name.slice(dot)}`;
+    if (!takenNames.includes(candidate)) return candidate;
+  }
+}
+
+/**
  * Reads a file as an attachment, rejecting anything that is not UTF-8 text.
  * Returns an error message instead of throwing.
  */

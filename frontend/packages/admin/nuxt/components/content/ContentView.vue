@@ -92,8 +92,8 @@ const stateLabels: Record<string, string> = {
               <tbody>
                 <tr v-for="s in sections.data?.sections" :key="s.slug">
                   <td>{{ s.slug }}</td>
-                  <td>{{ s.beginning }}</td>
-                  <td>{{ s.ending }}</td>
+                  <td>{{ new Date(s.beginning).toLocaleString("ja-JP") }}</td>
+                  <td>{{ new Date(s.ending).toLocaleString("ja-JP") }}</td>
                 </tr>
               </tbody>
             </table>
@@ -156,7 +156,9 @@ const stateLabels: Record<string, string> = {
                       a.title
                     }}</NuxtLink>
                   </td>
-                  <td>{{ a.effective_from }}</td>
+                  <td>
+                    {{ new Date(a.effective_from).toLocaleString("ja-JP") }}
+                  </td>
                 </tr>
               </tbody>
             </table>

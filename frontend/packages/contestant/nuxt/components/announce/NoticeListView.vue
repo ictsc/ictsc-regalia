@@ -17,7 +17,7 @@ defineEmits<{ toggleRead: [slug: string]; markAllRead: []; retry: [] }>();
   </header>
   <RequestState :error="error" :pending="pending" @retry="$emit('retry')"
     ><slot name="settings" />
-    <div class="actions">
+    <div class="actions notice-actions">
       <button class="button-secondary" @click="$emit('markAllRead')">
         すべて既読にする
       </button>

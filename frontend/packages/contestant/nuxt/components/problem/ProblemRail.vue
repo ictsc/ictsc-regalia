@@ -75,10 +75,14 @@ watch(groups, showCurrentRailItem, { flush: "post" });
         :class="{
           'is-active': p.code === currentCode,
           'is-answer-closed': !p.submissionStatus?.isSubmittable,
-          'has-status': cooldownMinutes > 0 || pending || submitted,
+          'has-status':
+            cooldownMinutes > 0 ||
+            pending ||
+            submitted ||
+            !p.submissionStatus?.isSubmittable,
         }"
         :aria-current="p.code === currentCode ? 'page' : undefined"
-        :aria-label="`${p.code} ${p.title} ${p.score ? `${p.score.score}点 / ${p.maxScore}点満点` : '得点未確定'}${cooldownMinutes ? ` 再提出可能まで${cooldownMinutes}分` : pending ? ' 最新の提出を採点中' : submitted ? ' 提出済み' : ''}`"
+        :aria-label="`${p.code} ${p.title} ${p.score ? `${p.score.score}点 / ${p.maxScore}点満点` : '得点未確定'}${cooldownMinutes ? ` 再提出可能まで${cooldownMinutes}分` : pending ? ' 最新の提出を採点中' : submitted ? ' 提出済み' : !p.submissionStatus?.isSubmittable ? ' 受付時間外' : ''}`"
         ><b>{{ p.code }}</b
         ><span class="rail-score">
           <strong>{{ p.score ? p.score.score : "—" }}</strong>
@@ -91,6 +95,11 @@ watch(groups, showCurrentRailItem, { flush: "post" });
           >採点中</em
         ><em v-else-if="submitted" class="rail-pending" aria-hidden="true"
           >提出済み</em
+        ><em
+          v-else-if="!p.submissionStatus?.isSubmittable"
+          class="rail-pending"
+          aria-hidden="true"
+          >受付時間外</em
         ><span class="problem-preview"
           ><strong>{{ p.title }}</strong
           ><small>{{ p.category }}</small

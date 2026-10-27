@@ -116,8 +116,7 @@ function resetFilters() {
               </fieldset>
             </div>
           </details></span
-        ><span v-if="resultsHidden" class="problem-heading-filter score-filter"
-          >得点</span
+        ><span v-if="resultsHidden" class="score-filter">得点</span
         ><span v-else class="problem-heading-filter score-filter"
           ><details class="column-filter">
             <summary :class="{ 'is-filtered': selectedScores.length }">

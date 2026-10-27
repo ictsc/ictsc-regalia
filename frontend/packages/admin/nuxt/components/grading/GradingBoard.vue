@@ -182,18 +182,17 @@ function onDrop(event: DragEvent, status: GradingStatus) {
   border: 1px solid var(--line-light);
   background: var(--paper);
 }
-.grading-card:focus-within,
-.grading-card:hover {
-  border-color: var(--accent);
-}
 .grading-card-link {
   display: grid;
   gap: 6px;
   color: inherit;
   text-decoration: none;
 }
-.grading-card-link:hover strong {
+.grading-card-link:hover strong,
+.grading-card-link:focus-visible strong {
+  color: var(--accent);
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .grading-card-link span,
 .grading-card-meta {

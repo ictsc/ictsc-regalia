@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { mount, RouterLinkStub } from "@vue/test-utils";
+import { flushPromises, mount, RouterLinkStub } from "@vue/test-utils";
 import AnswerForm from "./AnswerForm.vue";
 import AnswerHistory from "./AnswerHistory.vue";
 import DeploymentHistory from "./DeploymentHistory.vue";
@@ -206,6 +206,89 @@ describe("AnswerForm", () => {
     await composer.findAll("button").at(-1)!.trigger("click");
     expect(composer.find("[role='alert']").text()).toContain("添付済み");
     expect(wrapper.emitted("update:attachments")).toBeUndefined();
+  });
+
+  it("attaches dropped log files and reports the rejected ones", async () => {
+    const wrapper = mount(AnswerForm, {
+      props: {
+        ...props,
+        allowAttachments: true,
+        attachments: [{ name: "app.log", size: 1, content: "x" }],
+      },
+    });
+    const zone = wrapper.find(".answer-attachments");
+    const dataTransfer = {
+      types: ["Files"],
+      files: [
+        new File(["second\n"], "app.log"),
+        new File(["png"], "screen.png"),
+      ],
+      dropEffect: "none",
+    };
+    await zone.trigger("dragenter", { dataTransfer });
+    expect(zone.classes()).toContain("is-drop-over");
+    expect(wrapper.find(".answer-attach-button").text()).toContain("離すと");
+    await zone.trigger("drop", { dataTransfer });
+    await flushPromises();
+    expect(zone.classes()).not.toContain("is-drop-ready");
+    expect(wrapper.emitted("update:attachments")?.at(-1)).toEqual([
+      [
+        { name: "app.log", size: 1, content: "x" },
+        { name: "app-2.log", size: 7, content: "second\n" },
+      ],
+    ]);
+    expect(wrapper.find(".answer-drop-errors").text()).toContain("screen.png");
+  });
+
+  it("marks the attachment area while files are dragged over the page", async () => {
+    const wrapper = mount(AnswerForm, {
+      props: { ...props, allowAttachments: true, attachments: [] },
+      attachTo: document.body,
+    });
+    const event = new Event("dragenter");
+    Object.assign(event, { dataTransfer: { types: ["Files"] } });
+    window.dispatchEvent(event);
+    await wrapper.vm.$nextTick();
+    const zone = wrapper.find(".answer-attachments");
+    expect(zone.classes()).toContain("is-drop-ready");
+    expect(zone.classes()).not.toContain("is-drop-over");
+    expect(wrapper.find(".answer-attach-button").text()).toBe(
+      "ここにドロップしてログを添付",
+    );
+    window.dispatchEvent(new Event("dragend"));
+    await wrapper.vm.$nextTick();
+    expect(zone.classes()).not.toContain("is-drop-ready");
+    wrapper.unmount();
+  });
+
+  it("ignores files dropped outside the attachment area", async () => {
+    const wrapper = mount(AnswerForm, {
+      props: { ...props, allowAttachments: true, attachments: [] },
+    });
+    const dataTransfer = {
+      types: ["Files"],
+      files: [new File(["log\n"], "app.log")],
+      dropEffect: "copy",
+    };
+    await wrapper.find("textarea").trigger("dragover", { dataTransfer });
+    expect(dataTransfer.dropEffect).toBe("none");
+    await wrapper.find("textarea").trigger("drop", { dataTransfer });
+    await flushPromises();
+    expect(wrapper.emitted("update:attachments")).toBeUndefined();
+  });
+
+  it("shows the content of an attached log", () => {
+    const wrapper = mount(AnswerForm, {
+      props: {
+        ...props,
+        allowAttachments: true,
+        attachments: [{ name: "app.log", size: 6, content: "<b>x\n" }],
+      },
+    });
+    const entry = wrapper.find(".answer-attachment-list details");
+    expect(entry.find("summary").text()).toContain("app.log");
+    expect(entry.find("pre").text()).toBe("<b>x");
+    expect(entry.find("pre b").exists()).toBe(false);
   });
 
   it("offers log attachments only when the problem allows them", () => {

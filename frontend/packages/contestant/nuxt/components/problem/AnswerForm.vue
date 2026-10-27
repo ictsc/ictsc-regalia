@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import MarkdownContent from "@ictsc/ui/components/MarkdownContent.vue";
 import {
   answerLength,
   formatBytes,
   maxAttachments,
+  readAttachment,
+  uniqueAttachmentName,
   type AttachmentFile,
 } from "@ictsc/ui/attachments";
 import TabHint from "@ictsc/ui/components/TabHint.vue";
@@ -37,6 +39,11 @@ const emit = defineEmits<{ submit: [] }>();
 const preview = ref(false);
 const confirming = ref(false);
 const composing = ref(false);
+/** Files are dragged somewhere over the page; counts nested dragenters. */
+const pageDragDepth = ref(0);
+/** Files are dragged over the attachment area itself. */
+const dragDepth = ref(0);
+const dropErrors = ref<string[]>([]);
 const editor = ref<HTMLTextAreaElement | null>(null);
 const previewHeight = ref<string>();
 const { onKeydown, onBlur, hintVisible } = useTabIndent();
@@ -76,6 +83,96 @@ function addAttachment(attachment: AttachmentFile) {
   attachments.value = [...attachments.value, attachment];
   composing.value = false;
 }
+function draggingFiles(event: DragEvent) {
+  return event.dataTransfer?.types.includes("Files") ?? false;
+}
+// While files are dragged anywhere on the page, the attachment area shows
+// itself as the drop target.
+function onPageDragEnter(event: DragEvent) {
+  if (draggingFiles(event)) pageDragDepth.value++;
+}
+function onPageDragLeave(event: DragEvent) {
+  if (draggingFiles(event))
+    pageDragDepth.value = Math.max(0, pageDragDepth.value - 1);
+}
+function onPageDragEnd() {
+  pageDragDepth.value = 0;
+  dragDepth.value = 0;
+}
+onMounted(() => {
+  if (!props.allowAttachments) return;
+  window.addEventListener("dragenter", onPageDragEnter);
+  window.addEventListener("dragleave", onPageDragLeave);
+  window.addEventListener("drop", onPageDragEnd);
+  window.addEventListener("dragend", onPageDragEnd);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener("dragenter", onPageDragEnter);
+  window.removeEventListener("dragleave", onPageDragLeave);
+  window.removeEventListener("drop", onPageDragEnd);
+  window.removeEventListener("dragend", onPageDragEnd);
+});
+
+// Only the attachment area takes drops; these run on it.
+function onDragEnter(event: DragEvent) {
+  if (!draggingFiles(event)) return;
+  event.preventDefault();
+  dragDepth.value++;
+}
+function onDragOver(event: DragEvent) {
+  if (!draggingFiles(event)) return;
+  // Without this the browser opens the file instead of dropping it here.
+  event.preventDefault();
+  if (event.dataTransfer)
+    event.dataTransfer.dropEffect = canAttach.value ? "copy" : "none";
+}
+function onDragLeave(event: DragEvent) {
+  if (!draggingFiles(event)) return;
+  dragDepth.value = Math.max(0, dragDepth.value - 1);
+}
+/** Attaches dropped files directly, as many as there are free slots. */
+async function onDrop(event: DragEvent) {
+  if (!draggingFiles(event)) return;
+  event.preventDefault();
+  dragDepth.value = 0;
+  pageDragDepth.value = 0;
+  if (!canAttach.value) return;
+  const files = [...(event.dataTransfer?.files ?? [])];
+  const errors: string[] = [];
+  let added = [...attachments.value];
+  for (const file of files) {
+    if (added.length >= maxAttachments) {
+      errors.push(`${file.name}: 添付は${maxAttachments}件までです`);
+      continue;
+    }
+    const result = await readAttachment(file);
+    if (typeof result === "string") {
+      errors.push(result);
+      continue;
+    }
+    added = [
+      ...added,
+      {
+        ...result,
+        name: uniqueAttachmentName(
+          result.name,
+          added.map((attachment) => attachment.name),
+        ),
+      },
+    ];
+  }
+  attachments.value = added;
+  dropErrors.value = errors;
+}
+/**
+ * A file dropped anywhere else in the form is ignored, so the browser does
+ * not open it and leave the page.
+ */
+function ignoreFileDrop(event: DragEvent) {
+  if (event.defaultPrevented || !draggingFiles(event)) return;
+  event.preventDefault();
+  if (event.dataTransfer) event.dataTransfer.dropEffect = "none";
+}
 function removeAttachment(name: string) {
   attachments.value = attachments.value.filter((a) => a.name !== name);
 }
@@ -87,7 +184,12 @@ function confirm() {
 </script>
 <template>
   <section class="answer-section">
-    <form @submit.prevent="canSubmit && (confirming = true)">
+    <form
+      class="answer-form"
+      @submit.prevent="canSubmit && (confirming = true)"
+      @dragover="ignoreFileDrop"
+      @drop="ignoreFileDrop"
+    >
       <div class="answer-heading-row">
         <h2>回答</h2>
         <div class="answer-heading-tools">
@@ -177,7 +279,18 @@ function confirm() {
         {{ length.toLocaleString() }} / {{ maxLength.toLocaleString() }} 文字
         <span class="visually-hidden">（改行を除く）</span>
       </p>
-      <div v-if="allowAttachments" class="answer-attachments">
+      <div
+        v-if="allowAttachments"
+        class="answer-attachments"
+        :class="{
+          'is-drop-ready': pageDragDepth > 0 || dragDepth > 0,
+          'is-drop-over': dragDepth > 0,
+        }"
+        @dragenter="onDragEnter"
+        @dragover="onDragOver"
+        @dragleave="onDragLeave"
+        @drop="onDrop"
+      >
         <button
           type="button"
           class="answer-attach-button"
@@ -185,15 +298,35 @@ function confirm() {
           :disabled="!canAttach || composing"
           @click="composing = true"
         >
-          <span
-            >ログの添付（.txt / .log、各1MB、{{ maxAttachments }}件まで）</span
+          <span v-if="pageDragDepth > 0 || dragDepth > 0">{{
+            !canAttach
+              ? "これ以上添付できません"
+              : dragDepth > 0
+                ? "離すと添付します（.txt / .log）"
+                : "ここにドロップしてログを添付"
+          }}</span>
+          <span v-else
+            >ログの添付（ここにドロップも可、.txt / .log、各1MB、{{
+              maxAttachments
+            }}件まで）</span
           >
           <UiIcon name="file-plus" />
         </button>
+        <ul v-if="dropErrors.length" role="alert" class="answer-drop-errors">
+          <li v-for="message in dropErrors" :key="message">{{ message }}</li>
+        </ul>
         <ul v-if="attachments.length" class="answer-attachment-list">
           <li v-for="attachment in attachments" :key="attachment.name">
-            <span>{{ attachment.name }}</span>
-            <small>{{ formatBytes(attachment.size) }}</small>
+            <details>
+              <summary>
+                <span>{{ attachment.name }}</span>
+                <small>{{ formatBytes(attachment.size) }}</small>
+              </summary>
+              <!-- Shown as text only; Vue escapes the content. -->
+              <pre class="answer-attachment-content">{{
+                attachment.content
+              }}</pre>
+            </details>
             <button
               type="button"
               class="icon-button answer-attachment-remove"
@@ -322,8 +455,32 @@ function confirm() {
   color: var(--danger, #c0392b);
   font-weight: 700;
 }
+/* While files are dragged over the page, a dashed frame marks the
+   attachment area as the drop target; over it the frame turns solid and
+   thicker. The label changes too, so neither state relies on color. */
+.answer-attachments.is-drop-ready::after {
+  content: "";
+  position: absolute;
+  inset: -4px -9px;
+  border: 1px dashed var(--ink);
+  pointer-events: none;
+}
+.answer-attachments.is-drop-over::after {
+  border: 2px solid var(--ink);
+}
+.answer-attachments.is-drop-ready .answer-attach-button {
+  font-weight: 700;
+}
 .answer-attachments {
+  position: relative;
   margin-top: 14px;
+}
+.answer-drop-errors {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--danger, #c0392b);
+  font-size: 12px;
 }
 .answer-attach-button {
   /* Text and icon sit on the column edges like the textarea and submit
@@ -386,8 +543,26 @@ function confirm() {
 }
 .answer-attachment-list li {
   display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.answer-attachment-list details {
+  flex: 1;
+  min-width: 0;
+}
+.answer-attachment-list summary {
+  min-height: 28px;
+  display: flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
+}
+/* Same states as the top bar: hover is accent with an underline. */
+.answer-attachment-list summary:hover span,
+.answer-attachment-list summary:focus-visible span {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .answer-attachment-list span {
   font-family: var(--mono);
@@ -395,6 +570,18 @@ function confirm() {
 }
 .answer-attachment-list small {
   color: var(--muted);
+}
+.answer-attachment-content {
+  max-height: 240px;
+  margin: 4px 0 8px;
+  padding: 4px 0 4px 12px;
+  overflow: auto;
+  border-left: 2px solid var(--line-light);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 .answer-attachment-remove {
   width: 28px;
