@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import MarkdownContent from "@ictsc/ui/components/MarkdownContent.vue";
+import AttachmentList from "@ictsc/ui/components/AttachmentList.vue";
+import type { AttachmentFile } from "@ictsc/ui/attachments";
 import type { components } from "@ictsc/api";
 import {
   answerSourceLines,
@@ -37,6 +39,8 @@ const props = defineProps<{
   /** Earlier answers to the same problem, newest first. */
   previous: Schemas["AdminAnswer"][];
   marks: Schemas["MarkingResult"][];
+  /** Text logs submitted with the answer. */
+  attachments?: AttachmentFile[];
   /** A marking or comment deletion is running. */
   busy: boolean;
   /** The assignment is being updated. */
@@ -512,6 +516,14 @@ function startResize(
                 <MarkdownContent :source="answer.body.body" />
               </details>
             </template>
+            <section
+              v-if="attachments?.length"
+              class="grading-attachments"
+              aria-label="添付ログ"
+            >
+              <h3>添付ログ</h3>
+              <AttachmentList :attachments="attachments" />
+            </section>
           </template>
           <template v-else>
             <p v-if="blockedMessage" class="grading-blocked" role="note">
@@ -919,6 +931,13 @@ function startResize(
 }
 .grading-markdown-preview {
   margin-top: 20px;
+}
+.grading-attachments {
+  margin-top: 20px;
+}
+.grading-attachments h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
 }
 /* Markdown-only answers sit directly in the pane without an inner box. */
 .grading-answer-toolbar.is-plain {

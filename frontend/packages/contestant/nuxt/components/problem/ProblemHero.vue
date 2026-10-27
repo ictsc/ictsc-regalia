@@ -17,21 +17,23 @@ defineProps<{
   <header class="problem-hero">
     <div class="hero-copy">
       <h1>{{ code }}:{{ title }}.</h1>
-      <p>{{ category }}</p>
-    </div>
-    <div class="problem-summary-side">
-      <p class="problem-score-summary">
-        <strong>{{ score ? `${score.score}点` : "—" }}</strong
-        ><span>/ {{ maxScore }}点満点</span>
-      </p>
-      <p
-        class="problem-cooldown"
-        :class="{ 'is-answer-closed': !open && !cooldownMinutes }"
-      >
-        <template v-if="cooldownMinutes"
-          ><span>再回答可能まで</span><strong>{{ cooldownMinutes }}</strong
-          ><small>分</small></template
-        ><span v-else>{{ open ? "回答受付中" : "回答終了" }}</span>
+      <!-- Category, score and answer status share one meta line under the
+           title, so the answer column starts with its own heading. -->
+      <p class="problem-meta">
+        <span class="problem-category-label">{{ category }}</span>
+        <span class="problem-score-summary">
+          <strong>{{ score ? `${score.score}点` : "—" }}</strong
+          ><span>/ {{ maxScore }}点満点</span>
+        </span>
+        <span
+          class="problem-cooldown"
+          :class="{ 'is-answer-closed': !open && !cooldownMinutes }"
+        >
+          <template v-if="cooldownMinutes"
+            ><span>再回答可能まで</span><strong>{{ cooldownMinutes }}</strong
+            ><small>分</small></template
+          ><span v-else>{{ open ? "回答受付中" : "回答終了" }}</span>
+        </span>
       </p>
     </div>
   </header>

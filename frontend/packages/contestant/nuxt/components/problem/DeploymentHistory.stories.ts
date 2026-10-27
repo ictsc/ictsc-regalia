@@ -13,6 +13,7 @@ const meta = {
     penaltyThreshold: 2,
     deploying: false,
     streamError: false,
+    resetDisabled: false,
   },
 } satisfies Meta<typeof DeploymentHistory>;
 export default meta;

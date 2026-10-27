@@ -63,6 +63,11 @@ type Problem struct {
 	ExplanationPath        string       `json:"explanation_path,omitempty" yaml:"explanation_path"`
 	Redeploy               RedeployRule `json:"redeploy_rule" yaml:"redeploy_rule"`
 	DefaultGraderDiscordID string       `json:"default_grader_discord_id,omitempty" yaml:"default_grader_discord_id,omitempty"`
+	// AnswerMaxLength limits answers in characters, not counting line
+	// breaks. Zero means DefaultAnswerMaxLength (snapshots stored before the
+	// field existed have zero).
+	AnswerMaxLength  int32 `json:"answer_max_length,omitempty" yaml:"-"`
+	AllowAttachments bool  `json:"allow_attachments,omitempty" yaml:"-"`
 }
 
 type Section struct {
@@ -153,6 +158,16 @@ type Answer struct {
 	MaxScore          int32
 	RedeployRule      RedeployRule
 	DeploymentsBefore int32
+	// Attachments carries full content when submitting; answers read back
+	// from the store carry only names and sizes.
+	Attachments []AnswerAttachment
+}
+
+// AnswerAttachment is a text log submitted with an answer.
+type AnswerAttachment struct {
+	Name    string
+	Size    int32
+	Content string
 }
 
 type Visibility string

@@ -145,17 +145,21 @@ func TestBuildManifestFollowsMasterSyncRules(t *testing.T) {
 	if rule := manifest.Problems[byCode["3818"]].Redeploy; rule.Type != "PERCENTAGE_PENALTY" || *rule.Threshold != 999 || *rule.Percentage != 0 {
 		t.Fatalf("missing rule default = %#v", rule)
 	}
+	if problem := manifest.Problems[byCode["3818"]]; problem.AnswerMaxLength != 3000 || problem.AllowAttachments {
+		t.Fatalf("answer defaults = %d %v", problem.AnswerMaxLength, problem.AllowAttachments)
+	}
 }
 
 func TestBuildManifestSecondaryQualifierRules(t *testing.T) {
 	single := "schedules:\n- name: contest\n  startAt: 2026-12-12T13:00:00+09:00\n  endAt: 2026-12-12T18:00:00+09:00\n"
 	files := masterFiles(single)
-	files.Problems["problems/mid.problem.md"] = []byte("---\ncode: mid\ntitle: Mid\nmax_score: 100\ncategory: Network\nredeploy_rule:\n  type: MANUAL\n---\nbody\n")
+	files.Problems["problems/mid.problem.md"] = []byte("---\ncode: mid\ntitle: Mid\nmax_score: 100\ncategory: Network\nredeploy_rule:\n  type: MANUAL\nanswer_max_length: 5000\nallow_attachments: true\n---\nbody\n")
 	manifest, err := BuildManifest(files, true)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if manifest.Problems[0].Code != "MID" || manifest.Problems[0].SectionSlug != "contest" {
+	if manifest.Problems[0].Code != "MID" || manifest.Problems[0].SectionSlug != "contest" ||
+		manifest.Problems[0].AnswerMaxLength != 5000 || !manifest.Problems[0].AllowAttachments {
 		t.Fatalf("problem = %#v", manifest.Problems[0])
 	}
 	tests := map[string]MasterFiles{
@@ -180,6 +184,7 @@ func TestBuildManifestRejectsInvalidMasterFiles(t *testing.T) {
 		"unknown schedule":          withProblem(masterFiles(schedule), "---\ncode: x\ntitle: X\nmax_score: 1\nsubmissionable_schedules: [day9]\n---\nbody\n"),
 		"multiple schedules":        withProblem(masterFiles(schedule), "---\ncode: x\ntitle: X\nmax_score: 1\nsubmissionable_schedules: [day1, day2]\n---\nbody\n"),
 		"empty body":                withProblem(masterFiles(schedule), "---\ncode: x\ntitle: X\nmax_score: 1\nsubmissionable_schedules: [day1]\n---\n\n"),
+		"zero answer length":        withProblem(masterFiles(schedule), "---\ncode: x\ntitle: X\nmax_score: 1\nanswer_max_length: 0\nsubmissionable_schedules: [day1]\n---\nbody\n"),
 		"unknown redeploy type":     withProblem(masterFiles(schedule), "---\ncode: x\ntitle: X\nmax_score: 1\nredeploy_rule:\n  type: 3\nsubmissionable_schedules: [day1]\n---\nbody\n"),
 		"overlapping schedules":     masterFiles(schedule + "- name: day2\n  startAt: 2026-08-30T11:00:00Z\n  endAt: 2026-08-30T13:00:00Z\n"),
 	}

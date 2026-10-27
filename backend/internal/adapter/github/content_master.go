@@ -251,6 +251,8 @@ type problemFrontmatter struct {
 	SubmissionableSchedules []string                 `yaml:"submissionable_schedules"`
 	Draft                   bool                     `yaml:"draft"`
 	DefaultGraderDiscordID  string                   `yaml:"default_grader_discord_id"`
+	AnswerMaxLength         *int32                   `yaml:"answer_max_length"`
+	AllowAttachments        bool                     `yaml:"allow_attachments"`
 }
 
 type redeployRuleFrontmatter struct {
@@ -365,6 +367,13 @@ func buildProblem(filePath string, data []byte, explanations map[string][]byte) 
 	if strings.TrimSpace(body) == "" {
 		return parsedProblem{}, false, invalidManifest("%s: body is empty", filePath)
 	}
+	answerMaxLength := int32(core.DefaultAnswerMaxLength)
+	if matter.AnswerMaxLength != nil {
+		answerMaxLength = *matter.AnswerMaxLength
+	}
+	if answerMaxLength < 1 || answerMaxLength > core.MaxAnswerLength {
+		return parsedProblem{}, false, invalidManifest("%s: answer_max_length must be between 1 and %d", filePath, core.MaxAnswerLength)
+	}
 	rule, err := redeployRule(matter.RedeployRule)
 	if err != nil {
 		return parsedProblem{}, false, invalidManifest("%s: redeploy_rule: %v", filePath, err)
@@ -373,6 +382,7 @@ func buildProblem(filePath string, data []byte, explanations map[string][]byte) 
 		Code: code, Title: matter.Title, MaxScore: matter.MaxScore, Category: matter.Category,
 		Type: "DESCRIPTIVE", Body: body, BodyPath: filePath, Redeploy: rule,
 		DefaultGraderDiscordID: matter.DefaultGraderDiscordID,
+		AnswerMaxLength:        answerMaxLength, AllowAttachments: matter.AllowAttachments,
 	}
 	explanationPath := strings.TrimSuffix(filePath, problemFileSuffix) + explanationFileSuffix
 	if explanation, ok := explanations[explanationPath]; ok {

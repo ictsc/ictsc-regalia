@@ -456,6 +456,12 @@ button {
   padding: 0 22px;
   background: var(--clock-background);
   color: var(--clock-foreground);
+  text-decoration: none;
+}
+.competition-clock:hover,
+.competition-clock:focus-visible {
+  outline: none;
+  box-shadow: inset 0 -3px 0 var(--accent);
 }
 .competition-clock time {
   font-family: var(--mono);
@@ -1464,58 +1470,6 @@ a.problem-row.is-answer-closed .problem-score .problem-cooldown-badge {
   margin-bottom: 0;
   color: var(--muted);
 }
-.problem-rail-toggle {
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-}
-.problem-rail-toggle:hover,
-.problem-rail-toggle:focus-visible {
-  color: var(--ink);
-}
-.problem-rail-toggle:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-.problem-rail-toggle-icon {
-  position: relative;
-  width: 24px;
-  height: 18px;
-  display: block;
-  border: 1px solid currentColor;
-  opacity: 1;
-}
-.problem-rail-toggle-icon::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 7px;
-  border-left: 1px solid currentColor;
-}
-.problem-rail-toggle-icon::after {
-  content: "‹";
-  position: absolute;
-  top: 50%;
-  right: 3px;
-  font-family: var(--mono);
-  font-size: 13px;
-  line-height: 1;
-  transform: translateY(-56%);
-}
-.problem-rail-toggle[aria-expanded="false"] .problem-rail-toggle-icon::after {
-  content: "›";
-}
-.problem-rail-toggle:hover .problem-rail-toggle-icon,
-.problem-rail-toggle:focus-visible .problem-rail-toggle-icon {
-  opacity: 1;
-}
 .detail-layout {
   display: grid;
   grid-template-columns: 204px minmax(0, 1fr);
@@ -1872,59 +1826,80 @@ a.problem-row.is-answer-closed .problem-score .problem-cooldown-badge {
   line-height: 1.3;
   letter-spacing: -0.035em;
 }
-.problem-score-summary {
-  flex: none;
+.problem-meta {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 7px;
-  margin: 0;
-  font-family: var(--mono);
+  row-gap: 4px;
+}
+/* A short rule separates the facts on the meta line. */
+.problem-meta > * + *::before {
+  content: "";
+  display: inline-block;
+  width: 1px;
+  height: 0.9em;
+  margin: 0 14px;
+  background: var(--line-light);
+  vertical-align: -0.1em;
+}
+.problem-score-summary {
   white-space: nowrap;
+  font-family: var(--mono);
 }
 .problem-score-summary strong {
-  font-size: 20px;
+  margin-right: 6px;
   font-weight: 500;
 }
 .problem-score-summary span {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
 }
-.problem-summary-side {
-  flex: none;
-  display: grid;
-  justify-items: end;
-  gap: 7px;
+@media (min-width: 761px) {
+  /* The top of the detail page runs on three shared lines:
+     1. a 42px title line: rail label and title;
+     2. a 32px meta line: first stage chip with category, score and answer
+        status;
+     3. the content: first rail item, problem text and answer heading all
+        start 20px below the meta line. */
+  .detail-layout {
+    padding-top: 24px;
+  }
+  .detail-layout .problem-rail-label {
+    min-height: 42px;
+  }
+  .detail-layout .problem-rail-group:first-of-type > h2 {
+    margin-bottom: 20px;
+  }
+  .detail-layout .problem-hero {
+    padding-top: 0;
+    padding-bottom: 20px;
+  }
+  .detail-layout .hero-copy p {
+    margin-top: 6px;
+    line-height: 32px;
+  }
+  .detail-layout .reading-section,
+  .detail-layout .answer-section {
+    padding-top: 0;
+  }
 }
 .problem-cooldown {
-  display: flex;
-  align-items: baseline;
-  margin: 0;
-  color: var(--accent);
   white-space: nowrap;
 }
-.problem-cooldown span {
-  margin-right: 8px;
-  color: var(--ink);
-  font-size: 12px;
-}
 .problem-cooldown strong {
-  min-width: 2ch;
+  margin: 0 2px 0 6px;
+  color: var(--accent);
   font-family: var(--mono);
-  font-size: 18px;
-  font-weight: 500;
-  text-align: right;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 .problem-cooldown small {
-  margin-left: 3px;
-  font-size: 12px;
+  color: var(--accent);
+  font-size: inherit;
 }
-.problem-cooldown.is-answer-closed span {
-  margin-right: 0;
+.problem-cooldown.is-answer-closed {
   color: var(--disabled);
-  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.08em;
 }
 .hero-facet {
   display: none;
@@ -1953,7 +1928,12 @@ a.problem-row.is-answer-closed .problem-score .problem-cooldown-badge {
 }
 .content-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(400px, 40%);
+  /* --answer-width is set when the contestant drags the answer panel edge. */
+  grid-template-columns: minmax(0, 1fr) var(--answer-width, minmax(400px, 40%));
+  /* Problem text, redeploy and answer history, then a filler row: the answer
+     column spans all four, and its extra height goes only to the 1fr filler
+     so it never stretches the sections on the left. */
+  grid-template-rows: auto auto auto 1fr;
   align-items: start;
   padding-left: 0;
 }
@@ -2012,20 +1992,34 @@ a.problem-row.is-answer-closed .problem-score .problem-cooldown-badge {
 .environment-list dd {
   margin: 0;
 }
+body.is-resizing-answer {
+  cursor: col-resize;
+  user-select: none;
+}
 .answer-section {
   grid-column: 2;
-  grid-row: 1 / span 2;
+  grid-row: 1 / span 4;
   position: sticky;
   top: 20px;
   max-height: calc(100vh - 40px);
   overflow-y: auto;
+  /* Same top spacing as the problem text so both columns start together. */
+  padding-top: 16px;
   padding-left: 34px;
 }
 .answer-heading-row {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
+}
+.problem-content .answer-heading-row h2 {
+  font-size: 18px;
+  /* The problem text's 32px line; the larger bold face still sits 1.5px
+     high, so nudge it onto the text's baseline. */
+  position: relative;
+  top: 1.5px;
+  line-height: 32px;
 }
 .answer-heading-row p {
   margin: 0;
@@ -2062,7 +2056,8 @@ a.problem-row.is-answer-closed .problem-score .problem-cooldown-badge {
   position: absolute;
   z-index: 30;
   right: 0;
-  bottom: calc(100% + 6px);
+  /* Below the icon: the answer panel scrolls and would clip it above. */
+  top: calc(100% + 6px);
   padding: 8px 10px;
   background: var(--ink);
   color: var(--paper);
@@ -2150,10 +2145,6 @@ textarea:focus-visible {
   content: "↻";
   min-width: 1em;
   margin-left: 12px;
-}
-.detail-toolbar {
-  justify-content: space-between;
-  min-height: 46px;
 }
 .detail-reset {
   min-height: 38px;
@@ -2303,7 +2294,7 @@ dialog.confirmation-dialog h2 {
     padding-left: 26px;
   }
   .content-grid {
-    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-columns: minmax(0, 1fr) var(--answer-width, 360px);
     padding-left: 0;
   }
   .reading-section,
@@ -2668,9 +2659,6 @@ dialog.confirmation-dialog h2 {
     font-size: 26px;
     overflow-wrap: anywhere;
   }
-  .problem-summary-side {
-    justify-items: start;
-  }
   .content-grid {
     display: block;
   }
@@ -2701,5 +2689,20 @@ dialog.confirmation-dialog h2 {
   *::after {
     scroll-behavior: auto !important;
     transition: none !important;
+  }
+}
+
+/* In the two-column problem layout, the score and the answer panel end at the
+   same right edge as the top bar and the toolbar. */
+@media (min-width: 1001px) {
+  .problem-hero {
+    padding-right: 0;
+  }
+  /* Content ends on the top bar's right edge; the 9px beyond it leaves room
+     for hover borders of buttons flush with that edge (the panel scrolls, so
+     anything past its padding would be clipped). */
+  .answer-section {
+    margin-right: -9px;
+    padding-right: 9px;
   }
 }

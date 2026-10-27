@@ -91,14 +91,18 @@ button:disabled {
   padding: 0 var(--table-cell-padding);
   vertical-align: middle;
 }
+/* Plain data tables are denser than the ranking and problem rows; cells
+   still grow when their content wraps. */
 .data-table th {
-  height: var(--table-header-height);
+  height: 32px;
   color: var(--muted);
   font-size: var(--table-header-size);
   font-weight: 500;
 }
 .data-table td {
-  height: var(--table-row-height);
+  height: 36px;
+  padding-top: 6px;
+  padding-bottom: 6px;
 }
 .data-table a {
   text-decoration: underline;
@@ -248,11 +252,21 @@ button:disabled {
   color: var(--accent);
   text-decoration: underline;
 }
+/* Code uses the site's mono face a step smaller than the text around it;
+   the browser's bare monospace runs visibly larger than Noto Sans JP. */
+.markdown code {
+  font-family: var(--mono);
+  font-size: 0.875em;
+}
 .markdown pre {
-  padding: 20px;
+  padding: 12px 16px;
   overflow: auto;
   border: 1px solid var(--ink);
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.markdown pre code {
+  font-size: inherit;
 }
 .markdown img {
   max-width: 100%;
@@ -264,21 +278,24 @@ button:disabled {
   overflow-x: auto;
   font-family: var(--sans-read);
 }
+/* Same density as .data-table. */
 .markdown td,
 .markdown th {
   min-width: 120px;
-  height: var(--table-row-height);
-  padding: 0 var(--table-cell-padding);
+  /* One row is one 32px line of problem text. */
+  height: 32px;
+  padding: 4px var(--table-cell-padding);
+  line-height: 1.5;
   border: 0;
   border-bottom: 1px solid var(--ink);
+  text-align: center;
   vertical-align: middle;
 }
 .markdown th {
-  height: var(--table-header-height);
+  height: 28px;
   color: var(--muted);
   font-size: var(--table-header-size);
   font-weight: 500;
-  text-align: left;
 }
 .markdown blockquote {
   border-left: 3px solid var(--accent);

@@ -601,7 +601,7 @@ func safeRelativePath(value string) bool {
 	return value != "" && clean == value && clean != "." && !strings.HasPrefix(clean, "../") && !strings.HasPrefix(clean, "/")
 }
 
-func (s *Service) SubmitAnswer(ctx context.Context, contestant core.Contestant, problemCode, body string) (core.Answer, time.Duration, error) {
+func (s *Service) SubmitAnswer(ctx context.Context, contestant core.Contestant, problemCode, body string, attachments []core.AnswerAttachment) (core.Answer, time.Duration, error) {
 	snapshot, err := s.Store.ActiveContent(ctx)
 	if err != nil {
 		return core.Answer{}, 0, err
@@ -615,6 +615,9 @@ func (s *Service) SubmitAnswer(ctx context.Context, contestant core.Contestant, 
 	if !ok || now.Before(section.Beginning) || !now.Before(section.Ending) {
 		return core.Answer{}, 0, core.NewError(http.StatusConflict, "submission_closed", "Problem is not currently submittable")
 	}
+	if err := core.ValidateAnswer(problem, body, attachments); err != nil {
+		return core.Answer{}, 0, err
+	}
 	team := contestant.TeamCode
 	deployments, err := s.Store.ListDeployments(ctx, core.DeploymentFilter{TeamCode: &team, ProblemCode: &problemCode})
 	if err != nil {
@@ -623,7 +626,7 @@ func (s *Service) SubmitAnswer(ctx context.Context, contestant core.Contestant, 
 	answer := core.Answer{
 		TeamCode: contestant.TeamCode, ProblemCode: problemCode, AuthorName: contestant.Name,
 		Body: body, SubmittedAt: now, ContentCommit: snapshot.CommitSHA, MaxScore: problem.MaxScore,
-		RedeployRule: problem.Redeploy, DeploymentsBefore: int32(len(deployments)),
+		RedeployRule: problem.Redeploy, DeploymentsBefore: int32(len(deployments)), Attachments: attachments,
 	}
 	return s.Store.SubmitAnswer(ctx, answer, core.AnswerInterval)
 }

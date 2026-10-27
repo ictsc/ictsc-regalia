@@ -127,6 +127,17 @@ describe("GradingDetailView", () => {
     );
     expect(wrapper.find('input[type="number"]').exists()).toBe(false);
   });
+  it("shows attached logs as plain text", () => {
+    const wrapper = mountView({
+      attachments: [
+        { name: "app.log", size: 26, content: "<script>alert(1)</script>\n" },
+      ],
+    });
+    const section = wrapper.find(".grading-attachments");
+    expect(section.text()).toContain("app.log");
+    expect(section.find("pre").text()).toContain("<script>alert(1)</script>");
+    expect(section.find("script").exists()).toBe(false);
+  });
   it("collapses panes through the model", async () => {
     const wrapper = mountView();
     await wrapper.find(".grading-pane-header button").trigger("click");

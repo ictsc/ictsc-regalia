@@ -87,7 +87,22 @@ func New(svc *service.Service, options Options) (http.Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	return validator(responseValidated), nil
+	return limitRequestBody(validator(responseValidated)), nil
+}
+
+// maxRequestBodyBytes bounds every request body before it is read. An answer
+// with three 1 MiB log attachments fits with room for JSON escaping.
+const maxRequestBodyBytes = 8 << 20
+
+func limitRequestBody(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.ContentLength > maxRequestBodyBytes {
+			writeProblem(w, r, core.NewError(http.StatusRequestEntityTooLarge, "validation_error", "Request body is too large"))
+			return
+		}
+		r.Body = http.MaxBytesReader(w, r.Body, maxRequestBodyBytes)
+		next.ServeHTTP(w, r)
+	})
 }
 
 func (s *Server) attachRequest(next api.StrictHandlerFunc, _ string) api.StrictHandlerFunc {

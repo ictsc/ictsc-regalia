@@ -249,6 +249,8 @@ test("viewerから問題を開き、再展開のQUEUED表示をSSEで完了へ�
           max_score: 100,
           category: "Network",
           section_slug: "day1",
+          answer_max_length: 3000,
+          allow_attachments: false,
           type: "NORMAL",
           body: "# Restore service\n\nKeep DNS available.",
           score: null,
@@ -504,6 +506,8 @@ test("回答429のRetry-Afterをcountdownへ反映する", async ({ page }) => {
           max_score: 100,
           category: "Network",
           section_slug: "day1",
+          answer_max_length: 3000,
+          allow_attachments: false,
           type: "DESCRIPTIVE",
           body: "# Restore service",
           score: null,
@@ -567,6 +571,7 @@ test("回答429のRetry-Afterをcountdownへ反映する", async ({ page }) => {
   await page.goto("/problems/A01");
   await page.getByLabel("回答", { exact: true }).fill("設定を修正しました");
   await page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "提出する" }).click();
   await expect(
     page.getByRole("status").filter({ hasText: /再回答可能まで/ }),
   ).toBeVisible();
@@ -641,6 +646,12 @@ test("Nuxtの問題一覧、下書き復元、利用者分離とモバイル表�
     `このブラウザに保存済み ${savedTime}`,
   );
   await page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }).click();
+  const confirmation = page.getByRole("dialog", {
+    name: "この内容で提出しますか？",
+  });
+  await expect(confirmation).toContainText("原因: 設定の不整合");
+  await expect(confirmation).toContainText("16 / 3,000 文字");
+  await confirmation.getByRole("button", { name: "提出する" }).click();
   await expect(
     page.getByText("回答を提出しました", { exact: true }),
   ).toBeVisible();

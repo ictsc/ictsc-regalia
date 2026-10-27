@@ -414,6 +414,22 @@ func (s *CompetitionStore) SubmitAnswer(_ context.Context, answer core.Answer, i
 	return answer, 0, nil
 }
 
+func (s *CompetitionStore) ListAnswerAttachments(_ context.Context, teamCode int64, problemCode string, number int32) ([]core.AnswerAttachment, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	for _, answer := range s.answers {
+		if answer.TeamCode == teamCode && answer.ProblemCode == problemCode && answer.Number == number {
+			attachments := make([]core.AnswerAttachment, 0, len(answer.Attachments))
+			for _, attachment := range answer.Attachments {
+				attachment.Size = int32(len(attachment.Content))
+				attachments = append(attachments, attachment)
+			}
+			return attachments, nil
+		}
+	}
+	return []core.AnswerAttachment{}, nil
+}
+
 func (s *CompetitionStore) ListMarkingResults(context.Context) ([]core.MarkingResult, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()

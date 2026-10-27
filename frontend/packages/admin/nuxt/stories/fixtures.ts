@@ -147,6 +147,8 @@ export const adminProblem: Schemas["AdminProblem"] = {
   },
   content_commit: contentStatus.active_commit!,
   default_grader_discord_id: null,
+  answer_max_length: 3000,
+  allow_attachments: true,
 };
 
 export const ranking: Schemas["RankingResponse"] = {

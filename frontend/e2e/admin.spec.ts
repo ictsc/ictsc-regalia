@@ -19,6 +19,8 @@ const problem = {
   category: "Network",
   section_slug: "day1",
   type: "DESCRIPTIVE",
+  answer_max_length: 3000,
+  allow_attachments: false,
   default_grader_discord_id: "123456789012345678",
   body: "# Restore service",
   explanation: "# 解説\n\nDNSを復旧します。",
@@ -281,6 +283,12 @@ async function installAdminApi(page: Page): Promise<ApiState> {
           );
         }),
       });
+    }
+    if (
+      path.startsWith("/api/v1/admin/answers/") &&
+      path.endsWith("/attachments")
+    ) {
+      return fulfillJson(route, { attachments: [] });
     }
     if (path === "/api/v1/admin/answers/12/A01/1") {
       return fulfillJson(route, { answer: state.answers[0] });

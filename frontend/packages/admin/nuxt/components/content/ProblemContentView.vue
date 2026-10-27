@@ -41,6 +41,11 @@ const commit = ref(props.initialCommit);
           {{ problem.default_grader_discord_id ?? "未設定" }}
         </p>
         <p>
+          回答の文字数上限: {{ problem.answer_max_length.toLocaleString() }}
+          文字（改行を除く） / ログ添付:
+          {{ problem.allow_attachments ? "可" : "不可" }}
+        </p>
+        <p>
           再展開ルール: {{ problem.redeploy_rule.type }} / 減点開始回数
           {{ problem.redeploy_rule.penalty_threshold ?? "—" }} /
           {{ problem.redeploy_rule.penalty_percentage ?? "—" }}%

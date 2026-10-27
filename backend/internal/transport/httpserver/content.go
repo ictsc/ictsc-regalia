@@ -158,6 +158,7 @@ func (h *Handler) ListContestantProblems(ctx context.Context, _ api.ListContesta
 			Code: problem.Code, Title: problem.Title, MaxScore: problem.MaxScore, Category: problem.Category,
 			SectionSlug: problem.SectionSlug, Score: score, SubmissionStatus: submissionStatus(snapshot, problem, now),
 			Deployment: contestantDeploymentState(problem), NextSubmittableAt: next,
+			AnswerMaxLength: problem.EffectiveAnswerMaxLength(), AllowAttachments: problem.AllowAttachments,
 		})
 	}
 	return api.ListContestantProblems200JSONResponse{Problems: problems}, nil
@@ -199,6 +200,7 @@ func (h *Handler) GetContestantProblem(ctx context.Context, request api.GetConte
 		Code: problem.Code, Title: problem.Title, MaxScore: problem.MaxScore, Category: problem.Category,
 		SectionSlug: problem.SectionSlug, Type: api.ProblemType(problem.Type), Body: problem.Body,
 		Score: score, SubmissionStatus: submissionStatus(snapshot, problem, now), Deployment: contestantDeploymentState(problem),
+		AnswerMaxLength: problem.EffectiveAnswerMaxLength(), AllowAttachments: problem.AllowAttachments,
 	}}, nil
 }
 

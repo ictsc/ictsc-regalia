@@ -122,6 +122,10 @@ PostgreSQL統合テストは通常Dockerを起動します。Dockerを使用で�
 
 コンテンツはICTSCのマスタリポジトリと同じ配置（`schedule.yaml`・`problems/*.problem.md`・`notices/*.md`・`images/*`）から読みます。詳細は `docs/content-repository-contract.md` を参照してください。`schedule.yaml` の場所は `ICTSC_GITHUB_SCHEDULE_PATH` で変更できます（旧 `ICTSC_GITHUB_MANIFEST_PATH` は廃止）。画像を保存するため、既存DBには `db/migrations/0006_content_assets.sql` を適用します。
 
+## 回答の文字数制限とログ添付
+
+問題 frontmatter の `answer_max_length`（省略時3000文字、改行は数えない）で回答の長さを制限し、`allow_attachments: true` の問題では回答にテキストのログを添付できます。添付は1回答3ファイル・各1 MiBまで、`.txt` / `.log` の UTF-8 テキストだけで、回答と同じリクエストで送り、回答と同じトランザクションで保存します。画面ではHTMLとして描画せずプレーンテキストで表示し、ダウンロードはブラウザ内で作るファイルで行います。リクエスト本文はAPIとnginxの両方で8 MiBまでです。既存DBには `db/migrations/0007_answer_attachments.sql` を適用します。
+
 ## 二次予選モード
 
 `ICTSC_SECONDARY_QUALIFIER_MODE=true` で、競技終了後に各チーム・問題の最新回答だけを採点し、最終公開まで競技者に採点結果と順位を返しません。順位凍結は使わず、`schedule.yaml` はスケジュール1つ、問題は `submissionable_schedules` なしで書きます。開発モード（`ICTSC_DEV_FAKE_MODE=true`）では、管理画面の競技設定から競技前・競技中・競技後を切り替えられます。

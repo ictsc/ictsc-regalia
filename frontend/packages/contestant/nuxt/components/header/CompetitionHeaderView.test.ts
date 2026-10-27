@@ -76,4 +76,12 @@ describe("CompetitionHeaderView", () => {
     await wrapper.setProps({ routeKey: "/ranking" });
     expect(menu.open).toBe(false);
   });
+
+  it("links the clock to the schedule", () => {
+    const clock = mountHeader()
+      .findAllComponents(RouterLinkStub)
+      .find((link) => link.classes("competition-clock"));
+    expect(clock?.props("to")).toBe("/schedule");
+    expect(clock?.text()).toContain("02:13:48");
+  });
 });

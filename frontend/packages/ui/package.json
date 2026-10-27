@@ -5,7 +5,9 @@
   "exports": {
     "./*": "./*",
     "./colors": "./colors.ts",
-    "./markdown": "./markdown.ts"
+    "./markdown": "./markdown.ts",
+    "./attachments": "./attachments.ts",
+    "./textarea": "./textarea.ts"
   },
   "scripts": {
     "test": "vitest run",

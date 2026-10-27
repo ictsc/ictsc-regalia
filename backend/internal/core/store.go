@@ -32,6 +32,8 @@ type Store interface {
 	ListAnswers(ctx context.Context, filter AnswerFilter) ([]Answer, error)
 	GetAnswer(ctx context.Context, teamCode int64, problemCode string, number int32) (Answer, error)
 	SubmitAnswer(ctx context.Context, answer Answer, interval time.Duration) (Answer, time.Duration, error)
+	// ListAnswerAttachments returns one answer's attachments with content.
+	ListAnswerAttachments(ctx context.Context, teamCode int64, problemCode string, number int32) ([]AnswerAttachment, error)
 	ListMarkingResults(ctx context.Context) ([]MarkingResult, error)
 	CreateMarkingResult(ctx context.Context, result MarkingResult) (MarkingResult, error)
 	DeleteMarkingLineComment(ctx context.Context, markingID string, commentIndex int32, actor string, at time.Time) (MarkingResult, error)

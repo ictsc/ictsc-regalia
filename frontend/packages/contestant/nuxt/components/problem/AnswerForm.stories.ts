@@ -17,6 +17,8 @@ const meta = {
     cooldownSeconds: 0,
     savedAt: "",
     saveError: "",
+    maxLength: 3000,
+    allowAttachments: false,
   },
   // Keep the textarea editable in the preview.
   render: (args) => ({
@@ -57,6 +59,30 @@ export const SubmitError: Story = {
     body: answerBody,
     savedAt,
     actionError: new Error("回答を提出できませんでした。"),
+  },
+};
+
+export const OverLimit: Story = {
+  args: { body: answerBody, savedAt, maxLength: 40 },
+};
+
+export const WithAttachments: Story = {
+  args: {
+    body: answerBody,
+    savedAt,
+    allowAttachments: true,
+    attachments: [
+      {
+        name: "syslog.txt",
+        size: 18432,
+        content: "Oct 26 10:00:00 host kernel: ...",
+      },
+      {
+        name: "nginx-error.log",
+        size: 2048,
+        content: "2026/10/26 10:00:01 [error] ...",
+      },
+    ],
   },
 };
 

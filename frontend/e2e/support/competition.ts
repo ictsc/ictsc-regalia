@@ -54,6 +54,8 @@ export async function installCompetitionApi(
       category,
       max_score,
       section_slug,
+      answer_max_length: 3000,
+      allow_attachments: false,
       type: "NORMAL",
       body:
         code === "B02"

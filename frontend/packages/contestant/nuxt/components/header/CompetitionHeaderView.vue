@@ -110,10 +110,15 @@ watch(
       >
       <ThemeToggle class="header-nav-secondary" />
     </nav>
-    <div class="competition-clock">
+    <NuxtLink
+      class="competition-clock"
+      to="/schedule"
+      :aria-label="`${clock.label} ${clock.text}（スケジュールを見る）`"
+      title="スケジュールを見る"
+    >
       <time>{{ clock.text }}</time
       ><span :class="{ 'is-demo': demoMode }">{{ clock.label }}</span>
-    </div>
+    </NuxtLink>
     <details ref="mobileMenu" class="mobile-menu">
       <summary>
         <span aria-hidden="true" /><b class="visually-hidden">メニューを開く</b>

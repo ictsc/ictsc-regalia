@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import MarkdownContent from "@ictsc/ui/components/MarkdownContent.vue";
+import AttachmentList from "@ictsc/ui/components/AttachmentList.vue";
+import type { AttachmentFile } from "@ictsc/ui/attachments";
 import type { Answer } from "~/features/answer";
 
 defineProps<{
@@ -8,6 +10,8 @@ defineProps<{
   selectedAnswerNumber: number | null;
   /** Body of the answer chosen with `?answer=`; omitted when none is selected. */
   selectedAnswerBody?: string;
+  /** Logs attached to the selected answer. */
+  selectedAnswerAttachments?: AttachmentFile[];
   /** Results stay hidden until the final reveal (secondary qualifier mode). */
   resultsHidden?: boolean;
 }>();
@@ -60,6 +64,10 @@ defineProps<{
       aria-live="polite"
     >
       <MarkdownContent :source="selectedAnswerBody" />
+      <template v-if="selectedAnswerAttachments?.length">
+        <h3 class="answer-history-attachments">添付したログ</h3>
+        <AttachmentList :attachments="selectedAnswerAttachments" />
+      </template>
     </div>
   </section>
 </template>

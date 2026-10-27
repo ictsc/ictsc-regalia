@@ -70,6 +70,7 @@ func toAPIAdminProblem(problem core.Problem, commit string) api.AdminProblem {
 		SectionSlug: problem.SectionSlug, Type: api.ProblemType(problem.Type), Body: problem.Body,
 		Explanation: problem.Explanation, RedeployRule: toAPIRedeploy(problem.Redeploy), ContentCommit: commit,
 		DefaultGraderDiscordId: defaultGrader,
+		AnswerMaxLength:        problem.EffectiveAnswerMaxLength(), AllowAttachments: problem.AllowAttachments,
 	}
 }
 
@@ -98,10 +99,30 @@ func toAPIAnswer(answer core.Answer, score *core.Score) api.Answer {
 	if score != nil {
 		mapped = toAPIScore(*score)
 	}
+	attachments := make([]api.AnswerAttachmentInfo, 0, len(answer.Attachments))
+	for _, attachment := range answer.Attachments {
+		attachments = append(attachments, api.AnswerAttachmentInfo{Name: attachment.Name, Size: attachmentSize(attachment)})
+	}
 	return api.Answer{
 		Number: answer.Number, SubmittedAt: answer.SubmittedAt, ContentCommit: answer.ContentCommit,
 		Body: api.AnswerBody{Type: api.AnswerBodyTypeDESCRIPTIVE, Body: answer.Body}, Score: mapped,
+		Attachments: attachments,
 	}
+}
+
+func attachmentSize(attachment core.AnswerAttachment) int32 {
+	if attachment.Size > 0 {
+		return attachment.Size
+	}
+	return int32(len(attachment.Content))
+}
+
+func toAPIAttachments(attachments []core.AnswerAttachment) api.AnswerAttachmentsResponse {
+	mapped := make([]api.AnswerAttachment, 0, len(attachments))
+	for _, attachment := range attachments {
+		mapped = append(mapped, api.AnswerAttachment{Name: attachment.Name, Size: attachmentSize(attachment), Content: attachment.Content})
+	}
+	return api.AnswerAttachmentsResponse{Attachments: mapped}
 }
 
 func toAPIAnswerSummary(answer core.Answer, score *core.Score) api.AnswerSummary {

@@ -422,6 +422,14 @@ func (s *Store) SubmitAnswer(ctx context.Context, answer core.Answer, interval t
 	if err != nil {
 		return core.Answer{}, 0, conflictError(err, "answer_conflict", "Answer could not be submitted concurrently")
 	}
+	for position, attachment := range answer.Attachments {
+		if _, err = tx.Exec(ctx, `
+			INSERT INTO answer_attachments(team_code,problem_code,answer_number,position,name,size_bytes,content)
+			VALUES($1,$2,$3,$4,$5,$6,$7)`, answer.TeamCode, answer.ProblemCode, answer.Number, position,
+			attachment.Name, len(attachment.Content), attachment.Content); err != nil {
+			return core.Answer{}, 0, dbError(err)
+		}
+	}
 	_, err = tx.Exec(ctx, `
 		UPDATE answer_counters SET next_number=$3,last_submitted_at=$4
 		WHERE team_code=$1 AND problem_code=$2`, answer.TeamCode, answer.ProblemCode, answer.Number+1, answer.SubmittedAt)
@@ -868,4 +876,23 @@ func (s *Store) GetContentAsset(ctx context.Context, commit, name string) (core.
 		return core.ContentAsset{}, dbError(err)
 	}
 	return asset, nil
+}
+
+func (s *Store) ListAnswerAttachments(ctx context.Context, teamCode int64, problemCode string, number int32) ([]core.AnswerAttachment, error) {
+	rows, err := s.pool.Query(ctx, `
+		SELECT name,size_bytes,content FROM answer_attachments
+		WHERE team_code=$1 AND problem_code=$2 AND answer_number=$3 ORDER BY position`, teamCode, problemCode, number)
+	if err != nil {
+		return nil, dbError(err)
+	}
+	defer rows.Close()
+	attachments := make([]core.AnswerAttachment, 0)
+	for rows.Next() {
+		var attachment core.AnswerAttachment
+		if err := rows.Scan(&attachment.Name, &attachment.Size, &attachment.Content); err != nil {
+			return nil, dbError(err)
+		}
+		attachments = append(attachments, attachment)
+	}
+	return attachments, dbError(rows.Err())
 }

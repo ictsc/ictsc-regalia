@@ -11,10 +11,15 @@ import {
 import { draftKey, loadDraft, saveDraft } from "~/features/draft";
 import { fetchActivity } from "~/features/activity";
 import { remainingCooldownSeconds } from "~/features/problem/cooldown";
+import type { AttachmentFile } from "@ictsc/ui/attachments";
 import AnswerForm from "~/components/problem/AnswerForm.vue";
+import AnswerResizer from "~/components/problem/AnswerResizer.vue";
+import {
+  loadAnswerWidth,
+  saveAnswerWidth,
+} from "~/features/problem/answer-width";
 import AnswerHistory from "~/components/problem/AnswerHistory.vue";
 import DeploymentHistory from "~/components/problem/DeploymentHistory.vue";
-import ProblemDetailToolbar from "~/components/problem/ProblemDetailToolbar.vue";
 import ProblemHero from "~/components/problem/ProblemHero.vue";
 import ProblemRail, {
   type ProblemRailItem,
@@ -58,8 +63,24 @@ useHead({
   ),
   bodyAttrs: { class: "detail-page" },
 });
-const rail = useState<boolean>("problem-rail-open", () => true),
-  body = ref(""),
+const contentGrid = ref<HTMLElement | null>(null);
+const answerWidth = ref<number>();
+onMounted(() => {
+  try {
+    answerWidth.value = loadAnswerWidth(localStorage);
+  } catch {
+    /* The default width works without storage. */
+  }
+});
+watch(answerWidth, (width) => {
+  try {
+    saveAnswerWidth(localStorage, width);
+  } catch {
+    /* The width just is not remembered. */
+  }
+});
+const body = ref(""),
+  attachments = ref<AttachmentFile[]>([]),
   savedAt = ref(""),
   saveError = ref(""),
   actionError = ref<unknown>(),
@@ -153,7 +174,8 @@ async function submit() {
   actionError.value = undefined;
   submitted.value = false;
   try {
-    await submitAnswer(api, code, body.value);
+    await submitAnswer(api, code, body.value, attachments.value);
+    attachments.value = [];
     submitted.value = true;
     await refresh();
     await refreshNuxtData(["competition", "activity"]);
@@ -228,12 +250,8 @@ const score = computed(
   <main>
     <RequestState :pending="pending" :error="error" @retry="refresh"
       ><template v-if="data"
-        ><ProblemDetailToolbar
-          v-model:rail-open="rail"
-          :reset-disabled="!data.problem.redeployable || !!deploymentBusy"
-          @reset="resetOpen = true" />
-        <div class="detail-layout" :class="{ 'is-rail-hidden': !rail }">
-          <ProblemRail v-if="rail" :items="railItems" :current-code="code" />
+        ><div class="detail-layout">
+          <ProblemRail :items="railItems" :current-code="code" />
           <article class="problem-content">
             <ProblemHero
               :code="code"
@@ -244,7 +262,17 @@ const score = computed(
               :cooldown-minutes="cooldownMinutes"
               :open="open"
             />
-            <div class="content-grid">
+            <div
+              ref="contentGrid"
+              class="content-grid"
+              :style="
+                answerWidth ? { '--answer-width': `${answerWidth}px` } : {}
+              "
+            >
+              <AnswerResizer
+                v-model:width="answerWidth"
+                :container="contentGrid"
+              />
               <section class="reading-section">
                 <div class="reading-copy">
                   <MarkdownContent :source="data.problem.body" />
@@ -252,6 +280,7 @@ const score = computed(
               </section>
               <AnswerForm
                 v-model:body="body"
+                v-model:attachments="attachments"
                 :open="open"
                 :sending="sending"
                 :submitted="submitted"
@@ -259,6 +288,8 @@ const score = computed(
                 :saved-at="savedAt"
                 :save-error="saveError"
                 :action-error="actionError"
+                :max-length="data.problem.answerMaxLength"
+                :allow-attachments="data.problem.allowAttachments"
                 @submit="submit"
               />
               <DeploymentHistory
@@ -266,6 +297,8 @@ const score = computed(
                 :penalty-threshold="data.problem.penaltyThreashold"
                 :deploying="deploying"
                 :stream-error="streamError"
+                :reset-disabled="!data.problem.redeployable || !!deploymentBusy"
+                @reset="resetOpen = true"
               />
               <AnswerHistory
                 :problem-code="code"
@@ -273,6 +306,7 @@ const score = computed(
                 :results-hidden="resultsHidden"
                 :selected-answer-number="selectedAnswerNumber"
                 :selected-answer-body="data.selectedAnswer?.answerBody"
+                :selected-answer-attachments="data.selectedAnswer?.attachments"
               />
             </div>
           </article></div></template

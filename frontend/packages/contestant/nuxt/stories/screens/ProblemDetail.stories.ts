@@ -4,8 +4,8 @@ import MarkdownContent from "@ictsc/ui/components/MarkdownContent.vue";
 import CompetitionHeaderView from "~/components/header/CompetitionHeaderView.vue";
 import AnswerForm from "~/components/problem/AnswerForm.vue";
 import AnswerHistory from "~/components/problem/AnswerHistory.vue";
+import AnswerResizer from "~/components/problem/AnswerResizer.vue";
 import DeploymentHistory from "~/components/problem/DeploymentHistory.vue";
-import ProblemDetailToolbar from "~/components/problem/ProblemDetailToolbar.vue";
 import ProblemHero from "~/components/problem/ProblemHero.vue";
 import ProblemRail from "~/components/problem/ProblemRail.vue";
 import { headerRankingItems } from "~/features/ranking";
@@ -24,7 +24,7 @@ import {
 
 const problem = problems.find((p) => p.code === "B02")!;
 
-type ScreenArgs = { railOpen: boolean; cooldownMinutes: number };
+type ScreenArgs = { cooldownMinutes: number };
 
 const meta = {
   title: "Contestant/Screens/ProblemDetail",
@@ -34,22 +34,23 @@ const meta = {
     bodyClass: "detail-page",
     route: "/problems/B02",
   },
-  args: { railOpen: true, cooldownMinutes: 0 },
+  args: { cooldownMinutes: 0 },
   render: (args) => ({
     components: {
       AnswerForm,
       AnswerHistory,
+      AnswerResizer,
       CompetitionHeaderView,
       DeploymentHistory,
       MarkdownContent,
-      ProblemDetailToolbar,
       ProblemHero,
       ProblemRail,
     },
     setup: () => ({
       args,
-      rail: ref(args.railOpen),
       body: ref(""),
+      contentGrid: ref<HTMLElement | null>(null),
+      answerWidth: ref<number>(),
       header: {
         compact: true,
         rankingItems: headerRankingItems(ranking, ownTeamCode),
@@ -74,9 +75,8 @@ const meta = {
     template: `
 <CompetitionHeaderView v-bind="header" />
 <main>
-  <ProblemDetailToolbar v-model:rail-open="rail" :reset-disabled="false" />
-  <div class="detail-layout" :class="{ 'is-rail-hidden': !rail }">
-    <ProblemRail v-if="rail" :items="railItems" :current-code="problem.code" />
+  <div class="detail-layout">
+    <ProblemRail :items="railItems" :current-code="problem.code" />
     <article class="problem-content">
       <ProblemHero
         :code="problem.code"
@@ -87,7 +87,12 @@ const meta = {
         :cooldown-minutes="args.cooldownMinutes"
         :open="true"
       />
-      <div class="content-grid">
+      <div
+        ref="contentGrid"
+        class="content-grid"
+        :style="answerWidth ? { '--answer-width': answerWidth + 'px' } : {}"
+      >
+        <AnswerResizer v-model:width="answerWidth" :container="contentGrid" />
         <section class="reading-section">
           <div class="reading-copy"><MarkdownContent :source="problemBody" /></div>
         </section>
@@ -99,12 +104,15 @@ const meta = {
           :cooldown-seconds="args.cooldownMinutes * 60"
           saved-at=""
           save-error=""
+          :max-length="3000"
+          :allow-attachments="true"
         />
         <DeploymentHistory
           :deployments="deployments"
           :penalty-threshold="2"
           :deploying="false"
           :stream-error="false"
+          :reset-disabled="false"
         />
         <AnswerHistory
           :problem-code="problem.code"
@@ -121,10 +129,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Desktop: Story = {};
-
-export const RailHidden: Story = {
-  args: { railOpen: false },
-};
 
 export const Cooldown: Story = {
   args: { cooldownMinutes: 18 },

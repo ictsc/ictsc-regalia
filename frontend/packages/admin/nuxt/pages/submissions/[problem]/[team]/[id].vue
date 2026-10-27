@@ -28,7 +28,7 @@ const { data, error, pending, refresh } = await useAsyncData(
     const answer = await getAdminAnswer(api, reference);
     // 二次予選モードは最新回答だけを採点するので、過去回答との差分は不要。
     const comparesPrevious = answer.competition_mode === "STANDARD";
-    const [problem, active, previous, marks] = await Promise.all([
+    const [problem, active, previous, marks, attachments] = await Promise.all([
       createAdminActions(api).getProblem(
         reference.problem_code,
         answer.content_commit,
@@ -48,6 +48,12 @@ const { data, error, pending, refresh } = await useAsyncData(
             .then(expectData)
         : { answers: [] },
       listAdminMarkingResults(api),
+      api
+        .GET(
+          "/api/v1/admin/answers/{team_code}/{problem_code}/{answer_number}/attachments",
+          { params: { path: reference } },
+        )
+        .then(expectData),
     ]);
     return {
       answer,
@@ -58,6 +64,7 @@ const { data, error, pending, refresh } = await useAsyncData(
         .toSorted(
           (a, b) => b.reference.answer_number - a.reference.answer_number,
         ),
+      attachments: attachments.attachments,
       marks: marks.filter(
         (m) =>
           m.answer.problem_code === reference.problem_code &&
@@ -168,6 +175,7 @@ watch(
         :active-commit="data.active.content_commit"
         :previous="data.previous"
         :marks="data.marks"
+        :attachments="data.attachments"
         :busy="busy"
         :workflow-busy="workflowBusy"
         :submit-marking="submitMarking"

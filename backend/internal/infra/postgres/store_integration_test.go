@@ -218,12 +218,20 @@ func TestPostgresStoreIntegration(t *testing.T) {
 		second := answer
 		second.Body = "second answer"
 		second.SubmittedAt = base.Add(core.AnswerInterval)
+		second.Attachments = []core.AnswerAttachment{{Name: "syslog.txt", Content: "line 1\n"}, {Name: "app.log", Content: "\x1b[31merror\x1b[0m"}}
 		second, _, err = fixture.store.SubmitAnswer(ctx, second, core.AnswerInterval)
 		if err != nil {
 			t.Fatalf("submit answer at interval boundary: %v", err)
 		}
 		if second.Number != 2 {
 			t.Fatalf("second answer number = %d, want 2", second.Number)
+		}
+		attachments, err := fixture.store.ListAnswerAttachments(ctx, teamCode, problem, 2)
+		if err != nil || len(attachments) != 2 || attachments[0].Name != "syslog.txt" || attachments[0].Size != 7 || attachments[1].Content != "\x1b[31merror\x1b[0m" {
+			t.Fatalf("attachments = %#v, err = %v", attachments, err)
+		}
+		if none, err := fixture.store.ListAnswerAttachments(ctx, teamCode, problem, 1); err != nil || len(none) != 0 {
+			t.Fatalf("first answer attachments = %#v, err = %v", none, err)
 		}
 
 		var count, maxNumber int

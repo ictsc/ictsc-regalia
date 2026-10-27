@@ -3,7 +3,6 @@ import { mount, RouterLinkStub } from "@vue/test-utils";
 import AnswerForm from "./AnswerForm.vue";
 import AnswerHistory from "./AnswerHistory.vue";
 import DeploymentHistory from "./DeploymentHistory.vue";
-import ProblemDetailToolbar from "./ProblemDetailToolbar.vue";
 import ProblemHero from "./ProblemHero.vue";
 import ProblemRail from "./ProblemRail.vue";
 import ResetDialog from "./ResetDialog.vue";
@@ -84,6 +83,14 @@ describe("ProblemHero", () => {
     cooldownMinutes: 0,
     open: true,
   };
+  it("puts category, score and status on the meta line", () => {
+    const meta = mount(ProblemHero, { props }).find(".problem-meta");
+    expect(meta.findAll(":scope > span").map((part) => part.text())).toEqual([
+      "サーバー",
+      "—/ 300点満点",
+      "回答受付中",
+    ]);
+  });
   it("shows whether answers are accepted", () => {
     expect(mount(ProblemHero, { props }).find(".problem-cooldown").text()).toBe(
       "回答受付中",
@@ -114,15 +121,102 @@ describe("AnswerForm", () => {
     cooldownSeconds: 0,
     savedAt: "",
     saveError: "",
+    maxLength: 10,
+    allowAttachments: false,
   };
   const submitButton = (wrapper: ReturnType<typeof mount>) =>
     wrapper.find<HTMLButtonElement>(".button-submit").element;
 
-  it("submits a non-empty answer while open", async () => {
-    const wrapper = mount(AnswerForm, { props });
+  it("submits only after confirming the preview", async () => {
+    const wrapper = mount(AnswerForm, {
+      props,
+      global: { stubs: { MarkdownContent: true } },
+    });
     expect(submitButton(wrapper).disabled).toBe(false);
     await wrapper.find("form").trigger("submit");
+    expect(wrapper.emitted("submit")).toBeUndefined();
+    const dialog = wrapper.find(".answer-confirm-dialog");
+    expect(dialog.text()).toContain("この内容で提出しますか？");
+    await dialog.find(".button-primary").trigger("click");
     expect(wrapper.emitted("submit")).toHaveLength(1);
+  });
+
+  it("counts characters without line breaks and blocks over-long answers", async () => {
+    const wrapper = mount(AnswerForm, {
+      props: { ...props, body: "1234567890\n\n" },
+    });
+    expect(wrapper.find(".answer-length").text()).toContain("10 / 10 文字");
+    expect(submitButton(wrapper).disabled).toBe(false);
+    await wrapper.setProps({ body: "12345678901" });
+    expect(wrapper.find(".answer-length").text()).toContain("11 / 10 文字");
+    expect(wrapper.find(".answer-length").classes()).toContain("is-over");
+    expect(submitButton(wrapper).disabled).toBe(true);
+  });
+
+  it("hints that Escape leaves the field after Tab indents", async () => {
+    const wrapper = mount(AnswerForm, { props, attachTo: document.body });
+    expect(wrapper.find(".tab-hint").exists()).toBe(false);
+    await wrapper.find("textarea").trigger("keydown", { key: "Tab" });
+    expect(wrapper.find(".tab-hint").text()).toContain("Esc");
+    wrapper.unmount();
+  });
+
+  it("switches between the editor and the Markdown preview", async () => {
+    const wrapper = mount(AnswerForm, {
+      props,
+      global: { stubs: { MarkdownContent: true } },
+    });
+    expect(wrapper.find(".answer-preview").exists()).toBe(false);
+    const toggle = wrapper.find(".answer-preview-switch");
+    expect(toggle.attributes("aria-checked")).toBe("false");
+    await toggle.trigger("click");
+    expect(toggle.attributes("aria-checked")).toBe("true");
+    expect(wrapper.find(".answer-preview").exists()).toBe(true);
+    expect(wrapper.find("textarea").isVisible()).toBe(false);
+  });
+
+  it("creates a log attachment from pasted text", async () => {
+    const wrapper = mount(AnswerForm, {
+      props: { ...props, allowAttachments: true, attachments: [] },
+    });
+    expect(wrapper.find(".log-composer").exists()).toBe(false);
+    await wrapper.find(".answer-attach-button").trigger("click");
+    const composer = wrapper.find(".log-composer");
+    expect(composer.find("input").element.value).toBe("log-1.txt");
+    await composer.find("textarea").setValue("Oct 26 kernel: oops\n");
+    await composer.findAll("button").at(-1)!.trigger("click");
+    expect(wrapper.emitted("update:attachments")?.at(-1)).toEqual([
+      [{ name: "log-1.txt", size: 20, content: "Oct 26 kernel: oops\n" }],
+    ]);
+    expect(wrapper.find(".log-composer").exists()).toBe(false);
+  });
+
+  it("rejects a pasted log that reuses an attached name", async () => {
+    const wrapper = mount(AnswerForm, {
+      props: {
+        ...props,
+        allowAttachments: true,
+        attachments: [{ name: "app.log", size: 1, content: "x" }],
+      },
+    });
+    await wrapper.find(".answer-attach-button").trigger("click");
+    const composer = wrapper.find(".log-composer");
+    await composer.find("input").setValue("app.log");
+    await composer.find("textarea").setValue("y");
+    await composer.findAll("button").at(-1)!.trigger("click");
+    expect(composer.find("[role='alert']").text()).toContain("添付済み");
+    expect(wrapper.emitted("update:attachments")).toBeUndefined();
+  });
+
+  it("offers log attachments only when the problem allows them", () => {
+    expect(
+      mount(AnswerForm, { props }).find(".answer-attachments").exists(),
+    ).toBe(false);
+    expect(
+      mount(AnswerForm, { props: { ...props, allowAttachments: true } })
+        .find(".answer-attachments")
+        .exists(),
+    ).toBe(true);
   });
 
   it("disables submission while closed, cooling down, sending or empty", () => {
@@ -177,6 +271,7 @@ describe("DeploymentHistory", () => {
         penaltyThreshold: 2,
         deploying: true,
         streamError: true,
+        resetDisabled: false,
       },
     });
     expect(empty.text()).toContain("減点なしの上限: 2回");
@@ -199,6 +294,7 @@ describe("DeploymentHistory", () => {
         penaltyThreshold: 2,
         deploying: false,
         streamError: false,
+        resetDisabled: false,
       },
     });
     expect(listed.find("li").text()).toBe("#2 DEPLOYING / 減点 0 / 残り 1回");
@@ -246,20 +342,21 @@ describe("AnswerHistory", () => {
   });
 });
 
-describe("ProblemDetailToolbar", () => {
-  it("toggles the rail and requests a reset", async () => {
-    const wrapper = mount(ProblemDetailToolbar, {
-      props: { railOpen: true, resetDisabled: false },
+describe("DeploymentHistory reset", () => {
+  const props = {
+    deployments: [],
+    penaltyThreshold: 2,
+    deploying: false,
+    streamError: false,
+  };
+  it("requests a reset", async () => {
+    const wrapper = mount(DeploymentHistory, {
+      props: { ...props, resetDisabled: false },
     });
-    const toggle = wrapper.find(".problem-rail-toggle");
-    expect(toggle.attributes("aria-expanded")).toBe("true");
-    expect(toggle.attributes("aria-controls")).toBe("problem-rail");
-    await toggle.trigger("click");
-    expect(wrapper.emitted("update:railOpen")).toEqual([[false]]);
     await wrapper.find(".detail-reset").trigger("click");
     expect(wrapper.emitted("reset")).toHaveLength(1);
-    const disabled = mount(ProblemDetailToolbar, {
-      props: { railOpen: false, resetDisabled: true },
+    const disabled = mount(DeploymentHistory, {
+      props: { ...props, resetDisabled: true },
     });
     expect(
       disabled.find<HTMLButtonElement>(".detail-reset").element.disabled,

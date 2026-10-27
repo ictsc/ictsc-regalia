@@ -99,3 +99,17 @@ export const SecondaryQualifierBeforeEnd: Story = {
     marks: [],
   },
 };
+
+/** 回答にログが添付されている場合。中身はテキストとしてだけ表示する。 */
+export const WithAttachments: Story = {
+  args: {
+    attachments: [
+      {
+        name: "docker-logs.txt",
+        size: 214,
+        content:
+          "api-gateway  | dial tcp 10.20.1.99:8080: connect: connection refused\napi-gateway  | <script>alert(1)</script> is shown as text\n",
+      },
+    ],
+  },
+};

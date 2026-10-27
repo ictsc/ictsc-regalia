@@ -212,3 +212,75 @@ func TestContentImagesAreServedFromTheActiveSnapshot(t *testing.T) {
 		t.Fatalf("anonymous image: %d", response.Code)
 	}
 }
+
+func TestAnswerLengthLimitAndLogAttachments(t *testing.T) {
+	fixture := newContractFixture(t)
+	contestant := fixture.seedContestant(t)
+	fixture.seedActiveContent(t)
+	ctx := context.Background()
+	active, err := fixture.store.ActiveContent(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	next := active
+	next.CommitSHA = strings.Repeat("f", 40)
+	next.Manifest.Problems = append([]core.Problem(nil), active.Manifest.Problems...)
+	next.Manifest.Problems[0].AnswerMaxLength = 10
+	next.Manifest.Problems[0].AllowAttachments = true
+	if _, err := fixture.store.ActivateContent(ctx, next, active.CommitSHA); err != nil {
+		t.Fatal(err)
+	}
+	team := fixture.createSession(t, session.Data{Kind: session.KindContestant, ContestantName: contestant.Name}, service.ContestantTTL)
+	submit := func(body string) *httptest.ResponseRecorder {
+		t.Helper()
+		request := httptest.NewRequest(http.MethodPost, "/api/v1/contestant/problems/P1/answers", strings.NewReader(body))
+		request.Header.Set("Content-Type", "application/json")
+		request.Header.Set("Origin", testOrigin)
+		request.AddCookie(team)
+		response := httptest.NewRecorder()
+		fixture.handler.ServeHTTP(response, request)
+		return response
+	}
+	var problem api.ProblemResponse
+	if err := json.Unmarshal(fixture.request(t, http.MethodGet, "/api/v1/contestant/problems/P1", "", team).Body.Bytes(), &problem); err != nil {
+		t.Fatal(err)
+	}
+	if problem.Problem.AnswerMaxLength != 10 || !problem.Problem.AllowAttachments {
+		t.Fatalf("problem limits: %#v", problem.Problem)
+	}
+	if response := submit(`{"body":"12345678901"}`); response.Code != http.StatusUnprocessableEntity {
+		t.Fatalf("over-long answer: %d %s", response.Code, response.Body.String())
+	}
+	if response := submit(`{"body":"ok","attachments":[{"name":"../x.txt","content":"x"}]}`); response.Code != http.StatusUnprocessableEntity {
+		t.Fatalf("unsafe attachment name: %d %s", response.Code, response.Body.String())
+	}
+	if response := submit(`{"body":"ok","attachments":[{"name":"x.log","content":"a\u0000b"}]}`); response.Code != http.StatusUnprocessableEntity {
+		t.Fatalf("binary attachment: %d %s", response.Code, response.Body.String())
+	}
+	tooLarge := httptest.NewRequest(http.MethodPost, "/api/v1/contestant/problems/P1/answers", strings.NewReader(strings.Repeat("a", 9<<20)))
+	tooLarge.Header.Set("Content-Type", "application/json")
+	tooLarge.Header.Set("Origin", testOrigin)
+	tooLarge.AddCookie(team)
+	rejected := httptest.NewRecorder()
+	fixture.handler.ServeHTTP(rejected, tooLarge)
+	if rejected.Code != http.StatusRequestEntityTooLarge {
+		t.Fatalf("oversized request: %d", rejected.Code)
+	}
+	response := submit(`{"body":"1234567890\n\n","attachments":[{"name":"syslog.txt","content":"<script>alert(1)</script>\n"}]}`)
+	if response.Code != http.StatusCreated {
+		t.Fatalf("submit: %d %s", response.Code, response.Body.String())
+	}
+	var created api.AnswerResponse
+	if err := json.Unmarshal(response.Body.Bytes(), &created); err != nil || len(created.Answer.Attachments) != 1 || created.Answer.Attachments[0].Size != 26 {
+		t.Fatalf("created answer: %s", response.Body.String())
+	}
+	var attachments api.AnswerAttachmentsResponse
+	if err := json.Unmarshal(fixture.request(t, http.MethodGet, "/api/v1/contestant/problems/P1/answers/1/attachments", "", team).Body.Bytes(), &attachments); err != nil ||
+		len(attachments.Attachments) != 1 || attachments.Attachments[0].Content != "<script>alert(1)</script>\n" {
+		t.Fatalf("contestant attachments: %#v %v", attachments, err)
+	}
+	admin := fixture.createSession(t, session.Data{Kind: session.KindAdmin, AdminName: "Judge"}, service.AdminTTL)
+	if response := fixture.request(t, http.MethodGet, "/api/v1/admin/answers/2/P1/1/attachments", "", admin); response.Code != http.StatusOK {
+		t.Fatalf("admin attachments: %d", response.Code)
+	}
+}

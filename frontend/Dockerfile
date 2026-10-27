@@ -43,6 +43,8 @@ server {
     resolver \${NGINX_RESOLVER} ipv6=off valid=10s;
     set \$api_upstream \${API_UPSTREAM};
     location /api/ {
+        # Matches the API's request body limit (answers with log attachments).
+        client_max_body_size 8m;
         proxy_pass \$api_upstream\$request_uri;
         proxy_http_version 1.1;
         proxy_set_header Host \$host;

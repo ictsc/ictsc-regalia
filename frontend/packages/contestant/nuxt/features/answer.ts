@@ -1,4 +1,5 @@
 import { expectData, type ApiClient } from "@ictsc/api";
+import type { AttachmentFile } from "@ictsc/ui/attachments";
 import type { ScoreModel } from "./models";
 
 export type Answer = {
@@ -44,6 +45,7 @@ export async function fetchAnswers(
 type FetchAnswerResult = {
   readonly answerBody: string;
   readonly submittedAtString: string;
+  readonly attachments: AttachmentFile[];
 };
 
 export async function fetchAnswer(
@@ -64,21 +66,52 @@ export async function fetchAnswer(
       },
     ),
   );
+  const attachments = response.answer.attachments.length
+    ? await fetchAnswerAttachments(client, problemCode, answerNumber)
+    : [];
   return {
     answerBody: response.answer.body.body,
     submittedAtString: response.answer.submitted_at,
+    attachments,
   };
+}
+
+export async function fetchAnswerAttachments(
+  client: ApiClient,
+  problemCode: string,
+  answerNumber: number,
+): Promise<AttachmentFile[]> {
+  const response = expectData(
+    await client.GET(
+      "/api/v1/contestant/problems/{problem_code}/answers/{answer_number}/attachments",
+      {
+        params: {
+          path: { problem_code: problemCode, answer_number: answerNumber },
+        },
+      },
+    ),
+  );
+  return response.attachments;
 }
 
 export async function submitAnswer(
   client: ApiClient,
   problemCode: string,
   body: string,
+  attachments: readonly AttachmentFile[] = [],
 ): Promise<void> {
   const response = expectData(
     await client.POST("/api/v1/contestant/problems/{problem_code}/answers", {
       params: { path: { problem_code: problemCode } },
-      body: { body },
+      body: attachments.length
+        ? {
+            body,
+            attachments: attachments.map(({ name, content }) => ({
+              name,
+              content,
+            })),
+          }
+        : { body },
     }),
   );
   void response;

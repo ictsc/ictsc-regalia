@@ -39,3 +39,11 @@ it("serves repository images from the configured API path", async () => {
     setMarkdownImageUrl(undefined);
   }
 });
+
+it("highlights common troubleshooting languages", async () => {
+  const html = await renderMarkdown(
+    "```c\nint main(void) { return 0; }\n```\n\n```nginx\nserver { listen 80; }\n```",
+  );
+  expect(html.match(/class="shiki/g)).toHaveLength(2);
+  expect(html).toMatch(/<span style="color:#[0-9A-Fa-f]{6}">int<\/span>/);
+});

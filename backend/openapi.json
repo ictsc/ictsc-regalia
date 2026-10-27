@@ -478,6 +478,30 @@
         }
       }
     },
+    "/api/v1/contestant/problems/{problem_code}/answers/{answer_number}/attachments": {
+      "parameters": [
+        { "$ref": "#/components/parameters/ProblemCodePath" },
+        { "$ref": "#/components/parameters/AnswerNumberPath" }
+      ],
+      "get": {
+        "tags": ["Contestant Competition"],
+        "summary": "自チームの回答の添付を取得する",
+        "description": "添付の中身をテキストとして返す。表示時はHTMLとして解釈しないこと。",
+        "operationId": "listContestantAnswerAttachments",
+        "security": [{ "ContestantSession": [] }],
+        "responses": {
+          "200": {
+            "description": "添付",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnswerAttachmentsResponse" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
     "/api/v1/contestant/problems/{problem_code}/deployments": {
       "parameters": [
         { "$ref": "#/components/parameters/ProblemCodePath" }
@@ -1062,6 +1086,31 @@
           "422": { "$ref": "#/components/responses/ValidationError" },
           "500": { "$ref": "#/components/responses/InternalServerError" },
           "502": { "$ref": "#/components/responses/BadGateway" }
+        }
+      }
+    },
+    "/api/v1/admin/answers/{team_code}/{problem_code}/{answer_number}/attachments": {
+      "parameters": [
+        { "$ref": "#/components/parameters/TeamCodePath" },
+        { "$ref": "#/components/parameters/ProblemCodePath" },
+        { "$ref": "#/components/parameters/AnswerNumberPath" }
+      ],
+      "get": {
+        "tags": ["Admin Competition"],
+        "summary": "回答の添付を取得する",
+        "description": "添付の中身をテキストとして返す。表示時はHTMLとして解釈しないこと。",
+        "operationId": "listAdminAnswerAttachments",
+        "security": [{ "AdminSession": [] }],
+        "responses": {
+          "200": {
+            "description": "添付",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AnswerAttachmentsResponse" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       }
     },
@@ -2404,8 +2453,10 @@
       "ProblemSummary": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["code", "title", "max_score", "category", "section_slug", "score", "deployment", "submission_status", "next_submittable_at"],
+        "required": ["code", "title", "max_score", "category", "section_slug", "score", "deployment", "submission_status", "next_submittable_at", "answer_max_length", "allow_attachments"],
         "properties": {
+          "answer_max_length": { "type": "integer", "format": "int32", "minimum": 1, "maximum": 100000, "description": "回答の最大文字数。改行は数えない。" },
+          "allow_attachments": { "type": "boolean", "description": "回答にテキストのログを添付できるか" },
           "code": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" },
           "title": { "type": "string", "minLength": 1, "maxLength": 255 },
           "max_score": { "type": "integer", "format": "int32", "minimum": 1 },
@@ -2429,8 +2480,10 @@
       "ProblemDetail": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["code", "title", "max_score", "category", "section_slug", "type", "body", "score", "deployment", "submission_status"],
+        "required": ["code", "title", "max_score", "category", "section_slug", "type", "body", "score", "deployment", "submission_status", "answer_max_length", "allow_attachments"],
         "properties": {
+          "answer_max_length": { "type": "integer", "format": "int32", "minimum": 1, "maximum": 100000, "description": "回答の最大文字数。改行は数えない。" },
+          "allow_attachments": { "type": "boolean", "description": "回答にテキストのログを添付できるか" },
           "code": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" },
           "title": { "type": "string", "minLength": 1, "maxLength": 255 },
           "max_score": { "type": "integer", "format": "int32", "minimum": 1 },
@@ -2451,8 +2504,10 @@
       "AdminProblem": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["code", "title", "max_score", "category", "section_slug", "type", "body", "explanation", "redeploy_rule", "content_commit", "default_grader_discord_id"],
+        "required": ["code", "title", "max_score", "category", "section_slug", "type", "body", "explanation", "redeploy_rule", "content_commit", "default_grader_discord_id", "answer_max_length", "allow_attachments"],
         "properties": {
+          "answer_max_length": { "type": "integer", "format": "int32", "minimum": 1, "maximum": 100000, "description": "回答の最大文字数。改行は数えない。" },
+          "allow_attachments": { "type": "boolean", "description": "回答にテキストのログを添付できるか" },
           "code": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" },
           "title": { "type": "string", "minLength": 1, "maxLength": 255 },
           "max_score": { "type": "integer", "format": "int32", "minimum": 1 },
@@ -2527,10 +2582,11 @@
       "Answer": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["number", "body", "submitted_at", "score", "content_commit"],
+        "required": ["number", "body", "submitted_at", "score", "content_commit", "attachments"],
         "properties": {
           "number": { "type": "integer", "format": "int32", "minimum": 1 },
           "body": { "$ref": "#/components/schemas/AnswerBody" },
+          "attachments": { "type": "array", "items": { "$ref": "#/components/schemas/AnswerAttachmentInfo" } },
           "submitted_at": { "type": "string", "format": "date-time" },
           "score": {
             "oneOf": [
@@ -2554,11 +2610,59 @@
       "SubmitAnswerRequest": {
         "type": "object",
         "additionalProperties": false,
+        "description": "bodyの文字数（改行を除く）は問題のanswer_max_length以下。attachmentsは問題のallow_attachmentsがtrueのときだけ指定できる。",
         "required": ["body"],
         "properties": {
-          "body": { "type": "string", "minLength": 1, "maxLength": 100000 }
+          "body": { "type": "string", "minLength": 1, "maxLength": 100000 },
+          "attachments": {
+            "type": "array",
+            "maxItems": 3,
+            "items": { "$ref": "#/components/schemas/AnswerAttachmentUpload" }
+          }
         },
         "examples": [{ "body": "調査結果と復旧手順をMarkdownで記載します。" }]
+      },
+      "AnswerAttachmentUpload": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "テキストのログ。contentはUTF-8で1バイト以上1 MiB以下、NULを含まない。",
+        "required": ["name", "content"],
+        "properties": {
+          "name": { "$ref": "#/components/schemas/AnswerAttachmentName" },
+          "content": { "type": "string", "minLength": 1, "maxLength": 1048576 }
+        }
+      },
+      "AnswerAttachmentName": {
+        "type": "string",
+        "description": "英数字・.・_・-のみ、先頭は.以外、.txtか.logで終わる。名前は1回答内で一意。",
+        "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]{0,95}\\.(txt|log)$"
+      },
+      "AnswerAttachmentInfo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "size"],
+        "properties": {
+          "name": { "$ref": "#/components/schemas/AnswerAttachmentName" },
+          "size": { "type": "integer", "format": "int32", "minimum": 1, "description": "バイト数" }
+        }
+      },
+      "AnswerAttachment": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "size", "content"],
+        "properties": {
+          "name": { "$ref": "#/components/schemas/AnswerAttachmentName" },
+          "size": { "type": "integer", "format": "int32", "minimum": 1 },
+          "content": { "type": "string", "description": "プレーンテキストとして表示する。HTMLとして解釈しない。" }
+        }
+      },
+      "AnswerAttachmentsResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["attachments"],
+        "properties": {
+          "attachments": { "type": "array", "items": { "$ref": "#/components/schemas/AnswerAttachment" } }
+        }
       },
       "AnswerResponse": {
         "type": "object",

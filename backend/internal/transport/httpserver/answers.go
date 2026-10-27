@@ -51,7 +51,13 @@ func (h *Handler) SubmitContestantAnswer(ctx context.Context, request api.Submit
 	if err != nil {
 		return nil, err
 	}
-	answer, _, err := h.service.SubmitAnswer(ctx, contestant, request.ProblemCode, request.Body.Body)
+	var attachments []core.AnswerAttachment
+	if request.Body.Attachments != nil {
+		for _, attachment := range *request.Body.Attachments {
+			attachments = append(attachments, core.AnswerAttachment{Name: string(attachment.Name), Content: attachment.Content})
+		}
+	}
+	answer, _, err := h.service.SubmitAnswer(ctx, contestant, request.ProblemCode, request.Body.Body, attachments)
 	if err != nil {
 		return nil, err
 	}
@@ -65,6 +71,9 @@ func (h *Handler) GetContestantAnswer(ctx context.Context, request api.GetContes
 	}
 	answer, err := h.service.Store.GetAnswer(ctx, contestant.TeamCode, request.ProblemCode, request.AnswerNumber)
 	if err != nil {
+		return nil, err
+	}
+	if answer.Attachments, err = h.service.Store.ListAnswerAttachments(ctx, answer.TeamCode, answer.ProblemCode, answer.Number); err != nil {
 		return nil, err
 	}
 	score, err := h.scoreForAnswer(ctx, answer, true)
@@ -354,4 +363,33 @@ func (h *Handler) RevealAdminFinalScores(ctx context.Context, _ api.RevealAdminF
 		return nil, err
 	}
 	return api.RevealAdminFinalScores204Response{}, nil
+}
+
+func (h *Handler) ListContestantAnswerAttachments(ctx context.Context, request api.ListContestantAnswerAttachmentsRequestObject) (api.ListContestantAnswerAttachmentsResponseObject, error) {
+	contestant, err := h.currentContestant(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// Reading the answer through the team scope keeps other teams' logs out of reach.
+	answer, err := h.service.Store.GetAnswer(ctx, contestant.TeamCode, request.ProblemCode, request.AnswerNumber)
+	if err != nil {
+		return nil, err
+	}
+	attachments, err := h.service.Store.ListAnswerAttachments(ctx, answer.TeamCode, answer.ProblemCode, answer.Number)
+	if err != nil {
+		return nil, err
+	}
+	return api.ListContestantAnswerAttachments200JSONResponse(toAPIAttachments(attachments)), nil
+}
+
+func (h *Handler) ListAdminAnswerAttachments(ctx context.Context, request api.ListAdminAnswerAttachmentsRequestObject) (api.ListAdminAnswerAttachmentsResponseObject, error) {
+	answer, err := h.service.Store.GetAnswer(ctx, request.TeamCode, request.ProblemCode, request.AnswerNumber)
+	if err != nil {
+		return nil, err
+	}
+	attachments, err := h.service.Store.ListAnswerAttachments(ctx, answer.TeamCode, answer.ProblemCode, answer.Number)
+	if err != nil {
+		return nil, err
+	}
+	return api.ListAdminAnswerAttachments200JSONResponse(toAPIAttachments(attachments)), nil
 }
