@@ -65,7 +65,8 @@ const processor = unified()
   .use(rehypeContentImages)
   .use(rehypeKatex, { trust: false })
   .use(rehypeShiki, {
-    theme: "github-light",
+    // Both palettes are inlined; application.css switches to the dark one.
+    themes: { light: "github-light", dark: "github-dark" },
     // Languages commonly used in troubleshooting reports; others fall back to text.
     langs: [
       "javascript",

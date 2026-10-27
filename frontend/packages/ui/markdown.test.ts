@@ -45,5 +45,8 @@ it("highlights common troubleshooting languages", async () => {
     "```c\nint main(void) { return 0; }\n```\n\n```nginx\nserver { listen 80; }\n```",
   );
   expect(html.match(/class="shiki/g)).toHaveLength(2);
-  expect(html).toMatch(/<span style="color:#[0-9A-Fa-f]{6}">int<\/span>/);
+  // Light colors inline, dark ones in --shiki-dark for the dark theme.
+  expect(html).toMatch(
+    /<span style="color:#[0-9A-Fa-f]{6};--shiki-dark:#[0-9A-Fa-f]{6}">int<\/span>/,
+  );
 });
