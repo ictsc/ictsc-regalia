@@ -97,10 +97,39 @@ export function textAttachment(
   return { name, size, content };
 }
 
-/** Saves an attachment from memory; nothing is fetched from the server. */
+/**
+ * Removes what a terminal would act on instead of print: escape sequences
+ * (colors, cursor moves, window titles, clipboard writes), other control
+ * characters and carriage returns that could hide a line when the saved
+ * log is printed with cat. Tabs and line breaks are kept.
+ */
+export function stripTerminalControls(text: string): string {
+  return (
+    text
+      // OSC (e.g. title, hyperlink, clipboard) ended by BEL or ST.
+      .replace(/\u001b\][^\u0007\u001b]*(?:\u0007|\u001b\\)?/g, "")
+      // DCS, SOS, PM and APC strings ended by ST.
+      .replace(/\u001b[PX^_][^\u001b]*(?:\u001b\\)?/g, "")
+      // CSI (colors, cursor movement, erasing).
+      .replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, "")
+      // Any other escape sequence.
+      .replace(/\u001b[\s\S]?/g, "")
+      // A bare CR returns to the line start and would overwrite it.
+      .replace(/\r\n?/g, "\n")
+      // Remaining C0 controls except tab and line feed, DEL and C1 controls.
+      .replace(/[\u0000-\u0008\u000b-\u001f\u007f-\u009f]/g, "")
+  );
+}
+
+/**
+ * Saves an attachment from memory; nothing is fetched from the server.
+ * Terminal control sequences are removed so printing the file is safe.
+ */
 export function downloadAttachment(attachment: AttachmentFile) {
   const url = URL.createObjectURL(
-    new Blob([attachment.content], { type: "text/plain;charset=utf-8" }),
+    new Blob([stripTerminalControls(attachment.content)], {
+      type: "text/plain;charset=utf-8",
+    }),
   );
   const link = document.createElement("a");
   link.href = url;
