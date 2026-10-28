@@ -76,4 +76,7 @@ it("removes terminal control sequences from saved logs", () => {
   );
   expect(stripTerminalControls("x\u0008\u009b31my\u007fz")).toBe("x31myz");
   expect(stripTerminalControls("日本語のログ\n")).toBe("日本語のログ\n");
+  expect(stripTerminalControls("ls \u202e# txt.exe\u202c")).toBe(
+    "ls # txt.exe",
+  );
 });

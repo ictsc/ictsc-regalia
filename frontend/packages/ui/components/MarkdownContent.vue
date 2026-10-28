@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, watch } from "vue";
+import { stripTerminalControls } from "../attachments";
 import { renderMarkdown, type ImageUrl } from "../markdown";
 import UiIcon from "./UiIcon.vue";
 const props = defineProps<{
   source: string;
   /** Overrides how /images/<file> is served, e.g. for a past content commit. */
   imageUrl?: ImageUrl;
+  /**
+   * Written by contestants (answers, profiles): images from other hosts are
+   * shown as their URL instead of being loaded in the reader's browser.
+   */
+  blockExternalImages?: boolean;
 }>();
 // Two roots (the content and the image viewer): attributes go on the content.
 defineOptions({ inheritAttrs: false });
@@ -41,14 +47,17 @@ function setCopyState(
 }
 
 watch(
-  () => [props.source, props.imageUrl] as const,
-  async ([source, imageUrl], _, onCleanup) => {
+  () => [props.source, props.imageUrl, props.blockExternalImages] as const,
+  async ([source, imageUrl, blockExternalImages], _, onCleanup) => {
     let active = true;
     onCleanup(() => {
       active = false;
     });
     try {
-      const result = await renderMarkdown(source, { imageUrl });
+      const result = await renderMarkdown(source, {
+        imageUrl,
+        blockExternalImages,
+      });
       if (active) {
         html.value = result;
         failed.value = false;
@@ -85,7 +94,10 @@ async function copyCode(button: HTMLButtonElement) {
   const code = button.parentElement?.querySelector("pre > code");
   if (!code) return;
   try {
-    await navigator.clipboard.writeText(code.textContent ?? "");
+    // What is pasted into a terminal must be what is on screen.
+    await navigator.clipboard.writeText(
+      stripTerminalControls(code.textContent ?? ""),
+    );
     setCopyState(button, "done");
   } catch {
     setCopyState(button, "failed");

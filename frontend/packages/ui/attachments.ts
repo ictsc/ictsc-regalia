@@ -101,7 +101,8 @@ export function textAttachment(
  * Removes what a terminal would act on instead of print: escape sequences
  * (colors, cursor moves, window titles, clipboard writes), other control
  * characters and carriage returns that could hide a line when the saved
- * log is printed with cat. Tabs and line breaks are kept.
+ * log is printed with cat, and bidirectional overrides that make text read
+ * differently from what runs. Tabs and line breaks are kept.
  */
 export function stripTerminalControls(text: string): string {
   return (
@@ -118,6 +119,8 @@ export function stripTerminalControls(text: string): string {
       .replace(/\r\n?/g, "\n")
       // Remaining C0 controls except tab and line feed, DEL and C1 controls.
       .replace(/[\u0000-\u0008\u000b-\u001f\u007f-\u009f]/g, "")
+      // Bidirectional embeddings, overrides and isolates.
+      .replace(/[\u202a-\u202e\u2066-\u2069]/g, "")
   );
 }
 

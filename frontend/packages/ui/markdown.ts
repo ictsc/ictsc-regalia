@@ -13,6 +13,7 @@ type HastNode = {
   tagName?: string;
   properties?: Record<string, unknown>;
   children?: HastNode[];
+  value?: string;
 };
 
 /** Maps a content image file name to the URL that serves it. */
@@ -40,9 +41,25 @@ function rehypeContentImages() {
   return (tree: HastNode, file: { data: Record<string, unknown> }) => {
     const imageUrl =
       (file.data.imageUrl as ImageUrl | undefined) ?? defaultImageUrl;
+    const blockExternal = file.data.blockExternalImages === true;
     const visit = (node: HastNode) => {
       if (node.tagName === "img" && typeof node.properties?.src === "string") {
-        node.properties.src = rewriteImageSource(node.properties.src, imageUrl);
+        const src = node.properties.src;
+        if (blockExternal && !src.startsWith("/images/")) {
+          // Loading it would tell the image's host who read the text and when.
+          const alt =
+            typeof node.properties.alt === "string" ? node.properties.alt : "";
+          node.tagName = "span";
+          node.properties = { className: ["blocked-image"] };
+          node.children = [
+            {
+              type: "text",
+              value: `[外部の画像は表示しません${alt ? `: ${alt}` : ""}] ${src}`,
+            },
+          ];
+          return;
+        }
+        node.properties.src = rewriteImageSource(src, imageUrl);
       }
       node.children?.forEach(visit);
     };
@@ -114,12 +131,15 @@ const processor = unified()
   .use(rehypeStringify);
 export async function renderMarkdown(
   markdown: string,
-  options: { imageUrl?: ImageUrl } = {},
+  options: { imageUrl?: ImageUrl; blockExternalImages?: boolean } = {},
 ): Promise<string> {
   return String(
     await processor.process({
       value: markdown,
-      data: { imageUrl: options.imageUrl },
+      data: {
+        imageUrl: options.imageUrl,
+        blockExternalImages: options.blockExternalImages,
+      },
     }),
   );
 }

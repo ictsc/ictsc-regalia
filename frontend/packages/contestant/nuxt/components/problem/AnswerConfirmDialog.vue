@@ -49,7 +49,7 @@ function onBackdrop(event: MouseEvent) {
       {{ length.toLocaleString() }} / {{ maxLength.toLocaleString() }} 文字
     </p>
     <div ref="preview" class="answer-confirm-preview">
-      <MarkdownContent :source="body" />
+      <MarkdownContent :source="body" block-external-images />
     </div>
     <template v-if="attachments.length">
       <h3>添付するログ（クリックで内容を確認）</h3>

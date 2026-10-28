@@ -30,6 +30,7 @@ defineEmits<{ retry: [] }>();
           <MarkdownContent
             v-if="member.selfIntroduction"
             :source="member.selfIntroduction"
+            block-external-images
           />
         </article>
       </div></section

@@ -267,7 +267,11 @@ function confirm() {
         tabindex="0"
         :style="{ height: previewHeight }"
       >
-        <MarkdownContent v-if="body.trim()" :source="body" />
+        <MarkdownContent
+          v-if="body.trim()"
+          :source="body"
+          block-external-images
+        />
         <p v-else class="answer-preview-empty">回答が入力されていません</p>
       </div>
       <p

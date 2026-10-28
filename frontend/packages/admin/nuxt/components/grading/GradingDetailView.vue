@@ -342,6 +342,7 @@ function startResize(
               v-if="markdownOnly"
               class="grading-markdown-answer"
               :source="answer.body.body"
+              block-external-images
             />
             <template v-else>
               <div v-if="isDiffView && comparison" class="grading-diff-filebar">
@@ -513,7 +514,10 @@ function startResize(
               </div>
               <details class="grading-markdown-preview">
                 <summary>今回の回答を Markdown で表示</summary>
-                <MarkdownContent :source="answer.body.body" />
+                <MarkdownContent
+                  :source="answer.body.body"
+                  block-external-images
+                />
               </details>
             </template>
             <section

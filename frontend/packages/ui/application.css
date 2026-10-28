@@ -327,6 +327,13 @@ html[data-theme="dark"] .markdown .shiki span {
     opacity: 1;
   }
 }
+/* An image from another host in contestant text, shown as its URL. */
+.markdown .blocked-image {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.875em;
+  overflow-wrap: anywhere;
+}
 .markdown img:not(a img) {
   cursor: zoom-in;
 }

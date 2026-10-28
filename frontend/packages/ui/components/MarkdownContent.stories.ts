@@ -77,3 +77,17 @@ export const LongText: Story = {
     ).join("\n\n"),
   },
 };
+
+/** Answers and profiles: images from other hosts are not loaded. */
+export const ContestantText: Story = {
+  args: {
+    source: `原因は図の通りです。
+
+![手元で取った構成図](https://example.com/topology.png)
+
+\`\`\`console
+$ sudo ip route replace default via 192.0.2.1
+\`\`\``,
+    blockExternalImages: true,
+  },
+};

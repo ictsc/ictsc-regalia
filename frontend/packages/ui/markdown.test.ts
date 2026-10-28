@@ -50,3 +50,18 @@ it("highlights common troubleshooting languages", async () => {
     /<span style="color:#[0-9A-Fa-f]{6};--shiki-dark:#[0-9A-Fa-f]{6}">int<\/span>/,
   );
 });
+
+it("shows external images in contestant text as their URL", async () => {
+  const html = await renderMarkdown(
+    "![図](https://evil.example/t.png) ![構成](/images/net.png)",
+    {
+      blockExternalImages: true,
+      imageUrl: (name) => `/api/v1/admin/images/${name}`,
+    },
+  );
+  expect(html).not.toContain('src="https://evil.example');
+  expect(html).toContain(
+    "[外部の画像は表示しません: 図] https://evil.example/t.png",
+  );
+  expect(html).toContain('src="/api/v1/admin/images/net.png"');
+});

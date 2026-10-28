@@ -42,6 +42,33 @@ it("copies the text of a code block", async () => {
   wrapper.unmount();
 });
 
+it("copies code without terminal control characters", async () => {
+  const writeText = vi.fn().mockResolvedValue(undefined);
+  Object.assign(navigator, { clipboard: { writeText } });
+  const wrapper = await render(
+    "```text\necho ok\u001b]52;c;cm0gLXJmIH4=\u0007\rrm -rf ~\n```",
+  );
+  await wrapper.find(".code-copy").trigger("click");
+  await flushPromises();
+  expect(writeText).toHaveBeenCalledWith("echo ok\nrm -rf ~");
+  wrapper.unmount();
+});
+
+it("shows external images in contestant text as their URL", async () => {
+  const wrapper = mount(MarkdownContent, {
+    props: {
+      source: "![x](https://evil.example/t.png)",
+      blockExternalImages: true,
+    },
+    attachTo: document.body,
+  });
+  await vi.waitFor(() => {
+    expect(wrapper.find(".blocked-image").exists()).toBe(true);
+  });
+  expect(wrapper.find(".markdown img").exists()).toBe(false);
+  wrapper.unmount();
+});
+
 it("opens an image in the viewer and closes it again", async () => {
   const wrapper = await render("![構成図](https://example.com/net.png)");
   const dialog = wrapper.find<HTMLDialogElement>("dialog.image-viewer");

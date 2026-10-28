@@ -63,7 +63,7 @@ defineProps<{
       class="reading-copy"
       aria-live="polite"
     >
-      <MarkdownContent :source="selectedAnswerBody" />
+      <MarkdownContent :source="selectedAnswerBody" block-external-images />
       <template v-if="selectedAnswerAttachments?.length">
         <h3 class="answer-history-attachments">添付したログ</h3>
         <AttachmentList :attachments="selectedAnswerAttachments" />
