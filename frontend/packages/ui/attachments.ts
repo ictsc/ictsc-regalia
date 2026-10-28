@@ -1,3 +1,5 @@
+import { stripTerminalControls } from "./terminal-text";
+
 /** A text log attached to an answer. */
 export type AttachmentFile = {
   name: string;
@@ -78,6 +80,36 @@ export async function readAttachment(
 }
 
 /**
+ * Reads files dropped or picked by the contestant and appends them to the
+ * existing attachments, up to maxAttachments. A name that is already taken
+ * is numbered. Files that cannot be attached come back as error messages.
+ */
+export async function appendAttachmentFiles(
+  existing: readonly AttachmentFile[],
+  files: Iterable<File>,
+): Promise<{ attachments: AttachmentFile[]; errors: string[] }> {
+  const attachments = [...existing];
+  const errors: string[] = [];
+  for (const file of files) {
+    if (attachments.length >= maxAttachments) {
+      errors.push(`${file.name}: 添付は${maxAttachments}件までです`);
+      continue;
+    }
+    const result = await readAttachment(file);
+    if (typeof result === "string") {
+      errors.push(result);
+      continue;
+    }
+    const taken = attachments.map((attachment) => attachment.name);
+    attachments.push({
+      ...result,
+      name: uniqueAttachmentName(result.name, taken),
+    });
+  }
+  return { attachments, errors };
+}
+
+/**
  * Builds an attachment from text typed or pasted into the log editor. A name
  * without .txt or .log gets .txt. Returns an error message instead of throwing.
  */
@@ -95,33 +127,6 @@ export function textAttachment(
   const size = new TextEncoder().encode(content).length;
   if (size > maxAttachmentBytes) return "1MB を超えるログは添付できません";
   return { name, size, content };
-}
-
-/**
- * Removes what a terminal would act on instead of print: escape sequences
- * (colors, cursor moves, window titles, clipboard writes), other control
- * characters and carriage returns that could hide a line when the saved
- * log is printed with cat, and bidirectional overrides that make text read
- * differently from what runs. Tabs and line breaks are kept.
- */
-export function stripTerminalControls(text: string): string {
-  return (
-    text
-      // OSC (e.g. title, hyperlink, clipboard) ended by BEL or ST.
-      .replace(/\u001b\][^\u0007\u001b]*(?:\u0007|\u001b\\)?/g, "")
-      // DCS, SOS, PM and APC strings ended by ST.
-      .replace(/\u001b[PX^_][^\u001b]*(?:\u001b\\)?/g, "")
-      // CSI (colors, cursor movement, erasing).
-      .replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, "")
-      // Any other escape sequence.
-      .replace(/\u001b[\s\S]?/g, "")
-      // A bare CR returns to the line start and would overwrite it.
-      .replace(/\r\n?/g, "\n")
-      // Remaining C0 controls except tab and line feed, DEL and C1 controls.
-      .replace(/[\u0000-\u0008\u000b-\u001f\u007f-\u009f]/g, "")
-      // Bidirectional embeddings, overrides and isolates.
-      .replace(/[\u202a-\u202e\u2066-\u2069]/g, "")
-  );
 }
 
 /**
