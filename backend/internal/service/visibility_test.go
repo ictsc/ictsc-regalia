@@ -96,3 +96,25 @@ func TestContentActivationAppliesScheduleFreeze(t *testing.T) {
 		t.Fatalf("freeze was not cleared: %v, err = %v", store.state.RankingFreezeAt, err)
 	}
 }
+
+func (s *freezeStore) ReplaceRule(_ context.Context, markdown, _ string) (core.CompetitionState, error) {
+	s.calls++
+	s.state.RuleMarkdown = markdown
+	return s.state, nil
+}
+
+func TestContentActivationAppliesRule(t *testing.T) {
+	store := &freezeStore{state: core.CompetitionState{RuleMarkdown: "edited in admin"}}
+	service := New(store, nil, Config{})
+	snapshot := core.ContentSnapshot{CommitSHA: "abc", Manifest: core.Manifest{RulePath: "rule.md", RuleMarkdown: "# rule"}}
+	if err := service.applyContentRule(context.Background(), snapshot); err != nil || store.state.RuleMarkdown != "# rule" {
+		t.Fatalf("rule = %q, err = %v", store.state.RuleMarkdown, err)
+	}
+	if err := service.applyContentRule(context.Background(), snapshot); err != nil || store.calls != 1 {
+		t.Fatalf("unchanged rule was rewritten: calls = %d, err = %v", store.calls, err)
+	}
+	snapshot.Manifest = core.Manifest{}
+	if err := service.applyContentRule(context.Background(), snapshot); err != nil || store.state.RuleMarkdown != "# rule" {
+		t.Fatalf("a repository without rule.md changed the rule: %q, err = %v", store.state.RuleMarkdown, err)
+	}
+}

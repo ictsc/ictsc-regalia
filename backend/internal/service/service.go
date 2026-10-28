@@ -418,6 +418,12 @@ func (s *Service) RefreshContent(ctx context.Context, claims ActionsClaims, comm
 	if activeErr == nil {
 		expectedCurrent = active.CommitSHA
 		if active.CommitSHA == commit {
+			// Refreshing the active commit again also brings the rule page in
+			// line with its rule.md.
+			if err := s.applyContentRule(ctx, active); err != nil {
+				s.setContentFailure(commit, err, true)
+				return core.ContentSnapshot{}, err
+			}
 			s.setContentSuccess(active)
 			return active, nil
 		}
@@ -454,6 +460,10 @@ func (s *Service) RefreshContent(ctx context.Context, claims ActionsClaims, comm
 		s.setContentFailure(commit, err, true)
 		return core.ContentSnapshot{}, err
 	}
+	if err := s.applyContentRule(ctx, snapshot); err != nil {
+		s.setContentFailure(commit, err, true)
+		return core.ContentSnapshot{}, err
+	}
 	s.setContentSuccess(snapshot)
 	return snapshot, nil
 }
@@ -470,6 +480,23 @@ func (s *Service) applyContentFreeze(ctx context.Context, snapshot core.ContentS
 		return nil
 	}
 	_, err = s.Store.ReplaceFreezeAt(ctx, next, "content:"+snapshot.CommitSHA)
+	return err
+}
+
+// applyContentRule makes rule.md the rule page when the repository has one.
+// Without rule.md the rule edited in the admin settings is kept.
+func (s *Service) applyContentRule(ctx context.Context, snapshot core.ContentSnapshot) error {
+	if snapshot.Manifest.RulePath == "" {
+		return nil
+	}
+	state, err := s.Store.GetCompetitionState(ctx)
+	if err != nil {
+		return err
+	}
+	if state.RuleMarkdown == snapshot.Manifest.RuleMarkdown {
+		return nil
+	}
+	_, err = s.Store.ReplaceRule(ctx, snapshot.Manifest.RuleMarkdown, "content:"+snapshot.CommitSHA)
 	return err
 }
 

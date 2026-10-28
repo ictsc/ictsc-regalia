@@ -1,5 +1,7 @@
 # GitHubコンテンツリポジトリ契約
 
+設定・反映・障害対応の手順は [content-operations.md](content-operations.md) を参照してください。
+
 問題、Section、お知らせの正本は設定済みGitHub repositoryです。Regaliaはbranchの内容を直接配信せず、
 GitHub Actionsが指定した完全なcommit object IDから全fileを取得・検証し、成功したsnapshotだけを
 有効化します。
@@ -34,6 +36,11 @@ schedules:
 - `name` は一意で、英数字・`_`・`-` です。期間は `[startAt, endAt)` で、互いに重複できません。
 - `ranking_freeze_at` が正本です。コンテンツ更新時に順位凍結時刻へ反映し、書かれていなければ凍結を解除します。
 - 二次予選モードでは `schedules` はちょうど1つで、`ranking_freeze_at` は書けません。
+
+## rule.md
+
+`rule.md` がある commit を有効化すると、その内容を参加者のルールページに反映します（運営画面の競技設定で
+編集したルールは上書きされます）。`rule.md` がない commit では、現在のルールをそのまま残します。
 
 ## 問題
 
