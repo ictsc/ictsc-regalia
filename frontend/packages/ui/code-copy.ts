@@ -1,3 +1,6 @@
+// Copy buttons for code blocks in rendered Markdown. They are added to the
+// DOM that MarkdownContent creates with v-html, so they are plain elements,
+// not Vue components, and must be added again after every render.
 import { stripTerminalControls } from "./terminal-text";
 
 // Static markup for buttons added inside rendered HTML, drawn like UiIcon.

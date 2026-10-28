@@ -1,3 +1,8 @@
+// Renders Markdown from problems, notices, rules, answers and profiles to
+// HTML that MarkdownContent puts in the page with v-html. The input may be
+// written by contestants, so raw HTML is dropped and the tree is sanitized
+// first; image rewriting, KaTeX (trust: false) and Shiki run only on the
+// sanitized tree. Keep that order when adding plugins.
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";

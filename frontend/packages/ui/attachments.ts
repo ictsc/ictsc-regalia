@@ -1,3 +1,7 @@
+// Text logs attached to answers, on the browser side: reading files,
+// building logs from pasted text and saving them again. The checks mirror
+// the server (backend/internal/core/answer_limits.go and the
+// answer_attachments table), which has the final say; keep them in sync.
 import { stripTerminalControls } from "./terminal-text";
 
 /** A text log attached to an answer. */

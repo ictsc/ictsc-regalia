@@ -9,7 +9,11 @@ import {
 import UiIcon from "@ictsc/ui/components/UiIcon.vue";
 import LogComposer from "./LogComposer.vue";
 
-/** The log files attached to an answer: drop, write or paste, and remove. */
+/**
+ * The log files attached to an answer: drop, write or paste, and remove.
+ * While mounted it listens for drags on the whole window, so it can mark
+ * itself as the drop target as soon as a file is dragged over the page.
+ */
 const attachments = defineModel<AttachmentFile[]>({ required: true });
 const props = defineProps<{
   /** Answers are being accepted now. */
