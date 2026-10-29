@@ -1,0 +1,23 @@
+name: PR preview validation
+on:
+  pull_request:
+    paths:
+      - .github/scripts/**
+      - .github/workflows/pr-preview-*.yaml
+      - backend/Dockerfile
+  push:
+    branches: [main]
+    paths:
+      - .github/scripts/**
+      - .github/workflows/pr-preview-*.yaml
+      - backend/Dockerfile
+permissions:
+  contents: read
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - run: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s .github/scripts -p 'test_*.py' -v
