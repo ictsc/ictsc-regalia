@@ -43,13 +43,13 @@ jobs:
           test "$(jq -r '.pull_requests[0].head.sha' <<< "$run")" = "$sha"
           echo "number=$number" >> "$GITHUB_OUTPUT"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: preview-backend
           run-id: ${{ github.event.workflow_run.id }}
           path: backend
           github-token: ${{ github.token }}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: preview-frontend
           run-id: ${{ github.event.workflow_run.id }}
