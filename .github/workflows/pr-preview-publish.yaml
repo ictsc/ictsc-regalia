@@ -1,0 +1,103 @@
+name: PR preview publish
+
+on:
+  workflow_run:
+    workflows: [PR preview build]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+  packages: write
+  pull-requests: read
+
+jobs:
+  publish:
+    # Explicit activation gate. Merging this workflow does not publish PR images.
+    if: github.event.workflow_run.conclusion == 'success' && vars.ENABLE_PR_PREVIEW_PUBLISH == 'true'
+    runs-on: ubuntu-latest
+    concurrency:
+      # Fork workflow runs can have pull_requests: []; serialize all publishers
+      # before resolving the PR number from trusted GitHub API metadata.
+      group: preview-publish
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: refs/heads/main
+          persist-credentials: false
+      - name: Validate run and PR using GitHub API
+        id: validate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}" > run.json
+          workflow_id=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/pr-preview-build.yaml" --jq .id)
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls?state=open&per_page=100" | jq -s 'add // []' > candidates.json
+          number=$(python3 .github/scripts/validate_preview_run.py \
+            select run.json candidates.json "$workflow_id" "$GITHUB_REPOSITORY")
+          gh api "repos/${GITHUB_REPOSITORY}/pulls/${number}" > pr.json
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts?per_page=100" > artifacts.json
+          python3 .github/scripts/validate_preview_run.py \
+            validate run.json pr.json artifacts.json candidates.json \
+            "$workflow_id" "$GITHUB_REPOSITORY" > selected.txt
+          cat selected.txt >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v8
+        with:
+          artifact-ids: ${{ steps.validate.outputs.backend_id }}
+          run-id: ${{ github.event.workflow_run.id }}
+          path: backend
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v8
+        with:
+          artifact-ids: ${{ steps.validate.outputs.frontend_id }}
+          run-id: ${{ github.event.workflow_run.id }}
+          path: frontend
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v8
+        with:
+          artifact-ids: ${{ steps.validate.outputs.migrations_id }}
+          run-id: ${{ github.event.workflow_run.id }}
+          path: migrations
+          github-token: ${{ github.token }}
+      - name: Install skopeo
+        run: sudo apt-get update && sudo apt-get install -y skopeo
+      - name: Recheck PR and publish fixed targets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ steps.validate.outputs.number }}
+          SHA: ${{ steps.validate.outputs.sha }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          REGISTRY_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          workflow_id=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/pr-preview-build.yaml" --jq .id)
+          for image in backend frontend migrations; do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}" > run-now.json
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls?state=open&per_page=100" | jq -s 'add // []' > candidates-now.json
+            gh api "repos/${GITHUB_REPOSITORY}/pulls/${NUMBER}" > pr-now.json
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts?per_page=100" > artifacts-now.json
+            python3 .github/scripts/validate_preview_run.py \
+              validate run-now.json pr-now.json artifacts-now.json candidates-now.json \
+              "$workflow_id" "$GITHUB_REPOSITORY" > selected-now.txt
+            cmp selected.txt selected-now.txt
+            dest="docker://ghcr.io/${GITHUB_REPOSITORY}/${image}:pr-${NUMBER}-${SHA}"
+            test -f "${image}/${image}.tar"
+            source="oci-archive:${image}/${image}.tar"
+            skopeo inspect --raw "$source" > source-manifest.json
+            if skopeo inspect --raw --creds "${GITHUB_ACTOR}:${REGISTRY_TOKEN}" "$dest" > existing-manifest.json 2>inspect.err; then
+              python3 .github/scripts/compare_preview_manifest.py source-manifest.json existing-manifest.json
+              continue
+            fi
+            if ! grep -Eqi 'manifest unknown|not found|404' inspect.err; then
+              cat inspect.err >&2
+              exit 1
+            fi
+            skopeo copy --all --preserve-digests \
+              --dest-creds "${GITHUB_ACTOR}:${REGISTRY_TOKEN}" \
+              "$source" "$dest"
+            skopeo inspect --raw --creds "${GITHUB_ACTOR}:${REGISTRY_TOKEN}" "$dest" > published-manifest.json
+            python3 .github/scripts/compare_preview_manifest.py source-manifest.json published-manifest.json
+          done
