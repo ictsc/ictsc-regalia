@@ -13,7 +13,8 @@ permissions:
 
 jobs:
   publish:
-    if: github.event.workflow_run.conclusion == 'success'
+    # Explicit activation gate. Merging this workflow does not publish PR images.
+    if: github.event.workflow_run.conclusion == 'success' && vars.ENABLE_PR_PREVIEW_PUBLISH == 'true'
     runs-on: ubuntu-latest
     concurrency:
       group: preview-publish-${{ github.event.workflow_run.pull_requests[0].number || github.event.workflow_run.id }}
