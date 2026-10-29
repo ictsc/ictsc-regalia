@@ -89,6 +89,11 @@ async function onClick(event: MouseEvent) {
     if (timer) copyTimers.add(timer);
     return;
   }
+  const diagram = target.closest<SVGSVGElement>(".mermaid-output svg");
+  if (diagram) {
+    await viewer.value?.openDiagram(diagram, "図の拡大表示");
+    return;
+  }
   // Images inside links keep following the link.
   if (target instanceof HTMLImageElement && !target.closest("a"))
     await viewer.value?.open(target.currentSrc || target.src, target.alt);

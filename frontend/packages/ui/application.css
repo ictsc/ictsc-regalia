@@ -345,6 +345,9 @@ html[data-theme="dark"] .markdown .shiki span {
   height: auto;
   margin: 0 auto;
 }
+.markdown .mermaid-output svg {
+  cursor: zoom-in;
+}
 .markdown .mermaid-diagram.is-failed .mermaid-output {
   margin-top: 4px;
   color: var(--muted);
@@ -378,6 +381,20 @@ html[data-theme="dark"] .markdown .shiki span {
   object-fit: contain;
   background: #ffffff;
   cursor: zoom-out;
+}
+/* A diagram is drawn in the theme's colors, so it sits on the page
+   background; Mermaid's inline max-width would keep it small. */
+.image-viewer-diagram {
+  padding: 24px;
+  background: var(--paper);
+  cursor: zoom-out;
+}
+.image-viewer-diagram svg {
+  display: block;
+  width: min(90vw, 1600px);
+  max-width: none !important;
+  height: auto;
+  max-height: 86vh;
 }
 .image-viewer-close {
   position: fixed;
