@@ -75,10 +75,8 @@ jobs:
             test -f "${image}/${image}.tar"
             source="oci-archive:${image}/${image}.tar"
             skopeo inspect --raw "$source" > source-manifest.json
-            source_digest=$(sha256sum source-manifest.json | cut -d' ' -f1)
             if skopeo inspect --raw --creds "${GITHUB_ACTOR}:${REGISTRY_TOKEN}" "$dest" > existing-manifest.json 2>inspect.err; then
-              existing_digest=$(sha256sum existing-manifest.json | cut -d' ' -f1)
-              test "$existing_digest" = "$source_digest"
+              python3 .github/scripts/compare_preview_manifest.py source-manifest.json existing-manifest.json
               continue
             fi
             if ! grep -Eqi 'manifest unknown|not found|404' inspect.err; then
@@ -89,5 +87,5 @@ jobs:
               --dest-creds "${GITHUB_ACTOR}:${REGISTRY_TOKEN}" \
               "$source" "$dest"
             skopeo inspect --raw --creds "${GITHUB_ACTOR}:${REGISTRY_TOKEN}" "$dest" > published-manifest.json
-            test "$(sha256sum published-manifest.json | cut -d' ' -f1)" = "$source_digest"
+            python3 .github/scripts/compare_preview_manifest.py source-manifest.json published-manifest.json
           done
