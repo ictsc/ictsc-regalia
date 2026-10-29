@@ -30,8 +30,8 @@ importers:
         specifier: workspace:*
         version: link:../ui
       diff:
-        specifier: 8.0.4
-        version: 8.0.4
+        specifier: 9.0.0
+        version: 9.0.0
       katex:
         specifier: ^0.16.0
         version: 0.16.47
