@@ -30,3 +30,8 @@ COPY --from=builder --chown=nonroot:nonroot /api /api
 
 EXPOSE 8080
 ENTRYPOINT ["/api"]
+
+# Preview-only, PR-scoped database migration image. Never receives shared DB credentials.
+FROM postgres:16-alpine AS migrations
+COPY db/migrations/ /migrations/
+COPY scripts/seed-dev.sql /migrations/seed-dev.sql

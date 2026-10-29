@@ -19,6 +19,10 @@ jobs:
       group: preview-publish-${{ github.event.workflow_run.pull_requests[0].number || github.event.workflow_run.id }}
       cancel-in-progress: false
     steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: refs/heads/main
+          persist-credentials: false
       - name: Validate run and PR using GitHub API
         id: validate
         env:
@@ -26,34 +30,31 @@ jobs:
           RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
           set -euo pipefail
-          run=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}")
-          test "$(jq -r .event <<< "$run")" = pull_request
-          test "$(jq -r .name <<< "$run")" = 'PR preview build'
-          test "$(jq -r .conclusion <<< "$run")" = success
-          test "$(jq -r .head_repository.full_name <<< "$run")" = "$GITHUB_REPOSITORY"
-          test "$(jq '.pull_requests | length' <<< "$run")" -eq 1
-          number=$(jq -r '.pull_requests[0].number' <<< "$run")
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}" > run.json
+          number=$(jq -r '.pull_requests[0].number' run.json)
           [[ "$number" =~ ^[1-9][0-9]*$ ]]
-          pr=$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${number}")
-          test "$(jq -r .state <<< "$pr")" = open
-          test "$(jq -r .head.repo.full_name <<< "$pr")" = "$GITHUB_REPOSITORY"
-          jq -e '.labels | any(.name == "preview")' <<< "$pr" >/dev/null
-          sha=$(jq -r .head.sha <<< "$pr")
-          [[ "$sha" =~ ^[0-9a-f]{40}$ ]]
-          test "$(jq -r '.pull_requests[0].head.sha' <<< "$run")" = "$sha"
-          echo "number=$number" >> "$GITHUB_OUTPUT"
-          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          gh api "repos/${GITHUB_REPOSITORY}/pulls/${number}" > pr.json
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts?per_page=100" > artifacts.json
+          workflow_id=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/pr-preview-build.yaml" --jq .id)
+          python3 .github/scripts/validate_preview_run.py \
+            run.json pr.json artifacts.json "$workflow_id" "$GITHUB_REPOSITORY" >> "$GITHUB_OUTPUT"
       - uses: actions/download-artifact@v8
         with:
-          name: preview-backend
+          artifact-ids: ${{ steps.validate.outputs.backend_id }}
           run-id: ${{ github.event.workflow_run.id }}
           path: backend
           github-token: ${{ github.token }}
       - uses: actions/download-artifact@v8
         with:
-          name: preview-frontend
+          artifact-ids: ${{ steps.validate.outputs.frontend_id }}
           run-id: ${{ github.event.workflow_run.id }}
           path: frontend
+          github-token: ${{ github.token }}
+      - uses: actions/download-artifact@v8
+        with:
+          artifact-ids: ${{ steps.validate.outputs.migrations_id }}
+          run-id: ${{ github.event.workflow_run.id }}
+          path: migrations
           github-token: ${{ github.token }}
       - name: Install skopeo
         run: sudo apt-get update && sudo apt-get install -y skopeo
@@ -65,7 +66,7 @@ jobs:
           REGISTRY_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          for image in backend frontend; do
+          for image in backend frontend migrations; do
             pr=$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${NUMBER}")
             test "$(jq -r .state <<< "$pr")" = open
             test "$(jq -r .head.sha <<< "$pr")" = "$SHA"
@@ -73,9 +74,10 @@ jobs:
             dest="docker://ghcr.io/${GITHUB_REPOSITORY}/${image}:pr-${NUMBER}-${SHA}"
             test -f "${image}/${image}.tar"
             source="oci-archive:${image}/${image}.tar"
-            source_digest=$(skopeo inspect --raw "$source" | sha256sum | cut -d' ' -f1)
-            if existing=$(skopeo inspect --raw --creds "${GITHUB_ACTOR}:${REGISTRY_TOKEN}" "$dest" 2>inspect.err); then
-              existing_digest=$(printf %s "$existing" | sha256sum | cut -d' ' -f1)
+            skopeo inspect --raw "$source" > source-manifest.json
+            source_digest=$(sha256sum source-manifest.json | cut -d' ' -f1)
+            if skopeo inspect --raw --creds "${GITHUB_ACTOR}:${REGISTRY_TOKEN}" "$dest" > existing-manifest.json 2>inspect.err; then
+              existing_digest=$(sha256sum existing-manifest.json | cut -d' ' -f1)
               test "$existing_digest" = "$source_digest"
               continue
             fi
@@ -86,4 +88,6 @@ jobs:
             skopeo copy --all --preserve-digests \
               --dest-creds "${GITHUB_ACTOR}:${REGISTRY_TOKEN}" \
               "$source" "$dest"
+            skopeo inspect --raw --creds "${GITHUB_ACTOR}:${REGISTRY_TOKEN}" "$dest" > published-manifest.json
+            test "$(sha256sum published-manifest.json | cut -d' ' -f1)" = "$source_digest"
           done
