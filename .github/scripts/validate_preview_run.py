@@ -17,6 +17,7 @@ def validate(run, pr, artifacts, workflow_id, repository):
         raise ValueError("invalid PR number or head SHA")
     if (run.get("event") != "pull_request" or run.get("conclusion") != "success"
             or run.get("workflow_id") != workflow_id
+            or run.get("repository", {}).get("full_name") != repository
             or run.get("path", "").split("@", 1)[0] != ".github/workflows/pr-preview-build.yaml"):
         raise ValueError("unexpected workflow run")
     linked = run.get("pull_requests", [])

@@ -5,6 +5,7 @@ from validate_preview_run import validate
 REPO = "ictsc/ictsc-regalia"
 SHA = "a" * 40
 RUN = {"event": "pull_request", "conclusion": "success", "workflow_id": 42,
+       "repository": {"full_name": REPO},
        "path": ".github/workflows/pr-preview-build.yaml@refs/pull/7/merge",
        "head_repository": {"full_name": REPO},
        "pull_requests": [{"number": 7, "head": {"sha": SHA}}]}
@@ -54,6 +55,10 @@ class ValidationTests(unittest.TestCase):
 
     def test_wrong_workflow(self):
         self.run["workflow_id"] = 99
+        with self.assertRaises(ValueError): self.valid()
+
+    def test_wrong_base_repository(self):
+        self.run["repository"]["full_name"] = "someone/other"
         with self.assertRaises(ValueError): self.valid()
 
     def test_wrong_path(self):
