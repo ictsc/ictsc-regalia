@@ -91,3 +91,25 @@ $ sudo ip route replace default via 192.0.2.1
     blockExternalImages: true,
   },
 };
+
+/** Problems and answers: ```mermaid blocks are drawn as diagrams. */
+export const MermaidDiagram: Story = {
+  args: {
+    source: `構成は次の通りです。
+
+\`\`\`mermaid
+flowchart LR
+  client[クライアント] --> router[ルーター]
+  router --> web[(Web サーバー)]
+  router -.-> dns[DNS]
+\`\`\`
+
+記法の誤りは元のコードのまま表示されます。
+
+\`\`\`mermaid
+flowchart LR
+  A -->
+\`\`\``,
+    diagrams: true,
+  },
+};

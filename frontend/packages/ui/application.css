@@ -327,6 +327,29 @@ html[data-theme="dark"] .markdown .shiki span {
     opacity: 1;
   }
 }
+/* A ```mermaid block: its source until the diagram is drawn, then the
+   diagram alone; a diagram that fails keeps the source with a note. */
+.markdown .mermaid-diagram {
+  margin: 1em 0;
+  overflow-x: auto;
+}
+.markdown .mermaid-source {
+  margin: 0;
+}
+.markdown .mermaid-diagram.is-rendered .mermaid-source {
+  display: none;
+}
+.markdown .mermaid-output svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+.markdown .mermaid-diagram.is-failed .mermaid-output {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.875em;
+}
 /* An image from another host in contestant text, shown as its URL. */
 .markdown .blocked-image {
   color: var(--muted);

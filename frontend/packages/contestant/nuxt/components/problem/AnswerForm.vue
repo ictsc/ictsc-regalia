@@ -159,6 +159,7 @@ function confirm() {
           v-if="body.trim()"
           :source="body"
           block-external-images
+          diagrams
         />
         <p v-else class="answer-preview-empty">回答が入力されていません</p>
       </div>

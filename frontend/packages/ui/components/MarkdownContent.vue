@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, ref, watch } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { addCopyButtons, copyCode } from "../code-copy";
 import { renderMarkdown, type ImageUrl } from "../markdown";
+import { renderDiagrams } from "../mermaid";
 import ImageViewer from "./ImageViewer.vue";
 const props = defineProps<{
   source: string;
@@ -12,6 +13,8 @@ const props = defineProps<{
    * shown as their URL instead of being loaded in the reader's browser.
    */
   blockExternalImages?: boolean;
+  /** Draws ```mermaid blocks as diagrams (problems and answers). */
+  diagrams?: boolean;
 }>();
 // Two roots (the content and the image viewer): attributes go on the content.
 defineOptions({ inheritAttrs: false });
@@ -22,8 +25,14 @@ const viewer = ref<InstanceType<typeof ImageViewer> | null>(null);
 const copyTimers = new Set<ReturnType<typeof setTimeout>>();
 
 watch(
-  () => [props.source, props.imageUrl, props.blockExternalImages] as const,
-  async ([source, imageUrl, blockExternalImages], _, onCleanup) => {
+  () =>
+    [
+      props.source,
+      props.imageUrl,
+      props.blockExternalImages,
+      props.diagrams,
+    ] as const,
+  async ([source, imageUrl, blockExternalImages, diagrams], _, onCleanup) => {
     let active = true;
     onCleanup(() => {
       active = false;
@@ -32,6 +41,7 @@ watch(
       const result = await renderMarkdown(source, {
         imageUrl,
         blockExternalImages,
+        mermaid: diagrams,
       });
       if (active) {
         html.value = result;
@@ -43,9 +53,31 @@ watch(
   },
   { immediate: true },
 );
-// v-html replaces the code blocks on every render, so add the buttons again.
-watch(html, () => nextTick(() => root.value && addCopyButtons(root.value)), {
-  flush: "post",
+function drawDiagrams() {
+  // A diagram that cannot be drawn keeps showing its source.
+  if (props.diagrams && root.value)
+    renderDiagrams(root.value).catch(() => undefined);
+}
+// v-html replaces the code blocks on every render, so add the buttons and
+// draw the diagrams again.
+watch(
+  html,
+  () =>
+    nextTick(() => {
+      if (!root.value) return;
+      addCopyButtons(root.value);
+      drawDiagrams();
+    }),
+  { flush: "post" },
+);
+// Diagrams are drawn in the theme's colors, so redraw them when it changes.
+let themeObserver: MutationObserver | undefined;
+onMounted(() => {
+  themeObserver = new MutationObserver(drawDiagrams);
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
 });
 
 /** Copy buttons and images live in v-html, so clicks are handled here. */
@@ -63,6 +95,7 @@ async function onClick(event: MouseEvent) {
 }
 
 onBeforeUnmount(() => {
+  themeObserver?.disconnect();
   for (const timer of copyTimers) clearTimeout(timer);
 });
 </script>

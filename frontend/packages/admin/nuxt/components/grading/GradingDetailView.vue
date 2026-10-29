@@ -262,12 +262,14 @@ function startResize(
             <MarkdownContent
               :source="problem.body"
               :image-url="problemImageUrl"
+              diagrams
             />
             <details v-if="problem.explanation">
               <summary>問題解説</summary>
               <MarkdownContent
                 :source="problem.explanation"
                 :image-url="problemImageUrl"
+                diagrams
               />
             </details>
             <details>
@@ -343,6 +345,7 @@ function startResize(
               class="grading-markdown-answer"
               :source="answer.body.body"
               block-external-images
+              diagrams
             />
             <template v-else>
               <div v-if="isDiffView && comparison" class="grading-diff-filebar">
@@ -517,6 +520,7 @@ function startResize(
                 <MarkdownContent
                   :source="answer.body.body"
                   block-external-images
+                  diagrams
                 />
               </details>
             </template>

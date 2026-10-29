@@ -65,3 +65,14 @@ it("shows external images in contestant text as their URL", async () => {
   );
   expect(html).toContain('src="/api/v1/admin/images/net.png"');
 });
+
+it("leaves mermaid blocks as text for diagrams only when asked", async () => {
+  const source = "```mermaid\ngraph LR\n  A --> B\n```";
+  const diagram = await renderMarkdown(source, { mermaid: true });
+  expect(diagram).toContain('<div class="mermaid-diagram">');
+  expect(diagram).toContain("graph LR\n  A --> B");
+  expect(diagram).not.toContain("shiki");
+  const code = await renderMarkdown(source);
+  expect(code).not.toContain("mermaid-diagram");
+  expect(code).toContain("shiki");
+});

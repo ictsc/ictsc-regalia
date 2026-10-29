@@ -56,6 +56,7 @@ const commit = ref(props.initialCommit);
         <MarkdownContent
           :source="problem.body"
           :image-url="adminImageUrl(problem.content_commit)"
+          diagrams
         />
       </section>
       <section class="admin-panel">
@@ -63,6 +64,7 @@ const commit = ref(props.initialCommit);
         <MarkdownContent
           :source="problem.explanation"
           :image-url="adminImageUrl(problem.content_commit)"
+          diagrams
         /></section></template
   ></RequestState>
 </template>

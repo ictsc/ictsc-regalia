@@ -275,7 +275,7 @@ const score = computed(
               />
               <section class="reading-section">
                 <div class="reading-copy">
-                  <MarkdownContent :source="data.problem.body" />
+                  <MarkdownContent :source="data.problem.body" diagrams />
                 </div>
               </section>
               <AnswerForm

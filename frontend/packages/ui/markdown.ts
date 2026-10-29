@@ -2,7 +2,8 @@
 // HTML that MarkdownContent puts in the page with v-html. The input may be
 // written by contestants, so raw HTML is dropped and the tree is sanitized
 // first; image rewriting, KaTeX (trust: false) and Shiki run only on the
-// sanitized tree. Keep that order when adding plugins.
+// sanitized tree. Keep that order when adding plugins. Mermaid blocks are
+// only marked here; mermaid.ts draws them in the browser.
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
@@ -72,6 +73,47 @@ function rehypeContentImages() {
   };
 }
 
+/**
+ * Keeps ```mermaid code as plain text in a .mermaid-diagram box instead of a
+ * highlighted code block, so MarkdownContent can draw it.
+ */
+function rehypeMermaidBlocks() {
+  return (tree: HastNode, file: { data: Record<string, unknown> }) => {
+    if (file.data.mermaid !== true) return;
+    const visit = (node: HastNode) => {
+      node.children?.forEach((child, index) => {
+        const code = child.tagName === "pre" ? child.children?.[0] : undefined;
+        const className = code?.properties?.className;
+        if (
+          code?.tagName === "code" &&
+          Array.isArray(className) &&
+          className.includes("language-mermaid")
+        ) {
+          const source = (code.children ?? [])
+            .map((text) => text.value ?? "")
+            .join("");
+          node.children![index] = {
+            type: "element",
+            tagName: "div",
+            properties: { className: ["mermaid-diagram"] },
+            children: [
+              {
+                type: "element",
+                tagName: "pre",
+                properties: { className: ["mermaid-source"] },
+                children: [{ type: "text", value: source }],
+              },
+            ],
+          };
+          return;
+        }
+        visit(child);
+      });
+    };
+    visit(tree);
+  };
+}
+
 const processor = unified()
   .use(remarkParse)
   .use(remarkGfm)
@@ -85,6 +127,7 @@ const processor = unified()
     },
   })
   .use(rehypeContentImages)
+  .use(rehypeMermaidBlocks)
   .use(rehypeKatex, { trust: false })
   .use(rehypeShiki, {
     // Both palettes are inlined; application.css switches to the dark one.
@@ -136,7 +179,12 @@ const processor = unified()
   .use(rehypeStringify);
 export async function renderMarkdown(
   markdown: string,
-  options: { imageUrl?: ImageUrl; blockExternalImages?: boolean } = {},
+  options: {
+    imageUrl?: ImageUrl;
+    blockExternalImages?: boolean;
+    /** Leave ```mermaid blocks for mermaid.ts to draw. */
+    mermaid?: boolean;
+  } = {},
 ): Promise<string> {
   return String(
     await processor.process({
@@ -144,6 +192,7 @@ export async function renderMarkdown(
       data: {
         imageUrl: options.imageUrl,
         blockExternalImages: options.blockExternalImages,
+        mermaid: options.mermaid,
       },
     }),
   );
