@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
+	"github.com/ictsc/ictsc-regalia/backend/internal/service"
 	api "github.com/ictsc/ictsc-regalia/backend/internal/transport/api"
 )
 
@@ -82,16 +83,16 @@ func toAPIScore(score core.Score) *api.Score {
 	return &api.Score{MarkedScore: score.MarkedScore, Penalty: score.Penalty, Score: score.EffectiveScore, MaxScore: score.MaxScore}
 }
 
-func toAPIRanking(entries []core.RankingEntry, frozen bool, frozenAt *time.Time, hidden bool) api.RankingResponse {
-	ranking := make([]api.Rank, 0, len(entries))
-	for _, entry := range entries {
+func toAPIRanking(view service.RankingView) api.RankingResponse {
+	ranking := make([]api.Rank, 0, len(view.Entries))
+	for _, entry := range view.Entries {
 		ranking = append(ranking, api.Rank{
 			Rank: entry.Rank, TeamCode: entry.Team.Code, TeamName: entry.Team.Name,
 			Organization: entry.Team.Organization, Score: entry.Score,
 			LastEffectiveSubmissionAt: entry.LastEffectiveSubmissionAt,
 		})
 	}
-	return api.RankingResponse{Ranking: ranking, Frozen: frozen, FrozenAt: frozenAt, Hidden: hidden}
+	return api.RankingResponse{Ranking: ranking, Frozen: view.Frozen, FrozenAt: view.FrozenAt, Hidden: view.Hidden}
 }
 
 func toAPIAnswer(answer core.Answer, score *core.Score) api.Answer {

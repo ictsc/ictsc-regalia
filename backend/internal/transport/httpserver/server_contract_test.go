@@ -524,8 +524,8 @@ func TestGeneratedRouterRegistersEveryOpenAPIOperation(t *testing.T) {
 
 	missing := setDifference(want, got)
 	extra := setDifference(got, want)
-	if len(want) != 72 {
-		t.Errorf("OpenAPI operation count = %d, want 72", len(want))
+	if len(want) != 71 {
+		t.Errorf("OpenAPI operation count = %d, want 71", len(want))
 	}
 	if len(missing) != 0 || len(extra) != 0 {
 		t.Errorf("generated route mismatch\nmissing: %v\nextra: %v", missing, extra)

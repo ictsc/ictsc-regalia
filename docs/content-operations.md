@@ -65,15 +65,13 @@ OIDC token と API token は別物です。前者は「どの workflow からの
 どちらの経路でも同じです。
 
 1. 反映中の依頼が他にあれば `409 content_refresh_in_progress` で断る。
-2. 公開中の commit と同じなら、取得はせずにルールだけ `rule.md` に合わせて終わる。
+2. 公開中の commit と同じなら、取得はせずに順位凍結時刻だけ `schedule.yaml` に合わせて終わる。
 3. 公開中の commit の**子孫でない** commit（古い commit、force push で履歴が分かれた commit）は
    `409 content_rollback_rejected` で断る。
 4. GitHub API で commit・tree・各ファイル・画像を取得し、[契約](content-repository-contract.md)に沿って検証する。
    ひとつでも不正なら `422 content_invalid` で断り、公開中の内容はそのまま。
-5. DB で公開中の内容を原子的に切り替える。
-6. `schedule.yaml` の `ranking_freeze_at` を順位凍結時刻に反映する（書かれていなければ凍結を解除）。
-7. `rule.md` があればルールページに反映する（運営画面で編集したルールは上書きされる）。
-   `rule.md` がなければ今のルールを残す。
+5. DB で公開中の内容を切り替え、同じトランザクションで `schedule.yaml` の `ranking_freeze_at` を
+   順位凍結時刻に反映する（書かれていなければ凍結を解除）。ルールページはこの commit の `rule.md` を表示する。
 
 回答・採点・再展開は、その時点の commit に固定されます。問題を直して反映しても、過去の回答が
 書き換わることはありません。
@@ -158,9 +156,8 @@ force push はしないでください。
 
 ### ルールページを直したい
 
-運営画面「競技設定」のルール編集でも直せますが、次に `rule.md` を含む commit を反映すると上書きされます。
-恒久的な修正はマスタリポジトリの `rule.md` で行ってください。急ぐときは、`rule.md` を直して push するか、
-今の commit を運営画面からもう一度反映すると、`rule.md` の内容に戻ります。
+ルールはマスタリポジトリの `rule.md` だけで管理します。`rule.md` を直して push し、反映してください。
+運営画面「競技設定」では、いま表示されているルールを確認できます。
 
 ## 開発環境で試す
 

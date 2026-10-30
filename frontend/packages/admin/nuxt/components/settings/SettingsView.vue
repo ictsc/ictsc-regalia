@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import MarkdownContent from "@ictsc/ui/components/MarkdownContent.vue";
 import RequestState from "@ictsc/ui/components/RequestState.vue";
 import type { components } from "@ictsc/api";
 import DevContestPhasePanel from "./DevContestPhasePanel.vue";
 
-const props = defineProps<{
-  initialMarkdown: string;
+defineProps<{
+  /** The active content's rule.md. */
+  ruleMarkdown: string;
   /** Freeze time as a `datetime-local` value in the browser's time zone. */
   initialFreeze: string;
   pending?: boolean;
@@ -20,21 +20,17 @@ const props = defineProps<{
   contestPhase?: components["schemas"]["DevContestPhase"];
 }>();
 defineEmits<{
-  saveRule: [markdown: string];
   setPhase: [phase: components["schemas"]["ContestPhase"]];
   retry: [];
 }>();
-
-// Initialized once like the page did; edits are kept across refreshes.
-const markdown = ref(props.initialMarkdown);
 </script>
 <template>
   <h1>競技設定</h1>
   <p class="admin-lead">
     {{
       secondaryQualifier
-        ? "参加者に表示するルールを管理します。二次予選モードでは順位は最終公開まで非公開のため、凍結は使いません。"
-        : "参加者に表示するルールを管理し、ランキングの凍結時刻を確認します。"
+        ? "参加者に表示するルールを確認します。二次予選モードでは順位は最終公開まで非公開のため、凍結は使いません。"
+        : "参加者に表示するルールとランキングの凍結時刻を確認します。"
     }}
   </p>
   <p role="status">{{ message }}</p>
@@ -46,16 +42,15 @@ const markdown = ref(props.initialMarkdown);
       @set-phase="$emit('setPhase', $event)"
     />
     <section class="admin-panel">
-      <h2>ルール編集</h2>
-      <p>Markdown で編集し、下のプレビューで表示を確認できます。</p>
-      <form class="form-grid" @submit.prevent="$emit('saveRule', markdown)">
-        <label>Markdown<textarea v-model="markdown" rows="18" /></label
-        ><button class="button-primary" :disabled="busy">ルールを更新</button>
-      </form>
-    </section>
-    <section class="admin-panel">
-      <h2>ルールのプレビュー</h2>
-      <MarkdownContent :source="markdown" />
+      <h2>ルール</h2>
+      <p>
+        ルールはコンテンツリポジトリの <code>rule.md</code>
+        で管理し、コンテンツ更新時に反映されます。
+      </p>
+      <MarkdownContent v-if="ruleMarkdown.trim()" :source="ruleMarkdown" />
+      <p v-else class="muted">
+        有効なコンテンツに <code>rule.md</code> がありません。
+      </p>
     </section>
     <section v-if="!secondaryQualifier" class="admin-panel">
       <h2>ランキング凍結</h2>

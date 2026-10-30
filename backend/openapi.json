@@ -1462,26 +1462,6 @@
           "403": { "$ref": "#/components/responses/Forbidden" },
           "500": { "$ref": "#/components/responses/InternalServerError" }
         }
-      },
-      "put": {
-        "tags": ["Admin Competition"],
-        "summary": "競技ルールを置換する",
-        "operationId": "replaceAdminRule",
-        "security": [{ "AdminSession": [] }],
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Rule" } } }
-        },
-        "responses": {
-          "200": {
-            "description": "更新後の競技ルール",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RuleResponse" } } }
-          },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "403": { "$ref": "#/components/responses/Forbidden" },
-          "422": { "$ref": "#/components/responses/ValidationError" },
-          "500": { "$ref": "#/components/responses/InternalServerError" }
-        }
       }
     },
     "/api/v1/admin/dashboard-schedule": {
@@ -2455,7 +2435,7 @@
         "additionalProperties": false,
         "required": ["code", "title", "max_score", "category", "section_slug", "score", "deployment", "submission_status", "next_submittable_at", "answer_max_length", "allow_attachments"],
         "properties": {
-          "answer_max_length": { "type": "integer", "format": "int32", "minimum": 1, "maximum": 100000, "description": "回答の最大文字数。改行は数えない。" },
+          "answer_max_length": { "type": "integer", "format": "int32", "minimum": 1, "maximum": 10000, "description": "回答の最大文字数。改行は数えない。" },
           "allow_attachments": { "type": "boolean", "description": "回答にテキストのログを添付できるか" },
           "code": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" },
           "title": { "type": "string", "minLength": 1, "maxLength": 255 },
@@ -2482,7 +2462,7 @@
         "additionalProperties": false,
         "required": ["code", "title", "max_score", "category", "section_slug", "type", "body", "score", "deployment", "submission_status", "answer_max_length", "allow_attachments"],
         "properties": {
-          "answer_max_length": { "type": "integer", "format": "int32", "minimum": 1, "maximum": 100000, "description": "回答の最大文字数。改行は数えない。" },
+          "answer_max_length": { "type": "integer", "format": "int32", "minimum": 1, "maximum": 10000, "description": "回答の最大文字数。改行は数えない。" },
           "allow_attachments": { "type": "boolean", "description": "回答にテキストのログを添付できるか" },
           "code": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" },
           "title": { "type": "string", "minLength": 1, "maxLength": 255 },
@@ -2506,7 +2486,7 @@
         "additionalProperties": false,
         "required": ["code", "title", "max_score", "category", "section_slug", "type", "body", "explanation", "redeploy_rule", "content_commit", "default_grader_discord_id", "answer_max_length", "allow_attachments"],
         "properties": {
-          "answer_max_length": { "type": "integer", "format": "int32", "minimum": 1, "maximum": 100000, "description": "回答の最大文字数。改行は数えない。" },
+          "answer_max_length": { "type": "integer", "format": "int32", "minimum": 1, "maximum": 10000, "description": "回答の最大文字数。改行は数えない。" },
           "allow_attachments": { "type": "boolean", "description": "回答にテキストのログを添付できるか" },
           "code": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" },
           "title": { "type": "string", "minLength": 1, "maxLength": 255 },
@@ -2613,7 +2593,12 @@
         "description": "bodyの文字数（改行を除く）は問題のanswer_max_length以下。attachmentsは問題のallow_attachmentsがtrueのときだけ指定できる。",
         "required": ["body"],
         "properties": {
-          "body": { "type": "string", "minLength": 1, "maxLength": 100000 },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30000,
+            "description": "改行を含む全体の上限。改行を除いた文字数は問題のanswer_max_length（最大10000）以下。"
+          },
           "attachments": {
             "type": "array",
             "maxItems": 3,
@@ -2776,6 +2761,7 @@
       "Rule": {
         "type": "object",
         "additionalProperties": false,
+        "description": "有効なコンテンツの rule.md。コンテンツリポジトリで管理し、APIからは変更できない。rule.md がない、またはコンテンツ未取り込みのときは空文字。",
         "required": ["markdown"],
         "properties": {
           "markdown": { "type": "string" }

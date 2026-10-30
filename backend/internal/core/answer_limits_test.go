@@ -22,6 +22,13 @@ func TestValidateAnswerLimits(t *testing.T) {
 	if err := ValidateAnswer(Problem{}, strings.Repeat("a", DefaultAnswerMaxLength), nil); err != nil {
 		t.Fatalf("default limit: %v", err)
 	}
+	full := Problem{AnswerMaxLength: MaxAnswerLength}
+	if err := ValidateAnswer(full, strings.Repeat("a", MaxAnswerLength)+"\n", nil); err != nil {
+		t.Fatalf("answer at the limit with a line break: %v", err)
+	}
+	if err := ValidateAnswer(full, strings.Repeat("\n", MaxAnswerBodyLength+1), nil); err == nil {
+		t.Fatal("body over the overall limit accepted")
+	}
 	valid := AnswerAttachment{Name: "syslog.txt", Content: "log"}
 	for name, attachments := range map[string][]AnswerAttachment{
 		"path":      {{Name: "../etc/passwd.txt", Content: "x"}},

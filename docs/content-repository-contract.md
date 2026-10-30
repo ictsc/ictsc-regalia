@@ -39,8 +39,8 @@ schedules:
 
 ## rule.md
 
-`rule.md` がある commit を有効化すると、その内容を参加者のルールページに反映します（運営画面の競技設定で
-編集したルールは上書きされます）。`rule.md` がない commit では、現在のルールをそのまま残します。
+参加者のルールページは、有効な commit の `rule.md` をそのまま表示します。ルールはこのファイルだけで管理し、
+運営画面からは編集できません。`rule.md` がない commit では、ルールページは空になります。
 
 ## 問題
 
@@ -67,7 +67,7 @@ submissionable_schedules: [day2]
 - `submissionable_schedules` は通常モードでは必須で、現在は1つだけ指定できます。二次予選モードでは書けず、
   全問題がその1つのスケジュールに属します。
 - 任意で `default_grader_discord_id`（Discord IDの数字文字列）を指定できます。
-- `answer_max_length` は回答の最大文字数です（1〜100000、省略時3000）。改行は数えず、Unicodeのコードポイント数で数えます。
+- `answer_max_length` は回答の最大文字数です（1〜10000、省略時3000）。改行は数えず、Unicodeのコードポイント数で数えます。
 - `allow_attachments: true` の問題だけ、回答にテキストのログを添付できます（省略時は不可）。
 - 問題文は空白だけにできません。未知のfrontmatter fieldは拒否します。
 

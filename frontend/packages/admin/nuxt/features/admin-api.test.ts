@@ -234,10 +234,6 @@ describe("Admin mutation actions", () => {
         `${origin}/api/v1/admin/deployments/:teamCode/:problemCode/sync`,
         () => new HttpResponse(null, { status: 204 }),
       ),
-      http.put(`${origin}/api/v1/admin/rule`, async ({ request }) => {
-        await remember(request);
-        return HttpResponse.json({ rule: { markdown: "# Updated" } });
-      }),
       http.put(
         `${origin}/api/v1/admin/dashboard-schedule`,
         async ({ request }) => {
@@ -271,7 +267,6 @@ describe("Admin mutation actions", () => {
     await actions.reveal();
     await actions.createDeployment(2, "A01");
     await actions.syncDeployment(2, "A01");
-    await actions.replaceRule("# Updated");
     await actions.replaceFreeze(null);
 
     expect(seen.get("POST /api/v1/admin/content/actions/refresh")).toEqual({

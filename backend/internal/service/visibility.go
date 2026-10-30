@@ -125,21 +125,37 @@ func (s *Service) AnswerGrading(ctx context.Context, answer core.Answer) (bool, 
 	if err != nil {
 		return false, "", err
 	}
-	latest := core.IsLatestAnswer(answer, answers)
-	if !s.Config.SecondaryQualifierMode {
-		return latest, "", nil
-	}
-	end, err := s.ContestEndAt(ctx)
+	end, err := s.GradingStartsAt(ctx)
 	if err != nil {
 		return false, "", err
 	}
-	if end != nil && s.Now().Before(*end) {
-		return latest, MarkingBlockedContestRunning, nil
+	latest, blocked := s.Grading(answer, core.LatestAnswerNumbers(answers), end)
+	return latest, blocked, nil
+}
+
+// GradingStartsAt is when grading opens: the end of the contest in secondary
+// qualifier mode, otherwise nil (grading is always open).
+func (s *Service) GradingStartsAt(ctx context.Context) (*time.Time, error) {
+	if !s.Config.SecondaryQualifierMode {
+		return nil, nil
+	}
+	return s.ContestEndAt(ctx)
+}
+
+// Grading is AnswerGrading for callers that already hold the latest answer
+// numbers (core.LatestAnswerNumbers) and GradingStartsAt, such as lists.
+func (s *Service) Grading(answer core.Answer, latestNumbers map[int64]map[string]int32, startsAt *time.Time) (bool, string) {
+	latest := answer.Number >= latestNumbers[answer.TeamCode][answer.ProblemCode]
+	if !s.Config.SecondaryQualifierMode {
+		return latest, ""
+	}
+	if startsAt != nil && s.Now().Before(*startsAt) {
+		return latest, MarkingBlockedContestRunning
 	}
 	if !latest {
-		return latest, MarkingBlockedNotLatest, nil
+		return latest, MarkingBlockedNotLatest
 	}
-	return latest, "", nil
+	return latest, ""
 }
 
 // CompetitionMode names the scoring mode exposed through the API.

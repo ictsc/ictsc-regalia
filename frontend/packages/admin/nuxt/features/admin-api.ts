@@ -182,8 +182,6 @@ export function createAdminActions(api: ApiClient) {
           },
         ),
       ),
-    replaceRule: async (markdown: string) =>
-      expectData(await api.PUT("/api/v1/admin/rule", { body: { markdown } })),
     setDevContestPhase: async (phase: components["schemas"]["ContestPhase"]) =>
       expectData(
         await api.PUT("/api/v1/admin/dev/contest-phase", { body: { phase } }),

@@ -1,8 +1,10 @@
 // Draws the ```mermaid blocks that markdown.ts leaves in rendered Markdown
 // as SVG in the browser. Mermaid is large, so it is loaded only when a page
-// has a diagram. Diagrams can be written by contestants: Mermaid runs with
-// securityLevel "strict" (labels are text, no click handlers) and anything
-// that would load from another host is removed from the SVG.
+// has a diagram. Diagrams can be written by contestants, and Mermaid loads
+// some resources while it draws, before its SVG reaches us. So a diagram
+// that names an image or a stylesheet is not drawn at all, directives cannot
+// change the styling or sanitizer settings, HTML in labels is limited to
+// text formatting, and the finished SVG is stripped once more.
 import type { Mermaid } from "mermaid";
 
 let mermaidModule: Promise<Mermaid> | undefined;
@@ -16,6 +18,54 @@ function loadMermaid() {
 }
 
 const outsideUrl = /url\(\s*['"]?(?!#)/i;
+
+// Mermaid fetches node images (A@{ img: "..." }) and CSS resources itself.
+const imageShape = /@\{[^}]*\bimg\b/i;
+const cssResource = /\burl\s*\(|image-set\s*\(|@import/i;
+
+/** Reports whether drawing source would make Mermaid load a resource. */
+export function loadsResources(source: string): boolean {
+  return imageShape.test(source) || cssResource.test(source);
+}
+
+// Mermaid's own secure keys plus everything that changes styling or the
+// sanitizer, so %%{init}%% directives in a diagram cannot set them.
+const secure = [
+  "secure",
+  "securityLevel",
+  "startOnLoad",
+  "maxTextSize",
+  "suppressErrorRendering",
+  "maxEdges",
+  "dompurifyConfig",
+  "theme",
+  "themeCSS",
+  "themeVariables",
+  "darkMode",
+  "fontFamily",
+  "altFontFamily",
+  "htmlLabels",
+];
+// Labels may use text formatting only: no images, media or styles.
+const dompurifyConfig = {
+  ALLOWED_TAGS: [
+    "b",
+    "strong",
+    "i",
+    "em",
+    "u",
+    "s",
+    "sub",
+    "sup",
+    "small",
+    "code",
+    "br",
+    "span",
+    "div",
+    "p",
+  ],
+  ALLOWED_ATTR: ["class"],
+};
 
 /**
  * Removes images, links and url() references to anything outside the SVG,
@@ -52,6 +102,8 @@ export function renderDiagrams(root: ParentNode): Promise<void> {
     mermaid.initialize({
       startOnLoad: false,
       securityLevel: "strict",
+      secure,
+      dompurifyConfig,
       theme: dark ? "dark" : "default",
       fontFamily: getComputedStyle(diagrams[0]!).fontFamily,
     });
@@ -64,6 +116,12 @@ export function renderDiagrams(root: ParentNode): Promise<void> {
         output = document.createElement("div");
         output.className = "mermaid-output";
         diagram.append(output);
+      }
+      if (loadsResources(source)) {
+        output.textContent = "外部の画像やスタイルを読み込む図は表示しません。";
+        diagram.classList.add("is-failed");
+        diagram.classList.remove("is-rendered");
+        continue;
       }
       try {
         const { svg } = await mermaid.render(id, source);

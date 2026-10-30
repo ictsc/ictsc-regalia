@@ -29,8 +29,6 @@ const initialFreeze = data.value?.schedule.ranking_freeze_at
   : "";
 const { busy, message, run } = useMutation(refresh);
 const actions = createAdminActions(api);
-const saveRule = (markdown: string) =>
-  run("ルール更新", () => actions.replaceRule(markdown));
 const phaseLabels = { BEFORE: "競技前", DURING: "競技中", AFTER: "競技後" };
 const setPhase = (phase: keyof typeof phaseLabels) =>
   run(
@@ -42,7 +40,7 @@ const setPhase = (phase: keyof typeof phaseLabels) =>
 <template>
   <main class="workspace">
     <SettingsView
-      :initial-markdown="data?.rule.markdown ?? ''"
+      :rule-markdown="data?.rule.markdown ?? ''"
       :initial-freeze="initialFreeze"
       :pending="pending"
       :error="error"
@@ -50,7 +48,6 @@ const setPhase = (phase: keyof typeof phaseLabels) =>
       :message="message"
       :contest-phase="data?.contestPhase"
       :secondary-qualifier="data?.secondaryQualifier"
-      @save-rule="saveRule"
       @set-phase="setPhase"
       @retry="refresh"
     />

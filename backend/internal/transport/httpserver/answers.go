@@ -73,7 +73,7 @@ func (h *Handler) GetContestantAnswer(ctx context.Context, request api.GetContes
 	if err != nil {
 		return nil, err
 	}
-	if answer.Attachments, err = h.service.Store.ListAnswerAttachments(ctx, answer.TeamCode, answer.ProblemCode, answer.Number); err != nil {
+	if answer.Attachments, err = h.service.Store.ListAnswerAttachmentInfo(ctx, answer.TeamCode, answer.ProblemCode, answer.Number); err != nil {
 		return nil, err
 	}
 	score, err := h.scoreForAnswer(ctx, answer, true)
@@ -89,6 +89,13 @@ func (h *Handler) ListAdminAnswers(ctx context.Context, request api.ListAdminAns
 		return nil, err
 	}
 	includeMarked := request.Params.IncludeMarked != nil && *request.Params.IncludeMarked
+	// The filters only narrow by team and problem, so answers holds every
+	// answer of each listed pair and gives the latest numbers directly.
+	latestNumbers := core.LatestAnswerNumbers(answers)
+	gradingStartsAt, err := h.service.GradingStartsAt(ctx)
+	if err != nil {
+		return nil, err
+	}
 	mapped := make([]api.AdminAnswer, 0, len(answers))
 	for _, answer := range answers {
 		score, err := h.scoreForAnswer(ctx, answer, false)
@@ -98,7 +105,8 @@ func (h *Handler) ListAdminAnswers(ctx context.Context, request api.ListAdminAns
 		if score != nil && !includeMarked {
 			continue
 		}
-		mappedAnswer, err := h.toAdminAnswer(ctx, answer, score)
+		latest, blocked := h.service.Grading(answer, latestNumbers, gradingStartsAt)
+		mappedAnswer, err := h.toAdminAnswer(ctx, answer, score, latest, blocked)
 		if err != nil {
 			return nil, err
 		}
@@ -128,14 +136,23 @@ func (h *Handler) GetAdminAnswer(ctx context.Context, request api.GetAdminAnswer
 	if err != nil {
 		return nil, err
 	}
-	mapped, err := h.toAdminAnswer(ctx, answer, score)
+	mapped, err := h.toAdminAnswerGraded(ctx, answer, score)
 	if err != nil {
 		return nil, err
 	}
 	return api.GetAdminAnswer200JSONResponse{Answer: mapped}, nil
 }
 
-func (h *Handler) toAdminAnswer(ctx context.Context, answer core.Answer, score *core.Score) (api.AdminAnswer, error) {
+// toAdminAnswerGraded maps one answer, looking up whether it may be graded.
+func (h *Handler) toAdminAnswerGraded(ctx context.Context, answer core.Answer, score *core.Score) (api.AdminAnswer, error) {
+	latest, blocked, err := h.service.AnswerGrading(ctx, answer)
+	if err != nil {
+		return api.AdminAnswer{}, err
+	}
+	return h.toAdminAnswer(ctx, answer, score, latest, blocked)
+}
+
+func (h *Handler) toAdminAnswer(ctx context.Context, answer core.Answer, score *core.Score, latest bool, blocked string) (api.AdminAnswer, error) {
 	team, err := h.service.Store.GetTeam(ctx, answer.TeamCode)
 	if err != nil {
 		return api.AdminAnswer{}, err
@@ -157,10 +174,6 @@ func (h *Handler) toAdminAnswer(ctx context.Context, answer core.Answer, score *
 		markingScore = &api.MarkingScore{Marked: score.MarkedScore, Penalty: score.Penalty, Total: score.EffectiveScore, Max: score.MaxScore}
 	}
 	workflow, err := h.service.Store.GetAnswerWorkflow(ctx, answer.TeamCode, answer.ProblemCode, answer.Number)
-	if err != nil {
-		return api.AdminAnswer{}, err
-	}
-	latest, blocked, err := h.service.AnswerGrading(ctx, answer)
 	if err != nil {
 		return api.AdminAnswer{}, err
 	}
@@ -219,7 +232,7 @@ func (h *Handler) UpdateAdminAnswerWorkflow(ctx context.Context, request api.Upd
 	if err != nil {
 		return nil, err
 	}
-	mapped, err := h.toAdminAnswer(ctx, answer, score)
+	mapped, err := h.toAdminAnswerGraded(ctx, answer, score)
 	if err != nil {
 		return nil, err
 	}

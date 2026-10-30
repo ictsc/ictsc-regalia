@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"sort"
 
@@ -17,50 +18,49 @@ func (h *Handler) GetHealth(ctx context.Context, _ api.GetHealthRequestObject) (
 }
 
 func (h *Handler) GetAdminRanking(ctx context.Context, _ api.GetAdminRankingRequestObject) (api.GetAdminRankingResponseObject, error) {
-	ranking, frozen, frozenAt, err := h.service.Ranking(ctx, true)
+	ranking, err := h.service.Ranking(ctx, true)
 	if err != nil {
 		return nil, err
 	}
-	return api.GetAdminRanking200JSONResponse(toAPIRanking(ranking, frozen, frozenAt, false)), nil
+	return api.GetAdminRanking200JSONResponse(toAPIRanking(ranking)), nil
 }
 
 func (h *Handler) GetContestantRanking(ctx context.Context, _ api.GetContestantRankingRequestObject) (api.GetContestantRankingResponseObject, error) {
-	state, err := h.service.Store.GetCompetitionState(ctx)
+	ranking, err := h.service.Ranking(ctx, false)
 	if err != nil {
 		return nil, err
 	}
-	ranking, frozen, frozenAt, err := h.service.Ranking(ctx, false)
-	if err != nil {
-		return nil, err
-	}
-	return api.GetContestantRanking200JSONResponse(toAPIRanking(ranking, frozen, frozenAt, h.service.ScoresHidden(state))), nil
+	return api.GetContestantRanking200JSONResponse(toAPIRanking(ranking)), nil
 }
 
 func (h *Handler) GetAdminRule(ctx context.Context, _ api.GetAdminRuleRequestObject) (api.GetAdminRuleResponseObject, error) {
-	state, err := h.service.Store.GetCompetitionState(ctx)
+	markdown, err := h.ruleMarkdown(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return api.GetAdminRule200JSONResponse{Rule: api.Rule{Markdown: state.RuleMarkdown}}, nil
+	return api.GetAdminRule200JSONResponse{Rule: api.Rule{Markdown: markdown}}, nil
 }
 
 func (h *Handler) GetContestantRule(ctx context.Context, _ api.GetContestantRuleRequestObject) (api.GetContestantRuleResponseObject, error) {
-	state, err := h.service.Store.GetCompetitionState(ctx)
+	markdown, err := h.ruleMarkdown(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return api.GetContestantRule200JSONResponse{Rule: api.Rule{Markdown: state.RuleMarkdown}}, nil
+	return api.GetContestantRule200JSONResponse{Rule: api.Rule{Markdown: markdown}}, nil
 }
 
-func (h *Handler) ReplaceAdminRule(ctx context.Context, request api.ReplaceAdminRuleRequestObject) (api.ReplaceAdminRuleResponseObject, error) {
-	if request.Body == nil {
-		return nil, core.NewError(http.StatusUnprocessableEntity, "validation_error", "Request body is required")
+// ruleMarkdown is the active content's rule.md; the rule is managed in the
+// content repository only. Before the first import it is empty.
+func (h *Handler) ruleMarkdown(ctx context.Context) (string, error) {
+	snapshot, err := h.service.Store.ActiveContent(ctx)
+	var domainErr *core.Error
+	if errors.As(err, &domainErr) && domainErr.Code == "content_not_available" {
+		return "", nil
 	}
-	state, err := h.service.Store.ReplaceRule(ctx, request.Body.Markdown, principal(ctx).Session.AdminName)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return api.ReplaceAdminRule200JSONResponse{Rule: api.Rule{Markdown: state.RuleMarkdown}}, nil
+	return snapshot.Manifest.RuleMarkdown, nil
 }
 
 func (h *Handler) GetAdminDashboardSchedule(ctx context.Context, _ api.GetAdminDashboardScheduleRequestObject) (api.GetAdminDashboardScheduleResponseObject, error) {

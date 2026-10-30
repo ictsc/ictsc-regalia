@@ -230,6 +230,10 @@ func TestPostgresStoreIntegration(t *testing.T) {
 		if err != nil || len(attachments) != 2 || attachments[0].Name != "syslog.txt" || attachments[0].Size != 7 || attachments[1].Content != "\x1b[31merror\x1b[0m" {
 			t.Fatalf("attachments = %#v, err = %v", attachments, err)
 		}
+		info, err := fixture.store.ListAnswerAttachmentInfo(ctx, teamCode, problem, 2)
+		if err != nil || len(info) != 2 || info[0].Name != "syslog.txt" || info[0].Size != 7 || info[1].Content != "" {
+			t.Fatalf("attachment info = %#v, err = %v", info, err)
+		}
 		if none, err := fixture.store.ListAnswerAttachments(ctx, teamCode, problem, 1); err != nil || len(none) != 0 {
 			t.Fatalf("first answer attachments = %#v, err = %v", none, err)
 		}
@@ -365,6 +369,40 @@ func TestPostgresStoreIntegration(t *testing.T) {
 		sort.Strings(wantEventIDs)
 		if fmt.Sprint(eventIDs) != fmt.Sprint(wantEventIDs) {
 			t.Fatalf("persisted event IDs = %v, want %v", eventIDs, wantEventIDs)
+		}
+	})
+
+	t.Run("sets the schedule freeze in the activation transaction", func(t *testing.T) {
+		ctx := t.Context()
+		freeze := time.Date(2026, 12, 12, 8, 0, 0, 0, time.UTC)
+		snapshot := core.ContentSnapshot{
+			CommitSHA: "f000000000000000000000000000000000000001", Repository: "ictsc/content", Ref: "refs/heads/main",
+			Manifest: core.Manifest{Version: 1, RankingFreezeAt: &freeze}, FetchedAt: time.Now().UTC(),
+		}
+		active, err := fixture.store.ActiveContent(ctx)
+		expected := core.NoActiveContentCommit
+		if err == nil {
+			expected = active.CommitSHA
+		}
+		if _, err := fixture.store.ActivateContent(ctx, snapshot, expected); err != nil {
+			t.Fatalf("activate content: %v", err)
+		}
+		state, err := fixture.store.GetCompetitionState(ctx)
+		if err != nil || state.RankingFreezeAt == nil || !state.RankingFreezeAt.Equal(freeze) || state.UpdatedBy != "content:"+snapshot.CommitSHA {
+			t.Fatalf("freeze after activation = %v by %q, err = %v", state.RankingFreezeAt, state.UpdatedBy, err)
+		}
+		if _, err := fixture.store.ReplaceFreezeAt(ctx, nil, "admin"); err != nil {
+			t.Fatalf("clear freeze: %v", err)
+		}
+		if _, err := fixture.store.ActivateContent(ctx, snapshot, snapshot.CommitSHA); err != nil {
+			t.Fatalf("activate the active commit again: %v", err)
+		}
+		if state, err = fixture.store.GetCompetitionState(ctx); err != nil || state.RankingFreezeAt == nil || !state.RankingFreezeAt.Equal(freeze) {
+			t.Fatalf("same-commit activation did not repair the freeze: %v, err = %v", state.RankingFreezeAt, err)
+		}
+		var audits int
+		if err := fixture.pool.QueryRow(ctx, `SELECT count(*) FROM audit_log WHERE actor=$1 AND action='replace_freeze'`, "content:"+snapshot.CommitSHA).Scan(&audits); err != nil || audits != 2 {
+			t.Fatalf("freeze audit entries = %d, err = %v", audits, err)
 		}
 	})
 }

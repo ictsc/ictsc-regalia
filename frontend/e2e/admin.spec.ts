@@ -54,7 +54,8 @@ const answer = {
     assignee_discord_id: "123456789012345678",
     assignment_source: "DEFAULT",
     revision: 1,
-  },  competition_mode: "STANDARD",
+  },
+  competition_mode: "STANDARD",
   latest: true,
   marking_blocked_reason: null,
 };
@@ -453,9 +454,6 @@ async function installAdminApi(page: Page): Promise<ApiState> {
     if (path === "/api/v1/admin/rule" && method === "GET") {
       return fulfillJson(route, { rule: { markdown: "# E2E rule" } });
     }
-    if (path === "/api/v1/admin/rule" && method === "PUT") {
-      return fulfillJson(route, { rule: body });
-    }
     if (path === "/api/v1/admin/dashboard-schedule" && method === "GET") {
       return fulfillJson(route, {
         dashboard_schedule: { ranking_freeze_at: now },
@@ -667,9 +665,9 @@ test("回答詳細・再採点・得点操作・freeze・404を検証する", as
   ).toBe(false);
 
   await page.goto("/admin/settings");
-  await page.getByLabel("Markdown").fill("# Updated rule");
-  await page.getByRole("button", { name: "ルールを更新" }).click();
-  await expect(page.getByText("ルール更新しました")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "E2E rule", level: 1 }),
+  ).toBeVisible();
   await expect(page.getByText("現在の凍結時刻:")).toBeVisible();
 
   await page.goto("/admin/submissions/A01/12/999");

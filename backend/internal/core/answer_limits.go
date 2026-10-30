@@ -13,7 +13,10 @@ const (
 	// answer_max_length.
 	DefaultAnswerMaxLength = 3000
 	// MaxAnswerLength is the largest answer_max_length a problem may set.
-	MaxAnswerLength = 100000
+	MaxAnswerLength = 10000
+	// MaxAnswerBodyLength bounds the body with line breaks, which the
+	// per-problem limit does not count; it matches the OpenAPI maxLength.
+	MaxAnswerBodyLength = 30000
 
 	MaxAnswerAttachments    = 3
 	MaxAnswerAttachmentSize = 1 << 20
@@ -38,6 +41,10 @@ func AnswerLength(body string) int {
 // ValidateAnswer checks an answer body and its attachments against the
 // problem's limits before it is stored.
 func ValidateAnswer(problem Problem, body string, attachments []AnswerAttachment) error {
+	if utf8.RuneCountInString(body) > MaxAnswerBodyLength {
+		return NewError(http.StatusUnprocessableEntity, "validation_error",
+			fmt.Sprintf("Answer is over %d characters including line breaks", MaxAnswerBodyLength))
+	}
 	if length, limit := AnswerLength(body), int(problem.EffectiveAnswerMaxLength()); length > limit {
 		return NewError(http.StatusUnprocessableEntity, "validation_error",
 			fmt.Sprintf("Answer is %d characters, over the limit of %d (line breaks are not counted)", length, limit))

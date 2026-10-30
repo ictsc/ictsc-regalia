@@ -123,16 +123,14 @@ describe("ScoresView", () => {
 });
 
 describe("SettingsView", () => {
-  it("saves the rule and shows the freeze from schedule.yaml", async () => {
+  it("shows rule.md read-only and the freeze from schedule.yaml", async () => {
     const wrapper = mount(SettingsView, {
-      props: { ...base, initialMarkdown: "# rule", initialFreeze: "" },
+      props: { ...base, ruleMarkdown: "", initialFreeze: "" },
       global,
     });
-    await wrapper.find("textarea").setValue("# new rule");
-    const forms = wrapper.findAll("form");
-    expect(forms).toHaveLength(1);
-    await forms[0]!.trigger("submit");
-    expect(wrapper.emitted("saveRule")).toEqual([["# new rule"]]);
+    expect(wrapper.find("textarea").exists()).toBe(false);
+    expect(wrapper.find("form").exists()).toBe(false);
+    expect(wrapper.text()).toContain("rule.md がありません");
     expect(wrapper.text()).toContain("現在の凍結時刻: 未設定");
   });
 });

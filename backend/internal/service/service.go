@@ -418,9 +418,9 @@ func (s *Service) RefreshContent(ctx context.Context, claims ActionsClaims, comm
 	if activeErr == nil {
 		expectedCurrent = active.CommitSHA
 		if active.CommitSHA == commit {
-			// Refreshing the active commit again also brings the rule page in
-			// line with its rule.md.
-			if err := s.applyContentRule(ctx, active); err != nil {
+			// Activating the active commit again repairs its ranking freeze.
+			active, err := s.Store.ActivateContent(ctx, active, active.CommitSHA)
+			if err != nil {
 				s.setContentFailure(commit, err, true)
 				return core.ContentSnapshot{}, err
 			}
@@ -456,48 +456,8 @@ func (s *Service) RefreshContent(ctx context.Context, claims ActionsClaims, comm
 		s.setContentFailure(commit, err, activeErr == nil)
 		return core.ContentSnapshot{}, err
 	}
-	if err := s.applyContentFreeze(ctx, snapshot); err != nil {
-		s.setContentFailure(commit, err, true)
-		return core.ContentSnapshot{}, err
-	}
-	if err := s.applyContentRule(ctx, snapshot); err != nil {
-		s.setContentFailure(commit, err, true)
-		return core.ContentSnapshot{}, err
-	}
 	s.setContentSuccess(snapshot)
 	return snapshot, nil
-}
-
-// applyContentFreeze makes schedule.yaml the source of the ranking freeze:
-// activating content sets the freeze to its value, or clears it when absent.
-func (s *Service) applyContentFreeze(ctx context.Context, snapshot core.ContentSnapshot) error {
-	state, err := s.Store.GetCompetitionState(ctx)
-	if err != nil {
-		return err
-	}
-	current, next := state.RankingFreezeAt, snapshot.Manifest.RankingFreezeAt
-	if current == nil && next == nil || current != nil && next != nil && current.Equal(*next) {
-		return nil
-	}
-	_, err = s.Store.ReplaceFreezeAt(ctx, next, "content:"+snapshot.CommitSHA)
-	return err
-}
-
-// applyContentRule makes rule.md the rule page when the repository has one.
-// Without rule.md the rule edited in the admin settings is kept.
-func (s *Service) applyContentRule(ctx context.Context, snapshot core.ContentSnapshot) error {
-	if snapshot.Manifest.RulePath == "" {
-		return nil
-	}
-	state, err := s.Store.GetCompetitionState(ctx)
-	if err != nil {
-		return err
-	}
-	if state.RuleMarkdown == snapshot.Manifest.RuleMarkdown {
-		return nil
-	}
-	_, err = s.Store.ReplaceRule(ctx, snapshot.Manifest.RuleMarkdown, "content:"+snapshot.CommitSHA)
-	return err
 }
 
 func (s *Service) ContentStatus(ctx context.Context) ContentStatus {
@@ -679,45 +639,54 @@ func (s *Service) Scores(ctx context.Context, before *time.Time) (map[int64]map[
 	return s.selectScores(answers, markings), nil
 }
 
-func (s *Service) Ranking(ctx context.Context, admin bool) ([]core.RankingEntry, bool, *time.Time, error) {
+// RankingView is a ranking as one viewer sees it, read from a single
+// competition state so Hidden and Frozen always match the entries.
+type RankingView struct {
+	Entries  []core.RankingEntry
+	Frozen   bool
+	FrozenAt *time.Time
+	// Hidden: contestants see no ranking yet (secondary qualifier mode
+	// before the final reveal).
+	Hidden bool
+}
+
+func (s *Service) Ranking(ctx context.Context, admin bool) (RankingView, error) {
 	state, err := s.Store.GetCompetitionState(ctx)
 	if err != nil {
-		return nil, false, nil, err
+		return RankingView{}, err
 	}
-	frozen := false
-	var before *time.Time
 	if !admin && s.ScoresHidden(state) {
-		return []core.RankingEntry{}, false, nil, nil
+		return RankingView{Entries: []core.RankingEntry{}, Hidden: true}, nil
 	}
 	if !admin && state.FinalRevealedAt == nil && state.RankingFreezeAt != nil && !s.Now().Before(*state.RankingFreezeAt) {
-		frozen, before = true, state.RankingFreezeAt
-	}
-	if frozen {
-		entries, freezeErr := s.frozenRanking(ctx, *before)
-		return entries, true, before, freezeErr
+		entries, err := s.frozenRanking(ctx, *state.RankingFreezeAt)
+		if err != nil {
+			return RankingView{}, err
+		}
+		return RankingView{Entries: entries, Frozen: true, FrozenAt: state.RankingFreezeAt}, nil
 	}
 	snapshot, err := s.Store.ActiveContent(ctx)
 	if err != nil {
-		return nil, false, nil, err
+		return RankingView{}, err
 	}
 	var scores map[int64]map[string]core.Score
 	if admin {
 		scores, err = s.Scores(ctx, nil)
 	} else {
-		scores, err = s.publicScores(ctx, before, state.FinalRevealedAt != nil)
+		scores, err = s.publicScores(ctx, nil, state.FinalRevealedAt != nil)
 	}
 	if err != nil {
-		return nil, false, nil, err
+		return RankingView{}, err
 	}
 	teams, err := s.Store.ListTeams(ctx)
 	if err != nil {
-		return nil, false, nil, err
+		return RankingView{}, err
 	}
 	active := make(map[string]struct{}, len(snapshot.Manifest.Problems))
 	for _, problem := range snapshot.Manifest.Problems {
 		active[problem.Code] = struct{}{}
 	}
-	return core.BuildRanking(teams, active, scores), frozen, before, nil
+	return RankingView{Entries: core.BuildRanking(teams, active, scores)}, nil
 }
 
 func (s *Service) QueueDeployment(ctx context.Context, teamCode int64, problemCode string, enforceContestWindow bool) (core.Deployment, error) {

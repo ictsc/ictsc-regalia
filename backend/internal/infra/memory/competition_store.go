@@ -334,7 +334,9 @@ func (s *CompetitionStore) ActivateContent(_ context.Context, snapshot core.Cont
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if snapshot.CommitSHA == s.active {
-		return s.contents[s.active], nil
+		active := s.contents[s.active]
+		s.applyContentFreeze(active)
+		return active, nil
 	}
 	if expected == core.NoActiveContentCommit && s.active != "" {
 		return core.ContentSnapshot{}, core.NewError(http.StatusConflict, "content_refresh_in_progress", "Active content appeared while refresh was in progress")
@@ -349,7 +351,25 @@ func (s *CompetitionStore) ActivateContent(_ context.Context, snapshot core.Cont
 	snapshot.Assets = nil
 	s.contents[snapshot.CommitSHA] = snapshot
 	s.active = snapshot.CommitSHA
+	s.applyContentFreeze(snapshot)
 	return snapshot, nil
+}
+
+// applyContentFreeze makes schedule.yaml the source of the ranking freeze,
+// under the same lock as the activation. The caller holds s.mu.
+func (s *CompetitionStore) applyContentFreeze(snapshot core.ContentSnapshot) {
+	next := snapshot.Manifest.RankingFreezeAt
+	if next != nil {
+		value := next.UTC().Truncate(time.Microsecond)
+		next = &value
+	}
+	current := s.state.RankingFreezeAt
+	if current == nil && next == nil || current != nil && next != nil && current.Equal(*next) {
+		return
+	}
+	s.state.RankingFreezeAt = next
+	s.rankingSnapshots = make(map[string]core.RankingSnapshot)
+	s.state.UpdatedBy, s.state.UpdatedAt = "content:"+snapshot.CommitSHA, time.Now().UTC()
 }
 
 func (s *CompetitionStore) GetContentAsset(_ context.Context, commit, name string) (core.ContentAsset, error) {
@@ -412,6 +432,14 @@ func (s *CompetitionStore) SubmitAnswer(_ context.Context, answer core.Answer, i
 	answer.Number = number
 	s.answers = append(s.answers, answer)
 	return answer, 0, nil
+}
+
+func (s *CompetitionStore) ListAnswerAttachmentInfo(ctx context.Context, teamCode int64, problemCode string, number int32) ([]core.AnswerAttachment, error) {
+	attachments, err := s.ListAnswerAttachments(ctx, teamCode, problemCode, number)
+	for index := range attachments {
+		attachments[index].Content = ""
+	}
+	return attachments, err
 }
 
 func (s *CompetitionStore) ListAnswerAttachments(_ context.Context, teamCode int64, problemCode string, number int32) ([]core.AnswerAttachment, error) {
@@ -613,13 +641,6 @@ func (s *CompetitionStore) AppendDeploymentEvent(_ context.Context, requestID st
 func (s *CompetitionStore) GetCompetitionState(context.Context) (core.CompetitionState, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.state, nil
-}
-
-func (s *CompetitionStore) ReplaceRule(_ context.Context, markdown, actor string) (core.CompetitionState, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.state.RuleMarkdown, s.state.UpdatedBy, s.state.UpdatedAt = markdown, actor, time.Now().UTC()
 	return s.state, nil
 }
 

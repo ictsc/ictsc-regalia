@@ -108,15 +108,19 @@ func SelectLatestScores(answers []Answer, markings []MarkingResult) map[int64]ma
 	return selected
 }
 
-// IsLatestAnswer reports whether answer has the highest number among answers
-// of the same team and problem.
-func IsLatestAnswer(answer Answer, answers []Answer) bool {
-	for _, other := range answers {
-		if other.TeamCode == answer.TeamCode && other.ProblemCode == answer.ProblemCode && other.Number > answer.Number {
-			return false
+// LatestAnswerNumbers returns the highest answer number per team and
+// problem among answers.
+func LatestAnswerNumbers(answers []Answer) map[int64]map[string]int32 {
+	latest := make(map[int64]map[string]int32)
+	for _, answer := range answers {
+		if _, ok := latest[answer.TeamCode]; !ok {
+			latest[answer.TeamCode] = make(map[string]int32)
+		}
+		if current, ok := latest[answer.TeamCode][answer.ProblemCode]; !ok || answer.Number > current {
+			latest[answer.TeamCode][answer.ProblemCode] = answer.Number
 		}
 	}
-	return true
+	return latest
 }
 
 func BuildRanking(teams []Team, activeProblems map[string]struct{}, selected map[int64]map[string]Score) []RankingEntry {

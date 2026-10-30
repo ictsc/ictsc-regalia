@@ -261,7 +261,6 @@ type Deployment struct {
 }
 
 type CompetitionState struct {
-	RuleMarkdown    string
 	RankingFreezeAt *time.Time
 	FinalRevealedAt *time.Time
 	UpdatedAt       time.Time

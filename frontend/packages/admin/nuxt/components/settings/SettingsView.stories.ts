@@ -9,7 +9,7 @@ const meta = {
   decorators: [withAdminShell("/settings")],
   parameters: { layout: "fullscreen" },
   args: {
-    initialMarkdown: ruleMarkdown,
+    ruleMarkdown: ruleMarkdown,
     initialFreeze: "2026-09-02T13:13",
     busy: false,
     message: "",
@@ -25,7 +25,7 @@ export const NoFreeze: Story = {
 };
 
 export const EmptyRule: Story = {
-  args: { initialMarkdown: "" },
+  args: { ruleMarkdown: "" },
 };
 
 /** 二次予選モードは凍結を使わないので、凍結の設定を出さない。 */

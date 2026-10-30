@@ -1123,8 +1123,7 @@ export interface paths {
         };
         /** 競技ルールを取得する */
         get: operations["getAdminRule"];
-        /** 競技ルールを置換する */
-        put: operations["replaceAdminRule"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -1711,6 +1710,7 @@ export interface components {
          *     }
          */
         SubmitAnswerRequest: {
+            /** @description 改行を含む全体の上限。改行を除いた文字数は問題のanswer_max_length（最大10000）以下。 */
             body: string;
             attachments?: components["schemas"]["AnswerAttachmentUpload"][];
         };
@@ -1803,6 +1803,7 @@ export interface components {
         AnnouncementResponse: {
             announcement: components["schemas"]["Announcement"];
         };
+        /** @description 有効なコンテンツの rule.md。コンテンツリポジトリで管理し、APIからは変更できない。rule.md がない、またはコンテンツ未取り込みのときは空文字。 */
         Rule: {
             markdown: string;
         };
@@ -3940,34 +3941,6 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    replaceAdminRule: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Rule"];
-            };
-        };
-        responses: {
-            /** @description 更新後の競技ルール */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RuleResponse"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            422: components["responses"]["ValidationError"];
             500: components["responses"]["InternalServerError"];
         };
     };
