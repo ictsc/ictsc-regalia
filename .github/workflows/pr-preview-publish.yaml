@@ -16,6 +16,9 @@ jobs:
     # Explicit activation gate. Merging this workflow does not publish PR images.
     if: github.event.workflow_run.conclusion == 'success' && vars.ENABLE_PR_PREVIEW_PUBLISH == 'true'
     runs-on: ubuntu-latest
+    outputs:
+      number: ${{ steps.validate.outputs.number }}
+      sha: ${{ steps.validate.outputs.sha }}
     concurrency:
       # Fork workflow runs can have pull_requests: []; serialize all publishers
       # before resolving the PR number from trusted GitHub API metadata.
@@ -101,3 +104,25 @@ jobs:
             skopeo inspect --raw --creds "${GITHUB_ACTOR}:${REGISTRY_TOKEN}" "$dest" > published-manifest.json
             python3 .github/scripts/compare_preview_manifest.py source-manifest.json published-manifest.json
           done
+  comment:
+    # Keep the write token separate from artifact download and image inspection.
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    concurrency:
+      group: preview-status-${{ needs.publish.outputs.number }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: refs/heads/main
+          persist-credentials: false
+      - name: Post or update image-published comment
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.publish.outputs.number }}
+          HEAD_SHA: ${{ needs.publish.outputs.sha }}
+          BUILD_RUN_ID: ${{ github.event.workflow_run.id }}
+        run: python3 .github/scripts/preview_status_comment.py
