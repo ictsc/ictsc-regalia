@@ -3,6 +3,7 @@ import { themeInitScript } from "../ui/theme-init";
 import { japaneseFontStylesheet, latinFontStylesheet } from "../ui/fonts";
 export default defineNuxtConfig({
   buildId: process.env.NUXT_BUILD_ID || undefined,
+  experimental: { appManifest: !process.env.NUXT_BUILD_ID },
   compatibilityDate: "2026-09-05",
   srcDir: "nuxt/",
   ssr: false,
