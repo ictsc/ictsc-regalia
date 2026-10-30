@@ -117,8 +117,8 @@ github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMo
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
 github.com/fsnotify/fsnotify v1.10.1 h1:b0/UzAf9yR5rhf3RPm9gf3ehBPpf0oZKIjtpKrx59Ho=
 github.com/fsnotify/fsnotify v1.10.1/go.mod h1:TLheqan6HD6GBK6PrDWyDPBaEV8LspOxvPSjC+bVfgo=
-github.com/getkin/kin-openapi v0.149.0 h1:ZbhmVJ4yq5RZDUsyP8lcBcGMsjsaTqXEFt6isdtMDfA=
-github.com/getkin/kin-openapi v0.149.0/go.mod h1:1+BHDzstro+P5CKtPy1X4PfofnFgmRe6uvMy9+r9fKY=
+github.com/getkin/kin-openapi v0.152.0 h1:XRVo77lMRyOGMHf1paMu9lxX3wzuQDZeprssZJnz/x8=
+github.com/getkin/kin-openapi v0.152.0/go.mod h1:1+BHDzstro+P5CKtPy1X4PfofnFgmRe6uvMy9+r9fKY=
 github.com/go-chi/chi/v5 v5.5.0 h1:xdKQ1dJmVJsmgahrXSKhUx8NyVPzpwdlyrrQFpMPJgg=
 github.com/go-chi/chi/v5 v5.5.0/go.mod h1:d1IG7GtKPSjPyBP365PH8sAGVHk3qfB/IhjFNRH1wWM=
 github.com/go-logr/logr v1.2.2/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=
@@ -150,8 +150,8 @@ github.com/gohugoio/hashstructure v1.1.0 h1:38yUfZBca6qXSbUpteLhjDGLNskclHaguFBY
 github.com/gohugoio/hashstructure v1.1.0/go.mod h1:Pz8dcwjZs6FBKWu9x/ZIChrTHIM175zfUJK0KLvC1z8=
 github.com/gohugoio/httpcache v0.9.0 h1:f3Jb93RAP+qlmK7Ma5uGfwJslYDqTfzYJ6AeOT7nDe8=
 github.com/gohugoio/httpcache v0.9.0/go.mod h1:YQsVn7oB30TG1QO9HoHc3Xq8dDQDVOdxBc0p7CYgbhE=
-github.com/gohugoio/hugo v0.168.0 h1:66W8JvXbGhxhAktj3ycv6kLyDIvQkwaoAl/6yRfI09w=
-github.com/gohugoio/hugo v0.168.0/go.mod h1:iaJdmjHjjFb19UwtO2CvHDWOl5hkWwX+s8Vp6lSHZks=
+github.com/gohugoio/hugo v0.169.0 h1:AANgaeWv05+Xh2gUoc//bjj9RBMenvYTPhxA4UQUq7o=
+github.com/gohugoio/hugo v0.169.0/go.mod h1:pkLazxbrnqFLreDSDoZMwoa07gLX9ba7Nzy3miTSMBs=
 github.com/gohugoio/hugo-goldmark-extensions/extras v0.7.0 h1:I/n6v7VImJ3aISLnn73JAHXyjcQsMVvbguQPTk9Ehus=
 github.com/gohugoio/hugo-goldmark-extensions/extras v0.7.0/go.mod h1:9LJNfKWFmhEJ7HW0in5znezMwH+FYMBIhNZ3VWtRcRs=
 github.com/gohugoio/hugo-goldmark-extensions/passthrough v0.5.0 h1:p13Q0DBCrBRpJGtbtlgkYNCs4TnIlZJh8vHgnAiofrI=
@@ -338,8 +338,8 @@ github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.12.1 h1:EuwCh5fleGS7H32xRwO3wRGT7DxrDhLAT6FF8MpWDWE=
 github.com/stretchr/testify v1.12.1/go.mod h1:MDEgiDPPsNp5cuIrHPPCyornHKgEVbtFUmoNlxoYthg=
-github.com/tdewolff/minify/v2 v2.24.19 h1:j2exx54gvrCFN9UiFm0Z5vbNWBFcuY5Ql1VmaM2Dkeo=
-github.com/tdewolff/minify/v2 v2.24.19/go.mod h1:HVgQO08FJeDxQx+lcFOVDi1IySi/77WlN/dDckCkZoA=
+github.com/tdewolff/minify/v2 v2.24.22 h1:48fGkqDfZ/dAHGf51NsuHQaMYRRmSh3hhVjnGXheGhs=
+github.com/tdewolff/minify/v2 v2.24.22/go.mod h1:y+QjTzveZX+MfkswbAnt4V/zcBbKjNBdDTrOoqy4nX8=
 github.com/tdewolff/parse/v2 v2.8.20 h1:eU+UStwuoeHnXdaSBIoEfNnj33URx24gJDdNViHHYwM=
 github.com/tdewolff/parse/v2 v2.8.20/go.mod h1:OemXEPll2+Sn7pQ6xFxC9cEm1wDnNt1hC2q3jIh+OoI=
 github.com/tdewolff/test v1.0.12 h1:7F21DqIajswxuche0geHdrUZRCWE4oko4b7bcmkkrxk=
