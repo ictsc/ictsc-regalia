@@ -60,15 +60,6 @@ jobs:
             "./$context"
           tar -xOf "${IMAGE}.tar" index.json | jq -r '.manifests[0].digest' \
             > "${IMAGE}-${{ matrix.replica }}.digest"
-      - name: Diagnose frontend repeat within runner
-        if: matrix.image == 'frontend' && matrix.replica == 'a'
-        run: |
-          docker buildx build --no-cache --target frontend \
-            --build-arg "NUXT_BUILD_ID=${{ github.event.pull_request.head.sha }}" \
-            --build-arg "SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}" \
-            --output 'type=oci,dest=frontend-repeat.tar,rewrite-timestamp=true' \
-            ./frontend
-          python3 .github/scripts/diagnose_preview_oci.py frontend.tar frontend-repeat.tar
       - uses: actions/upload-artifact@v7
         with:
           name: digest-${{ matrix.image }}-${{ matrix.replica }}
