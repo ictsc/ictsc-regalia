@@ -21,6 +21,9 @@ jobs:
   backend:
     name: Build Backend
     needs: validate
+    permissions:
+      contents: read
+      packages: write
     uses: ./.github/workflows/wf-docker-build.yaml
     with:
       target: backend
@@ -30,6 +33,9 @@ jobs:
   frontend:
     name: Build Frontend
     needs: validate
+    permissions:
+      contents: read
+      packages: write
     uses: ./.github/workflows/wf-docker-build.yaml
     with:
       target: frontend
