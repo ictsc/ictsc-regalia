@@ -11,7 +11,8 @@ COPY . .
 RUN pnpm install --recursive --offline
 ARG NUXT_BUILD_ID
 ARG SOURCE_DATE_EPOCH
-RUN pnpm run build
+RUN pnpm run build && \
+    if [ -n "$SOURCE_DATE_EPOCH" ]; then node scripts/fix-prerendered-at.mjs; fi
 
 FROM nginx:1.31.8 AS frontend
 ENV API_UPSTREAM=http://api:8080

@@ -5,12 +5,18 @@ on:
       - .github/scripts/**
       - .github/workflows/pr-preview-*.yaml
       - backend/Dockerfile
+      - frontend/Dockerfile
+      - frontend/scripts/fix-prerendered-at.mjs
+      - frontend/packages/*/nuxt.config.ts
   push:
     branches: [main]
     paths:
       - .github/scripts/**
       - .github/workflows/pr-preview-*.yaml
       - backend/Dockerfile
+      - frontend/Dockerfile
+      - frontend/scripts/fix-prerendered-at.mjs
+      - frontend/packages/*/nuxt.config.ts
 permissions:
   contents: read
 jobs:
@@ -21,6 +27,7 @@ jobs:
         with:
           persist-credentials: false
       - run: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s .github/scripts -p 'test_*.py' -v
+      - run: node --test frontend/scripts/fix-prerendered-at.test.mjs
   reproducible-images:
     # Two independent runners build each image from the same PR head.
     if: github.event_name == 'pull_request'
