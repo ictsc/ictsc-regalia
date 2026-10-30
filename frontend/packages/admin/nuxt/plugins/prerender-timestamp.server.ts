@@ -4,6 +4,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   const timestamp = Number(process.env.SOURCE_DATE_EPOCH) * 1000;
   if (!Number.isSafeInteger(timestamp)) throw new Error("invalid SOURCE_DATE_EPOCH");
   nuxtApp.hook("app:rendered", ({ ssrContext }) => {
-    ssrContext.payload.prerenderedAt = timestamp;
+    if (ssrContext) ssrContext.payload.prerenderedAt = timestamp;
   });
 });
