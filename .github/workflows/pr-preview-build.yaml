@@ -9,7 +9,8 @@ permissions:
 
 jobs:
   build:
-    if: contains(github.event.pull_request.labels.*.name, 'preview')
+    # Other labels must not start a second build for the same PR head.
+    if: contains(github.event.pull_request.labels.*.name, 'preview') && (github.event.action != 'labeled' || github.event.label.name == 'preview')
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -28,10 +29,12 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
       - uses: docker/setup-buildx-action@v4
+      - name: Fix source timestamp to this exact PR head
+        run: echo "SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)" >> "$GITHUB_ENV"
       - name: Build OCI archive
         run: |
           docker buildx build --target "${{ matrix.target }}" \
-            --output "type=oci,dest=${{ matrix.image }}.tar" \
+            --output "type=oci,dest=${{ matrix.image }}.tar,rewrite-timestamp=true" \
             "./${{ matrix.context || matrix.image }}"
       - uses: actions/upload-artifact@v7
         with:

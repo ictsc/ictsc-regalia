@@ -21,3 +21,50 @@ jobs:
         with:
           persist-credentials: false
       - run: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s .github/scripts -p 'test_*.py' -v
+  reproducible-images:
+    # Two independent runners build each image from the same PR head.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: [backend, frontend, migrations]
+        replica: [a, b]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@v4
+      - name: Fix source timestamp
+        run: echo "SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)" >> "$GITHUB_ENV"
+      - name: Build OCI archive
+        env:
+          IMAGE: ${{ matrix.image }}
+        run: |
+          case "$IMAGE" in
+            backend) target=production; context=backend ;;
+            frontend) target=frontend; context=frontend ;;
+            migrations) target=migrations; context=backend ;;
+          esac
+          docker buildx build --target "$target" \
+            --output "type=oci,dest=${IMAGE}.tar,rewrite-timestamp=true" \
+            "./$context"
+          tar -xOf "${IMAGE}.tar" index.json | jq -r '.manifests[0].digest' \
+            > "${IMAGE}-${{ matrix.replica }}.digest"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: digest-${{ matrix.image }}-${{ matrix.replica }}
+          path: ${{ matrix.image }}-${{ matrix.replica }}.digest
+          if-no-files-found: error
+  compare-reproduced-images:
+    needs: reproducible-images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: digest-*
+          merge-multiple: true
+      - run: |
+          for image in backend frontend migrations; do
+            cmp "${image}-a.digest" "${image}-b.digest"
+          done
