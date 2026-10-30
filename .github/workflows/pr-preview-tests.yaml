@@ -47,6 +47,7 @@ jobs:
             migrations) target=migrations; context=backend ;;
           esac
           docker buildx build --target "$target" \
+            --build-arg "NUXT_BUILD_ID=${{ github.event.pull_request.head.sha }}" \
             --output "type=oci,dest=${IMAGE}.tar,rewrite-timestamp=true" \
             "./$context"
           tar -xOf "${IMAGE}.tar" index.json | jq -r '.manifests[0].digest' \
@@ -55,6 +56,7 @@ jobs:
         if: matrix.image == 'frontend' && matrix.replica == 'a'
         run: |
           docker buildx build --no-cache --target frontend \
+            --build-arg "NUXT_BUILD_ID=${{ github.event.pull_request.head.sha }}" \
             --output 'type=oci,dest=frontend-repeat.tar,rewrite-timestamp=true' \
             ./frontend
           python3 .github/scripts/diagnose_preview_oci.py frontend.tar frontend-repeat.tar
