@@ -35,6 +35,7 @@ jobs:
         run: |
           docker buildx build --target "${{ matrix.target }}" \
             --build-arg "NUXT_BUILD_ID=${{ github.event.pull_request.head.sha }}" \
+            --build-arg "SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}" \
             --output "type=oci,dest=${{ matrix.image }}.tar,rewrite-timestamp=true" \
             "./${{ matrix.context || matrix.image }}"
       - uses: actions/upload-artifact@v7

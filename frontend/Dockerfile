@@ -10,6 +10,7 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 COPY . .
 RUN pnpm install --recursive --offline
 ARG NUXT_BUILD_ID
+ARG SOURCE_DATE_EPOCH
 RUN pnpm run build
 
 FROM nginx:1.31.8 AS frontend
