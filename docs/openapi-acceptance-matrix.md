@@ -62,9 +62,7 @@
 | `createAdminDeploymentEvent` | `POST /api/v1/admin/deployments/{team_code}/{problem_code}/{revision}/events` | strict handler ✓ | service + store/adapter ✓ | SState callback (server-to-server) | contract + transition/SSE/Redis + E2E |
 | `getAdminRanking` | `GET /api/v1/admin/ranking` | strict handler ✓ | service + store/adapter ✓ | Admin /scores | contract + service/PostgreSQL + E2E |
 | `getAdminRule` | `GET /api/v1/admin/rule` | strict handler ✓ | service + store/adapter ✓ | Admin /settings | contract + service/PostgreSQL + E2E |
-| `replaceAdminRule` | `PUT /api/v1/admin/rule` | strict handler ✓ | service + store/adapter ✓ | Admin /settings | contract + service/PostgreSQL + E2E |
 | `getAdminDashboardSchedule` | `GET /api/v1/admin/dashboard-schedule` | strict handler ✓ | service + store/adapter ✓ | Admin /settings | contract + service/PostgreSQL + E2E |
-| `replaceAdminDashboardSchedule` | `PUT /api/v1/admin/dashboard-schedule` | strict handler ✓ | service + store/adapter ✓ | Admin /settings | contract + service/PostgreSQL + E2E |
 | `listContestantAnswerAttachments` | `GET /api/v1/contestant/problems/{problem_code}/answers/{answer_number}/attachments` | strict handler ✓ | service + store/adapter ✓ | Contestant answer history | contract + PostgreSQL |
 | `listAdminAnswerAttachments` | `GET /api/v1/admin/answers/{team_code}/{problem_code}/{answer_number}/attachments` | strict handler ✓ | service + store/adapter ✓ | Admin grading detail | contract |
 | `getContestantImage` | `GET /api/v1/contestant/images/{image_name}` | strict handler ✓ | service + store/adapter ✓ | Contestant Markdown images | contract |

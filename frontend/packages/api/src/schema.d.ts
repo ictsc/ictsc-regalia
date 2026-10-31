@@ -1140,11 +1140,7 @@ export interface paths {
         };
         /** ランキング凍結時刻を取得する */
         get: operations["getAdminDashboardSchedule"];
-        /**
-         * ランキング凍結時刻を置換する
-         * @description 二次予選モードでは凍結を使わないため、凍結時刻の設定は409で拒否する（nullでの解除は可能）。
-         */
-        put: operations["replaceAdminDashboardSchedule"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -3964,35 +3960,6 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    replaceAdminDashboardSchedule: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DashboardSchedule"];
-            };
-        };
-        responses: {
-            /** @description 更新後のdashboard schedule */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DashboardScheduleResponse"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            409: components["responses"]["Conflict"];
-            422: components["responses"]["ValidationError"];
             500: components["responses"]["InternalServerError"];
         };
     };

@@ -79,20 +79,6 @@ func (h *Handler) GetContestantDashboardSchedule(ctx context.Context, _ api.GetC
 	return api.GetContestantDashboardSchedule200JSONResponse(h.toAPIDashboardSchedule(state)), nil
 }
 
-func (h *Handler) ReplaceAdminDashboardSchedule(ctx context.Context, request api.ReplaceAdminDashboardScheduleRequestObject) (api.ReplaceAdminDashboardScheduleResponseObject, error) {
-	if request.Body == nil {
-		return nil, core.NewError(http.StatusUnprocessableEntity, "validation_error", "Request body is required")
-	}
-	if request.Body.RankingFreezeAt != nil && h.service.Config.SecondaryQualifierMode {
-		return nil, core.NewError(http.StatusConflict, "conflict", "Ranking freeze is not used in secondary qualifier mode")
-	}
-	state, err := h.service.Store.ReplaceFreezeAt(ctx, request.Body.RankingFreezeAt, principal(ctx).Session.AdminName)
-	if err != nil {
-		return nil, err
-	}
-	return api.ReplaceAdminDashboardSchedule200JSONResponse(h.toAPIDashboardSchedule(state)), nil
-}
-
 func (h *Handler) toAPIDashboardSchedule(state core.CompetitionState) api.DashboardScheduleResponse {
 	return api.DashboardScheduleResponse{
 		DashboardSchedule: api.DashboardSchedule{RankingFreezeAt: state.RankingFreezeAt},

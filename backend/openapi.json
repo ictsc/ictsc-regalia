@@ -1479,28 +1479,6 @@
           "403": { "$ref": "#/components/responses/Forbidden" },
           "500": { "$ref": "#/components/responses/InternalServerError" }
         }
-      },
-      "put": {
-        "tags": ["Admin Competition"],
-        "summary": "ランキング凍結時刻を置換する",
-        "description": "二次予選モードでは凍結を使わないため、凍結時刻の設定は409で拒否する（nullでの解除は可能）。",
-        "operationId": "replaceAdminDashboardSchedule",
-        "security": [{ "AdminSession": [] }],
-        "requestBody": {
-          "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardSchedule" } } }
-        },
-        "responses": {
-          "200": {
-            "description": "更新後のdashboard schedule",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DashboardScheduleResponse" } } }
-          },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "403": { "$ref": "#/components/responses/Forbidden" },
-          "409": { "$ref": "#/components/responses/Conflict" },
-          "422": { "$ref": "#/components/responses/ValidationError" },
-          "500": { "$ref": "#/components/responses/InternalServerError" }
-        }
       }
     },
     "/api/v1/contestant/images/{image_name}": {

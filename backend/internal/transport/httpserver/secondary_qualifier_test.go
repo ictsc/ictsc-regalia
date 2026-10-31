@@ -135,27 +135,21 @@ func TestDevContestPhaseShiftsScheduleOnlyInDevSecondaryQualifier(t *testing.T) 
 	}
 }
 
-func TestSecondaryQualifierRejectsRankingFreeze(t *testing.T) {
+func TestRankingFreezeCannotBeSetThroughTheAPI(t *testing.T) {
 	fixture := newContractFixture(t)
-	fixture.service.Config.SecondaryQualifierMode = true
 	admin := fixture.createSession(t, session.Data{Kind: session.KindAdmin, AdminName: "Judge"}, service.AdminTTL)
-	put := func(body string) *httptest.ResponseRecorder {
-		t.Helper()
-		request := httptest.NewRequest(http.MethodPut, "/api/v1/admin/dashboard-schedule", strings.NewReader(body))
-		request.Header.Set("Content-Type", "application/json")
-		request.Header.Set("Origin", testOrigin)
-		request.AddCookie(admin)
-		response := httptest.NewRecorder()
-		fixture.handler.ServeHTTP(response, request)
-		return response
+	request := httptest.NewRequest(http.MethodPut, "/api/v1/admin/dashboard-schedule", strings.NewReader(`{"ranking_freeze_at":"2026-08-30T06:00:00Z"}`))
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Origin", testOrigin)
+	request.AddCookie(admin)
+	response := httptest.NewRecorder()
+	fixture.handler.ServeHTTP(response, request)
+	if response.Code < 400 {
+		t.Fatalf("freeze was writable: %d %s", response.Code, response.Body.String())
 	}
-	if response := put(`{"ranking_freeze_at":"2026-08-30T06:00:00Z"}`); response.Code != http.StatusConflict {
-		t.Fatalf("set freeze: %d %s", response.Code, response.Body.String())
-	}
-	response := put(`{"ranking_freeze_at":null}`)
-	var body api.DashboardScheduleResponse
-	if err := json.Unmarshal(response.Body.Bytes(), &body); err != nil || response.Code != http.StatusOK || body.CompetitionMode != api.SECONDARYQUALIFIER {
-		t.Fatalf("clear freeze: %d %s", response.Code, response.Body.String())
+	state, err := fixture.store.GetCompetitionState(t.Context())
+	if err != nil || state.RankingFreezeAt != nil {
+		t.Fatalf("freeze = %v, err = %v", state.RankingFreezeAt, err)
 	}
 }
 

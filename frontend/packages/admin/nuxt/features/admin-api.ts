@@ -186,12 +186,6 @@ export function createAdminActions(api: ApiClient) {
       expectData(
         await api.PUT("/api/v1/admin/dev/contest-phase", { body: { phase } }),
       ),
-    replaceFreeze: async (rankingFreezeAt: string | null) =>
-      expectData(
-        await api.PUT("/api/v1/admin/dashboard-schedule", {
-          body: { ranking_freeze_at: rankingFreezeAt },
-        }),
-      ),
   };
 }
 

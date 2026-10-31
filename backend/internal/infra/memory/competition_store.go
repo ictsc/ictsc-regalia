@@ -644,19 +644,6 @@ func (s *CompetitionStore) GetCompetitionState(context.Context) (core.Competitio
 	return s.state, nil
 }
 
-func (s *CompetitionStore) ReplaceFreezeAt(_ context.Context, freezeAt *time.Time, actor string) (core.CompetitionState, error) {
-	if freezeAt != nil {
-		value := freezeAt.UTC().Truncate(time.Microsecond)
-		freezeAt = &value
-	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.state.RankingFreezeAt = freezeAt
-	s.rankingSnapshots = make(map[string]core.RankingSnapshot)
-	s.state.UpdatedBy, s.state.UpdatedAt = actor, time.Now().UTC()
-	return s.state, nil
-}
-
 func (s *CompetitionStore) RevealFinal(_ context.Context, at time.Time, actor string) (core.CompetitionState, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()

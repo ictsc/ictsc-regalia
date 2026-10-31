@@ -25,13 +25,14 @@ func (h *Handler) ListContestantAnswers(ctx context.Context, request api.ListCon
 		return nil, err
 	}
 	sort.SliceStable(answers, func(i, j int) bool { return answers[i].Number > answers[j].Number })
+	scores, err := h.loadAnswerScores(ctx)
+	if err != nil {
+		return nil, err
+	}
 	mapped := make([]api.AnswerSummary, 0, len(answers))
 	var last *time.Time
 	for _, answer := range answers {
-		score, err := h.scoreForAnswer(ctx, answer, true)
-		if err != nil {
-			return nil, err
-		}
+		score := h.scoreFor(scores, answer, true)
 		mapped = append(mapped, toAPIAnswerSummary(answer, score))
 		if last == nil || answer.SubmittedAt.After(*last) {
 			value := answer.SubmittedAt
@@ -96,12 +97,13 @@ func (h *Handler) ListAdminAnswers(ctx context.Context, request api.ListAdminAns
 	if err != nil {
 		return nil, err
 	}
+	scores, err := h.loadAnswerScores(ctx)
+	if err != nil {
+		return nil, err
+	}
 	mapped := make([]api.AdminAnswer, 0, len(answers))
 	for _, answer := range answers {
-		score, err := h.scoreForAnswer(ctx, answer, false)
-		if err != nil {
-			return nil, err
-		}
+		score := h.scoreFor(scores, answer, false)
 		if score != nil && !includeMarked {
 			continue
 		}

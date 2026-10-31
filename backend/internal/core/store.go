@@ -52,7 +52,6 @@ type Store interface {
 	CreateDeployment(ctx context.Context, deployment Deployment) (Deployment, error)
 	AppendDeploymentEvent(ctx context.Context, requestID string, event DeploymentEvent, recovery bool) (Deployment, bool, error)
 	GetCompetitionState(ctx context.Context) (CompetitionState, error)
-	ReplaceFreezeAt(ctx context.Context, freezeAt *time.Time, actor string) (CompetitionState, error)
 	RevealFinal(ctx context.Context, at time.Time, actor string) (CompetitionState, error)
 	UpsertWebPushSubscription(ctx context.Context, subscription WebPushSubscription) error
 	DeleteWebPushSubscription(ctx context.Context, contestantName, endpoint string) error

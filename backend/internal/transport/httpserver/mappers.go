@@ -181,29 +181,45 @@ func toAPIMarking(result core.MarkingResult) api.MarkingResult {
 	}
 }
 
-func (h *Handler) scoreForAnswer(ctx context.Context, answer core.Answer, contestant bool) (*core.Score, error) {
+// answerScores holds what scoring an answer needs, read once per request so
+// lists do not reload every marking for each answer.
+type answerScores struct {
+	latest map[string]core.MarkingResult
+	state  core.CompetitionState
+}
+
+func (h *Handler) loadAnswerScores(ctx context.Context) (answerScores, error) {
 	markings, err := h.service.Store.ListMarkingResults(ctx)
 	if err != nil {
-		return nil, err
+		return answerScores{}, err
 	}
 	state, err := h.service.Store.GetCompetitionState(ctx)
 	if err != nil {
+		return answerScores{}, err
+	}
+	return answerScores{latest: core.LatestMarkings(markings), state: state}, nil
+}
+
+// scoreFor is the answer's score from its latest marking, or nil when it is
+// unmarked or, for contestants, not visible yet.
+func (h *Handler) scoreFor(scores answerScores, answer core.Answer, contestant bool) *core.Score {
+	marking, ok := core.LatestMarkingForAnswer(scores.latest, answer.TeamCode, answer.ProblemCode, answer.Number)
+	if !ok {
+		return nil
+	}
+	if contestant && (marking.ID == "" || h.service.MarkingVisibility(answer.SubmittedAt, scores.state) == core.VisibilityPrivate) {
+		return nil
+	}
+	score := core.EffectiveScore(answer, marking)
+	return &score
+}
+
+func (h *Handler) scoreForAnswer(ctx context.Context, answer core.Answer, contestant bool) (*core.Score, error) {
+	scores, err := h.loadAnswerScores(ctx)
+	if err != nil {
 		return nil, err
 	}
-	latest := core.LatestMarkings(markings)
-	keyed := core.SelectBestScores([]core.Answer{answer}, markings)
-	score, ok := keyed[answer.TeamCode][answer.ProblemCode]
-	if !ok {
-		return nil, nil
-	}
-	if contestant {
-		marking, hasMarking := core.LatestMarkingForAnswer(latest, answer.TeamCode, answer.ProblemCode, answer.Number)
-		visibility := h.service.MarkingVisibility(answer.SubmittedAt, state)
-		if !hasMarking || marking.ID == "" || visibility == core.VisibilityPrivate {
-			return nil, nil
-		}
-	}
-	return &score, nil
+	return h.scoreFor(scores, answer, contestant), nil
 }
 
 func submissionStatus(snapshot core.ContentSnapshot, problem core.Problem, now time.Time) api.SubmissionStatus {

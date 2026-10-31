@@ -459,9 +459,6 @@ async function installAdminApi(page: Page): Promise<ApiState> {
         dashboard_schedule: { ranking_freeze_at: now },
       });
     }
-    if (path === "/api/v1/admin/dashboard-schedule" && method === "PUT") {
-      return fulfillJson(route, { dashboard_schedule: body });
-    }
     if (path === "/api/v1/admin/dev/contest-phase" && method === "GET") {
       return fulfillJson(route, {
         contest_phase: { enabled: false, phase: "DURING", sections: [] },

@@ -391,7 +391,7 @@ func TestPostgresStoreIntegration(t *testing.T) {
 		if err != nil || state.RankingFreezeAt == nil || !state.RankingFreezeAt.Equal(freeze) || state.UpdatedBy != "content:"+snapshot.CommitSHA {
 			t.Fatalf("freeze after activation = %v by %q, err = %v", state.RankingFreezeAt, state.UpdatedBy, err)
 		}
-		if _, err := fixture.store.ReplaceFreezeAt(ctx, nil, "admin"); err != nil {
+		if _, err := fixture.pool.Exec(ctx, `UPDATE competition_state SET ranking_freeze_at=NULL WHERE singleton=true`); err != nil {
 			t.Fatalf("clear freeze: %v", err)
 		}
 		if _, err := fixture.store.ActivateContent(ctx, snapshot, snapshot.CommitSHA); err != nil {

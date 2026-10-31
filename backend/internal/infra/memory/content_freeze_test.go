@@ -22,9 +22,7 @@ func TestActivateContentSetsScheduleFreeze(t *testing.T) {
 	}
 
 	// Activating the active commit again repairs a freeze that drifted.
-	if _, err := store.ReplaceFreezeAt(ctx, nil, "admin"); err != nil {
-		t.Fatal(err)
-	}
+	store.state.RankingFreezeAt = nil
 	if _, err := store.ActivateContent(ctx, snapshot, "aaa"); err != nil {
 		t.Fatal(err)
 	}

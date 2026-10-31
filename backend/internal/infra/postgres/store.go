@@ -820,10 +820,6 @@ func truncateFreeze(freezeAt *time.Time) *time.Time {
 	return &value
 }
 
-func (s *Store) ReplaceFreezeAt(ctx context.Context, freezeAt *time.Time, actor string) (core.CompetitionState, error) {
-	return s.mutateCompetitionState(ctx, actor, "replace_freeze", truncateFreeze(freezeAt), true, nil)
-}
-
 func (s *Store) RevealFinal(ctx context.Context, at time.Time, actor string) (core.CompetitionState, error) {
 	return s.mutateCompetitionState(ctx, actor, "reveal_final", nil, false, &at)
 }
