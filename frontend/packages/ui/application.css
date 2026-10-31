@@ -186,6 +186,19 @@ button:disabled {
   border-color: var(--accent);
   color: var(--accent);
 }
+.realtime-status {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 20;
+  max-width: calc(100vw - 32px);
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 13px;
+}
 .admin-header {
   width: min(100%, var(--page-max-width));
   margin-inline: auto;

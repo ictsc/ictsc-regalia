@@ -560,6 +560,46 @@
         }
       }
     },
+    "/api/v1/contestant/events/stream": {
+      "get": {
+        "tags": ["Contestant Competition"],
+        "summary": "自チームの画面に関わる変更通知をSSEで購読する",
+        "description": "接続時と再接続時にreadyイベントを送り、以後は変更の種類だけを通知する。イベントは得点や回答本文を含まないため、クライアントは該当するREST APIを取り直す。自チームの回答提出はanswers、自チームの採点結果が見えるようになり得る時点（提出から公開遅延が経過した時点、公開遅延経過後の採点、最終公開）はscoresで通知する。公開遅延中の採点は通知しない。15秒間隔でkeepaliveコメントを送る。ブラウザからの状態ポーリングには使用しない。",
+        "operationId": "streamContestantEvents",
+        "security": [{ "ContestantSession": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/LastEventIdHeader" }
+        ],
+        "x-sse-events": {
+          "ready": { "$ref": "#/components/schemas/RealtimeNotice" },
+          "answers": { "$ref": "#/components/schemas/ContestantRealtimeProblemEvent" },
+          "scores": { "$ref": "#/components/schemas/ContestantRealtimeProblemEvent" },
+          "ranking": { "$ref": "#/components/schemas/RealtimeNotice" },
+          "content": { "$ref": "#/components/schemas/RealtimeNotice" },
+          "teams": { "$ref": "#/components/schemas/RealtimeNotice" },
+          "competition": { "$ref": "#/components/schemas/RealtimeNotice" }
+        },
+        "responses": {
+          "200": {
+            "description": "変更通知イベントのストリーム。各data行はx-sse-eventsに示すJSON。readyとcompetitionを受け取ったクライアントは表示中のデータをすべて取り直す。",
+            "headers": {
+              "Cache-Control": { "$ref": "#/components/headers/SSECacheControl" },
+              "X-Accel-Buffering": { "$ref": "#/components/headers/SSEBuffering" }
+            },
+            "content": {
+              "text/event-stream": {
+                "schema": { "type": "string" },
+                "example": "event: ready\nid: 8bd91aa8-4c57-4ed5-85bf-b829a4cd5571\ndata: {}\n\nevent: answers\nid: 0b7e1c55-3f7d-4a43-9d0e-3a0f61c1f1b2\ndata: {\"problem_code\":\"ABC\"}\n\n: keepalive\n\n"
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
     "/api/v1/contestant/announcements": {
       "get": {
         "tags": ["Contestant Content"],
@@ -1282,6 +1322,46 @@
           "422": { "$ref": "#/components/responses/ValidationError" },
           "500": { "$ref": "#/components/responses/InternalServerError" },
           "502": { "$ref": "#/components/responses/BadGateway" }
+        }
+      }
+    },
+    "/api/v1/admin/events/stream": {
+      "get": {
+        "tags": ["Admin Marking"],
+        "summary": "運営画面に関わる変更通知をSSEで購読する",
+        "description": "接続時と再接続時にreadyイベントを送り、以後は変更の種類と対象の回答参照だけを通知する。クライアントは該当するREST APIを取り直す。15秒間隔でkeepaliveコメントを送る。ブラウザからの状態ポーリングには使用しない。",
+        "operationId": "streamAdminEvents",
+        "security": [{ "AdminSession": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/LastEventIdHeader" }
+        ],
+        "x-sse-events": {
+          "ready": { "$ref": "#/components/schemas/RealtimeNotice" },
+          "answer": { "$ref": "#/components/schemas/AdminRealtimeAnswerEvent" },
+          "scores": { "$ref": "#/components/schemas/RealtimeNotice" },
+          "ranking": { "$ref": "#/components/schemas/RealtimeNotice" },
+          "content": { "$ref": "#/components/schemas/RealtimeNotice" },
+          "teams": { "$ref": "#/components/schemas/RealtimeNotice" },
+          "competition": { "$ref": "#/components/schemas/RealtimeNotice" }
+        },
+        "responses": {
+          "200": {
+            "description": "変更通知イベントのストリーム。各data行はx-sse-eventsに示すJSON。readyとcompetitionを受け取ったクライアントは表示中のデータをすべて取り直す。",
+            "headers": {
+              "Cache-Control": { "$ref": "#/components/headers/SSECacheControl" },
+              "X-Accel-Buffering": { "$ref": "#/components/headers/SSEBuffering" }
+            },
+            "content": {
+              "text/event-stream": {
+                "schema": { "type": "string" },
+                "example": "event: ready\nid: 8bd91aa8-4c57-4ed5-85bf-b829a4cd5571\ndata: {}\n\nevent: answer\nid: 0b7e1c55-3f7d-4a43-9d0e-3a0f61c1f1b2\ndata: {\"reason\":\"SUBMITTED\",\"answer\":{\"team_code\":2,\"problem_code\":\"ABC\",\"answer_number\":1}}\n\n: keepalive\n\n"
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       }
     },
@@ -2470,6 +2550,31 @@
         "required": ["deployment"],
         "properties": {
           "deployment": { "$ref": "#/components/schemas/ContestantDeployment" }
+        }
+      },
+      "RealtimeNotice": {
+        "type": "object",
+        "description": "対象を持たない変更通知。クライアントはイベント名に対応するREST APIを取り直す。",
+        "additionalProperties": false,
+        "properties": {}
+      },
+      "ContestantRealtimeProblemEvent": {
+        "type": "object",
+        "description": "自チームの特定の問題に関する変更通知。",
+        "additionalProperties": false,
+        "required": ["problem_code"],
+        "properties": {
+          "problem_code": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" }
+        }
+      },
+      "AdminRealtimeAnswerEvent": {
+        "type": "object",
+        "description": "回答に関する変更通知。SUBMITTEDは新着、WORKFLOW_UPDATEDは担当・ステータス変更、MARKING_UPDATEDは採点結果の作成・変更、PUBLICATION_DELAY_ELAPSEDは公開遅延の経過による採点結果の可視性変化を表す。",
+        "additionalProperties": false,
+        "required": ["reason", "answer"],
+        "properties": {
+          "reason": { "type": "string", "enum": ["SUBMITTED", "WORKFLOW_UPDATED", "MARKING_UPDATED", "PUBLICATION_DELAY_ELAPSED"] },
+          "answer": { "$ref": "#/components/schemas/AdminAnswerReference" }
         }
       },
       "Announcement": {

@@ -71,3 +71,20 @@ func (s *Service) publicScores(ctx context.Context, visibleAt *time.Time, final 
 	}
 	return core.SelectBestScores(answers, visible), nil
 }
+
+// TeamSeesMarkingNow reports whether a marking on the answer is already
+// visible to the answering team, mirroring ContestantScores. Realtime
+// notifications use it so a marking made during the publication delay sends
+// nothing to contestants; the delay's end is announced on its own schedule.
+// Any rule that hides markings from ContestantScores must also apply here.
+func (s *Service) TeamSeesMarkingNow(ctx context.Context, teamCode int64, problemCode string, answerNumber int32) (bool, error) {
+	answer, err := s.Store.GetAnswer(ctx, teamCode, problemCode, answerNumber)
+	if err != nil {
+		return false, err
+	}
+	state, err := s.Store.GetCompetitionState(ctx)
+	if err != nil {
+		return false, err
+	}
+	return state.FinalRevealedAt != nil || !s.Now().Before(answer.SubmittedAt.Add(core.PublishDelay)), nil
+}

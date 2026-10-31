@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AdminHeader from "~/components/layout/AdminHeader.vue";
 import AdminNav from "~/components/layout/AdminNav.vue";
+import RealtimeSync from "~/components/realtime/RealtimeSync.vue";
 const { viewer, refresh, signOut } = useAdminSession();
 const route = useRoute();
 const error = ref<unknown>();
@@ -43,7 +44,8 @@ async function logout() {
         >
       </main>
       <template v-else-if="viewer"
-        ><div class="admin-shell">
+        ><RealtimeSync v-if="viewer.state === 'ADMIN'" />
+        <div class="admin-shell">
           <AdminNav :current-path="route.path" />
           <slot /></div></template
     ></RequestState>

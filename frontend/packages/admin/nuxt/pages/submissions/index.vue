@@ -4,11 +4,15 @@ import GradingBoard, {
   type GradingChange,
 } from "~/components/grading/GradingBoard.vue";
 import GradingFilters from "~/components/grading/GradingFilters.vue";
-import { updateAdminAnswerWorkflow } from "~/features/admin-api";
+import {
+  getAdminAnswer,
+  updateAdminAnswerWorkflow,
+} from "~/features/admin-api";
 import {
   answerKey,
   answerPath,
   filterAnswers,
+  upsertAnswer,
   type GradingAnswer,
 } from "~/features/grading";
 
@@ -26,6 +30,25 @@ const { data, error, pending, refresh } = await useAsyncData(
       }),
     ),
 );
+// New answers and other operators' assignment or marking changes arrive
+// without reloading the board.
+useRealtime(async (event) => {
+  if (event.type !== "answer") return;
+  try {
+    const answer = await getAdminAnswer(api, {
+      team_code: event.teamCode,
+      problem_code: event.problemCode,
+      answer_number: event.answerNumber,
+    });
+    if (data.value)
+      data.value = {
+        ...data.value,
+        answers: upsertAnswer(data.value.answers, answer),
+      };
+  } catch {
+    await refresh();
+  }
+});
 const teams = ref<string[]>([]);
 const problems = ref<string[]>([]);
 const recent = ref(false);

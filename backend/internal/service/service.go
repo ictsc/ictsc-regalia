@@ -48,6 +48,7 @@ type Service struct {
 	Content        ContentSource
 	Deployments    DeploymentGateway
 	Events         EventBus
+	Realtime       EventBus
 	WebPush        WebPushSender
 	VAPIDPublicKey string
 	Config         Config
@@ -55,6 +56,7 @@ type Service struct {
 
 	statusMu      sync.RWMutex
 	contentStatus ContentStatus
+	realtime      realtimeHub
 }
 
 func (s *Service) WebPushConfig() (bool, string) {
@@ -371,6 +373,7 @@ func (s *Service) SignUp(ctx context.Context, signupToken, name, displayName, in
 	if consumed.Discord.ID != signup.Discord.ID {
 		return core.Contestant{}, "", core.NewError(http.StatusInternalServerError, "internal_error", "Consumed signup identity did not match")
 	}
+	s.PublishRealtime(ctx, core.RealtimeEvent{Kind: core.RealtimeTeamsUpdated, TeamCode: contestant.TeamCode})
 	token, err := s.Sessions.Create(ctx, session.Data{
 		Kind: session.KindContestant, ContestantName: contestant.Name, Discord: signup.Discord,
 	}, ContestantTTL)
@@ -445,6 +448,7 @@ func (s *Service) RefreshContent(ctx context.Context, claims ActionsClaims, comm
 		return core.ContentSnapshot{}, err
 	}
 	s.setContentSuccess(snapshot)
+	s.PublishRealtime(ctx, core.RealtimeEvent{Kind: core.RealtimeContentUpdated})
 	return snapshot, nil
 }
 
@@ -600,7 +604,15 @@ func (s *Service) SubmitAnswer(ctx context.Context, contestant core.Contestant, 
 		Body: body, SubmittedAt: now, ContentCommit: snapshot.CommitSHA, MaxScore: problem.MaxScore,
 		RedeployRule: problem.Redeploy, DeploymentsBefore: int32(len(deployments)),
 	}
-	return s.Store.SubmitAnswer(ctx, answer, core.AnswerInterval)
+	submitted, wait, err := s.Store.SubmitAnswer(ctx, answer, core.AnswerInterval)
+	if err != nil {
+		return submitted, wait, err
+	}
+	s.PublishRealtime(ctx, core.RealtimeEvent{
+		Kind: core.RealtimeAnswerSubmitted, TeamCode: submitted.TeamCode,
+		ProblemCode: submitted.ProblemCode, AnswerNumber: submitted.Number,
+	})
+	return submitted, wait, nil
 }
 
 func (s *Service) Scores(ctx context.Context, before *time.Time) (map[int64]map[string]core.Score, error) {
