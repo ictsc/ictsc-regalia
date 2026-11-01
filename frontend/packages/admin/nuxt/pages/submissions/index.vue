@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { api, expectData } from "@ictsc/api";
+import AdminPage from "~/components/layout/AdminPage.vue";
 import GradingBoard, {
   type GradingChange,
 } from "~/components/grading/GradingBoard.vue";
@@ -123,14 +124,15 @@ async function update(answer: GradingAnswer, change: GradingChange) {
 
 <template>
   <main class="workspace grading-workspace">
-    <h1>採点</h1>
-    <p class="admin-lead">
-      自分の担当回答を各列の先頭に表示します。カードを開くと採点できます。
-    </p>
-    <p v-if="secondaryQualifier" class="admin-lead">
-      二次予選モード:
-      各チーム・問題の最終答案だけを表示します。採点は競技終了後に行えます。
-    </p>
+    <AdminPage title="採点">
+      <template #lead
+        >自分の担当回答を各列の先頭に表示します。カードを開くと採点できます。<template
+          v-if="secondaryQualifier"
+          ><br />二次予選モード:
+          各チーム・問題の最終答案だけを表示します。採点は競技終了後に行えます。</template
+        ></template
+      >
+    </AdminPage>
     <GradingFilters
       v-model:teams="teams"
       v-model:problems="problems"
@@ -152,9 +154,3 @@ async function update(answer: GradingAnswer, change: GradingChange) {
     </RequestState>
   </main>
 </template>
-
-<style scoped>
-.grading-workspace {
-  max-width: none;
-}
-</style>

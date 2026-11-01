@@ -82,7 +82,9 @@ describe("TeamDetailView", () => {
     expect(wrapper.emitted("invite")).toEqual([["2026-09-03T10:00"]]);
     await wrapper.find(".admin-danger button").trigger("click");
     expect(wrapper.emitted("remove")).toHaveLength(1);
-    expect(wrapper.findAll("tbody tr")).toHaveLength(2);
+    expect(wrapper.findAll("tbody tr")).toHaveLength(
+      props.members.length + invitations.length,
+    );
   });
 });
 
@@ -92,9 +94,9 @@ describe("ContestantsView", () => {
       props: { ...base, contestants },
       global,
     });
-    expect(wrapper.find(".muted").text()).toBe("6 / 6 人を表示");
+    expect(wrapper.find(".admin-panel-aside").text()).toBe("6 / 6 人");
     await wrapper.find("input").setValue("carol");
-    expect(wrapper.find(".muted").text()).toBe("1 / 6 人を表示");
+    expect(wrapper.find(".admin-panel-aside").text()).toBe("1 / 6 人");
     await wrapper.find("tbody button").trigger("click");
     expect(wrapper.emitted("impersonate")).toEqual([["carol"]]);
     await wrapper.find("input").setValue("nobody");
@@ -113,8 +115,8 @@ describe("ScoresView", () => {
       global,
     });
     expect(wrapper.find(".admin-badge").text()).toBe("凍結中");
-    expect(wrapper.text()).toContain("凍結時刻:");
-    const buttons = wrapper.findAll(".actions button");
+    expect(wrapper.find(".admin-facts dt").text()).toBe("凍結時刻");
+    const buttons = wrapper.findAll(".admin-page-actions button");
     await buttons[0]!.trigger("click");
     await buttons[1]!.trigger("click");
     expect(wrapper.emitted("recalculate")).toHaveLength(1);
@@ -131,7 +133,7 @@ describe("SettingsView", () => {
     expect(wrapper.find("textarea").exists()).toBe(false);
     expect(wrapper.find("form").exists()).toBe(false);
     expect(wrapper.text()).toContain("rule.md がありません");
-    expect(wrapper.text()).toContain("現在の凍結時刻: 未設定");
+    expect(wrapper.find(".admin-facts").text()).toBe("現在の凍結時刻未設定");
   });
 });
 
@@ -155,7 +157,7 @@ describe("DeploymentsView", () => {
     const selects = wrapper.findAll("select");
     await selects[0]!.setValue("4");
     await selects[1]!.setValue("B02");
-    expect(wrapper.find(".admin-panel-heading span").text()).toBe("2 件");
+    expect(wrapper.find(".admin-panel-aside").text()).toBe("2 件");
     await wrapper.find("form").trigger("submit");
     expect(wrapper.emitted("create")).toEqual([[4, "B02"]]);
 
@@ -164,7 +166,8 @@ describe("DeploymentsView", () => {
     await row.findAll("button")[1]!.trigger("click");
     expect(wrapper.emitted("sync")).toEqual([[4, "B02"]]);
     await row.findAll("button")[0]!.trigger("click");
-    expect(wrapper.findAll("article.content-section")).toHaveLength(2);
+    const events = wrapper.findAll(".admin-panel").at(-1)!;
+    expect(events.findAll("tbody tr")).toHaveLength(2);
   });
 });
 
@@ -196,7 +199,9 @@ describe("ProblemContentView", () => {
       global,
     });
     expect(wrapper.find("h1").text()).toBe("B02: コンテナが起動を繰り返す");
-    expect(wrapper.text()).toContain("デフォルト採点担当者: 未設定");
+    expect(wrapper.find(".admin-facts").text()).toContain(
+      "デフォルト採点担当者未設定",
+    );
     await wrapper.find("input").setValue("1a2b3c4");
     await wrapper.find("form").trigger("submit");
     expect(wrapper.emitted("viewCommit")).toEqual([["1a2b3c4"]]);

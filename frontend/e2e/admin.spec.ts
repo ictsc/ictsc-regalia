@@ -503,10 +503,12 @@ test("Admin navigation、team・招待・参加者・content履歴を操作す�
 
   await page.getByRole("link", { name: "コンテンツ", exact: true }).click();
   await page.getByLabel("Git commit SHA").fill(historicalCommit);
-  await page.getByRole("button", { name: "指定commitを取得" }).click();
+  await page.getByRole("button", { name: "指定 commit を取得" }).click();
   await expect(page.getByText("コンテンツ更新しました")).toBeVisible();
   await page.goto("/admin/content/problems/A01");
-  await page.getByLabel("参照commit（空欄でactive）").fill(historicalCommit);
+  await page
+    .getByLabel("参照 commit（空欄で配信中の版）")
+    .fill(historicalCommit);
   await page.getByRole("button", { name: "表示" }).click();
   await expect(page.getByText(historicalCommit, { exact: true })).toBeVisible();
   expect(
@@ -665,7 +667,7 @@ test("回答詳細・再採点・得点操作・freeze・404を検証する", as
   await expect(
     page.getByRole("heading", { name: "E2E rule", level: 1 }),
   ).toBeVisible();
-  await expect(page.getByText("現在の凍結時刻:")).toBeVisible();
+  await expect(page.getByText("現在の凍結時刻")).toBeVisible();
 
   await page.goto("/admin/submissions/A01/12/999");
   await expect(page.getByText("指定された回答は存在しません")).toBeVisible();

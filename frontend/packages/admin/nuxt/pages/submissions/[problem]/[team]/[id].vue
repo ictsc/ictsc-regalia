@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { api, expectData } from "@ictsc/api";
+import AdminPage from "~/components/layout/AdminPage.vue";
 import GradingDetailView, {
   type MarkingInput,
 } from "~/components/grading/GradingDetailView.vue";
@@ -148,22 +149,21 @@ watch(
 
 <template>
   <main class="workspace grading-detail-workspace">
-    <NuxtLink class="text-link" to="/submissions">← 採点一覧</NuxtLink>
-    <h1>
-      {{ reference.problem_code }} / Team {{ reference.team_code }} / #{{
-        reference.answer_number
-      }}
-    </h1>
-    <p v-if="data" class="admin-lead">
-      {{ data.answer.team.name }} · {{ data.answer.author.display_name }} ·
-      <time :datetime="data.answer.submitted_at">{{
-        new Date(data.answer.submitted_at).toLocaleString("ja-JP")
-      }}</time>
-      <span class="grading-detail-age"
-        >提出から {{ elapsedMinutes(data.answer.submitted_at) }} 分</span
+    <AdminPage
+      :title="`${reference.problem_code} / Team ${reference.team_code} / #${reference.answer_number}`"
+      :back="{ to: '/submissions', label: '採点一覧' }"
+      :message="message"
+    >
+      <template v-if="data" #lead
+        >{{ data.answer.team.name }} · {{ data.answer.author.display_name }} ·
+        <time :datetime="data.answer.submitted_at">{{
+          new Date(data.answer.submitted_at).toLocaleString("ja-JP")
+        }}</time>
+        <span class="grading-detail-age"
+          >提出から {{ elapsedMinutes(data.answer.submitted_at) }} 分</span
+        ></template
       >
-    </p>
-    <p role="status">{{ message }}</p>
+    </AdminPage>
     <p v-if="workflowError" role="alert">{{ workflowError }}</p>
     <RequestState :error="error" :pending="pending" @retry="refresh">
       <GradingDetailView
@@ -187,9 +187,6 @@ watch(
 </template>
 
 <style scoped>
-.grading-detail-workspace {
-  max-width: none;
-}
 .grading-detail-age {
   display: inline-block;
   margin-left: 8px;

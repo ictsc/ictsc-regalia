@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { components } from "@ictsc/api";
+import AdminFacts from "~/components/layout/AdminFacts.vue";
+import AdminPanel from "~/components/layout/AdminPanel.vue";
 
 type ContestPhase = components["schemas"]["ContestPhase"];
 
@@ -31,20 +33,19 @@ const labelOf = (phase: ContestPhase) =>
 const format = (value: string) => new Date(value).toLocaleString("ja-JP");
 </script>
 <template>
-  <section class="admin-panel dev-contest-phase">
-    <h2>開発用: 競技状態の切り替え</h2>
+  <AdminPanel title="開発用: 競技状態の切り替え">
     <p>
       開発モードかつ二次予選モードでのみ表示されます。セクションの数・長さ・間隔は保ったまま、現在時刻を基準に全体を前後へずらします。
     </p>
-    <p>
-      現在の状態: <strong>{{ labelOf(contestPhase.phase) }}</strong>
-    </p>
-    <ul class="dev-contest-phase-sections">
-      <li v-for="section in contestPhase.sections" :key="section.slug">
-        <code>{{ section.slug }}</code>
-        {{ format(section.beginning) }} 〜 {{ format(section.ending) }}
-      </li>
-    </ul>
+    <AdminFacts
+      :items="[
+        { label: '現在の状態', value: labelOf(contestPhase.phase) },
+        ...contestPhase.sections.map((section) => ({
+          label: section.slug,
+          value: `${format(section.beginning)} 〜 ${format(section.ending)}`,
+        })),
+      ]"
+    />
     <div class="actions">
       <button
         v-for="option in phases"
@@ -62,13 +63,5 @@ const format = (value: string) => new Date(value).toLocaleString("ja-JP");
         {{ option.label }}にする
       </button>
     </div>
-  </section>
+  </AdminPanel>
 </template>
-
-<style scoped>
-.dev-contest-phase-sections {
-  margin: 0 0 16px;
-  padding-left: 1.2em;
-  font-variant-numeric: tabular-nums;
-}
-</style>

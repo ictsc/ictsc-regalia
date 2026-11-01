@@ -80,6 +80,9 @@
 html {
   color-scheme: light;
   scroll-behavior: smooth;
+  /* Keep room for the scrollbar on short pages too, so moving between
+     pages does not shift the centered layout sideways. */
+  scrollbar-gutter: stable;
 }
 html[data-theme="dark"] {
   color-scheme: dark;

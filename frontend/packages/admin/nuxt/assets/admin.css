@@ -2,17 +2,15 @@
 .admin-app {
   min-height: 100vh;
 }
-/* Spans the same width as .admin-shell: the brand lines up with the nav
-   labels (14px nav padding + 3px marker + 12px link padding) and the
-   actions with the workspace's right edge. */
+/* The admin screen is anchored to the left edge, not centered: the header
+   and navigation stay put on every page and only the content width varies.
+   The brand lines up with the nav labels (14px nav padding + 3px marker +
+   12px link padding). */
 .admin-app .admin-header {
   width: 100%;
-  max-width: 1680px;
+  max-width: none;
   min-height: 72px;
   padding: 0 clamp(20px, 3vw, 48px) 0 29px;
-}
-.admin-app:has(.grading-detail-workspace) .admin-header {
-  max-width: none;
 }
 .admin-app .admin-header .actions {
   margin: 0;
@@ -28,11 +26,6 @@
 .admin-shell {
   display: grid;
   grid-template-columns: 216px minmax(0, 1fr);
-  max-width: 1680px;
-  margin-inline: auto;
-}
-.admin-shell:has(> .grading-detail-workspace) {
-  max-width: none;
 }
 .admin-shell .admin-nav {
   align-self: stretch;
@@ -77,21 +70,56 @@
 .admin-shell > .workspace {
   width: 100%;
   min-width: 0;
-  max-width: none;
+  max-width: 1464px;
+  margin: 0;
   padding: 34px clamp(20px, 3vw, 48px) 80px;
 }
-.admin-shell .workspace h1 {
+/* Grading needs the room: the board's columns and the detail's panes use
+   the full width. They start at the same left edge as every other page. */
+.admin-shell > .workspace:is(.grading-workspace, .grading-detail-workspace) {
+  max-width: none;
+}
+/* AdminPage: every page starts with the same back link, title, lead and
+   page actions, so switching pages does not move the content around. */
+.admin-page-header {
+  margin: 0 0 30px;
+}
+.admin-back {
+  display: inline-block;
   margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.admin-back:hover,
+.admin-back:focus-visible {
+  color: var(--accent);
+}
+.workspace .admin-page-header h1 {
+  margin: 0 0 10px;
   font-size: clamp(27px, 3vw, 36px);
 }
-.admin-shell .workspace h2 {
-  margin: 0 0 16px;
-  font-size: 19px;
-}
 .admin-lead {
-  margin: 0 0 30px;
+  margin: 0;
   color: var(--muted);
   line-height: 1.7;
+}
+.admin-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+.admin-page-actions .button-primary,
+.admin-page-actions .button-secondary {
+  width: fit-content;
+  min-height: 42px;
+  padding: 9px 16px;
+}
+.admin-status {
+  margin: -12px 0 24px;
+  font-weight: 600;
 }
 .admin-panel {
   min-width: 0;
@@ -112,18 +140,54 @@
   gap: 16px;
   margin-bottom: 14px;
 }
-.admin-panel-heading h2 {
-  margin: 0 !important;
+.workspace .admin-panel-heading h2 {
+  margin: 0;
+  font-size: 19px;
 }
-.admin-panel-heading a {
+/* Count, badge, link or button on the right of a panel heading. */
+.admin-panel-aside {
+  flex: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.admin-panel-aside a {
+  color: var(--ink);
+}
+/* Label and value pairs (AdminFacts). */
+.admin-facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 8px 24px;
+  margin: 0 0 20px;
+}
+.admin-facts > div {
+  display: contents;
+}
+.admin-facts dt {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.admin-facts dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.admin-facts dd.admin-code {
   font-size: 13px;
 }
 .admin-panel .data-table {
   margin: 0;
 }
+/* Forms stay at a readable width instead of stretching across the page. */
 .admin-panel .form-grid {
   margin: 0;
-  max-width: none;
+  max-width: 640px;
+}
+.admin-panel .form-grid + .table-scroll,
+.admin-panel .form-grid + .admin-empty {
+  margin-top: 28px;
 }
 .admin-panel .table-scroll {
   max-width: 100%;
@@ -249,15 +313,18 @@
 .admin-panel .button-primary {
   width: fit-content;
 }
-/* Page-level actions above the panels, e.g. on the scores page. */
-.admin-shell > .workspace > .actions {
-  margin: 0 0 24px;
+/* Buttons inside table rows stay compact so rows keep their height. */
+.admin-panel .data-table .button-primary,
+.admin-panel .data-table .button-secondary,
+.admin-panel-aside .button-secondary {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 13px;
 }
-.admin-shell > .workspace > .actions .button-primary,
-.admin-shell > .workspace > .actions .button-secondary {
-  width: fit-content;
-  min-height: 42px;
-  padding: 9px 16px;
+.admin-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 .admin-panel .form-grid label {
   min-width: 0;
@@ -271,9 +338,28 @@
 .admin-panel .form-grid textarea {
   resize: vertical;
 }
+/* Commit inputs use the mono face at the same size as other inputs. */
+.admin-panel .form-grid input.admin-code {
+  font-size: inherit;
+}
 .admin-panel .markdown {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+/* Markdown headings stay below the page title and panel headings. */
+.workspace .admin-panel .markdown h1 {
+  margin: 1.2em 0 0.6em;
+  font-size: 22px;
+}
+.workspace .admin-panel .markdown h2 {
+  margin: 1.2em 0 0.6em;
+  font-size: 18px;
+}
+.workspace .admin-panel .markdown h3 {
+  font-size: 16px;
+}
+.workspace .admin-panel .markdown > :first-child {
+  margin-top: 0;
 }
 .admin-panel .mono,
 .admin-panel pre {

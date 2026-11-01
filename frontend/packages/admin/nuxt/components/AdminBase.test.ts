@@ -70,11 +70,12 @@ describe("OverviewView", () => {
       "最終正常版を配信中",
     ]);
     expect(badges[0]!.classes()).toContain("is-active");
-    expect(wrapper.find(".admin-code").text()).toBe("有効な commit: abc123");
+    expect(wrapper.find(".admin-facts dt").text()).toBe("有効な commit");
+    expect(wrapper.find(".admin-facts dd").text()).toBe("abc123");
   });
   it("falls back when the content status is unknown", () => {
     const wrapper = mount(OverviewView, { props: { cards: [] }, global });
     expect(wrapper.find(".admin-badge").text()).toBe("状態不明");
-    expect(wrapper.find(".admin-code").text()).toBe("有効な commit: 未設定");
+    expect(wrapper.find(".admin-facts dd").text()).toBe("未設定");
   });
 });
