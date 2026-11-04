@@ -48,6 +48,21 @@ type DeploymentGateway interface {
 	Status(ctx context.Context, teamCode int64, problemCode string) (core.DeploymentEvent, error)
 }
 
+// DeploymentObservation is what a gateway without callbacks reports for the
+// latest job of a team's problem. Status may be QUEUED while the job waits.
+type DeploymentObservation struct {
+	JobID     string
+	CreatedAt time.Time
+	Status    core.DeploymentStatus
+	Message   *string
+}
+
+// DeploymentProber is implemented by gateways that never call back, such as
+// rstate. The service polls them to move active deployments forward.
+type DeploymentProber interface {
+	Observe(ctx context.Context, teamCode int64, problemCode string) (DeploymentObservation, error)
+}
+
 type Subscription interface {
 	Messages() <-chan []byte
 	Close() error
