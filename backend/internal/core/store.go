@@ -84,4 +84,7 @@ type AnswerFilter struct {
 type DeploymentFilter struct {
 	TeamCode    *int64
 	ProblemCode *string
+	// Statuses keeps only deployments whose latest status is listed; nil
+	// keeps every status.
+	Statuses []DeploymentStatus
 }

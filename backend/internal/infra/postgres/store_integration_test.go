@@ -279,6 +279,18 @@ func TestPostgresStoreIntegration(t *testing.T) {
 		if err != nil || len(listed) != 1 || listed[0].GatewayJobID != "8ed8f0d9-8eb9-11ed-9bc1-befd30ae56b9" {
 			t.Fatalf("listed deployments = %#v, err = %v", listed, err)
 		}
+		active, err := fixture.store.ListDeployments(ctx, core.DeploymentFilter{
+			TeamCode: &team, Statuses: []core.DeploymentStatus{core.DeploymentQueued, core.DeploymentDeploying},
+		})
+		if err != nil || len(active) != 1 {
+			t.Fatalf("active deployments = %#v, err = %v", active, err)
+		}
+		finished, err := fixture.store.ListDeployments(ctx, core.DeploymentFilter{
+			TeamCode: &team, Statuses: []core.DeploymentStatus{core.DeploymentCompleted},
+		})
+		if err != nil || len(finished) != 0 {
+			t.Fatalf("finished deployments = %#v, err = %v", finished, err)
+		}
 	})
 
 	t.Run("deduplicates deployment events and validates transitions", func(t *testing.T) {

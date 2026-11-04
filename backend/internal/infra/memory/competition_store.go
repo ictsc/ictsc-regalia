@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -578,7 +579,8 @@ func (s *CompetitionStore) ListDeployments(_ context.Context, filter core.Deploy
 	result := make([]core.Deployment, 0)
 	for _, deployment := range s.deployments {
 		if filter.TeamCode != nil && deployment.TeamCode != *filter.TeamCode ||
-			filter.ProblemCode != nil && deployment.ProblemCode != *filter.ProblemCode {
+			filter.ProblemCode != nil && deployment.ProblemCode != *filter.ProblemCode ||
+			filter.Statuses != nil && !slices.Contains(filter.Statuses, deployment.LatestStatus) {
 			continue
 		}
 		result = append(result, deployment)

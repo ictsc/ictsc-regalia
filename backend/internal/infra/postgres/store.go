@@ -634,10 +634,18 @@ func (s *Store) UpdateAnswerWorkflow(ctx context.Context, teamCode int64, proble
 }
 
 func (s *Store) ListDeployments(ctx context.Context, filter core.DeploymentFilter) ([]core.Deployment, error) {
+	var statuses []string
+	if filter.Statuses != nil {
+		statuses = make([]string, 0, len(filter.Statuses))
+		for _, status := range filter.Statuses {
+			statuses = append(statuses, string(status))
+		}
+	}
 	rows, err := s.pool.Query(ctx, `
 		SELECT request_id::text,team_code,problem_code,revision,content_commit,requested_at,latest_status,COALESCE(gateway_job_id,'')
 		FROM deployments WHERE ($1::bigint IS NULL OR team_code=$1) AND ($2::text IS NULL OR problem_code=$2)
-		ORDER BY requested_at DESC,team_code,problem_code,revision DESC`, filter.TeamCode, filter.ProblemCode)
+		AND ($3::text[] IS NULL OR latest_status::text=ANY($3))
+		ORDER BY requested_at DESC,team_code,problem_code,revision DESC`, filter.TeamCode, filter.ProblemCode, statuses)
 	if err != nil {
 		return nil, dbError(err)
 	}

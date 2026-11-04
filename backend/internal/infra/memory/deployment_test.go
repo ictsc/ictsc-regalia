@@ -64,6 +64,12 @@ func TestDeploymentJobIDIsSetOnce(t *testing.T) {
 	if err != nil || len(listed) != 1 || listed[0].GatewayJobID != "job-1" {
 		t.Fatalf("listed = %#v, err = %v", listed, err)
 	}
+	if active, _ := store.ListDeployments(ctx, core.DeploymentFilter{Statuses: []core.DeploymentStatus{core.DeploymentQueued}}); len(active) != 1 {
+		t.Fatalf("active = %#v, want the queued deployment", active)
+	}
+	if finished, _ := store.ListDeployments(ctx, core.DeploymentFilter{Statuses: []core.DeploymentStatus{core.DeploymentCompleted}}); len(finished) != 0 {
+		t.Fatalf("finished = %#v, want none", finished)
+	}
 }
 
 func TestOnlyOneDeploymentCanBeActive(t *testing.T) {
