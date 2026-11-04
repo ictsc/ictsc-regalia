@@ -119,7 +119,7 @@ func (c *Client) Queue(ctx context.Context, request service.DeploymentRequest) e
 	if err := validateTarget(request.TeamCode, request.ProblemCode); err != nil {
 		return err
 	}
-	form := url.Values{"team_id": {teamID(request.TeamCode)}, "prob_id": {request.ProblemCode}}
+	form := url.Values{"team_id": {teamID(request.TeamCode)}, "prob_id": {probID(request.ProblemCode)}}
 	response, err := c.do(ctx, http.MethodPost, c.endpoint("/admin/postJob"), strings.NewReader(form.Encode()), "queue redeployment")
 	if err != nil {
 		return err
@@ -151,11 +151,11 @@ func (c *Client) Observe(ctx context.Context, teamCode int64, problemCode string
 	if err != nil {
 		return service.DeploymentObservation{}, err
 	}
-	team := fmt.Sprintf("%02d", teamCode)
+	team, problem := fmt.Sprintf("%02d", teamCode), probID(problemCode)
 	var latest *Job
 	for i := range jobs {
 		job := &jobs[i]
-		if job.TeamID != team || job.ProbID != problemCode {
+		if job.TeamID != team || job.ProbID != problem {
 			continue
 		}
 		if latest == nil || job.CreatedTime > latest.CreatedTime {
@@ -235,6 +235,13 @@ func (c *Client) endpoint(endpointPath string) string {
 
 func teamID(teamCode int64) string {
 	return fmt.Sprintf("team%02d", teamCode)
+}
+
+// probID lowercases the problem code: rstate's Terraform modules are named
+// in lower case, and both the Discord bot and rstate's SState-compatible API
+// send codes that way.
+func probID(problemCode string) string {
+	return strings.ToLower(problemCode)
 }
 
 func validateTarget(teamCode int64, problemCode string) error {

@@ -27,10 +27,10 @@ func TestQueuePostsJobFormWithBasicAuth(t *testing.T) {
 		if got := r.Header.Get("Content-Type"); got != "application/x-www-form-urlencoded" {
 			t.Fatalf("Content-Type = %q", got)
 		}
-		if r.PostFormValue("team_id") != "team02" || r.PostFormValue("prob_id") != "A01" {
+		if r.PostFormValue("team_id") != "team02" || r.PostFormValue("prob_id") != "a01" {
 			t.Fatalf("form = %v", r.PostForm)
 		}
-		_, _ = w.Write([]byte(`{"id":"8ed8f0d9-8eb9-11ed-9bc1-befd30ae56b9","state":0,"team_id":"team02","prob_id":"A01"}`))
+		_, _ = w.Write([]byte(`{"id":"8ed8f0d9-8eb9-11ed-9bc1-befd30ae56b9","state":0,"team_id":"team02","prob_id":"a01"}`))
 	}))
 	defer server.Close()
 
@@ -96,10 +96,10 @@ func TestObservePicksNewestJobForTeamAndProblem(t *testing.T) {
 		}
 		assertBasicAuth(t, r)
 		_, _ = w.Write([]byte(`[
-			{"id":"old","state":"終了","created_time":1,"end_time":2,"team_id":"02","prob_id":"A01"},
-			{"id":"new","state":"実行中","created_time":` + itoa(created.UnixNano()) + `,"end_time":0,"team_id":"02","prob_id":"A01"},
-			{"id":"other-team","state":"エラー","created_time":` + itoa(created.UnixNano()+1) + `,"end_time":0,"team_id":"12","prob_id":"A01"},
-			{"id":"other-problem","state":"エラー","created_time":` + itoa(created.UnixNano()+1) + `,"end_time":0,"team_id":"02","prob_id":"B01"}
+			{"id":"old","state":"終了","created_time":1,"end_time":2,"team_id":"02","prob_id":"a01"},
+			{"id":"new","state":"実行中","created_time":` + itoa(created.UnixNano()) + `,"end_time":0,"team_id":"02","prob_id":"a01"},
+			{"id":"other-team","state":"エラー","created_time":` + itoa(created.UnixNano()+1) + `,"end_time":0,"team_id":"12","prob_id":"a01"},
+			{"id":"other-problem","state":"エラー","created_time":` + itoa(created.UnixNano()+1) + `,"end_time":0,"team_id":"02","prob_id":"b01"}
 		]`))
 	}))
 	defer server.Close()
@@ -120,7 +120,7 @@ func TestObserveMapsStates(t *testing.T) {
 	} {
 		t.Run(state, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				_, _ = w.Write([]byte(`[{"id":"job","state":"` + state + `","created_time":1,"end_time":1,"team_id":"02","prob_id":"A01"}]`))
+				_, _ = w.Write([]byte(`[{"id":"job","state":"` + state + `","created_time":1,"end_time":1,"team_id":"02","prob_id":"a01"}]`))
 			}))
 			defer server.Close()
 			observation, err := newTestClient(t, server).Observe(context.Background(), 2, "A01")
@@ -135,7 +135,7 @@ func TestObserveMapsStates(t *testing.T) {
 }
 
 func TestObserveReportsMissingJobAndUnknownState(t *testing.T) {
-	for name, body := range map[string]string{"null list": `null`, "other team": `[{"id":"job","state":"終了","created_time":1,"team_id":"03","prob_id":"A01"}]`} {
+	for name, body := range map[string]string{"null list": `null`, "other team": `[{"id":"job","state":"終了","created_time":1,"team_id":"03","prob_id":"a01"}]`} {
 		t.Run(name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { _, _ = w.Write([]byte(body)) }))
 			defer server.Close()
@@ -147,7 +147,7 @@ func TestObserveReportsMissingJobAndUnknownState(t *testing.T) {
 		})
 	}
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte(`[{"id":"job","state":"Unknown State","created_time":1,"team_id":"02","prob_id":"A01"}]`))
+		_, _ = w.Write([]byte(`[{"id":"job","state":"Unknown State","created_time":1,"team_id":"02","prob_id":"a01"}]`))
 	}))
 	defer server.Close()
 	if _, err := newTestClient(t, server).Observe(context.Background(), 2, "A01"); err == nil {
@@ -157,7 +157,7 @@ func TestObserveReportsMissingJobAndUnknownState(t *testing.T) {
 
 func TestStatusReportsWaitingJobAsDeploying(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte(`[{"id":"job","state":"開始待ち","created_time":1,"team_id":"02","prob_id":"A01"}]`))
+		_, _ = w.Write([]byte(`[{"id":"job","state":"開始待ち","created_time":1,"team_id":"02","prob_id":"a01"}]`))
 	}))
 	defer server.Close()
 	event, err := newTestClient(t, server).Status(context.Background(), 2, "A01")
