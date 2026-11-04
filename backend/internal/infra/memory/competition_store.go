@@ -608,6 +608,21 @@ func (s *CompetitionStore) CreateDeployment(_ context.Context, deployment core.D
 	return deployment, nil
 }
 
+func (s *CompetitionStore) SetDeploymentJobID(_ context.Context, requestID, jobID string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	deployment, ok := s.deployments[requestID]
+	if !ok {
+		return core.NewError(http.StatusNotFound, "deployment_not_found", "Deployment was not found")
+	}
+	if deployment.GatewayJobID != "" && deployment.GatewayJobID != jobID {
+		return core.NewError(http.StatusConflict, "deployment_job_mismatch", "Deployment already has a different job ID")
+	}
+	deployment.GatewayJobID = jobID
+	s.deployments[requestID] = deployment
+	return nil
+}
+
 func (s *CompetitionStore) AppendDeploymentEvent(_ context.Context, requestID string, event core.DeploymentEvent, recovery bool) (core.Deployment, bool, error) {
 	event.OccurredAt = event.OccurredAt.UTC().Truncate(time.Microsecond)
 	s.mu.Lock()

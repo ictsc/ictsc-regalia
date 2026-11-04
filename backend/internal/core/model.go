@@ -257,7 +257,10 @@ type Deployment struct {
 	ContentCommit string
 	RequestedAt   time.Time
 	LatestStatus  DeploymentStatus
-	Events        []DeploymentEvent
+	// GatewayJobID is the job a gateway without callbacks created for this
+	// request; empty until the gateway reports it.
+	GatewayJobID string
+	Events       []DeploymentEvent
 }
 
 type CompetitionState struct {
