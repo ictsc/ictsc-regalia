@@ -2,6 +2,10 @@ import { fileURLToPath } from "node:url";
 import { themeInitScript } from "../ui/theme-init";
 import { japaneseFontStylesheet, latinFontStylesheet } from "../ui/fonts";
 export default defineNuxtConfig({
+  buildId: process.env.NUXT_BUILD_ID || undefined,
+  // The app manifest embeds a wall-clock build timestamp even with a fixed ID.
+  // Preview images must be reproducible for the publisher's digest check.
+  experimental: { appManifest: !process.env.NUXT_BUILD_ID },
   compatibilityDate: "2026-09-05",
   srcDir: "nuxt/",
   ssr: false,

@@ -9,9 +9,12 @@ RUN --mount=type=bind,source=package.json,target=package.json \
     pnpm fetch
 COPY . .
 RUN pnpm install --recursive --offline
-RUN pnpm run build
+ARG NUXT_BUILD_ID
+ARG SOURCE_DATE_EPOCH
+RUN pnpm run build && \
+    if [ -n "$SOURCE_DATE_EPOCH" ]; then node scripts/fix-prerendered-at.mjs; fi
 
-FROM nginx:1.31.7 AS frontend
+FROM nginx:1.31.8 AS frontend
 ENV API_UPSTREAM=http://api:8080
 ENV NGINX_RESOLVER=127.0.0.11
 ENV ICTSC_DEMO_MODE=false
