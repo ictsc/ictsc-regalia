@@ -15,7 +15,7 @@ var runtimeEnvKeys = []string{
 	"ICTSC_GITHUB_REPOSITORY", "ICTSC_GITHUB_REF", "ICTSC_GITHUB_WORKFLOW_REF",
 	"ICTSC_SSTATE_BASE_URL", "ICTSC_SSTATE_REQUEST_TOKEN", "ICTSC_SSTATE_CALLBACK_TOKEN",
 	"ICTSC_CALLBACK_BASE_URL", "ICTSC_API_READ_HEADER_TIMEOUT", "ICTSC_API_SHUTDOWN_TIMEOUT",
-	"ICTSC_RSTATE_BASE_URL", "ICTSC_RSTATE_ADMIN_PASSWORD", "ICTSC_RSTATE_POLL_INTERVAL", "ICTSC_RSTATE_ALLOW_HTTP",
+	"ICTSC_RSTATE_BASE_URL", "ICTSC_RSTATE_ADMIN_USER", "ICTSC_RSTATE_ADMIN_PASSWORD", "ICTSC_RSTATE_POLL_INTERVAL", "ICTSC_RSTATE_ALLOW_HTTP",
 }
 
 func clearRuntimeEnv(t *testing.T) {
@@ -94,7 +94,7 @@ func TestLoadRuntimeSecondaryQualifierUsesRstateInsteadOfSState(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !cfg.SecondaryQualifierMode || cfg.RStateBaseURL != "https://rstate.example" || cfg.RStatePollInterval != 10*time.Second {
+	if !cfg.SecondaryQualifierMode || cfg.RStateBaseURL != "https://rstate.example" || cfg.RStateAdminUser != "ictsc" || cfg.RStatePollInterval != 10*time.Second {
 		t.Fatalf("unexpected rstate settings: %#v", cfg)
 	}
 

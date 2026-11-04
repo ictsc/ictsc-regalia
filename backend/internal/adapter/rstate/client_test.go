@@ -169,6 +169,23 @@ func TestStatusReportsWaitingJobAsDeploying(t *testing.T) {
 	}
 }
 
+func TestAdminUserCanBeOverridden(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if user, password, ok := r.BasicAuth(); !ok || user != "proxy-user" || password != testPassword {
+			t.Fatalf("Basic auth = %q/%q (%v)", user, password, ok)
+		}
+		_, _ = w.Write([]byte(`[]`))
+	}))
+	defer server.Close()
+	client, err := New(Config{BaseURL: server.URL, AdminUser: "proxy-user", AdminPassword: testPassword, HTTPClient: server.Client(), AllowInsecureHTTP: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := client.ListJobs(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestNewRequiresHTTPSUnlessAllowed(t *testing.T) {
 	if _, err := New(Config{BaseURL: "http://rstate:8089", AdminPassword: testPassword}); err == nil {
 		t.Fatal("plain HTTP was accepted without AllowInsecureHTTP")
@@ -193,7 +210,7 @@ func newTestClient(t *testing.T, server *httptest.Server) *Client {
 func assertBasicAuth(t *testing.T, request *http.Request) {
 	t.Helper()
 	user, password, ok := request.BasicAuth()
-	if !ok || user != adminUser || password != testPassword {
+	if !ok || user != defaultAdminUser || password != testPassword {
 		t.Fatalf("Basic auth = %q/%q (%v)", user, password, ok)
 	}
 }

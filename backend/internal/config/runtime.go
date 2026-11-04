@@ -53,6 +53,7 @@ type Runtime struct {
 	// rstate replaces SState in secondary qualifier mode. It has no
 	// callbacks, so the API polls it every RStatePollInterval.
 	RStateBaseURL       string
+	RStateAdminUser     string
 	RStateAdminPassword string
 	RStatePollInterval  time.Duration
 	// RStateAllowHTTP permits a plain HTTP rstate URL, which rstate serves
@@ -121,6 +122,7 @@ func LoadRuntime() (Runtime, error) {
 		CallbackBaseURL:          strings.TrimSpace(os.Getenv("ICTSC_CALLBACK_BASE_URL")),
 		AllowInsecureHTTP:        insecure,
 		RStateBaseURL:            strings.TrimSpace(os.Getenv("ICTSC_RSTATE_BASE_URL")),
+		RStateAdminUser:          envOrDefault("ICTSC_RSTATE_ADMIN_USER", "ictsc"),
 		RStateAdminPassword:      strings.TrimSpace(os.Getenv("ICTSC_RSTATE_ADMIN_PASSWORD")),
 		RStatePollInterval:       10 * time.Second,
 		RStateAllowHTTP:          rstateAllowHTTP,

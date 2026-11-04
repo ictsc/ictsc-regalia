@@ -19,7 +19,7 @@ import (
 const (
 	defaultTimeout = 15 * time.Second
 	// rstate's admin routes use gin.BasicAuth with this fixed account.
-	adminUser        = "ictsc"
+	defaultAdminUser = "ictsc"
 	maxResponseBytes = 4 << 20
 )
 
@@ -32,7 +32,10 @@ var (
 )
 
 type Config struct {
-	BaseURL           string
+	BaseURL string
+	// AdminUser defaults to rstate's fixed "ictsc" account; set it when a
+	// proxy in front of rstate checks other credentials.
+	AdminUser         string
 	AdminPassword     string
 	HTTPClient        *http.Client
 	AllowInsecureHTTP bool
@@ -40,6 +43,7 @@ type Config struct {
 
 type Client struct {
 	baseURL       *url.URL
+	adminUser     string
 	adminPassword string
 	httpClient    *http.Client
 }
@@ -108,8 +112,11 @@ func New(config Config) (*Client, error) {
 	if config.HTTPClient == nil {
 		config.HTTPClient = &http.Client{Timeout: defaultTimeout}
 	}
+	if config.AdminUser == "" {
+		config.AdminUser = defaultAdminUser
+	}
 	parsed.Path = strings.TrimRight(parsed.Path, "/")
-	return &Client{baseURL: parsed, adminPassword: config.AdminPassword, httpClient: config.HTTPClient}, nil
+	return &Client{baseURL: parsed, adminUser: config.AdminUser, adminPassword: config.AdminPassword, httpClient: config.HTTPClient}, nil
 }
 
 // Queue uses POST /admin/postJob behind Basic auth, as the ICTSC Discord bot
@@ -215,7 +222,7 @@ func (c *Client) do(ctx context.Context, method, endpoint string, form io.Reader
 	if err != nil {
 		return nil, fmt.Errorf("create rstate %s request: %w", operation, err)
 	}
-	request.SetBasicAuth(adminUser, c.adminPassword)
+	request.SetBasicAuth(c.adminUser, c.adminPassword)
 	request.Header.Set("Accept", "application/json")
 	if form != nil {
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")

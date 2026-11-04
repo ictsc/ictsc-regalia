@@ -191,7 +191,7 @@ func runtimeAdapters(cfg config.Runtime) (service.Discord, service.ContentSource
 	if cfg.SecondaryQualifierMode {
 		if !cfg.DevFakeMode || cfg.RStateBaseURL != "" {
 			client, err := rstate.New(rstate.Config{
-				BaseURL: cfg.RStateBaseURL, AdminPassword: cfg.RStateAdminPassword,
+				BaseURL: cfg.RStateBaseURL, AdminUser: cfg.RStateAdminUser, AdminPassword: cfg.RStateAdminPassword,
 				AllowInsecureHTTP: cfg.RStateAllowHTTP || cfg.AllowInsecureHTTP,
 			})
 			if err != nil {
