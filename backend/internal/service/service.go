@@ -736,9 +736,9 @@ func (s *Service) QueueDeployment(ctx context.Context, teamCode int64, problemCo
 		RequestID: requestID, TeamCode: teamCode, ProblemCode: problemCode, Revision: deployment.Revision,
 		ContentCommit: snapshot.CommitSHA, CallbackURL: fmt.Sprintf("%s/api/v1/admin/deployments/%d/%s/%d/events", strings.TrimRight(s.Config.CallbackBaseURL, "/"), teamCode, problemCode, deployment.Revision),
 	}
-	queueErr := s.Deployments.Queue(ctx, gatewayRequest)
+	jobID, queueErr := s.Deployments.Queue(ctx, gatewayRequest)
 	if queueErr != nil && !definitiveDeploymentRejection(queueErr) {
-		queueErr = s.Deployments.Queue(ctx, gatewayRequest)
+		jobID, queueErr = s.Deployments.Queue(ctx, gatewayRequest)
 	}
 	if queueErr != nil {
 		if definitiveDeploymentRejection(queueErr) {
@@ -747,6 +747,11 @@ func (s *Service) QueueDeployment(ctx context.Context, teamCode int64, problemCo
 			}
 		}
 		return core.Deployment{}, core.WrapError(http.StatusBadGateway, "upstream_unavailable", "SState rejected deployment request", queueErr)
+	}
+	if jobID != "" {
+		// Polling also adopts the team's active job when this write fails,
+		// so the accepted request is still tracked.
+		_ = s.Store.SetDeploymentJobID(ctx, requestID, jobID)
 	}
 	filterTeam, filterProblem := teamCode, problemCode
 	if current, listErr := s.Store.ListDeployments(ctx, core.DeploymentFilter{TeamCode: &filterTeam, ProblemCode: &filterProblem}); listErr == nil {

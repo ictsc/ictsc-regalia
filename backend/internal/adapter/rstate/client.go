@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -130,19 +131,27 @@ func New(config Config) (*Client, error) {
 // Queue uses POST /admin/postJob behind Basic auth, as the ICTSC Discord bot
 // did. rstate refuses contestant teams there until its preparatory-phase
 // dates (pkg/utils/util.go) are set for the contest.
-func (c *Client) Queue(ctx context.Context, request service.DeploymentRequest) error {
+func (c *Client) Queue(ctx context.Context, request service.DeploymentRequest) (string, error) {
 	if err := validateTarget(request.TeamCode, request.ProblemCode); err != nil {
-		return err
+		return "", err
 	}
 	form := url.Values{"team_id": {teamID(request.TeamCode)}, "prob_id": {probID(request.ProblemCode)}}
 	response, err := c.do(ctx, http.MethodPost, c.endpoint("/admin/postJob"), strings.NewReader(form.Encode()), "queue redeployment")
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer drainAndClose(response.Body)
 	switch response.StatusCode {
 	case http.StatusOK:
-		return nil
+		var job struct {
+			ID string `json:"id"`
+		}
+		if err := json.NewDecoder(io.LimitReader(response.Body, maxResponseBytes)).Decode(&job); err != nil || job.ID == "" {
+			// rstate has taken the job; polling adopts it as the team's
+			// running job without the ID.
+			return "", nil
+		}
+		return job.ID, nil
 	case http.StatusBadRequest:
 		// The body is either "BadRequest!" or the team's status page URL,
 		// which carries a token and must not reach deployment messages.
@@ -151,65 +160,70 @@ func (c *Client) Queue(ctx context.Context, request service.DeploymentRequest) e
 		if strings.TrimSpace(string(body)) == postJobBadRequest {
 			reason = "rstate rejected the team or problem ID"
 		}
-		return &HTTPError{Operation: "queue redeployment", StatusCode: response.StatusCode, Body: reason}
+		return "", &HTTPError{Operation: "queue redeployment", StatusCode: response.StatusCode, Body: reason}
 	default:
-		return readHTTPError("queue redeployment", response)
+		return "", readHTTPError("queue redeployment", response)
 	}
 }
 
-// Observe returns rstate's newest job for the team's problem.
-func (c *Client) Observe(ctx context.Context, teamCode int64, problemCode string) (service.DeploymentObservation, error) {
-	if err := validateTarget(teamCode, problemCode); err != nil {
-		return service.DeploymentObservation{}, err
-	}
-	jobs, err := c.ListJobs(ctx)
+// ListJobs returns every job rstate reports, skipping entries whose team or
+// state Regalia cannot read.
+func (c *Client) ListJobs(ctx context.Context) ([]service.DeploymentJob, error) {
+	raw, err := c.listJobs(ctx)
 	if err != nil {
-		return service.DeploymentObservation{}, err
+		return nil, err
 	}
-	team, problem := fmt.Sprintf("%02d", teamCode), probID(problemCode)
-	var latest *Job
-	for i := range jobs {
-		job := &jobs[i]
-		if job.TeamID != team || job.ProbID != problem {
+	jobs := make([]service.DeploymentJob, 0, len(raw))
+	for _, entry := range raw {
+		teamCode, err := strconv.ParseInt(entry.TeamID, 10, 64)
+		if err != nil {
 			continue
 		}
-		if latest == nil || job.CreatedTime > latest.CreatedTime {
-			latest = job
+		status, err := mapState(entry.State)
+		if err != nil {
+			continue
 		}
+		job := service.DeploymentJob{ID: entry.ID, TeamCode: teamCode, ProblemCode: entry.ProbID, Status: status}
+		if status == core.DeploymentFailed {
+			message := fmt.Sprintf("rstate job %s ended with state %s", entry.ID, entry.State)
+			job.Message = &message
+		}
+		jobs = append(jobs, job)
 	}
-	if latest == nil {
-		return service.DeploymentObservation{}, &NotFoundError{TeamCode: teamCode, ProblemCode: problemCode}
-	}
-	status, err := mapState(latest.State)
-	if err != nil {
-		return service.DeploymentObservation{}, err
-	}
-	observation := service.DeploymentObservation{
-		JobID: latest.ID, CreatedAt: time.Unix(0, latest.CreatedTime).UTC(), Status: status,
-	}
-	if status == core.DeploymentFailed {
-		message := fmt.Sprintf("rstate job %s ended with state %s", latest.ID, latest.State)
-		observation.Message = &message
-	}
-	return observation, nil
+	return jobs, nil
 }
 
-// Status serves the operator sync. rstate keeps no event IDs, so the caller
-// assigns the event ID and time; a waiting job is reported as DEPLOYING
-// because QUEUED cannot be sent as an event.
+// Status reports the newest job for the team's problem. The operator sync
+// does not use it for rstate, which goes through the service's polling path.
 func (c *Client) Status(ctx context.Context, teamCode int64, problemCode string) (core.DeploymentEvent, error) {
-	observation, err := c.Observe(ctx, teamCode, problemCode)
+	if err := validateTarget(teamCode, problemCode); err != nil {
+		return core.DeploymentEvent{}, err
+	}
+	raw, err := c.listJobs(ctx)
 	if err != nil {
 		return core.DeploymentEvent{}, err
 	}
-	status := observation.Status
+	team, problem := fmt.Sprintf("%02d", teamCode), probID(problemCode)
+	var latest *Job
+	for i := range raw {
+		if raw[i].TeamID == team && raw[i].ProbID == problem && (latest == nil || raw[i].CreatedTime > latest.CreatedTime) {
+			latest = &raw[i]
+		}
+	}
+	if latest == nil {
+		return core.DeploymentEvent{}, &NotFoundError{TeamCode: teamCode, ProblemCode: problemCode}
+	}
+	status, err := mapState(latest.State)
+	if err != nil {
+		return core.DeploymentEvent{}, err
+	}
 	if status == core.DeploymentQueued {
 		status = core.DeploymentDeploying
 	}
-	return core.DeploymentEvent{Status: status, Message: observation.Message}, nil
+	return core.DeploymentEvent{Status: status}, nil
 }
 
-func (c *Client) ListJobs(ctx context.Context) ([]Job, error) {
+func (c *Client) listJobs(ctx context.Context) ([]Job, error) {
 	response, err := c.do(ctx, http.MethodGet, c.endpoint("/admin/list"), nil, "list jobs")
 	if err != nil {
 		return nil, err

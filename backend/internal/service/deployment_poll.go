@@ -4,68 +4,56 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
 )
 
-// polledJobClockSkew lets a job whose creation time reads slightly before the
-// request still count as that request's job, since the deployer's clock is
-// not ours. Older jobs belong to an earlier redeploy and are ignored.
-const polledJobClockSkew = 2 * time.Minute
-
 // polledEventNamespace scopes the deterministic IDs of polled events.
 var polledEventNamespace = uuid.MustParse("6f1d7a52-3c0e-4b8a-9d55-2a0f4c1e9b37")
 
-// PollDeployments moves every active deployment forward from what a
-// DeploymentProber reports. It is a no-op for gateways that call back.
+var activeDeploymentStatuses = []core.DeploymentStatus{core.DeploymentQueued, core.DeploymentDeploying}
+
+// PollDeployments moves every active deployment forward from one job list of
+// a DeploymentProber. It is a no-op for gateways that call back.
 func (s *Service) PollDeployments(ctx context.Context) error {
 	prober, ok := s.Deployments.(DeploymentProber)
 	if !ok {
 		return nil
 	}
-	deployments, err := s.Store.ListDeployments(ctx, core.DeploymentFilter{})
+	deployments, err := s.Store.ListDeployments(ctx, core.DeploymentFilter{Statuses: activeDeploymentStatuses})
+	if err != nil || len(deployments) == 0 {
+		return err
+	}
+	jobs, err := prober.ListJobs(ctx)
 	if err != nil {
 		return err
 	}
-	type target struct {
-		team    int64
-		problem string
-	}
-	latest := make(map[target]core.Deployment, len(deployments))
-	for _, deployment := range deployments {
-		key := target{deployment.TeamCode, deployment.ProblemCode}
-		if current, ok := latest[key]; !ok || deployment.Revision > current.Revision {
-			latest[key] = deployment
-		}
-	}
 	var errs []error
-	for _, deployment := range latest {
-		if deployment.LatestStatus != core.DeploymentQueued && deployment.LatestStatus != core.DeploymentDeploying {
-			continue
-		}
-		if err := s.pollDeployment(ctx, prober, deployment); err != nil {
+	for _, deployment := range deployments {
+		if _, err := s.advancePolledDeployment(ctx, deployment, jobs); err != nil {
 			errs = append(errs, fmt.Errorf("poll deployment %d/%s revision %d: %w", deployment.TeamCode, deployment.ProblemCode, deployment.Revision, err))
 		}
 	}
 	return errors.Join(errs...)
 }
 
-func (s *Service) pollDeployment(ctx context.Context, prober DeploymentProber, deployment core.Deployment) error {
-	observation, err := prober.Observe(ctx, deployment.TeamCode, deployment.ProblemCode)
-	if err != nil {
-		var notFound interface{ DeploymentStatusNotFound() bool }
-		if errors.As(err, &notFound) && notFound.DeploymentStatusNotFound() {
-			return nil
-		}
-		return err
+// advancePolledDeployment applies the state of the deployment's own job and
+// reports whether that job was found.
+func (s *Service) advancePolledDeployment(ctx context.Context, deployment core.Deployment, jobs []DeploymentJob) (bool, error) {
+	job, ok := deploymentJob(deployment, jobs)
+	if !ok {
+		return false, nil
 	}
-	if observation.CreatedAt.Before(deployment.RequestedAt.Add(-polledJobClockSkew)) {
-		return nil
+	if deployment.GatewayJobID == "" {
+		if err := s.Store.SetDeploymentJobID(ctx, deployment.RequestID, job.ID); err != nil {
+			return true, err
+		}
 	}
 	var steps []core.DeploymentStatus
-	switch observation.Status {
+	switch job.Status {
 	case core.DeploymentDeploying:
 		if deployment.LatestStatus == core.DeploymentQueued {
 			steps = []core.DeploymentStatus{core.DeploymentDeploying}
@@ -74,26 +62,48 @@ func (s *Service) pollDeployment(ctx context.Context, prober DeploymentProber, d
 		if deployment.LatestStatus == core.DeploymentQueued {
 			steps = append(steps, core.DeploymentDeploying)
 		}
-		steps = append(steps, observation.Status)
+		if deployment.LatestStatus != job.Status {
+			steps = append(steps, job.Status)
+		}
 	}
 	for _, status := range steps {
-		// The deployer's timestamps may run behind ours and the store refuses
-		// events older than the latest one, so polled events use our clock.
+		// The gateway keeps no event times we can trust against ours, and
+		// the store refuses events older than the latest one.
 		event := core.DeploymentEvent{
 			EventID:    polledEventID(deployment.RequestID, status),
 			OccurredAt: s.nextDeploymentEventTime(deployment),
 			Status:     status,
 		}
-		if status == observation.Status {
-			event.Message = observation.Message
+		if status == job.Status {
+			event.Message = job.Message
 		}
 		updated, _, err := s.ApplyDeploymentEvent(ctx, deployment.TeamCode, deployment.ProblemCode, deployment.Revision, event, false)
 		if err != nil {
-			return err
+			return true, err
 		}
 		deployment = updated
 	}
-	return nil
+	return true, nil
+}
+
+// deploymentJob finds the job by the ID recorded for the deployment. Before
+// an ID is recorded, only a waiting or running job of the same team and
+// problem can be its job: the gateway runs one at a time per problem, and a
+// finished one may be from an earlier request.
+func deploymentJob(deployment core.Deployment, jobs []DeploymentJob) (DeploymentJob, bool) {
+	for _, job := range jobs {
+		if deployment.GatewayJobID != "" {
+			if job.ID == deployment.GatewayJobID {
+				return job, true
+			}
+			continue
+		}
+		if job.TeamCode == deployment.TeamCode && strings.EqualFold(job.ProblemCode, deployment.ProblemCode) &&
+			(job.Status == core.DeploymentQueued || job.Status == core.DeploymentDeploying) {
+			return job, true
+		}
+	}
+	return DeploymentJob{}, false
 }
 
 func (s *Service) nextDeploymentEventTime(deployment core.Deployment) time.Time {

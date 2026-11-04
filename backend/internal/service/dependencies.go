@@ -44,23 +44,26 @@ type DeploymentRequest struct {
 }
 
 type DeploymentGateway interface {
-	Queue(ctx context.Context, request DeploymentRequest) error
+	// Queue returns the job ID the gateway gave the request, or "" for a
+	// gateway that reports progress by callback.
+	Queue(ctx context.Context, request DeploymentRequest) (string, error)
 	Status(ctx context.Context, teamCode int64, problemCode string) (core.DeploymentEvent, error)
 }
 
-// DeploymentObservation is what a gateway without callbacks reports for the
-// latest job of a team's problem. Status may be QUEUED while the job waits.
-type DeploymentObservation struct {
-	JobID     string
-	CreatedAt time.Time
-	Status    core.DeploymentStatus
-	Message   *string
+// DeploymentJob is one job a gateway without callbacks reports. Status is
+// QUEUED while the job waits.
+type DeploymentJob struct {
+	ID          string
+	TeamCode    int64
+	ProblemCode string
+	Status      core.DeploymentStatus
+	Message     *string
 }
 
 // DeploymentProber is implemented by gateways that never call back, such as
 // rstate. The service polls them to move active deployments forward.
 type DeploymentProber interface {
-	Observe(ctx context.Context, teamCode int64, problemCode string) (DeploymentObservation, error)
+	ListJobs(ctx context.Context) ([]DeploymentJob, error)
 }
 
 type Subscription interface {

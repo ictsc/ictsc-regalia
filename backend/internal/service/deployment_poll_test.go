@@ -11,26 +11,21 @@ import (
 )
 
 type fakeProber struct {
-	observation service.DeploymentObservation
-	err         error
-	calls       int
+	jobs  []service.DeploymentJob
+	err   error
+	calls int
 }
 
-func (*fakeProber) Queue(context.Context, service.DeploymentRequest) error { return nil }
+func (*fakeProber) Queue(context.Context, service.DeploymentRequest) (string, error) { return "", nil }
 
 func (*fakeProber) Status(context.Context, int64, string) (core.DeploymentEvent, error) {
 	return core.DeploymentEvent{}, nil
 }
 
-func (p *fakeProber) Observe(context.Context, int64, string) (service.DeploymentObservation, error) {
+func (p *fakeProber) ListJobs(context.Context) ([]service.DeploymentJob, error) {
 	p.calls++
-	return p.observation, p.err
+	return p.jobs, p.err
 }
-
-type notFoundError struct{}
-
-func (notFoundError) Error() string                  { return "no job" }
-func (notFoundError) DeploymentStatusNotFound() bool { return true }
 
 func newPollingService(t *testing.T, now time.Time, prober service.DeploymentGateway) (*service.Service, *memory.CompetitionStore, core.Deployment) {
 	t.Helper()
@@ -38,107 +33,160 @@ func newPollingService(t *testing.T, now time.Time, prober service.DeploymentGat
 	svc := service.New(store, memory.NewSessionStore(), service.Config{})
 	svc.Now = func() time.Time { return now }
 	svc.Deployments = prober
-	requestedAt := now.Add(-time.Minute)
+	deployment := createQueuedDeployment(t, store, "74d8dc35-8a9c-4da3-9fed-d20a41cc7317", 2, "A01", now.Add(-time.Minute))
+	return svc, store, deployment
+}
+
+func createQueuedDeployment(t *testing.T, store *memory.CompetitionStore, requestID string, team int64, problem string, requestedAt time.Time) core.Deployment {
+	t.Helper()
 	deployment, err := store.CreateDeployment(t.Context(), core.Deployment{
-		RequestID: "74d8dc35-8a9c-4da3-9fed-d20a41cc7317", TeamCode: 2, ProblemCode: "A01",
+		RequestID: requestID, TeamCode: team, ProblemCode: problem,
 		ContentCommit: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", RequestedAt: requestedAt, LatestStatus: core.DeploymentQueued,
-		Events: []core.DeploymentEvent{{EventID: "702aa55d-c9fc-4c58-b46e-17b176bba691", OccurredAt: requestedAt, Status: core.DeploymentQueued}},
+		Events: []core.DeploymentEvent{{EventID: requestID[:8] + "-c9fc-4c58-b46e-17b176bba691", OccurredAt: requestedAt, Status: core.DeploymentQueued}},
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	return svc, store, deployment
+	return deployment
 }
 
-func latestDeployment(t *testing.T, store *memory.CompetitionStore) core.Deployment {
+func deploymentByID(t *testing.T, store *memory.CompetitionStore, requestID string) core.Deployment {
 	t.Helper()
 	deployments, err := store.ListDeployments(t.Context(), core.DeploymentFilter{})
-	if err != nil || len(deployments) != 1 {
-		t.Fatalf("deployments = %#v, err = %v", deployments, err)
+	if err != nil {
+		t.Fatal(err)
 	}
-	return deployments[0]
+	for _, deployment := range deployments {
+		if deployment.RequestID == requestID {
+			return deployment
+		}
+	}
+	t.Fatalf("deployment %s not found", requestID)
+	return core.Deployment{}
 }
 
-func TestPollDeploymentsCompletesQueuedDeploymentThroughDeploying(t *testing.T) {
+func job(id string, status core.DeploymentStatus) service.DeploymentJob {
+	return service.DeploymentJob{ID: id, TeamCode: 2, ProblemCode: "a01", Status: status}
+}
+
+func TestPollDeploymentsFollowsTheRecordedJobOnly(t *testing.T) {
 	now := time.Date(2026, 11, 4, 3, 0, 0, 0, time.UTC)
-	prober := &fakeProber{observation: service.DeploymentObservation{JobID: "job", CreatedAt: now.Add(-30 * time.Second), Status: core.DeploymentCompleted}}
-	svc, store, _ := newPollingService(t, now, prober)
+	// The earlier job finished moments ago; only "new" belongs to the request.
+	prober := &fakeProber{jobs: []service.DeploymentJob{job("old", core.DeploymentFailed), job("new", core.DeploymentQueued)}}
+	svc, store, deployment := newPollingService(t, now, prober)
+	if err := store.SetDeploymentJobID(t.Context(), deployment.RequestID, "new"); err != nil {
+		t.Fatal(err)
+	}
 
 	if err := svc.PollDeployments(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	deployment := latestDeployment(t, store)
-	if deployment.LatestStatus != core.DeploymentCompleted || len(deployment.Events) != 3 {
-		t.Fatalf("deployment = %#v, want QUEUED -> DEPLOYING -> COMPLETED", deployment)
-	}
-	if !deployment.Events[2].OccurredAt.After(deployment.Events[1].OccurredAt) {
-		t.Fatalf("events are not strictly ordered: %#v", deployment.Events)
+	if got := deploymentByID(t, store, deployment.RequestID); got.LatestStatus != core.DeploymentQueued || len(got.Events) != 1 {
+		t.Fatalf("the earlier job's failure reached the deployment: %#v", got)
 	}
 
-	// A finished deployment is no longer polled.
+	prober.jobs = []service.DeploymentJob{job("old", core.DeploymentFailed), job("new", core.DeploymentCompleted)}
 	if err := svc.PollDeployments(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if prober.calls != 1 {
-		t.Fatalf("Observe called %d times, want 1", prober.calls)
+	got := deploymentByID(t, store, deployment.RequestID)
+	if got.LatestStatus != core.DeploymentCompleted || len(got.Events) != 3 {
+		t.Fatalf("deployment = %#v, want QUEUED -> DEPLOYING -> COMPLETED", got)
+	}
+	if !got.Events[2].OccurredAt.After(got.Events[1].OccurredAt) {
+		t.Fatalf("events are not strictly ordered: %#v", got.Events)
+	}
+}
+
+func TestPollDeploymentsAdoptsOnlyAnActiveJobWithoutID(t *testing.T) {
+	now := time.Date(2026, 11, 4, 3, 0, 0, 0, time.UTC)
+	prober := &fakeProber{jobs: []service.DeploymentJob{job("old", core.DeploymentCompleted)}}
+	svc, store, deployment := newPollingService(t, now, prober)
+
+	if err := svc.PollDeployments(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	if got := deploymentByID(t, store, deployment.RequestID); got.LatestStatus != core.DeploymentQueued || got.GatewayJobID != "" {
+		t.Fatalf("a finished job was adopted: %#v", got)
+	}
+
+	prober.jobs = append(prober.jobs, job("running", core.DeploymentDeploying))
+	if err := svc.PollDeployments(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	if got := deploymentByID(t, store, deployment.RequestID); got.LatestStatus != core.DeploymentDeploying || got.GatewayJobID != "running" {
+		t.Fatalf("deployment = %#v, want the running job adopted", got)
 	}
 }
 
 func TestPollDeploymentsKeepsWaitingAndRepeatedStatesQuiet(t *testing.T) {
 	now := time.Date(2026, 11, 4, 3, 0, 0, 0, time.UTC)
-	prober := &fakeProber{observation: service.DeploymentObservation{CreatedAt: now, Status: core.DeploymentQueued}}
-	svc, store, _ := newPollingService(t, now, prober)
+	prober := &fakeProber{jobs: []service.DeploymentJob{job("job", core.DeploymentQueued)}}
+	svc, store, deployment := newPollingService(t, now, prober)
 
 	if err := svc.PollDeployments(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if got := latestDeployment(t, store); got.LatestStatus != core.DeploymentQueued || len(got.Events) != 1 {
+	if got := deploymentByID(t, store, deployment.RequestID); got.LatestStatus != core.DeploymentQueued || len(got.Events) != 1 {
 		t.Fatalf("waiting job changed the deployment: %#v", got)
 	}
 
-	prober.observation.Status = core.DeploymentDeploying
+	prober.jobs = []service.DeploymentJob{job("job", core.DeploymentDeploying)}
 	for range 2 {
 		if err := svc.PollDeployments(t.Context()); err != nil {
 			t.Fatal(err)
 		}
 	}
-	if got := latestDeployment(t, store); got.LatestStatus != core.DeploymentDeploying || len(got.Events) != 2 {
+	if got := deploymentByID(t, store, deployment.RequestID); got.LatestStatus != core.DeploymentDeploying || len(got.Events) != 2 {
 		t.Fatalf("deployment = %#v, want a single DEPLOYING event", got)
 	}
 }
 
-func TestPollDeploymentsIgnoresJobsOlderThanTheRequest(t *testing.T) {
+func TestPollDeploymentsReadsTheJobListOncePerTick(t *testing.T) {
 	now := time.Date(2026, 11, 4, 3, 0, 0, 0, time.UTC)
-	prober := &fakeProber{observation: service.DeploymentObservation{CreatedAt: now.Add(-time.Hour), Status: core.DeploymentCompleted}}
+	prober := &fakeProber{}
 	svc, store, _ := newPollingService(t, now, prober)
 
 	if err := svc.PollDeployments(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	if got := latestDeployment(t, store); got.LatestStatus != core.DeploymentQueued {
-		t.Fatalf("stale job moved the deployment to %s", got.LatestStatus)
+	createQueuedDeployment(t, store, "9b2f0a51-8a9c-4da3-9fed-d20a41cc7317", 3, "A01", now.Add(-time.Minute))
+	createQueuedDeployment(t, store, "c1d3e5f7-8a9c-4da3-9fed-d20a41cc7317", 2, "B01", now.Add(-time.Minute))
+	if err := svc.PollDeployments(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	if prober.calls != 2 {
+		t.Fatalf("ListJobs called %d times over two ticks, want 2", prober.calls)
 	}
 }
 
-func TestPollDeploymentsRecordsFailureMessageAndSkipsMissingJobs(t *testing.T) {
+func TestPollDeploymentsSkipsTheGatewayWhenNothingIsActive(t *testing.T) {
 	now := time.Date(2026, 11, 4, 3, 0, 0, 0, time.UTC)
-	prober := &fakeProber{err: notFoundError{}}
-	svc, store, _ := newPollingService(t, now, prober)
-
-	if err := svc.PollDeployments(t.Context()); err != nil {
-		t.Fatalf("missing job should be skipped: %v", err)
-	}
-
 	message := "rstate job ended with state エラー"
-	prober.err = nil
-	prober.observation = service.DeploymentObservation{CreatedAt: now, Status: core.DeploymentFailed, Message: &message}
+	failed := job("job", core.DeploymentFailed)
+	failed.Message = &message
+	prober := &fakeProber{jobs: []service.DeploymentJob{job("job", core.DeploymentDeploying)}}
+	svc, store, deployment := newPollingService(t, now, prober)
+
 	if err := svc.PollDeployments(t.Context()); err != nil {
 		t.Fatal(err)
 	}
-	got := latestDeployment(t, store)
+	prober.jobs = []service.DeploymentJob{failed}
+	if err := svc.PollDeployments(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	got := deploymentByID(t, store, deployment.RequestID)
 	last := got.Events[len(got.Events)-1]
 	if got.LatestStatus != core.DeploymentFailed || last.Message == nil || *last.Message != message {
 		t.Fatalf("deployment = %#v, want FAILED with message", got)
+	}
+
+	calls := prober.calls
+	if err := svc.PollDeployments(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+	if prober.calls != calls {
+		t.Fatal("ListJobs was called with no active deployment")
 	}
 }
 
