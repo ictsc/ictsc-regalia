@@ -13,6 +13,7 @@ import (
 
 	"github.com/ictsc/ictsc-regalia/backend/internal/adapter/discord"
 	githubadapter "github.com/ictsc/ictsc-regalia/backend/internal/adapter/github"
+	"github.com/ictsc/ictsc-regalia/backend/internal/adapter/rstate"
 	"github.com/ictsc/ictsc-regalia/backend/internal/adapter/sstate"
 	webpushadapter "github.com/ictsc/ictsc-regalia/backend/internal/adapter/webpush"
 	"github.com/ictsc/ictsc-regalia/backend/internal/config"
@@ -67,6 +68,9 @@ func run() error {
 		svc.VAPIDPublicKey = cfg.WebPushVAPIDPublicKey
 		go runAnnouncementPushDispatcher(ctx, svc)
 	}
+	if _, ok := deploymentClient.(service.DeploymentProber); ok {
+		go runDeploymentPoller(ctx, svc, cfg.RStatePollInterval)
+	}
 	handler, err := httpserver.New(svc, httpserver.Options{
 		SecureCookies: cfg.SecureCookies, AllowedOrigins: cfg.AllowedOrigins,
 		SStateCallbackToken: cfg.SStateCallbackToken, ReadTimeout: cfg.ReadHeaderTimeout,
@@ -111,6 +115,22 @@ func runAnnouncementPushDispatcher(ctx context.Context, svc *service.Service) {
 			return
 		case <-ticker.C:
 			dispatch()
+		}
+	}
+}
+
+// runDeploymentPoller stands in for callbacks from gateways that have none.
+func runDeploymentPoller(ctx context.Context, svc *service.Service, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			if err := svc.PollDeployments(ctx); err != nil && ctx.Err() == nil {
+				log.Printf("poll deployments: %v", err)
+			}
 		}
 	}
 }
@@ -168,7 +188,18 @@ func runtimeAdapters(cfg config.Runtime) (service.Discord, service.ContentSource
 		}
 		contentClient = client
 	}
-	if !cfg.DevFakeMode || cfg.SStateBaseURL != "" {
+	if cfg.SecondaryQualifierMode {
+		if !cfg.DevFakeMode || cfg.RStateBaseURL != "" {
+			client, err := rstate.New(rstate.Config{
+				BaseURL: cfg.RStateBaseURL, AdminPassword: cfg.RStateAdminPassword,
+				AllowInsecureHTTP: cfg.RStateAllowHTTP || cfg.AllowInsecureHTTP,
+			})
+			if err != nil {
+				return nil, nil, nil, fmt.Errorf("configure rstate: %w", err)
+			}
+			deploymentClient = client
+		}
+	} else if !cfg.DevFakeMode || cfg.SStateBaseURL != "" {
 		client, err := sstate.New(sstate.Config{
 			BaseURL: cfg.SStateBaseURL, BearerToken: cfg.SStateRequestToken, AllowInsecureHTTP: cfg.AllowInsecureHTTP,
 		})
