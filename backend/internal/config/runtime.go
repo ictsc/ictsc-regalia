@@ -19,8 +19,9 @@ type Runtime struct {
 	SecureCookies     bool
 	AllowedOrigins    []string
 	DevFakeMode       bool
-	// SecondaryQualifierMode defers grading until the contest ends and hides
-	// every score from contestants until the final reveal.
+	// SecondaryQualifierMode defers grading until the contest ends, hides
+	// every score from contestants until the final reveal, and redeploys
+	// problems through rstate instead of SState.
 	SecondaryQualifierMode bool
 
 	DiscordClientID          string
@@ -49,6 +50,15 @@ type Runtime struct {
 	CallbackBaseURL     string
 	AllowInsecureHTTP   bool
 
+	// rstate replaces SState in secondary qualifier mode. It has no
+	// callbacks, so the API polls it every RStatePollInterval.
+	RStateBaseURL       string
+	RStateAdminPassword string
+	RStatePollInterval  time.Duration
+	// RStateAllowHTTP permits a plain HTTP rstate URL, which rstate serves
+	// by default, without enabling every other insecure upstream.
+	RStateAllowHTTP bool
+
 	WebPushVAPIDPublicKey  string
 	WebPushVAPIDPrivateKey string
 	WebPushVAPIDSubject    string
@@ -71,6 +81,10 @@ func LoadRuntime() (Runtime, error) {
 		return Runtime{}, fmt.Errorf("ICTSC_ALLOW_INSECURE_UPSTREAMS is only allowed with ICTSC_DEV_FAKE_MODE")
 	}
 	secondaryQualifier, err := boolEnv("ICTSC_SECONDARY_QUALIFIER_MODE", false)
+	if err != nil {
+		return Runtime{}, err
+	}
+	rstateAllowHTTP, err := boolEnv("ICTSC_RSTATE_ALLOW_HTTP", false)
 	if err != nil {
 		return Runtime{}, err
 	}
@@ -106,6 +120,10 @@ func LoadRuntime() (Runtime, error) {
 		SStateCallbackToken:      strings.TrimSpace(os.Getenv("ICTSC_SSTATE_CALLBACK_TOKEN")),
 		CallbackBaseURL:          strings.TrimSpace(os.Getenv("ICTSC_CALLBACK_BASE_URL")),
 		AllowInsecureHTTP:        insecure,
+		RStateBaseURL:            strings.TrimSpace(os.Getenv("ICTSC_RSTATE_BASE_URL")),
+		RStateAdminPassword:      strings.TrimSpace(os.Getenv("ICTSC_RSTATE_ADMIN_PASSWORD")),
+		RStatePollInterval:       10 * time.Second,
+		RStateAllowHTTP:          rstateAllowHTTP,
 		WebPushVAPIDPublicKey:    strings.TrimSpace(os.Getenv("ICTSC_WEB_PUSH_VAPID_PUBLIC_KEY")),
 		WebPushVAPIDPrivateKey:   strings.TrimSpace(os.Getenv("ICTSC_WEB_PUSH_VAPID_PRIVATE_KEY")),
 		WebPushVAPIDSubject:      strings.TrimSpace(os.Getenv("ICTSC_WEB_PUSH_VAPID_SUBJECT")),
@@ -118,6 +136,12 @@ func LoadRuntime() (Runtime, error) {
 	}
 	if raw := os.Getenv("ICTSC_API_SHUTDOWN_TIMEOUT"); raw != "" {
 		cfg.ShutdownTimeout, err = positiveDuration("ICTSC_API_SHUTDOWN_TIMEOUT", raw)
+		if err != nil {
+			return Runtime{}, err
+		}
+	}
+	if raw := os.Getenv("ICTSC_RSTATE_POLL_INTERVAL"); raw != "" {
+		cfg.RStatePollInterval, err = positiveDuration("ICTSC_RSTATE_POLL_INTERVAL", raw)
 		if err != nil {
 			return Runtime{}, err
 		}
@@ -159,17 +183,25 @@ func (c Runtime) Validate() error {
 		if !c.SecureCookies {
 			return fmt.Errorf("ICTSC_SECURE_COOKIES must be true outside development fake mode")
 		}
-		for name, value := range map[string]string{
+		required := map[string]string{
 			"ICTSC_DATABASE_URL": c.DatabaseURL, "ICTSC_REDIS_URL": c.RedisURL,
 			"ICTSC_DISCORD_CLIENT_ID": c.DiscordClientID, "ICTSC_DISCORD_CLIENT_SECRET": c.DiscordClientSecret,
 			"ICTSC_DISCORD_CONTESTANT_REDIRECT_URI": c.ContestantRedirectURI, "ICTSC_DISCORD_ADMIN_REDIRECT_URI": c.AdminRedirectURI,
 			"ICTSC_DISCORD_ADMIN_GUILD_ID": c.DiscordAdminGuildID, "ICTSC_GITHUB_API_TOKEN": c.GitHubAPIToken,
 			"ICTSC_GITHUB_OIDC_AUDIENCE": c.GitHubOIDCAudience, "ICTSC_GITHUB_REPOSITORY_ID": c.GitHubRepositoryID,
 			"ICTSC_GITHUB_REPOSITORY": c.GitHubRepository, "ICTSC_GITHUB_REF": c.GitHubRef,
-			"ICTSC_GITHUB_WORKFLOW_REF": c.GitHubWorkflowRef, "ICTSC_SSTATE_BASE_URL": c.SStateBaseURL,
-			"ICTSC_SSTATE_REQUEST_TOKEN": c.SStateRequestToken, "ICTSC_SSTATE_CALLBACK_TOKEN": c.SStateCallbackToken,
-			"ICTSC_CALLBACK_BASE_URL": c.CallbackBaseURL,
-		} {
+			"ICTSC_GITHUB_WORKFLOW_REF": c.GitHubWorkflowRef,
+		}
+		if c.SecondaryQualifierMode {
+			required["ICTSC_RSTATE_BASE_URL"] = c.RStateBaseURL
+			required["ICTSC_RSTATE_ADMIN_PASSWORD"] = c.RStateAdminPassword
+		} else {
+			required["ICTSC_SSTATE_BASE_URL"] = c.SStateBaseURL
+			required["ICTSC_SSTATE_REQUEST_TOKEN"] = c.SStateRequestToken
+			required["ICTSC_SSTATE_CALLBACK_TOKEN"] = c.SStateCallbackToken
+			required["ICTSC_CALLBACK_BASE_URL"] = c.CallbackBaseURL
+		}
+		for name, value := range required {
 			if strings.TrimSpace(value) == "" {
 				return fmt.Errorf("%s is required outside development fake mode", name)
 			}
@@ -196,6 +228,11 @@ func (c Runtime) Validate() error {
 	}
 	if c.RedisURL != "" {
 		if err := validateConnectionURL("ICTSC_REDIS_URL", c.RedisURL, "redis", "rediss"); err != nil {
+			return err
+		}
+	}
+	if c.RStateBaseURL != "" {
+		if err := validateAbsoluteURL("rstate base URL", c.RStateBaseURL, true, c.RStateAllowHTTP || c.DevFakeMode && c.AllowInsecureHTTP); err != nil {
 			return err
 		}
 	}
