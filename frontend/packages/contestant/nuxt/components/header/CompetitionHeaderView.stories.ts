@@ -89,6 +89,11 @@ export const ContestFinished: Story = {
   },
 };
 
+/** 二次予選モードで最終公開前。順位欄を出さず、メニューだけを右寄せで表示する。 */
+export const RankingHidden: Story = {
+  args: { rankingItems: [], rankingHidden: true },
+};
+
 export const Mobile: Story = {
   globals: { viewport: { value: "mobile1", isRotated: false } },
 };

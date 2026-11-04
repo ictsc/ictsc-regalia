@@ -1,3 +1,9 @@
+// Renders Markdown from problems, notices, rules, answers and profiles to
+// HTML that MarkdownContent puts in the page with v-html. The input may be
+// written by contestants, so raw HTML is dropped and the tree is sanitized
+// first; image rewriting, KaTeX (trust: false) and Shiki run only on the
+// sanitized tree. Keep that order when adding plugins. Mermaid blocks are
+// only marked here; mermaid.ts draws them in the browser.
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
@@ -7,6 +13,106 @@ import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeKatex from "rehype-katex";
 import rehypeShiki from "@shikijs/rehype";
 import rehypeStringify from "rehype-stringify";
+
+type HastNode = {
+  type: string;
+  tagName?: string;
+  properties?: Record<string, unknown>;
+  children?: HastNode[];
+  value?: string;
+};
+
+/** Maps a content image file name to the URL that serves it. */
+export type ImageUrl = (name: string) => string;
+
+// Content repositories reference their images as /images/<file>; each app
+// serves them from its own authenticated API path.
+let defaultImageUrl: ImageUrl | undefined;
+
+/** Sets how "/images/<file>" sources are rewritten when no per-render URL is given. */
+export function setMarkdownImageUrl(imageUrl: ImageUrl | undefined) {
+  defaultImageUrl = imageUrl;
+}
+
+export function rewriteImageSource(
+  src: string,
+  imageUrl = defaultImageUrl,
+): string {
+  return imageUrl && src.startsWith("/images/")
+    ? imageUrl(decodeURIComponent(src.slice("/images/".length)))
+    : src;
+}
+
+function rehypeContentImages() {
+  return (tree: HastNode, file: { data: Record<string, unknown> }) => {
+    const imageUrl =
+      (file.data.imageUrl as ImageUrl | undefined) ?? defaultImageUrl;
+    const blockExternal = file.data.blockExternalImages === true;
+    const visit = (node: HastNode) => {
+      if (node.tagName === "img" && typeof node.properties?.src === "string") {
+        const src = node.properties.src;
+        if (blockExternal && !src.startsWith("/images/")) {
+          // Loading it would tell the image's host who read the text and when.
+          const alt =
+            typeof node.properties.alt === "string" ? node.properties.alt : "";
+          node.tagName = "span";
+          node.properties = { className: ["blocked-image"] };
+          node.children = [
+            {
+              type: "text",
+              value: `[外部の画像は表示しません${alt ? `: ${alt}` : ""}] ${src}`,
+            },
+          ];
+          return;
+        }
+        node.properties.src = rewriteImageSource(src, imageUrl);
+      }
+      node.children?.forEach(visit);
+    };
+    visit(tree);
+  };
+}
+
+/**
+ * Keeps ```mermaid code as plain text in a .mermaid-diagram box instead of a
+ * highlighted code block, so MarkdownContent can draw it.
+ */
+function rehypeMermaidBlocks() {
+  return (tree: HastNode, file: { data: Record<string, unknown> }) => {
+    if (file.data.mermaid !== true) return;
+    const visit = (node: HastNode) => {
+      node.children?.forEach((child, index) => {
+        const code = child.tagName === "pre" ? child.children?.[0] : undefined;
+        const className = code?.properties?.className;
+        if (
+          code?.tagName === "code" &&
+          Array.isArray(className) &&
+          className.includes("language-mermaid")
+        ) {
+          const source = (code.children ?? [])
+            .map((text) => text.value ?? "")
+            .join("");
+          node.children![index] = {
+            type: "element",
+            tagName: "div",
+            properties: { className: ["mermaid-diagram"] },
+            children: [
+              {
+                type: "element",
+                tagName: "pre",
+                properties: { className: ["mermaid-source"] },
+                children: [{ type: "text", value: source }],
+              },
+            ],
+          };
+          return;
+        }
+        visit(child);
+      });
+    };
+    visit(tree);
+  };
+}
 
 const processor = unified()
   .use(remarkParse)
@@ -20,25 +126,74 @@ const processor = unified()
       code: [["className", /^language-./, "math-inline", "math-display"]],
     },
   })
+  .use(rehypeContentImages)
+  .use(rehypeMermaidBlocks)
   .use(rehypeKatex, { trust: false })
   .use(rehypeShiki, {
-    theme: "github-light",
+    // Both palettes are inlined; application.css switches to the dark one.
+    themes: { light: "github-light", dark: "github-dark" },
+    // Languages commonly used in troubleshooting reports; others fall back to text.
     langs: [
       "javascript",
       "typescript",
       "bash",
+      "shellscript",
+      "sh",
+      "zsh",
+      "console",
+      "powershell",
       "json",
+      "jsonc",
       "yaml",
-      "go",
-      "python",
-      "sql",
-      "diff",
+      "toml",
+      "ini",
+      "xml",
       "html",
       "css",
+      "markdown",
+      "go",
+      "python",
+      "c",
+      "cpp",
+      "csharp",
+      "java",
+      "kotlin",
+      "rust",
+      "ruby",
+      "php",
+      "perl",
+      "lua",
+      "sql",
+      "diff",
+      "dockerfile",
+      "nginx",
+      "apache",
+      "makefile",
+      "hcl",
+      "ssh-config",
+      "systemd",
+      "log",
     ],
     fallbackLanguage: "text",
   })
   .use(rehypeStringify);
-export async function renderMarkdown(markdown: string): Promise<string> {
-  return String(await processor.process(markdown));
+export async function renderMarkdown(
+  markdown: string,
+  options: {
+    imageUrl?: ImageUrl;
+    blockExternalImages?: boolean;
+    /** Leave ```mermaid blocks for mermaid.ts to draw. */
+    mermaid?: boolean;
+  } = {},
+): Promise<string> {
+  return String(
+    await processor.process({
+      value: markdown,
+      data: {
+        imageUrl: options.imageUrl,
+        blockExternalImages: options.blockExternalImages,
+        mermaid: options.mermaid,
+      },
+    }),
+  );
 }

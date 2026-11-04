@@ -77,6 +77,52 @@ func SelectBestScores(answers []Answer, markings []MarkingResult) map[int64]map[
 	return selected
 }
 
+// SelectLatestScores scores each team and problem by its most recent answer
+// only. An unmarked latest answer yields no score even when an older answer
+// was marked, because only the final submission counts.
+func SelectLatestScores(answers []Answer, markings []MarkingResult) map[int64]map[string]Score {
+	latestAnswers := make(map[int64]map[string]Answer)
+	for _, answer := range answers {
+		if _, ok := latestAnswers[answer.TeamCode]; !ok {
+			latestAnswers[answer.TeamCode] = make(map[string]Answer)
+		}
+		current, ok := latestAnswers[answer.TeamCode][answer.ProblemCode]
+		if !ok || answer.Number > current.Number {
+			latestAnswers[answer.TeamCode][answer.ProblemCode] = answer
+		}
+	}
+	latest := LatestMarkings(markings)
+	selected := make(map[int64]map[string]Score)
+	for teamCode, byProblem := range latestAnswers {
+		for problemCode, answer := range byProblem {
+			marking, ok := latest[answerKey(answer.TeamCode, answer.ProblemCode, answer.Number)]
+			if !ok {
+				continue
+			}
+			if _, ok := selected[teamCode]; !ok {
+				selected[teamCode] = make(map[string]Score)
+			}
+			selected[teamCode][problemCode] = EffectiveScore(answer, marking)
+		}
+	}
+	return selected
+}
+
+// LatestAnswerNumbers returns the highest answer number per team and
+// problem among answers.
+func LatestAnswerNumbers(answers []Answer) map[int64]map[string]int32 {
+	latest := make(map[int64]map[string]int32)
+	for _, answer := range answers {
+		if _, ok := latest[answer.TeamCode]; !ok {
+			latest[answer.TeamCode] = make(map[string]int32)
+		}
+		if current, ok := latest[answer.TeamCode][answer.ProblemCode]; !ok || answer.Number > current {
+			latest[answer.TeamCode][answer.ProblemCode] = answer.Number
+		}
+	}
+	return latest
+}
+
 func BuildRanking(teams []Team, activeProblems map[string]struct{}, selected map[int64]map[string]Score) []RankingEntry {
 	entries := make([]RankingEntry, 0, len(teams))
 	for _, team := range teams {

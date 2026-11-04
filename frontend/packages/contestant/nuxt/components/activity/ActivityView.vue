@@ -4,6 +4,8 @@ import type { ActivityEntry } from "~/features/activity";
 
 defineProps<{
   entries?: ActivityEntry[];
+  /** Results stay hidden until the final reveal (secondary qualifier mode). */
+  resultsHidden?: boolean;
   pending?: boolean;
   error?: unknown;
 }>();
@@ -47,7 +49,9 @@ defineEmits<{ retry: [] }>();
               </NuxtLink>
             </td>
             <td data-label="得点">
-              <span class="numeric">{{ a.score?.score ?? "採点中" }}</span>
+              <span class="numeric">{{
+                a.score?.score ?? (resultsHidden ? "提出済み" : "採点中")
+              }}</span>
               / <span class="numeric">{{ a.maxScore }}</span>
             </td>
           </tr>

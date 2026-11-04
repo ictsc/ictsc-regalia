@@ -23,10 +23,23 @@ type Store interface {
 	ActiveContent(ctx context.Context) (ContentSnapshot, error)
 	GetContent(ctx context.Context, commit string) (ContentSnapshot, error)
 	ContentAt(ctx context.Context, at time.Time) (ContentSnapshot, error)
+	// ActivateContent makes snapshot the active content and, in the same
+	// transaction, sets the ranking freeze to its schedule.yaml value.
+	// Activating the active commit again only repairs the freeze.
 	ActivateContent(ctx context.Context, snapshot ContentSnapshot, expectedCurrentCommit string) (ContentSnapshot, error)
+	// GetContentAsset reads one image stored with the snapshot at commit.
+	GetContentAsset(ctx context.Context, commit, name string) (ContentAsset, error)
+	// ReplaceActiveSections rewrites the active snapshot's section intervals.
+	// It exists for development tooling only.
+	ReplaceActiveSections(ctx context.Context, sections []Section) (ContentSnapshot, error)
 	ListAnswers(ctx context.Context, filter AnswerFilter) ([]Answer, error)
 	GetAnswer(ctx context.Context, teamCode int64, problemCode string, number int32) (Answer, error)
 	SubmitAnswer(ctx context.Context, answer Answer, interval time.Duration) (Answer, time.Duration, error)
+	// ListAnswerAttachmentInfo returns one answer's attachment names and
+	// sizes without their content.
+	ListAnswerAttachmentInfo(ctx context.Context, teamCode int64, problemCode string, number int32) ([]AnswerAttachment, error)
+	// ListAnswerAttachments returns one answer's attachments with content.
+	ListAnswerAttachments(ctx context.Context, teamCode int64, problemCode string, number int32) ([]AnswerAttachment, error)
 	ListMarkingResults(ctx context.Context) ([]MarkingResult, error)
 	CreateMarkingResult(ctx context.Context, result MarkingResult) (MarkingResult, error)
 	DeleteMarkingLineComment(ctx context.Context, markingID string, commentIndex int32, actor string, at time.Time) (MarkingResult, error)
@@ -39,8 +52,6 @@ type Store interface {
 	CreateDeployment(ctx context.Context, deployment Deployment) (Deployment, error)
 	AppendDeploymentEvent(ctx context.Context, requestID string, event DeploymentEvent, recovery bool) (Deployment, bool, error)
 	GetCompetitionState(ctx context.Context) (CompetitionState, error)
-	ReplaceRule(ctx context.Context, markdown, actor string) (CompetitionState, error)
-	ReplaceFreezeAt(ctx context.Context, freezeAt *time.Time, actor string) (CompetitionState, error)
 	RevealFinal(ctx context.Context, at time.Time, actor string) (CompetitionState, error)
 	UpsertWebPushSubscription(ctx context.Context, subscription WebPushSubscription) error
 	DeleteWebPushSubscription(ctx context.Context, contestantName, endpoint string) error

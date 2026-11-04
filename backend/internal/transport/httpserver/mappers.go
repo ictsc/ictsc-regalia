@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
+	"github.com/ictsc/ictsc-regalia/backend/internal/service"
 	api "github.com/ictsc/ictsc-regalia/backend/internal/transport/api"
 )
 
@@ -70,6 +71,7 @@ func toAPIAdminProblem(problem core.Problem, commit string) api.AdminProblem {
 		SectionSlug: problem.SectionSlug, Type: api.ProblemType(problem.Type), Body: problem.Body,
 		Explanation: problem.Explanation, RedeployRule: toAPIRedeploy(problem.Redeploy), ContentCommit: commit,
 		DefaultGraderDiscordId: defaultGrader,
+		AnswerMaxLength:        problem.EffectiveAnswerMaxLength(), AllowAttachments: problem.AllowAttachments,
 	}
 }
 
@@ -81,16 +83,16 @@ func toAPIScore(score core.Score) *api.Score {
 	return &api.Score{MarkedScore: score.MarkedScore, Penalty: score.Penalty, Score: score.EffectiveScore, MaxScore: score.MaxScore}
 }
 
-func toAPIRanking(entries []core.RankingEntry, frozen bool, frozenAt *time.Time) api.RankingResponse {
-	ranking := make([]api.Rank, 0, len(entries))
-	for _, entry := range entries {
+func toAPIRanking(view service.RankingView) api.RankingResponse {
+	ranking := make([]api.Rank, 0, len(view.Entries))
+	for _, entry := range view.Entries {
 		ranking = append(ranking, api.Rank{
 			Rank: entry.Rank, TeamCode: entry.Team.Code, TeamName: entry.Team.Name,
 			Organization: entry.Team.Organization, Score: entry.Score,
 			LastEffectiveSubmissionAt: entry.LastEffectiveSubmissionAt,
 		})
 	}
-	return api.RankingResponse{Ranking: ranking, Frozen: frozen, FrozenAt: frozenAt}
+	return api.RankingResponse{Ranking: ranking, Frozen: view.Frozen, FrozenAt: view.FrozenAt, Hidden: view.Hidden}
 }
 
 func toAPIAnswer(answer core.Answer, score *core.Score) api.Answer {
@@ -98,10 +100,30 @@ func toAPIAnswer(answer core.Answer, score *core.Score) api.Answer {
 	if score != nil {
 		mapped = toAPIScore(*score)
 	}
+	attachments := make([]api.AnswerAttachmentInfo, 0, len(answer.Attachments))
+	for _, attachment := range answer.Attachments {
+		attachments = append(attachments, api.AnswerAttachmentInfo{Name: attachment.Name, Size: attachmentSize(attachment)})
+	}
 	return api.Answer{
 		Number: answer.Number, SubmittedAt: answer.SubmittedAt, ContentCommit: answer.ContentCommit,
 		Body: api.AnswerBody{Type: api.AnswerBodyTypeDESCRIPTIVE, Body: answer.Body}, Score: mapped,
+		Attachments: attachments,
 	}
+}
+
+func attachmentSize(attachment core.AnswerAttachment) int32 {
+	if attachment.Size > 0 {
+		return attachment.Size
+	}
+	return int32(len(attachment.Content))
+}
+
+func toAPIAttachments(attachments []core.AnswerAttachment) api.AnswerAttachmentsResponse {
+	mapped := make([]api.AnswerAttachment, 0, len(attachments))
+	for _, attachment := range attachments {
+		mapped = append(mapped, api.AnswerAttachment{Name: attachment.Name, Size: attachmentSize(attachment), Content: attachment.Content})
+	}
+	return api.AnswerAttachmentsResponse{Attachments: mapped}
 }
 
 func toAPIAnswerSummary(answer core.Answer, score *core.Score) api.AnswerSummary {
@@ -159,29 +181,45 @@ func toAPIMarking(result core.MarkingResult) api.MarkingResult {
 	}
 }
 
-func (h *Handler) scoreForAnswer(ctx context.Context, answer core.Answer, contestant bool) (*core.Score, error) {
+// answerScores holds what scoring an answer needs, read once per request so
+// lists do not reload every marking for each answer.
+type answerScores struct {
+	latest map[string]core.MarkingResult
+	state  core.CompetitionState
+}
+
+func (h *Handler) loadAnswerScores(ctx context.Context) (answerScores, error) {
 	markings, err := h.service.Store.ListMarkingResults(ctx)
 	if err != nil {
-		return nil, err
+		return answerScores{}, err
 	}
 	state, err := h.service.Store.GetCompetitionState(ctx)
 	if err != nil {
+		return answerScores{}, err
+	}
+	return answerScores{latest: core.LatestMarkings(markings), state: state}, nil
+}
+
+// scoreFor is the answer's score from its latest marking, or nil when it is
+// unmarked or, for contestants, not visible yet.
+func (h *Handler) scoreFor(scores answerScores, answer core.Answer, contestant bool) *core.Score {
+	marking, ok := core.LatestMarkingForAnswer(scores.latest, answer.TeamCode, answer.ProblemCode, answer.Number)
+	if !ok {
+		return nil
+	}
+	if contestant && (marking.ID == "" || h.service.MarkingVisibility(answer.SubmittedAt, scores.state) == core.VisibilityPrivate) {
+		return nil
+	}
+	score := core.EffectiveScore(answer, marking)
+	return &score
+}
+
+func (h *Handler) scoreForAnswer(ctx context.Context, answer core.Answer, contestant bool) (*core.Score, error) {
+	scores, err := h.loadAnswerScores(ctx)
+	if err != nil {
 		return nil, err
 	}
-	latest := core.LatestMarkings(markings)
-	keyed := core.SelectBestScores([]core.Answer{answer}, markings)
-	score, ok := keyed[answer.TeamCode][answer.ProblemCode]
-	if !ok {
-		return nil, nil
-	}
-	if contestant {
-		marking, hasMarking := core.LatestMarkingForAnswer(latest, answer.TeamCode, answer.ProblemCode, answer.Number)
-		visibility := core.MarkingVisibilityAt(answer.SubmittedAt, h.service.Now(), state.RankingFreezeAt, state.FinalRevealedAt)
-		if !hasMarking || marking.ID == "" || visibility == core.VisibilityPrivate {
-			return nil, nil
-		}
-	}
-	return &score, nil
+	return h.scoreFor(scores, answer, contestant), nil
 }
 
 func submissionStatus(snapshot core.ContentSnapshot, problem core.Problem, now time.Time) api.SubmissionStatus {

@@ -12,6 +12,7 @@ const { data: activity } = await useAsyncData("activity", () =>
 );
 const now = useClock();
 const problemCooldown = useProblemCooldown();
+const resultsHidden = computed(() => data.value?.ranking.hidden ?? false);
 const items = computed<ProblemListItem[]>(() =>
   (data.value?.problems ?? []).map((problem) => {
     const submitted = activity.value?.some(
@@ -24,6 +25,7 @@ const items = computed<ProblemListItem[]>(() =>
         submitted,
         activity.value?.find((a) => a.problemCode === problem.code)?.score ===
           undefined && !!submitted,
+        resultsHidden.value,
       ),
       cooldownMinutes: problemCooldown.remainingMinutes(
         problem.code,
@@ -38,6 +40,7 @@ const items = computed<ProblemListItem[]>(() =>
   <main>
     <ProblemListView
       :items="items"
+      :results-hidden="resultsHidden"
       :pending="pending"
       :error="error"
       @retry="refresh"

@@ -147,6 +147,8 @@ export const adminProblem: Schemas["AdminProblem"] = {
   },
   content_commit: contentStatus.active_commit!,
   default_grader_discord_id: null,
+  answer_max_length: 3000,
+  allow_attachments: true,
 };
 
 export const ranking: Schemas["RankingResponse"] = {
@@ -160,6 +162,7 @@ export const ranking: Schemas["RankingResponse"] = {
   })),
   frozen: false,
   frozen_at: null,
+  hidden: false,
 };
 
 export const scores: Schemas["AdminScore"][] = teams
@@ -278,6 +281,9 @@ export const answers: Schemas["AdminAnswer"][] = answerRows.map(
         assignment_source: claimed ? "CLAIMED" : "DEFAULT",
         revision: 1,
       },
+      competition_mode: "STANDARD",
+      latest: true,
+      marking_blocked_reason: null,
     };
   },
 );

@@ -291,10 +291,19 @@ func (s *Store) ActivateContent(ctx context.Context, snapshot core.ContentSnapsh
 		return core.ContentSnapshot{}, dbError(err)
 	}
 	if hasCurrent && current == snapshot.CommitSHA {
-		if err := tx.Rollback(ctx); err != nil {
-			return core.ContentSnapshot{}, dbError(err)
+		// Activating the active commit again repairs the freeze, which an
+		// older build may have left out of step with schedule.yaml.
+		active, err := s.GetContent(ctx, snapshot.CommitSHA)
+		if err != nil {
+			return core.ContentSnapshot{}, err
 		}
-		return s.GetContent(ctx, snapshot.CommitSHA)
+		if err := s.applyContentFreeze(ctx, tx, active); err != nil {
+			return core.ContentSnapshot{}, err
+		}
+		if err := tx.Commit(ctx); err != nil {
+			return core.ContentSnapshot{}, conflictError(err, "content_refresh_in_progress", "Content activation conflicted with another refresh")
+		}
+		return active, nil
 	}
 	if expectedCurrentCommit == core.NoActiveContentCommit && hasCurrent {
 		return core.ContentSnapshot{}, core.NewError(http.StatusConflict, "content_refresh_in_progress", "Active content appeared while refresh was in progress")
@@ -316,10 +325,26 @@ func (s *Store) ActivateContent(ctx context.Context, snapshot core.ContentSnapsh
 	if err != nil {
 		return core.ContentSnapshot{}, dbError(err)
 	}
+	for _, asset := range snapshot.Assets {
+		if _, err := tx.Exec(ctx, `INSERT INTO content_blobs(sha,data) VALUES($1,$2) ON CONFLICT(sha) DO NOTHING`,
+			asset.SHA, asset.Data); err != nil {
+			return core.ContentSnapshot{}, dbError(err)
+		}
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO content_assets(commit_sha,name,content_type,blob_sha) VALUES($1,$2,$3,$4)
+			ON CONFLICT(commit_sha,name) DO UPDATE SET content_type=excluded.content_type,blob_sha=excluded.blob_sha`,
+			snapshot.CommitSHA, asset.Name, asset.ContentType, asset.SHA); err != nil {
+			return core.ContentSnapshot{}, dbError(err)
+		}
+	}
+	if err := s.applyContentFreeze(ctx, tx, snapshot); err != nil {
+		return core.ContentSnapshot{}, err
+	}
 	if err := tx.Commit(ctx); err != nil {
 		return core.ContentSnapshot{}, conflictError(err, "content_refresh_in_progress", "Content activation conflicted with another refresh")
 	}
 	snapshot.ActivatedAt = activatedAt
+	snapshot.Assets = nil
 	return snapshot, nil
 }
 
@@ -408,6 +433,14 @@ func (s *Store) SubmitAnswer(ctx context.Context, answer core.Answer, interval t
 		answer.AuthorName, answer.Body, answer.SubmittedAt, answer.ContentCommit, answer.MaxScore, rule, answer.DeploymentsBefore)
 	if err != nil {
 		return core.Answer{}, 0, conflictError(err, "answer_conflict", "Answer could not be submitted concurrently")
+	}
+	for position, attachment := range answer.Attachments {
+		if _, err = tx.Exec(ctx, `
+			INSERT INTO answer_attachments(team_code,problem_code,answer_number,position,name,size_bytes,content)
+			VALUES($1,$2,$3,$4,$5,$6,$7)`, answer.TeamCode, answer.ProblemCode, answer.Number, position,
+			attachment.Name, len(attachment.Content), attachment.Content); err != nil {
+			return core.Answer{}, 0, dbError(err)
+		}
 	}
 	_, err = tx.Exec(ctx, `
 		UPDATE answer_counters SET next_number=$3,last_submitted_at=$4
@@ -764,26 +797,31 @@ func (s *Store) deploymentEvents(ctx context.Context, requestID string) ([]core.
 func (s *Store) GetCompetitionState(ctx context.Context) (core.CompetitionState, error) {
 	var state core.CompetitionState
 	err := s.pool.QueryRow(ctx, `
-		SELECT rule_markdown,ranking_freeze_at,final_revealed_at,updated_at,updated_by
-		FROM competition_state WHERE singleton=true`).Scan(&state.RuleMarkdown, &state.RankingFreezeAt,
+		SELECT ranking_freeze_at,final_revealed_at,updated_at,updated_by
+		FROM competition_state WHERE singleton=true`).Scan(&state.RankingFreezeAt,
 		&state.FinalRevealedAt, &state.UpdatedAt, &state.UpdatedBy)
 	return state, dbError(err)
 }
 
-func (s *Store) ReplaceRule(ctx context.Context, markdown, actor string) (core.CompetitionState, error) {
-	return s.mutateCompetitionState(ctx, actor, "replace_rule", &markdown, true, nil, false, nil)
+// applyContentFreeze makes schedule.yaml the source of the ranking freeze
+// in the activation transaction, so a concurrent refresh of another commit
+// cannot leave this commit's freeze behind.
+func (s *Store) applyContentFreeze(ctx context.Context, tx pgx.Tx, snapshot core.ContentSnapshot) error {
+	_, err := s.changeCompetitionState(ctx, tx, "content:"+snapshot.CommitSHA, "replace_freeze",
+		truncateFreeze(snapshot.Manifest.RankingFreezeAt), true, nil)
+	return err
 }
 
-func (s *Store) ReplaceFreezeAt(ctx context.Context, freezeAt *time.Time, actor string) (core.CompetitionState, error) {
-	if freezeAt != nil {
-		value := freezeAt.UTC().Truncate(time.Microsecond)
-		freezeAt = &value
+func truncateFreeze(freezeAt *time.Time) *time.Time {
+	if freezeAt == nil {
+		return nil
 	}
-	return s.mutateCompetitionState(ctx, actor, "replace_freeze", nil, false, freezeAt, true, nil)
+	value := freezeAt.UTC().Truncate(time.Microsecond)
+	return &value
 }
 
 func (s *Store) RevealFinal(ctx context.Context, at time.Time, actor string) (core.CompetitionState, error) {
-	return s.mutateCompetitionState(ctx, actor, "reveal_final", nil, false, nil, false, &at)
+	return s.mutateCompetitionState(ctx, actor, "reveal_final", nil, false, &at)
 }
 
 func dbError(err error) error {
@@ -840,4 +878,57 @@ func (s *Store) RegisterContestant(ctx context.Context, contestant core.Contesta
 		return core.Contestant{}, dbError(err)
 	}
 	return contestant, nil
+}
+
+func (s *Store) GetContentAsset(ctx context.Context, commit, name string) (core.ContentAsset, error) {
+	asset := core.ContentAsset{Name: name}
+	err := s.pool.QueryRow(ctx, `
+		SELECT a.content_type,a.blob_sha,b.data FROM content_assets a JOIN content_blobs b ON b.sha=a.blob_sha
+		WHERE a.commit_sha=$1 AND a.name=$2`, commit, name).
+		Scan(&asset.ContentType, &asset.SHA, &asset.Data)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return core.ContentAsset{}, core.NewError(http.StatusNotFound, "resource_not_found", "Image was not found")
+	}
+	if err != nil {
+		return core.ContentAsset{}, dbError(err)
+	}
+	return asset, nil
+}
+
+func (s *Store) ListAnswerAttachmentInfo(ctx context.Context, teamCode int64, problemCode string, number int32) ([]core.AnswerAttachment, error) {
+	rows, err := s.pool.Query(ctx, `
+		SELECT name,size_bytes FROM answer_attachments
+		WHERE team_code=$1 AND problem_code=$2 AND answer_number=$3 ORDER BY position`, teamCode, problemCode, number)
+	if err != nil {
+		return nil, dbError(err)
+	}
+	defer rows.Close()
+	attachments := make([]core.AnswerAttachment, 0)
+	for rows.Next() {
+		var attachment core.AnswerAttachment
+		if err := rows.Scan(&attachment.Name, &attachment.Size); err != nil {
+			return nil, dbError(err)
+		}
+		attachments = append(attachments, attachment)
+	}
+	return attachments, dbError(rows.Err())
+}
+
+func (s *Store) ListAnswerAttachments(ctx context.Context, teamCode int64, problemCode string, number int32) ([]core.AnswerAttachment, error) {
+	rows, err := s.pool.Query(ctx, `
+		SELECT name,size_bytes,content FROM answer_attachments
+		WHERE team_code=$1 AND problem_code=$2 AND answer_number=$3 ORDER BY position`, teamCode, problemCode, number)
+	if err != nil {
+		return nil, dbError(err)
+	}
+	defer rows.Close()
+	attachments := make([]core.AnswerAttachment, 0)
+	for rows.Next() {
+		var attachment core.AnswerAttachment
+		if err := rows.Scan(&attachment.Name, &attachment.Size, &attachment.Content); err != nil {
+			return nil, dbError(err)
+		}
+		attachments = append(attachments, attachment)
+	}
+	return attachments, dbError(rows.Err())
 }

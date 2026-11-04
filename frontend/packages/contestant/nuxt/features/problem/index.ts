@@ -47,6 +47,9 @@ export type ProblemDetail = {
   penaltyThreashold: number;
   body: string;
   submissionStatus?: SubmissionStatus;
+  /** Answer characters allowed, not counting line breaks. */
+  answerMaxLength: number;
+  allowAttachments: boolean;
 };
 
 export async function fetchProblem(
@@ -68,6 +71,8 @@ export async function fetchProblem(
     penaltyThreashold: problem.deployment?.penalty_threshold ?? 0,
     body: problem.body,
     submissionStatus: mapSubmissionStatus(problem.submission_status),
+    answerMaxLength: problem.answer_max_length,
+    allowAttachments: problem.allow_attachments,
   };
 }
 

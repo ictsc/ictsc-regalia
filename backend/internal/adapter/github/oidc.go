@@ -24,7 +24,7 @@ import (
 const (
 	defaultIssuer        = "https://token.actions.githubusercontent.com"
 	defaultAPIBaseURL    = "https://api.github.com"
-	defaultManifestPath  = "content/manifest.yaml"
+	defaultSchedulePath  = "schedule.yaml"
 	defaultHTTPTimeout   = 15 * time.Second
 	defaultJWKSCacheTTL  = 5 * time.Minute
 	defaultClockSkew     = 30 * time.Second
@@ -37,28 +37,31 @@ var ErrInvalidActionsToken = errors.New("invalid GitHub Actions OIDC token")
 var _ service.ContentSource = (*Client)(nil)
 
 type Config struct {
-	APIBaseURL        string
-	APIToken          string
-	ManifestPath      string
-	Issuer            string
-	Audience          string
-	RepositoryID      string
-	Repository        string
-	Ref               string
-	WorkflowRef       string
-	DiscoveryURL      string
-	HTTPClient        *http.Client
-	Now               func() time.Time
-	JWKSCacheTTL      time.Duration
-	ClockSkew         time.Duration
-	AllowInsecureHTTP bool
+	APIBaseURL   string
+	APIToken     string
+	SchedulePath string
+	// SecondaryQualifierMode changes how schedules are validated and
+	// assigned to problems; see BuildManifest.
+	SecondaryQualifierMode bool
+	Issuer                 string
+	Audience               string
+	RepositoryID           string
+	Repository             string
+	Ref                    string
+	WorkflowRef            string
+	DiscoveryURL           string
+	HTTPClient             *http.Client
+	Now                    func() time.Time
+	JWKSCacheTTL           time.Duration
+	ClockSkew              time.Duration
+	AllowInsecureHTTP      bool
 }
 
 type Client struct {
-	apiBaseURL   string
-	apiToken     string
-	manifestPath string
-	contentRoot  string
+	apiBaseURL         string
+	apiToken           string
+	schedulePath       string
+	secondaryQualifier bool
 
 	issuer       string
 	audience     string
@@ -134,8 +137,8 @@ func New(config Config) (*Client, error) {
 	if config.APIBaseURL == "" {
 		config.APIBaseURL = defaultAPIBaseURL
 	}
-	if config.ManifestPath == "" {
-		config.ManifestPath = defaultManifestPath
+	if config.SchedulePath == "" {
+		config.SchedulePath = defaultSchedulePath
 	}
 	if config.Issuer == "" {
 		config.Issuer = defaultIssuer
@@ -149,8 +152,8 @@ func New(config Config) (*Client, error) {
 	if _, _, err := splitRepository(config.Repository); err != nil {
 		return nil, fmt.Errorf("configured GitHub repository: %w", err)
 	}
-	if !safeRepositoryPath(config.ManifestPath) {
-		return nil, errors.New("GitHub manifest path must be a clean repository-relative path")
+	if !safeRepositoryPath(config.SchedulePath) {
+		return nil, errors.New("GitHub schedule path must be a clean repository-relative path")
 	}
 	apiURL, err := validateEndpoint(config.APIBaseURL, config.AllowInsecureHTTP)
 	if err != nil {
@@ -177,21 +180,21 @@ func New(config Config) (*Client, error) {
 		config.ClockSkew = defaultClockSkew
 	}
 	return &Client{
-		apiBaseURL:   strings.TrimRight(apiURL.String(), "/"),
-		apiToken:     config.APIToken,
-		manifestPath: config.ManifestPath,
-		contentRoot:  repositoryDir(config.ManifestPath),
-		issuer:       strings.TrimRight(issuerURL.String(), "/"),
-		audience:     config.Audience,
-		repositoryID: config.RepositoryID,
-		repository:   config.Repository,
-		ref:          config.Ref,
-		workflowRef:  config.WorkflowRef,
-		discoveryURL: discoveryURL.String(),
-		httpClient:   config.HTTPClient,
-		now:          config.Now,
-		cacheTTL:     config.JWKSCacheTTL,
-		clockSkew:    config.ClockSkew,
+		apiBaseURL:         strings.TrimRight(apiURL.String(), "/"),
+		apiToken:           config.APIToken,
+		schedulePath:       config.SchedulePath,
+		secondaryQualifier: config.SecondaryQualifierMode,
+		issuer:             strings.TrimRight(issuerURL.String(), "/"),
+		audience:           config.Audience,
+		repositoryID:       config.RepositoryID,
+		repository:         config.Repository,
+		ref:                config.Ref,
+		workflowRef:        config.WorkflowRef,
+		discoveryURL:       discoveryURL.String(),
+		httpClient:         config.HTTPClient,
+		now:                config.Now,
+		cacheTTL:           config.JWKSCacheTTL,
+		clockSkew:          config.ClockSkew,
 	}, nil
 }
 

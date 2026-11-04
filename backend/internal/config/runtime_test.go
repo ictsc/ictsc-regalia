@@ -6,7 +6,7 @@ import (
 )
 
 var runtimeEnvKeys = []string{
-	"ICTSC_DEV_FAKE_MODE", "ICTSC_SECURE_COOKIES", "ICTSC_ALLOW_INSECURE_UPSTREAMS",
+	"ICTSC_DEV_FAKE_MODE", "ICTSC_SECONDARY_QUALIFIER_MODE", "ICTSC_SECURE_COOKIES", "ICTSC_ALLOW_INSECURE_UPSTREAMS",
 	"ICTSC_ALLOWED_ORIGINS", "ICTSC_DATABASE_URL", "ICTSC_REDIS_URL",
 	"ICTSC_DISCORD_CLIENT_ID", "ICTSC_DISCORD_CLIENT_SECRET", "ICTSC_DISCORD_CONTESTANT_REDIRECT_URI",
 	"ICTSC_DISCORD_ADMIN_REDIRECT_URI", "ICTSC_DISCORD_ADMIN_GUILD_ID", "ICTSC_DISCORD_CONTESTANT_GUILD_ID", "ICTSC_DISCORD_ADMIN_ROLE_IDS",
@@ -58,7 +58,7 @@ func TestLoadRuntimeProductionValidatesAndDefaultsSecureCookies(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !cfg.SecureCookies || cfg.DevFakeMode {
+	if !cfg.SecureCookies || cfg.DevFakeMode || cfg.SecondaryQualifierMode {
 		t.Fatalf("unexpected security mode: %#v", cfg)
 	}
 	if len(cfg.AllowedOrigins) != 2 || len(cfg.DiscordAdminRoleIDs) != 2 {
@@ -114,5 +114,17 @@ func TestLoadRuntimeRejectsOriginPathAndBadDuration(t *testing.T) {
 				t.Fatal("expected validation error")
 			}
 		})
+	}
+}
+
+func TestLoadRuntimeSecondaryQualifierMode(t *testing.T) {
+	setValidProductionRuntimeEnv(t)
+	t.Setenv("ICTSC_SECONDARY_QUALIFIER_MODE", "true")
+	cfg, err := LoadRuntime()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !cfg.SecondaryQualifierMode {
+		t.Fatalf("secondary qualifier mode was not enabled: %#v", cfg)
 	}
 }

@@ -7,6 +7,8 @@ export type RankingSnapshot = {
   ranking: Rank[];
   frozen: boolean;
   frozenAt?: string;
+  /** 二次予選モードで最終公開前。採点結果と順位は非公開。 */
+  hidden: boolean;
 };
 
 export type HeaderRankingItem =
@@ -64,5 +66,6 @@ export async function fetchRanking(
     })),
     frozen: response.frozen,
     frozenAt: response.frozen_at ?? undefined,
+    hidden: response.hidden,
   };
 }

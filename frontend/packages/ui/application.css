@@ -56,6 +56,10 @@ button:disabled {
   min-height: 160px;
   font-family: var(--sans-read);
 }
+/* An empty status line would add a second grid gap above the button. */
+.form-grid > p[role="status"]:empty {
+  display: none;
+}
 .actions {
   display: flex;
   gap: 16px;
@@ -91,14 +95,18 @@ button:disabled {
   padding: 0 var(--table-cell-padding);
   vertical-align: middle;
 }
+/* Plain data tables are denser than the ranking and problem rows; cells
+   still grow when their content wraps. */
 .data-table th {
-  height: var(--table-header-height);
+  height: 32px;
   color: var(--muted);
   font-size: var(--table-header-size);
   font-weight: 500;
 }
 .data-table td {
-  height: var(--table-row-height);
+  height: 36px;
+  padding-top: 6px;
+  padding-bottom: 6px;
 }
 .data-table a {
   text-decoration: underline;
@@ -209,7 +217,10 @@ button:disabled {
   font-size: 13px;
 }
 .admin-nav .router-link-exact-active {
-  color: var(--accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
 }
 .account-nav {
   justify-content: flex-end;
@@ -248,11 +259,161 @@ button:disabled {
   color: var(--accent);
   text-decoration: underline;
 }
+/* Code uses the site's mono face a step smaller than the text around it;
+   the browser's bare monospace runs visibly larger than Noto Sans JP. */
+.markdown code {
+  font-family: var(--mono);
+  font-size: 0.875em;
+}
 .markdown pre {
-  padding: 20px;
+  padding: 12px 16px;
   overflow: auto;
   border: 1px solid var(--ink);
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.markdown pre code {
+  font-size: inherit;
+}
+/* Shiki inlines the light colors and keeps the dark ones in --shiki-dark.
+   Code sits on the page background in both themes, framed by the border. */
+.markdown pre.shiki {
+  background-color: var(--paper) !important;
+}
+html[data-theme="dark"] .markdown .shiki,
+html[data-theme="dark"] .markdown .shiki span {
+  color: var(--shiki-dark) !important;
+}
+/* MarkdownContent wraps each code block so its copy button stays in the
+   corner while the code scrolls sideways. */
+.markdown .code-block {
+  position: relative;
+  margin: 1em 0;
+}
+.markdown .code-block > pre {
+  margin: 0;
+}
+.markdown .code-copy {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  opacity: 0;
+}
+.markdown .code-copy .ui-icon {
+  width: 16px;
+  height: 16px;
+}
+.markdown .code-block:hover .code-copy,
+.markdown .code-copy:focus-visible {
+  opacity: 1;
+}
+/* An icon has no text to underline; hover inverts it like a button. */
+.markdown .code-copy:hover,
+.markdown .code-copy:focus-visible {
+  background: var(--ink);
+  color: var(--paper);
+}
+@media (hover: none) {
+  .markdown .code-copy {
+    opacity: 1;
+  }
+}
+/* A ```mermaid block: its source until the diagram is drawn, then the
+   diagram alone; a diagram that fails keeps the source with a note. */
+.markdown .mermaid-diagram {
+  margin: 1em 0;
+  overflow-x: auto;
+}
+.markdown .mermaid-source {
+  margin: 0;
+}
+.markdown .mermaid-diagram.is-rendered .mermaid-source {
+  display: none;
+}
+.markdown .mermaid-output svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+.markdown .mermaid-output svg {
+  cursor: zoom-in;
+}
+.markdown .mermaid-diagram.is-failed .mermaid-output {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.875em;
+}
+/* An image from another host in contestant text, shown as its URL. */
+.markdown .blocked-image {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.875em;
+  overflow-wrap: anywhere;
+}
+.markdown img:not(a img) {
+  cursor: zoom-in;
+}
+.image-viewer {
+  max-width: 96vw;
+  max-height: 96vh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+}
+.image-viewer::backdrop {
+  background: rgb(0 0 0 / 80%);
+}
+.image-viewer img {
+  display: block;
+  max-width: 96vw;
+  max-height: 90vh;
+  object-fit: contain;
+  background: #ffffff;
+  cursor: zoom-out;
+}
+/* A diagram is drawn in the theme's colors, so it sits on the page
+   background; Mermaid's inline max-width would keep it small. */
+.image-viewer-diagram {
+  padding: 24px;
+  background: var(--paper);
+  cursor: zoom-out;
+}
+.image-viewer-diagram svg {
+  display: block;
+  width: min(90vw, 1600px);
+  max-width: none !important;
+  height: auto;
+  max-height: 86vh;
+}
+.image-viewer-close {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #ffffff;
+  background: #1d1d1d;
+  color: #ffffff;
+  cursor: pointer;
+}
+.image-viewer-close:hover,
+.image-viewer-close:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
 }
 .markdown img {
   max-width: 100%;
@@ -264,21 +425,24 @@ button:disabled {
   overflow-x: auto;
   font-family: var(--sans-read);
 }
+/* Same density as .data-table. */
 .markdown td,
 .markdown th {
   min-width: 120px;
-  height: var(--table-row-height);
-  padding: 0 var(--table-cell-padding);
+  /* One row is one 32px line of problem text. */
+  height: 32px;
+  padding: 4px var(--table-cell-padding);
+  line-height: 1.5;
   border: 0;
   border-bottom: 1px solid var(--ink);
+  text-align: center;
   vertical-align: middle;
 }
 .markdown th {
-  height: var(--table-header-height);
+  height: 28px;
   color: var(--muted);
   font-size: var(--table-header-size);
   font-weight: 500;
-  text-align: left;
 }
 .markdown blockquote {
   border-left: 3px solid var(--accent);

@@ -47,15 +47,17 @@ func run() error {
 		roles[role] = struct{}{}
 	}
 	svc := service.New(store, sessions, service.Config{
-		ContestantRedirectURI: cfg.ContestantRedirectURI,
-		AdminRedirectURI:      cfg.AdminRedirectURI,
-		ContentRepository:     cfg.GitHubRepository,
-		ContentRef:            cfg.GitHubRef,
-		CallbackBaseURL:       cfg.CallbackBaseURL,
-		AdminGuildID:          cfg.DiscordAdminGuildID,
-		ContestantGuildID:     cfg.DiscordContestantGuildID,
-		DiscordRoleTeams:      cfg.DiscordRoleTeams,
-		AdminRoleIDs:          roles,
+		ContestantRedirectURI:  cfg.ContestantRedirectURI,
+		AdminRedirectURI:       cfg.AdminRedirectURI,
+		ContentRepository:      cfg.GitHubRepository,
+		ContentRef:             cfg.GitHubRef,
+		CallbackBaseURL:        cfg.CallbackBaseURL,
+		AdminGuildID:           cfg.DiscordAdminGuildID,
+		ContestantGuildID:      cfg.DiscordContestantGuildID,
+		DiscordRoleTeams:       cfg.DiscordRoleTeams,
+		AdminRoleIDs:           roles,
+		SecondaryQualifierMode: cfg.SecondaryQualifierMode,
+		DevTools:               cfg.DevFakeMode,
 	})
 	svc.Discord, svc.Content, svc.Deployments, svc.Events = discordClient, contentClient, deploymentClient, events
 	if cfg.WebPushVAPIDPublicKey != "" {
@@ -156,7 +158,7 @@ func runtimeAdapters(cfg config.Runtime) (service.Discord, service.ContentSource
 	if !cfg.DevFakeMode || cfg.GitHubRepository != "" {
 		client, err := githubadapter.New(githubadapter.Config{
 			APIBaseURL: cfg.GitHubAPIBaseURL, APIToken: cfg.GitHubAPIToken,
-			ManifestPath: cfg.GitHubManifestPath, Issuer: cfg.GitHubOIDCIssuer,
+			SchedulePath: cfg.GitHubSchedulePath, SecondaryQualifierMode: cfg.SecondaryQualifierMode, Issuer: cfg.GitHubOIDCIssuer,
 			Audience: cfg.GitHubOIDCAudience, RepositoryID: cfg.GitHubRepositoryID,
 			Repository: cfg.GitHubRepository, Ref: cfg.GitHubRef, WorkflowRef: cfg.GitHubWorkflowRef,
 			DiscoveryURL: cfg.GitHubDiscoveryURL, AllowInsecureHTTP: cfg.AllowInsecureHTTP,

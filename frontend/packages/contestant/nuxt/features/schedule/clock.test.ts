@@ -61,4 +61,22 @@ describe("contestClock", () => {
       text: "10:00:00",
     });
   });
+
+  it("counts down to the end of a section that started on an earlier day", () => {
+    expect(
+      contestClock(
+        [
+          {
+            name: "multi-day",
+            startAt: "2026-09-26T09:00:00+09:00",
+            endAt: "2026-09-28T17:00:00+09:00",
+          },
+        ],
+        Date.parse("2026-09-27T12:00:00+09:00"),
+      ),
+    ).toEqual({
+      label: "競技終了まで",
+      text: "29:00:00",
+    });
+  });
 });

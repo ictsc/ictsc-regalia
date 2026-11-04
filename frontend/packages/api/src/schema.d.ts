@@ -379,6 +379,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/contestant/problems/{problem_code}/answers/{answer_number}/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 問題コード */
+                problem_code: components["parameters"]["ProblemCodePath"];
+                /** @description チーム・問題内で採番された回答番号 */
+                answer_number: components["parameters"]["AnswerNumberPath"];
+            };
+            cookie?: never;
+        };
+        /**
+         * 自チームの回答の添付を取得する
+         * @description 添付の中身をテキストとして返す。表示時はHTMLとして解釈しないこと。
+         */
+        get: operations["listContestantAnswerAttachments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/contestant/problems/{problem_code}/deployments": {
         parameters: {
             query?: never;
@@ -799,6 +824,33 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/answers/{team_code}/{problem_code}/{answer_number}/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description チーム番号 */
+                team_code: components["parameters"]["TeamCodePath"];
+                /** @description 問題コード */
+                problem_code: components["parameters"]["ProblemCodePath"];
+                /** @description チーム・問題内で採番された回答番号 */
+                answer_number: components["parameters"]["AnswerNumberPath"];
+            };
+            cookie?: never;
+        };
+        /**
+         * 回答の添付を取得する
+         * @description 添付の中身をテキストとして返す。表示時はHTMLとして解釈しないこと。
+         */
+        get: operations["listAdminAnswerAttachments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/answers/{team_code}/{problem_code}/{answer_number}": {
         parameters: {
             query?: never;
@@ -862,7 +914,7 @@ export interface paths {
         put?: never;
         /**
          * 採点結果を登録する
-         * @description 全Adminが採点者として登録できる。judgeはBearer JWTから決定し、可視性と集計得点は競技ルール・凍結状態に基づいてサーバー内部で更新する。
+         * @description 全Adminが採点者として登録できる。judgeはBearer JWTから決定し、可視性と集計得点は競技ルール・凍結状態に基づいてサーバー内部で更新する。二次予選モードでは競技終了前（grading_not_started）と最新でない回答（answer_not_latest）への登録を409で拒否する。
          */
         post: operations["createAdminMarkingResult"];
         delete?: never;
@@ -1071,8 +1123,7 @@ export interface paths {
         };
         /** 競技ルールを取得する */
         get: operations["getAdminRule"];
-        /** 競技ルールを置換する */
-        put: operations["replaceAdminRule"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -1089,8 +1140,83 @@ export interface paths {
         };
         /** ランキング凍結時刻を取得する */
         get: operations["getAdminDashboardSchedule"];
-        /** ランキング凍結時刻を置換する */
-        put: operations["replaceAdminDashboardSchedule"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/contestant/images/{image_name}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description 以前に受け取ったETag。一致すれば304を返す。 */
+                "If-None-Match"?: components["parameters"]["IfNoneMatchHeader"];
+            };
+            path: {
+                /** @description images/ 直下のファイル名 */
+                image_name: components["parameters"]["ImageNamePath"];
+            };
+            cookie?: never;
+        };
+        /**
+         * 問題文・お知らせから参照される画像を取得する
+         * @description コンテンツリポジトリの images/ にあるファイルを、有効なコンテンツのものから返す。Markdown では /images/{image_name} として参照する。
+         */
+        get: operations["getContestantImage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/images/{image_name}": {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description 以前に受け取ったETag。一致すれば304を返す。 */
+                "If-None-Match"?: components["parameters"]["IfNoneMatchHeader"];
+            };
+            path: {
+                /** @description images/ 直下のファイル名 */
+                image_name: components["parameters"]["ImageNamePath"];
+            };
+            cookie?: never;
+        };
+        /**
+         * 問題文・お知らせから参照される画像を取得する
+         * @description commitを省略すると有効なコンテンツの画像を返す。
+         */
+        get: operations["getAdminImage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/dev/contest-phase": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 現在の競技状態を取得する
+         * @description BEFOREはどのセクションも始まっていない状態、DURINGはいずれかのセクション中、AFTERはセクション外でいずれかのセクションが始まったことがある状態（セクション間の休憩を含む）。enabledは開発モードかつ二次予選モードで切り替えが使えるときtrue。
+         */
+        get: operations["getAdminDevContestPhase"];
+        /**
+         * 開発用に競技状態を切り替える
+         * @description 開発モードかつ二次予選モードでのみ使える。セクションの数・長さ・間隔は保ったまま全体を現在時刻基準で平行移動し、有効なコンテンツの manifest を書き換える。BEFOREは最初のセクションが10分後に始まり、DURINGは最初のセクションが10分前に始まり、AFTERは最後のセクションが10分前に終わる。無効な環境では404。
+         */
+        put: operations["replaceAdminDevContestPhase"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1138,7 +1264,7 @@ export interface components {
          * @description クライアントが分岐に利用できる後方互換なRFC 9457 code。各responseのx-error-codesがそのstatusで返り得る値を示す。
          * @enum {string}
          */
-        ErrorCode: "authentication_required" | "invalid_session" | "oauth_state_invalid" | "invalid_machine_token" | "permission_denied" | "origin_forbidden" | "admin_role_required" | "guild_membership_required" | "team_role_required" | "ambiguous_team_roles" | "team_role_mismatch" | "resource_not_found" | "content_not_found" | "validation_error" | "conflict" | "team_code_conflict" | "invitation_expired" | "invitation_already_used" | "team_full" | "contestant_already_registered" | "answer_rate_limited" | "submission_closed" | "deployment_not_allowed" | "deployment_in_progress" | "invalid_deployment_transition" | "duplicate_event_mismatch" | "content_rollback_rejected" | "content_refresh_in_progress" | "upstream_unavailable" | "content_not_available" | "content_invalid" | "internal_error";
+        ErrorCode: "authentication_required" | "invalid_session" | "oauth_state_invalid" | "invalid_machine_token" | "permission_denied" | "origin_forbidden" | "admin_role_required" | "guild_membership_required" | "team_role_required" | "ambiguous_team_roles" | "team_role_mismatch" | "resource_not_found" | "content_not_found" | "validation_error" | "conflict" | "team_code_conflict" | "invitation_expired" | "invitation_already_used" | "team_full" | "contestant_already_registered" | "answer_rate_limited" | "submission_closed" | "deployment_not_allowed" | "grading_not_started" | "answer_not_latest" | "deployment_in_progress" | "invalid_deployment_transition" | "duplicate_event_mismatch" | "content_rollback_rejected" | "content_refresh_in_progress" | "upstream_unavailable" | "content_not_available" | "content_invalid" | "internal_error";
         ErrorDetail: {
             location: string;
             message: string;
@@ -1416,7 +1542,13 @@ export interface components {
         ContestantScheduleResponse: {
             /** @description beginning昇順、同時刻の場合slug辞書順。 */
             sections: components["schemas"]["ContestantScheduleSection"][];
+            competition_mode: components["schemas"]["CompetitionMode"];
         };
+        /**
+         * @description STANDARDは回答ごとに随時採点し、最高得点の回答を採用する。SECONDARY_QUALIFIERは競技終了後に各チーム・問題の最新回答だけを採点し、その得点を採用する。SECONDARY_QUALIFIERでは最終公開まで競技者に採点結果と順位を返さない。
+         * @enum {string}
+         */
+        CompetitionMode: "STANDARD" | "SECONDARY_QUALIFIER";
         /** @enum {string} */
         ProblemType: "DESCRIPTIVE";
         /** @enum {string} */
@@ -1459,6 +1591,13 @@ export interface components {
             penalty_threshold: number | null;
         };
         ProblemSummary: {
+            /**
+             * Format: int32
+             * @description 回答の最大文字数。改行は数えない。
+             */
+            answer_max_length: number;
+            /** @description 回答にテキストのログを添付できるか */
+            allow_attachments: boolean;
             code: string;
             title: string;
             /** Format: int32 */
@@ -1475,6 +1614,13 @@ export interface components {
             next_submittable_at: string | null;
         };
         ProblemDetail: {
+            /**
+             * Format: int32
+             * @description 回答の最大文字数。改行は数えない。
+             */
+            answer_max_length: number;
+            /** @description 回答にテキストのログを添付できるか */
+            allow_attachments: boolean;
             code: string;
             title: string;
             /** Format: int32 */
@@ -1489,6 +1635,13 @@ export interface components {
             submission_status: components["schemas"]["SubmissionStatus"];
         };
         AdminProblem: {
+            /**
+             * Format: int32
+             * @description 回答の最大文字数。改行は数えない。
+             */
+            answer_max_length: number;
+            /** @description 回答にテキストのログを添付できるか */
+            allow_attachments: boolean;
             code: string;
             title: string;
             /** Format: int32 */
@@ -1534,6 +1687,7 @@ export interface components {
             /** Format: int32 */
             number: number;
             body: components["schemas"]["AnswerBody"];
+            attachments: components["schemas"]["AnswerAttachmentInfo"][];
             /** Format: date-time */
             submitted_at: string;
             score: components["schemas"]["Score"] | null;
@@ -1546,12 +1700,40 @@ export interface components {
             last_submitted_at: string | null;
         };
         /**
+         * @description bodyの文字数（改行を除く）は問題のanswer_max_length以下。attachmentsは問題のallow_attachmentsがtrueのときだけ指定できる。
          * @example {
          *       "body": "調査結果と復旧手順をMarkdownで記載します。"
          *     }
          */
         SubmitAnswerRequest: {
+            /** @description 改行を含む全体の上限。改行を除いた文字数は問題のanswer_max_length（最大10000）以下。 */
             body: string;
+            attachments?: components["schemas"]["AnswerAttachmentUpload"][];
+        };
+        /** @description テキストのログ。contentはUTF-8で1バイト以上1 MiB以下、NULを含まない。 */
+        AnswerAttachmentUpload: {
+            name: components["schemas"]["AnswerAttachmentName"];
+            content: string;
+        };
+        /** @description 英数字・.・_・-のみ、先頭は.以外、.txtか.logで終わる。名前は1回答内で一意。 */
+        AnswerAttachmentName: string;
+        AnswerAttachmentInfo: {
+            name: components["schemas"]["AnswerAttachmentName"];
+            /**
+             * Format: int32
+             * @description バイト数
+             */
+            size: number;
+        };
+        AnswerAttachment: {
+            name: components["schemas"]["AnswerAttachmentName"];
+            /** Format: int32 */
+            size: number;
+            /** @description プレーンテキストとして表示する。HTMLとして解釈しない。 */
+            content: string;
+        };
+        AnswerAttachmentsResponse: {
+            attachments: components["schemas"]["AnswerAttachment"][];
         };
         AnswerResponse: {
             answer: components["schemas"]["Answer"];
@@ -1617,6 +1799,7 @@ export interface components {
         AnnouncementResponse: {
             announcement: components["schemas"]["Announcement"];
         };
+        /** @description 有効なコンテンツの rule.md。コンテンツリポジトリで管理し、APIからは変更できない。rule.md がない、またはコンテンツ未取り込みのときは空文字。 */
         Rule: {
             markdown: string;
         };
@@ -1638,8 +1821,24 @@ export interface components {
              */
             ranking_freeze_at: string | null;
         };
+        /** @enum {string} */
+        ContestPhase: "BEFORE" | "DURING" | "AFTER";
+        DevContestPhase: {
+            enabled: boolean;
+            phase: components["schemas"]["ContestPhase"];
+            /** @description beginning昇順、同時刻の場合slug辞書順。 */
+            sections: components["schemas"]["ContestantScheduleSection"][];
+        };
+        DevContestPhaseResponse: {
+            contest_phase: components["schemas"]["DevContestPhase"];
+        };
+        ReplaceDevContestPhaseRequest: {
+            phase: components["schemas"]["ContestPhase"];
+        };
+        /** @description SECONDARY_QUALIFIERでは順位は最終公開まで返さず、凍結は使わない。 */
         DashboardScheduleResponse: {
             dashboard_schedule: components["schemas"]["DashboardSchedule"];
+            competition_mode: components["schemas"]["CompetitionMode"];
         };
         Rank: {
             /** Format: int32 */
@@ -1654,7 +1853,7 @@ export interface components {
             last_effective_submission_at: string | null;
         };
         /**
-         * @description frozen=trueならfrozen_atはfreeze snapshotの基準時刻、frozen=falseならnull。
+         * @description frozen=trueならfrozen_atはfreeze snapshotの基準時刻、frozen=falseならnull。hidden=trueは二次予選モードで最終公開前のため順位を返さないことを示し、rankingは空配列になる。
          * @example {
          *       "ranking": [
          *         {
@@ -1667,7 +1866,8 @@ export interface components {
          *         }
          *       ],
          *       "frozen": true,
-         *       "frozen_at": "2026-08-30T15:00:00+09:00"
+         *       "frozen_at": "2026-08-30T15:00:00+09:00",
+         *       "hidden": false
          *     }
          */
         RankingResponse: {
@@ -1676,6 +1876,7 @@ export interface components {
             frozen: boolean;
             /** Format: date-time */
             frozen_at: string | null;
+            hidden: boolean;
         } & unknown;
         AdminAnswerReference: {
             /** Format: int64 */
@@ -1705,7 +1906,17 @@ export interface components {
             score: components["schemas"]["MarkingScore"] | null;
             content_commit: components["schemas"]["ContentCommit"];
             workflow: components["schemas"]["AdminAnswerWorkflow"];
+            competition_mode: components["schemas"]["CompetitionMode"];
+            /** @description 同じチーム・問題の回答の中で最新ならtrue。 */
+            latest: boolean;
+            /** @description nullなら採点結果を登録できる。 */
+            marking_blocked_reason: components["schemas"]["MarkingBlockedReason"] | null;
         };
+        /**
+         * @description 採点結果を登録できない理由。grading_not_startedは競技終了前、answer_not_latestは最新でない回答。いずれもSECONDARY_QUALIFIERでのみ発生する。
+         * @enum {string}
+         */
+        MarkingBlockedReason: "grading_not_started" | "answer_not_latest";
         AdminAnswerWorkflow: {
             /** @enum {string} */
             status: "WAITING" | "IN_PROGRESS" | "COMPLETED";
@@ -1943,6 +2154,10 @@ export interface components {
         OptionalProblemCodeQuery: string;
         /** @description チーム・問題内で採番された回答番号 */
         AnswerNumberPath: number;
+        /** @description 以前に受け取ったETag。一致すれば304を返す。 */
+        IfNoneMatchHeader: string;
+        /** @description images/ 直下のファイル名 */
+        ImageNamePath: string;
         /** @description お知らせslug */
         AnnouncementSlugPath: string;
         /** @description 展開revision */
@@ -2468,6 +2683,36 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AnswerResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    listContestantAnswerAttachments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 問題コード */
+                problem_code: components["parameters"]["ProblemCodePath"];
+                /** @description チーム・問題内で採番された回答番号 */
+                answer_number: components["parameters"]["AnswerNumberPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 添付 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnswerAttachmentsResponse"];
                 };
             };
             401: components["responses"]["Unauthorized"];
@@ -3213,6 +3458,38 @@ export interface operations {
             502: components["responses"]["BadGateway"];
         };
     };
+    listAdminAnswerAttachments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description チーム番号 */
+                team_code: components["parameters"]["TeamCodePath"];
+                /** @description 問題コード */
+                problem_code: components["parameters"]["ProblemCodePath"];
+                /** @description チーム・問題内で採番された回答番号 */
+                answer_number: components["parameters"]["AnswerNumberPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 添付 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnswerAttachmentsResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
     getAdminAnswer: {
         parameters: {
             query?: never;
@@ -3663,34 +3940,6 @@ export interface operations {
             500: components["responses"]["InternalServerError"];
         };
     };
-    replaceAdminRule: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Rule"];
-            };
-        };
-        responses: {
-            /** @description 更新後の競技ルール */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RuleResponse"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            422: components["responses"]["ValidationError"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
     getAdminDashboardSchedule: {
         parameters: {
             query?: never;
@@ -3714,7 +3963,123 @@ export interface operations {
             500: components["responses"]["InternalServerError"];
         };
     };
-    replaceAdminDashboardSchedule: {
+    getContestantImage: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description 以前に受け取ったETag。一致すれば304を返す。 */
+                "If-None-Match"?: components["parameters"]["IfNoneMatchHeader"];
+            };
+            path: {
+                /** @description images/ 直下のファイル名 */
+                image_name: components["parameters"]["ImageNamePath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 画像 */
+            200: {
+                headers: {
+                    "Cache-Control"?: string;
+                    ETag?: string;
+                    "X-Content-Type-Options"?: "nosniff";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": string;
+                    "image/jpeg": string;
+                    "image/gif": string;
+                    "image/webp": string;
+                };
+            };
+            /** @description If-None-Matchと一致した（画像は変わっていない） */
+            304: {
+                headers: {
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    getAdminImage: {
+        parameters: {
+            query?: {
+                /** @description 参照するGitHub content commit。省略時はactive snapshotを参照する。 */
+                commit?: components["parameters"]["ContentCommitQuery"];
+            };
+            header?: {
+                /** @description 以前に受け取ったETag。一致すれば304を返す。 */
+                "If-None-Match"?: components["parameters"]["IfNoneMatchHeader"];
+            };
+            path: {
+                /** @description images/ 直下のファイル名 */
+                image_name: components["parameters"]["ImageNamePath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 画像 */
+            200: {
+                headers: {
+                    "Cache-Control"?: string;
+                    ETag?: string;
+                    "X-Content-Type-Options"?: "nosniff";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": string;
+                    "image/jpeg": string;
+                    "image/gif": string;
+                    "image/webp": string;
+                };
+            };
+            /** @description If-None-Matchと一致した（画像は変わっていない） */
+            304: {
+                headers: {
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    getAdminDevContestPhase: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 競技状態 */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DevContestPhaseResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    replaceAdminDevContestPhase: {
         parameters: {
             query?: never;
             header?: never;
@@ -3723,21 +4088,22 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["DashboardSchedule"];
+                "application/json": components["schemas"]["ReplaceDevContestPhaseRequest"];
             };
         };
         responses: {
-            /** @description 更新後のdashboard schedule */
+            /** @description 切り替え後の競技状態 */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DashboardScheduleResponse"];
+                    "application/json": components["schemas"]["DevContestPhaseResponse"];
                 };
             };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
             422: components["responses"]["ValidationError"];
             500: components["responses"]["InternalServerError"];
         };

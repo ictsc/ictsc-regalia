@@ -19,6 +19,8 @@ const problem = {
   category: "Network",
   section_slug: "day1",
   type: "DESCRIPTIVE",
+  answer_max_length: 3000,
+  allow_attachments: false,
   default_grader_discord_id: "123456789012345678",
   body: "# Restore service",
   explanation: "# 解説\n\nDNSを復旧します。",
@@ -53,6 +55,9 @@ const answer = {
     assignment_source: "DEFAULT",
     revision: 1,
   },
+  competition_mode: "STANDARD",
+  latest: true,
+  marking_blocked_reason: null,
 };
 const existingMark = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -280,6 +285,12 @@ async function installAdminApi(page: Page): Promise<ApiState> {
         }),
       });
     }
+    if (
+      path.startsWith("/api/v1/admin/answers/") &&
+      path.endsWith("/attachments")
+    ) {
+      return fulfillJson(route, { attachments: [] });
+    }
     if (path === "/api/v1/admin/answers/12/A01/1") {
       return fulfillJson(route, { answer: state.answers[0] });
     }
@@ -420,6 +431,7 @@ async function installAdminApi(page: Page): Promise<ApiState> {
         ],
         frozen: true,
         frozen_at: now,
+        hidden: false,
       });
     }
     if (
@@ -442,16 +454,15 @@ async function installAdminApi(page: Page): Promise<ApiState> {
     if (path === "/api/v1/admin/rule" && method === "GET") {
       return fulfillJson(route, { rule: { markdown: "# E2E rule" } });
     }
-    if (path === "/api/v1/admin/rule" && method === "PUT") {
-      return fulfillJson(route, { rule: body });
-    }
     if (path === "/api/v1/admin/dashboard-schedule" && method === "GET") {
       return fulfillJson(route, {
         dashboard_schedule: { ranking_freeze_at: now },
       });
     }
-    if (path === "/api/v1/admin/dashboard-schedule" && method === "PUT") {
-      return fulfillJson(route, { dashboard_schedule: body });
+    if (path === "/api/v1/admin/dev/contest-phase" && method === "GET") {
+      return fulfillJson(route, {
+        contest_phase: { enabled: false, phase: "DURING", sections: [] },
+      });
     }
 
     return fulfillJson(
@@ -492,10 +503,12 @@ test("Admin navigation、team・招待・参加者・content履歴を操作す�
 
   await page.getByRole("link", { name: "コンテンツ", exact: true }).click();
   await page.getByLabel("Git commit SHA").fill(historicalCommit);
-  await page.getByRole("button", { name: "指定commitを取得" }).click();
+  await page.getByRole("button", { name: "指定 commit を取得" }).click();
   await expect(page.getByText("コンテンツ更新しました")).toBeVisible();
   await page.goto("/admin/content/problems/A01");
-  await page.getByLabel("参照commit（空欄でactive）").fill(historicalCommit);
+  await page
+    .getByLabel("参照 commit（空欄で配信中の版）")
+    .fill(historicalCommit);
   await page.getByRole("button", { name: "表示" }).click();
   await expect(page.getByText(historicalCommit, { exact: true })).toBeVisible();
   expect(
@@ -651,12 +664,10 @@ test("回答詳細・再採点・得点操作・freeze・404を検証する", as
   ).toBe(false);
 
   await page.goto("/admin/settings");
-  await page.getByLabel("Markdown").fill("# Updated rule");
-  await page.getByRole("button", { name: "ルールを更新" }).click();
-  await expect(page.getByText("ルール更新しました")).toBeVisible();
-  await page.getByLabel("凍結時刻").fill("");
-  await page.getByRole("button", { name: "凍結時刻を保存" }).click();
-  await expect(page.getByText("凍結時刻更新しました")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "E2E rule", level: 1 }),
+  ).toBeVisible();
+  await expect(page.getByText("現在の凍結時刻")).toBeVisible();
 
   await page.goto("/admin/submissions/A01/12/999");
   await expect(page.getByText("指定された回答は存在しません")).toBeVisible();

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { api, expectData } from "@ictsc/api";
+import AdminPage from "~/components/layout/AdminPage.vue";
 import GradingBoard, {
   type GradingChange,
 } from "~/components/grading/GradingBoard.vue";
@@ -9,6 +10,7 @@ import {
   answerKey,
   answerPath,
   filterAnswers,
+  gradableAnswers,
   type GradingAnswer,
 } from "~/features/grading";
 
@@ -31,6 +33,9 @@ const problems = ref<string[]>([]);
 const recent = ref(false);
 const perfect = ref(true);
 const unscored = ref(false);
+const secondaryQualifier = computed(() =>
+  data.value?.answers.some((a) => a.competition_mode === "SECONDARY_QUALIFIER"),
+);
 const busyKey = ref("");
 const actionError = ref("");
 const { now } = useSubmissionAge();
@@ -71,9 +76,10 @@ watch(
   },
   { deep: true },
 );
+const gradable = computed(() => gradableAnswers(data.value?.answers ?? []));
 const filtered = computed(() =>
   filterAnswers(
-    data.value?.answers ?? [],
+    gradable.value,
     {
       teams: teams.value,
       problems: problems.value,
@@ -85,10 +91,10 @@ const filtered = computed(() =>
   ),
 );
 const problemCodes = computed(() => [
-  ...new Set(data.value?.answers.map((a) => a.problem.code)),
+  ...new Set(gradable.value.map((a) => a.problem.code)),
 ]);
 const teamNames = computed(() => [
-  ...new Set(data.value?.answers.map((a) => a.team.name)),
+  ...new Set(gradable.value.map((a) => a.team.name)),
 ]);
 async function update(answer: GradingAnswer, change: GradingChange) {
   if (change.status === "COMPLETED" && !answer.score) {
@@ -118,10 +124,15 @@ async function update(answer: GradingAnswer, change: GradingChange) {
 
 <template>
   <main class="workspace grading-workspace">
-    <h1>採点</h1>
-    <p class="admin-lead">
-      自分の担当回答を各列の先頭に表示します。カードを開くと採点できます。
-    </p>
+    <AdminPage title="採点">
+      <template #lead
+        >自分の担当回答を各列の先頭に表示します。カードを開くと採点できます。<template
+          v-if="secondaryQualifier"
+          ><br />二次予選モード:
+          各チーム・問題の最終答案だけを表示します。採点は競技終了後に行えます。</template
+        ></template
+      >
+    </AdminPage>
     <GradingFilters
       v-model:teams="teams"
       v-model:problems="problems"
@@ -143,9 +154,3 @@ async function update(answer: GradingAnswer, change: GradingChange) {
     </RequestState>
   </main>
 </template>
-
-<style scoped>
-.grading-workspace {
-  max-width: none;
-}
-</style>

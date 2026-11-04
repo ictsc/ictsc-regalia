@@ -29,6 +29,7 @@ type CompetitionStore struct {
 	state             core.CompetitionState
 	pushSubscriptions map[string]core.WebPushSubscription
 	pushDeliveries    map[string]bool
+	assets            map[string]core.ContentAsset
 }
 
 func NewCompetitionStore() *CompetitionStore {
@@ -44,6 +45,7 @@ func NewCompetitionStore() *CompetitionStore {
 		deployments:       make(map[string]core.Deployment),
 		pushSubscriptions: make(map[string]core.WebPushSubscription),
 		pushDeliveries:    make(map[string]bool),
+		assets:            make(map[string]core.ContentAsset),
 		state:             core.CompetitionState{UpdatedAt: time.Now().UTC(), UpdatedBy: "system"},
 	}
 }
@@ -332,7 +334,9 @@ func (s *CompetitionStore) ActivateContent(_ context.Context, snapshot core.Cont
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if snapshot.CommitSHA == s.active {
-		return s.contents[s.active], nil
+		active := s.contents[s.active]
+		s.applyContentFreeze(active)
+		return active, nil
 	}
 	if expected == core.NoActiveContentCommit && s.active != "" {
 		return core.ContentSnapshot{}, core.NewError(http.StatusConflict, "content_refresh_in_progress", "Active content appeared while refresh was in progress")
@@ -341,9 +345,41 @@ func (s *CompetitionStore) ActivateContent(_ context.Context, snapshot core.Cont
 		return core.ContentSnapshot{}, core.NewError(http.StatusConflict, "content_refresh_in_progress", "Active content changed while refresh was in progress")
 	}
 	snapshot.ActivatedAt = time.Now().UTC()
+	for _, asset := range snapshot.Assets {
+		s.assets[snapshot.CommitSHA+"/"+asset.Name] = asset
+	}
+	snapshot.Assets = nil
 	s.contents[snapshot.CommitSHA] = snapshot
 	s.active = snapshot.CommitSHA
+	s.applyContentFreeze(snapshot)
 	return snapshot, nil
+}
+
+// applyContentFreeze makes schedule.yaml the source of the ranking freeze,
+// under the same lock as the activation. The caller holds s.mu.
+func (s *CompetitionStore) applyContentFreeze(snapshot core.ContentSnapshot) {
+	next := snapshot.Manifest.RankingFreezeAt
+	if next != nil {
+		value := next.UTC().Truncate(time.Microsecond)
+		next = &value
+	}
+	current := s.state.RankingFreezeAt
+	if current == nil && next == nil || current != nil && next != nil && current.Equal(*next) {
+		return
+	}
+	s.state.RankingFreezeAt = next
+	s.rankingSnapshots = make(map[string]core.RankingSnapshot)
+	s.state.UpdatedBy, s.state.UpdatedAt = "content:"+snapshot.CommitSHA, time.Now().UTC()
+}
+
+func (s *CompetitionStore) GetContentAsset(_ context.Context, commit, name string) (core.ContentAsset, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	asset, ok := s.assets[commit+"/"+name]
+	if !ok {
+		return core.ContentAsset{}, core.NewError(http.StatusNotFound, "resource_not_found", "Image was not found")
+	}
+	return asset, nil
 }
 
 func (s *CompetitionStore) ListAnswers(_ context.Context, filter core.AnswerFilter) ([]core.Answer, error) {
@@ -396,6 +432,30 @@ func (s *CompetitionStore) SubmitAnswer(_ context.Context, answer core.Answer, i
 	answer.Number = number
 	s.answers = append(s.answers, answer)
 	return answer, 0, nil
+}
+
+func (s *CompetitionStore) ListAnswerAttachmentInfo(ctx context.Context, teamCode int64, problemCode string, number int32) ([]core.AnswerAttachment, error) {
+	attachments, err := s.ListAnswerAttachments(ctx, teamCode, problemCode, number)
+	for index := range attachments {
+		attachments[index].Content = ""
+	}
+	return attachments, err
+}
+
+func (s *CompetitionStore) ListAnswerAttachments(_ context.Context, teamCode int64, problemCode string, number int32) ([]core.AnswerAttachment, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	for _, answer := range s.answers {
+		if answer.TeamCode == teamCode && answer.ProblemCode == problemCode && answer.Number == number {
+			attachments := make([]core.AnswerAttachment, 0, len(answer.Attachments))
+			for _, attachment := range answer.Attachments {
+				attachment.Size = int32(len(attachment.Content))
+				attachments = append(attachments, attachment)
+			}
+			return attachments, nil
+		}
+	}
+	return []core.AnswerAttachment{}, nil
 }
 
 func (s *CompetitionStore) ListMarkingResults(context.Context) ([]core.MarkingResult, error) {
@@ -581,26 +641,6 @@ func (s *CompetitionStore) AppendDeploymentEvent(_ context.Context, requestID st
 func (s *CompetitionStore) GetCompetitionState(context.Context) (core.CompetitionState, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.state, nil
-}
-
-func (s *CompetitionStore) ReplaceRule(_ context.Context, markdown, actor string) (core.CompetitionState, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.state.RuleMarkdown, s.state.UpdatedBy, s.state.UpdatedAt = markdown, actor, time.Now().UTC()
-	return s.state, nil
-}
-
-func (s *CompetitionStore) ReplaceFreezeAt(_ context.Context, freezeAt *time.Time, actor string) (core.CompetitionState, error) {
-	if freezeAt != nil {
-		value := freezeAt.UTC().Truncate(time.Microsecond)
-		freezeAt = &value
-	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.state.RankingFreezeAt = freezeAt
-	s.rankingSnapshots = make(map[string]core.RankingSnapshot)
-	s.state.UpdatedBy, s.state.UpdatedAt = actor, time.Now().UTC()
 	return s.state, nil
 }
 

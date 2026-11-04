@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AdminHeader from "~/components/layout/AdminHeader.vue";
 import AdminNav from "~/components/layout/AdminNav.vue";
+import AdminPage from "~/components/layout/AdminPage.vue";
 const { viewer, refresh, signOut } = useAdminSession();
 const route = useRoute();
 const error = ref<unknown>();
@@ -33,14 +34,19 @@ async function logout() {
       @logout="logout"
     />
     <RequestState :error="error" @retry="load"
-      ><main v-if="viewer?.state === 'ANONYMOUS'" class="workspace">
-        <h1>ICTSC Admin</h1>
-        <p>Discordの運営ロールでログインしてください。</p>
-        <a
-          class="button-primary"
-          href="/api/v1/admin/auth/discord?next=%2Fadmin%2F"
-          >Discordでログイン</a
+      ><main v-if="viewer?.state === 'ANONYMOUS'" class="workspace admin-login">
+        <AdminPage
+          title="ICTSC Admin"
+          lead="Discordの運営ロールでログインしてください。"
         >
+          <template #actions
+            ><a
+              class="button-primary"
+              href="/api/v1/admin/auth/discord?next=%2Fadmin%2F"
+              >Discordでログイン</a
+            ></template
+          >
+        </AdminPage>
       </main>
       <template v-else-if="viewer"
         ><div class="admin-shell">

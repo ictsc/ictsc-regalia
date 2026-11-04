@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { api, expectData } from "@ictsc/api";
+import AdminPage from "~/components/layout/AdminPage.vue";
 import GradingDetailView, {
   type MarkingInput,
 } from "~/components/grading/GradingDetailView.vue";
@@ -26,24 +27,34 @@ const { data, error, pending, refresh } = await useAsyncData(
   `admin-answer:${route.fullPath}`,
   async () => {
     const answer = await getAdminAnswer(api, reference);
-    const [problem, active, previous, marks] = await Promise.all([
+    // 二次予選モードは最新回答だけを採点するので、過去回答との差分は不要。
+    const comparesPrevious = answer.competition_mode === "STANDARD";
+    const [problem, active, previous, marks, attachments] = await Promise.all([
       createAdminActions(api).getProblem(
         reference.problem_code,
         answer.content_commit,
       ),
       createAdminActions(api).getProblem(reference.problem_code),
-      api
-        .GET("/api/v1/admin/answers", {
-          params: {
-            query: {
-              include_marked: true,
-              team_code: reference.team_code,
-              problem_code: reference.problem_code,
-            },
-          },
-        })
-        .then(expectData),
+      comparesPrevious
+        ? api
+            .GET("/api/v1/admin/answers", {
+              params: {
+                query: {
+                  include_marked: true,
+                  team_code: reference.team_code,
+                  problem_code: reference.problem_code,
+                },
+              },
+            })
+            .then(expectData)
+        : { answers: [] },
       listAdminMarkingResults(api),
+      api
+        .GET(
+          "/api/v1/admin/answers/{team_code}/{problem_code}/{answer_number}/attachments",
+          { params: { path: reference } },
+        )
+        .then(expectData),
     ]);
     return {
       answer,
@@ -54,6 +65,7 @@ const { data, error, pending, refresh } = await useAsyncData(
         .toSorted(
           (a, b) => b.reference.answer_number - a.reference.answer_number,
         ),
+      attachments: attachments.attachments,
       marks: marks.filter(
         (m) =>
           m.answer.problem_code === reference.problem_code &&
@@ -137,22 +149,21 @@ watch(
 
 <template>
   <main class="workspace grading-detail-workspace">
-    <NuxtLink class="text-link" to="/submissions">← 採点一覧</NuxtLink>
-    <h1>
-      {{ reference.problem_code }} / Team {{ reference.team_code }} / #{{
-        reference.answer_number
-      }}
-    </h1>
-    <p v-if="data" class="admin-lead">
-      {{ data.answer.team.name }} · {{ data.answer.author.display_name }} ·
-      <time :datetime="data.answer.submitted_at">{{
-        new Date(data.answer.submitted_at).toLocaleString("ja-JP")
-      }}</time>
-      <span class="grading-detail-age"
-        >提出から {{ elapsedMinutes(data.answer.submitted_at) }} 分</span
+    <AdminPage
+      :title="`${reference.problem_code} / Team ${reference.team_code} / #${reference.answer_number}`"
+      :back="{ to: '/submissions', label: '採点一覧' }"
+      :message="message"
+    >
+      <template v-if="data" #lead
+        >{{ data.answer.team.name }} · {{ data.answer.author.display_name }} ·
+        <time :datetime="data.answer.submitted_at">{{
+          new Date(data.answer.submitted_at).toLocaleString("ja-JP")
+        }}</time>
+        <span class="grading-detail-age"
+          >提出から {{ elapsedMinutes(data.answer.submitted_at) }} 分</span
+        ></template
       >
-    </p>
-    <p role="status">{{ message }}</p>
+    </AdminPage>
     <p v-if="workflowError" role="alert">{{ workflowError }}</p>
     <RequestState :error="error" :pending="pending" @retry="refresh">
       <GradingDetailView
@@ -164,6 +175,7 @@ watch(
         :active-commit="data.active.content_commit"
         :previous="data.previous"
         :marks="data.marks"
+        :attachments="data.attachments"
         :busy="busy"
         :workflow-busy="workflowBusy"
         :submit-marking="submitMarking"
@@ -175,9 +187,6 @@ watch(
 </template>
 
 <style scoped>
-.grading-detail-workspace {
-  max-width: none;
-}
 .grading-detail-age {
   display: inline-block;
   margin-left: 8px;

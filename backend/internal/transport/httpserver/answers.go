@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
+	"github.com/ictsc/ictsc-regalia/backend/internal/service"
 	api "github.com/ictsc/ictsc-regalia/backend/internal/transport/api"
 )
 
@@ -24,13 +25,14 @@ func (h *Handler) ListContestantAnswers(ctx context.Context, request api.ListCon
 		return nil, err
 	}
 	sort.SliceStable(answers, func(i, j int) bool { return answers[i].Number > answers[j].Number })
+	scores, err := h.loadAnswerScores(ctx)
+	if err != nil {
+		return nil, err
+	}
 	mapped := make([]api.AnswerSummary, 0, len(answers))
 	var last *time.Time
 	for _, answer := range answers {
-		score, err := h.scoreForAnswer(ctx, answer, true)
-		if err != nil {
-			return nil, err
-		}
+		score := h.scoreFor(scores, answer, true)
 		mapped = append(mapped, toAPIAnswerSummary(answer, score))
 		if last == nil || answer.SubmittedAt.After(*last) {
 			value := answer.SubmittedAt
@@ -50,7 +52,13 @@ func (h *Handler) SubmitContestantAnswer(ctx context.Context, request api.Submit
 	if err != nil {
 		return nil, err
 	}
-	answer, _, err := h.service.SubmitAnswer(ctx, contestant, request.ProblemCode, request.Body.Body)
+	var attachments []core.AnswerAttachment
+	if request.Body.Attachments != nil {
+		for _, attachment := range *request.Body.Attachments {
+			attachments = append(attachments, core.AnswerAttachment{Name: string(attachment.Name), Content: attachment.Content})
+		}
+	}
+	answer, _, err := h.service.SubmitAnswer(ctx, contestant, request.ProblemCode, request.Body.Body, attachments)
 	if err != nil {
 		return nil, err
 	}
@@ -66,6 +74,9 @@ func (h *Handler) GetContestantAnswer(ctx context.Context, request api.GetContes
 	if err != nil {
 		return nil, err
 	}
+	if answer.Attachments, err = h.service.Store.ListAnswerAttachmentInfo(ctx, answer.TeamCode, answer.ProblemCode, answer.Number); err != nil {
+		return nil, err
+	}
 	score, err := h.scoreForAnswer(ctx, answer, true)
 	if err != nil {
 		return nil, err
@@ -79,16 +90,25 @@ func (h *Handler) ListAdminAnswers(ctx context.Context, request api.ListAdminAns
 		return nil, err
 	}
 	includeMarked := request.Params.IncludeMarked != nil && *request.Params.IncludeMarked
+	// The filters only narrow by team and problem, so answers holds every
+	// answer of each listed pair and gives the latest numbers directly.
+	latestNumbers := core.LatestAnswerNumbers(answers)
+	gradingStartsAt, err := h.service.GradingStartsAt(ctx)
+	if err != nil {
+		return nil, err
+	}
+	scores, err := h.loadAnswerScores(ctx)
+	if err != nil {
+		return nil, err
+	}
 	mapped := make([]api.AdminAnswer, 0, len(answers))
 	for _, answer := range answers {
-		score, err := h.scoreForAnswer(ctx, answer, false)
-		if err != nil {
-			return nil, err
-		}
+		score := h.scoreFor(scores, answer, false)
 		if score != nil && !includeMarked {
 			continue
 		}
-		mappedAnswer, err := h.toAdminAnswer(ctx, answer, score)
+		latest, blocked := h.service.Grading(answer, latestNumbers, gradingStartsAt)
+		mappedAnswer, err := h.toAdminAnswer(ctx, answer, score, latest, blocked)
 		if err != nil {
 			return nil, err
 		}
@@ -118,14 +138,23 @@ func (h *Handler) GetAdminAnswer(ctx context.Context, request api.GetAdminAnswer
 	if err != nil {
 		return nil, err
 	}
-	mapped, err := h.toAdminAnswer(ctx, answer, score)
+	mapped, err := h.toAdminAnswerGraded(ctx, answer, score)
 	if err != nil {
 		return nil, err
 	}
 	return api.GetAdminAnswer200JSONResponse{Answer: mapped}, nil
 }
 
-func (h *Handler) toAdminAnswer(ctx context.Context, answer core.Answer, score *core.Score) (api.AdminAnswer, error) {
+// toAdminAnswerGraded maps one answer, looking up whether it may be graded.
+func (h *Handler) toAdminAnswerGraded(ctx context.Context, answer core.Answer, score *core.Score) (api.AdminAnswer, error) {
+	latest, blocked, err := h.service.AnswerGrading(ctx, answer)
+	if err != nil {
+		return api.AdminAnswer{}, err
+	}
+	return h.toAdminAnswer(ctx, answer, score, latest, blocked)
+}
+
+func (h *Handler) toAdminAnswer(ctx context.Context, answer core.Answer, score *core.Score, latest bool, blocked string) (api.AdminAnswer, error) {
 	team, err := h.service.Store.GetTeam(ctx, answer.TeamCode)
 	if err != nil {
 		return api.AdminAnswer{}, err
@@ -150,6 +179,11 @@ func (h *Handler) toAdminAnswer(ctx context.Context, answer core.Answer, score *
 	if err != nil {
 		return api.AdminAnswer{}, err
 	}
+	var blockedReason *api.MarkingBlockedReason
+	if blocked != "" {
+		reason := api.MarkingBlockedReason(blocked)
+		blockedReason = &reason
+	}
 	var assignee *string
 	source := api.AdminAnswerWorkflowAssignmentSource("DEFAULT")
 	if workflow.ClaimedBy != "" {
@@ -163,7 +197,8 @@ func (h *Handler) toAdminAnswer(ctx context.Context, answer core.Answer, score *
 		Team:      toAPITeam(team), Author: toAPIProfile(author), Problem: toAPICatalog(problem),
 		Body: api.AnswerBody{Type: api.AnswerBodyTypeDESCRIPTIVE, Body: answer.Body}, SubmittedAt: answer.SubmittedAt,
 		ContentCommit: answer.ContentCommit, Score: markingScore,
-		Workflow: api.AdminAnswerWorkflow{Status: api.AdminAnswerWorkflowStatus(workflow.Status), AssigneeDiscordId: assignee, AssignmentSource: source, Revision: workflow.Revision},
+		Workflow:        api.AdminAnswerWorkflow{Status: api.AdminAnswerWorkflowStatus(workflow.Status), AssigneeDiscordId: assignee, AssignmentSource: source, Revision: workflow.Revision},
+		CompetitionMode: api.CompetitionMode(h.service.CompetitionMode()), Latest: latest, MarkingBlockedReason: blockedReason,
 	}, nil
 }
 
@@ -199,7 +234,7 @@ func (h *Handler) UpdateAdminAnswerWorkflow(ctx context.Context, request api.Upd
 	if err != nil {
 		return nil, err
 	}
-	mapped, err := h.toAdminAnswer(ctx, answer, score)
+	mapped, err := h.toAdminAnswerGraded(ctx, answer, score)
 	if err != nil {
 		return nil, err
 	}
@@ -221,7 +256,7 @@ func (h *Handler) ListAdminMarkingResults(ctx context.Context, request api.ListA
 		if err != nil {
 			return nil, err
 		}
-		result.Visibility = core.MarkingVisibilityAt(answer.SubmittedAt, h.service.Now(), state.RankingFreezeAt, state.FinalRevealedAt)
+		result.Visibility = h.service.MarkingVisibility(answer.SubmittedAt, state)
 		if request.Params.Visibility != nil && core.Visibility(*request.Params.Visibility) != result.Visibility {
 			continue
 		}
@@ -244,6 +279,13 @@ func (h *Handler) CreateAdminMarkingResult(ctx context.Context, request api.Crea
 	if err != nil {
 		return nil, err
 	}
+	if _, blocked, err := h.service.AnswerGrading(ctx, answer); err != nil {
+		return nil, err
+	} else if blocked == service.MarkingBlockedContestRunning {
+		return nil, core.NewError(http.StatusConflict, blocked, "Grading starts after the contest ends")
+	} else if blocked == service.MarkingBlockedNotLatest {
+		return nil, core.NewError(http.StatusConflict, blocked, "Only the latest answer can be graded")
+	}
 	if request.Body.Score > answer.MaxScore {
 		return nil, core.NewError(http.StatusUnprocessableEntity, "validation_error", "Score cannot exceed the answer snapshot maximum")
 	}
@@ -265,7 +307,7 @@ func (h *Handler) CreateAdminMarkingResult(ctx context.Context, request api.Crea
 	if err != nil {
 		return nil, err
 	}
-	visibility := core.MarkingVisibilityAt(answer.SubmittedAt, h.service.Now(), state.RankingFreezeAt, state.FinalRevealedAt)
+	visibility := h.service.MarkingVisibility(answer.SubmittedAt, state)
 	result, err := h.service.Store.CreateMarkingResult(ctx, core.MarkingResult{
 		ID: uuid.NewString(), TeamCode: answer.TeamCode, ProblemCode: answer.ProblemCode, AnswerNumber: answer.Number,
 		Judge: principal(ctx).Session.AdminName, MarkedScore: request.Body.Score, Rationale: request.Body.Rationale, LineComments: lineComments,
@@ -336,4 +378,33 @@ func (h *Handler) RevealAdminFinalScores(ctx context.Context, _ api.RevealAdminF
 		return nil, err
 	}
 	return api.RevealAdminFinalScores204Response{}, nil
+}
+
+func (h *Handler) ListContestantAnswerAttachments(ctx context.Context, request api.ListContestantAnswerAttachmentsRequestObject) (api.ListContestantAnswerAttachmentsResponseObject, error) {
+	contestant, err := h.currentContestant(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// Reading the answer through the team scope keeps other teams' logs out of reach.
+	answer, err := h.service.Store.GetAnswer(ctx, contestant.TeamCode, request.ProblemCode, request.AnswerNumber)
+	if err != nil {
+		return nil, err
+	}
+	attachments, err := h.service.Store.ListAnswerAttachments(ctx, answer.TeamCode, answer.ProblemCode, answer.Number)
+	if err != nil {
+		return nil, err
+	}
+	return api.ListContestantAnswerAttachments200JSONResponse(toAPIAttachments(attachments)), nil
+}
+
+func (h *Handler) ListAdminAnswerAttachments(ctx context.Context, request api.ListAdminAnswerAttachmentsRequestObject) (api.ListAdminAnswerAttachmentsResponseObject, error) {
+	answer, err := h.service.Store.GetAnswer(ctx, request.TeamCode, request.ProblemCode, request.AnswerNumber)
+	if err != nil {
+		return nil, err
+	}
+	attachments, err := h.service.Store.ListAnswerAttachments(ctx, answer.TeamCode, answer.ProblemCode, answer.Number)
+	if err != nil {
+		return nil, err
+	}
+	return api.ListAdminAnswerAttachments200JSONResponse(toAPIAttachments(attachments)), nil
 }

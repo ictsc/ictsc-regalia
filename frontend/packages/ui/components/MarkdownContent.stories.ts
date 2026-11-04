@@ -77,3 +77,39 @@ export const LongText: Story = {
     ).join("\n\n"),
   },
 };
+
+/** Answers and profiles: images from other hosts are not loaded. */
+export const ContestantText: Story = {
+  args: {
+    source: `原因は図の通りです。
+
+![手元で取った構成図](https://example.com/topology.png)
+
+\`\`\`console
+$ sudo ip route replace default via 192.0.2.1
+\`\`\``,
+    blockExternalImages: true,
+  },
+};
+
+/** Problems and answers: ```mermaid blocks are drawn as diagrams. */
+export const MermaidDiagram: Story = {
+  args: {
+    source: `構成は次の通りです。
+
+\`\`\`mermaid
+flowchart LR
+  client[クライアント] --> router[ルーター]
+  router --> web[(Web サーバー)]
+  router -.-> dns[DNS]
+\`\`\`
+
+記法の誤りは元のコードのまま表示されます。
+
+\`\`\`mermaid
+flowchart LR
+  A -->
+\`\`\``,
+    diagrams: true,
+  },
+};

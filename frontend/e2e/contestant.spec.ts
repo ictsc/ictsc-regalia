@@ -249,6 +249,8 @@ test("viewerから問題を開き、再展開のQUEUED表示をSSEで完了へ�
           max_score: 100,
           category: "Network",
           section_slug: "day1",
+          answer_max_length: 3000,
+          allow_attachments: false,
           type: "NORMAL",
           body: "# Restore service\n\nKeep DNS available.",
           score: null,
@@ -428,6 +430,7 @@ test("profile更新と凍結rankingを表示する", async ({ page }) => {
         ],
         frozen: true,
         frozen_at: requestedAt,
+        hidden: false,
       });
     }
     return fulfillJson(
@@ -503,6 +506,8 @@ test("回答429のRetry-Afterをcountdownへ反映する", async ({ page }) => {
           max_score: 100,
           category: "Network",
           section_slug: "day1",
+          answer_max_length: 3000,
+          allow_attachments: false,
           type: "DESCRIPTIVE",
           body: "# Restore service",
           score: null,
@@ -566,6 +571,7 @@ test("回答429のRetry-Afterをcountdownへ反映する", async ({ page }) => {
   await page.goto("/problems/A01");
   await page.getByLabel("回答", { exact: true }).fill("設定を修正しました");
   await page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "提出する" }).click();
   await expect(
     page.getByRole("status").filter({ hasText: /再回答可能まで/ }),
   ).toBeVisible();
@@ -640,6 +646,12 @@ test("Nuxtの問題一覧、下書き復元、利用者分離とモバイル表�
     `このブラウザに保存済み ${savedTime}`,
   );
   await page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }).click();
+  const confirmation = page.getByRole("dialog", {
+    name: "この内容で提出しますか？",
+  });
+  await expect(confirmation).toContainText("原因: 設定の不整合");
+  await expect(confirmation).toContainText("16 / 3,000 文字");
+  await confirmation.getByRole("button", { name: "提出する" }).click();
   await expect(
     page.getByText("回答を提出しました", { exact: true }),
   ).toBeVisible();
@@ -732,6 +744,38 @@ test("問題一覧は採点中の問題に採点中と表示する", async ({ pa
     page.locator(`a.problem-row[href="/problems/${code}"]`);
   await expect(row("A02").locator(".problem-pending")).toHaveText("採点中");
   await expect(row("A04").locator(".problem-pending")).toHaveCount(0);
+});
+
+test("二次予選モードでは最終公開まで採点結果と順位を表示しない", async ({
+  page,
+}) => {
+  await installCompetitionApi(page, { resultsHidden: true });
+  await page.route("**/api/v1/contestant/problems/A02/answers", (route) =>
+    fulfillJson(route, {
+      answers: [
+        {
+          number: 2,
+          type: "DESCRIPTIVE",
+          submitted_at: requestedAt,
+          score: null,
+          content_commit: commit,
+        },
+      ],
+      submit_interval_seconds: 1200,
+      last_submitted_at: requestedAt,
+    }),
+  );
+  await page.goto("/problems");
+  const row = (code: string) =>
+    page.locator(`a.problem-row[href="/problems/${code}"]`);
+  await expect(row("A02").locator(".problem-pending")).toHaveText("提出済み");
+  await expect(page.getByText("採点中")).toHaveCount(0);
+  await expect(page.locator(".header-ranking")).toHaveCount(0);
+  await page.goto("/ranking");
+  await expect(
+    page.getByText("順位は最終結果の公開後に表示されます"),
+  ).toBeVisible();
+  await expect(page.locator(".ranking-table")).toHaveCount(0);
 });
 
 test("再提出待ちの間は採点中ではなく待ち時間を表示する", async ({ page }) => {

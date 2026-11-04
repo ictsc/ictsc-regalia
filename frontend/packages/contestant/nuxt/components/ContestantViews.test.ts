@@ -108,7 +108,12 @@ describe("RankingView", () => {
   it("highlights the own team and shows the frozen notice", () => {
     const wrapper = mount(RankingView, {
       props: {
-        snapshot: { ranking, frozen: true, frozenAt: "2026-09-02T13:00Z" },
+        snapshot: {
+          ranking,
+          frozen: true,
+          frozenAt: "2026-09-02T13:00Z",
+          hidden: false,
+        },
         ownTeamCode: 12,
       },
     });
@@ -120,9 +125,16 @@ describe("RankingView", () => {
   });
   it("shows the empty state", () => {
     const wrapper = mount(RankingView, {
-      props: { snapshot: { ranking: [], frozen: false } },
+      props: { snapshot: { ranking: [], frozen: false, hidden: false } },
     });
     expect(wrapper.text()).toContain("順位はまだありません。");
+  });
+  it("explains that the ranking is hidden until the final reveal", () => {
+    const wrapper = mount(RankingView, {
+      props: { snapshot: { ranking: [], frozen: false, hidden: true } },
+    });
+    expect(wrapper.text()).toContain("順位は最終結果の公開後に表示されます");
+    expect(wrapper.find(".ranking-table").exists()).toBe(false);
   });
 });
 

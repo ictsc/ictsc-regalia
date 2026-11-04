@@ -11,7 +11,7 @@ const meta = {
     () => ({ template: "<main><story /></main>" }),
   ],
   parameters: { layout: "fullscreen", route: "/ranking" },
-  args: { snapshot: { ranking, frozen: false }, ownTeamCode },
+  args: { snapshot: { ranking, frozen: false, hidden: false }, ownTeamCode },
 } satisfies Meta<typeof RankingView>;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -24,6 +24,7 @@ export const Frozen: Story = {
       ranking,
       frozen: true,
       frozenAt: "2026-09-02T13:13:48+09:00",
+      hidden: false,
     },
   },
 };
@@ -35,6 +36,7 @@ export const Tie: Story = {
         entry.teamCode === 13 ? { ...entry, rank: 12, score: 1230 } : entry,
       ),
       frozen: false,
+      hidden: false,
     },
   },
 };
@@ -52,12 +54,13 @@ export const LongNames: Story = {
           : entry,
       ),
       frozen: false,
+      hidden: false,
     },
   },
 };
 
 export const Empty: Story = {
-  args: { snapshot: { ranking: [], frozen: false } },
+  args: { snapshot: { ranking: [], frozen: false, hidden: false } },
 };
 
 export const Loading: Story = {
@@ -66,4 +69,9 @@ export const Loading: Story = {
 
 export const Mobile: Story = {
   globals: { viewport: { value: "mobile1", isRotated: false } },
+};
+
+/** 二次予選モードで最終公開前。順位は返らない。 */
+export const Hidden: Story = {
+  args: { snapshot: { ranking: [], frozen: false, hidden: true } },
 };

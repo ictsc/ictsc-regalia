@@ -8,6 +8,8 @@ const props = defineProps<{
   /** Simplified header used on problem detail pages. */
   compact: boolean;
   rankingItems: HeaderRankingItem[];
+  /** Secondary qualifier mode never shows the ranking in the top bar. */
+  rankingHidden?: boolean;
   ownTeamCode?: number;
   maxScore: number;
   clock: { label: string; text: string };
@@ -39,7 +41,7 @@ watch(
       <AsciiLogo />
     </NuxtLink>
     <div v-if="!compact" class="header-performance">
-      <div class="header-ranking" aria-label="現在の順位">
+      <div v-if="!rankingHidden" class="header-ranking" aria-label="現在の順位">
         <small class="header-ranking-label">順位</small>
         <span class="header-neighbors">
           <template
@@ -108,10 +110,15 @@ watch(
       >
       <ThemeToggle class="header-nav-secondary" />
     </nav>
-    <div class="competition-clock">
+    <NuxtLink
+      class="competition-clock"
+      to="/schedule"
+      :aria-label="`${clock.label} ${clock.text}（スケジュールを見る）`"
+      title="スケジュールを見る"
+    >
       <time>{{ clock.text }}</time
       ><span :class="{ 'is-demo': demoMode }">{{ clock.label }}</span>
-    </div>
+    </NuxtLink>
     <details ref="mobileMenu" class="mobile-menu">
       <summary>
         <span aria-hidden="true" /><b class="visually-hidden">メニューを開く</b>

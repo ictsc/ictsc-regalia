@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import MarkdownContent from "@ictsc/ui/components/MarkdownContent.vue";
+import AttachmentList from "@ictsc/ui/components/AttachmentList.vue";
+import type { AttachmentFile } from "@ictsc/ui/attachments";
 import type { Answer } from "~/features/answer";
 
 defineProps<{
@@ -8,6 +10,10 @@ defineProps<{
   selectedAnswerNumber: number | null;
   /** Body of the answer chosen with `?answer=`; omitted when none is selected. */
   selectedAnswerBody?: string;
+  /** Logs attached to the selected answer. */
+  selectedAnswerAttachments?: AttachmentFile[];
+  /** Results stay hidden until the final reveal (secondary qualifier mode). */
+  resultsHidden?: boolean;
 }>();
 </script>
 <template>
@@ -45,7 +51,9 @@ defineProps<{
             {{ new Date(a.submittedAt).toLocaleString("ja-JP") }}
           </td>
           <td>
-            <span class="numeric">{{ a.score?.score ?? "採点中" }}</span>
+            <span class="numeric">{{
+              a.score?.score ?? (resultsHidden ? "提出済み" : "採点中")
+            }}</span>
           </td>
         </tr>
       </tbody>
@@ -55,7 +63,15 @@ defineProps<{
       class="reading-copy"
       aria-live="polite"
     >
-      <MarkdownContent :source="selectedAnswerBody" />
+      <MarkdownContent
+        :source="selectedAnswerBody"
+        block-external-images
+        diagrams
+      />
+      <template v-if="selectedAnswerAttachments?.length">
+        <h3 class="answer-history-attachments">添付したログ</h3>
+        <AttachmentList :attachments="selectedAnswerAttachments" />
+      </template>
     </div>
   </section>
 </template>

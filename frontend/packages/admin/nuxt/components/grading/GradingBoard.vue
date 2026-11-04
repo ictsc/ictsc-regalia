@@ -4,6 +4,7 @@ import {
   answerPath,
   columnAnswers,
   gradingColumns,
+  markingBlockedLabels,
   minutesSince,
   type GradingAnswer,
   type GradingStatus,
@@ -79,6 +80,11 @@ function onDrop(event: DragEvent, status: GradingStatus) {
           </span>
           <span v-if="answer.score"
             >{{ answer.score.total }} / {{ answer.score.max }} 点</span
+          >
+          <span
+            v-if="answer.marking_blocked_reason"
+            class="grading-card-blocked"
+            >{{ markingBlockedLabels[answer.marking_blocked_reason] }}</span
           >
         </NuxtLink>
         <div class="grading-card-meta">
@@ -176,18 +182,17 @@ function onDrop(event: DragEvent, status: GradingStatus) {
   border: 1px solid var(--line-light);
   background: var(--paper);
 }
-.grading-card:focus-within,
-.grading-card:hover {
-  border-color: var(--accent);
-}
 .grading-card-link {
   display: grid;
   gap: 6px;
   color: inherit;
   text-decoration: none;
 }
-.grading-card-link:hover strong {
+.grading-card-link:hover strong,
+.grading-card-link:focus-visible strong {
+  color: var(--accent);
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 .grading-card-link span,
 .grading-card-meta {
@@ -204,6 +209,14 @@ function onDrop(event: DragEvent, status: GradingStatus) {
   color: var(--accent);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+.grading-card-link .grading-card-blocked {
+  justify-self: start;
+  padding: 1px 8px;
+  border: 1px solid var(--line-light);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
 }
 .grading-card-meta {
   display: flex;

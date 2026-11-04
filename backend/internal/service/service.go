@@ -39,6 +39,12 @@ type Config struct {
 	ContestantGuildID     string
 	DiscordRoleTeams      map[string]int64
 	AdminRoleIDs          map[string]struct{}
+	// SecondaryQualifierMode grades only each team's latest answer after the
+	// contest ends and keeps scores private until the final reveal.
+	SecondaryQualifierMode bool
+	// DevTools enables development-only operations such as moving the
+	// schedule. It is set only in development fake mode.
+	DevTools bool
 }
 
 type Service struct {
@@ -412,6 +418,12 @@ func (s *Service) RefreshContent(ctx context.Context, claims ActionsClaims, comm
 	if activeErr == nil {
 		expectedCurrent = active.CommitSHA
 		if active.CommitSHA == commit {
+			// Activating the active commit again repairs its ranking freeze.
+			active, err := s.Store.ActivateContent(ctx, active, active.CommitSHA)
+			if err != nil {
+				s.setContentFailure(commit, err, true)
+				return core.ContentSnapshot{}, err
+			}
 			s.setContentSuccess(active)
 			return active, nil
 		}
@@ -576,7 +588,7 @@ func safeRelativePath(value string) bool {
 	return value != "" && clean == value && clean != "." && !strings.HasPrefix(clean, "../") && !strings.HasPrefix(clean, "/")
 }
 
-func (s *Service) SubmitAnswer(ctx context.Context, contestant core.Contestant, problemCode, body string) (core.Answer, time.Duration, error) {
+func (s *Service) SubmitAnswer(ctx context.Context, contestant core.Contestant, problemCode, body string, attachments []core.AnswerAttachment) (core.Answer, time.Duration, error) {
 	snapshot, err := s.Store.ActiveContent(ctx)
 	if err != nil {
 		return core.Answer{}, 0, err
@@ -590,6 +602,9 @@ func (s *Service) SubmitAnswer(ctx context.Context, contestant core.Contestant, 
 	if !ok || now.Before(section.Beginning) || !now.Before(section.Ending) {
 		return core.Answer{}, 0, core.NewError(http.StatusConflict, "submission_closed", "Problem is not currently submittable")
 	}
+	if err := core.ValidateAnswer(problem, body, attachments); err != nil {
+		return core.Answer{}, 0, err
+	}
 	team := contestant.TeamCode
 	deployments, err := s.Store.ListDeployments(ctx, core.DeploymentFilter{TeamCode: &team, ProblemCode: &problemCode})
 	if err != nil {
@@ -598,7 +613,7 @@ func (s *Service) SubmitAnswer(ctx context.Context, contestant core.Contestant, 
 	answer := core.Answer{
 		TeamCode: contestant.TeamCode, ProblemCode: problemCode, AuthorName: contestant.Name,
 		Body: body, SubmittedAt: now, ContentCommit: snapshot.CommitSHA, MaxScore: problem.MaxScore,
-		RedeployRule: problem.Redeploy, DeploymentsBefore: int32(len(deployments)),
+		RedeployRule: problem.Redeploy, DeploymentsBefore: int32(len(deployments)), Attachments: attachments,
 	}
 	return s.Store.SubmitAnswer(ctx, answer, core.AnswerInterval)
 }
@@ -621,45 +636,57 @@ func (s *Service) Scores(ctx context.Context, before *time.Time) (map[int64]map[
 		}
 		markings = filtered
 	}
-	return core.SelectBestScores(answers, markings), nil
+	return s.selectScores(answers, markings), nil
 }
 
-func (s *Service) Ranking(ctx context.Context, admin bool) ([]core.RankingEntry, bool, *time.Time, error) {
+// RankingView is a ranking as one viewer sees it, read from a single
+// competition state so Hidden and Frozen always match the entries.
+type RankingView struct {
+	Entries  []core.RankingEntry
+	Frozen   bool
+	FrozenAt *time.Time
+	// Hidden: contestants see no ranking yet (secondary qualifier mode
+	// before the final reveal).
+	Hidden bool
+}
+
+func (s *Service) Ranking(ctx context.Context, admin bool) (RankingView, error) {
 	state, err := s.Store.GetCompetitionState(ctx)
 	if err != nil {
-		return nil, false, nil, err
+		return RankingView{}, err
 	}
-	frozen := false
-	var before *time.Time
+	if !admin && s.ScoresHidden(state) {
+		return RankingView{Entries: []core.RankingEntry{}, Hidden: true}, nil
+	}
 	if !admin && state.FinalRevealedAt == nil && state.RankingFreezeAt != nil && !s.Now().Before(*state.RankingFreezeAt) {
-		frozen, before = true, state.RankingFreezeAt
-	}
-	if frozen {
-		entries, freezeErr := s.frozenRanking(ctx, *before)
-		return entries, true, before, freezeErr
+		entries, err := s.frozenRanking(ctx, *state.RankingFreezeAt)
+		if err != nil {
+			return RankingView{}, err
+		}
+		return RankingView{Entries: entries, Frozen: true, FrozenAt: state.RankingFreezeAt}, nil
 	}
 	snapshot, err := s.Store.ActiveContent(ctx)
 	if err != nil {
-		return nil, false, nil, err
+		return RankingView{}, err
 	}
 	var scores map[int64]map[string]core.Score
 	if admin {
 		scores, err = s.Scores(ctx, nil)
 	} else {
-		scores, err = s.publicScores(ctx, before, state.FinalRevealedAt != nil)
+		scores, err = s.publicScores(ctx, nil, state.FinalRevealedAt != nil)
 	}
 	if err != nil {
-		return nil, false, nil, err
+		return RankingView{}, err
 	}
 	teams, err := s.Store.ListTeams(ctx)
 	if err != nil {
-		return nil, false, nil, err
+		return RankingView{}, err
 	}
 	active := make(map[string]struct{}, len(snapshot.Manifest.Problems))
 	for _, problem := range snapshot.Manifest.Problems {
 		active[problem.Code] = struct{}{}
 	}
-	return core.BuildRanking(teams, active, scores), frozen, before, nil
+	return RankingView{Entries: core.BuildRanking(teams, active, scores)}, nil
 }
 
 func (s *Service) QueueDeployment(ctx context.Context, teamCode int64, problemCode string, enforceContestWindow bool) (core.Deployment, error) {

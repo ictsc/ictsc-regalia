@@ -106,25 +106,36 @@ func (s *Store) PutRankingSnapshot(ctx context.Context, snapshot core.RankingSna
 	return stored, nil
 }
 
-func (s *Store) mutateCompetitionState(ctx context.Context, actor, action string, rule *string, setRule bool, freezeAt *time.Time, setFreeze bool, revealAt *time.Time) (core.CompetitionState, error) {
+func (s *Store) mutateCompetitionState(ctx context.Context, actor, action string, freezeAt *time.Time, setFreeze bool, revealAt *time.Time) (core.CompetitionState, error) {
 	tx, err := s.pool.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.Serializable})
 	if err != nil {
 		return core.CompetitionState{}, dbError(err)
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
+	after, err := s.changeCompetitionState(ctx, tx, actor, action, freezeAt, setFreeze, revealAt)
+	if err != nil {
+		return core.CompetitionState{}, err
+	}
+	if err = tx.Commit(ctx); err != nil {
+		return core.CompetitionState{}, conflictError(err, "conflict", "Competition state update conflicted with another operation")
+	}
+	return after, nil
+}
+
+// changeCompetitionState applies a change inside tx and records it in
+// audit_log; content activation uses it to set the freeze in its own
+// transaction.
+func (s *Store) changeCompetitionState(ctx context.Context, tx pgx.Tx, actor, action string, freezeAt *time.Time, setFreeze bool, revealAt *time.Time) (core.CompetitionState, error) {
 	var before core.CompetitionState
-	err = tx.QueryRow(ctx, `
-		SELECT rule_markdown,ranking_freeze_at,final_revealed_at,updated_at,updated_by
-		FROM competition_state WHERE singleton=true FOR UPDATE`).Scan(&before.RuleMarkdown, &before.RankingFreezeAt,
+	err := tx.QueryRow(ctx, `
+		SELECT ranking_freeze_at,final_revealed_at,updated_at,updated_by
+		FROM competition_state WHERE singleton=true FOR UPDATE`).Scan(&before.RankingFreezeAt,
 		&before.FinalRevealedAt, &before.UpdatedAt, &before.UpdatedBy)
 	if err != nil {
 		return core.CompetitionState{}, dbError(err)
 	}
 	after := before
 	changed := false
-	if setRule && rule != nil && after.RuleMarkdown != *rule {
-		after.RuleMarkdown, changed = *rule, true
-	}
 	if setFreeze && !sameOptionalTime(after.RankingFreezeAt, freezeAt) {
 		after.RankingFreezeAt, changed = freezeAt, true
 	}
@@ -137,8 +148,8 @@ func (s *Store) mutateCompetitionState(ctx context.Context, actor, action string
 	}
 	after.UpdatedAt, after.UpdatedBy = s.now(), actor
 	_, err = tx.Exec(ctx, `
-		UPDATE competition_state SET rule_markdown=$1,ranking_freeze_at=$2,final_revealed_at=$3,updated_at=$4,updated_by=$5
-		WHERE singleton=true`, after.RuleMarkdown, after.RankingFreezeAt, after.FinalRevealedAt, after.UpdatedAt, after.UpdatedBy)
+		UPDATE competition_state SET ranking_freeze_at=$1,final_revealed_at=$2,updated_at=$3,updated_by=$4
+		WHERE singleton=true`, after.RankingFreezeAt, after.FinalRevealedAt, after.UpdatedAt, after.UpdatedBy)
 	if err != nil {
 		return core.CompetitionState{}, dbError(err)
 	}
@@ -153,9 +164,6 @@ func (s *Store) mutateCompetitionState(ctx context.Context, actor, action string
 		INSERT INTO audit_log(actor,action,resource,before_json,after_json)
 		VALUES($1,$2,'competition_state',$3,$4)`, actor, action, beforeJSON, afterJSON); err != nil {
 		return core.CompetitionState{}, dbError(err)
-	}
-	if err = tx.Commit(ctx); err != nil {
-		return core.CompetitionState{}, conflictError(err, "conflict", "Competition state update conflicted with another operation")
 	}
 	return after, nil
 }

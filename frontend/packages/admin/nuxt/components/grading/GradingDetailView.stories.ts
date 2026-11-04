@@ -77,3 +77,39 @@ export const DefaultAssignment: Story = {
     marks: [],
   },
 };
+
+/** 二次予選モード: 差分なしで最新回答だけを採点する。 */
+export const SecondaryQualifier: Story = {
+  args: {
+    answer: { ...detailAnswer, competition_mode: "SECONDARY_QUALIFIER" },
+    previous: [],
+  },
+};
+
+/** 二次予選モードで競技終了前。採点フォームの代わりに理由を表示する。 */
+export const SecondaryQualifierBeforeEnd: Story = {
+  args: {
+    answer: {
+      ...detailAnswer,
+      score: null,
+      competition_mode: "SECONDARY_QUALIFIER",
+      marking_blocked_reason: "grading_not_started",
+    },
+    previous: [],
+    marks: [],
+  },
+};
+
+/** 回答にログが添付されている場合。中身はテキストとしてだけ表示する。 */
+export const WithAttachments: Story = {
+  args: {
+    attachments: [
+      {
+        name: "docker-logs.txt",
+        size: 214,
+        content:
+          "api-gateway  | dial tcp 10.20.1.99:8080: connect: connection refused\napi-gateway  | <script>alert(1)</script> is shown as text\n",
+      },
+    ],
+  },
+};
