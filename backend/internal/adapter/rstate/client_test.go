@@ -82,8 +82,10 @@ func TestQueueRejectsProblemCodesRstateRefuses(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, code := range []string{"A1", "../x", ""} {
-		if err := client.Queue(context.Background(), service.DeploymentRequest{TeamCode: 2, ProblemCode: code}); err == nil {
-			t.Fatalf("problem code %q was accepted", code)
+		err := client.Queue(context.Background(), service.DeploymentRequest{TeamCode: 2, ProblemCode: code})
+		var rejection interface{ DefinitiveDeploymentRejection() bool }
+		if !errors.As(err, &rejection) || !rejection.DefinitiveDeploymentRejection() {
+			t.Fatalf("problem code %q: error = %v, want a definitive rejection", code, err)
 		}
 	}
 }

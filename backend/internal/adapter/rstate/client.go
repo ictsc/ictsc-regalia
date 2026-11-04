@@ -85,6 +85,14 @@ func (e *HTTPError) Error() string {
 	return fmt.Sprintf("rstate %s returned HTTP %d: %s", e.Operation, e.StatusCode, e.Body)
 }
 
+// TargetError means rstate cannot take the team or problem at all, so the
+// request is rejected before it is sent and is never worth retrying.
+type TargetError struct {
+	Reason string
+}
+
+func (e *TargetError) Error() string { return e.Reason }
+
 // NotFoundError means rstate has never run a job for the team's problem.
 type NotFoundError struct {
 	TeamCode    int64
@@ -253,10 +261,10 @@ func probID(problemCode string) string {
 
 func validateTarget(teamCode int64, problemCode string) error {
 	if teamCode < 2 || teamCode > 99 {
-		return errors.New("rstate team code must be between 2 and 99")
+		return &TargetError{Reason: "rstate team code must be between 2 and 99"}
 	}
 	if !problemCodePattern.MatchString(problemCode) {
-		return errors.New("rstate problem code must be 3 to 8 letters, digits, '_' or '-'")
+		return &TargetError{Reason: "rstate problem code must be 3 to 8 letters, digits, '_' or '-'"}
 	}
 	return nil
 }
