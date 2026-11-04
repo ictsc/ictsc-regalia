@@ -16,6 +16,8 @@ TypeScript側は共有REST clientを生成し、手書きのhandler/usecaseと�
 - Discord: 競技者・運営のAuthorization Code + PKCE認証元。
 - GitHub: 問題・Section・お知らせの正本。GitHub Actions OIDCでrefreshを起動。
 - SState: 再展開実行サービス。APIがrequestし、SStateがHTTP callbackで状態を通知。
+- rstate: 二次予選モードでSStateの代わりに使う再展開ツール。callbackが無いのでAPIが状態を取りに行く
+  （[rstate-integration.md](rstate-integration.md)）。
 
 ## 主要なデータフロー
 
@@ -25,8 +27,9 @@ TypeScript側は共有REST clientを生成し、手書きのhandler/usecaseと�
 4. 再展開POSTをSStateが`202 Accepted`で受理し、進捗はBearer付きcallbackでAPIへ返します。
 5. APIはcallbackをDBへ冪等記録し、Redis Pub/Sub経由でブラウザのSSEへ配信します。
 
-バックグラウンドの再展開ポーリングは行いません。運営の`sync`操作だけが明示的な
-一回限りの状態照会です。
+SStateに対してはバックグラウンドの再展開ポーリングは行いません。運営の`sync`操作だけが
+明示的な一回限りの状態照会です。二次予選モードのrstateだけは、処理中の再展開を一定間隔で
+問い合わせます。
 
 ## セキュリティ境界
 

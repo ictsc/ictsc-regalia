@@ -99,7 +99,7 @@ OIDC token と API token は別物です。前者は「どの workflow からの
 | `ICTSC_GITHUB_OIDC_AUDIENCE` | 大会ごとに決めた値（例: `regalia-2026-pr2`） |
 | `ICTSC_GITHUB_API_TOKEN` | 1-2 で作った読み取り専用 token（Secret で管理） |
 | `ICTSC_GITHUB_SCHEDULE_PATH` | 既定 `schedule.yaml` のままでよい |
-| `ICTSC_SECONDARY_QUALIFIER_MODE` | 二次予選なら `true` |
+| `ICTSC_SECONDARY_QUALIFIER_MODE` | 二次予選なら `true`（再展開は rstate を使う。設定は [rstate-integration.md](rstate-integration.md)） |
 
 設定は起動時に検証されます。値を変えたら API を再起動してください。
 
