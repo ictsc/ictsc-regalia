@@ -20,8 +20,8 @@
 
 | 用途 | request | Regaliaの扱い |
 | ---- | ------- | ------------- |
-| 再展開の依頼 | `POST /admin/postJob`（Basic認証、form: `team_id`・`prob_id`） | `200`で受理。`400`は確定した拒否として`FAILED`にする |
-| 状態の取得 | `GET /admin/list`（Basic認証） | 該当チーム・問題で`created_time`が最新のjobを使う |
+| 再展開の依頼 | `POST /admin/postJob`（Basic認証、form: `team_id`・`prob_id`） | `200`で受理し、応答のjob IDを再展開ごとに保存する |
+| 状態の取得 | `GET /admin/list`（Basic認証） | 保存したjob IDのjobの状態を使う |
 
 2024年にDiscord bot（[ictsc/ictsc-discord-bot](https://github.com/ictsc/ictsc-discord-bot)）が
 再展開に使っていたのと同じ入口です。
@@ -29,11 +29,14 @@
 - チームは`team_code`を2桁にした`team02`のような名前で送ります。rstateはこれをTerraform
   workspace名として使うので、rstate側のworkspaceも同じ名前にしてください。
 - 問題コードは小文字にして送ります（`A01`なら`a01`）。rstateはこれをTerraformの
-  `module.<問題コード>`として使います。長さはrstateの制約に合わせて3〜8文字です。
-- `/admin/postJob`の`400`は、本文が`BadRequest!`ならチームか問題の指定が不正、それ以外
-  （本文はチームのstatusページのURL）なら同じ問題の再展開が待機中か実行中、またはrstateが
-  準備期間と判定したことを表します。URLにはtokenが含まれるので、Regaliaは本文を記録せず
-  決まった文言で`FAILED`にします。
+  `module.<問題コード>`として使います。長さはrstateの制約に合わせて3〜8文字で、1〜2文字の
+  問題は送る前に`FAILED`にします。
+- `/admin/postJob`の`400`は、本文が`BadRequest!`ならチームか問題の指定が不正です。それ以外
+  （本文はチームのstatusページのURL）は、同じ問題のjobが待機中か実行中、またはrstateが準備期間と
+  判定したことを表します。Regaliaはこのとき`GET /admin/list`を確認し、そのチーム・問題のjobが
+  待機中か実行中なら受理されたものとしてそのjob IDを保存します（応答が失われて再送した場合も
+  ここに来ます）。無ければ準備期間として`FAILED`にします。URLにはtokenが含まれるので、本文は
+  記録しません。
 
 ### rstate側の準備
 
@@ -56,12 +59,23 @@ Regaliaは使わないので、rstateは外部から届かない場所に置い�
 
 ## ポーリング
 
-rstateはcallbackを送らないため、APIは`ICTSC_RSTATE_POLL_INTERVAL`ごとに、各チーム・問題の
-最新revisionのうち`QUEUED`か`DEPLOYING`のものだけrstateへ問い合わせて状態を進めます。
+rstateはcallbackを送らないため、APIは`ICTSC_RSTATE_POLL_INTERVAL`ごとに、`QUEUED`か
+`DEPLOYING`の再展開だけをDBから読み、`GET /admin/list`を1回呼んで状態を進めます。処理中の
+再展開が無いときはrstateを呼びません。
 
-- 依頼時刻より2分以上前に作られたjobは前回の再展開のものとして無視します。
+- 再展開とjobは、依頼時に保存したjob ID（`deployments.gateway_job_id`）で対応づけます。
+  作成時刻では判定しないので、直前に終わった前回のjobを取り違えず、サーバー間の時計のずれにも
+  左右されません。
+- job IDがまだ無い再展開は、そのチーム・問題で待機中か実行中のjobだけを自分のjobとみなし、
+  そのIDを保存します。rstateは同じチーム・問題のjobを同時に1つしか動かしません。
 - `QUEUED`から直接`終了`や`エラー`を見たときは、`DEPLOYING`を挟んで記録します。
-- eventの時刻はAPI側の時計、event IDは再展開と状態から決まる値です。複数のAPI instanceが
-  同時に記録しても重複しません。
+- eventの時刻はAPI側の時計、event IDは再展開と状態から決まる値です。
+- DBに記録したあとRedisへの配信に失敗した更新は、次の周期で配信し直します。
 
-運営画面のsyncも同じ`GET /admin/list`を1回呼んで状態を反映します。
+運営画面のsyncも同じ処理で、`GET /admin/list`を1回呼んで状態を反映します。同じ状態のまま
+もう一度syncしても何も変わりません。`QUEUED`のままrstateにjobが無い場合は`FAILED`にします。
+
+## 既存DBの更新
+
+job IDを保存する列は`backend/db/migrations/0008_deployment_job_id.sql`で追加します。既存DBには
+API更新前に適用してください。
