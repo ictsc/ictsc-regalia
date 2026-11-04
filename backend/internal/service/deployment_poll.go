@@ -24,15 +24,15 @@ func (s *Service) PollDeployments(ctx context.Context) error {
 	if !ok {
 		return nil
 	}
+	errs := []error{s.republishDeployments(ctx)}
 	deployments, err := s.Store.ListDeployments(ctx, core.DeploymentFilter{Statuses: activeDeploymentStatuses})
 	if err != nil || len(deployments) == 0 {
-		return err
+		return errors.Join(append(errs, err)...)
 	}
 	jobs, err := prober.ListJobs(ctx)
 	if err != nil {
-		return err
+		return errors.Join(append(errs, err)...)
 	}
-	var errs []error
 	for _, deployment := range deployments {
 		if _, err := s.advancePolledDeployment(ctx, deployment, jobs); err != nil {
 			errs = append(errs, fmt.Errorf("poll deployment %d/%s revision %d: %w", deployment.TeamCode, deployment.ProblemCode, deployment.Revision, err))
@@ -102,13 +102,47 @@ func (s *Service) advancePolledDeployment(ctx context.Context, deployment core.D
 		if status == job.Status {
 			event.Message = job.Message
 		}
-		updated, _, err := s.ApplyDeploymentEvent(ctx, deployment.TeamCode, deployment.ProblemCode, deployment.Revision, event, false)
+		updated, _, err := s.Store.AppendDeploymentEvent(ctx, deployment.RequestID, event, false)
 		if err != nil {
+			return true, err
+		}
+		if err := s.publishPolledDeployment(ctx, updated); err != nil {
 			return true, err
 		}
 		deployment = updated
 	}
 	return true, nil
+}
+
+// publishPolledDeployment publishes a stored update, keeping it for the next
+// poll when publication fails. A later update of the same deployment
+// replaces it, so only the newest state is ever published again.
+func (s *Service) publishPolledDeployment(ctx context.Context, deployment core.Deployment) error {
+	s.unpublishedMu.Lock()
+	defer s.unpublishedMu.Unlock()
+	if err := s.publishDeployment(ctx, deployment); err != nil {
+		if s.unpublishedDeployments == nil {
+			s.unpublishedDeployments = make(map[string]core.Deployment)
+		}
+		s.unpublishedDeployments[deployment.RequestID] = deployment
+		return fmt.Errorf("publish deployment update: %w", err)
+	}
+	delete(s.unpublishedDeployments, deployment.RequestID)
+	return nil
+}
+
+func (s *Service) republishDeployments(ctx context.Context) error {
+	s.unpublishedMu.Lock()
+	defer s.unpublishedMu.Unlock()
+	var errs []error
+	for requestID, deployment := range s.unpublishedDeployments {
+		if err := s.publishDeployment(ctx, deployment); err != nil {
+			errs = append(errs, fmt.Errorf("publish deployment update again: %w", err))
+			continue
+		}
+		delete(s.unpublishedDeployments, requestID)
+	}
+	return errors.Join(errs...)
 }
 
 // deploymentJob finds the job by the ID recorded for the deployment. Before

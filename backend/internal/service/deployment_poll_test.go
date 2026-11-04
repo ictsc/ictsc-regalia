@@ -222,3 +222,27 @@ func TestSyncPolledDeploymentFailsAQueuedRequestWithoutAJob(t *testing.T) {
 		t.Fatal("a finished deployment was looked up again")
 	}
 }
+
+func TestPollDeploymentsPublishesAStoredUpdateAgain(t *testing.T) {
+	now := time.Date(2026, 11, 4, 3, 0, 0, 0, time.UTC)
+	prober := &fakeProber{jobs: []service.DeploymentJob{job("job", core.DeploymentDeploying)}}
+	svc, store, deployment := newPollingService(t, now, prober)
+	bus := &failOnceEventBus{}
+	svc.Events = bus
+
+	if err := svc.PollDeployments(t.Context()); err == nil {
+		t.Fatal("the failed publication was not reported")
+	}
+	if got := deploymentByID(t, store, deployment.RequestID); got.LatestStatus != core.DeploymentDeploying {
+		t.Fatalf("deployment = %#v, want DEPLOYING stored", got)
+	}
+	// Nothing changes on the next tick, yet the stored update goes out.
+	for range 2 {
+		if err := svc.PollDeployments(t.Context()); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if bus.publishCalls != 2 {
+		t.Fatalf("publish calls = %d, want the failure and one republish", bus.publishCalls)
+	}
+}

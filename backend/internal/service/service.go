@@ -61,6 +61,12 @@ type Service struct {
 
 	statusMu      sync.RWMutex
 	contentStatus ContentStatus
+
+	// unpublishedDeployments holds polled updates that were stored but not
+	// published, keyed by request ID; the next poll publishes them again
+	// because a gateway without callbacks never resends them.
+	unpublishedMu          sync.Mutex
+	unpublishedDeployments map[string]core.Deployment
 }
 
 func (s *Service) WebPushConfig() (bool, string) {
