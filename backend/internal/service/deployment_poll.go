@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -38,6 +39,30 @@ func (s *Service) PollDeployments(ctx context.Context) error {
 		}
 	}
 	return errors.Join(errs...)
+}
+
+// SyncPolledDeployment is the operator sync for a DeploymentProber: one job
+// list read applied through the same staged transitions as polling, so a
+// job that finished before the first tick or a repeated sync never asks the
+// store for a transition it refuses. A finished deployment is left as is.
+func (s *Service) SyncPolledDeployment(ctx context.Context, prober DeploymentProber, deployment core.Deployment) error {
+	if deployment.LatestStatus != core.DeploymentQueued && deployment.LatestStatus != core.DeploymentDeploying {
+		return nil
+	}
+	jobs, err := prober.ListJobs(ctx)
+	if err != nil {
+		return core.WrapError(http.StatusBadGateway, "upstream_unavailable", "Deployment job lookup failed", err)
+	}
+	found, err := s.advancePolledDeployment(ctx, deployment, jobs)
+	if err != nil || found {
+		return err
+	}
+	if deployment.LatestStatus == core.DeploymentQueued {
+		if err := s.FailQueuedDeployment(ctx, deployment, "The redeploy service has no job for this request"); err != nil {
+			return err
+		}
+	}
+	return core.NewError(http.StatusNotFound, "resource_not_found", "The redeploy service has no job for this deployment")
 }
 
 // advancePolledDeployment applies the state of the deployment's own job and

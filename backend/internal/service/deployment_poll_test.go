@@ -2,6 +2,8 @@ package service_test
 
 import (
 	"context"
+	"errors"
+	"net/http"
 	"testing"
 	"time"
 
@@ -195,5 +197,28 @@ func TestPollDeploymentsIsNoOpForCallbackGateways(t *testing.T) {
 	svc := service.New(store, memory.NewSessionStore(), service.Config{})
 	if err := svc.PollDeployments(t.Context()); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestSyncPolledDeploymentFailsAQueuedRequestWithoutAJob(t *testing.T) {
+	now := time.Date(2026, 11, 4, 3, 0, 0, 0, time.UTC)
+	prober := &fakeProber{jobs: []service.DeploymentJob{job("old", core.DeploymentCompleted)}}
+	svc, store, deployment := newPollingService(t, now, prober)
+
+	err := svc.SyncPolledDeployment(t.Context(), prober, deployment)
+	var domainErr *core.Error
+	if !errors.As(err, &domainErr) || domainErr.Status != http.StatusNotFound {
+		t.Fatalf("error = %v, want 404", err)
+	}
+	if got := deploymentByID(t, store, deployment.RequestID); got.LatestStatus != core.DeploymentFailed {
+		t.Fatalf("deployment = %#v, want FAILED", got)
+	}
+
+	calls := prober.calls
+	if err := svc.SyncPolledDeployment(t.Context(), prober, deploymentByID(t, store, deployment.RequestID)); err != nil {
+		t.Fatalf("sync of a finished deployment: %v", err)
+	}
+	if prober.calls != calls {
+		t.Fatal("a finished deployment was looked up again")
 	}
 }
