@@ -107,7 +107,7 @@ func (s *Service) nextDeploymentEventTime(deployment core.Deployment) time.Time 
 }
 
 // polledEventID is stable per deployment and status, so a status applied by
-// an overlapping poll is recognised by its event ID.
+// an overlapping poll is recognized by its event ID.
 func polledEventID(requestID string, status core.DeploymentStatus) string {
 	return uuid.NewSHA1(polledEventNamespace, []byte(requestID+":"+string(status))).String()
 }
