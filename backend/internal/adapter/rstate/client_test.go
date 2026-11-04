@@ -53,12 +53,17 @@ func TestQueueClassifiesRejections(t *testing.T) {
 		reason     string
 	}{
 		"bad parameters":   {http.StatusBadRequest, "BadRequest!", true, "rejected the team or problem ID"},
-		"already queued":   {http.StatusBadRequest, "https://rstate.example/status/0b6f-secret-token", true, "already queued"},
+		"preparatory":      {http.StatusBadRequest, "https://rstate.example/status/0b6f-secret-token", true, "preparatory phase"},
 		"wrong password":   {http.StatusUnauthorized, "", false, ""},
 		"upstream failure": {http.StatusBadGateway, "", false, ""},
 	} {
 		t.Run(name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path == "/admin/list" {
+					// A finished job does not explain the refusal.
+					_, _ = w.Write([]byte(`[{"id":"old","state":"終了","created_time":1,"team_id":"02","prob_id":"a01"}]`))
+					return
+				}
 				w.WriteHeader(tc.status)
 				_, _ = w.Write([]byte(tc.body))
 			}))
@@ -75,6 +80,30 @@ func TestQueueClassifiesRejections(t *testing.T) {
 				t.Fatalf("error = %q, want reason %q without the status page URL", err, tc.reason)
 			}
 		})
+	}
+}
+
+func TestQueueTakesARefusalExplainedByAnActiveJobAsAccepted(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assertBasicAuth(t, r)
+		switch r.URL.Path {
+		case "/admin/postJob":
+			// A retry after the first response was lost.
+			w.WriteHeader(http.StatusBadRequest)
+			_, _ = w.Write([]byte("https://rstate.example/status/0b6f-secret-token"))
+		case "/admin/list":
+			_, _ = w.Write([]byte(`[
+				{"id":"other-team","state":"実行中","created_time":2,"team_id":"03","prob_id":"a01"},
+				{"id":"taken","state":"開始待ち","created_time":2,"team_id":"02","prob_id":"a01"}
+			]`))
+		default:
+			t.Fatalf("unexpected request: %s %s", r.Method, r.URL.Path)
+		}
+	}))
+	defer server.Close()
+	jobID, err := newTestClient(t, server).Queue(context.Background(), service.DeploymentRequest{TeamCode: 2, ProblemCode: "A01", Revision: 1})
+	if err != nil || jobID != "taken" {
+		t.Fatalf("job ID = %q, err = %v, want the active job", jobID, err)
 	}
 }
 

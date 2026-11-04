@@ -156,14 +156,31 @@ func (c *Client) Queue(ctx context.Context, request service.DeploymentRequest) (
 		// The body is either "BadRequest!" or the team's status page URL,
 		// which carries a token and must not reach deployment messages.
 		body, _ := io.ReadAll(io.LimitReader(response.Body, 4096))
-		reason := "a job for this team and problem is already queued, or rstate is in its preparatory phase"
 		if strings.TrimSpace(string(body)) == postJobBadRequest {
-			reason = "rstate rejected the team or problem ID"
+			return "", &HTTPError{Operation: "queue redeployment", StatusCode: response.StatusCode, Body: "rstate rejected the team or problem ID"}
 		}
-		return "", &HTTPError{Operation: "queue redeployment", StatusCode: response.StatusCode, Body: reason}
+		return c.resolveRefusedJob(ctx, request)
 	default:
 		return "", readHTTPError("queue redeployment", response)
 	}
+}
+
+// resolveRefusedJob settles postJob's ambiguous 400, sent both when the
+// team's problem already has a waiting or running job and in rstate's
+// preparatory phase. A retry after a lost response lands here too, so an
+// active job means the request was taken and returns that job's ID.
+func (c *Client) resolveRefusedJob(ctx context.Context, request service.DeploymentRequest) (string, error) {
+	jobs, err := c.ListJobs(ctx)
+	if err != nil {
+		return "", fmt.Errorf("check rstate jobs after a refused redeployment: %w", err)
+	}
+	for _, job := range jobs {
+		if job.TeamCode == request.TeamCode && job.ProblemCode == probID(request.ProblemCode) &&
+			(job.Status == core.DeploymentQueued || job.Status == core.DeploymentDeploying) {
+			return job.ID, nil
+		}
+	}
+	return "", &HTTPError{Operation: "queue redeployment", StatusCode: http.StatusBadRequest, Body: "rstate is in its preparatory phase"}
 }
 
 // ListJobs returns every job rstate reports, skipping entries whose team or
