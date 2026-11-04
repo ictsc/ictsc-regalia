@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -15,14 +16,20 @@ import (
 
 const testPassword = "rstate-admin-password"
 
-func TestQueuePostsToBackendRouteWithTeamID(t *testing.T) {
+func TestQueuePostsJobFormWithBasicAuth(t *testing.T) {
 	requests := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requests++
-		if r.Method != http.MethodPost || r.URL.Path != "/backend/team02/A01" {
+		if r.Method != http.MethodPost || r.URL.Path != "/admin/postJob" {
 			t.Fatalf("unexpected request: %s %s", r.Method, r.URL.Path)
 		}
 		assertBasicAuth(t, r)
+		if got := r.Header.Get("Content-Type"); got != "application/x-www-form-urlencoded" {
+			t.Fatalf("Content-Type = %q", got)
+		}
+		if r.PostFormValue("team_id") != "team02" || r.PostFormValue("prob_id") != "A01" {
+			t.Fatalf("form = %v", r.PostForm)
+		}
 		_, _ = w.Write([]byte(`{"id":"8ed8f0d9-8eb9-11ed-9bc1-befd30ae56b9","state":0,"team_id":"team02","prob_id":"A01"}`))
 	}))
 	defer server.Close()
@@ -37,22 +44,33 @@ func TestQueuePostsToBackendRouteWithTeamID(t *testing.T) {
 }
 
 func TestQueueClassifiesRejections(t *testing.T) {
-	for status, definitive := range map[int]bool{
-		http.StatusBadRequest: true, http.StatusConflict: true,
-		http.StatusUnauthorized: false, http.StatusBadGateway: false,
+	for name, tc := range map[string]struct {
+		status     int
+		body       string
+		definitive bool
+		reason     string
+	}{
+		"bad parameters":   {http.StatusBadRequest, "BadRequest!", true, "rejected the team or problem ID"},
+		"already queued":   {http.StatusBadRequest, "https://rstate.example/status/0b6f-secret-token", true, "already queued"},
+		"wrong password":   {http.StatusUnauthorized, "", false, ""},
+		"upstream failure": {http.StatusBadGateway, "", false, ""},
 	} {
-		t.Run(http.StatusText(status), func(t *testing.T) {
+		t.Run(name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(status)
+				w.WriteHeader(tc.status)
+				_, _ = w.Write([]byte(tc.body))
 			}))
 			defer server.Close()
 			err := newTestClient(t, server).Queue(context.Background(), service.DeploymentRequest{TeamCode: 2, ProblemCode: "A01", Revision: 1})
 			var httpErr *HTTPError
-			if !errors.As(err, &httpErr) || httpErr.StatusCode != status {
-				t.Fatalf("error = %v, want HTTPError status %d", err, status)
+			if !errors.As(err, &httpErr) || httpErr.StatusCode != tc.status {
+				t.Fatalf("error = %v, want HTTPError status %d", err, tc.status)
 			}
-			if httpErr.DefinitiveDeploymentRejection() != definitive {
-				t.Fatalf("DefinitiveDeploymentRejection = %v, want %v", !definitive, definitive)
+			if httpErr.DefinitiveDeploymentRejection() != tc.definitive {
+				t.Fatalf("DefinitiveDeploymentRejection = %v, want %v", !tc.definitive, tc.definitive)
+			}
+			if !strings.Contains(err.Error(), tc.reason) || strings.Contains(err.Error(), "secret-token") {
+				t.Fatalf("error = %q, want reason %q without the status page URL", err, tc.reason)
 			}
 		})
 	}

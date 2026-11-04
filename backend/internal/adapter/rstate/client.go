@@ -64,6 +64,10 @@ const (
 	stateLimit   = "Limit"
 )
 
+// postJobBadRequest is the body rstate's postJob sends for an invalid team or
+// problem ID; its other 400s carry the team's status page URL instead.
+const postJobBadRequest = "BadRequest!"
+
 type HTTPError struct {
 	Operation  string
 	StatusCode int
@@ -108,23 +112,34 @@ func New(config Config) (*Client, error) {
 	return &Client{baseURL: parsed, adminPassword: config.AdminPassword, httpClient: config.HTTPClient}, nil
 }
 
-// Queue uses POST /backend/:teamid/:probcode rather than /admin/postJob:
-// postJob refuses every contestant team because rstate's preparatory-phase
-// check compares against fixed 2022 timestamps.
+// Queue uses POST /admin/postJob behind Basic auth, as the ICTSC Discord bot
+// did. rstate refuses contestant teams there until its preparatory-phase
+// dates (pkg/utils/util.go) are set for the contest.
 func (c *Client) Queue(ctx context.Context, request service.DeploymentRequest) error {
 	if err := validateTarget(request.TeamCode, request.ProblemCode); err != nil {
 		return err
 	}
-	endpoint := c.endpoint("/backend/" + teamID(request.TeamCode) + "/" + url.PathEscape(request.ProblemCode))
-	response, err := c.do(ctx, http.MethodPost, endpoint, "queue redeployment")
+	form := url.Values{"team_id": {teamID(request.TeamCode)}, "prob_id": {request.ProblemCode}}
+	response, err := c.do(ctx, http.MethodPost, c.endpoint("/admin/postJob"), strings.NewReader(form.Encode()), "queue redeployment")
 	if err != nil {
 		return err
 	}
 	defer drainAndClose(response.Body)
-	if response.StatusCode != http.StatusOK {
+	switch response.StatusCode {
+	case http.StatusOK:
+		return nil
+	case http.StatusBadRequest:
+		// The body is either "BadRequest!" or the team's status page URL,
+		// which carries a token and must not reach deployment messages.
+		body, _ := io.ReadAll(io.LimitReader(response.Body, 4096))
+		reason := "a job for this team and problem is already queued, or rstate is in its preparatory phase"
+		if strings.TrimSpace(string(body)) == postJobBadRequest {
+			reason = "rstate rejected the team or problem ID"
+		}
+		return &HTTPError{Operation: "queue redeployment", StatusCode: response.StatusCode, Body: reason}
+	default:
 		return readHTTPError("queue redeployment", response)
 	}
-	return nil
 }
 
 // Observe returns rstate's newest job for the team's problem.
@@ -180,7 +195,7 @@ func (c *Client) Status(ctx context.Context, teamCode int64, problemCode string)
 }
 
 func (c *Client) ListJobs(ctx context.Context) ([]Job, error) {
-	response, err := c.do(ctx, http.MethodGet, c.endpoint("/admin/list"), "list jobs")
+	response, err := c.do(ctx, http.MethodGet, c.endpoint("/admin/list"), nil, "list jobs")
 	if err != nil {
 		return nil, err
 	}
@@ -195,13 +210,16 @@ func (c *Client) ListJobs(ctx context.Context) ([]Job, error) {
 	return jobs, nil
 }
 
-func (c *Client) do(ctx context.Context, method, endpoint, operation string) (*http.Response, error) {
-	request, err := http.NewRequestWithContext(ctx, method, endpoint, nil)
+func (c *Client) do(ctx context.Context, method, endpoint string, form io.Reader, operation string) (*http.Response, error) {
+	request, err := http.NewRequestWithContext(ctx, method, endpoint, form)
 	if err != nil {
 		return nil, fmt.Errorf("create rstate %s request: %w", operation, err)
 	}
 	request.SetBasicAuth(adminUser, c.adminPassword)
 	request.Header.Set("Accept", "application/json")
+	if form != nil {
+		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
 	response, err := c.httpClient.Do(request)
 	if err != nil {
 		return nil, fmt.Errorf("rstate %s: %w", operation, err)
