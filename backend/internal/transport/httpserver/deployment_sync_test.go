@@ -4,7 +4,9 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
 	"github.com/ictsc/ictsc-regalia/backend/internal/service"
@@ -18,8 +20,8 @@ func (missingDeploymentStatusError) DeploymentStatusNotFound() bool { return tru
 
 type missingDeploymentStatusGateway struct{}
 
-func (missingDeploymentStatusGateway) Queue(context.Context, service.DeploymentRequest) error {
-	return nil
+func (missingDeploymentStatusGateway) Queue(context.Context, service.DeploymentRequest) (string, error) {
+	return "", nil
 }
 
 func (missingDeploymentStatusGateway) Status(context.Context, int64, string) (core.DeploymentEvent, error) {
@@ -64,5 +66,83 @@ func TestManualSyncNotFoundReleasesQueuedDeployment(t *testing.T) {
 		deployments[0].Events[0].Status != core.DeploymentDeploying ||
 		deployments[0].Events[1].Status != core.DeploymentFailed {
 		t.Fatalf("recovery events = %#v, want DEPLOYING then FAILED", deployments[0].Events)
+	}
+}
+
+type jobIDGateway struct{ missingDeploymentStatusGateway }
+
+func (jobIDGateway) Queue(context.Context, service.DeploymentRequest) (string, error) {
+	return "8ed8f0d9-8eb9-11ed-9bc1-befd30ae56b9", nil
+}
+
+func TestQueuedDeploymentRecordsTheGatewayJobID(t *testing.T) {
+	fixture := newContractFixture(t)
+	fixture.service.Deployments = jobIDGateway{}
+	fixture.seedContestant(t)
+	fixture.seedActiveContent(t)
+	admin := fixture.createSession(t, session.Data{Kind: session.KindAdmin, AdminName: "operator"}, service.AdminTTL)
+
+	request := httptest.NewRequest(http.MethodPost, "/api/v1/admin/deployments", strings.NewReader(`{"team_code":2,"problem_code":"P1"}`))
+	request.Header.Set("Origin", testOrigin)
+	request.Header.Set("Content-Type", "application/json")
+	request.AddCookie(admin)
+	recorder := httptest.NewRecorder()
+	fixture.handler.ServeHTTP(recorder, request)
+	if recorder.Code != http.StatusCreated {
+		t.Fatalf("status = %d, want 201; body = %s", recorder.Code, recorder.Body.String())
+	}
+
+	team, problem := int64(2), "P1"
+	deployments, err := fixture.store.ListDeployments(t.Context(), core.DeploymentFilter{TeamCode: &team, ProblemCode: &problem})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(deployments) != 1 || deployments[0].GatewayJobID != "8ed8f0d9-8eb9-11ed-9bc1-befd30ae56b9" {
+		t.Fatalf("deployments = %#v, want the gateway job ID recorded", deployments)
+	}
+}
+
+type finishedJobGateway struct{ missingDeploymentStatusGateway }
+
+func (finishedJobGateway) ListJobs(context.Context) ([]service.DeploymentJob, error) {
+	return []service.DeploymentJob{{ID: "job-1", TeamCode: 2, ProblemCode: "p1", Status: core.DeploymentCompleted}}, nil
+}
+
+func TestManualSyncWithAProberStagesTheJobState(t *testing.T) {
+	fixture := newContractFixture(t)
+	fixture.service.Deployments = finishedJobGateway{}
+	deployment, err := fixture.store.CreateDeployment(t.Context(), core.Deployment{
+		RequestID: "74d8dc35-8a9c-4da3-9fed-d20a41cc7317", TeamCode: 2, ProblemCode: "P1",
+		ContentCommit: testContentCommit, RequestedAt: testNow.Add(-time.Minute), LatestStatus: core.DeploymentQueued,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := fixture.store.SetDeploymentJobID(t.Context(), deployment.RequestID, "job-1"); err != nil {
+		t.Fatal(err)
+	}
+	admin := fixture.createSession(t, session.Data{Kind: session.KindAdmin, AdminName: "operator"}, service.AdminTTL)
+
+	// The job finished before any poll: the first sync must not attempt
+	// QUEUED -> COMPLETED, and a repeated sync must not conflict.
+	for range 2 {
+		request := httptest.NewRequest(http.MethodPost, "/api/v1/admin/deployments/2/P1/sync", nil)
+		request.Header.Set("Origin", testOrigin)
+		request.AddCookie(admin)
+		recorder := httptest.NewRecorder()
+		fixture.handler.ServeHTTP(recorder, request)
+		if recorder.Code != http.StatusNoContent {
+			t.Fatalf("status = %d, want 204; body = %s", recorder.Code, recorder.Body.String())
+		}
+	}
+
+	team, problem := int64(2), "P1"
+	deployments, err := fixture.store.ListDeployments(t.Context(), core.DeploymentFilter{TeamCode: &team, ProblemCode: &problem})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(deployments) != 1 || deployments[0].LatestStatus != core.DeploymentCompleted || len(deployments[0].Events) != 2 ||
+		deployments[0].Events[0].Status != core.DeploymentDeploying {
+		t.Fatalf("deployments = %#v, want DEPLOYING then COMPLETED", deployments)
 	}
 }

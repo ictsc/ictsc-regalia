@@ -51,6 +51,9 @@ type Store interface {
 	ListDeployments(ctx context.Context, filter DeploymentFilter) ([]Deployment, error)
 	CreateDeployment(ctx context.Context, deployment Deployment) (Deployment, error)
 	AppendDeploymentEvent(ctx context.Context, requestID string, event DeploymentEvent, recovery bool) (Deployment, bool, error)
+	// SetDeploymentJobID records the gateway's job ID once; setting the same
+	// ID again succeeds and a different one is a conflict.
+	SetDeploymentJobID(ctx context.Context, requestID, jobID string) error
 	GetCompetitionState(ctx context.Context) (CompetitionState, error)
 	RevealFinal(ctx context.Context, at time.Time, actor string) (CompetitionState, error)
 	UpsertWebPushSubscription(ctx context.Context, subscription WebPushSubscription) error
@@ -81,4 +84,7 @@ type AnswerFilter struct {
 type DeploymentFilter struct {
 	TeamCode    *int64
 	ProblemCode *string
+	// Statuses keeps only deployments whose latest status is listed; nil
+	// keeps every status.
+	Statuses []DeploymentStatus
 }

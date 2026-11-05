@@ -247,6 +247,64 @@ func TestPostgresStoreIntegration(t *testing.T) {
 		}
 	})
 
+	t.Run("accepts team codes from 1 to 99", func(t *testing.T) {
+		ctx := t.Context()
+		if _, err := fixture.store.CreateTeam(ctx, core.Team{Code: 1, Name: "team-1", Organization: "ICTSC", MemberLimit: 5}); err != nil {
+			t.Fatalf("create team 1: %v", err)
+		}
+		for _, code := range []int64{0, 100} {
+			if _, err := fixture.store.CreateTeam(ctx, core.Team{Code: code, Name: fmt.Sprintf("team-%d", code), Organization: "ICTSC", MemberLimit: 5}); err == nil {
+				t.Fatalf("team %d was accepted", code)
+			}
+		}
+	})
+
+	t.Run("records a deployment's gateway job ID once", func(t *testing.T) {
+		ctx := t.Context()
+		const (
+			teamCode = int64(5)
+			commit   = "3333333333333333333333333333333333333333"
+		)
+		seedTeamContestantAndContent(t, fixture, teamCode, "job-recorder", "100000000000000030", commit)
+		deployment, err := fixture.store.CreateDeployment(ctx, core.Deployment{
+			RequestID: uuid.NewString(), TeamCode: teamCode, ProblemCode: "Q03", ContentCommit: commit,
+			RequestedAt: time.Date(2026, time.August, 30, 3, 0, 0, 0, time.UTC), LatestStatus: core.DeploymentQueued,
+		})
+		if err != nil {
+			t.Fatalf("create deployment: %v", err)
+		}
+		if deployment.GatewayJobID != "" {
+			t.Fatalf("new deployment job ID = %q, want empty", deployment.GatewayJobID)
+		}
+		for range 2 {
+			if err := fixture.store.SetDeploymentJobID(ctx, deployment.RequestID, "8ed8f0d9-8eb9-11ed-9bc1-befd30ae56b9"); err != nil {
+				t.Fatalf("set job ID: %v", err)
+			}
+		}
+		err = fixture.store.SetDeploymentJobID(ctx, deployment.RequestID, "other-job")
+		assertCoreErrorCode(t, err, http.StatusConflict, "deployment_job_mismatch")
+		err = fixture.store.SetDeploymentJobID(ctx, uuid.NewString(), "8ed8f0d9-8eb9-11ed-9bc1-befd30ae56b9")
+		assertCoreErrorCode(t, err, http.StatusNotFound, "deployment_not_found")
+
+		team := teamCode
+		listed, err := fixture.store.ListDeployments(ctx, core.DeploymentFilter{TeamCode: &team})
+		if err != nil || len(listed) != 1 || listed[0].GatewayJobID != "8ed8f0d9-8eb9-11ed-9bc1-befd30ae56b9" {
+			t.Fatalf("listed deployments = %#v, err = %v", listed, err)
+		}
+		active, err := fixture.store.ListDeployments(ctx, core.DeploymentFilter{
+			TeamCode: &team, Statuses: []core.DeploymentStatus{core.DeploymentQueued, core.DeploymentDeploying},
+		})
+		if err != nil || len(active) != 1 {
+			t.Fatalf("active deployments = %#v, err = %v", active, err)
+		}
+		finished, err := fixture.store.ListDeployments(ctx, core.DeploymentFilter{
+			TeamCode: &team, Statuses: []core.DeploymentStatus{core.DeploymentCompleted},
+		})
+		if err != nil || len(finished) != 0 {
+			t.Fatalf("finished deployments = %#v, err = %v", finished, err)
+		}
+	})
+
 	t.Run("deduplicates deployment events and validates transitions", func(t *testing.T) {
 		ctx := t.Context()
 		const (

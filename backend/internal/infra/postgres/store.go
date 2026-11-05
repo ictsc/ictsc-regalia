@@ -634,10 +634,18 @@ func (s *Store) UpdateAnswerWorkflow(ctx context.Context, teamCode int64, proble
 }
 
 func (s *Store) ListDeployments(ctx context.Context, filter core.DeploymentFilter) ([]core.Deployment, error) {
+	var statuses []string
+	if filter.Statuses != nil {
+		statuses = make([]string, 0, len(filter.Statuses))
+		for _, status := range filter.Statuses {
+			statuses = append(statuses, string(status))
+		}
+	}
 	rows, err := s.pool.Query(ctx, `
-		SELECT request_id::text,team_code,problem_code,revision,content_commit,requested_at,latest_status
+		SELECT request_id::text,team_code,problem_code,revision,content_commit,requested_at,latest_status,COALESCE(gateway_job_id,'')
 		FROM deployments WHERE ($1::bigint IS NULL OR team_code=$1) AND ($2::text IS NULL OR problem_code=$2)
-		ORDER BY requested_at DESC,team_code,problem_code,revision DESC`, filter.TeamCode, filter.ProblemCode)
+		AND ($3::text[] IS NULL OR latest_status::text=ANY($3))
+		ORDER BY requested_at DESC,team_code,problem_code,revision DESC`, filter.TeamCode, filter.ProblemCode, statuses)
 	if err != nil {
 		return nil, dbError(err)
 	}
@@ -646,7 +654,7 @@ func (s *Store) ListDeployments(ctx context.Context, filter core.DeploymentFilte
 	for rows.Next() {
 		var deployment core.Deployment
 		if err := rows.Scan(&deployment.RequestID, &deployment.TeamCode, &deployment.ProblemCode, &deployment.Revision,
-			&deployment.ContentCommit, &deployment.RequestedAt, &deployment.LatestStatus); err != nil {
+			&deployment.ContentCommit, &deployment.RequestedAt, &deployment.LatestStatus, &deployment.GatewayJobID); err != nil {
 			return nil, dbError(err)
 		}
 		deployments = append(deployments, deployment)
@@ -730,9 +738,10 @@ func (s *Store) AppendDeploymentEvent(ctx context.Context, requestID string, eve
 	defer func() { _ = tx.Rollback(ctx) }()
 	var deployment core.Deployment
 	err = tx.QueryRow(ctx, `
-		SELECT request_id::text,team_code,problem_code,revision,content_commit,requested_at,latest_status
+		SELECT request_id::text,team_code,problem_code,revision,content_commit,requested_at,latest_status,COALESCE(gateway_job_id,'')
 		FROM deployments WHERE request_id=$1 FOR UPDATE`, requestID).Scan(&deployment.RequestID, &deployment.TeamCode,
-		&deployment.ProblemCode, &deployment.Revision, &deployment.ContentCommit, &deployment.RequestedAt, &deployment.LatestStatus)
+		&deployment.ProblemCode, &deployment.Revision, &deployment.ContentCommit, &deployment.RequestedAt, &deployment.LatestStatus,
+		&deployment.GatewayJobID)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return core.Deployment{}, false, core.NewError(http.StatusNotFound, "deployment_not_found", "Deployment was not found")
 	}
@@ -788,6 +797,25 @@ func (s *Store) AppendDeploymentEvent(ctx context.Context, requestID string, eve
 	deployment.LatestStatus = event.Status
 	deployment.Events, err = s.deploymentEvents(ctx, requestID)
 	return deployment, false, err
+}
+
+func (s *Store) SetDeploymentJobID(ctx context.Context, requestID, jobID string) error {
+	tag, err := s.pool.Exec(ctx, `UPDATE deployments SET gateway_job_id=$2,updated_at=now()
+		WHERE request_id=$1 AND (gateway_job_id IS NULL OR gateway_job_id=$2)`, requestID, jobID)
+	if err != nil {
+		return dbError(err)
+	}
+	if tag.RowsAffected() == 1 {
+		return nil
+	}
+	var exists bool
+	if err := s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM deployments WHERE request_id=$1)`, requestID).Scan(&exists); err != nil {
+		return dbError(err)
+	}
+	if !exists {
+		return core.NewError(http.StatusNotFound, "deployment_not_found", "Deployment was not found")
+	}
+	return core.NewError(http.StatusConflict, "deployment_job_mismatch", "Deployment already has a different job ID")
 }
 
 func (s *Store) deploymentEvents(ctx context.Context, requestID string) ([]core.DeploymentEvent, error) {

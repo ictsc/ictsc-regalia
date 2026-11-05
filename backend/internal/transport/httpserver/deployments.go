@@ -114,6 +114,12 @@ func (h *Handler) SyncAdminDeployment(ctx context.Context, request api.SyncAdmin
 			latest = deployment
 		}
 	}
+	if prober, ok := h.service.Deployments.(service.DeploymentProber); ok {
+		if err := h.service.SyncPolledDeployment(ctx, prober, latest); err != nil {
+			return nil, err
+		}
+		return api.SyncAdminDeployment204Response{}, nil
+	}
 	event, err := h.service.Deployments.Status(ctx, team, problem)
 	if err != nil {
 		var notFound interface{ DeploymentStatusNotFound() bool }

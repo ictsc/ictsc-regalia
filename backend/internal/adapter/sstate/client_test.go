@@ -40,7 +40,7 @@ func TestQueueRequiresAcceptedAndSendsCallbackContract(t *testing.T) {
 		RequestID: "123e4567-e89b-12d3-a456-426614174000", TeamCode: 2, ProblemCode: "A01", Revision: 3,
 		ContentCommit: testCommit, CallbackURL: "https://score.example/api/v1/admin/deployments/2/A01/3/events",
 	}
-	if err := client.Queue(context.Background(), request); err != nil {
+	if _, err := client.Queue(context.Background(), request); err != nil {
 		t.Fatal(err)
 	}
 	want := RedeployRequest{
@@ -60,7 +60,7 @@ func TestQueueRejectsEveryStatusExceptAccepted(t *testing.T) {
 			}))
 			defer server.Close()
 			client := newTestClient(t, server)
-			err := client.Queue(context.Background(), service.DeploymentRequest{
+			_, err := client.Queue(context.Background(), service.DeploymentRequest{
 				RequestID: "123e4567-e89b-12d3-a456-426614174000", TeamCode: 2, ProblemCode: "A01", Revision: 1,
 				ContentCommit: testCommit, CallbackURL: "https://score.example/callback",
 			})

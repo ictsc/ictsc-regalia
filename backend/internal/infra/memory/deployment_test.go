@@ -37,6 +37,41 @@ func TestDeploymentEventIdempotencyAndMismatch(t *testing.T) {
 	}
 }
 
+func TestDeploymentJobIDIsSetOnce(t *testing.T) {
+	t.Parallel()
+	store := NewCompetitionStore()
+	ctx := context.Background()
+	created, err := store.CreateDeployment(ctx, core.Deployment{
+		RequestID: "74d8dc35-8a9c-4da3-9fed-d20a41cc7317", TeamCode: 2, ProblemCode: "A01",
+		ContentCommit: "0123456789012345678901234567890123456789", RequestedAt: time.Unix(10, 0).UTC(), LatestStatus: core.DeploymentQueued,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for range 2 {
+		if err := store.SetDeploymentJobID(ctx, created.RequestID, "job-1"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	var domainErr *core.Error
+	if err := store.SetDeploymentJobID(ctx, created.RequestID, "job-2"); !errors.As(err, &domainErr) || domainErr.Code != "deployment_job_mismatch" {
+		t.Fatalf("mismatch error = %#v", err)
+	}
+	if err := store.SetDeploymentJobID(ctx, "missing", "job-1"); !errors.As(err, &domainErr) || domainErr.Code != "deployment_not_found" {
+		t.Fatalf("missing error = %#v", err)
+	}
+	listed, err := store.ListDeployments(ctx, core.DeploymentFilter{})
+	if err != nil || len(listed) != 1 || listed[0].GatewayJobID != "job-1" {
+		t.Fatalf("listed = %#v, err = %v", listed, err)
+	}
+	if active, _ := store.ListDeployments(ctx, core.DeploymentFilter{Statuses: []core.DeploymentStatus{core.DeploymentQueued}}); len(active) != 1 {
+		t.Fatalf("active = %#v, want the queued deployment", active)
+	}
+	if finished, _ := store.ListDeployments(ctx, core.DeploymentFilter{Statuses: []core.DeploymentStatus{core.DeploymentCompleted}}); len(finished) != 0 {
+		t.Fatalf("finished = %#v, want none", finished)
+	}
+}
+
 func TestOnlyOneDeploymentCanBeActive(t *testing.T) {
 	t.Parallel()
 	store := NewCompetitionStore()

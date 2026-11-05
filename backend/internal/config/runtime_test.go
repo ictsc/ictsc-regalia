@@ -3,6 +3,7 @@ package config
 import (
 	"strings"
 	"testing"
+	"time"
 )
 
 var runtimeEnvKeys = []string{
@@ -14,6 +15,7 @@ var runtimeEnvKeys = []string{
 	"ICTSC_GITHUB_REPOSITORY", "ICTSC_GITHUB_REF", "ICTSC_GITHUB_WORKFLOW_REF",
 	"ICTSC_SSTATE_BASE_URL", "ICTSC_SSTATE_REQUEST_TOKEN", "ICTSC_SSTATE_CALLBACK_TOKEN",
 	"ICTSC_CALLBACK_BASE_URL", "ICTSC_API_READ_HEADER_TIMEOUT", "ICTSC_API_SHUTDOWN_TIMEOUT",
+	"ICTSC_DISCORD_ROLE_TEAMS", "ICTSC_RSTATE_BASE_URL", "ICTSC_RSTATE_ADMIN_USER", "ICTSC_RSTATE_ADMIN_PASSWORD", "ICTSC_RSTATE_POLL_INTERVAL", "ICTSC_RSTATE_ALLOW_HTTP",
 }
 
 func clearRuntimeEnv(t *testing.T) {
@@ -75,6 +77,69 @@ func TestLoadRuntimeRejectsMissingProductionSecret(t *testing.T) {
 	}
 }
 
+func setValidSecondaryQualifierRuntimeEnv(t *testing.T) {
+	t.Helper()
+	setValidProductionRuntimeEnv(t)
+	for _, key := range []string{"ICTSC_SSTATE_BASE_URL", "ICTSC_SSTATE_REQUEST_TOKEN", "ICTSC_SSTATE_CALLBACK_TOKEN", "ICTSC_CALLBACK_BASE_URL"} {
+		t.Setenv(key, "")
+	}
+	t.Setenv("ICTSC_SECONDARY_QUALIFIER_MODE", "true")
+	t.Setenv("ICTSC_RSTATE_BASE_URL", "https://rstate.example")
+	t.Setenv("ICTSC_RSTATE_ADMIN_PASSWORD", "rstate-password")
+}
+
+func TestLoadRuntimeSecondaryQualifierUsesRstateInsteadOfSState(t *testing.T) {
+	setValidSecondaryQualifierRuntimeEnv(t)
+	cfg, err := LoadRuntime()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !cfg.SecondaryQualifierMode || cfg.RStateBaseURL != "https://rstate.example" || cfg.RStateAdminUser != "ictsc" || cfg.RStatePollInterval != 10*time.Second {
+		t.Fatalf("unexpected rstate settings: %#v", cfg)
+	}
+
+	t.Setenv("ICTSC_RSTATE_ADMIN_PASSWORD", "")
+	if _, err := LoadRuntime(); err == nil || !strings.Contains(err.Error(), "ICTSC_RSTATE_ADMIN_PASSWORD") {
+		t.Fatalf("error = %v", err)
+	}
+}
+
+func TestLoadRuntimeMapsDiscordRolesToTeamsOneToNinetyNine(t *testing.T) {
+	setValidProductionRuntimeEnv(t)
+	t.Setenv("ICTSC_DISCORD_CONTESTANT_GUILD_ID", "523456789012345678")
+	t.Setenv("ICTSC_DISCORD_ROLE_TEAMS", `{"623456789012345678":1,"723456789012345678":99}`)
+	cfg, err := LoadRuntime()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.DiscordRoleTeams["623456789012345678"] != 1 {
+		t.Fatalf("role teams = %#v", cfg.DiscordRoleTeams)
+	}
+	for _, team := range []string{"0", "100"} {
+		t.Setenv("ICTSC_DISCORD_ROLE_TEAMS", `{"623456789012345678":`+team+`}`)
+		if _, err := LoadRuntime(); err == nil || !strings.Contains(err.Error(), "team role mapping") {
+			t.Fatalf("team %s: error = %v", team, err)
+		}
+	}
+}
+
+func TestLoadRuntimeRstateHTTPNeedsExplicitOptIn(t *testing.T) {
+	setValidSecondaryQualifierRuntimeEnv(t)
+	t.Setenv("ICTSC_RSTATE_BASE_URL", "http://rstate:8089")
+	if _, err := LoadRuntime(); err == nil || !strings.Contains(err.Error(), "rstate base URL must use HTTPS") {
+		t.Fatalf("error = %v", err)
+	}
+	t.Setenv("ICTSC_RSTATE_ALLOW_HTTP", "true")
+	t.Setenv("ICTSC_RSTATE_POLL_INTERVAL", "3s")
+	cfg, err := LoadRuntime()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !cfg.RStateAllowHTTP || cfg.RStatePollInterval != 3*time.Second {
+		t.Fatalf("unexpected rstate settings: %#v", cfg)
+	}
+}
+
 func TestLoadRuntimeDevelopmentFakeAllowsLocalHTTP(t *testing.T) {
 	clearRuntimeEnv(t)
 	t.Setenv("ICTSC_DEV_FAKE_MODE", "true")
@@ -118,8 +183,7 @@ func TestLoadRuntimeRejectsOriginPathAndBadDuration(t *testing.T) {
 }
 
 func TestLoadRuntimeSecondaryQualifierMode(t *testing.T) {
-	setValidProductionRuntimeEnv(t)
-	t.Setenv("ICTSC_SECONDARY_QUALIFIER_MODE", "true")
+	setValidSecondaryQualifierRuntimeEnv(t)
 	cfg, err := LoadRuntime()
 	if err != nil {
 		t.Fatal(err)

@@ -92,7 +92,12 @@ func New(config Config) (*Client, error) {
 	return &Client{baseURL: parsed, bearerToken: config.BearerToken, httpClient: config.HTTPClient}, nil
 }
 
-func (c *Client) Queue(ctx context.Context, request service.DeploymentRequest) error {
+// Queue returns no job ID: SState reports progress by callback.
+func (c *Client) Queue(ctx context.Context, request service.DeploymentRequest) (string, error) {
+	return "", c.queue(ctx, request)
+}
+
+func (c *Client) queue(ctx context.Context, request service.DeploymentRequest) error {
 	payload := RedeployRequest{
 		RequestID: request.RequestID, TeamCode: request.TeamCode, ProblemCode: request.ProblemCode,
 		Revision: request.Revision, ContentCommit: request.ContentCommit, CallbackURL: request.CallbackURL,

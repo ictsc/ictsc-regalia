@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -578,7 +579,8 @@ func (s *CompetitionStore) ListDeployments(_ context.Context, filter core.Deploy
 	result := make([]core.Deployment, 0)
 	for _, deployment := range s.deployments {
 		if filter.TeamCode != nil && deployment.TeamCode != *filter.TeamCode ||
-			filter.ProblemCode != nil && deployment.ProblemCode != *filter.ProblemCode {
+			filter.ProblemCode != nil && deployment.ProblemCode != *filter.ProblemCode ||
+			filter.Statuses != nil && !slices.Contains(filter.Statuses, deployment.LatestStatus) {
 			continue
 		}
 		result = append(result, deployment)
@@ -606,6 +608,21 @@ func (s *CompetitionStore) CreateDeployment(_ context.Context, deployment core.D
 	}
 	s.deployments[deployment.RequestID] = deployment
 	return deployment, nil
+}
+
+func (s *CompetitionStore) SetDeploymentJobID(_ context.Context, requestID, jobID string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	deployment, ok := s.deployments[requestID]
+	if !ok {
+		return core.NewError(http.StatusNotFound, "deployment_not_found", "Deployment was not found")
+	}
+	if deployment.GatewayJobID != "" && deployment.GatewayJobID != jobID {
+		return core.NewError(http.StatusConflict, "deployment_job_mismatch", "Deployment already has a different job ID")
+	}
+	deployment.GatewayJobID = jobID
+	s.deployments[requestID] = deployment
+	return nil
 }
 
 func (s *CompetitionStore) AppendDeploymentEvent(_ context.Context, requestID string, event core.DeploymentEvent, recovery bool) (core.Deployment, bool, error) {

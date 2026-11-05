@@ -32,8 +32,8 @@ func (disabledContent) IsAncestor(context.Context, string, string, string) (bool
 
 type disabledDeployments struct{}
 
-func (disabledDeployments) Queue(context.Context, service.DeploymentRequest) error {
-	return errDevDependencyDisabled
+func (disabledDeployments) Queue(context.Context, service.DeploymentRequest) (string, error) {
+	return "", errDevDependencyDisabled
 }
 func (disabledDeployments) Status(context.Context, int64, string) (core.DeploymentEvent, error) {
 	return core.DeploymentEvent{}, errDevDependencyDisabled
