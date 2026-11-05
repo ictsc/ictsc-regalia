@@ -121,6 +121,46 @@ func TestQueueRejectsProblemCodesRstateRefuses(t *testing.T) {
 	}
 }
 
+func TestQueueAcceptsTeamOne(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/admin/postJob" || r.PostFormValue("team_id") != "team01" {
+			t.Fatalf("unexpected request: %s %s form=%v", r.Method, r.URL.Path, r.PostForm)
+		}
+		_, _ = w.Write([]byte(`{"id":"team-one-job","state":0,"team_id":"team01","prob_id":"a01"}`))
+	}))
+	defer server.Close()
+	jobID, err := newTestClient(t, server).Queue(context.Background(), service.DeploymentRequest{TeamCode: 1, ProblemCode: "A01", Revision: 1})
+	if err != nil || jobID != "team-one-job" {
+		t.Fatalf("job ID = %q, err = %v", jobID, err)
+	}
+}
+
+func TestQueueRejectsTeamCodesOutsideRstateWorkspaces(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t.Fatalf("rstate was asked for %s %s", r.Method, r.URL.Path)
+	}))
+	defer server.Close()
+	client := newTestClient(t, server)
+	for _, team := range []int64{0, 100} {
+		_, err := client.Queue(context.Background(), service.DeploymentRequest{TeamCode: team, ProblemCode: "A01", Revision: 1})
+		var targetErr *TargetError
+		if !errors.As(err, &targetErr) {
+			t.Fatalf("team %d: error = %v, want a TargetError", team, err)
+		}
+	}
+}
+
+func TestStatusFindsTeamOneJob(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`[{"id":"job","state":"終了","created_time":1,"team_id":"01","prob_id":"a01"}]`))
+	}))
+	defer server.Close()
+	event, err := newTestClient(t, server).Status(context.Background(), 1, "A01")
+	if err != nil || event.Status != core.DeploymentCompleted {
+		t.Fatalf("event = %#v, err = %v", event, err)
+	}
+}
+
 func TestListJobsReadsEveryJob(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet || r.URL.Path != "/admin/list" {

@@ -291,8 +291,10 @@ func probID(problemCode string) string {
 }
 
 func validateTarget(teamCode int64, problemCode string) error {
-	if teamCode < 2 || teamCode > 99 {
-		return &TargetError{Reason: "rstate team code must be between 2 and 99"}
+	// rstate only needs the "team" prefix; 99 keeps teamID's two digits in
+	// line with rstate's team01 to team99 workspaces.
+	if teamCode < 1 || teamCode > 99 {
+		return &TargetError{Reason: "rstate team code must be between 1 and 99"}
 	}
 	if !problemCodePattern.MatchString(problemCode) {
 		return &TargetError{Reason: "rstate problem code must be 3 to 8 letters, digits, '_' or '-'"}

@@ -28,6 +28,7 @@
 
 - チームは`team_code`を2桁にした`team02`のような名前で送ります。rstateはこれをTerraform
   workspace名として使うので、rstate側のworkspaceも同じ名前にしてください。
+- team_code は1〜99を送ります（SStateの2〜99とは違い、rstateに下限はありません）。
 - 問題コードは小文字にして送ります（`A01`なら`a01`）。rstateはこれをTerraformの
   `module.<問題コード>`として使います。長さはrstateの制約に合わせて3〜8文字で、1〜2文字の
   問題は送る前に`FAILED`にします。
