@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/ictsc/ictsc-regalia/backend/internal/service"
+	"github.com/ictsc/ictsc-regalia/backend/internal/telemetry"
 )
 
 const (
@@ -168,7 +169,7 @@ func New(config Config) (*Client, error) {
 		return nil, fmt.Errorf("GitHub OIDC issuer: %w", err)
 	}
 	if config.HTTPClient == nil {
-		config.HTTPClient = &http.Client{Timeout: defaultHTTPTimeout}
+		config.HTTPClient = &http.Client{Timeout: defaultHTTPTimeout, Transport: telemetry.HTTPTransport(nil)}
 	}
 	if config.Now == nil {
 		config.Now = func() time.Time { return time.Now().UTC() }

@@ -95,6 +95,36 @@ task dev-backend-local
 本番のURLはHTTPSのみ許可されます。mutationはブラウザsession利用時にOriginを
 検証し、SState callbackだけは固定Bearerで認証します。
 
+## OpenTelemetry
+
+APIはOpenTelemetryのtraceとmetricをOTLPで送信できます。設定は標準の
+`OTEL_*` 環境変数だけで行い、`OTEL_EXPORTER_OTLP_ENDPOINT` などのexport設定が
+1つもない場合（ローカル開発やテスト）は何も送信しません。`OTEL_SDK_DISABLED=true`
+で明示的に無効化できます。
+
+ictsc-k8s-infraのクラスタでは、`telemetry` namespaceのノードローカルcollector
+（`otlp` Service）へ送ります。collectorがk8s属性を付与し、traceはMackerelへ、
+metricはPrometheusへ転送されます。
+
+```sh
+OTEL_EXPORTER_OTLP_ENDPOINT=http://otlp.telemetry:4317
+OTEL_EXPORTER_OTLP_PROTOCOL=grpc            # http/protobufなら :4318
+OTEL_METRIC_EXPORT_INTERVAL=15000
+OTEL_SERVICE_NAME=ictsc-regalia-api         # 省略時の既定値
+```
+
+計装対象は次のとおりです。
+
+- HTTP server: span名は `GET /api/v1/teams/{team_id}` のようなroute単位。
+  `/api/v1/health` は記録しません。受信した `traceparent` を引き継ぎます。
+- PostgreSQL（pgx）のquery spanとconnection pool metric
+- Redisのcommand spanとconnection pool metric
+- Discord / GitHub / SState / rstateへのHTTP client span
+- Go runtime metric
+
+ローカルで出力を確認する場合は `OTEL_TRACES_EXPORTER=console` と
+`OTEL_METRICS_EXPORTER=console` を指定します。
+
 ## テスト
 
 ```sh
