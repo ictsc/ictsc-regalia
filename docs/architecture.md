@@ -38,3 +38,5 @@ SStateに対してはバックグラウンドの再展開ポーリングは行�
 - すべてのmutationでOriginを検証します。
 - GitHub refreshはActions OIDC、SState callbackは固定Bearerで認証します。
 - 問題本文は開始済みSectionだけ競技者へ返し、未来の予定APIは時刻情報だけを返します。
+
+<!-- PR preview E2E check 2026-11-06 -->
