@@ -19,7 +19,7 @@ defineProps<{
 defineEmits<{ create: [form: TeamCreateForm]; retry: [] }>();
 
 const form = reactive({
-  code: 2,
+  code: 1,
   name: "",
   organization: "",
   member_limit: 4,
@@ -68,7 +68,7 @@ const form = reactive({
           >チームコード<input
             v-model.number="form.code"
             type="number"
-            min="2"
+            min="1"
             max="99"
             required /></label
         ><label
