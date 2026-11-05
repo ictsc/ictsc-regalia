@@ -29,6 +29,7 @@
 - チームは`team_code`を2桁にした`team02`のような名前で送ります。rstateはこれをTerraform
   workspace名として使うので、rstate側のworkspaceも同じ名前にしてください。
 - team_code は1〜99を送ります（SStateの2〜99とは違い、rstateに下限はありません）。
+  Regaliaのチーム番号も1〜99で、team 1を作れます。
 - 問題コードは小文字にして送ります（`A01`なら`a01`）。rstateはこれをTerraformの
   `module.<問題コード>`として使います。長さはrstateの制約に合わせて3〜8文字で、1〜2文字の
   問題は送る前に`FAILED`にします。
@@ -78,5 +79,6 @@ rstateはcallbackを送らないため、APIは`ICTSC_RSTATE_POLL_INTERVAL`ご�
 
 ## 既存DBの更新
 
-job IDを保存する列は`backend/db/migrations/0008_deployment_job_id.sql`で追加します。既存DBには
-API更新前に適用してください。
+job IDを保存する列は`backend/db/migrations/0008_deployment_job_id.sql`で、チーム番号の下限を1に
+する変更は`backend/db/migrations/0009_team_code_one.sql`で行います。既存DBにはAPI更新前に両方を
+番号順に適用してください。
