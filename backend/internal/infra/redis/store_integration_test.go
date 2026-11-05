@@ -5,12 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/ictsc/ictsc-regalia/backend/internal/session"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
+	"go.opentelemetry.io/otel"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/sdk/trace/tracetest"
 )
 
 const redisTestImage = "redis:7.4-alpine"
@@ -21,6 +25,38 @@ func TestRedisStoreIntegration(t *testing.T) {
 	}
 
 	rawURL := startRedisContainer(t)
+
+	t.Run("does not export session tokens in traces", func(t *testing.T) {
+		recorder := tracetest.NewSpanRecorder()
+		previous := otel.GetTracerProvider()
+		otel.SetTracerProvider(sdktrace.NewTracerProvider(sdktrace.WithSpanProcessor(recorder)))
+		t.Cleanup(func() { otel.SetTracerProvider(previous) })
+
+		store, err := Open(t.Context(), rawURL)
+		if err != nil {
+			t.Fatalf("open Redis session store: %v", err)
+		}
+		t.Cleanup(func() { _ = store.Close() })
+		token, err := store.Create(t.Context(), session.Data{Kind: session.KindContestant, ContestantName: "traced-user"}, time.Minute)
+		if err != nil {
+			t.Fatalf("create session: %v", err)
+		}
+		if _, err := store.Get(t.Context(), token, session.KindContestant); err != nil {
+			t.Fatalf("get session: %v", err)
+		}
+
+		spans := recorder.Ended()
+		if len(spans) == 0 {
+			t.Fatal("no Redis spans were recorded")
+		}
+		for _, span := range spans {
+			for _, attr := range span.Attributes() {
+				if strings.Contains(attr.Value.Emit(), token) {
+					t.Fatalf("span %q attribute %s leaks the session token", span.Name(), attr.Key)
+				}
+			}
+		}
+	})
 
 	t.Run("stores opaque sessions with a real TTL", func(t *testing.T) {
 		store, err := Open(t.Context(), rawURL)

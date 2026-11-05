@@ -24,7 +24,10 @@ func Open(ctx context.Context, rawURL string) (*Store, error) {
 		return nil, fmt.Errorf("parse redis URL: %w", err)
 	}
 	store := &Store{client: redislib.NewClient(options)}
-	if err := errors.Join(redisotel.InstrumentTracing(store.client), redisotel.InstrumentMetrics(store.client)); err != nil {
+	// Session keys embed the bearer token, so raw commands must never be
+	// exported as db.statement.
+	tracing := redisotel.InstrumentTracing(store.client, redisotel.WithDBStatement(false))
+	if err := errors.Join(tracing, redisotel.InstrumentMetrics(store.client)); err != nil {
 		_ = store.client.Close()
 		return nil, fmt.Errorf("instrument redis: %w", err)
 	}
