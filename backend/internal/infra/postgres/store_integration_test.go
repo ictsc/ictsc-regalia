@@ -247,6 +247,18 @@ func TestPostgresStoreIntegration(t *testing.T) {
 		}
 	})
 
+	t.Run("accepts team codes from 1 to 99", func(t *testing.T) {
+		ctx := t.Context()
+		if _, err := fixture.store.CreateTeam(ctx, core.Team{Code: 1, Name: "team-1", Organization: "ICTSC", MemberLimit: 5}); err != nil {
+			t.Fatalf("create team 1: %v", err)
+		}
+		for _, code := range []int64{0, 100} {
+			if _, err := fixture.store.CreateTeam(ctx, core.Team{Code: code, Name: fmt.Sprintf("team-%d", code), Organization: "ICTSC", MemberLimit: 5}); err == nil {
+				t.Fatalf("team %d was accepted", code)
+			}
+		}
+	})
+
 	t.Run("records a deployment's gateway job ID once", func(t *testing.T) {
 		ctx := t.Context()
 		const (

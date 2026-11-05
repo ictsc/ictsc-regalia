@@ -130,6 +130,8 @@ PostgreSQL統合テストは通常Dockerを起動します。Dockerを使用で�
 
 二次予選モードでは再展開をrstateへ依頼し、rstateが返したjob IDを再展開ごとに保存してその状態を問い合わせます。既存DBにはAPI更新前に `db/migrations/0008_deployment_job_id.sql` を適用します。既存の再展開はjob IDなしのまま残ります。設定は `../docs/rstate-integration.md` を参照してください。
 
+チーム番号は1〜99です（rstateのworkspaceがteam01から始まるため）。既存DBにはAPI更新前に `db/migrations/0009_team_code_one.sql` を適用します。
+
 ## 二次予選モード
 
 `ICTSC_SECONDARY_QUALIFIER_MODE=true` で、競技終了後に各チーム・問題の最新回答だけを採点し、最終公開まで競技者に採点結果と順位を返しません。順位凍結は使わず、`schedule.yaml` はスケジュール1つ、問題は `submissionable_schedules` なしで書きます。開発モード（`ICTSC_DEV_FAKE_MODE=true`）では、管理画面の競技設定から競技前・競技中・競技後を切り替えられます。

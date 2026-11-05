@@ -15,7 +15,7 @@ var runtimeEnvKeys = []string{
 	"ICTSC_GITHUB_REPOSITORY", "ICTSC_GITHUB_REF", "ICTSC_GITHUB_WORKFLOW_REF",
 	"ICTSC_SSTATE_BASE_URL", "ICTSC_SSTATE_REQUEST_TOKEN", "ICTSC_SSTATE_CALLBACK_TOKEN",
 	"ICTSC_CALLBACK_BASE_URL", "ICTSC_API_READ_HEADER_TIMEOUT", "ICTSC_API_SHUTDOWN_TIMEOUT",
-	"ICTSC_RSTATE_BASE_URL", "ICTSC_RSTATE_ADMIN_USER", "ICTSC_RSTATE_ADMIN_PASSWORD", "ICTSC_RSTATE_POLL_INTERVAL", "ICTSC_RSTATE_ALLOW_HTTP",
+	"ICTSC_DISCORD_ROLE_TEAMS", "ICTSC_RSTATE_BASE_URL", "ICTSC_RSTATE_ADMIN_USER", "ICTSC_RSTATE_ADMIN_PASSWORD", "ICTSC_RSTATE_POLL_INTERVAL", "ICTSC_RSTATE_ALLOW_HTTP",
 }
 
 func clearRuntimeEnv(t *testing.T) {
@@ -101,6 +101,25 @@ func TestLoadRuntimeSecondaryQualifierUsesRstateInsteadOfSState(t *testing.T) {
 	t.Setenv("ICTSC_RSTATE_ADMIN_PASSWORD", "")
 	if _, err := LoadRuntime(); err == nil || !strings.Contains(err.Error(), "ICTSC_RSTATE_ADMIN_PASSWORD") {
 		t.Fatalf("error = %v", err)
+	}
+}
+
+func TestLoadRuntimeMapsDiscordRolesToTeamsOneToNinetyNine(t *testing.T) {
+	setValidProductionRuntimeEnv(t)
+	t.Setenv("ICTSC_DISCORD_CONTESTANT_GUILD_ID", "523456789012345678")
+	t.Setenv("ICTSC_DISCORD_ROLE_TEAMS", `{"623456789012345678":1,"723456789012345678":99}`)
+	cfg, err := LoadRuntime()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.DiscordRoleTeams["623456789012345678"] != 1 {
+		t.Fatalf("role teams = %#v", cfg.DiscordRoleTeams)
+	}
+	for _, team := range []string{"0", "100"} {
+		t.Setenv("ICTSC_DISCORD_ROLE_TEAMS", `{"623456789012345678":`+team+`}`)
+		if _, err := LoadRuntime(); err == nil || !strings.Contains(err.Error(), "team role mapping") {
+			t.Fatalf("team %s: error = %v", team, err)
+		}
 	}
 }
 

@@ -158,7 +158,7 @@ func LoadRuntime() (Runtime, error) {
 			return Runtime{}, fmt.Errorf("ICTSC_DISCORD_CONTESTANT_GUILD_ID is required with team role mapping")
 		}
 		for role, team := range cfg.DiscordRoleTeams {
-			if _, err := strconv.ParseUint(role, 10, 64); err != nil || team < 2 || team > 99 {
+			if _, err := strconv.ParseUint(role, 10, 64); err != nil || team < 1 || team > 99 {
 				return Runtime{}, fmt.Errorf("invalid Discord team role mapping")
 			}
 		}
