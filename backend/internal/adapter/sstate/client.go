@@ -17,6 +17,7 @@ import (
 
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
 	"github.com/ictsc/ictsc-regalia/backend/internal/service"
+	"github.com/ictsc/ictsc-regalia/backend/internal/telemetry"
 )
 
 const (
@@ -86,7 +87,7 @@ func New(config Config) (*Client, error) {
 		return nil, errors.New("SState base URL must use HTTPS")
 	}
 	if config.HTTPClient == nil {
-		config.HTTPClient = &http.Client{Timeout: defaultTimeout}
+		config.HTTPClient = &http.Client{Timeout: defaultTimeout, Transport: telemetry.HTTPTransport(nil)}
 	}
 	parsed.Path = strings.TrimRight(parsed.Path, "/")
 	return &Client{baseURL: parsed, bearerToken: config.BearerToken, httpClient: config.HTTPClient}, nil

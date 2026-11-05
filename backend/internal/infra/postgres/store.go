@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/exaring/otelpgx"
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -25,9 +26,14 @@ func Open(ctx context.Context, databaseURL string) (*Store, error) {
 		return nil, fmt.Errorf("parse postgres configuration: %w", err)
 	}
 	config.ConnConfig.RuntimeParams["application_name"] = "ictsc-regalia-api"
+	config.ConnConfig.Tracer = otelpgx.NewTracer(otelpgx.WithTrimSQLInSpanName())
 	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("open postgres: %w", err)
+	}
+	if err := otelpgx.RecordStats(pool); err != nil {
+		pool.Close()
+		return nil, fmt.Errorf("record postgres pool metrics: %w", err)
 	}
 	store := &Store{pool: pool, now: func() time.Time { return time.Now().UTC() }}
 	if err := store.Ping(ctx); err != nil {

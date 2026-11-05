@@ -17,6 +17,7 @@ import (
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
 	"github.com/ictsc/ictsc-regalia/backend/internal/service"
 	"github.com/ictsc/ictsc-regalia/backend/internal/session"
+	"github.com/ictsc/ictsc-regalia/backend/internal/telemetry"
 	api "github.com/ictsc/ictsc-regalia/backend/internal/transport/api"
 	nethttpmiddleware "github.com/oapi-codegen/nethttp-middleware"
 )
@@ -63,6 +64,7 @@ func New(svc *service.Service, options Options) (http.Handler, error) {
 	})
 	router := chi.NewRouter()
 	router.Use(chimiddleware.RequestID, chimiddleware.RealIP, chimiddleware.Recoverer)
+	router.Use(telemetry.ChiRoute)
 	router.Use(server.verifyOrigin)
 	api.HandlerFromMux(strict, router)
 	validator := nethttpmiddleware.OapiRequestValidatorWithOptions(spec, &nethttpmiddleware.Options{
@@ -76,6 +78,8 @@ func New(svc *service.Service, options Options) (http.Handler, error) {
 			code := "validation_error"
 			if opts.MatchedRoute == nil {
 				status, code = http.StatusNotFound, "resource_not_found"
+			} else if opts.MatchedRoute.Route != nil {
+				telemetry.SetRoute(r, opts.MatchedRoute.Route.Path)
 			}
 			if domainErr := preferredDomainError(err); domainErr != nil {
 				status, code = domainErr.Status, domainErr.Code
@@ -87,7 +91,7 @@ func New(svc *service.Service, options Options) (http.Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	return limitRequestBody(validator(responseValidated)), nil
+	return telemetry.HTTPHandler(limitRequestBody(validator(responseValidated))), nil
 }
 
 // maxRequestBodyBytes bounds every request body before it is read. An answer

@@ -23,6 +23,7 @@ import (
 	redisinfra "github.com/ictsc/ictsc-regalia/backend/internal/infra/redis"
 	"github.com/ictsc/ictsc-regalia/backend/internal/service"
 	"github.com/ictsc/ictsc-regalia/backend/internal/session"
+	"github.com/ictsc/ictsc-regalia/backend/internal/telemetry"
 	"github.com/ictsc/ictsc-regalia/backend/internal/transport/httpserver"
 )
 
@@ -33,6 +34,19 @@ func run() error {
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
+
+	shutdownTelemetry, err := telemetry.Setup(ctx)
+	if err != nil {
+		return fmt.Errorf("set up telemetry: %w", err)
+	}
+	defer func() {
+		// Flush buffered spans and metrics after the HTTP server has drained.
+		flushCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := shutdownTelemetry(flushCtx); err != nil {
+			log.Printf("shut down telemetry: %v", err)
+		}
+	}()
 
 	store, sessions, events, cleanup, err := runtimeStores(ctx, cfg)
 	if err != nil {

@@ -18,6 +18,7 @@ import (
 
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
 	"github.com/ictsc/ictsc-regalia/backend/internal/service"
+	"github.com/ictsc/ictsc-regalia/backend/internal/telemetry"
 )
 
 const (
@@ -123,7 +124,7 @@ func New(config Config) (*Client, error) {
 	}
 	httpClient := config.HTTPClient
 	if httpClient == nil {
-		httpClient = &http.Client{Timeout: defaultTimeout}
+		httpClient = &http.Client{Timeout: defaultTimeout, Transport: telemetry.HTTPTransport(nil)}
 	}
 	return &Client{
 		clientID:              config.ClientID,

@@ -3,10 +3,12 @@ package redis
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/ictsc/ictsc-regalia/backend/internal/session"
+	"github.com/redis/go-redis/extra/redisotel/v9"
 	redislib "github.com/redis/go-redis/v9"
 )
 
@@ -22,6 +24,10 @@ func Open(ctx context.Context, rawURL string) (*Store, error) {
 		return nil, fmt.Errorf("parse redis URL: %w", err)
 	}
 	store := &Store{client: redislib.NewClient(options)}
+	if err := errors.Join(redisotel.InstrumentTracing(store.client), redisotel.InstrumentMetrics(store.client)); err != nil {
+		_ = store.client.Close()
+		return nil, fmt.Errorf("instrument redis: %w", err)
+	}
 	if err := store.client.Ping(ctx).Err(); err != nil {
 		_ = store.client.Close()
 		return nil, fmt.Errorf("connect redis: %w", err)
