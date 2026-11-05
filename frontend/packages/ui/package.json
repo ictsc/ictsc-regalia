@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@shikijs/rehype": "^3.2.1",
-    "katex": "^0.16.0",
+    "katex": "^0.18.0",
     "mermaid": "^11.17.2",
     "rehype-katex": "^7.0.1",
     "rehype-sanitize": "^6.0.0",
