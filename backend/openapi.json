@@ -1069,7 +1069,7 @@
           },
           {
             "name": "team_code", "in": "query", "required": false,
-            "schema": { "type": "integer", "format": "int64", "minimum": 2, "maximum": 99 }
+            "schema": { "type": "integer", "format": "int64", "minimum": 1, "maximum": 99 }
           },
           {
             "name": "problem_code", "in": "query", "required": false,
@@ -1644,21 +1644,21 @@
         "in": "path",
         "required": true,
         "description": "チーム番号",
-        "schema": { "type": "integer", "format": "int64", "minimum": 2, "maximum": 99 }
+        "schema": { "type": "integer", "format": "int64", "minimum": 1, "maximum": 99 }
       },
       "TeamCodeQuery": {
         "name": "team_code",
         "in": "query",
         "required": true,
         "description": "チーム番号",
-        "schema": { "type": "integer", "format": "int64", "minimum": 2, "maximum": 99 }
+        "schema": { "type": "integer", "format": "int64", "minimum": 1, "maximum": 99 }
       },
       "OptionalTeamCodeQuery": {
         "name": "team_code",
         "in": "query",
         "required": false,
         "description": "指定時はチーム番号で絞り込む",
-        "schema": { "type": "integer", "format": "int64", "minimum": 2, "maximum": 99 }
+        "schema": { "type": "integer", "format": "int64", "minimum": 1, "maximum": 99 }
       },
       "ProblemCodePath": {
         "name": "problem_code",
@@ -2076,7 +2076,7 @@
         "additionalProperties": false,
         "required": ["code", "name", "organization", "member_limit"],
         "properties": {
-          "code": { "type": "integer", "format": "int64", "minimum": 2, "maximum": 99 },
+          "code": { "type": "integer", "format": "int64", "minimum": 1, "maximum": 99 },
           "name": { "type": "string", "minLength": 1, "maxLength": 255 },
           "organization": { "type": "string", "minLength": 1, "maxLength": 255 },
           "member_limit": { "type": "integer", "format": "int32", "minimum": 1 },
@@ -2127,7 +2127,7 @@
         "additionalProperties": false,
         "required": ["code", "name", "organization", "member_limit"],
         "properties": {
-          "code": { "type": "integer", "format": "int64", "minimum": 2, "maximum": 99 },
+          "code": { "type": "integer", "format": "int64", "minimum": 1, "maximum": 99 },
           "name": { "type": "string", "minLength": 1, "maxLength": 255 },
           "organization": { "type": "string", "minLength": 1, "maxLength": 255 },
           "member_limit": { "type": "integer", "format": "int32", "minimum": 1 },
@@ -2151,7 +2151,7 @@
         "required": ["code", "team_code", "created_at", "expires_at"],
         "properties": {
           "code": { "type": "string", "minLength": 1, "maxLength": 255 },
-          "team_code": { "type": "integer", "format": "int64", "minimum": 2, "maximum": 99 },
+          "team_code": { "type": "integer", "format": "int64", "minimum": 1, "maximum": 99 },
           "created_at": { "type": "string", "format": "date-time" },
           "expires_at": { "type": "string", "format": "date-time" }
         }
@@ -2161,7 +2161,7 @@
         "additionalProperties": false,
         "required": ["team_code", "expires_at"],
         "properties": {
-          "team_code": { "type": "integer", "format": "int64", "minimum": 2, "maximum": 99 },
+          "team_code": { "type": "integer", "format": "int64", "minimum": 1, "maximum": 99 },
           "expires_at": { "type": "string", "format": "date-time" }
         }
       },
@@ -2819,7 +2819,7 @@
         "required": ["rank", "team_code", "team_name", "organization", "score", "last_effective_submission_at"],
         "properties": {
           "rank": { "type": "integer", "format": "int32", "minimum": 1 },
-          "team_code": { "type": "integer", "format": "int64", "minimum": 2, "maximum": 99 },
+          "team_code": { "type": "integer", "format": "int64", "minimum": 1, "maximum": 99 },
           "team_name": { "type": "string", "minLength": 1, "maxLength": 255 },
           "organization": { "type": "string", "minLength": 1, "maxLength": 255 },
           "score": { "type": "integer", "format": "int64", "minimum": 0 },
@@ -2871,7 +2871,7 @@
         "additionalProperties": false,
         "required": ["team_code", "problem_code", "answer_number"],
         "properties": {
-          "team_code": { "type": "integer", "format": "int64", "minimum": 2, "maximum": 99 },
+          "team_code": { "type": "integer", "format": "int64", "minimum": 1, "maximum": 99 },
           "problem_code": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" },
           "answer_number": { "type": "integer", "format": "int32", "minimum": 1 }
         }
@@ -3062,7 +3062,7 @@
         "additionalProperties": false,
         "required": ["team_code", "problem_code", "revision", "latest_status", "events", "content_commit"],
         "properties": {
-          "team_code": { "type": "integer", "format": "int64", "minimum": 2, "maximum": 99 },
+          "team_code": { "type": "integer", "format": "int64", "minimum": 1, "maximum": 99 },
           "problem_code": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" },
           "revision": { "type": "integer", "format": "int32", "minimum": 1 },
           "latest_status": { "$ref": "#/components/schemas/DeploymentStatus" },
@@ -3079,7 +3079,7 @@
         "additionalProperties": false,
         "required": ["team_code", "problem_code"],
         "properties": {
-          "team_code": { "type": "integer", "format": "int64", "minimum": 2, "maximum": 99 },
+          "team_code": { "type": "integer", "format": "int64", "minimum": 1, "maximum": 99 },
           "problem_code": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" }
         }
       },
