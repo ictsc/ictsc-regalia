@@ -106,7 +106,10 @@ jobs:
           done
   comment:
     # Keep the write token separate from artifact download and image inspection.
+    # Runs after a failed publish too, but only once the run and PR validated;
+    # pr-preview-status.yaml already reported "publishing" for this build.
     needs: publish
+    if: always() && needs.publish.outputs.number != '' && needs.publish.outputs.sha != ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -119,10 +122,13 @@ jobs:
         with:
           ref: refs/heads/main
           persist-credentials: false
-      - name: Post or update image-published comment
+      - name: Post or update preview status comment
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ needs.publish.outputs.number }}
           HEAD_SHA: ${{ needs.publish.outputs.sha }}
+          PREVIEW_PHASE: ${{ needs.publish.result == 'success' && 'published' || needs.publish.result == 'cancelled' && 'publish_cancelled' || 'publish_failed' }}
           BUILD_RUN_ID: ${{ github.event.workflow_run.id }}
+          BUILD_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          PUBLISH_RUN_ID: ${{ github.run_id }}
         run: python3 .github/scripts/preview_status_comment.py

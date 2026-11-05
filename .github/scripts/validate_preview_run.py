@@ -10,8 +10,9 @@ SHA = re.compile(r"[a-f0-9]{40}\Z")
 DIGEST = re.compile(r"sha256:[a-f0-9]{64}\Z")
 
 
-def validate_run(run, workflow_id, repository):
-    if (run.get("event") != "pull_request" or run.get("conclusion") != "success"
+def validate_run(run, workflow_id, repository, require_success=True):
+    if (run.get("event") != "pull_request"
+            or (require_success and run.get("conclusion") != "success")
             or run.get("workflow_id") != workflow_id
             or run.get("repository", {}).get("full_name") != repository
             or run.get("path", "").split("@", 1)[0] != ".github/workflows/pr-preview-build.yaml"):
@@ -28,8 +29,8 @@ def matches_unlinked_run(run, pr):
             and head.get("ref") == run.get("head_branch"))
 
 
-def select_pr_number(run, candidates, workflow_id, repository):
-    validate_run(run, workflow_id, repository)
+def select_pr_number(run, candidates, workflow_id, repository, require_success=True):
+    validate_run(run, workflow_id, repository, require_success)
     linked = run.get("pull_requests")
     if not isinstance(linked, list):
         raise ValueError("missing run PR association")
@@ -49,6 +50,27 @@ def select_pr_number(run, candidates, workflow_id, repository):
             or isinstance(matched[0], bool) or matched[0] < 1):
         raise ValueError("unlinked run has no unique current PR")
     return matched[0]
+
+
+def select_status_target(run, candidates, jobs, workflow_id, repository):
+    """Resolve the PR for a build run that may still be running or have failed.
+
+    Returns None when every job was skipped (e.g. a non-preview label event), so
+    no status is posted for a run that never builds anything.
+    """
+    number = select_pr_number(run, candidates, workflow_id, repository,
+                              require_success=False)
+    sha = run.get("head_sha", "")
+    attempt = run.get("run_attempt")
+    if (not SHA.fullmatch(sha) or not isinstance(attempt, int)
+            or isinstance(attempt, bool) or attempt < 1):
+        raise ValueError("invalid run head SHA or attempt")
+    found = jobs.get("jobs") if isinstance(jobs, dict) else None
+    if not isinstance(found, list):
+        raise ValueError("invalid job listing")
+    if not any(job.get("conclusion") != "skipped" for job in found):
+        return None
+    return {"number": number, "sha": sha, "attempt": attempt}
 
 
 def validate(run, pr, artifacts, workflow_id, repository, candidates):
@@ -93,6 +115,13 @@ if __name__ == "__main__":
             run = json.load(open(sys.argv[2], encoding="utf-8"))
             candidates = json.load(open(sys.argv[3], encoding="utf-8"))
             print(select_pr_number(run, candidates, int(sys.argv[4]), sys.argv[5]))
+            raise SystemExit(0)
+        if mode == "status":
+            run, candidates, jobs = (
+                json.load(open(p, encoding="utf-8")) for p in sys.argv[2:5])
+            target = select_status_target(run, candidates, jobs, int(sys.argv[5]), sys.argv[6])
+            print("skip=true" if target is None
+                  else "\n".join(f"{key}={value}" for key, value in target.items()))
             raise SystemExit(0)
         if mode != "validate":
             raise ValueError("unknown validation mode")

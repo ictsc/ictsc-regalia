@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Post an image-published status on a validated preview PR.
+"""Post or update the PR preview status comment on a validated preview PR.
 
-This runs only after the trusted publisher succeeds. It never claims that the
-deployment is Ready: the publisher has no access to Argo CD health.
+The comment mirrors the Cloudflare Pages deploy comment and is edited in place
+as the preview progresses (building, publishing, published or failed). It never
+claims that the deployment is Ready: no workflow here can see Argo CD health.
 """
 
 import json
@@ -15,6 +16,24 @@ BOT_ID = 41898282  # github-actions[bot]
 BOT_LOGIN = "github-actions[bot]"
 SHA_RE = re.compile(r"[0-9a-f]{40}\Z")
 REPO_RE = re.compile(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+\Z")
+STATE_PREFIX = "<!-- ictsc-regalia-pr-preview-state"
+STATE_RE = re.compile(re.escape(STATE_PREFIX)
+                      + r" sha=([0-9a-f]{40}) run=([0-9]+) attempt=([0-9]+) rank=([0-9]+) -->")
+
+# phase: (rank, status text, build cell, publish cell, show preview URL)
+# Within one build run attempt a higher rank is a later stage, so a late
+# delivery of an earlier stage never overwrites a later one.
+PHASES = {
+    "building": (0, "🔨 Building…", "In progress", "Waiting for build", True),
+    "publishing": (1, "📦 Publishing images…", "Succeeded", "Queued", True),
+    "build_failed": (2, "❌ Build failed", "Failed", "Skipped", False),
+    "build_cancelled": (2, "⏹️ Cancelled", "Cancelled", "Skipped", False),
+    "published": (3, "✅ Images published (preview will be deployed by Argo CD)",
+                  "Succeeded", "Succeeded", True),
+    "publish_failed": (3, "❌ Publish failed", "Succeeded", "Failed", False),
+    "publish_cancelled": (3, "⏹️ Cancelled", "Succeeded", "Cancelled", False),
+}
+PUBLISH_PHASES = {"published", "publish_failed", "publish_cancelled"}
 
 
 def eligible(pr, repo, number, sha):
@@ -34,27 +53,81 @@ def owned_comment(comment):
             and user.get("type") == "Bot")
 
 
-def render(repo, number, sha, build_run_id, publish_run_id):
-    host = f"pr-{number}.k8s-dev.ictsc.net"
+def build_phase(action, conclusion):
+    """Map a PR preview build workflow_run event to a phase, or None to ignore."""
+    if action == "in_progress":
+        return "building"
+    if action != "completed":
+        return None
+    return {"success": "publishing", "failure": "build_failed",
+            "timed_out": "build_failed", "cancelled": "build_cancelled"}.get(conclusion)
+
+
+def parse_state(body):
+    match = STATE_RE.search(body)
+    if not match:
+        return None
+    sha, run, attempt, rank = match.groups()
+    return sha, (int(run), int(attempt), int(rank))
+
+
+def supersedes(body, sha, key):
+    """Return whether a status for (sha, key) may replace the comment body.
+
+    The caller has already checked that sha is the PR's current head, so a
+    comment about any other SHA is older and always replaced. For the same SHA,
+    a newer run/attempt or a later stage of the same attempt wins.
+    """
+    state = parse_state(body)
+    if state is None or state[0] != sha:
+        return True
+    return key >= state[1]
+
+
+def render(repo, number, sha, phase, build_run_id, build_run_attempt=1,
+           publish_run_id=None):
+    rank, status, build_cell, publish_cell, show_url = PHASES[phase]
+    base = f"https://github.com/{repo}"
+    build_url = f"{base}/actions/runs/{build_run_id}"
+    publish_url = publish_run_id and f"{base}/actions/runs/{publish_run_id}"
+    url = f"https://pr-{number}.k8s-dev.ictsc.net/"
+    rows = [
+        ("Latest commit", f"<a href='{base}/commit/{sha}'><code>{sha[:7]}</code></a>"),
+        ("Status", status),
+    ]
+    if show_url:
+        rows.append(("Preview URL", f"<a href='{url}'>{url}</a>"))
+    rows.append(("Build", f"<a href='{build_url}'>{build_cell}</a>"))
+    rows.append(("Image publish", f"<a href='{publish_url}'>{publish_cell}</a>"
+                 if publish_url else publish_cell))
+    table = "\n".join(f"<tr><td><strong>{name}:</strong></td><td>{value}</td></tr>"
+                      for name, value in rows)
     return "\n".join([
         MARKER,
-        f"### PR preview #{number}",
-        f"Expected URL: https://{host}/ (Dex sign-in required once deployed)",
-        f"Head: `{sha}`",
-        f"Build: [succeeded](https://github.com/{repo}/actions/runs/{build_run_id})",
-        f"Image publish: [succeeded](https://github.com/{repo}/actions/runs/{publish_run_id})",
-        "Deployment: **not verified by this workflow**. The URL may be unavailable, "
-        "and this comment does not indicate Argo CD or application health. "
-        "Closing the PR or removing its preview label starts teardown; do not "
-        "treat this URL as available after that point.",
+        f"{STATE_PREFIX} sha={sha} run={build_run_id} "
+        f"attempt={build_run_attempt} rank={rank} -->",
+        f"## PR preview #{number}",
+        "",
+        f"<table>{table}</table>",
+        "",
+        f"[View logs]({publish_url or build_url})",
+        "",
+        "<sub>Argo CD deployment and application health are not verified by this "
+        "comment; the URL may be unavailable and requires Dex sign-in. Closing the "
+        "PR or removing the <code>preview</code> label tears the preview down.</sub>",
     ]) + "\n"
 
 
-def update_comment(api, repo, number, sha, build_run_id, publish_run_id):
+def update_comment(api, repo, number, sha, phase, build_run_id,
+                   build_run_attempt=1, publish_run_id=None):
     if not REPO_RE.fullmatch(repo) or not SHA_RE.fullmatch(sha):
         raise ValueError("invalid repository or SHA")
-    if any(not isinstance(n, int) or isinstance(n, bool) or n < 1
-           for n in (number, build_run_id, publish_run_id)):
+    if phase not in PHASES or (phase in PUBLISH_PHASES) != (publish_run_id is not None):
+        raise ValueError("invalid phase or missing publish run ID")
+    ids = [number, build_run_id, build_run_attempt]
+    if publish_run_id is not None:
+        ids.append(publish_run_id)
+    if any(not isinstance(n, int) or isinstance(n, bool) or n < 1 for n in ids):
         raise ValueError("invalid PR or workflow run ID")
 
     pr_path = f"repos/{repo}/pulls/{number}"
@@ -75,12 +148,16 @@ def update_comment(api, repo, number, sha, build_run_id, publish_run_id):
     owned = [comment for comment in comments if owned_comment(comment)]
     if len(owned) > 1:
         raise ValueError("multiple bot-owned preview comments")
+    key = (build_run_id, build_run_attempt, PHASES[phase][0])
+    if owned and not supersedes(owned[0]["body"], sha, key):
+        return "skipped: comment already shows a newer run or later stage"
     # Recheck immediately before a write; a close or new commit must not get a
-    # new image-published status based on the previous workflow run.
+    # new status based on the previous workflow run.
     if not eligible(api("GET", pr_path), repo, number, sha):
         return "skipped: PR changed before comment write"
 
-    body = render(repo, number, sha, build_run_id, publish_run_id)
+    body = render(repo, number, sha, phase, build_run_id, build_run_attempt,
+                  publish_run_id)
     if owned:
         if owned[0]["body"] == body:
             return "unchanged: bot comment already current"
@@ -108,11 +185,14 @@ def github_api(method, path, payload=None):
 
 
 if __name__ == "__main__":
+    publish_run = os.environ.get("PUBLISH_RUN_ID")
     print(update_comment(
         github_api,
         os.environ["GITHUB_REPOSITORY"],
         int(os.environ["PR_NUMBER"]),
         os.environ["HEAD_SHA"],
+        os.environ["PREVIEW_PHASE"],
         int(os.environ["BUILD_RUN_ID"]),
-        int(os.environ["GITHUB_RUN_ID"]),
+        int(os.environ["BUILD_RUN_ATTEMPT"]),
+        int(publish_run) if publish_run else None,
     ))
