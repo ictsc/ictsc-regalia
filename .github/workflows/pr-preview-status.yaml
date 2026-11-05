@@ -1,0 +1,91 @@
+name: PR preview status
+
+# Reports build progress on the PR preview comment. The build workflow runs
+# with a read-only token for untrusted PR code, so status writes happen here in
+# the base repository context. Successful builds are finished by
+# pr-preview-publish.yaml, which posts the published or publish-failed status.
+on:
+  workflow_run:
+    workflows: [PR preview build]
+    types: [in_progress, completed]
+
+permissions: {}
+
+jobs:
+  resolve:
+    # Same activation gate as the publisher, so no status is posted that the
+    # publisher would never complete.
+    if: >-
+      vars.ENABLE_PR_PREVIEW_PUBLISH == 'true'
+      && github.event.workflow_run.event == 'pull_request'
+      && (github.event.action == 'in_progress'
+          || contains(fromJSON('["success","failure","timed_out","cancelled"]'), github.event.workflow_run.conclusion))
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+    outputs:
+      number: ${{ steps.resolve.outputs.number }}
+      sha: ${{ steps.resolve.outputs.sha }}
+      attempt: ${{ steps.resolve.outputs.attempt }}
+      phase: ${{ steps.resolve.outputs.phase }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: refs/heads/main
+          persist-credentials: false
+      - name: Resolve PR using GitHub API
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          ACTION: ${{ github.event.action }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        run: |
+          set -euo pipefail
+          phase=$(python3 -c 'import sys; sys.path.insert(0, ".github/scripts"); import preview_status_comment as s; print(s.build_phase(sys.argv[1], sys.argv[2]) or "")' "$ACTION" "$CONCLUSION")
+          if [ -z "$phase" ]; then
+            echo "No preview status for ${ACTION}/${CONCLUSION}"
+            exit 0
+          fi
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/attempts/${RUN_ATTEMPT}" > run.json
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/attempts/${RUN_ATTEMPT}/jobs?per_page=100" > jobs.json
+          workflow_id=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/pr-preview-build.yaml" --jq .id)
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls?state=open&per_page=100" | jq -s 'add // []' > candidates.json
+          python3 .github/scripts/validate_preview_run.py \
+            status run.json candidates.json jobs.json "$workflow_id" "$GITHUB_REPOSITORY" > target.txt
+          if grep -qx 'skip=true' target.txt; then
+            echo "Every build job was skipped; not a preview build"
+            exit 0
+          fi
+          cat target.txt >> "$GITHUB_OUTPUT"
+          echo "phase=${phase}" >> "$GITHUB_OUTPUT"
+  comment:
+    # Keep the write token separate from run resolution.
+    needs: resolve
+    if: needs.resolve.outputs.number != '' && needs.resolve.outputs.phase != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    concurrency:
+      # Shared with pr-preview-publish.yaml so all writers to one PR's comment
+      # are serialized.
+      group: preview-status-${{ needs.resolve.outputs.number }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: refs/heads/main
+          persist-credentials: false
+      - name: Post or update preview status comment
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.resolve.outputs.number }}
+          HEAD_SHA: ${{ needs.resolve.outputs.sha }}
+          PREVIEW_PHASE: ${{ needs.resolve.outputs.phase }}
+          BUILD_RUN_ID: ${{ github.event.workflow_run.id }}
+          BUILD_RUN_ATTEMPT: ${{ needs.resolve.outputs.attempt }}
+        run: python3 .github/scripts/preview_status_comment.py

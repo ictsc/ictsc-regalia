@@ -1,6 +1,6 @@
 import copy
 import unittest
-from validate_preview_run import select_pr_number, validate
+from validate_preview_run import select_pr_number, select_status_target, validate
 
 REPO = "ictsc/ictsc-regalia"
 SHA = "a" * 40
@@ -122,6 +122,51 @@ class ValidationTests(unittest.TestCase):
     def test_expired(self):
         self.artifacts["artifacts"][0]["expired"] = True
         with self.assertRaises(ValueError): self.valid()
+
+
+class StatusTargetTests(unittest.TestCase):
+    def setUp(self):
+        self.run = copy.deepcopy(RUN)
+        self.run.update(run_attempt=2, conclusion=None, status="in_progress")
+        self.jobs = {"jobs": [{"conclusion": None}, {"conclusion": "skipped"}]}
+
+    def target(self, candidates=None):
+        return select_status_target(self.run, candidates or [copy.deepcopy(PR)],
+                                    self.jobs, 42, REPO)
+
+    def test_running_build(self):
+        self.assertEqual(self.target(), {"number": 7, "sha": SHA, "attempt": 2})
+
+    def test_failed_build(self):
+        self.run["conclusion"] = "failure"
+        self.assertEqual(self.target()["number"], 7)
+
+    def test_all_jobs_skipped_is_not_a_preview_build(self):
+        self.jobs = {"jobs": [{"conclusion": "skipped"}] * 3}
+        self.assertIsNone(self.target())
+
+    def test_wrong_workflow_or_event(self):
+        for key, value in (("workflow_id", 1), ("event", "push"),
+                           ("path", ".github/workflows/other.yaml")):
+            with self.subTest(key=key):
+                run = copy.deepcopy(self.run)
+                run[key] = value
+                with self.assertRaises(ValueError):
+                    select_status_target(run, [PR], self.jobs, 42, REPO)
+
+    def test_invalid_attempt_or_jobs(self):
+        self.run["run_attempt"] = 0
+        with self.assertRaises(ValueError): self.target()
+        self.run["run_attempt"] = 1
+        self.jobs = {}
+        with self.assertRaises(ValueError): self.target()
+
+    def test_unlinked_fork_requires_unique_labeled_candidate(self):
+        self.run["pull_requests"] = []
+        self.assertEqual(self.target()["number"], 7)
+        unlabeled = copy.deepcopy(PR)
+        unlabeled["labels"] = []
+        with self.assertRaises(ValueError): self.target([unlabeled])
 
 
 if __name__ == "__main__":
