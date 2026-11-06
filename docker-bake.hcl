@@ -19,6 +19,15 @@ target "backend" {
   target = "production"
 }
 
+# SQL migrations for the deploy-time migrate Job. Published with the backend so
+# GitOps can pin both to the same commit.
+target "migrations" {
+  inherits = ["base"]
+  context = "./backend"
+  tags = make_tags(target.docker-metadata-action.tags, "migrations")
+  target = "migrations"
+}
+
 target "frontend" {
   inherits = ["base"]
   context = "./frontend"
