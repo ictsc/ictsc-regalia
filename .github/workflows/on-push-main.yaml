@@ -2,12 +2,26 @@ name: On Push Main
 
 on:
   push:
-    branches: [main, codex/openapi-contract-rebuild]
-    tags: ["preview-*"]
+    # ictsc-k8s-dev deploys the newest sha-* image to dev, so only main may
+    # publish them.
+    branches: [main]
 
 jobs:
+  migrations:
+    name: Build Migrations
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/wf-docker-build.yaml
+    with:
+      target: migrations
+      push-ghcr: true
+      save-cache: true
   backend:
     name: Build Backend
+    # dev picks up a new backend as soon as it is published; its schema
+    # migrations must already be available by then.
+    needs: migrations
     permissions:
       contents: read
       packages: write
