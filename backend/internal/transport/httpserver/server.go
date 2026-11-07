@@ -27,6 +27,10 @@ type Options struct {
 	AllowedOrigins      []string
 	SStateCallbackToken string
 	ReadTimeout         time.Duration
+	// StreamsDone is closed when the server starts shutting down. Open SSE
+	// streams then end, because they never finish on their own and
+	// http.Server.Shutdown would otherwise wait for its full timeout.
+	StreamsDone <-chan struct{}
 }
 type cookieJarKey struct{}
 

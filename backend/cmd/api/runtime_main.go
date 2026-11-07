@@ -87,9 +87,11 @@ func run() error {
 	if _, ok := deploymentClient.(service.DeploymentProber); ok {
 		go runDeploymentPoller(ctx, svc, cfg.RStatePollInterval)
 	}
+	streamsDone := make(chan struct{})
 	handler, err := httpserver.New(svc, httpserver.Options{
 		SecureCookies: cfg.SecureCookies, AllowedOrigins: cfg.AllowedOrigins,
 		SStateCallbackToken: cfg.SStateCallbackToken, ReadTimeout: cfg.ReadHeaderTimeout,
+		StreamsDone: streamsDone,
 	})
 	if err != nil {
 		return fmt.Errorf("build HTTP router: %w", err)
@@ -98,6 +100,9 @@ func run() error {
 		Addr: cfg.Address, Handler: handler, ReadHeaderTimeout: cfg.ReadHeaderTimeout,
 		ReadTimeout: cfg.ReadHeaderTimeout, WriteTimeout: 0, IdleTimeout: cfg.ReadHeaderTimeout * 12,
 	}
+	// Shutdown waits for active requests; end SSE streams so it waits only
+	// for ordinary requests, and browsers reconnect to another instance.
+	server.RegisterOnShutdown(func() { close(streamsDone) })
 	serverErrors := make(chan error, 1)
 	go func() { serverErrors <- server.ListenAndServe() }()
 	select {

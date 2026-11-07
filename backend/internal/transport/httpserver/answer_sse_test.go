@@ -175,3 +175,40 @@ func TestAnswerSSEReleasesSubscriptionWhenClientLeaves(t *testing.T) {
 		t.Fatal("subscription was not closed after the client disconnected")
 	}
 }
+
+func TestShutdownEndsOpenStreams(t *testing.T) {
+	fixture := newContractFixture(t)
+	contestant := fixture.seedContestant(t)
+	fixture.seedActiveContent(t)
+	team := fixture.createSession(t, session.Data{Kind: session.KindContestant, ContestantName: contestant.Name}, service.ContestantTTL)
+	streamsDone := make(chan struct{})
+	handler, err := New(fixture.service, Options{SecureCookies: true, AllowedOrigins: []string{testOrigin}, StreamsDone: streamsDone})
+	if err != nil {
+		t.Fatal(err)
+	}
+	server := httptest.NewUnstartedServer(handler)
+	server.Config.RegisterOnShutdown(func() { close(streamsDone) })
+	server.Start()
+	defer server.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	answers := openSSE(t, ctx, server, "/api/v1/contestant/answers/stream", team)
+	if event := answers(); event.name != "ready" {
+		t.Fatalf("first answer event = %#v, want ready", event)
+	}
+	deployments := openSSE(t, ctx, server, "/api/v1/contestant/problems/P1/deployments/stream", team)
+	if event := deployments(); event.name != "snapshot" {
+		t.Fatalf("first deployment event = %#v, want snapshot", event)
+	}
+
+	shutdownCtx, stop := context.WithTimeout(context.Background(), 2*time.Second)
+	defer stop()
+	began := time.Now()
+	if err := server.Config.Shutdown(shutdownCtx); err != nil {
+		t.Fatalf("shutdown waited for open streams: %v", err)
+	}
+	if elapsed := time.Since(began); elapsed > time.Second {
+		t.Fatalf("shutdown took %s", elapsed)
+	}
+}

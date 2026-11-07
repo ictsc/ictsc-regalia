@@ -39,7 +39,7 @@ func (h *Handler) StreamContestantAnswers(ctx context.Context, _ api.StreamConte
 		closeSubscription(subscription)
 		return nil, err
 	}
-	body := answerStream(ctx, subscription, func(change core.AnswerChange) (any, bool) {
+	body := h.answerStream(ctx, subscription, func(change core.AnswerChange) (any, bool) {
 		if change.TeamCode != team {
 			return nil, false
 		}
@@ -57,7 +57,7 @@ func (h *Handler) StreamAdminAnswers(ctx context.Context, _ api.StreamAdminAnswe
 		closeSubscription(subscription)
 		return nil, err
 	}
-	body := answerStream(ctx, subscription, func(change core.AnswerChange) (any, bool) {
+	body := h.answerStream(ctx, subscription, func(change core.AnswerChange) (any, bool) {
 		return adminAnswerChange(change), true
 	})
 	cache, buffering := "no-cache, no-store", "no"
@@ -68,7 +68,7 @@ func (h *Handler) StreamAdminAnswers(ctx context.Context, _ api.StreamAdminAnswe
 
 // answerStream sends a ready event first so that a reconnecting client
 // refetches whatever it missed, then one answer event per accepted change.
-func answerStream(ctx context.Context, subscription service.Subscription, mapChange func(core.AnswerChange) (any, bool)) io.Reader {
+func (h *Handler) answerStream(ctx context.Context, subscription service.Subscription, mapChange func(core.AnswerChange) (any, bool)) io.Reader {
 	reader, writer := io.Pipe()
 	go func() {
 		defer closeSubscription(subscription)
@@ -76,7 +76,7 @@ func answerStream(ctx context.Context, subscription service.Subscription, mapCha
 		if err := writeSSE(writer, "ready", uuid.NewString(), answerStreamReady{}); err != nil {
 			return
 		}
-		streamSubscription(ctx, writer, subscription, func(payload []byte) (string, string, any, bool) {
+		h.streamSubscription(ctx, writer, subscription, func(payload []byte) (string, string, any, bool) {
 			var change core.AnswerChange
 			if json.Unmarshal(payload, &change) != nil {
 				return "", "", nil, false

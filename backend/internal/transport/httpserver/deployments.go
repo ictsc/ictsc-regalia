@@ -270,7 +270,7 @@ func (h *Handler) adminDeploymentStream(ctx context.Context, filter core.Deploym
 }
 
 func (h *Handler) streamDeploymentEvents(ctx context.Context, writer io.Writer, subscription service.Subscription, mapEvent func(core.Deployment) (string, any, bool)) {
-	streamSubscription(ctx, writer, subscription, func(payload []byte) (string, string, any, bool) {
+	h.streamSubscription(ctx, writer, subscription, func(payload []byte) (string, string, any, bool) {
 		var deployment core.Deployment
 		if json.Unmarshal(payload, &deployment) != nil {
 			return "", "", nil, false

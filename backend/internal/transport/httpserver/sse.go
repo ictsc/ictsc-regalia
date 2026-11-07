@@ -25,8 +25,9 @@ func closeSubscription(subscription service.Subscription) {
 
 // streamSubscription writes a keepalive comment every 15 seconds and one SSE
 // event for each bus message that mapMessage accepts, until the client goes
-// away or the subscription ends. A nil subscription only sends keepalives.
-func streamSubscription(ctx context.Context, writer io.Writer, subscription service.Subscription, mapMessage func([]byte) (event, id string, body any, ok bool)) {
+// away, the subscription ends or the server shuts down. A nil subscription
+// only sends keepalives. Browsers reconnect by themselves after it returns.
+func (h *Handler) streamSubscription(ctx context.Context, writer io.Writer, subscription service.Subscription, mapMessage func([]byte) (event, id string, body any, ok bool)) {
 	ticker := time.NewTicker(sseKeepaliveInterval)
 	defer ticker.Stop()
 	var messages <-chan []byte
@@ -36,6 +37,8 @@ func streamSubscription(ctx context.Context, writer io.Writer, subscription serv
 	for {
 		select {
 		case <-ctx.Done():
+			return
+		case <-h.options.StreamsDone:
 			return
 		case <-ticker.C:
 			if _, err := io.WriteString(writer, ": keepalive\n\n"); err != nil {
