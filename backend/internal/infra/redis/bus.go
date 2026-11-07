@@ -3,6 +3,8 @@ package redis
 import (
 	"context"
 
+	redislib "github.com/redis/go-redis/v9"
+
 	"github.com/ictsc/ictsc-regalia/backend/internal/service"
 )
 
@@ -49,11 +51,22 @@ func (s *busSubscription) forward(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			return
-		case message, ok := <-s.inner.C:
+		case received, ok := <-s.inner.C:
 			if !ok {
 				return
 			}
-			payload := []byte(message.Payload)
+			var payload []byte
+			switch value := received.(type) {
+			case *redislib.Message:
+				payload = []byte(value.Payload)
+			case *redislib.Subscription:
+				// go-redis reconnected and dropped what was published in
+				// between. Ending the subscription ends the SSE response, so
+				// the browser reconnects and refetches from the database.
+				return
+			default:
+				continue
+			}
 			select {
 			case s.messages <- payload:
 			case <-ctx.Done():

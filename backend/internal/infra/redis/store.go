@@ -89,16 +89,21 @@ func (s *Store) Publish(ctx context.Context, channel string, event []byte) error
 
 type Subscription struct {
 	pubsub *redislib.PubSub
-	C      <-chan *redislib.Message
+	// C carries *redislib.Message for published events and
+	// *redislib.Subscription when go-redis subscribes again after it lost the
+	// connection. Messages published while disconnected are gone by then.
+	C <-chan any
 }
 
 func (s *Store) Subscribe(ctx context.Context, channel string) (*Subscription, error) {
 	pubsub := s.client.Subscribe(ctx, channel)
+	// Receive consumes the first confirmation, so any later one on C means
+	// a reconnect.
 	if _, err := pubsub.Receive(ctx); err != nil {
 		_ = pubsub.Close()
 		return nil, err
 	}
-	return &Subscription{pubsub: pubsub, C: pubsub.Channel(redislib.WithChannelSize(64))}, nil
+	return &Subscription{pubsub: pubsub, C: pubsub.ChannelWithSubscriptions(redislib.WithChannelSize(64))}, nil
 }
 
 func (s *Subscription) Close() error { return s.pubsub.Close() }

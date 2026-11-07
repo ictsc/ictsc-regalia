@@ -122,6 +122,38 @@ func TestRedisStoreIntegration(t *testing.T) {
 		}
 	})
 
+	t.Run("ends answer subscriptions when Redis drops the connection", func(t *testing.T) {
+		subscriberStore, err := Open(t.Context(), rawURL)
+		if err != nil {
+			t.Fatalf("open subscriber Redis store: %v", err)
+		}
+		t.Cleanup(func() { _ = subscriberStore.Close() })
+		adminStore, err := Open(t.Context(), rawURL)
+		if err != nil {
+			t.Fatalf("open admin Redis store: %v", err)
+		}
+		t.Cleanup(func() { _ = adminStore.Close() })
+
+		subscription, err := NewAnswerBus(subscriberStore).Subscribe(t.Context())
+		if err != nil {
+			t.Fatalf("subscribe to answer bus: %v", err)
+		}
+		t.Cleanup(func() { _ = subscription.Close() })
+		// go-redis reconnects by itself; events published meanwhile are lost,
+		// so the subscription must end and let SSE clients reconnect.
+		if err := adminStore.client.Do(t.Context(), "CLIENT", "KILL", "TYPE", "pubsub").Err(); err != nil {
+			t.Fatalf("kill Pub/Sub connections: %v", err)
+		}
+		select {
+		case _, ok := <-subscription.Messages():
+			if ok {
+				t.Fatal("received a message instead of the subscription ending")
+			}
+		case <-time.After(10 * time.Second):
+			t.Fatal("subscription did not end after Redis dropped the connection")
+		}
+	})
+
 	t.Run("delivers deployment events across store instances", func(t *testing.T) {
 		publisherStore, err := Open(t.Context(), rawURL)
 		if err != nil {
