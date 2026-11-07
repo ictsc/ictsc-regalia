@@ -6,6 +6,7 @@ package fanout
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/ictsc/ictsc-regalia/backend/internal/service"
 )
@@ -27,11 +28,22 @@ type Bus struct {
 }
 
 type shared struct {
+	// ready is closed once the inner subscription is set up; err tells
+	// whether that failed. Both fields below are set before ready closes.
+	ready        chan struct{}
+	err          error
 	subscription service.Subscription
 	cancel       context.CancelFunc
-	locals       map[*local]struct{}
-	stopOnce     sync.Once
+	// waiting counts Subscribe calls between joining and receiving their
+	// local subscriber, so the shared subscription is not stopped under them.
+	waiting  int
+	locals   map[*local]struct{}
+	stopOnce sync.Once
 }
+
+// subscribeTimeout bounds setting up the inner subscription, so a stalled
+// Redis cannot hold every new stream on this instance indefinitely.
+const subscribeTimeout = 10 * time.Second
 
 func New(inner service.EventBus) *Bus { return &Bus{inner: inner} }
 
@@ -40,24 +52,92 @@ func (b *Bus) Publish(ctx context.Context, event []byte) error {
 }
 
 // Subscribe returns once the shared subscription is active, so events
-// published after it returns are delivered.
-func (b *Bus) Subscribe(context.Context) (service.Subscription, error) {
+// published after it returns are delivered. Setting it up does not hold the
+// lock, and a caller whose ctx ends stops waiting for it.
+func (b *Bus) Subscribe(ctx context.Context) (service.Subscription, error) {
 	b.mu.Lock()
-	defer b.mu.Unlock()
-	if b.shared == nil {
-		// The shared subscription outlives the request that started it.
-		ctx, cancel := context.WithCancel(context.Background())
-		subscription, err := b.inner.Subscribe(ctx)
-		if err != nil {
-			cancel()
-			return nil, err
-		}
-		b.shared = &shared{subscription: subscription, cancel: cancel, locals: make(map[*local]struct{})}
-		go b.forward(b.shared)
+	s := b.shared
+	if s == nil {
+		s = &shared{ready: make(chan struct{}), locals: make(map[*local]struct{})}
+		b.shared = s
+		go b.start(s)
 	}
-	l := &local{bus: b, shared: b.shared, messages: make(chan []byte, bufferSize)}
-	b.shared.locals[l] = struct{}{}
+	s.waiting++
+	b.mu.Unlock()
+
+	select {
+	case <-s.ready:
+	case <-ctx.Done():
+		b.mu.Lock()
+		s.waiting--
+		b.mu.Unlock()
+		b.stopIfIdle(s)
+		return nil, ctx.Err()
+	}
+
+	b.mu.Lock()
+	s.waiting--
+	if s.err != nil {
+		b.mu.Unlock()
+		return nil, s.err
+	}
+	if s.locals == nil {
+		// It already ended, for example after Redis reconnected; start a
+		// fresh one.
+		b.mu.Unlock()
+		return b.Subscribe(ctx)
+	}
+	l := &local{bus: b, shared: s, messages: make(chan []byte, bufferSize)}
+	s.locals[l] = struct{}{}
+	b.mu.Unlock()
 	return l, nil
+}
+
+// start sets up the inner subscription. It outlives the request that
+// started it, so it uses its own context.
+func (b *Bus) start(s *shared) {
+	ctx, cancel := context.WithCancel(context.Background())
+	timer := time.AfterFunc(subscribeTimeout, cancel)
+	subscription, err := b.inner.Subscribe(ctx)
+	if !timer.Stop() && err == nil {
+		// The timeout fired just as setup finished; the subscription is
+		// already being torn down.
+		_ = subscription.Close()
+		err = context.DeadlineExceeded
+	}
+	b.mu.Lock()
+	s.subscription, s.cancel, s.err = subscription, cancel, err
+	if err != nil && b.shared == s {
+		b.shared = nil
+	}
+	close(s.ready)
+	b.mu.Unlock()
+	if err != nil {
+		cancel()
+		return
+	}
+	go b.forward(s)
+	// Every caller may have given up while it was being set up.
+	b.stopIfIdle(s)
+}
+
+// stopIfIdle stops a set-up shared subscription that nobody uses or waits for.
+func (b *Bus) stopIfIdle(s *shared) {
+	b.mu.Lock()
+	idle := b.shared == s && s.waiting == 0 && len(s.locals) == 0
+	select {
+	case <-s.ready:
+		idle = idle && s.err == nil
+	default:
+		idle = false
+	}
+	if idle {
+		b.shared = nil
+	}
+	b.mu.Unlock()
+	if idle {
+		s.stop()
+	}
 }
 
 func (b *Bus) forward(s *shared) {
@@ -110,14 +190,8 @@ func (l *local) Close() error {
 			delete(l.shared.locals, l)
 			close(l.messages)
 		}
-		last := len(l.shared.locals) == 0 && b.shared == l.shared
-		if last {
-			b.shared = nil
-		}
 		b.mu.Unlock()
-		if last {
-			l.shared.stop()
-		}
+		b.stopIfIdle(l.shared)
 	})
 	return nil
 }

@@ -168,3 +168,93 @@ func TestBusClosesOnlyASubscriberThatFallsBehind(t *testing.T) {
 	}
 	_ = slow.Close()
 }
+
+// gatedBus holds every inner Subscribe until the test opens the gate, like a
+// Redis that does not acknowledge the subscription.
+type gatedBus struct {
+	*countingBus
+	gate chan struct{}
+}
+
+func (b *gatedBus) Subscribe(ctx context.Context) (service.Subscription, error) {
+	select {
+	case <-b.gate:
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+	return b.countingBus.Subscribe(ctx)
+}
+
+func TestSubscribeStopsWaitingWhenCallerLeaves(t *testing.T) {
+	inner := &gatedBus{countingBus: newCountingBus(), gate: make(chan struct{})}
+	bus := New(inner)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	returned := make(chan error, 1)
+	go func() {
+		_, err := bus.Subscribe(ctx)
+		returned <- err
+	}()
+	time.Sleep(20 * time.Millisecond)
+	cancel()
+	select {
+	case err := <-returned:
+		if err == nil {
+			t.Fatal("canceled Subscribe returned a subscription")
+		}
+	case <-time.After(time.Second):
+		t.Fatal("Subscribe kept waiting after its caller left")
+	}
+
+	// Nobody wants it any more, so it is stopped once it is set up.
+	close(inner.gate)
+	waitFor(t, func() bool {
+		subscribed, closed := inner.counts()
+		return subscribed == 1 && closed == 1
+	})
+
+	// A later caller starts a fresh one and receives events.
+	subscription, err := bus.Subscribe(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer subscription.Close()
+	if err := bus.Publish(context.Background(), []byte("after")); err != nil {
+		t.Fatal(err)
+	}
+	if payload, ok := receive(t, subscription); !ok || string(payload) != "after" {
+		t.Fatalf("received %q, %v", payload, ok)
+	}
+}
+
+func TestSubscribeWaitersShareOneSetup(t *testing.T) {
+	inner := &gatedBus{countingBus: newCountingBus(), gate: make(chan struct{})}
+	bus := New(inner)
+
+	results := make(chan service.Subscription, 2)
+	for range 2 {
+		go func() {
+			subscription, err := bus.Subscribe(context.Background())
+			if err != nil {
+				t.Error(err)
+			}
+			results <- subscription
+		}()
+	}
+	time.Sleep(20 * time.Millisecond)
+	close(inner.gate)
+	first, second := <-results, <-results
+	if subscribed, _ := inner.counts(); subscribed != 1 {
+		t.Fatalf("inner subscriptions = %d, want 1", subscribed)
+	}
+	if err := bus.Publish(context.Background(), []byte("both")); err != nil {
+		t.Fatal(err)
+	}
+	for _, subscription := range []service.Subscription{first, second} {
+		if payload, ok := receive(t, subscription); !ok || string(payload) != "both" {
+			t.Fatalf("received %q, %v", payload, ok)
+		}
+		_ = subscription.Close()
+	}
+	waitFor(t, func() bool { _, closed := inner.counts(); return closed == 1 })
+}
