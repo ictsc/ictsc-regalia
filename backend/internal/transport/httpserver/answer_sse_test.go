@@ -136,3 +136,42 @@ func TestAnswerSSERequiresMatchingSession(t *testing.T) {
 		}
 	}
 }
+
+type closeTrackingBus struct{ closed chan struct{} }
+
+func (b *closeTrackingBus) Publish(context.Context, []byte) error { return nil }
+
+func (b *closeTrackingBus) Subscribe(context.Context) (service.Subscription, error) {
+	return &closeTrackingSubscription{bus: b, messages: make(chan []byte)}, nil
+}
+
+type closeTrackingSubscription struct {
+	bus      *closeTrackingBus
+	messages chan []byte
+}
+
+func (s *closeTrackingSubscription) Messages() <-chan []byte { return s.messages }
+func (s *closeTrackingSubscription) Close() error {
+	close(s.bus.closed)
+	return nil
+}
+
+func TestAnswerSSEReleasesSubscriptionWhenClientLeaves(t *testing.T) {
+	fixture := newContractFixture(t)
+	bus := &closeTrackingBus{closed: make(chan struct{})}
+	fixture.service.AnswerEvents = bus
+	admin := fixture.createSession(t, session.Data{Kind: session.KindAdmin, AdminName: "Judge"}, service.AdminTTL)
+	server := httptest.NewServer(fixture.handler)
+	defer server.Close()
+	ctx, cancel := context.WithCancel(context.Background())
+	next := openSSE(t, ctx, server, "/api/v1/admin/answers/stream", admin)
+	if event := next(); event.name != "ready" {
+		t.Fatalf("first event = %#v, want ready", event)
+	}
+	cancel()
+	select {
+	case <-bus.closed:
+	case <-time.After(3 * time.Second):
+		t.Fatal("subscription was not closed after the client disconnected")
+	}
+}
