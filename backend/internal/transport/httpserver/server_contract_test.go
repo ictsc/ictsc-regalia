@@ -72,6 +72,7 @@ func newContractFixture(t *testing.T) *contractFixture {
 	})
 	svc.Discord = fakeDiscord{}
 	svc.Events = memory.NewEventBus()
+	svc.AnswerEvents = memory.NewEventBus()
 	svc.Now = func() time.Time { return testNow }
 	handler, err := New(svc, Options{
 		SecureCookies:       true,
