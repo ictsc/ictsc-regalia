@@ -20,6 +20,11 @@ export {
   type ContestantDeploymentStreamMessage,
   type AdminDeploymentStreamMessage,
 } from "./sse";
+export {
+  createRefetchScheduler,
+  type RefetchScheduler,
+  type RefetchSchedulerOptions,
+} from "./refetch";
 export type { paths, components, operations } from "./schema";
 
 export { impersonateContestant } from "./impersonation";

@@ -1,4 +1,5 @@
 import {
+  createRefetchScheduler,
   subscribeContestantAnswerEvents,
   type ContestantAnswerChange,
 } from "@ictsc/api";
@@ -13,42 +14,39 @@ type AnswerChangeListener = (
 
 const listeners = new Set<AnswerChangeListener>();
 
-/** まとめて届いた変更を 1 回の再取得にまとめる待ち時間。 */
-const refreshDelayMs = 300;
-
 /**
  * 自チームの回答の変更を SSE で受け、問題一覧・サイドバー・提出履歴・
  * クールダウンの元データ(competition / activity)を再取得する。
  * レイアウトで一度だけ呼ぶ。チームメイトが別の端末で提出しても、
  * 再読み込みなしで「提出済み」に変わる。
+ * 接続・再接続時の再取得は 0〜5 秒ばらし、全員が同時に取り直さないようにする。
  */
 export function useAnswerStream() {
   const { viewer } = useSession();
   let unsubscribe: (() => void) | undefined;
-  let timer: ReturnType<typeof setTimeout> | undefined;
-
-  function scheduleRefresh() {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
+  const scheduler = createRefetchScheduler<ContestantAnswerChange>(
+    (changes) => {
       void refreshNuxtData(["competition", "activity"]);
-    }, refreshDelayMs);
-  }
-
-  function notify(change: ContestantAnswerChange | undefined) {
-    scheduleRefresh();
-    for (const listener of listeners) listener(change);
-  }
+      if (changes === null) {
+        for (const listener of listeners) listener(undefined);
+        return;
+      }
+      for (const change of changes)
+        for (const listener of listeners) listener(change);
+    },
+  );
 
   function connect() {
     // ready は初回接続でも再取得する。ページの初期取得が終わってから
     // 購読が始まるまでの間の提出を取りこぼさないため。
-    unsubscribe = subscribeContestantAnswerEvents((message) =>
-      notify(message.type === "answer" ? message.change : undefined),
-    );
+    unsubscribe = subscribeContestantAnswerEvents((message) => {
+      if (message.type === "answer") scheduler.change(message.change);
+      else scheduler.ready();
+    });
   }
 
   function disconnect() {
-    clearTimeout(timer);
+    scheduler.cancel();
     unsubscribe?.();
     unsubscribe = undefined;
   }
