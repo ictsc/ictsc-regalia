@@ -107,11 +107,16 @@ async function update(answer: GradingAnswer, change: GradingChange) {
   actionError.value = "";
   try {
     const updated = await updateAdminAnswerWorkflow(api, answer, change);
+    // 待っている間に SSE の再取得がより新しい版を読み込んでいたら、
+    // 古い PATCH のレスポンスで巻き戻さない。
     if (data.value)
       data.value = {
         ...data.value,
         answers: data.value.answers.map((a) =>
-          answerKey(a) === answerKey(answer) ? updated : a,
+          answerKey(a) === answerKey(answer) &&
+          updated.workflow.revision >= a.workflow.revision
+            ? updated
+            : a,
         ),
       };
   } catch (cause) {
