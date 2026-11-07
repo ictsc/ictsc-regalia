@@ -7,14 +7,9 @@ import (
 )
 
 func (h *Handler) subscribeDeploymentEvents(ctx context.Context) (service.Subscription, error) {
-	if h.service.Events == nil {
-		return nil, nil
-	}
-	return h.service.Events.Subscribe(ctx)
+	return subscribe(ctx, h.service.Events)
 }
 
 func closeDeploymentSubscription(subscription service.Subscription) {
-	if subscription != nil {
-		_ = subscription.Close()
-	}
+	closeSubscription(subscription)
 }

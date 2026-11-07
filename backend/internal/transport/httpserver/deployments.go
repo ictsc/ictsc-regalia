@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"sort"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
@@ -271,57 +270,29 @@ func (h *Handler) adminDeploymentStream(ctx context.Context, filter core.Deploym
 }
 
 func (h *Handler) streamDeploymentEvents(ctx context.Context, writer io.Writer, subscription service.Subscription, mapEvent func(core.Deployment) (string, any, bool)) {
-	ticker := time.NewTicker(15 * time.Second)
-	defer ticker.Stop()
-	if subscription == nil {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				if _, err := io.WriteString(writer, ": keepalive\n\n"); err != nil {
-					return
-				}
+	streamSubscription(ctx, writer, subscription, func(payload []byte) (string, string, any, bool) {
+		var deployment core.Deployment
+		if json.Unmarshal(payload, &deployment) != nil {
+			return "", "", nil, false
+		}
+		team, problem := deployment.TeamCode, deployment.ProblemCode
+		latest, err := h.service.Store.ListDeployments(ctx, core.DeploymentFilter{TeamCode: &team, ProblemCode: &problem})
+		if err != nil {
+			return "", "", nil, false
+		}
+		found := false
+		for _, current := range latest {
+			if current.RequestID == deployment.RequestID {
+				deployment, found = current, true
+				break
 			}
 		}
-	}
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-ticker.C:
-			if _, err := io.WriteString(writer, ": keepalive\n\n"); err != nil {
-				return
-			}
-		case payload, ok := <-subscription.Messages():
-			if !ok {
-				return
-			}
-			var deployment core.Deployment
-			if json.Unmarshal(payload, &deployment) != nil {
-				continue
-			}
-			team, problem := deployment.TeamCode, deployment.ProblemCode
-			latest, err := h.service.Store.ListDeployments(ctx, core.DeploymentFilter{TeamCode: &team, ProblemCode: &problem})
-			if err != nil {
-				continue
-			}
-			found := false
-			for _, current := range latest {
-				if current.RequestID == deployment.RequestID {
-					deployment, found = current, true
-					break
-				}
-			}
-			if !found {
-				continue
-			}
-			id, body, include := mapEvent(deployment)
-			if include && writeSSE(writer, "deployment", id, body) != nil {
-				return
-			}
+		if !found {
+			return "", "", nil, false
 		}
-	}
+		id, body, include := mapEvent(deployment)
+		return "deployment", id, body, include
+	})
 }
 
 func writeSSE(writer io.Writer, event, id string, value any) error {

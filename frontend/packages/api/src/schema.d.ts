@@ -454,6 +454,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/contestant/answers/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 自チームの回答の変更をSSEで購読する
+         * @description 接続時と再接続時にreadyイベントを送り、以後自チームの回答が提出・採点されるたびにanswerイベントと15秒間隔のkeepaliveコメントを送る。answerイベントは変更された回答の識別子だけを含むため、クライアントは受信後に必要な一覧を再取得する。readyイベント受信時も取りこぼし回復のため再取得する。
+         */
+        get: operations["streamContestantAnswers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/contestant/announcements": {
         parameters: {
             query?: never;
@@ -796,6 +816,26 @@ export interface paths {
         };
         /** お知らせを取得する */
         get: operations["getAdminAnnouncement"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/answers/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 回答の変更をSSEで購読する
+         * @description 接続時と再接続時にreadyイベントを送り、以後回答の提出・ワークフロー更新・採点のたびにanswerイベントと15秒間隔のkeepaliveコメントを送る。answerイベントは変更された回答の識別子だけを含むため、クライアントは受信後に必要な一覧を再取得する。readyイベント受信時も取りこぼし回復のため再取得する。
+         */
+        get: operations["streamAdminAnswers"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1768,6 +1808,24 @@ export interface components {
         };
         ContestantDeploymentResponse: {
             deployment: components["schemas"]["ContestantDeployment"];
+        };
+        /** @description ストリームの接続・再接続を知らせる。受信したクライアントは回答の一覧を再取得する。 */
+        AnswerStreamReady: Record<string, never>;
+        /** @description 自チームの回答が提出または採点されたことを知らせる。スコアは含まない。 */
+        ContestantAnswerChange: {
+            problem_code: string;
+            /** Format: int32 */
+            answer_number: number;
+        };
+        /** @description 回答の提出・ワークフロー更新・採点を知らせる。 */
+        AdminAnswerChange: {
+            /** Format: int64 */
+            team_code: number;
+            problem_code: string;
+            /** Format: int32 */
+            answer_number: number;
+            /** @enum {string} */
+            kind: "SUBMITTED" | "WORKFLOW" | "MARKED";
         };
         Announcement: {
             slug: string;
@@ -2820,6 +2878,46 @@ export interface operations {
             500: components["responses"]["InternalServerError"];
         };
     };
+    streamContestantAnswers: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description EventSource再接続時にブラウザが送る最後のSSE event ID。サーバーはこれに依存せずDBの最新snapshotから復元する。 */
+                "Last-Event-ID"?: components["parameters"]["LastEventIdHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description readyおよびanswerイベントのストリーム。各data行はx-sse-eventsに示すJSON。 */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["SSECacheControl"];
+                    "X-Accel-Buffering": components["headers"]["SSEBuffering"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example event: ready
+                     *     id: 8bd91aa8-4c57-4ed5-85bf-b829a4cd5571
+                     *     data: {}
+                     *
+                     *     event: answer
+                     *     id: 2f0f7c43-77c9-4c2d-9df5-5d0f8f8f6f0e
+                     *     data: {"problem_code":"ABC","answer_number":1}
+                     *
+                     *     : keepalive
+                     */
+                    "text/event-stream": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
     listContestantAnnouncements: {
         parameters: {
             query?: never;
@@ -3426,6 +3524,46 @@ export interface operations {
             422: components["responses"]["ValidationError"];
             500: components["responses"]["InternalServerError"];
             502: components["responses"]["BadGateway"];
+        };
+    };
+    streamAdminAnswers: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description EventSource再接続時にブラウザが送る最後のSSE event ID。サーバーはこれに依存せずDBの最新snapshotから復元する。 */
+                "Last-Event-ID"?: components["parameters"]["LastEventIdHeader"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description readyおよびanswerイベントのストリーム。各data行はx-sse-eventsに示すJSON。 */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["SSECacheControl"];
+                    "X-Accel-Buffering": components["headers"]["SSEBuffering"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example event: ready
+                     *     id: 8bd91aa8-4c57-4ed5-85bf-b829a4cd5571
+                     *     data: {}
+                     *
+                     *     event: answer
+                     *     id: 2f0f7c43-77c9-4c2d-9df5-5d0f8f8f6f0e
+                     *     data: {"team_code":1,"problem_code":"ABC","answer_number":1,"kind":"SUBMITTED"}
+                     *
+                     *     : keepalive
+                     */
+                    "text/event-stream": string;
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            422: components["responses"]["ValidationError"];
+            500: components["responses"]["InternalServerError"];
         };
     };
     listAdminAnswers: {

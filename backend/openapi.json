@@ -584,6 +584,41 @@
         }
       }
     },
+    "/api/v1/contestant/answers/stream": {
+      "get": {
+        "tags": ["Contestant Competition"],
+        "summary": "自チームの回答の変更をSSEで購読する",
+        "description": "接続時と再接続時にreadyイベントを送り、以後自チームの回答が提出・採点されるたびにanswerイベントと15秒間隔のkeepaliveコメントを送る。answerイベントは変更された回答の識別子だけを含むため、クライアントは受信後に必要な一覧を再取得する。readyイベント受信時も取りこぼし回復のため再取得する。",
+        "operationId": "streamContestantAnswers",
+        "security": [{ "ContestantSession": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/LastEventIdHeader" }
+        ],
+        "x-sse-events": {
+          "ready": { "$ref": "#/components/schemas/AnswerStreamReady" },
+          "answer": { "$ref": "#/components/schemas/ContestantAnswerChange" }
+        },
+        "responses": {
+          "200": {
+            "description": "readyおよびanswerイベントのストリーム。各data行はx-sse-eventsに示すJSON。",
+            "headers": {
+              "Cache-Control": { "$ref": "#/components/headers/SSECacheControl" },
+              "X-Accel-Buffering": { "$ref": "#/components/headers/SSEBuffering" }
+            },
+            "content": {
+              "text/event-stream": {
+                "schema": { "type": "string" },
+                "example": "event: ready\nid: 8bd91aa8-4c57-4ed5-85bf-b829a4cd5571\ndata: {}\n\nevent: answer\nid: 2f0f7c43-77c9-4c2d-9df5-5d0f8f8f6f0e\ndata: {\"problem_code\":\"ABC\",\"answer_number\":1}\n\n: keepalive\n\n"
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
     "/api/v1/contestant/announcements": {
       "get": {
         "tags": ["Contestant Content"],
@@ -1049,6 +1084,41 @@
           "422": { "$ref": "#/components/responses/ValidationError" },
           "500": { "$ref": "#/components/responses/InternalServerError" },
           "502": { "$ref": "#/components/responses/BadGateway" }
+        }
+      }
+    },
+    "/api/v1/admin/answers/stream": {
+      "get": {
+        "tags": ["Admin Marking"],
+        "summary": "回答の変更をSSEで購読する",
+        "description": "接続時と再接続時にreadyイベントを送り、以後回答の提出・ワークフロー更新・採点のたびにanswerイベントと15秒間隔のkeepaliveコメントを送る。answerイベントは変更された回答の識別子だけを含むため、クライアントは受信後に必要な一覧を再取得する。readyイベント受信時も取りこぼし回復のため再取得する。",
+        "operationId": "streamAdminAnswers",
+        "security": [{ "AdminSession": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/LastEventIdHeader" }
+        ],
+        "x-sse-events": {
+          "ready": { "$ref": "#/components/schemas/AnswerStreamReady" },
+          "answer": { "$ref": "#/components/schemas/AdminAnswerChange" }
+        },
+        "responses": {
+          "200": {
+            "description": "readyおよびanswerイベントのストリーム。各data行はx-sse-eventsに示すJSON。",
+            "headers": {
+              "Cache-Control": { "$ref": "#/components/headers/SSECacheControl" },
+              "X-Accel-Buffering": { "$ref": "#/components/headers/SSEBuffering" }
+            },
+            "content": {
+              "text/event-stream": {
+                "schema": { "type": "string" },
+                "example": "event: ready\nid: 8bd91aa8-4c57-4ed5-85bf-b829a4cd5571\ndata: {}\n\nevent: answer\nid: 2f0f7c43-77c9-4c2d-9df5-5d0f8f8f6f0e\ndata: {\"team_code\":1,\"problem_code\":\"ABC\",\"answer_number\":1,\"kind\":\"SUBMITTED\"}\n\n: keepalive\n\n"
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       }
     },
@@ -2672,6 +2742,34 @@
         "required": ["deployment"],
         "properties": {
           "deployment": { "$ref": "#/components/schemas/ContestantDeployment" }
+        }
+      },
+      "AnswerStreamReady": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "ストリームの接続・再接続を知らせる。受信したクライアントは回答の一覧を再取得する。",
+        "properties": {}
+      },
+      "ContestantAnswerChange": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "自チームの回答が提出または採点されたことを知らせる。スコアは含まない。",
+        "required": ["problem_code", "answer_number"],
+        "properties": {
+          "problem_code": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" },
+          "answer_number": { "type": "integer", "format": "int32", "minimum": 1 }
+        }
+      },
+      "AdminAnswerChange": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "回答の提出・ワークフロー更新・採点を知らせる。",
+        "required": ["team_code", "problem_code", "answer_number", "kind"],
+        "properties": {
+          "team_code": { "type": "integer", "format": "int64", "minimum": 1, "maximum": 99 },
+          "problem_code": { "type": "string", "minLength": 1, "maxLength": 8, "pattern": "^[A-Za-z0-9_-]+$" },
+          "answer_number": { "type": "integer", "format": "int32", "minimum": 1 },
+          "kind": { "type": "string", "enum": ["SUBMITTED", "WORKFLOW", "MARKED"] }
         }
       },
       "Announcement": {
