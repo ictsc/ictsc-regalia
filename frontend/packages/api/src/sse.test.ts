@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  subscribeAdminAnswerEvents,
+  subscribeContestantAnswerEvents,
   subscribeContestantDeploymentEvents,
+  type AdminAnswerChange,
+  type AnswerStreamMessage,
+  type ContestantAnswerChange,
   type ContestantDeployment,
   type ContestantDeploymentStreamMessage,
 } from "./sse";
@@ -11,7 +16,9 @@ class FakeEventSource {
   readonly withCredentials: boolean;
   closed = false;
   onerror: ((event: Event) => void) | null = null;
-  constructor(_url: string | URL, init?: EventSourceInit) {
+  readonly url: string;
+  constructor(url: string | URL, init?: EventSourceInit) {
+    this.url = String(url);
     this.withCredentials = init?.withCredentials ?? false;
     FakeEventSource.latest = this;
   }
@@ -60,5 +67,47 @@ describe("subscribeDeploymentEvents", () => {
     ]);
     unsubscribe();
     expect(FakeEventSource.latest.closed).toBe(true);
+  });
+});
+
+describe("subscribeAnswerEvents", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("delivers ready and answer events from the contestant stream", () => {
+    vi.stubGlobal("EventSource", FakeEventSource);
+    const messages: AnswerStreamMessage<ContestantAnswerChange>[] = [];
+    const unsubscribe = subscribeContestantAnswerEvents((message) =>
+      messages.push(message),
+    );
+    expect(FakeEventSource.latest.url).toBe(
+      "/api/v1/contestant/answers/stream",
+    );
+    expect(FakeEventSource.latest.withCredentials).toBe(true);
+    FakeEventSource.latest.emit("ready", {});
+    FakeEventSource.latest.emit("answer", {
+      problem_code: "P1",
+      answer_number: 2,
+    });
+    expect(messages).toEqual([
+      { type: "ready" },
+      { type: "answer", change: { problem_code: "P1", answer_number: 2 } },
+    ]);
+    unsubscribe();
+    expect(FakeEventSource.latest.closed).toBe(true);
+  });
+
+  it("ignores malformed data and reports stream errors", () => {
+    vi.stubGlobal("EventSource", FakeEventSource);
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const messages: AnswerStreamMessage<AdminAnswerChange>[] = [];
+    const onError = vi.fn();
+    subscribeAdminAnswerEvents((message) => messages.push(message), onError);
+    expect(FakeEventSource.latest.url).toBe("/api/v1/admin/answers/stream");
+    FakeEventSource.latest.listeners.get("answer")?.(
+      new MessageEvent("answer", { data: "{" }),
+    );
+    FakeEventSource.latest.onerror?.(new Event("error"));
+    expect(messages).toEqual([]);
+    expect(onError).toHaveBeenCalledOnce();
   });
 });
