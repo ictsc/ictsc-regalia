@@ -74,7 +74,8 @@ func run() error {
 		SecondaryQualifierMode: cfg.SecondaryQualifierMode,
 		DevTools:               cfg.DevFakeMode,
 	})
-	svc.Discord, svc.Content, svc.Deployments, svc.Events = discordClient, contentClient, deploymentClient, events
+	svc.Discord, svc.Content, svc.Deployments = discordClient, contentClient, deploymentClient
+	svc.Events, svc.AnswerEvents = events.deployments, events.answers
 	if cfg.WebPushVAPIDPublicKey != "" {
 		svc.WebPush = webpushadapter.New(webpushadapter.Config{
 			Subject: cfg.WebPushVAPIDSubject, PublicKey: cfg.WebPushVAPIDPublicKey, PrivateKey: cfg.WebPushVAPIDPrivateKey,
@@ -149,27 +150,34 @@ func runDeploymentPoller(ctx context.Context, svc *service.Service, interval tim
 	}
 }
 
-func runtimeStores(ctx context.Context, cfg config.Runtime) (core.Store, session.Store, service.EventBus, func(), error) {
+// eventBuses holds one bus per realtime stream so that subscribers decode only
+// the events they expect.
+type eventBuses struct {
+	deployments service.EventBus
+	answers     service.EventBus
+}
+
+func runtimeStores(ctx context.Context, cfg config.Runtime) (core.Store, session.Store, eventBuses, func(), error) {
 	if cfg.DevFakeMode && cfg.DatabaseURL == "" && cfg.RedisURL == "" {
-		return memory.NewCompetitionStore(), memory.NewSessionStore(), memory.NewEventBus(), func() {}, nil
+		return memory.NewCompetitionStore(), memory.NewSessionStore(), eventBuses{deployments: memory.NewEventBus(), answers: memory.NewEventBus()}, func() {}, nil
 	}
 	if cfg.DatabaseURL == "" || cfg.RedisURL == "" {
-		return nil, nil, nil, nil, fmt.Errorf("ICTSC_DATABASE_URL and ICTSC_REDIS_URL must either both be set or both be empty in development fake mode")
+		return nil, nil, eventBuses{}, nil, fmt.Errorf("ICTSC_DATABASE_URL and ICTSC_REDIS_URL must either both be set or both be empty in development fake mode")
 	}
 	store, err := postgres.Open(ctx, cfg.DatabaseURL)
 	if err != nil {
-		return nil, nil, nil, nil, fmt.Errorf("open PostgreSQL: %w", err)
+		return nil, nil, eventBuses{}, nil, fmt.Errorf("open PostgreSQL: %w", err)
 	}
 	redisStore, err := redisinfra.Open(ctx, cfg.RedisURL)
 	if err != nil {
 		store.Close()
-		return nil, nil, nil, nil, fmt.Errorf("open Redis: %w", err)
+		return nil, nil, eventBuses{}, nil, fmt.Errorf("open Redis: %w", err)
 	}
 	cleanup := func() {
 		_ = redisStore.Close()
 		store.Close()
 	}
-	return store, redisStore, redisinfra.NewDeploymentBus(redisStore), cleanup, nil
+	return store, redisStore, eventBuses{deployments: redisinfra.NewDeploymentBus(redisStore), answers: redisinfra.NewAnswerBus(redisStore)}, cleanup, nil
 }
 
 func runtimeAdapters(cfg config.Runtime) (service.Discord, service.ContentSource, service.DeploymentGateway, error) {

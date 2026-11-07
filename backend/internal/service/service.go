@@ -48,12 +48,15 @@ type Config struct {
 }
 
 type Service struct {
-	Store          core.Store
-	Sessions       session.Store
-	Discord        Discord
-	Content        ContentSource
-	Deployments    DeploymentGateway
-	Events         EventBus
+	Store       core.Store
+	Sessions    session.Store
+	Discord     Discord
+	Content     ContentSource
+	Deployments DeploymentGateway
+	Events      EventBus
+	// AnswerEvents carries answer changes (submission, grading workflow and
+	// marking) so that open screens can refetch without reloading.
+	AnswerEvents   EventBus
 	WebPush        WebPushSender
 	VAPIDPublicKey string
 	Config         Config
