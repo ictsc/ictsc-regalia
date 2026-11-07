@@ -18,6 +18,7 @@ import (
 	webpushadapter "github.com/ictsc/ictsc-regalia/backend/internal/adapter/webpush"
 	"github.com/ictsc/ictsc-regalia/backend/internal/config"
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
+	"github.com/ictsc/ictsc-regalia/backend/internal/infra/fanout"
 	"github.com/ictsc/ictsc-regalia/backend/internal/infra/memory"
 	"github.com/ictsc/ictsc-regalia/backend/internal/infra/postgres"
 	redisinfra "github.com/ictsc/ictsc-regalia/backend/internal/infra/redis"
@@ -177,7 +178,12 @@ func runtimeStores(ctx context.Context, cfg config.Runtime) (core.Store, session
 		_ = redisStore.Close()
 		store.Close()
 	}
-	return store, redisStore, eventBuses{deployments: redisinfra.NewDeploymentBus(redisStore), answers: redisinfra.NewAnswerBus(redisStore)}, cleanup, nil
+	return store, redisStore, eventBuses{
+		// One Redis subscription per channel per instance, shared by every
+		// open SSE stream.
+		deployments: fanout.New(redisinfra.NewDeploymentBus(redisStore)),
+		answers:     fanout.New(redisinfra.NewAnswerBus(redisStore)),
+	}, cleanup, nil
 }
 
 func runtimeAdapters(cfg config.Runtime) (service.Discord, service.ContentSource, service.DeploymentGateway, error) {
