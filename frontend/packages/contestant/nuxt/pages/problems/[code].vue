@@ -252,7 +252,7 @@ const score = computed(
 </script>
 <template>
   <main>
-    <RequestState :pending="pending" :error="error" @retry="refresh"
+    <RequestState :pending="pending && !data" :error="error" @retry="refresh"
       ><template v-if="data"
         ><div class="detail-layout">
           <ProblemRail :items="railItems" :current-code="code" />

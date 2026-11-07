@@ -13,7 +13,7 @@ const { data: competition } = await useCompetition();
     <ActivityView
       :entries="data ?? undefined"
       :results-hidden="competition?.ranking.hidden ?? false"
-      :pending="pending"
+      :pending="pending && !data"
       :error="error"
       @retry="refresh"
     />
