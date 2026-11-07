@@ -624,7 +624,13 @@ func (s *Service) SubmitAnswer(ctx context.Context, contestant core.Contestant, 
 		Body: body, SubmittedAt: now, ContentCommit: snapshot.CommitSHA, MaxScore: problem.MaxScore,
 		RedeployRule: problem.Redeploy, DeploymentsBefore: int32(len(deployments)), Attachments: attachments,
 	}
-	return s.Store.SubmitAnswer(ctx, answer, core.AnswerInterval)
+	stored, retryAfter, err := s.Store.SubmitAnswer(ctx, answer, core.AnswerInterval)
+	if err == nil {
+		s.PublishAnswerChange(ctx, core.AnswerChange{
+			TeamCode: stored.TeamCode, ProblemCode: stored.ProblemCode, AnswerNumber: stored.Number, Kind: core.AnswerSubmitted,
+		})
+	}
+	return stored, retryAfter, err
 }
 
 func (s *Service) Scores(ctx context.Context, before *time.Time) (map[int64]map[string]core.Score, error) {
