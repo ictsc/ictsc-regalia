@@ -571,7 +571,10 @@ test("回答429のRetry-Afterをcountdownへ反映する", async ({ page }) => {
   await page.goto("/problems/A01");
   await page.getByLabel("回答", { exact: true }).fill("設定を修正しました");
   await page.getByRole("button", { name: /^回答を提出(?:\s*↗)?$/ }).click();
-  await page.getByRole("dialog").getByRole("button", { name: "提出する" }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "提出する" })
+    .click();
   await expect(
     page.getByRole("status").filter({ hasText: /再回答可能まで/ }),
   ).toBeVisible();
@@ -776,6 +779,48 @@ test("二次予選モードでは最終公開まで採点結果と順位を表�
     page.getByText("順位は最終結果の公開後に表示されます"),
   ).toBeVisible();
   await expect(page.locator(".ranking-table")).toHaveCount(0);
+});
+
+test("二次予選モードではチームメイトの提出をSSEで再読み込みなしに反映する", async ({
+  page,
+}) => {
+  await installCompetitionApi(page, { resultsHidden: true });
+  let answers: unknown[] = [];
+  let answerGets = 0;
+  await page.route("**/api/v1/contestant/problems/A02/answers", (route) => {
+    answerGets += 1;
+    return fulfillJson(route, {
+      answers,
+      submit_interval_seconds: 1200,
+      last_submitted_at: answers.length ? requestedAt : null,
+    });
+  });
+  await page.goto("/problems");
+  const row = page.locator('a.problem-row[href="/problems/A02"]');
+  await expect(row).toBeVisible();
+  await expect(row.locator(".problem-pending")).toHaveCount(0);
+
+  // 接続直後の ready では再取得しない。
+  const getsBeforeReady = answerGets;
+  await emitSse(page, "/api/v1/contestant/answers/stream", "ready", {});
+  await page.waitForTimeout(600);
+  expect(answerGets).toBe(getsBeforeReady);
+
+  answers = [
+    {
+      number: 1,
+      type: "DESCRIPTIVE",
+      submitted_at: requestedAt,
+      score: null,
+      content_commit: commit,
+    },
+  ];
+  await emitSse(page, "/api/v1/contestant/answers/stream", "answer", {
+    problem_code: "A02",
+    answer_number: 1,
+  });
+  await expect(row.locator(".problem-pending")).toHaveText("提出済み");
+  await expect(page.getByText("読み込み中…")).toHaveCount(0);
 });
 
 test("再提出待ちの間は採点中ではなく待ち時間を表示する", async ({ page }) => {

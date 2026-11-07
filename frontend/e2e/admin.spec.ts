@@ -119,6 +119,8 @@ type ApiState = {
 };
 
 async function installAdminApi(page: Page): Promise<ApiState> {
+  // 画面は回答・再展開の SSE を購読する。実際には接続させない。
+  await installEventSourceMock(page);
   const state: ApiState = {
     answers: [structuredClone(answer)],
     teams: [team],
@@ -834,6 +836,68 @@ test("redeployはQUEUEDを楽観表示しSSE更新・履歴・一回syncのみ�
   const getsAfterSync = state.deploymentGets;
   await page.waitForTimeout(1_000);
   expect(state.deploymentGets).toBe(getsAfterSync);
+});
+
+test("採点看板と概要は提出・再展開をSSEで再読み込みなしに反映する", async ({
+  page,
+}) => {
+  await installEventSourceMock(page);
+  const state = await installAdminApi(page);
+  const secondAnswer = {
+    ...structuredClone(answer),
+    reference: { ...answer.reference, answer_number: 2 },
+    score: null,
+    workflow: {
+      status: "WAITING",
+      assignee_discord_id: null,
+      assignment_source: "DEFAULT",
+      revision: 0,
+    },
+  };
+  const change = {
+    team_code: 12,
+    problem_code: "A01",
+    answer_number: 2,
+    kind: "SUBMITTED",
+  };
+
+  await page.goto("/admin/submissions");
+  const newCard = page.locator('a[href="/admin/submissions/A01/12/2"]');
+  await expect(
+    page.locator('a[href="/admin/submissions/A01/12/1"]'),
+  ).toBeVisible();
+  await expect(newCard).toHaveCount(0);
+  state.answers.push(secondAnswer);
+  await emitSse(page, "/api/v1/admin/answers/stream", "ready", {});
+  await emitSse(page, "/api/v1/admin/answers/stream", "answer", change);
+  await expect(newCard).toBeVisible();
+  await expect(page.getByText("読み込み中…")).toHaveCount(0);
+
+  await page.goto("/admin/");
+  const count = (label: string) =>
+    page
+      .locator(".admin-summary-card")
+      .filter({ hasText: label })
+      .locator(".admin-summary-number");
+  await expect(count("回答")).toHaveText("2");
+  await expect(count("進行中の再展開")).toHaveText("0");
+  state.answers.push({
+    ...secondAnswer,
+    reference: { ...answer.reference, answer_number: 3 },
+  });
+  await emitSse(page, "/api/v1/admin/answers/stream", "answer", {
+    ...change,
+    answer_number: 3,
+  });
+  await expect(count("回答")).toHaveText("3");
+  await emitSse(page, "/api/v1/admin/deployments/stream", "deployment", {
+    deployment: queuedDeployment,
+  });
+  await expect(count("進行中の再展開")).toHaveText("1");
+  await emitSse(page, "/api/v1/admin/deployments/stream", "deployment", {
+    deployment: completedDeployment,
+  });
+  await expect(count("進行中の再展開")).toHaveText("0");
 });
 
 test("運営がチームカラーを保存し再読込できる", async ({ page }, testInfo) => {
