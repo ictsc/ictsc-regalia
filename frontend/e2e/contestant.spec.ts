@@ -190,12 +190,14 @@ test("viewerから問題を開き、再展開のQUEUED表示をSSEで完了へ�
   const allowPostResponse = deferred();
   const deploymentRequests: unknown[] = [];
   let deploymentListRequests = 0;
+  let answerGets = 0;
 
   await installEventSourceMock(page);
   await page.route("**/api/v1/**", async (route) => {
     const request = route.request();
     const path = new URL(request.url()).pathname;
 
+    if (path === "/api/v1/contestant/problems/A01/answers") answerGets += 1;
     if (
       path === "/api/v1/contestant/problems/A01/deployments" &&
       request.method() === "GET"
@@ -333,6 +335,17 @@ test("viewerから問題を開き、再展開のQUEUED表示をSSEで完了へ�
     "deployment",
     { deployment: completedDeployment },
   );
+  await expect(page.getByText(/#1 COMPLETED/)).toBeVisible();
+  await expect(redeployButton).toBeEnabled();
+  expect(deploymentListRequests).toBe(1);
+
+  // 回答の変更では回答だけを取り直し、SSE で得た再展開の状態を保つ。
+  const answerGetsBefore = answerGets;
+  await emitSse(page, "/api/v1/contestant/answers/stream", "answer", {
+    problem_code: "A01",
+    answer_number: 1,
+  });
+  await expect.poll(() => answerGets).toBeGreaterThan(answerGetsBefore);
   await expect(page.getByText(/#1 COMPLETED/)).toBeVisible();
   await expect(redeployButton).toBeEnabled();
   expect(deploymentListRequests).toBe(1);
@@ -785,41 +798,44 @@ test("二次予選モードではチームメイトの提出をSSEで再読み�
   page,
 }) => {
   await installCompetitionApi(page, { resultsHidden: true });
-  let answers: unknown[] = [];
-  let answerGets = 0;
-  await page.route("**/api/v1/contestant/problems/A02/answers", (route) => {
-    answerGets += 1;
-    return fulfillJson(route, {
-      answers,
-      submit_interval_seconds: 1200,
-      last_submitted_at: answers.length ? requestedAt : null,
-    });
+  const answers: Record<string, unknown[]> = { A02: [], A04: [] };
+  const submitted = (number: number) => ({
+    number,
+    type: "DESCRIPTIVE",
+    submitted_at: requestedAt,
+    score: null,
+    content_commit: commit,
   });
-  await page.goto("/problems");
-  const row = page.locator('a.problem-row[href="/problems/A02"]');
-  await expect(row).toBeVisible();
-  await expect(row.locator(".problem-pending")).toHaveCount(0);
-
-  // 接続直後の ready では再取得しない。
-  const getsBeforeReady = answerGets;
-  await emitSse(page, "/api/v1/contestant/answers/stream", "ready", {});
-  await page.waitForTimeout(600);
-  expect(answerGets).toBe(getsBeforeReady);
-
-  answers = [
-    {
-      number: 1,
-      type: "DESCRIPTIVE",
-      submitted_at: requestedAt,
-      score: null,
-      content_commit: commit,
+  await page.route(
+    /\/api\/v1\/contestant\/problems\/(A02|A04)\/answers$/,
+    (route) => {
+      const code = new URL(route.request().url()).pathname.split("/")[5];
+      const list = answers[code] ?? [];
+      return fulfillJson(route, {
+        answers: list,
+        submit_interval_seconds: 1200,
+        last_submitted_at: list.length ? requestedAt : null,
+      });
     },
-  ];
+  );
+  await page.goto("/problems");
+  const row = (code: string) =>
+    page.locator(`a.problem-row[href="/problems/${code}"]`);
+  await expect(row("A02")).toBeVisible();
+  await expect(row("A02").locator(".problem-pending")).toHaveCount(0);
+  await expect(row("A04").locator(".problem-pending")).toHaveCount(0);
+
+  // 初期取得の後、購読が始まる前の提出は ready をきっかけに取り直す。
+  answers.A02 = [submitted(1)];
+  await emitSse(page, "/api/v1/contestant/answers/stream", "ready", {});
+  await expect(row("A02").locator(".problem-pending")).toHaveText("提出済み");
+
+  answers.A04 = [submitted(1)];
   await emitSse(page, "/api/v1/contestant/answers/stream", "answer", {
-    problem_code: "A02",
+    problem_code: "A04",
     answer_number: 1,
   });
-  await expect(row.locator(".problem-pending")).toHaveText("提出済み");
+  await expect(row("A04").locator(".problem-pending")).toHaveText("提出済み");
   await expect(page.getByText("読み込み中…")).toHaveCount(0);
 });
 

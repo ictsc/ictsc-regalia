@@ -900,6 +900,35 @@ test("採点看板と概要は提出・再展開をSSEで再読み込みなし�
   await expect(count("進行中の再展開")).toHaveText("0");
 });
 
+test("概要は再展開一覧の初回取得に失敗してもSSEのsnapshotで復旧する", async ({
+  page,
+}) => {
+  await installAdminApi(page);
+  await page.route("**/api/v1/admin/deployments", (route) =>
+    fulfillJson(
+      route,
+      {
+        type: "about:blank",
+        title: "Internal Server Error",
+        status: 500,
+        detail: "temporary failure",
+        code: "internal_error",
+      },
+      500,
+    ),
+  );
+  await page.goto("/admin/");
+  const count = page
+    .locator(".admin-summary-card")
+    .filter({ hasText: "進行中の再展開" })
+    .locator(".admin-summary-number");
+  await expect(count).toHaveText("—");
+  await emitSse(page, "/api/v1/admin/deployments/stream", "snapshot", {
+    deployments: [queuedDeployment],
+  });
+  await expect(count).toHaveText("1");
+});
+
 test("運営がチームカラーを保存し再読込できる", async ({ page }, testInfo) => {
   const state = await installAdminApi(page);
   await page.goto("/admin/teams/12");

@@ -214,9 +214,25 @@ function connect() {
 }
 onMounted(connect);
 onUnmounted(() => unsubscribe?.());
-// チームメイトの提出や採点で、この問題の回答履歴を更新する。
+// チームメイトの提出や採点で、この問題の回答履歴だけを更新する。
+// refresh() は再展開一覧も取り直し、その間に SSE で届いた再展開の状態を
+// 古いレスポンスで上書きしてしまうので使わない。
+let answersRequest = 0;
+async function refreshAnswers() {
+  const request = ++answersRequest;
+  const [answers, selectedAnswer] = await Promise.all([
+    fetchAnswers(api, code),
+    selectedAnswerNumber == null
+      ? Promise.resolve(null)
+      : fetchAnswer(api, code, selectedAnswerNumber),
+  ]);
+  if (request !== answersRequest || !data.value) return;
+  data.value.answers = answers;
+  data.value.selectedAnswer = selectedAnswer;
+}
 onAnswerChange((change) => {
-  if (change === undefined || change.problem_code === code) void refresh();
+  if (change === undefined || change.problem_code === code)
+    refreshAnswers().catch((e) => console.error("回答履歴の更新に失敗", e));
 });
 async function redeploy() {
   resetOpen.value = false;

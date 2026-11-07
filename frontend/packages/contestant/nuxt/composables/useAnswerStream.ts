@@ -3,7 +3,10 @@ import {
   type ContestantAnswerChange,
 } from "@ictsc/api";
 
-/** undefined は再接続を表し、取りこぼした変更があり得るので全体を再取得する。 */
+/**
+ * undefined は接続(再接続を含む)を表す。初期取得から接続までや切断中の
+ * 変更は届かないので、受け取ったら全体を再取得する。
+ */
 type AnswerChangeListener = (
   change: ContestantAnswerChange | undefined,
 ) => void;
@@ -23,7 +26,6 @@ export function useAnswerStream() {
   const { viewer } = useSession();
   let unsubscribe: (() => void) | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
-  let connected = false;
 
   function scheduleRefresh() {
     clearTimeout(timer);
@@ -38,16 +40,11 @@ export function useAnswerStream() {
   }
 
   function connect() {
-    connected = false;
-    unsubscribe = subscribeContestantAnswerEvents((message) => {
-      if (message.type === "answer") {
-        notify(message.change);
-        return;
-      }
-      // 初回の ready はページの初期取得と重なるので何もしない。
-      if (connected) notify(undefined);
-      connected = true;
-    });
+    // ready は初回接続でも再取得する。ページの初期取得が終わってから
+    // 購読が始まるまでの間の提出を取りこぼさないため。
+    unsubscribe = subscribeContestantAnswerEvents((message) =>
+      notify(message.type === "answer" ? message.change : undefined),
+    );
   }
 
   function disconnect() {

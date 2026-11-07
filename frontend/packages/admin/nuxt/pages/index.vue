@@ -27,28 +27,29 @@ const { data, error, pending, refresh } = await useAsyncData(
   },
 );
 // 回答数と進行中の再展開数を、再読み込みなしで更新する。
+// 取得が重なったときは、最後に始めた取得の結果だけを使う。
+let answersRequest = 0;
 useAdminAnswerStream(async () => {
+  const request = ++answersRequest;
   const answers = await settled(
     api.GET("/api/v1/admin/answers").then(expectData),
   );
-  if (data.value) data.value = { ...data.value, answers };
+  if (request === answersRequest && data.value)
+    data.value = { ...data.value, answers };
 });
 let stopDeployments: (() => void) | undefined;
 onMounted(() => {
   stopDeployments = subscribeAdminDeploymentEvents(
     "/api/v1/admin/deployments/stream",
     (message) => {
-      const current = data.value?.deployments.data;
-      if (!data.value || !current) return;
+      if (!data.value) return;
+      const current = data.value.deployments.data?.deployments;
+      // snapshot は完全な一覧なので、初回取得に失敗していても受け入れる。
+      if (!current && message.type !== "snapshot") return;
+      const deployments = mergeAdminDeployments(current ?? [], message);
       data.value = {
         ...data.value,
-        deployments: {
-          data: {
-            ...current,
-            deployments: mergeAdminDeployments(current.deployments, message),
-          },
-          error: undefined,
-        },
+        deployments: { data: { deployments }, error: undefined },
       };
     },
   );
