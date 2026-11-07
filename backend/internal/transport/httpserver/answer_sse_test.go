@@ -113,3 +113,26 @@ func TestAnswerSSEDeliversSubmissionWorkflowAndMarking(t *testing.T) {
 		}
 	}
 }
+
+func TestAnswerSSERequiresMatchingSession(t *testing.T) {
+	fixture := newContractFixture(t)
+	contestant := fixture.seedContestant(t)
+	team := fixture.createSession(t, session.Data{Kind: session.KindContestant, ContestantName: contestant.Name}, service.ContestantTTL)
+	for _, tc := range []struct {
+		name    string
+		path    string
+		cookies []*http.Cookie
+	}{
+		{"anonymous contestant stream", "/api/v1/contestant/answers/stream", nil},
+		{"anonymous admin stream", "/api/v1/admin/answers/stream", nil},
+		{"contestant on admin stream", "/api/v1/admin/answers/stream", []*http.Cookie{team}},
+	} {
+		response := fixture.request(t, http.MethodGet, tc.path, "", tc.cookies...)
+		if response.Code != http.StatusUnauthorized && response.Code != http.StatusForbidden {
+			t.Errorf("%s: status %d, want 401 or 403; body %s", tc.name, response.Code, response.Body.String())
+		}
+		if strings.Contains(response.Header().Get("Content-Type"), "text/event-stream") {
+			t.Errorf("%s: opened an event stream", tc.name)
+		}
+	}
+}
