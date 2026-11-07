@@ -74,8 +74,7 @@ export type AdminAnswerChange = components["schemas"]["AdminAnswerChange"];
  * 回答の一覧を再取得する。answer は変更された回答の識別子だけを運ぶ。
  */
 export type AnswerStreamMessage<Change> =
-  | { type: "ready" }
-  | { type: "answer"; change: Change };
+  { type: "ready" } | { type: "answer"; change: Change };
 
 export function subscribeContestantAnswerEvents(
   onMessage: (message: AnswerStreamMessage<ContestantAnswerChange>) => void,
