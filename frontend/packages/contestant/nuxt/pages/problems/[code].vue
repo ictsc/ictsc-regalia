@@ -214,6 +214,10 @@ function connect() {
 }
 onMounted(connect);
 onUnmounted(() => unsubscribe?.());
+// チームメイトの提出や採点で、この問題の回答履歴を更新する。
+onAnswerChange((change) => {
+  if (change === undefined || change.problem_code === code) void refresh();
+});
 async function redeploy() {
   resetOpen.value = false;
   deploying.value = true;
