@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { api, expectData } from "@ictsc/api";
+import { api, expectData, subscribeAdminDeploymentEvents } from "@ictsc/api";
+import { mergeAdminDeployments } from "~/features/admin-api";
 import OverviewView, {
   type OverviewCard,
 } from "~/components/overview/OverviewView.vue";
@@ -25,6 +26,34 @@ const { data, error, pending, refresh } = await useAsyncData(
     return { teams, contestants, answers, deployments, content };
   },
 );
+// 回答数と進行中の再展開数を、再読み込みなしで更新する。
+useAdminAnswerStream(async () => {
+  const answers = await settled(
+    api.GET("/api/v1/admin/answers").then(expectData),
+  );
+  if (data.value) data.value = { ...data.value, answers };
+});
+let stopDeployments: (() => void) | undefined;
+onMounted(() => {
+  stopDeployments = subscribeAdminDeploymentEvents(
+    "/api/v1/admin/deployments/stream",
+    (message) => {
+      const current = data.value?.deployments.data;
+      if (!data.value || !current) return;
+      data.value = {
+        ...data.value,
+        deployments: {
+          data: {
+            ...current,
+            deployments: mergeAdminDeployments(current.deployments, message),
+          },
+          error: undefined,
+        },
+      };
+    },
+  );
+});
+onUnmounted(() => stopDeployments?.());
 const cards = computed<OverviewCard[]>(() =>
   data.value
     ? [

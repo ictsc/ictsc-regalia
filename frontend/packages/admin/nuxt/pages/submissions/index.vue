@@ -39,6 +39,8 @@ const secondaryQualifier = computed(() =>
 const busyKey = ref("");
 const actionError = ref("");
 const { now } = useSubmissionAge();
+// 他の運営の担当変更や新しい提出を、再読み込みなしで反映する。
+const { streamError } = useAdminAnswerStream(() => void refresh());
 
 onMounted(() => {
   try {
@@ -143,7 +145,10 @@ async function update(answer: GradingAnswer, change: GradingChange) {
       :team-names="teamNames"
     />
     <p v-if="actionError" role="alert">{{ actionError }}</p>
-    <RequestState :error="error" :pending="pending" @retry="refresh">
+    <p v-if="streamError" role="alert" class="admin-status">
+      状態更新に再接続しています。
+    </p>
+    <RequestState :error="error" :pending="pending && !data" @retry="refresh">
       <GradingBoard
         :answers="filtered"
         :my-discord-id="myDiscordID"
