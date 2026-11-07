@@ -42,9 +42,18 @@ const { data: competition } = await useCompetition();
 const { data: activity } = await useAsyncData("activity", () =>
   fetchActivity(api),
 );
+// 回答履歴と再展開一覧は、全体の取得のほかに SSE や回答だけの取得でも
+// 更新される。全体の取得中にそれらが新しくなったら、古い取得結果で
+// 巻き戻さないよう、その時点の値を残す。
+let answersRequest = 0;
+let latestAnswers: Awaited<ReturnType<typeof fetchAnswers>> | undefined;
+let deploymentsVersion = 0;
+let latestDeployments: Awaited<ReturnType<typeof fetchDeployments>> = [];
 const { data, error, pending, refresh } = await useAsyncData(
   `problem:${code}:answer:${selectedAnswerNumber ?? "none"}`,
   async () => {
+    const request = ++answersRequest;
+    const version = deploymentsVersion;
     const [problem, answers, deployments, selectedAnswer] = await Promise.all([
       fetchProblem(api, code),
       fetchAnswers(api, code),
@@ -53,7 +62,14 @@ const { data, error, pending, refresh } = await useAsyncData(
         ? Promise.resolve(null)
         : fetchAnswer(api, code, selectedAnswerNumber),
     ]);
-    return { problem, answers, deployments, selectedAnswer };
+    return {
+      problem,
+      answers:
+        request !== answersRequest && latestAnswers ? latestAnswers : answers,
+      deployments:
+        version !== deploymentsVersion ? latestDeployments : deployments,
+      selectedAnswer,
+    };
   },
   { deep: true },
 );
@@ -177,7 +193,12 @@ async function submit() {
     await submitAnswer(api, code, body.value, attachments.value);
     attachments.value = [];
     submitted.value = true;
-    await refresh();
+    // 提出で変わるのは回答履歴だけ。全体を取り直すと、その間に SSE で
+    // 届いた再展開の状態を古いレスポンスで上書きしてしまう。
+    // 提出自体は成功しているので、取り直しの失敗はエラー表示にしない。
+    await refreshAnswers().catch((e) =>
+      console.error("回答履歴の更新に失敗", e),
+    );
     await refreshNuxtData(["competition", "activity"]);
   } catch (e) {
     actionError.value = e;
@@ -197,7 +218,8 @@ function connect() {
     (message) => {
       if (!data.value) return;
       streamError.value = false;
-      data.value.deployments =
+      deploymentsVersion++;
+      latestDeployments = data.value.deployments =
         message.type === "snapshot"
           ? message.deployments.map(mapDeployment)
           : [
@@ -215,23 +237,16 @@ function connect() {
 onMounted(connect);
 onUnmounted(() => unsubscribe?.());
 // チームメイトの提出や採点で、この問題の回答履歴だけを更新する。
-// refresh() は再展開一覧も取り直し、その間に SSE で届いた再展開の状態を
-// 古いレスポンスで上書きしてしまうので使わない。
-let answersRequest = 0;
+// 選択中の回答の本文と添付は提出後に変わらないので取り直さない。
 async function refreshAnswers() {
   const request = ++answersRequest;
-  const [answers, selectedAnswer] = await Promise.all([
-    fetchAnswers(api, code),
-    selectedAnswerNumber == null
-      ? Promise.resolve(null)
-      : fetchAnswer(api, code, selectedAnswerNumber),
-  ]);
-  if (request !== answersRequest || !data.value) return;
-  data.value.answers = answers;
-  data.value.selectedAnswer = selectedAnswer;
+  const answers = await fetchAnswers(api, code);
+  if (request !== answersRequest) return;
+  latestAnswers = answers;
+  if (data.value) data.value.answers = answers;
 }
-onAnswerChange((change) => {
-  if (change === undefined || change.problem_code === code)
+onAnswerChange((problemCode) => {
+  if (problemCode === undefined || problemCode === code)
     refreshAnswers().catch((e) => console.error("回答履歴の更新に失敗", e));
 });
 async function redeploy() {
@@ -240,8 +255,9 @@ async function redeploy() {
   actionError.value = undefined;
   try {
     const deployment = await deploy(api, code);
+    deploymentsVersion++;
     if (data.value)
-      data.value.deployments = [
+      latestDeployments = data.value.deployments = [
         data.value.deployments.find(
           (d) => d.revision === deployment.revision && d.status !== "QUEUED",
         ) ?? deployment,

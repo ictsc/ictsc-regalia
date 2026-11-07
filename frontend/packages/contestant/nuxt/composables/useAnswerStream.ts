@@ -5,12 +5,11 @@ import {
 } from "@ictsc/api";
 
 /**
- * undefined は接続(再接続を含む)を表す。初期取得から接続までや切断中の
- * 変更は届かないので、受け取ったら全体を再取得する。
+ * 回答が変わった問題のコードを受け取る。まとめた変更ごとに、問題 1 つに
+ * つき 1 回だけ呼ぶ。undefined は接続(再接続を含む)を表す。初期取得から
+ * 接続までや切断中の変更は届かないので、受け取ったら全体を再取得する。
  */
-type AnswerChangeListener = (
-  change: ContestantAnswerChange | undefined,
-) => void;
+type AnswerChangeListener = (problemCode: string | undefined) => void;
 
 const listeners = new Set<AnswerChangeListener>();
 
@@ -31,8 +30,9 @@ export function useAnswerStream() {
         for (const listener of listeners) listener(undefined);
         return;
       }
-      for (const change of changes)
-        for (const listener of listeners) listener(change);
+      const problems = new Set(changes.map((change) => change.problem_code));
+      for (const problem of problems)
+        for (const listener of listeners) listener(problem);
     },
   );
 

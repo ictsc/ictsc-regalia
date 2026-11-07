@@ -340,12 +340,16 @@ test("viewerから問題を開き、再展開のQUEUED表示をSSEで完了へ�
   expect(deploymentListRequests).toBe(1);
 
   // 回答の変更では回答だけを取り直し、SSE で得た再展開の状態を保つ。
+  // 同じ問題への変更が続いても、まとめて 1 回だけ取り直す。
   const answerGetsBefore = answerGets;
-  await emitSse(page, "/api/v1/contestant/answers/stream", "answer", {
-    problem_code: "A01",
-    answer_number: 1,
-  });
+  for (const answerNumber of [1, 1, 2])
+    await emitSse(page, "/api/v1/contestant/answers/stream", "answer", {
+      problem_code: "A01",
+      answer_number: answerNumber,
+    });
   await expect.poll(() => answerGets).toBeGreaterThan(answerGetsBefore);
+  await page.waitForTimeout(600);
+  expect(answerGets).toBe(answerGetsBefore + 1);
   await expect(page.getByText(/#1 COMPLETED/)).toBeVisible();
   await expect(redeployButton).toBeEnabled();
   expect(deploymentListRequests).toBe(1);
