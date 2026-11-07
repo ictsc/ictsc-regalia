@@ -95,7 +95,7 @@ func New(svc *service.Service, options Options) (http.Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	return telemetry.HTTPHandler(limitRequestBody(validator(responseValidated))), nil
+	return unblockStreamsOnShutdown(options.StreamsDone, telemetry.HTTPHandler(limitRequestBody(validator(responseValidated)))), nil
 }
 
 // maxRequestBodyBytes bounds every request body before it is read. An answer

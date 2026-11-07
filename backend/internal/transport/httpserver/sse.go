@@ -3,6 +3,7 @@ package httpserver
 import (
 	"context"
 	"io"
+	"net/http"
 	"time"
 
 	"github.com/ictsc/ictsc-regalia/backend/internal/service"
@@ -54,4 +55,32 @@ func (h *Handler) streamSubscription(ctx context.Context, writer io.Writer, subs
 			}
 		}
 	}
+}
+
+// unblockStreamsOnShutdown lets SSE responses end promptly at shutdown even
+// when a client stopped reading. Without it, a write stuck on a full TCP
+// buffer would keep both the response and the stream producer from seeing
+// StreamsDone, and Shutdown would wait for its whole grace period. Moving the
+// write deadline to now fails that write, the response returns and closes
+// the pipe, and the producer's next write fails too.
+func unblockStreamsOnShutdown(done <-chan struct{}, next http.Handler) http.Handler {
+	if done == nil {
+		return next
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !isSSEPath(r.URL.Path) {
+			next.ServeHTTP(w, r)
+			return
+		}
+		finished := make(chan struct{})
+		defer close(finished)
+		go func() {
+			select {
+			case <-done:
+				_ = http.NewResponseController(w).SetWriteDeadline(time.Now())
+			case <-finished:
+			}
+		}()
+		next.ServeHTTP(w, r)
+	})
 }
