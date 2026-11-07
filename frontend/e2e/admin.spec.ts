@@ -119,6 +119,8 @@ type ApiState = {
 };
 
 async function installAdminApi(page: Page): Promise<ApiState> {
+  // 画面は回答・再展開の SSE を購読する。実際には接続させない。
+  await installEventSourceMock(page);
   const state: ApiState = {
     answers: [structuredClone(answer)],
     teams: [team],
@@ -834,6 +836,217 @@ test("redeployはQUEUEDを楽観表示しSSE更新・履歴・一回syncのみ�
   const getsAfterSync = state.deploymentGets;
   await page.waitForTimeout(1_000);
   expect(state.deploymentGets).toBe(getsAfterSync);
+});
+
+test("採点看板と概要は提出・再展開をSSEで再読み込みなしに反映する", async ({
+  page,
+}) => {
+  await installEventSourceMock(page);
+  const state = await installAdminApi(page);
+  const secondAnswer = {
+    ...structuredClone(answer),
+    reference: { ...answer.reference, answer_number: 2 },
+    score: null,
+    workflow: {
+      status: "WAITING",
+      assignee_discord_id: null,
+      assignment_source: "DEFAULT",
+      revision: 0,
+    },
+  };
+  const change = {
+    team_code: 12,
+    problem_code: "A01",
+    answer_number: 2,
+    kind: "SUBMITTED",
+  };
+
+  await page.goto("/admin/submissions");
+  const newCard = page.locator('a[href="/admin/submissions/A01/12/2"]');
+  await expect(
+    page.locator('a[href="/admin/submissions/A01/12/1"]'),
+  ).toBeVisible();
+  await expect(newCard).toHaveCount(0);
+  state.answers.push(secondAnswer);
+  await emitSse(page, "/api/v1/admin/answers/stream", "ready", {});
+  await emitSse(page, "/api/v1/admin/answers/stream", "answer", change);
+  await expect(newCard).toBeVisible();
+  await expect(page.getByText("読み込み中…")).toHaveCount(0);
+
+  await page.goto("/admin/");
+  const count = (label: string) =>
+    page
+      .locator(".admin-summary-card")
+      .filter({ hasText: label })
+      .locator(".admin-summary-number");
+  await expect(count("回答")).toHaveText("2");
+  await expect(count("進行中の再展開")).toHaveText("0");
+  state.answers.push({
+    ...secondAnswer,
+    reference: { ...answer.reference, answer_number: 3 },
+  });
+  await emitSse(page, "/api/v1/admin/answers/stream", "answer", {
+    ...change,
+    answer_number: 3,
+  });
+  await expect(count("回答")).toHaveText("3");
+  await emitSse(page, "/api/v1/admin/deployments/stream", "deployment", {
+    deployment: queuedDeployment,
+  });
+  await expect(count("進行中の再展開")).toHaveText("1");
+  await emitSse(page, "/api/v1/admin/deployments/stream", "deployment", {
+    deployment: completedDeployment,
+  });
+  await expect(count("進行中の再展開")).toHaveText("0");
+});
+
+test("採点看板は遅れて届いた担当変更のレスポンスでSSEの新しい状態を巻き戻さない", async ({
+  page,
+}) => {
+  await installEventSourceMock(page);
+  const state = await installAdminApi(page);
+  const second = {
+    ...structuredClone(answer),
+    reference: { ...answer.reference, answer_number: 2 },
+    score: null,
+    workflow: {
+      status: "WAITING",
+      assignee_discord_id: null as string | null,
+      assignment_source: "DEFAULT",
+      revision: 0,
+    },
+  };
+  state.answers.push(second);
+  let releasePatch!: () => void;
+  const patchHeld = new Promise<void>((resolve) => (releasePatch = resolve));
+  let patchStarted!: () => void;
+  const patchSeen = new Promise<void>((resolve) => (patchStarted = resolve));
+  await page.route("**/api/v1/admin/answers/12/A01/2/workflow", async (route) => {
+    patchStarted();
+    await patchHeld;
+    // 自分の引き受け(revision 1)のレスポンス。届く前に他の運営が更新している。
+    await fulfillJson(route, {
+      answer: {
+        ...second,
+        workflow: {
+          status: "WAITING",
+          assignee_discord_id: "123456789012345678",
+          assignment_source: "CLAIMED",
+          revision: 1,
+        },
+      },
+    });
+  });
+
+  await page.goto("/admin/submissions/");
+  const waiting = page.getByRole("region", { name: "採点待ち" });
+  const inProgress = page.getByRole("region", { name: "採点中" });
+  const card = waiting
+    .locator(".grading-card")
+    .filter({ hasText: "Existing Team / #2" });
+  await card.getByRole("button", { name: "自分が引き受ける" }).click();
+  await patchSeen;
+
+  second.workflow = {
+    status: "IN_PROGRESS",
+    assignee_discord_id: "999999999999999999",
+    assignment_source: "CLAIMED",
+    revision: 2,
+  };
+  await emitSse(page, "/api/v1/admin/answers/stream", "answer", {
+    team_code: 12,
+    problem_code: "A01",
+    answer_number: 2,
+    kind: "WORKFLOW",
+  });
+  await expect(inProgress.getByText("Existing Team / #2")).toBeVisible();
+
+  releasePatch();
+  await expect(page.getByText("読み込み中…")).toHaveCount(0);
+  await page.waitForTimeout(300);
+  await expect(inProgress.getByText("Existing Team / #2")).toBeVisible();
+  await expect(waiting.getByText("Existing Team / #2")).toHaveCount(0);
+});
+
+test("概要は再試行の取得中にSSEで届いた再展開の完了を巻き戻さない", async ({
+  page,
+}) => {
+  await installEventSourceMock(page);
+  await installAdminApi(page);
+  let contentFails = true;
+  await page.route("**/api/v1/admin/content/status", (route) =>
+    contentFails
+      ? fulfillJson(
+          route,
+          {
+            type: "about:blank",
+            title: "Internal Server Error",
+            status: 500,
+            detail: "temporary failure",
+            code: "internal_error",
+          },
+          500,
+        )
+      : route.fallback(),
+  );
+  let deploymentGets = 0;
+  let releaseRetry!: () => void;
+  const retryHeld = new Promise<void>((resolve) => (releaseRetry = resolve));
+  await page.route("**/api/v1/admin/deployments", async (route) => {
+    if (route.request().method() !== "GET") return route.fallback();
+    deploymentGets += 1;
+    // 再試行の取得は、SSE の完了通知より後に古い一覧を返す。
+    if (deploymentGets > 1) await retryHeld;
+    await fulfillJson(route, { deployments: [queuedDeployment] });
+  });
+
+  await page.goto("/admin/");
+  const count = page
+    .locator(".admin-summary-card")
+    .filter({ hasText: "進行中の再展開" })
+    .locator(".admin-summary-number");
+  await expect(count).toHaveText("1");
+  contentFails = false;
+  await page.getByRole("button", { name: "再試行" }).click();
+  await expect.poll(() => deploymentGets).toBe(2);
+  await emitSse(page, "/api/v1/admin/deployments/stream", "deployment", {
+    deployment: completedDeployment,
+  });
+  // 再試行中は概要全体が読み込み表示になるので、終わってから確かめる。
+  releaseRetry();
+  await expect(page.getByText("取得できませんでした")).toHaveCount(0);
+  await expect(count).toHaveText("0");
+  await page.waitForTimeout(300);
+  await expect(count).toHaveText("0");
+});
+
+test("概要は再展開一覧の初回取得に失敗してもSSEのsnapshotで復旧する", async ({
+  page,
+}) => {
+  await installAdminApi(page);
+  await page.route("**/api/v1/admin/deployments", (route) =>
+    fulfillJson(
+      route,
+      {
+        type: "about:blank",
+        title: "Internal Server Error",
+        status: 500,
+        detail: "temporary failure",
+        code: "internal_error",
+      },
+      500,
+    ),
+  );
+  await page.goto("/admin/");
+  const count = page
+    .locator(".admin-summary-card")
+    .filter({ hasText: "進行中の再展開" })
+    .locator(".admin-summary-number");
+  await expect(count).toHaveText("—");
+  await emitSse(page, "/api/v1/admin/deployments/stream", "snapshot", {
+    deployments: [queuedDeployment],
+  });
+  await expect(count).toHaveText("1");
 });
 
 test("運営がチームカラーを保存し再読込できる", async ({ page }, testInfo) => {

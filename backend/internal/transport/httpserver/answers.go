@@ -226,6 +226,9 @@ func (h *Handler) UpdateAdminAnswerWorkflow(ctx context.Context, request api.Upd
 	if _, err := h.service.Store.UpdateAnswerWorkflow(ctx, request.TeamCode, request.ProblemCode, request.AnswerNumber, update); err != nil {
 		return nil, err
 	}
+	h.service.PublishAnswerChange(ctx, core.AnswerChange{
+		TeamCode: request.TeamCode, ProblemCode: request.ProblemCode, AnswerNumber: request.AnswerNumber, Kind: core.AnswerWorkflowChanged,
+	})
 	answer, err := h.service.Store.GetAnswer(ctx, request.TeamCode, request.ProblemCode, request.AnswerNumber)
 	if err != nil {
 		return nil, err
@@ -316,6 +319,9 @@ func (h *Handler) CreateAdminMarkingResult(ctx context.Context, request api.Crea
 	if err != nil {
 		return nil, err
 	}
+	h.service.PublishAnswerChange(ctx, core.AnswerChange{
+		TeamCode: result.TeamCode, ProblemCode: result.ProblemCode, AnswerNumber: result.AnswerNumber, Kind: core.AnswerMarked,
+	})
 	return api.CreateAdminMarkingResult201JSONResponse{MarkingResult: toAPIMarking(result)}, nil
 }
 
@@ -324,6 +330,9 @@ func (h *Handler) DeleteAdminMarkingLineComment(ctx context.Context, request api
 	if err != nil {
 		return nil, err
 	}
+	h.service.PublishAnswerChange(ctx, core.AnswerChange{
+		TeamCode: result.TeamCode, ProblemCode: result.ProblemCode, AnswerNumber: result.AnswerNumber, Kind: core.AnswerMarked,
+	})
 	return api.DeleteAdminMarkingLineComment200JSONResponse{MarkingResult: toAPIMarking(result)}, nil
 }
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { api, expectData } from "@ictsc/api";
+import { api, expectData, subscribeAdminDeploymentEvents } from "@ictsc/api";
+import { mergeAdminDeployments } from "~/features/admin-api";
 import OverviewView, {
   type OverviewCard,
 } from "~/components/overview/OverviewView.vue";
@@ -11,20 +12,69 @@ async function settled<T>(p: Promise<T>) {
     return { data: undefined, error };
   }
 }
+const loadAnswers = () =>
+  settled(api.GET("/api/v1/admin/answers").then(expectData));
+const loadDeployments = () =>
+  settled(api.GET("/api/v1/admin/deployments").then(expectData));
+// 回答数と再展開一覧は、全体の取得のほかに SSE でも更新される。
+// 全体の取得(再試行)中にそれらが新しくなったら、古い取得結果で
+// 巻き戻さないよう、その時点の値を残す。
+let answersRequest = 0;
+let latestAnswers: Awaited<ReturnType<typeof loadAnswers>> | undefined;
+let deploymentsVersion = 0;
+let latestDeployments: Awaited<ReturnType<typeof loadDeployments>> | undefined;
 const { data, error, pending, refresh } = await useAsyncData(
   "admin-overview",
   async () => {
+    const request = ++answersRequest;
+    const version = deploymentsVersion;
     const [teams, contestants, answers, deployments, content] =
       await Promise.all([
         settled(api.GET("/api/v1/admin/teams").then(expectData)),
         settled(api.GET("/api/v1/admin/contestants").then(expectData)),
-        settled(api.GET("/api/v1/admin/answers").then(expectData)),
-        settled(api.GET("/api/v1/admin/deployments").then(expectData)),
+        loadAnswers(),
+        loadDeployments(),
         settled(api.GET("/api/v1/admin/content/status").then(expectData)),
       ]);
-    return { teams, contestants, answers, deployments, content };
+    return {
+      teams,
+      contestants,
+      answers:
+        request !== answersRequest && latestAnswers ? latestAnswers : answers,
+      deployments:
+        version !== deploymentsVersion && latestDeployments
+          ? latestDeployments
+          : deployments,
+      content,
+    };
   },
 );
+// 回答数と進行中の再展開数を、再読み込みなしで更新する。
+// 取得が重なったときは、最後に始めた取得の結果だけを使う。
+useAdminAnswerStream(async () => {
+  const request = ++answersRequest;
+  const answers = await loadAnswers();
+  if (request !== answersRequest) return;
+  latestAnswers = answers;
+  if (data.value) data.value = { ...data.value, answers };
+});
+let stopDeployments: (() => void) | undefined;
+onMounted(() => {
+  stopDeployments = subscribeAdminDeploymentEvents(
+    "/api/v1/admin/deployments/stream",
+    (message) => {
+      if (!data.value) return;
+      const current = data.value.deployments.data?.deployments;
+      // snapshot は完全な一覧なので、初回取得に失敗していても受け入れる。
+      if (!current && message.type !== "snapshot") return;
+      const deployments = mergeAdminDeployments(current ?? [], message);
+      deploymentsVersion++;
+      latestDeployments = { data: { deployments }, error: undefined };
+      data.value = { ...data.value, deployments: latestDeployments };
+    },
+  );
+});
+onUnmounted(() => stopDeployments?.());
 const cards = computed<OverviewCard[]>(() =>
   data.value
     ? [

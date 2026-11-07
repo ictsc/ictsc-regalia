@@ -27,6 +27,10 @@ type Options struct {
 	AllowedOrigins      []string
 	SStateCallbackToken string
 	ReadTimeout         time.Duration
+	// StreamsDone is closed when the server starts shutting down. Open SSE
+	// streams then end, because they never finish on their own and
+	// http.Server.Shutdown would otherwise wait for its full timeout.
+	StreamsDone <-chan struct{}
 }
 type cookieJarKey struct{}
 
@@ -91,7 +95,7 @@ func New(svc *service.Service, options Options) (http.Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	return telemetry.HTTPHandler(limitRequestBody(validator(responseValidated))), nil
+	return unblockStreamsOnShutdown(options.StreamsDone, telemetry.HTTPHandler(limitRequestBody(validator(responseValidated)))), nil
 }
 
 // maxRequestBodyBytes bounds every request body before it is read. An answer

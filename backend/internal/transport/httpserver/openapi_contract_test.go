@@ -51,8 +51,8 @@ func TestOpenAPIContractIsValidAndDeclaresTransportErrors(t *testing.T) {
 			}
 		}
 	}
-	if operationCount != 70 {
-		t.Errorf("operation count = %d, want 70", operationCount)
+	if operationCount != 72 {
+		t.Errorf("operation count = %d, want 72", operationCount)
 	}
 }
 

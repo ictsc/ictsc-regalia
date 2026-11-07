@@ -72,6 +72,7 @@ func newContractFixture(t *testing.T) *contractFixture {
 	})
 	svc.Discord = fakeDiscord{}
 	svc.Events = memory.NewEventBus()
+	svc.AnswerEvents = memory.NewEventBus()
 	svc.Now = func() time.Time { return testNow }
 	handler, err := New(svc, Options{
 		SecureCookies:       true,
@@ -524,8 +525,8 @@ func TestGeneratedRouterRegistersEveryOpenAPIOperation(t *testing.T) {
 
 	missing := setDifference(want, got)
 	extra := setDifference(got, want)
-	if len(want) != 70 {
-		t.Errorf("OpenAPI operation count = %d, want 70", len(want))
+	if len(want) != 72 {
+		t.Errorf("OpenAPI operation count = %d, want 72", len(want))
 	}
 	if len(missing) != 0 || len(extra) != 0 {
 		t.Errorf("generated route mismatch\nmissing: %v\nextra: %v", missing, extra)

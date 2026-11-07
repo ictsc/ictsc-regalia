@@ -163,6 +163,24 @@ type Answer struct {
 	Attachments []AnswerAttachment
 }
 
+// AnswerChangeKind says what changed on an answer.
+type AnswerChangeKind string
+
+const (
+	AnswerSubmitted       AnswerChangeKind = "SUBMITTED"
+	AnswerWorkflowChanged AnswerChangeKind = "WORKFLOW"
+	AnswerMarked          AnswerChangeKind = "MARKED"
+)
+
+// AnswerChange is published on every answer change. It carries only the
+// answer's identity so that subscribers refetch what they are allowed to see.
+type AnswerChange struct {
+	TeamCode     int64            `json:"team_code"`
+	ProblemCode  string           `json:"problem_code"`
+	AnswerNumber int32            `json:"answer_number"`
+	Kind         AnswerChangeKind `json:"kind"`
+}
+
 // AnswerAttachment is a text log submitted with an answer.
 type AnswerAttachment struct {
 	Name    string

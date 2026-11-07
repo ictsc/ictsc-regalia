@@ -18,6 +18,7 @@ import (
 	webpushadapter "github.com/ictsc/ictsc-regalia/backend/internal/adapter/webpush"
 	"github.com/ictsc/ictsc-regalia/backend/internal/config"
 	"github.com/ictsc/ictsc-regalia/backend/internal/core"
+	"github.com/ictsc/ictsc-regalia/backend/internal/infra/fanout"
 	"github.com/ictsc/ictsc-regalia/backend/internal/infra/memory"
 	"github.com/ictsc/ictsc-regalia/backend/internal/infra/postgres"
 	redisinfra "github.com/ictsc/ictsc-regalia/backend/internal/infra/redis"
@@ -74,7 +75,8 @@ func run() error {
 		SecondaryQualifierMode: cfg.SecondaryQualifierMode,
 		DevTools:               cfg.DevFakeMode,
 	})
-	svc.Discord, svc.Content, svc.Deployments, svc.Events = discordClient, contentClient, deploymentClient, events
+	svc.Discord, svc.Content, svc.Deployments = discordClient, contentClient, deploymentClient
+	svc.Events, svc.AnswerEvents = events.deployments, events.answers
 	if cfg.WebPushVAPIDPublicKey != "" {
 		svc.WebPush = webpushadapter.New(webpushadapter.Config{
 			Subject: cfg.WebPushVAPIDSubject, PublicKey: cfg.WebPushVAPIDPublicKey, PrivateKey: cfg.WebPushVAPIDPrivateKey,
@@ -85,9 +87,11 @@ func run() error {
 	if _, ok := deploymentClient.(service.DeploymentProber); ok {
 		go runDeploymentPoller(ctx, svc, cfg.RStatePollInterval)
 	}
+	streamsDone := make(chan struct{})
 	handler, err := httpserver.New(svc, httpserver.Options{
 		SecureCookies: cfg.SecureCookies, AllowedOrigins: cfg.AllowedOrigins,
 		SStateCallbackToken: cfg.SStateCallbackToken, ReadTimeout: cfg.ReadHeaderTimeout,
+		StreamsDone: streamsDone,
 	})
 	if err != nil {
 		return fmt.Errorf("build HTTP router: %w", err)
@@ -96,6 +100,9 @@ func run() error {
 		Addr: cfg.Address, Handler: handler, ReadHeaderTimeout: cfg.ReadHeaderTimeout,
 		ReadTimeout: cfg.ReadHeaderTimeout, WriteTimeout: 0, IdleTimeout: cfg.ReadHeaderTimeout * 12,
 	}
+	// Shutdown waits for active requests; end SSE streams so it waits only
+	// for ordinary requests, and browsers reconnect to another instance.
+	server.RegisterOnShutdown(func() { close(streamsDone) })
 	serverErrors := make(chan error, 1)
 	go func() { serverErrors <- server.ListenAndServe() }()
 	select {
@@ -149,27 +156,39 @@ func runDeploymentPoller(ctx context.Context, svc *service.Service, interval tim
 	}
 }
 
-func runtimeStores(ctx context.Context, cfg config.Runtime) (core.Store, session.Store, service.EventBus, func(), error) {
+// eventBuses holds one bus per realtime stream so that subscribers decode only
+// the events they expect.
+type eventBuses struct {
+	deployments service.EventBus
+	answers     service.EventBus
+}
+
+func runtimeStores(ctx context.Context, cfg config.Runtime) (core.Store, session.Store, eventBuses, func(), error) {
 	if cfg.DevFakeMode && cfg.DatabaseURL == "" && cfg.RedisURL == "" {
-		return memory.NewCompetitionStore(), memory.NewSessionStore(), memory.NewEventBus(), func() {}, nil
+		return memory.NewCompetitionStore(), memory.NewSessionStore(), eventBuses{deployments: memory.NewEventBus(), answers: memory.NewEventBus()}, func() {}, nil
 	}
 	if cfg.DatabaseURL == "" || cfg.RedisURL == "" {
-		return nil, nil, nil, nil, fmt.Errorf("ICTSC_DATABASE_URL and ICTSC_REDIS_URL must either both be set or both be empty in development fake mode")
+		return nil, nil, eventBuses{}, nil, fmt.Errorf("ICTSC_DATABASE_URL and ICTSC_REDIS_URL must either both be set or both be empty in development fake mode")
 	}
 	store, err := postgres.Open(ctx, cfg.DatabaseURL)
 	if err != nil {
-		return nil, nil, nil, nil, fmt.Errorf("open PostgreSQL: %w", err)
+		return nil, nil, eventBuses{}, nil, fmt.Errorf("open PostgreSQL: %w", err)
 	}
 	redisStore, err := redisinfra.Open(ctx, cfg.RedisURL)
 	if err != nil {
 		store.Close()
-		return nil, nil, nil, nil, fmt.Errorf("open Redis: %w", err)
+		return nil, nil, eventBuses{}, nil, fmt.Errorf("open Redis: %w", err)
 	}
 	cleanup := func() {
 		_ = redisStore.Close()
 		store.Close()
 	}
-	return store, redisStore, redisinfra.NewDeploymentBus(redisStore), cleanup, nil
+	return store, redisStore, eventBuses{
+		// One Redis subscription per channel per instance, shared by every
+		// open SSE stream.
+		deployments: fanout.New(redisinfra.NewDeploymentBus(redisStore)),
+		answers:     fanout.New(redisinfra.NewAnswerBus(redisStore)),
+	}, cleanup, nil
 }
 
 func runtimeAdapters(cfg config.Runtime) (service.Discord, service.ContentSource, service.DeploymentGateway, error) {

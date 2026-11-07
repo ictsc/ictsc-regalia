@@ -39,6 +39,8 @@ const secondaryQualifier = computed(() =>
 const busyKey = ref("");
 const actionError = ref("");
 const { now } = useSubmissionAge();
+// 他の運営の担当変更や新しい提出を、再読み込みなしで反映する。
+const { streamError } = useAdminAnswerStream(() => void refresh());
 
 onMounted(() => {
   try {
@@ -105,11 +107,16 @@ async function update(answer: GradingAnswer, change: GradingChange) {
   actionError.value = "";
   try {
     const updated = await updateAdminAnswerWorkflow(api, answer, change);
+    // 待っている間に SSE の再取得がより新しい版を読み込んでいたら、
+    // 古い PATCH のレスポンスで巻き戻さない。
     if (data.value)
       data.value = {
         ...data.value,
         answers: data.value.answers.map((a) =>
-          answerKey(a) === answerKey(answer) ? updated : a,
+          answerKey(a) === answerKey(answer) &&
+          updated.workflow.revision >= a.workflow.revision
+            ? updated
+            : a,
         ),
       };
   } catch (cause) {
@@ -143,7 +150,10 @@ async function update(answer: GradingAnswer, change: GradingChange) {
       :team-names="teamNames"
     />
     <p v-if="actionError" role="alert">{{ actionError }}</p>
-    <RequestState :error="error" :pending="pending" @retry="refresh">
+    <p v-if="streamError" role="alert" class="admin-status">
+      状態更新に再接続しています。
+    </p>
+    <RequestState :error="error" :pending="pending && !data" @retry="refresh">
       <GradingBoard
         :answers="filtered"
         :my-discord-id="myDiscordID"

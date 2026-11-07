@@ -41,7 +41,7 @@ const items = computed<ProblemListItem[]>(() =>
     <ProblemListView
       :items="items"
       :results-hidden="resultsHidden"
-      :pending="pending"
+      :pending="pending && !data"
       :error="error"
       @retry="refresh"
     />

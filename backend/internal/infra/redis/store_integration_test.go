@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ictsc/ictsc-regalia/backend/internal/infra/fanout"
+	"github.com/ictsc/ictsc-regalia/backend/internal/service"
 	"github.com/ictsc/ictsc-regalia/backend/internal/session"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -119,6 +121,89 @@ func TestRedisStoreIntegration(t *testing.T) {
 
 		if err := store.Delete(t.Context(), token); err != nil {
 			t.Fatalf("idempotently delete expired session: %v", err)
+		}
+	})
+
+	t.Run("ends answer subscriptions when Redis drops the connection", func(t *testing.T) {
+		subscriberStore, err := Open(t.Context(), rawURL)
+		if err != nil {
+			t.Fatalf("open subscriber Redis store: %v", err)
+		}
+		t.Cleanup(func() { _ = subscriberStore.Close() })
+		adminStore, err := Open(t.Context(), rawURL)
+		if err != nil {
+			t.Fatalf("open admin Redis store: %v", err)
+		}
+		t.Cleanup(func() { _ = adminStore.Close() })
+
+		subscription, err := NewAnswerBus(subscriberStore).Subscribe(t.Context())
+		if err != nil {
+			t.Fatalf("subscribe to answer bus: %v", err)
+		}
+		t.Cleanup(func() { _ = subscription.Close() })
+		// go-redis reconnects by itself; events published meanwhile are lost,
+		// so the subscription must end and let SSE clients reconnect.
+		if err := adminStore.client.Do(t.Context(), "CLIENT", "KILL", "TYPE", "pubsub").Err(); err != nil {
+			t.Fatalf("kill Pub/Sub connections: %v", err)
+		}
+		select {
+		case _, ok := <-subscription.Messages():
+			if ok {
+				t.Fatal("received a message instead of the subscription ending")
+			}
+		case <-time.After(10 * time.Second):
+			t.Fatal("subscription did not end after Redis dropped the connection")
+		}
+	})
+
+	t.Run("shares one Redis subscription among fan-out subscribers", func(t *testing.T) {
+		store, err := Open(t.Context(), rawURL)
+		if err != nil {
+			t.Fatalf("open Redis store: %v", err)
+		}
+		t.Cleanup(func() { _ = store.Close() })
+		bus := fanout.New(NewAnswerBus(store))
+		var subscriptions []service.Subscription
+		for range 3 {
+			subscription, err := bus.Subscribe(t.Context())
+			if err != nil {
+				t.Fatalf("subscribe: %v", err)
+			}
+			t.Cleanup(func() { _ = subscription.Close() })
+			subscriptions = append(subscriptions, subscription)
+		}
+		counts, err := store.client.PubSubNumSub(t.Context(), answerChannel).Result()
+		if err != nil {
+			t.Fatalf("count subscribers: %v", err)
+		}
+		if counts[answerChannel] != 1 {
+			t.Fatalf("Redis subscribers = %d, want 1", counts[answerChannel])
+		}
+		if err := bus.Publish(t.Context(), []byte("change")); err != nil {
+			t.Fatalf("publish: %v", err)
+		}
+		for _, subscription := range subscriptions {
+			select {
+			case got := <-subscription.Messages():
+				if string(got) != "change" {
+					t.Fatalf("payload = %q", got)
+				}
+			case <-time.After(5 * time.Second):
+				t.Fatal("timed out waiting for fan-out delivery")
+			}
+		}
+		if err := store.client.Do(t.Context(), "CLIENT", "KILL", "TYPE", "pubsub").Err(); err != nil {
+			t.Fatalf("kill Pub/Sub connections: %v", err)
+		}
+		for _, subscription := range subscriptions {
+			select {
+			case _, ok := <-subscription.Messages():
+				if ok {
+					t.Fatal("received a message instead of the subscription ending")
+				}
+			case <-time.After(10 * time.Second):
+				t.Fatal("fan-out subscriber did not end after Redis dropped the connection")
+			}
 		}
 	})
 

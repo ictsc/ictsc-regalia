@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { teamStyle } from "@ictsc/ui/colors";
 const { viewer } = useSession();
+useAnswerStream();
 </script>
 <template>
   <div
